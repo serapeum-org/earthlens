@@ -273,14 +273,31 @@ class Catalog(AbstractCatalog):
         return self.datasets
 
     def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no products were supplied.
+        """Auto-load the bundled catalog and verify alias uniqueness.
+
+        An alias that appears on more than one row would silently
+        shadow the later row in :meth:`resolve` (the loop returns
+        the first match). Catch the typo at construction so the
+        broken catalog fails fast.
 
         Raises:
             ValueError: Propagated from :meth:`load` when the YAML
-                is missing, empty, or has a malformed row.
+                is missing, empty, or has a malformed row; or when
+                an alias is reused across two product rows.
         """
         if not self.datasets:
             self.datasets = Catalog.load().datasets
+        seen: dict[str, str] = {}
+        for canonical, row in self.datasets.items():
+            for alias in row.aliases:
+                prior = seen.get(alias)
+                if prior is not None:
+                    raise ValueError(
+                        f"alias {alias!r} appears on both {prior!r} and "
+                        f"{canonical!r}; aliases must be unique across "
+                        "the ASF catalog"
+                    )
+                seen[alias] = canonical
         super().model_post_init(__context)
 
     @classmethod

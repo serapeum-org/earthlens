@@ -3,11 +3,39 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from earthlens.asf import ASF
 from earthlens.base import RemoteProduct
+
+
+def _build_capturing_results_cls(captured_fileNames: list[list[str]]) -> type:
+    """Subclass the conftest fake to record per-call fileNames into a shared list.
+
+    Builds a `_FakeResults` subclass whose `download` appends the
+    fileNames it was handed onto `captured_fileNames` and then delegates
+    to the base implementation (which writes the tiny per-product
+    files). Hoisted out of the test body so it does not violate the
+    "no nested function defs" convention.
+    """
+    from tests.asf.conftest import _FakeResults
+
+    class _CapturingResults(_FakeResults):
+        def download(
+            self,
+            path: str,
+            session: Any = None,
+            processes: int = 1,
+            fileType: Any = None,
+        ) -> None:
+            captured_fileNames.append(
+                [product.properties["fileName"] for product in self]
+            )
+            super().download(path, session, processes, fileType)
+
+    return _CapturingResults
 
 
 def _fake_remote_product(fake_asf_search_module, scene: str) -> RemoteProduct:
@@ -59,7 +87,7 @@ def test_fetch_is_idempotent_skips_existing_files(
     fake_asf_search, fake_earthdata_auth, tmp_path: Path
 ) -> None:
     """A product already on disk is not re-downloaded."""
-    from tests.asf.conftest import _FakeProduct, _FakeResults
+    from tests.asf.conftest import _FakeProduct
 
     fake_asf_search.search_results = [
         _FakeProduct(sceneName="S1A_PRESENT"),
@@ -78,15 +106,7 @@ def test_fetch_is_idempotent_skips_existing_files(
     (tmp_path / "S1A_PRESENT.zip").write_bytes(b"already-here")
     # Capture the fileNames actually passed to the SDK's download.
     captured: list[list[str]] = []
-
-    class _CapturingResults(_FakeResults):
-        def download(self, path, session=None, processes=1, fileType=None):
-            captured.append(
-                [product.properties["fileName"] for product in self]
-            )
-            super().download(path, session, processes, fileType)
-
-    fake_asf_search.ASFSearchResults = _CapturingResults
+    fake_asf_search.ASFSearchResults = _build_capturing_results_cls(captured)
     paths = backend._fetch(remotes)
     assert captured == [["S1A_MISSING.zip"]]
     # Returned paths include both, in original order.

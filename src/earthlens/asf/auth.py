@@ -21,9 +21,10 @@ The wrapper:
 
 `configure()` is idempotent. `is_authenticated()` is a cheap
 predicate (`self._session is not None`). Search calls do not need
-auth (`asf_search.geo_search` / `granule_search` / `stack_from_id`
-are anonymous endpoints), so the backend builds an :class:`ASFAuth`
-in `_initialize` and calls :meth:`configure` only from `_fetch`.
+auth (`asf_search.geo_search`, `granule_search` and
+`ASFProduct.stack` are anonymous endpoints), so the backend builds
+an :class:`ASFAuth` in `_initialize` and calls :meth:`configure`
+only from `_fetch`.
 """
 
 from __future__ import annotations

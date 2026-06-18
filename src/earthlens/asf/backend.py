@@ -81,7 +81,7 @@ class ASF(AbstractDataSource):
         fmt: str = "%Y-%m-%d",
         reference: str | None = None,
         perpendicular_baseline: tuple[float, float] | None = None,
-        temporal_baseline: tuple[float, float] | None = None,
+        temporal_baseline: tuple[int, int] | None = None,
         beam_mode: str | None = None,
         flight_direction: str | None = None,
         polarization: str | None = None,
@@ -119,8 +119,10 @@ class ASF(AbstractDataSource):
                 `None` disables the filter. Translated to
                 `ASFSearchOptions(minBaselinePerp, maxBaselinePerp)`.
             temporal_baseline: `(min_days, max_days)` temporal
-                baseline window in days. Translated to
-                `ASFSearchOptions(temporalBaselineDays)`.
+                baseline window in whole days. Translated to
+                `ASFSearchOptions(temporalBaselineDays="<min>,<max>")`.
+                Both values are required to be ints; fractional days
+                are not supported by the SDK's query encoding.
             beam_mode: Restrict to one ASF beam mode (e.g. `"IW"`
                 for Sentinel-1 Interferometric Wide swath), or
                 `None`.
@@ -292,8 +294,7 @@ class ASF(AbstractDataSource):
             kwargs["maxBaselinePerp"] = float(self._perpendicular_baseline[1])
         if self._temporal_baseline is not None:
             kwargs["temporalBaselineDays"] = (
-                f"{int(self._temporal_baseline[0])},"
-                f"{int(self._temporal_baseline[1])}"
+                f"{self._temporal_baseline[0]},{self._temporal_baseline[1]}"
             )
         return asf_search_module.ASFSearchOptions(**kwargs)
 
@@ -353,34 +354,47 @@ class ASF(AbstractDataSource):
                 search_kwargs["maxResults"] = self._max_results
             products = list(asf.geo_search(**search_kwargs))
 
-        return [
-            RemoteProduct(
-                id=product.properties.get("sceneName") or product.properties.get(
-                    "fileID", "?"
-                ),
-                href=product.properties.get("url"),
-                metadata={
-                    "product": product,
-                    "fileName": product.properties.get("fileName"),
-                    "perpendicularBaseline": product.properties.get(
-                        "perpendicularBaseline"
-                    ),
-                    "temporalBaseline": product.properties.get("temporalBaseline"),
-                },
+        is_stack_mode = self._mode == "stack"
+        result: list[RemoteProduct] = []
+        for product in products:
+            metadata: dict[str, Any] = {
+                "product": product,
+                "fileName": product.properties.get("fileName"),
+            }
+            # Baseline keys are only meaningful for stacked products
+            # — `ASFProduct.stack()` writes `perpendicularBaseline` /
+            # `temporalBaseline` onto each result; plain `geo_search`
+            # results carry neither. Including the keys (as `None`) in
+            # search mode would let a downstream consumer write
+            # `metadata["temporalBaseline"]` and silently get nothing.
+            if is_stack_mode:
+                metadata["perpendicularBaseline"] = product.properties.get(
+                    "perpendicularBaseline"
+                )
+                metadata["temporalBaseline"] = product.properties.get(
+                    "temporalBaseline"
+                )
+            result.append(
+                RemoteProduct(
+                    id=product.properties.get("sceneName")
+                    or product.properties.get("fileID", "?"),
+                    href=product.properties.get("url"),
+                    metadata=metadata,
+                )
             )
-            for product in products
-        ]
+        return result
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Download every product to `self.path` and return the written paths.
 
-        Calls `ASFAuth.session()` once (which runs the EDL login
-        on first access) and reuses the same authenticated session
-        for the whole batch. The download is idempotent — products
-        whose target file already exists under `self.path` are
-        skipped rather than re-downloaded (ASF SAR products are
-        large; CI re-runs would otherwise re-fetch hundreds of
-        megabytes).
+        Calls :meth:`ASFAuth.session` once **if any product needs to
+        be fetched** (which runs the EDL login on first access) and
+        reuses the same authenticated session for the whole batch.
+        The download is idempotent — products whose target file
+        already exists under `self.path` are skipped rather than
+        re-downloaded (ASF SAR products are large; CI re-runs would
+        otherwise re-fetch hundreds of megabytes). A `products` list
+        with nothing missing therefore does not authenticate.
 
         Args:
             products: The list returned by :meth:`_search`.
@@ -389,11 +403,28 @@ class ASF(AbstractDataSource):
             list[Path]: The on-disk file paths, in `products`
                 order. Includes already-present files (the path is
                 still the correct on-disk artefact).
+
+        Raises:
+            ValueError: When an `asf_search.ASFProduct` carries no
+                resolvable `fileName` property (defensive — should
+                not happen with the current SDK, but better to fail
+                loudly than crash with `TypeError` on `Path / None`).
         """
         import asf_search as asf
 
         out_dir = Path(self.path)
         out_dir.mkdir(parents=True, exist_ok=True)
+        missing = [
+            remote.id
+            for remote in products
+            if not remote.metadata.get("fileName")
+        ]
+        if missing:
+            raise ValueError(
+                "ASF product(s) returned without a resolvable fileName: "
+                f"{missing!r}. This points at an asf_search regression "
+                "or an unsupported product class; report it upstream."
+            )
         targets = [
             out_dir / remote.metadata["fileName"] for remote in products
         ]

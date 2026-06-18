@@ -178,8 +178,12 @@ def _validate_asf(catalog: Any) -> tuple[int, list[str]]:
     try:
         import asf_search as asf
     except ImportError:
-        return len(catalog.datasets), [
-            "asf_search is not installed; install the `asf` extra to validate"
+        # Report zero checked rows — nothing was inspected — and surface
+        # the install hint as the issue so JSON consumers can distinguish
+        # "ran clean" from "skipped because the SDK was missing".
+        return 0, [
+            f"asf_search is not installed; install the `asf` extra to "
+            f"validate {len(catalog.datasets)} curated row(s)"
         ]
     issues: list[str] = []
     products = catalog.datasets

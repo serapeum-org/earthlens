@@ -66,7 +66,7 @@ def test_stack_opts_with_only_temporal_baseline(
         end="2024-01-31",
         variables=["sentinel-1-slc"],
         reference="REF",
-        temporal_baseline=(0.0, 60.0),
+        temporal_baseline=(0, 60),
         path=tmp_path,
     )
     backend._search()

@@ -215,3 +215,38 @@ def test_get_product_with_unknown_key_raises() -> None:
     """`get_product` on an unknown key raises with a hint."""
     with pytest.raises(ValueError, match="ASF product catalog"):
         Catalog().get_product("unknown-product")
+
+
+@pytest.mark.asf
+@pytest.mark.unit
+def test_dotted_alias_resolves_to_canonical_key() -> None:
+    """The `alos-l1.1` alias survives the dot in the friendly name."""
+    assert Catalog().resolve("alos-l1.1") == "alos-palsar-slc"
+
+
+@pytest.mark.asf
+@pytest.mark.unit
+def test_catalog_rejects_duplicate_aliases_across_rows() -> None:
+    """An alias reused across two product rows fails at construction."""
+    duplicated = Product(
+        platform="SENTINEL1", product_type="SLC", aliases=["shared"]
+    )
+    other = Product(
+        platform="ALOS", product_type="L1_1", aliases=["shared"]
+    )
+    with pytest.raises(ValueError, match="alias 'shared'"):
+        Catalog(products={"one": duplicated, "two": other})
+
+
+@pytest.mark.asf
+@pytest.mark.unit
+def test_curated_catalog_aliases_are_globally_unique() -> None:
+    """The bundled YAML carries no duplicated aliases (defensive)."""
+    cat = Catalog()
+    seen: dict[str, str] = {}
+    for canonical, row in cat.products.items():
+        for alias in row.aliases:
+            assert alias not in seen, (
+                f"alias {alias!r} on {canonical!r} also on {seen[alias]!r}"
+            )
+            seen[alias] = canonical

@@ -50,7 +50,7 @@ def test_apply_baseline_windows_drops_out_of_window_products() -> None:
     filtered = apply_baseline_windows(
         [inside, too_high, too_late, missing],
         perpendicular_baseline=(-100.0, 100.0),
-        temporal_baseline=(0.0, 60.0),
+        temporal_baseline=(0, 60),
     )
     assert filtered == [inside]
 
@@ -153,7 +153,7 @@ def test_stack_mode_runs_granule_search_then_stack(
         variables=["sentinel-1-slc"],
         reference="S1A_REF_SLC",
         perpendicular_baseline=(-100.0, 100.0),
-        temporal_baseline=(0.0, 90.0),
+        temporal_baseline=(0, 90),
         path=tmp_path,
     )
     products = backend._search()
@@ -188,7 +188,7 @@ def test_stack_mode_post_filters_baseline_windows(
         variables=["sentinel-1-slc"],
         reference="REF",
         perpendicular_baseline=(-100.0, 100.0),
-        temporal_baseline=(0.0, 60.0),
+        temporal_baseline=(0, 60),
         path=tmp_path,
     )
     products = backend._search()
@@ -215,18 +215,16 @@ def test_stack_mode_unknown_reference_raises(
 
 @pytest.mark.asf
 @pytest.mark.unit
-def test_search_returns_remote_products_with_metadata(
+def test_search_mode_remote_product_metadata_omits_baseline_keys(
     fake_asf_search, tmp_path: Path
 ) -> None:
-    """Each `RemoteProduct` carries the raw product + fileName + baselines."""
+    """Search-mode `RemoteProduct.metadata` omits baseline keys (stack-only)."""
     from tests.asf.conftest import _FakeProduct
 
     fake_asf_search.search_results = [
         _FakeProduct(
             sceneName="S1A_TEST_SLC",
             fileName="S1A_TEST_SLC.zip",
-            perpendicularBaseline=1.5,
-            temporalBaseline=7,
         ),
     ]
     backend = ASF(
@@ -240,6 +238,6 @@ def test_search_returns_remote_products_with_metadata(
     [remote] = backend._search()
     assert remote.id == "S1A_TEST_SLC"
     assert remote.metadata["fileName"] == "S1A_TEST_SLC.zip"
-    assert remote.metadata["perpendicularBaseline"] == 1.5
-    assert remote.metadata["temporalBaseline"] == 7
+    assert "perpendicularBaseline" not in remote.metadata
+    assert "temporalBaseline" not in remote.metadata
     assert remote.metadata["product"] is fake_asf_search.search_results[0]

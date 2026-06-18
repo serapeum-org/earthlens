@@ -15,9 +15,11 @@
 #   Sentinel-1 BURST, ALOS PALSAR L1.1, etc.).
 #
 # Catalog refresh policy: hand-maintained (the SDK constants change
-# rarely, the curated set is small). The `earthlens datasets refresh
-# asf --validate` CLI handler runs a sanity check that every row's
-# constant names still exist on the installed asf_search.
+# rarely, the curated set is small). The `earthlens datasets validate
+# asf` CLI handler runs a sanity check that every row's PLATFORM /
+# DATASET / PRODUCT_TYPE member name still exists on the installed
+# asf_search; `earthlens datasets refresh asf` reports `unsupported`
+# (there is no live universe to diff against).
 
 products:
   sentinel-1-slc:
