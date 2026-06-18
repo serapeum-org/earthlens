@@ -101,7 +101,11 @@ def test_search_mode_calls_geo_search_with_resolved_args(
     assert len(products) == 2
     assert fake_asf_search.geo_search_calls, "geo_search was not called"
     call = fake_asf_search.geo_search_calls[0]
-    assert call["platform"] == "SENTINEL1"
+    # The backend must resolve catalog member NAMES to their SDK
+    # member VALUES at request time — passing 'SENTINEL1' (the name)
+    # instead of 'SENTINEL-1' (the value) silently returns 0 results
+    # against the live API.
+    assert call["platform"] == "SENTINEL-1"
     assert call["processingLevel"] == "SLC"
     assert call["flightDirection"] == "ASCENDING"
     assert call["beamMode"] == "IW"
@@ -129,7 +133,8 @@ def test_search_mode_uses_dataset_for_processed_products(
     backend._search()
     call = fake_asf_search.geo_search_calls[0]
     assert "platform" not in call
-    assert call["dataset"] == "OPERA_S1"
+    # `DATASET.OPERA_S1 == 'OPERA-S1'` — resolve member name → value.
+    assert call["dataset"] == "OPERA-S1"
     assert call["processingLevel"] == "RTC"
 
 

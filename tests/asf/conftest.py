@@ -123,31 +123,55 @@ class _FakeAsfSearch(types.ModuleType):
         self.ASFSession = _FakeSession
         self.ASFSearchOptions = _FakeOptions
         self.ASFSearchResults = _FakeResults
-        # Constant modules — populated with the real enum names so
-        # the catalog's constant-name guard test passes.
+        # Constant modules — populated with the real (member name ->
+        # SDK value) mapping for every constant the curated catalog
+        # references. Lets the constant-name guard test pass and
+        # surfaces the same `getattr(asf.PLATFORM, name)` value the
+        # real SDK returns at search time.
         self.PLATFORM = _FakeConstants(
-            SENTINEL1="SENTINEL-1",
+            AIRSAR="AIRSAR",
             ALOS="ALOS",
             ERS="ERS",
+            ERS1="ERS-1",
+            ERS2="ERS-2",
             JERS="JERS-1",
             NISAR="NISAR",
             RADARSAT="RADARSAT-1",
             SEASAT="SEASAT 1",
+            SENTINEL1="SENTINEL-1",
+            SENTINEL1A="Sentinel-1A",
+            SENTINEL1B="Sentinel-1B",
+            SENTINEL1C="Sentinel-1C",
+            SENTINEL1D="Sentinel-1D",
+            SIRC="SIR-C",
+            SMAP="SMAP",
+            UAVSAR="UAVSAR",
         )
         self.DATASET = _FakeConstants(
-            OPERA_S1="OPERA-S1",
+            ALOS_2="ALOS-2",
             ARIA_S1_GUNW="ARIA S1 GUNW",
+            OPERA_S1="OPERA-S1",
             SLC_BURST="SLC-BURST",
             SENTINEL1="SENTINEL-1",
         )
         self.PRODUCT_TYPE = _FakeConstants(
+            AMPLITUDE="AMPLITUDE",
             SLC="SLC",
             BURST="BURST",
             GRD_HD="GRD_HD",
+            GRD_MD="GRD_MD",
             RTC="RTC",
+            RTC_STATIC="RTC-STATIC",
             CSLC="CSLC",
+            CSLC_STATIC="CSLC-STATIC",
+            DIST_ALERT_S1="DIST-ALERT-S1",
             GUNW_STD="GUNW_STD",
+            L0="L0",
+            L1="L1",
+            L1A_RADAR_HDF5="L1A_Radar_HDF5",
             L1_1="L1.1",
+            OCN="OCN",
+            RAW="RAW",
             RSLC="RSLC",
         )
 

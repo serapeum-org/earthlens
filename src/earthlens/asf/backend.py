@@ -334,16 +334,38 @@ class ASF(AbstractDataSource):
                 self._temporal_baseline,
             )
         else:
+            # The catalog stores each row's enum *member name*
+            # (`SENTINEL1`, `OPERA_S1`, `SLC`) — not the underlying
+            # value the SDK actually filters on (`'SENTINEL-1'`,
+            # `'OPERA-S1'`, `'SLC'`). Resolve the value at request
+            # time so a constant like `PLATFORM.SENTINEL1` reaches
+            # `geo_search(platform='SENTINEL-1')` correctly. Without
+            # this, every search whose platform/dataset value differs
+            # from its member name (most of them) silently returns
+            # zero products.
+            platform_value = (
+                getattr(asf.PLATFORM, self._product.platform)
+                if self._product.platform is not None
+                else None
+            )
+            dataset_value = (
+                getattr(asf.DATASET, self._product.dataset)
+                if self._product.dataset is not None
+                else None
+            )
+            product_type_value = getattr(
+                asf.PRODUCT_TYPE, self._product.product_type
+            )
             search_kwargs: dict[str, Any] = {
                 "intersectsWith": wkt_from_extent(self.space),
-                "processingLevel": self._product.product_type,
+                "processingLevel": product_type_value,
                 "start": self.time.start_date.isoformat(),
                 "end": self.time.end_date.isoformat(),
             }
-            if self._product.platform is not None:
-                search_kwargs["platform"] = self._product.platform
+            if platform_value is not None:
+                search_kwargs["platform"] = platform_value
             else:
-                search_kwargs["dataset"] = self._product.dataset
+                search_kwargs["dataset"] = dataset_value
             if self._beam_mode is not None:
                 search_kwargs["beamMode"] = self._beam_mode
             if self._flight_direction is not None:
