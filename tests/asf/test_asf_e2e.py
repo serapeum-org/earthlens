@@ -104,7 +104,8 @@ class TestStackAnonymous:
         for remote in products:
             perp = remote.metadata["perpendicularBaseline"]
             temp = remote.metadata["temporalBaseline"]
-            # Server-side windowing should keep these inside the bounds.
+            # Client-side post-filter (apply_baseline_windows) keeps
+            # the returned acquisitions inside the bounds.
             assert perp is None or -100.0 <= perp <= 100.0
             assert temp is None or 0 <= temp <= 60
 

@@ -27,10 +27,10 @@ def test_empty_variables_list_rejected(tmp_path: Path) -> None:
 
 @pytest.mark.asf
 @pytest.mark.unit
-def test_stack_opts_with_only_perpendicular_baseline(
+def test_stack_opts_passes_empty_options_regardless_of_perp_window(
     fake_asf_search, tmp_path: Path
 ) -> None:
-    """A perpendicular window with no temporal window leaves the temporal key off."""
+    """The SDK opts are always empty; perpendicular filtering happens client-side."""
     from tests.asf.conftest import _FakeProduct
 
     reference = _FakeProduct(sceneName="REF", stack_return=[])
@@ -45,18 +45,15 @@ def test_stack_opts_with_only_perpendicular_baseline(
     )
     backend._search()
     opts = reference.stack_calls[0]["opts"]
-    assert opts.kwargs == {
-        "minBaselinePerp": -50.0,
-        "maxBaselinePerp": 50.0,
-    }
+    assert opts.kwargs == {}
 
 
 @pytest.mark.asf
 @pytest.mark.unit
-def test_stack_opts_with_only_temporal_baseline(
+def test_stack_opts_passes_empty_options_regardless_of_temporal_window(
     fake_asf_search, tmp_path: Path
 ) -> None:
-    """A temporal window with no perpendicular window leaves the perp keys off."""
+    """The SDK opts are always empty; temporal filtering happens client-side."""
     from tests.asf.conftest import _FakeProduct
 
     reference = _FakeProduct(sceneName="REF", stack_return=[])
@@ -71,7 +68,7 @@ def test_stack_opts_with_only_temporal_baseline(
     )
     backend._search()
     opts = reference.stack_calls[0]["opts"]
-    assert opts.kwargs == {"temporalBaselineDays": "0,60"}
+    assert opts.kwargs == {}
 
 
 @pytest.mark.asf

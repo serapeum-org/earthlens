@@ -281,31 +281,28 @@ class ASF(AbstractDataSource):
         return "stack" if self._reference is not None else "search"
 
     def _stack_opts(self, asf_search_module: Any) -> Any:
-        """Build the `ASFSearchOptions` for the baseline stack.
+        """Build an `ASFSearchOptions` for `ASFProduct.stack()`.
 
-        Translates the public-API kwargs
-        (`perpendicular_baseline`, `temporal_baseline`) to the SDK's
-        camelCase fields (`minBaselinePerp` / `maxBaselinePerp` /
-        `temporalBaselineDays`). `temporalBaselineDays` accepts a
-        `"<min>,<max>"` string in the SDK; we encode the tuple
-        accordingly.
+        Empirically the SDK's `.stack()` filter fields
+        (`minBaselinePerp` / `maxBaselinePerp` / `temporalBaselineDays`)
+        are passed straight into the internal `search()` call that
+        rebuilds the stack — adding them makes that search return
+        zero products before the baseline post-processing runs,
+        breaking the stack with "No products found matching stack
+        parameters". The reliable contract is: hand `.stack()` an
+        empty options bundle, let it return the full reference-frame
+        stack, and apply the perpendicular- / temporal-baseline
+        windows client-side via :func:`apply_baseline_windows`.
 
         Args:
-            asf_search_module: The `asf_search` module (passed in
-                so callers can reuse the already-imported handle).
+            asf_search_module: The `asf_search` module.
 
         Returns:
-            asf_search.ASFSearchOptions: Configured options object.
+            asf_search.ASFSearchOptions: An empty options object;
+                the baseline filtering happens after the stack
+                returns.
         """
-        kwargs: dict[str, Any] = {}
-        if self._perpendicular_baseline is not None:
-            kwargs["minBaselinePerp"] = float(self._perpendicular_baseline[0])
-            kwargs["maxBaselinePerp"] = float(self._perpendicular_baseline[1])
-        if self._temporal_baseline is not None:
-            kwargs["temporalBaselineDays"] = (
-                f"{self._temporal_baseline[0]},{self._temporal_baseline[1]}"
-            )
-        return asf_search_module.ASFSearchOptions(**kwargs)
+        return asf_search_module.ASFSearchOptions()
 
     def _search(self) -> list[RemoteProduct]:
         """Run a geo/temporal search or build a baseline stack.

@@ -80,11 +80,15 @@ paths = el.download()
 ```
 
 - `reference=` switches the backend into stack mode.
-- `perpendicular_baseline=(min_m, max_m)` becomes
-  `ASFSearchOptions(minBaselinePerp, maxBaselinePerp)` — the SDK
-  enforces the window server-side.
-- `temporal_baseline=(min_days, max_days)` becomes
-  `ASFSearchOptions(temporalBaselineDays="<min>,<max>")`.
+- The full reference-frame stack is fetched first
+  (`ASFProduct.stack()` returns every acquisition that shares the
+  reference scene's footprint and orbit).
+- `perpendicular_baseline=(min_m, max_m)` and
+  `temporal_baseline=(min_days, max_days)` are then applied as a
+  **client-side post-filter** on the returned stack. Empirically,
+  passing these as `ASFSearchOptions` makes the SDK's internal
+  search return zero products before the baseline calculator runs,
+  so the post-filter is the only working path.
 
 The bbox is **not** required in stack mode — the reference granule
 defines the area of interest. The two date kwargs (`start` / `end`)

@@ -164,10 +164,13 @@ def test_stack_mode_runs_granule_search_then_stack(
     products = backend._search()
     assert fake_asf_search.granule_search_calls == [["S1A_REF_SLC"]]
     assert reference.stack_calls, "stack() was not called on the reference"
+    # Empirically `.stack()` mis-interprets the baseline-window opts —
+    # adding them makes the SDK's internal search() return zero
+    # products before the baseline calculator runs. The backend now
+    # hands `.stack()` an empty options bundle and applies the
+    # baseline windows client-side.
     opts = reference.stack_calls[0]["opts"]
-    assert opts.kwargs["minBaselinePerp"] == -100.0
-    assert opts.kwargs["maxBaselinePerp"] == 100.0
-    assert opts.kwargs["temporalBaselineDays"] == "0,90"
+    assert opts.kwargs == {}
     assert len(products) == 2
     assert products[1].metadata["perpendicularBaseline"] == 42.0
 
