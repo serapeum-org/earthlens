@@ -296,12 +296,13 @@ class EarthLens:
             ['amazon-s3', 'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps',
              'cmems', 'dea', 'deafrica', 'digital-earth-africa',
              'digital-earth-australia', 'earth-search', 'earthdata', 'ecmwf',
-             'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee', 'ghs', 'ghsl',
-             'google-earth-engine', 'hdx', 'human-settlement', 'landsat',
-             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
-             'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
+             'eumetsat', 'fdsn', 'firms', 'gbif', 'gdacs', 'gee', 'ghs', 'ghsl',
+             'google-earth-engine', 'hdx', 'human-settlement', 'iucn', 'landsat',
+             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'obis',
+             'openaq', 'openeo', 'overture', 'planetary-computer',
+             'protected-planet', 'radar', 'redlist', 'sentinel-hub',
              'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
-             'usgs-water', 'veda', 'world-pop', 'worldpop']
+             'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -394,6 +395,20 @@ class EarthLens:
             crop to the AOI via `pyramids` with a tidy age/sex table for
             demographic products; `mixed` output; keys `"worldpop"` /
             `"world-pop"`.
+        :class:`earthlens.gbif.GBIF`: GBIF species occurrences via
+            `pygbif` (anonymous); `vector` occurrence-point
+            FeatureCollection; key `"gbif"`.
+        :class:`earthlens.obis.OBIS`: OBIS marine occurrences via
+            `pyobis` (anonymous); `vector` occurrence-point
+            FeatureCollection; key `"obis"`.
+        :class:`earthlens.wdpa.WDPA`: Protected Planet (WDPA)
+            protected-area polygons via the direct v4 REST API
+            (`?token=`); `vector` polygon FeatureCollection; keys
+            `"wdpa"` / `"protected-planet"`.
+        :class:`earthlens.iucn.IUCN`: IUCN Red List v4 assessments via
+            the direct REST shim (Bearer token); `tabular` `DataFrame`
+            (always a CC-BY-NC `LicenseWarning`); keys `"iucn"` /
+            `"redlist"`.
 
     """
 
@@ -538,6 +553,17 @@ class EarthLens:
             # "world-pop". The default REST path needs no extra SDK.
             "worldpop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
             "world-pop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
+            # Biodiversity cluster. GBIF / OBIS are anonymous occurrence search
+            # (vector FeatureCollection of points); WDPA returns protected-area
+            # polygons (token, ?token= query param); IUCN returns Red List
+            # assessments (tabular DataFrame, Bearer token). GBIF/OBIS need the
+            # pygbif/pyobis extra; WDPA/IUCN use core requests (no extra).
+            "gbif": ("earthlens.gbif", "GBIF", "gbif", {}),
+            "obis": ("earthlens.obis", "OBIS", "obis", {}),
+            "wdpa": ("earthlens.wdpa", "WDPA", "", {}),
+            "protected-planet": ("earthlens.wdpa", "WDPA", "", {}),
+            "iucn": ("earthlens.iucn", "IUCN", "", {}),
+            "redlist": ("earthlens.iucn", "IUCN", "", {}),
         }
     )
 
