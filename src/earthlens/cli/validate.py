@@ -352,6 +352,51 @@ def _validate_nwm(catalog: Any) -> tuple[int, list[str]]:
     return len(products), issues
 
 
+def _check_gbif_taxon(key: str, record: Any) -> list[str]:
+    """Flag a GBIF taxon missing its key or carrying a non-positive one."""
+    issues = _require(key, record, ("taxon_key",))
+    taxon_key = getattr(record, "taxon_key", None)
+    if taxon_key is not None and taxon_key <= 0:
+        issues.append(f"{key}: taxon_key must be positive, got {taxon_key!r}")
+    return issues
+
+
+def _validate_gbif(catalog: Any) -> tuple[int, list[str]]:
+    """Each curated GBIF taxon needs a positive integer backbone taxonKey."""
+    return _lint(catalog, _check_gbif_taxon)
+
+
+def _validate_obis(catalog: Any) -> tuple[int, list[str]]:
+    """Each curated OBIS species needs a scientific name."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("scientific_name",)))
+
+
+def _check_wdpa_country(key: str, record: Any) -> list[str]:
+    """Flag a WDPA country missing a name or with a malformed ISO3 key."""
+    issues = _require(key, record, ("name",))
+    if not (len(key) == 3 and key.isalpha() and key.isupper()):
+        issues.append(f"{key}: catalog key must be an upper-case ISO3 alpha-3 code")
+    return issues
+
+
+def _validate_wdpa(catalog: Any) -> tuple[int, list[str]]:
+    """Each curated WDPA country needs a name and an ISO3 alpha-3 key."""
+    return _lint(catalog, _check_wdpa_country)
+
+
+def _check_iucn_country(key: str, record: Any) -> list[str]:
+    """Flag an IUCN country missing a name or with a malformed ISO2 key."""
+    issues = _require(key, record, ("name",))
+    if not (len(key) == 2 and key.isalpha() and key.isupper()):
+        issues.append(f"{key}: catalog key must be an upper-case ISO2 alpha-2 code")
+    return issues
+
+
+def _validate_iucn(catalog: Any) -> tuple[int, list[str]]:
+    """Each curated IUCN country needs a name and an ISO2 alpha-2 key."""
+    return _lint(catalog, _check_iucn_country)
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -369,6 +414,10 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "usgs_water": _validate_usgs_water,
     "sentinel_hub": _validate_sentinel_hub,
     "worldpop": _validate_worldpop,
+    "gbif": _validate_gbif,
+    "obis": _validate_obis,
+    "wdpa": _validate_wdpa,
+    "iucn": _validate_iucn,
 }
 
 

@@ -1,0 +1,51 @@
+# WDPA country catalog — curated ISO3 countries for the earthlens WDPA backend.
+#
+# Each entry is keyed by its ISO 3166-1 alpha-3 code (the value the Protected
+# Planet v4 `country=` filter expects) and carries a human name and a region.
+# This is a curated, biodiversity-notable subset across every continent — it is
+# NOT exhaustive: the backend accepts ANY valid alpha-3 code (or a WDPA id) as a
+# `variables` selector, whether or not it is listed here. The catalog gives
+# friendly-name resolution, a did-you-mean hint, and the `validate` target.
+#
+# Validate the curated entries with: earthlens datasets validate wdpa
+countries:
+  KEN: {name: Kenya, region: Africa}
+  TZA: {name: Tanzania, region: Africa}
+  ZAF: {name: South Africa, region: Africa}
+  COD: {name: Democratic Republic of the Congo, region: Africa}
+  MDG: {name: Madagascar, region: Africa}
+  ETH: {name: Ethiopia, region: Africa}
+  NGA: {name: Nigeria, region: Africa}
+  GAB: {name: Gabon, region: Africa}
+  BWA: {name: Botswana, region: Africa}
+  NAM: {name: Namibia, region: Africa}
+  BRA: {name: Brazil, region: Americas}
+  USA: {name: United States, region: Americas}
+  CAN: {name: Canada, region: Americas}
+  MEX: {name: Mexico, region: Americas}
+  PER: {name: Peru, region: Americas}
+  COL: {name: Colombia, region: Americas}
+  ECU: {name: Ecuador, region: Americas}
+  CRI: {name: Costa Rica, region: Americas}
+  ARG: {name: Argentina, region: Americas}
+  CHL: {name: Chile, region: Americas}
+  IDN: {name: Indonesia, region: Asia}
+  IND: {name: India, region: Asia}
+  CHN: {name: China, region: Asia}
+  MYS: {name: Malaysia, region: Asia}
+  PHL: {name: Philippines, region: Asia}
+  THA: {name: Thailand, region: Asia}
+  NPL: {name: Nepal, region: Asia}
+  VNM: {name: Vietnam, region: Asia}
+  JPN: {name: Japan, region: Asia}
+  GBR: {name: United Kingdom, region: Europe}
+  FRA: {name: France, region: Europe}
+  ESP: {name: Spain, region: Europe}
+  DEU: {name: Germany, region: Europe}
+  NOR: {name: Norway, region: Europe}
+  ITA: {name: Italy, region: Europe}
+  LIE: {name: Liechtenstein, region: Europe}
+  AUS: {name: Australia, region: Oceania}
+  NZL: {name: New Zealand, region: Oceania}
+  PNG: {name: Papua New Guinea, region: Oceania}
+  FJI: {name: Fiji, region: Oceania}

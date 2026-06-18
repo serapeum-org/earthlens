@@ -35,6 +35,7 @@ from earthlens.base import (
 from earthlens.biodiversity import IUCN_LICENSE, warn_license
 from earthlens.iucn import _rest
 from earthlens.iucn.auth import IucnAuth, IucnCredentials
+from earthlens.iucn.catalog import Catalog
 
 FileFormat = Literal["csv", "parquet"]
 
@@ -116,6 +117,7 @@ class IUCN(AbstractDataSource):
         self._file_format: FileFormat = file_format
         self._token_arg = token
         self._auth: IucnAuth | None = None
+        self._catalog = Catalog()
         super().__init__(
             start=start,
             end=end,
@@ -224,7 +226,7 @@ class IUCN(AbstractDataSource):
             genus, species = _split_binomial(text[len(SPECIES_PREFIX) :].strip())
             return _rest.fetch_species(token, genus, species)
         if text.lower().startswith(COUNTRY_PREFIX):
-            return _rest.fetch_country(token, text[len(COUNTRY_PREFIX) :].strip())
+            return _rest.fetch_country(token, self._catalog.resolve_iso2(text))
         raise ValueError(
             f"IUCN selector {selector!r} must start with 'species:' "
             "(a binomial) or 'country:' (an ISO alpha-2 code)."

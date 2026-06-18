@@ -8,7 +8,7 @@
 # (`variables=["taxon:Panthera leo"]`) which resolves live via GBIF's
 # `species.name_backbone`.
 #
-# Verify upstream with: earthlens datasets validate gbif
+# Validate the curated entries with: earthlens datasets validate gbif
 taxa:
   animals:
     taxon_key: 1

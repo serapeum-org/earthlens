@@ -36,6 +36,7 @@ from earthlens.base import (
 from earthlens.biodiversity import WDPA_LICENSE, warn_license
 from earthlens.wdpa import _rest
 from earthlens.wdpa.auth import WdpaAuth, WdpaCredentials
+from earthlens.wdpa.catalog import Catalog
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -48,9 +49,6 @@ _FORMATS: dict[str, tuple[str, str]] = {
     "gpkg": ("GPKG", "gpkg"),
     "geojson": ("GeoJSON", "geojson"),
 }
-
-#: Prefix marking an explicit country (ISO3) selector in `variables`.
-COUNTRY_PREFIX = "country:"
 
 
 class WDPA(AbstractDataSource):
@@ -125,6 +123,7 @@ class WDPA(AbstractDataSource):
         self._file_format: FileFormat = file_format
         self._token_arg = token
         self._auth: WdpaAuth | None = None
+        self._catalog = Catalog()
         super().__init__(
             start=start,
             end=end,
@@ -213,21 +212,25 @@ class WDPA(AbstractDataSource):
         return gpd.GeoDataFrame(merged, geometry="geometry", crs=_rest.CRS)
 
     def _fetch_one(self, token: str, selector: str):
-        """Fetch one selector (country ISO3 or WDPA id).
+        """Fetch one selector (country or WDPA id).
+
+        A numeric selector is a WDPA id; anything else is resolved to an
+        ISO3 country code through the catalog (which accepts a
+        `country:<ISO3>` selector, a bare alpha-3 code, or a friendly
+        country name).
 
         Args:
             token: The resolved Protected Planet token.
-            selector: A `"country:<ISO3>"`, bare ISO3, or WDPA-id string.
+            selector: A WDPA id, `"country:<ISO3>"`, bare ISO3, or country
+                name.
 
         Returns:
             gpd.GeoDataFrame: The selector's protected-area polygons.
         """
         text = selector.strip()
-        if text.lower().startswith(COUNTRY_PREFIX):
-            return _rest.fetch_country(token, text[len(COUNTRY_PREFIX) :].strip())
         if text.isdigit():
             return _rest.fetch_by_id(token, text)
-        return _rest.fetch_country(token, text)
+        return _rest.fetch_country(token, self._catalog.resolve_iso3(text))
 
     def _api(self) -> FeatureCollection:
         """Fetch protected areas (satisfies the abstract contract)."""

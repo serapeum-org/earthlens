@@ -1,0 +1,67 @@
+"""Unit tests for the WDPA country catalog and ISO3 resolution."""
+
+from __future__ import annotations
+
+import pytest
+
+from earthlens.wdpa import Catalog, Country
+from earthlens.wdpa import catalog as catalog_module
+
+
+@pytest.mark.wdpa
+class TestCatalogLoad:
+    """The bundled catalog loads with the expected dict-like surface."""
+
+    def test_known_codes_present(self):
+        """Known ISO3 codes carry a country name."""
+        cat = Catalog()
+        assert "KEN" in cat
+        assert cat["KEN"].name == "Kenya"
+
+    def test_load_classmethod_and_cache(self):
+        """`load` reads from disk and a second call hits the parse cache."""
+        catalog_module.clear_catalog_cache()
+        first = Catalog.load()
+        second = Catalog.load()
+        assert first["BRA"].name == second["BRA"].name == "Brazil"
+
+    def test_supplied_datasets_skip_disk(self):
+        """Passing `datasets=` skips the disk read."""
+        cat = Catalog(datasets={"ZZZ": Country(name="Nowhere")})
+        assert list(cat) == ["ZZZ"]
+
+    def test_missing_block_raises(self, tmp_path, monkeypatch):
+        """A YAML without a `countries:` block raises a clear ValueError."""
+        empty = tmp_path / "empty.yaml"
+        empty.write_text("other: {}\n", encoding="utf-8")
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", empty)
+        catalog_module.clear_catalog_cache()
+        with pytest.raises(ValueError, match="empty 'countries:' block"):
+            Catalog()
+        catalog_module.clear_catalog_cache()
+
+
+@pytest.mark.wdpa
+class TestResolveIso3:
+    """`resolve_iso3` accepts codes, names, and `country:` selectors."""
+
+    def test_bare_code_passthrough(self):
+        """A bare alpha-3 code passes through uppercased."""
+        assert Catalog().resolve_iso3("ken") == "KEN"
+
+    def test_uncatalogued_code_passthrough(self):
+        """An alpha-3 code not in the catalog still passes through."""
+        assert Catalog().resolve_iso3("ZWE") == "ZWE"
+
+    def test_country_prefix(self):
+        """A `country:` prefix is stripped before resolution."""
+        assert Catalog().resolve_iso3("country:BRA") == "BRA"
+
+    def test_friendly_name(self):
+        """A country name resolves to its ISO3 code."""
+        assert Catalog().resolve_iso3("Kenya") == "KEN"
+
+    def test_unknown_name_did_you_mean(self):
+        """An unknown country name raises with a did-you-mean hint."""
+        with pytest.raises(ValueError, match="Did you mean 'Kenya'"):
+            Catalog().resolve_iso3("Kenyaa")

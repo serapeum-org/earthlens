@@ -17,9 +17,13 @@ from earthlens.iucn.auth import (
     IucnCredentials,
 )
 from earthlens.iucn.backend import IUCN
+from earthlens.iucn.catalog import CATALOG_PATH, Catalog, Country
 
 __all__ = [
     "AuthenticationError",
+    "CATALOG_PATH",
+    "Catalog",
+    "Country",
     "IUCN",
     "IucnAuth",
     "IucnCredentials",

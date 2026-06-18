@@ -6,7 +6,7 @@
 # well-known marine species. For any other taxon, pass the name explicitly with
 # the `species:` prefix (`variables=["species:Mola mola"]`).
 #
-# Verify upstream with: earthlens datasets validate obis
+# Validate the curated entries with: earthlens datasets validate obis
 species:
   common-dolphin:
     scientific_name: "Delphinus delphis"

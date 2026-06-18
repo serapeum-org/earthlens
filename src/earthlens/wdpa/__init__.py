@@ -16,9 +16,13 @@ from earthlens.wdpa.auth import (
     WdpaCredentials,
 )
 from earthlens.wdpa.backend import WDPA
+from earthlens.wdpa.catalog import CATALOG_PATH, Catalog, Country
 
 __all__ = [
     "AuthenticationError",
+    "CATALOG_PATH",
+    "Catalog",
+    "Country",
     "WDPA",
     "WdpaAuth",
     "WdpaCredentials",
