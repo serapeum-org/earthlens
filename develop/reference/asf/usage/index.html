@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11628,11 +11628,15 @@ perpendicular and temporal baselines:</p>
 </code></pre></div>
 <ul>
 <li><code>reference=</code> switches the backend into stack mode.</li>
-<li><code>perpendicular_baseline=(min_m, max_m)</code> becomes
-  <code>ASFSearchOptions(minBaselinePerp, maxBaselinePerp)</code> — the SDK
-  enforces the window server-side.</li>
-<li><code>temporal_baseline=(min_days, max_days)</code> becomes
-  <code>ASFSearchOptions(temporalBaselineDays="&lt;min&gt;,&lt;max&gt;")</code>.</li>
+<li>The full reference-frame stack is fetched first
+  (<code>ASFProduct.stack()</code> returns every acquisition that shares the
+  reference scene's footprint and orbit).</li>
+<li><code>perpendicular_baseline=(min_m, max_m)</code> and
+  <code>temporal_baseline=(min_days, max_days)</code> are then applied as a
+  <strong>client-side post-filter</strong> on the returned stack. Empirically,
+  passing these as <code>ASFSearchOptions</code> makes the SDK's internal
+  search return zero products before the baseline calculator runs,
+  so the post-filter is the only working path.</li>
 </ul>
 <p>The bbox is <strong>not</strong> required in stack mode — the reference granule
 defines the area of interest. The two date kwargs (<code>start</code> / <code>end</code>)
