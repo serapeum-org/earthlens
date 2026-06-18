@@ -21,13 +21,83 @@
 # asf_search; `earthlens datasets refresh asf` reports `unsupported`
 # (there is no live universe to diff against).
 
+# Informational index of curated product keys (the union of every
+# row in `products:` below, sorted). Mirrors the `available_*`
+# pattern used by overture / s3 / earthdata / cmems / etc., so a
+# tool can ask "what does the asf backend curate?" without parsing
+# the full `products:` block.
+available_products:
+  - airsar-l1
+  - alos-2-l11
+  - alos-palsar-slc
+  - aria-s1-gunw
+  - ers-1-slc
+  - ers-2-slc
+  - jers-1-l0
+  - nisar-rslc
+  - opera-cslc-s1
+  - opera-cslc-s1-static
+  - opera-dist-alert-s1
+  - opera-rtc-s1
+  - opera-rtc-s1-static
+  - radarsat-1-l0
+  - radarsat-1-l1
+  - seasat-l1
+  - sentinel-1-burst
+  - sentinel-1-grd
+  - sentinel-1-grd-md
+  - sentinel-1-ocn
+  - sentinel-1-raw
+  - sentinel-1-slc
+  - sentinel-1a-slc
+  - sentinel-1b-slc
+  - sentinel-1c-slc
+  - sentinel-1d-slc
+  - sir-c-slc
+  - smap-l1
+  - uavsar-amp
+
 products:
+  # ---------------------------------------------------------------
+  # Sentinel-1 family — C-band SAR, the workhorse for InSAR.
+  # The fleet-agnostic `SENTINEL1` platform key matches every
+  # available satellite (A/B/C/D); per-satellite rows below let
+  # callers restrict the constellation.
+  # ---------------------------------------------------------------
   sentinel-1-slc:
     aliases: [s1-slc, sentinel1-slc]
     platform: SENTINEL1
     product_type: SLC
     stackable: true
     description: Sentinel-1 Single Look Complex (the standard InSAR input)
+
+  sentinel-1a-slc:
+    aliases: [s1a-slc, sentinel1a-slc]
+    platform: SENTINEL1A
+    product_type: SLC
+    stackable: true
+    description: Sentinel-1A SLC restricted to the S1A platform
+
+  sentinel-1b-slc:
+    aliases: [s1b-slc, sentinel1b-slc]
+    platform: SENTINEL1B
+    product_type: SLC
+    stackable: true
+    description: Sentinel-1B SLC (operational until 2022; archive only)
+
+  sentinel-1c-slc:
+    aliases: [s1c-slc, sentinel1c-slc]
+    platform: SENTINEL1C
+    product_type: SLC
+    stackable: true
+    description: Sentinel-1C SLC (post-2024 replacement for S1B)
+
+  sentinel-1d-slc:
+    aliases: [s1d-slc, sentinel1d-slc]
+    platform: SENTINEL1D
+    product_type: SLC
+    stackable: true
+    description: Sentinel-1D SLC (planned successor; data once on orbit)
 
   sentinel-1-burst:
     aliases: [s1-burst, sentinel1-burst]
@@ -37,25 +107,68 @@ products:
     description: Sentinel-1 SLC burst (per-burst InSAR-ready subset of an SLC)
 
   sentinel-1-grd:
-    aliases: [s1-grd, sentinel1-grd]
+    aliases: [s1-grd, sentinel1-grd, s1-grd-hd]
     platform: SENTINEL1
     product_type: GRD_HD
     stackable: false
     description: Sentinel-1 Ground Range Detected, high-resolution dual-pol (search-only)
 
+  sentinel-1-grd-md:
+    aliases: [s1-grd-md]
+    platform: SENTINEL1
+    product_type: GRD_MD
+    stackable: false
+    description: Sentinel-1 GRD medium-resolution dual-pol (search-only)
+
+  sentinel-1-ocn:
+    aliases: [s1-ocn]
+    platform: SENTINEL1
+    product_type: OCN
+    stackable: false
+    description: Sentinel-1 Ocean Level-2 (wind / wave / Doppler grids)
+
+  sentinel-1-raw:
+    aliases: [s1-raw]
+    platform: SENTINEL1
+    product_type: RAW
+    stackable: false
+    description: Sentinel-1 raw (Level-0) downlinks for advanced reprocessing
+
+  # ---------------------------------------------------------------
+  # ALOS / ALOS-2 — JAXA's L-band PALSAR archive.
+  # ---------------------------------------------------------------
   alos-palsar-slc:
     aliases: [alos-slc, palsar-slc, alos-l1.1]
     platform: ALOS
     product_type: L1_1
     stackable: true
-    description: ALOS PALSAR Level-1.1 SLC
+    description: ALOS PALSAR Level-1.1 SLC (L-band, 2006-2011)
 
+  alos-2-l11:
+    aliases: [alos2-l11, palsar2-l11]
+    dataset: ALOS_2
+    product_type: L1_1
+    stackable: true
+    description: ALOS-2 PALSAR-2 Level-1.1 SLC (L-band, 2014+, restricted access)
+
+  # ---------------------------------------------------------------
+  # OPERA — NASA preprocessed S1 products.
+  # CSLC is the coregistered SLC; RTC is the analysis-ready radiometric
+  # terrain-corrected product; DIST-ALERT is the disturbance flag.
+  # ---------------------------------------------------------------
   opera-rtc-s1:
     aliases: [opera-rtc, opera-s1-rtc]
     dataset: OPERA_S1
     product_type: RTC
     stackable: false
     description: OPERA Sentinel-1 Radiometric Terrain Corrected (processed, search-only)
+
+  opera-rtc-s1-static:
+    aliases: [opera-rtc-static, opera-s1-rtc-static]
+    dataset: OPERA_S1
+    product_type: RTC_STATIC
+    stackable: false
+    description: OPERA RTC-S1 static-layer mask companion product
 
   opera-cslc-s1:
     aliases: [opera-cslc, opera-s1-cslc]
@@ -64,6 +177,20 @@ products:
     stackable: true
     description: OPERA Sentinel-1 Coregistered Single Look Complex
 
+  opera-cslc-s1-static:
+    aliases: [opera-cslc-static, opera-s1-cslc-static]
+    dataset: OPERA_S1
+    product_type: CSLC_STATIC
+    stackable: false
+    description: OPERA CSLC-S1 static-layer mask companion product
+
+  opera-dist-alert-s1:
+    aliases: [opera-dist-s1, dist-alert-s1]
+    dataset: OPERA_S1
+    product_type: DIST_ALERT_S1
+    stackable: false
+    description: OPERA Sentinel-1 land-surface disturbance alert (analysis-ready)
+
   aria-s1-gunw:
     aliases: [aria-gunw, gunw]
     dataset: ARIA_S1_GUNW
@@ -71,9 +198,94 @@ products:
     stackable: false
     description: ARIA Sentinel-1 Geocoded Unwrapped Interferogram (precomputed)
 
+  # ---------------------------------------------------------------
+  # NISAR — NASA-ISRO L+S-band; data starts after launch.
+  # ---------------------------------------------------------------
   nisar-rslc:
     aliases: [nisar-slc]
     platform: NISAR
     product_type: RSLC
     stackable: true
     description: NISAR Radar Single Look Complex (data starts arriving post-launch)
+
+  # ---------------------------------------------------------------
+  # ERS / JERS — legacy C/L-band SLC for historical baselines.
+  # `ERS-1` and `ERS-2` both speak the same product types; their
+  # archives reach back into the 1990s.
+  # ---------------------------------------------------------------
+  ers-1-slc:
+    aliases: [ers1-slc]
+    platform: ERS1
+    product_type: L1
+    stackable: true
+    description: ERS-1 Level-1 SLC (1991-2000)
+
+  ers-2-slc:
+    aliases: [ers2-slc]
+    platform: ERS2
+    product_type: L1
+    stackable: true
+    description: ERS-2 Level-1 SLC (1995-2011)
+
+  jers-1-l0:
+    aliases: [jers1-l0]
+    platform: JERS
+    product_type: L0
+    stackable: true
+    description: JERS-1 Level-0 raw downlink (L-band, 1992-1998)
+
+  # ---------------------------------------------------------------
+  # RADARSAT-1 — Canadian C-band, search-only.
+  # ---------------------------------------------------------------
+  radarsat-1-l0:
+    aliases: [radarsat1-l0, radarsat-l0]
+    platform: RADARSAT
+    product_type: L0
+    stackable: true
+    description: RADARSAT-1 Level-0 raw downlink (1995-2013)
+
+  radarsat-1-l1:
+    aliases: [radarsat1-l1, radarsat-l1]
+    platform: RADARSAT
+    product_type: L1
+    stackable: true
+    description: RADARSAT-1 Level-1 single-look products
+
+  # ---------------------------------------------------------------
+  # SEASAT (1978), SIR-C (Shuttle), AIRSAR / UAVSAR (airborne),
+  # SMAP — non-stackable archive completeness rows.
+  # ---------------------------------------------------------------
+  seasat-l1:
+    aliases: [seasat]
+    platform: SEASAT
+    product_type: L1
+    stackable: false
+    description: SEASAT-1 reprocessed Level-1 (1978 — the original spaceborne SAR)
+
+  sir-c-slc:
+    aliases: [sirc-slc, sir-c]
+    platform: SIRC
+    product_type: SLC
+    stackable: false
+    description: SIR-C / X-SAR Shuttle SAR campaigns (1994)
+
+  airsar-l1:
+    aliases: [airsar]
+    platform: AIRSAR
+    product_type: L1
+    stackable: false
+    description: AIRSAR airborne SAR (NASA / JPL, 1988-2004)
+
+  uavsar-amp:
+    aliases: [uavsar]
+    platform: UAVSAR
+    product_type: AMPLITUDE
+    stackable: false
+    description: UAVSAR airborne L-band SAR amplitude products
+
+  smap-l1:
+    aliases: [smap]
+    platform: SMAP
+    product_type: L1A_RADAR_HDF5
+    stackable: false
+    description: SMAP Level-1A radar HDF5 (mission ended 2015, archive only)

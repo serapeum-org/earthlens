@@ -90,6 +90,21 @@ def _load_catalog_data(path: Path) -> dict[str, Product]:
                 f"{path} product {name!r} failed validation:\n{exc}"
             ) from exc
 
+    # Sanity-check the informational `available_products:` index — if
+    # present, it must match the curated keys exactly. The index is
+    # documentation; a stale block would silently lie to anyone
+    # reading the YAML.
+    declared = data.get("available_products")
+    if declared is not None:
+        curated = sorted(rows)
+        if sorted(declared) != curated:
+            extra = sorted(set(declared) - set(rows))
+            missing = sorted(set(rows) - set(declared))
+            raise ValueError(
+                f"{path}: available_products: index drifted from products: "
+                f"block — extra={extra!r}, missing={missing!r}"
+            )
+
     _CATALOG_CACHE[key] = rows
     return rows
 

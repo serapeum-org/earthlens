@@ -250,3 +250,39 @@ def test_curated_catalog_aliases_are_globally_unique() -> None:
                 f"alias {alias!r} on {canonical!r} also on {seen[alias]!r}"
             )
             seen[alias] = canonical
+
+
+@pytest.mark.asf
+@pytest.mark.unit
+def test_available_products_index_matches_products_block(reset_catalog_cache) -> None:
+    """The informational `available_products:` index agrees with `products:`."""
+    cat = Catalog()
+    # The property reads from the loaded rows; we also verify the YAML
+    # itself by re-loading and asserting the loader accepted the index.
+    declared = cat.available_products
+    assert declared == sorted(cat.products)
+
+
+@pytest.mark.asf
+@pytest.mark.unit
+def test_drifted_available_products_block_rejected(
+    tmp_path, reset_catalog_cache
+) -> None:
+    """A stale `available_products:` block fails at load."""
+    yaml_path = tmp_path / "drifted.yaml"
+    yaml_path.write_text(
+        "available_products:\n"
+        "  - sentinel-1-slc\n"
+        "  - ghost-product\n"
+        "products:\n"
+        "  sentinel-1-slc:\n"
+        "    aliases: []\n"
+        "    platform: SENTINEL1\n"
+        "    product_type: SLC\n"
+        "    stackable: true\n",
+        encoding="utf-8",
+    )
+    from earthlens.asf.catalog import _load_catalog_data
+
+    with pytest.raises(ValueError, match="available_products"):
+        _load_catalog_data(yaml_path)
