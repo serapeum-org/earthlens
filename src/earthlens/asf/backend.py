@@ -65,6 +65,15 @@ class ASF(AbstractDataSource):
             a plain crop target, so the MVP returns paths for
             downstream InSAR tooling rather than processing them
             in-flight.
+
+    Note:
+        ASF ships every product as a SAFE `.zip` archive (not a
+        bare GeoTIFF / NetCDF), so :meth:`earthlens.earthlens.EarthLens.load`
+        — which calls `pyramids` on `.tif` / `.nc` / `.cog` /
+        `.zarr` extensions — returns the downloaded `.zip` path as
+        a plain :class:`pathlib.Path` rather than a pyramids object.
+        Use a dedicated SAR reader (`asf_search.export.read`, ISCE,
+        SNAP, `sarsen`, …) to open the archive.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
