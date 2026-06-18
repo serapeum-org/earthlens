@@ -293,15 +293,16 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['amazon-s3', 'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps',
-             'cmems', 'dea', 'deafrica', 'digital-earth-africa',
-             'digital-earth-australia', 'earth-search', 'earthdata', 'ecmwf',
-             'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee', 'ghs', 'ghsl',
-             'google-earth-engine', 'hdx', 'human-settlement', 'landsat',
-             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
-             'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
-             'usgs-water', 'veda', 'world-pop', 'worldpop']
+            ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bdc',
+             'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
+             'deafrica', 'digital-earth-africa', 'digital-earth-australia',
+             'earth-search', 'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms',
+             'gdacs', 'gee', 'ghs', 'ghsl', 'google-earth-engine', 'hdx',
+             'human-settlement', 'insar', 'landsat', 'national-water-model',
+             'nexrad', 'nwis', 'nwm', 'nwp', 'openaq', 'openeo', 'overture',
+             'planetary-computer', 'radar', 'sentinel-hub', 'sentinelhub',
+             'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis', 'usgs-water',
+             'veda', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -322,6 +323,11 @@ class EarthLens:
         :class:`earthlens.s3.S3`: AWS Open-Data datasets over public S3
             (ERA5, Sentinel-2, GOES, Copernicus DEM, ESA WorldCover) +
             an arbitrary-bucket passthrough.
+        :class:`earthlens.asf.ASF`: Alaska Satellite Facility SAR
+            search and InSAR baseline `stack()` via `asf_search`;
+            reuses NASA Earthdata Login auth from
+            :class:`earthlens.earthdata.EarthdataAuth`. Keys
+            `"asf"` / `"alaska-satellite-facility"` / `"insar"`.
         :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
             datasets via `copernicusmarine`.
         :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules
@@ -406,6 +412,13 @@ class EarthLens:
             # key is kept for callers that still use it.
             "chirps": ("earthlens.chc", "CHIRPS", "", {}),
             "amazon-s3": ("earthlens.s3", "S3", "s3", {}),
+            # Alaska Satellite Facility SAR search + InSAR baseline `stack()`
+            # via `asf_search`. Reuses NASA Earthdata Login from
+            # `earthlens.earthdata` — no second credential system. Aliases
+            # `"alaska-satellite-facility"` / `"insar"`.
+            "asf": ("earthlens.asf", "ASF", "asf", {}),
+            "alaska-satellite-facility": ("earthlens.asf", "ASF", "asf", {}),
+            "insar": ("earthlens.asf", "ASF", "asf", {}),
             "cmems": ("earthlens.cmems", "CMEMS", "cmems", {}),
             "earthdata": ("earthlens.earthdata", "Earthdata", "earthdata", {}),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf", {}),
@@ -568,7 +581,9 @@ class EarthLens:
         Args:
             data_source: Backend key. One of the registered keys in
                 :attr:`DataSources` — `"chc"` (alias `"chirps"`),
-                `"amazon-s3"`, `"cmems"`, `"earthdata"`, `"ecmwf"`,
+                `"amazon-s3"`, `"asf"` (aliases
+                `"alaska-satellite-facility"` / `"insar"`),
+                `"cmems"`, `"earthdata"`, `"ecmwf"`,
                 `"eumetsat"`, `"fdsn"`, `"firms"`, `"gdacs"`, `"gee"`
                 (alias `"google-earth-engine"`), `"ghsl"` (aliases
                 `"ghs"` / `"human-settlement"`), `"hdx"`, `"nwp"`,
