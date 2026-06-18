@@ -40,47 +40,31 @@ The two backends are deliberately complementary:
 
 **Search runs anonymously**; only the **download** step requires an
 EDL bearer token. The backend reuses
-[`earthlens.earthdata.EarthdataAuth`](../earthdata/auth.md), so the
-same credential ladder applies:
-
-1. `EARTHDATA_TOKEN` (a JSON Web Token generated from the EDL profile).
-2. `EARTHDATA_USERNAME` + `EARTHDATA_PASSWORD` env vars.
-3. A `urs.earthdata.nasa.gov` entry in `~/.netrc`.
-
-After a successful login, `EarthdataAuth` exposes the bearer token
-on its `earthaccess.Auth` handle (`_auth.token["access_token"]`),
-which the ASF wrapper hands to `asf_search.ASFSession().auth_with_token(...)`.
-There is **no second credential system** to configure — if your
-Earthdata account already works for the `earthdata` backend, it
-works for `asf` too.
-
-Register a free account at [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov).
+[`earthlens.earthdata.EarthdataAuth`](../earthdata/authentication.md)
+— there is no second credential system to configure. Full setup,
+the credential ladder, and the error path are documented under
+[Authentication](authentication.md).
 
 ## Products and the `stackable` flag
 
-The catalog (`asf_data_catalog.yaml`) curates one row per friendly
-product key. Each row carries either an `asf.PLATFORM` member
-(`SENTINEL1`, `ALOS`, `NISAR`, …) or an `asf.DATASET` member
-(`OPERA_S1`, `ARIA_S1_GUNW`, `SLC_BURST` — the processed-product
-families) plus an `asf.PRODUCT_TYPE` member (`SLC`, `BURST`,
-`L1_1`, `RTC`, `CSLC`, …) and a `stackable: bool` flag.
-
-| Product key | Description | `stackable` |
-|---|---|---|
-| `sentinel-1-slc` | Sentinel-1 Single Look Complex (the standard InSAR input) | **yes** |
-| `sentinel-1-burst` | Sentinel-1 SLC burst (per-burst InSAR subset) | **yes** |
-| `sentinel-1-grd` | Sentinel-1 Ground Range Detected, high-resolution dual-pol | no (search-only) |
-| `alos-palsar-slc` | ALOS PALSAR Level-1.1 SLC | **yes** |
-| `opera-cslc-s1` | OPERA S1 Coregistered Single Look Complex | **yes** |
-| `opera-rtc-s1` | OPERA S1 Radiometric Terrain Corrected | no (processed, search-only) |
-| `aria-s1-gunw` | ARIA S1 Geocoded Unwrapped Interferogram | no (precomputed) |
-| `nisar-rslc` | NISAR Radar Single Look Complex | yes (post-launch) |
+The catalog ships **29 curated rows** covering Sentinel-1
+(SLC / BURST / GRD / OCN / RAW + per-satellite variants), ALOS
+PALSAR + ALOS-2, the OPERA-S1 family (RTC / CSLC / DIST-ALERT),
+ARIA GUNW, NISAR, ERS-1/2, JERS-1, RADARSAT-1, plus the SEASAT /
+SIR-C / AIRSAR / UAVSAR / SMAP archive completeness rows. Each
+row carries either an `asf.PLATFORM` member or an `asf.DATASET`
+member, plus an `asf.PRODUCT_TYPE` member and a `stackable: bool`
+flag.
 
 `stackable: false` means `ASFProduct.stack()` returns an empty
 result for that product class — those products are *outputs* of
 the InSAR pipeline (RTC, GUNW) or do not have a baseline-comparable
 acquisition (GRD). Trying to use them in stack mode raises a
 `ValueError` at construction.
+
+The full product table — every curated row with its SDK selector,
+description, and aliases — lives under
+[Available products](datasets.md).
 
 Pass a friendly alias (`s1-slc`, `opera-rtc`, …) and the catalog
 resolves it to the curated key with a did-you-mean hint on a typo.

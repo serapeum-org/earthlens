@@ -122,7 +122,9 @@ nav:
       - Reference: reference/s3/reference.md
     - ASF (InSAR / SAR):
       - Introduction: reference/asf/introduction.md
+      - Authentication: reference/asf/authentication.md
       - Usage: reference/asf/usage.md
+      - Available products: reference/asf/datasets.md
       - Reference: reference/asf/asf.md
     - CMEMS (Copernicus Marine):
       - Introduction: reference/cmems/introduction.md
