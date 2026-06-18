@@ -16,7 +16,7 @@
         <link rel="prev" href="../../s3/reference/">
       
       
-        <link rel="next" href="../usage/">
+        <link rel="next" href="../authentication/">
       
       
         
@@ -1281,6 +1281,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../usage/" class="md-nav__link">
         
   
@@ -1289,6 +1317,34 @@
     
   
     Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available products
   
 
     
@@ -11333,83 +11389,27 @@ InSAR-ready stack available without leaving the <code>EarthLens()</code> /
 <h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
 <p><strong>Search runs anonymously</strong>; only the <strong>download</strong> step requires an
 EDL bearer token. The backend reuses
-<a href="../earthdata/auth.md"><code>earthlens.earthdata.EarthdataAuth</code></a>, so the
-same credential ladder applies:</p>
-<ol>
-<li><code>EARTHDATA_TOKEN</code> (a JSON Web Token generated from the EDL profile).</li>
-<li><code>EARTHDATA_USERNAME</code> + <code>EARTHDATA_PASSWORD</code> env vars.</li>
-<li>A <code>urs.earthdata.nasa.gov</code> entry in <code>~/.netrc</code>.</li>
-</ol>
-<p>After a successful login, <code>EarthdataAuth</code> exposes the bearer token
-on its <code>earthaccess.Auth</code> handle (<code>_auth.token["access_token"]</code>),
-which the ASF wrapper hands to <code>asf_search.ASFSession().auth_with_token(...)</code>.
-There is <strong>no second credential system</strong> to configure — if your
-Earthdata account already works for the <code>earthdata</code> backend, it
-works for <code>asf</code> too.</p>
-<p>Register a free account at <a href="https://urs.earthdata.nasa.gov">urs.earthdata.nasa.gov</a>.</p>
+<a href="../../earthdata/authentication/"><code>earthlens.earthdata.EarthdataAuth</code></a>
+— there is no second credential system to configure. Full setup,
+the credential ladder, and the error path are documented under
+<a href="../authentication/">Authentication</a>.</p>
 <h2 id="products-and-the-stackable-flag"><a class="toclink" href="#products-and-the-stackable-flag">Products and the <code>stackable</code> flag</a><a class="headerlink" href="#products-and-the-stackable-flag" title="Permanent link">#</a></h2>
-<p>The catalog (<code>asf_data_catalog.yaml</code>) curates one row per friendly
-product key. Each row carries either an <code>asf.PLATFORM</code> member
-(<code>SENTINEL1</code>, <code>ALOS</code>, <code>NISAR</code>, …) or an <code>asf.DATASET</code> member
-(<code>OPERA_S1</code>, <code>ARIA_S1_GUNW</code>, <code>SLC_BURST</code> — the processed-product
-families) plus an <code>asf.PRODUCT_TYPE</code> member (<code>SLC</code>, <code>BURST</code>,
-<code>L1_1</code>, <code>RTC</code>, <code>CSLC</code>, …) and a <code>stackable: bool</code> flag.</p>
-<table>
-<thead>
-<tr>
-<th>Product key</th>
-<th>Description</th>
-<th><code>stackable</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>sentinel-1-slc</code></td>
-<td>Sentinel-1 Single Look Complex (the standard InSAR input)</td>
-<td><strong>yes</strong></td>
-</tr>
-<tr>
-<td><code>sentinel-1-burst</code></td>
-<td>Sentinel-1 SLC burst (per-burst InSAR subset)</td>
-<td><strong>yes</strong></td>
-</tr>
-<tr>
-<td><code>sentinel-1-grd</code></td>
-<td>Sentinel-1 Ground Range Detected, high-resolution dual-pol</td>
-<td>no (search-only)</td>
-</tr>
-<tr>
-<td><code>alos-palsar-slc</code></td>
-<td>ALOS PALSAR Level-1.1 SLC</td>
-<td><strong>yes</strong></td>
-</tr>
-<tr>
-<td><code>opera-cslc-s1</code></td>
-<td>OPERA S1 Coregistered Single Look Complex</td>
-<td><strong>yes</strong></td>
-</tr>
-<tr>
-<td><code>opera-rtc-s1</code></td>
-<td>OPERA S1 Radiometric Terrain Corrected</td>
-<td>no (processed, search-only)</td>
-</tr>
-<tr>
-<td><code>aria-s1-gunw</code></td>
-<td>ARIA S1 Geocoded Unwrapped Interferogram</td>
-<td>no (precomputed)</td>
-</tr>
-<tr>
-<td><code>nisar-rslc</code></td>
-<td>NISAR Radar Single Look Complex</td>
-<td>yes (post-launch)</td>
-</tr>
-</tbody>
-</table>
+<p>The catalog ships <strong>29 curated rows</strong> covering Sentinel-1
+(SLC / BURST / GRD / OCN / RAW + per-satellite variants), ALOS
+PALSAR + ALOS-2, the OPERA-S1 family (RTC / CSLC / DIST-ALERT),
+ARIA GUNW, NISAR, ERS-1/2, JERS-1, RADARSAT-1, plus the SEASAT /
+SIR-C / AIRSAR / UAVSAR / SMAP archive completeness rows. Each
+row carries either an <code>asf.PLATFORM</code> member or an <code>asf.DATASET</code>
+member, plus an <code>asf.PRODUCT_TYPE</code> member and a <code>stackable: bool</code>
+flag.</p>
 <p><code>stackable: false</code> means <code>ASFProduct.stack()</code> returns an empty
 result for that product class — those products are <em>outputs</em> of
 the InSAR pipeline (RTC, GUNW) or do not have a baseline-comparable
 acquisition (GRD). Trying to use them in stack mode raises a
 <code>ValueError</code> at construction.</p>
+<p>The full product table — every curated row with its SDK selector,
+description, and aliases — lives under
+<a href="../datasets/">Available products</a>.</p>
 <p>Pass a friendly alias (<code>s1-slc</code>, <code>opera-rtc</code>, …) and the catalog
 resolves it to the curated key with a did-you-mean hint on a typo.</p>
 <h2 id="what-a-request-returns"><a class="toclink" href="#what-a-request-returns">What a request returns</a><a class="headerlink" href="#what-a-request-returns" title="Permanent link">#</a></h2>
@@ -11499,13 +11499,13 @@ the lazy <code>import asf_search</code>.</p>
         
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
+          <a href="../authentication/" class="md-footer__link md-footer__link--next" aria-label="Next: Authentication">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Usage
+                Authentication
               </div>
             </div>
             <div class="md-footer__button md-icon">
