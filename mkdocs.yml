@@ -248,10 +248,12 @@ nav:
     - Protected Planet (WDPA):
       - Introduction: reference/wdpa/introduction.md
       - Usage: reference/wdpa/usage.md
+      - Authentication: reference/wdpa/authentication.md
       - Reference: reference/wdpa/wdpa.md
     - IUCN Red List (assessments):
       - Introduction: reference/iucn/introduction.md
       - Usage: reference/iucn/usage.md
+      - Authentication: reference/iucn/authentication.md
       - Reference: reference/iucn/iucn.md
   - Examples:
     - Authentication: examples/authentication.md
@@ -273,6 +275,7 @@ nav:
       - NYC wildfire-smoke air quality (OpenAQ): examples/showcase/wildfire_smoke_air_quality.ipynb
       - Hurricane Harvey rainfall (NASA GPM/Earthdata): examples/showcase/hurricane_harvey_rainfall.ipynb
       - Hurricane Ian from GOES (geostationary, S3): examples/showcase/goes_hurricane_ian.ipynb
+      - Sea-turtle occurrences (GBIF + OBIS): examples/showcase/species_occurrences_gbif_obis.ipynb
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
       - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
