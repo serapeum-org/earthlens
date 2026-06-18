@@ -272,6 +272,7 @@ markers = [
     "biodiversity: tests for the shared biodiversity-cluster helpers (`wkt_from_bbox`, `occurrences_to_fc`, `LicenseWarning`; no extra SDK).",
     "gbif: tests for the GBIF species-occurrence backend (requires the `gbif` extra: pygbif; search is anonymous).",
     "obis: tests for the OBIS marine-occurrence backend (requires the `obis` extra: pyobis; search is anonymous).",
+    "wdpa: tests for the Protected Planet (WDPA) backend (no extra SDK; direct v4 REST via core `requests`; needs a token).",
 ]
 
 [tool.pixi.workspace]
