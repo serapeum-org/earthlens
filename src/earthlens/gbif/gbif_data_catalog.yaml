@@ -1,0 +1,32 @@
+# GBIF taxon catalog — friendly taxon keys for the earthlens GBIF backend.
+#
+# Each entry maps a friendly name a user can pass in `variables` to a GBIF
+# backbone `taxonKey`. The values are stable GBIF backbone usage keys: the
+# eight kingdom roots (1-8, e.g. Animalia=1, Plantae=6, Fungi=5) and two
+# well-known class keys (Aves=212, Mammalia=359). For any taxon not listed
+# here, pass a raw integer key (`variables=[212]`) or a name lookup
+# (`variables=["taxon:Panthera leo"]`) which resolves live via GBIF's
+# `species.name_backbone`.
+#
+# Verify upstream with: earthlens datasets validate gbif
+taxa:
+  animals:
+    taxon_key: 1
+    title: "Animalia — animals"
+    rank: kingdom
+  plants:
+    taxon_key: 6
+    title: "Plantae — plants"
+    rank: kingdom
+  fungi:
+    taxon_key: 5
+    title: "Fungi"
+    rank: kingdom
+  birds:
+    taxon_key: 212
+    title: "Aves — birds"
+    rank: class
+  mammals:
+    taxon_key: 359
+    title: "Mammalia — mammals"
+    rank: class
