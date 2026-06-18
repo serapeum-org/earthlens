@@ -89,7 +89,7 @@ def _in_window(value: float | int | None, window: tuple[float, float] | None) ->
 def apply_baseline_windows(
     products: list[Any],
     perpendicular_baseline: tuple[float, float] | None,
-    temporal_baseline: tuple[float, float] | None,
+    temporal_baseline: tuple[int, int] | None,
 ) -> list[Any]:
     """Drop stacked products outside the requested baseline windows.
 

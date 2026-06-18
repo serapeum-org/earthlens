@@ -196,3 +196,33 @@ def test_empty_search_short_circuits_download(
     )
     assert backend.download() == []
     assert backend._auth.is_authenticated() is False
+
+
+@pytest.mark.asf
+@pytest.mark.unit
+def test_fetch_raises_clear_error_on_missing_filename(
+    fake_asf_search, fake_earthdata_auth, tmp_path: Path
+) -> None:
+    """A product without a resolvable `fileName` raises `ValueError`, not `TypeError`."""
+    from tests.asf.conftest import _FakeProduct
+
+    backend = ASF(
+        start="2024-01-01",
+        end="2024-01-31",
+        variables=["sentinel-1-slc"],
+        lat_lim=[0.0, 1.0],
+        lon_lim=[0.0, 1.0],
+        path=tmp_path,
+    )
+    broken_product = _FakeProduct(sceneName="S1A_BROKEN_SLC")
+    broken_product.properties["fileName"] = None
+    broken_remote = RemoteProduct(
+        id="S1A_BROKEN_SLC",
+        metadata={"product": broken_product, "fileName": None},
+    )
+    with pytest.raises(ValueError, match="resolvable fileName"):
+        backend._fetch([broken_remote])
+    # The auth wrapper must not have been configured — failing this fast
+    # means we never paid for an EDL login just to discover the product
+    # was malformed.
+    assert backend._auth.is_authenticated() is False
