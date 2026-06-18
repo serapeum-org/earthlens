@@ -181,8 +181,8 @@ def fetch_species(
         if assessment.get("latest") and assessment.get("assessment_id") is not None:
             detail = _get(http, token, f"assessment/{assessment['assessment_id']}")
             row["category"] = _category(detail) or row["category"]
-            row["criteria"] = detail.get("criteria")
-            row["population_trend"] = detail.get("population_trend")
+            row["criteria"] = detail.get("criteria") or row["criteria"]
+            row["population_trend"] = detail.get("population_trend") or row["population_trend"]
         rows.append(row)
     return rows
 

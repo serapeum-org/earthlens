@@ -110,6 +110,14 @@ class TestFetchAndDownload:
         _backend(tmp_path).download()
         assert (tmp_path / "obis_occurrences.parquet").exists()
 
+    def test_multiple_species_unioned(self, tmp_path, fake_obis):
+        """Several species each issue a search and their rows are concatenated."""
+        fake_obis.occurrences.set_frame(fake_obis.frame([fake_obis.row()]))
+        fc = _backend(tmp_path, variables=["blue-whale", "common-dolphin"]).download()
+        names = [c["scientificname"] for c in fake_obis.occurrences.calls]
+        assert names == ["Balaenoptera musculus", "Delphinus delphis"]
+        assert len(fc) == 2
+
     def test_aggregate_rejected(self, tmp_path, fake_obis):
         """A non-None aggregate raises NotImplementedError mentioning vector."""
         with pytest.raises(NotImplementedError, match="vector"):

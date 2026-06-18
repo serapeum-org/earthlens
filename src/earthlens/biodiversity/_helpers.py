@@ -143,7 +143,11 @@ def occurrences_to_fc(
         Point(lon, lat) if pd.notna(lon) and pd.notna(lat) else None
         for lon, lat in zip(frame[lon_field], frame[lat_field])
     ]
-    gdf = gpd.GeoDataFrame(frame, geometry=gpd.GeoSeries(points, crs=CRS), crs=CRS)
+    # Tag the GeoSeries with the frame's own index so geopandas does not align
+    # a default RangeIndex against a non-default frame index (which would null
+    # every geometry) — OBIS frames can carry a non-default index.
+    geometry = gpd.GeoSeries(points, index=frame.index, crs=CRS)
+    gdf = gpd.GeoDataFrame(frame, geometry=geometry, crs=CRS)
     return FeatureCollection(gdf)
 
 

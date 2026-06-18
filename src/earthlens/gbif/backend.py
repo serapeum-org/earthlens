@@ -281,10 +281,12 @@ class GBIF(AbstractDataSource):
                 count = result.get("count")
             rows.extend(result.get("results", []))
             offset += _PAGE_SIZE
+            # Stop before issuing a request whose `offset + limit` would breach
+            # GBIF's 100,000 search ceiling (it 4xx's such requests).
             if (
                 result.get("endOfRecords")
                 or len(rows) >= self._max_records
-                or offset >= _OFFSET_CAP
+                or offset + _PAGE_SIZE > _OFFSET_CAP
             ):
                 break
         if count is not None and count > self._max_records:

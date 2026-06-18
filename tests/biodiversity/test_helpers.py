@@ -79,6 +79,20 @@ class TestOccurrencesToFc:
         assert len(fc) == 0
         assert list(fc.columns) == [*COLUMNS, "geometry"]
 
+    def test_nondefault_index_keeps_geometry(self):
+        """A DataFrame with a non-default index keeps its point geometries."""
+        frame = pd.DataFrame(
+            [
+                {"id": "a", "name": "x", "lat": 1.0, "lon": 2.0},
+                {"id": "b", "name": "y", "lat": 3.0, "lon": 4.0},
+            ],
+            index=[5, 7],
+        )
+        fc = _fc(frame)
+        assert isinstance(fc.geometry.iloc[0], Point)
+        assert fc.geometry.iloc[0] == Point(2.0, 1.0)
+        assert fc.geometry.notna().all()
+
     def test_columns_restricted_and_ordered(self):
         """Extra record keys are dropped and columns come out in the declared order."""
         fc = _fc([{"id": "a", "name": "x", "lat": 1.0, "lon": 2.0, "extra": "drop"}])

@@ -24,6 +24,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
+import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
@@ -208,8 +209,6 @@ class OBIS(AbstractDataSource):
         """
         import datetime as dt
 
-        import pandas as pd
-
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
         return TemporalExtent(
@@ -219,19 +218,24 @@ class OBIS(AbstractDataSource):
             dates=pd.DatetimeIndex([start_dt, end_dt]),
         )
 
-    def _plan_search(self) -> dict[str, Any]:
-        """Build the `occurrences.search` keyword arguments for the request.
+    def _plan_search(self, name: str | None = None) -> dict[str, Any]:
+        """Build the `occurrences.search` keyword arguments for one species.
 
-        Resolves the (single) `variables` entry to a `scientificname`,
-        turns the bbox into a WKT polygon, and maps the window to OBIS's
-        `startdate` / `enddate`.
+        Turns the bbox into a WKT polygon and maps the window to OBIS's
+        `startdate` / `enddate`. `name` defaults to the first `variables`
+        entry resolved to a `scientificname`.
+
+        Args:
+            name: The OBIS `scientificname` to search; defaults to the
+                first `variables` selector resolved through the catalog.
 
         Returns:
             dict[str, Any]: The `occurrences.search` kwargs
                 (`scientificname`, `geometry`, `startdate`, `enddate`,
                 `size`).
         """
-        name = self._catalog.resolve_scientific_name(self.vars[0])
+        if name is None:
+            name = self._catalog.resolve_scientific_name(self.vars[0])
         return {
             "scientificname": name,
             "geometry": wkt_from_bbox(self.space),
@@ -241,12 +245,13 @@ class OBIS(AbstractDataSource):
         }
 
     def _fetch(self) -> FeatureCollection:
-        """Run the search and map the result DataFrame to a FeatureCollection.
+        """Search every requested species and map the rows to a FeatureCollection.
 
         Imports `pyobis` lazily (so the package imports without the
-        `[obis]` extra), runs the lazy query to a `pandas.DataFrame` via
-        `.execute()`, maps it via the shared `occurrences_to_fc`, and warns
-        once per distinct restrictive license present.
+        `[obis]` extra), runs one lazy query per `variables` entry to a
+        `pandas.DataFrame` via `.execute()`, concatenates them, maps via
+        the shared `occurrences_to_fc`, and warns once per distinct
+        restrictive license present.
 
         Returns:
             FeatureCollection: The occurrence points, CRS `EPSG:4326`;
@@ -254,17 +259,23 @@ class OBIS(AbstractDataSource):
         """
         from pyobis import occurrences
 
-        response = occurrences.search(**self._plan_search())
-        frame = response.execute()
+        frames: list[pd.DataFrame] = []
+        licenses: set[str] = set()
+        for selector in self.vars:
+            name = self._catalog.resolve_scientific_name(selector)
+            frame = occurrences.search(**self._plan_search(name)).execute()
+            frames.append(frame)
+            if "license" in frame.columns:
+                licenses.update(frame["license"].dropna())
+        combined = pd.concat(frames, ignore_index=True) if len(frames) > 1 else frames[0]
         collection = occurrences_to_fc(
-            frame,
+            combined,
             lat_field="decimalLatitude",
             lon_field="decimalLongitude",
             columns=OBIS_COLUMNS,
         )
-        if "license" in frame.columns:
-            for lic in sorted(set(frame["license"].dropna())):
-                warn_license(lic, "obis")
+        for lic in sorted(licenses):
+            warn_license(lic, "obis")
         return collection
 
     def _api(self) -> FeatureCollection:
