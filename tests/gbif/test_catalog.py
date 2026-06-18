@@ -71,6 +71,9 @@ class TestResolveTaxonKey:
     def test_taxon_name_lookup(self, fake_gbif):
         """A `taxon:<name>` selector resolves live via name_backbone (usage.key)."""
         assert Catalog().resolve_taxon_key("taxon:Panthera leo") == 5219404
+        # The name must reach name_backbone's `scientificName` (passed positionally),
+        # not vanish into **kwargs as a stray `name=` (which real pygbif rejects).
+        assert fake_gbif.species.calls == ["Panthera leo"]
 
     def test_taxon_name_lookup_legacy_shape(self, fake_gbif):
         """The legacy flat `usageKey` shape is read when `usage` is absent."""

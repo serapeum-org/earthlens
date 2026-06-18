@@ -33,9 +33,16 @@ class _FakeSpecies:
     def __init__(self):
         """Default to a Panthera leo backbone match (nested 0.6.6 shape)."""
         self.result: dict = {"usage": {"key": 5219404, "name": "Panthera leo"}}
+        self.calls: list[str | None] = []
 
-    def name_backbone(self, name: str, **kwargs):
-        """Return the pinned backbone result regardless of `name`."""
+    def name_backbone(self, scientificName=None, **kwargs):
+        """Mirror pygbif 0.6.6's signature (first param `scientificName`).
+
+        Records the name actually received so a test can assert the backend
+        passes it positionally — a regression to a `name=` kwarg would leave
+        `scientificName` `None` and surface here.
+        """
+        self.calls.append(scientificName)
         return self.result
 
 

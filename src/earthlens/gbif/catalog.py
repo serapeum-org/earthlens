@@ -107,7 +107,9 @@ def _name_backbone_key(name: str) -> int:
     """
     from pygbif import species
 
-    result = species.name_backbone(name=name) or {}
+    # pygbif 0.6.6's first parameter is `scientificName` (positional here); an
+    # unknown `name=` kwarg would be forwarded to requests and raise TypeError.
+    result = species.name_backbone(name) or {}
     usage = result.get("usage") or {}
     key = usage.get("key", result.get("usageKey"))
     if key is None:
