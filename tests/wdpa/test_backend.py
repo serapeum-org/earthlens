@@ -48,6 +48,11 @@ class TestConstruction:
         with pytest.raises(ValueError, match="at least one country"):
             _backend(tmp_path, variables=[])
 
+    def test_unknown_file_format_rejected(self, tmp_path):
+        """An unknown file_format raises a ValueError."""
+        with pytest.raises(ValueError, match="file_format must be one of"):
+            _backend(tmp_path, file_format="shp")
+
 
 @pytest.mark.wdpa
 class TestFetchAndDownload:
@@ -129,6 +134,37 @@ class TestFetchAndDownload:
         )
         _backend(tmp_path).download()
         assert (tmp_path / "wdpa_protected_areas.parquet").exists()
+
+    def test_country_prefix_selector(self, tmp_path, fake_wdpa):
+        """A `country:` prefixed selector fetches the country's areas."""
+        fake_wdpa.state.set_responses(
+            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+        )
+        _backend(tmp_path, variables=["country:KEN"]).download()
+        assert fake_wdpa.state.calls[0]["params"]["country"] == "KEN"
+
+    def test_empty_result_keeps_schema(self, tmp_path, fake_wdpa):
+        """A country with no areas yields an empty FeatureCollection."""
+        fc = _backend(tmp_path).download()
+        assert len(fc) == 0
+        assert "geometry" in fc.columns
+
+    def test_geojson_write(self, tmp_path, fake_wdpa):
+        """A non-parquet file_format writes via the OGR driver."""
+        fake_wdpa.state.set_responses(
+            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+        )
+        _backend(tmp_path, file_format="geojson").download()
+        assert (tmp_path / "wdpa_protected_areas.geojson").exists()
+
+    def test_api_returns_collection(self, tmp_path, fake_wdpa):
+        """`_api` returns the protected-area FeatureCollection."""
+        from geopandas import GeoDataFrame
+
+        fake_wdpa.state.set_responses(
+            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+        )
+        assert isinstance(_backend(tmp_path)._api(), GeoDataFrame)
 
     def test_aggregate_rejected(self, tmp_path, fake_wdpa):
         """A non-None aggregate raises NotImplementedError mentioning vector."""

@@ -35,3 +35,10 @@ class TestWdpaAuth:
         """Reading the token before configure raises a clear error."""
         with pytest.raises(AuthenticationError, match="configure"):
             _ = WdpaAuth(WdpaCredentials(token="k")).token
+
+    def test_configure_is_idempotent(self):
+        """A second configure call short-circuits and keeps the token."""
+        auth = WdpaAuth(WdpaCredentials(token="k"))
+        auth.configure()
+        auth.configure()
+        assert auth.token == "k"
