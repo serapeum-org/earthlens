@@ -87,11 +87,12 @@ class TestSupportedProviders:
         """CHC's FTP product-tree walk is wired up."""
         assert "chc" in supported_providers()
 
-    def test_nineteen_refreshable_providers(self):
-        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm)."""
-        assert len(supported_providers()) == 19, sorted(supported_providers())
+    def test_twenty_refreshable_providers(self):
+        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm, jaxa)."""
+        assert len(supported_providers()) == 20, sorted(supported_providers())
         assert "s3" in supported_providers(), "s3 regenerates its index from curated"
         assert "nwm" in supported_providers(), "nwm walks its operational bucket"
+        assert "jaxa" in supported_providers(), "jaxa lists both SDK universes"
 
 
 class TestEcmwfRefresher:
