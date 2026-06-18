@@ -439,9 +439,13 @@ nav:
     - OBIS (marine occurrences):
       - Quickstart — marine occurrences: examples/obis/quickstart.ipynb
     - Protected Planet (WDPA):
+      - Catalog explorer (no network): examples/wdpa/catalog_explorer.ipynb
       - Quickstart — protected-area polygons: examples/wdpa/quickstart.ipynb
+      - Comparing countries (live): examples/wdpa/regional_comparison.ipynb
     - IUCN Red List (assessments):
+      - Catalog explorer (no network): examples/iucn/catalog_explorer.ipynb
       - Quickstart — species assessments: examples/iucn/quickstart.ipynb
+      - Country Red List breakdown (live): examples/iucn/country_redlist_breakdown.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
