@@ -235,6 +235,24 @@ nav:
       - Available datasets: reference/worldpop/datasets.md
       - WorldPopPy & no-xarray: reference/worldpop/worldpoppy.md
       - Reference: reference/worldpop/worldpop.md
+    - Biodiversity (overview):
+      - Introduction: reference/biodiversity/introduction.md
+    - GBIF (species occurrences):
+      - Introduction: reference/gbif/introduction.md
+      - Usage: reference/gbif/usage.md
+      - Reference: reference/gbif/gbif.md
+    - OBIS (marine occurrences):
+      - Introduction: reference/obis/introduction.md
+      - Usage: reference/obis/usage.md
+      - Reference: reference/obis/obis.md
+    - Protected Planet (WDPA):
+      - Introduction: reference/wdpa/introduction.md
+      - Usage: reference/wdpa/usage.md
+      - Reference: reference/wdpa/wdpa.md
+    - IUCN Red List (assessments):
+      - Introduction: reference/iucn/introduction.md
+      - Usage: reference/iucn/usage.md
+      - Reference: reference/iucn/iucn.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
