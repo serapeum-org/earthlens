@@ -13,14 +13,34 @@ Targets specific uncovered lines surfaced by `pytest --cov=src/earthlens/jaxa`:
 
 from __future__ import annotations
 
+import datetime as dt
 import sys
 import types
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
 import pytest
+from pydantic import SecretStr
 
+from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa import JAXA, AuthenticationError, JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Catalog, Dataset, clear_catalog_cache
+
+
+class _DatasetWithoutCollection:
+    """Stand-in for a malformed `jaxa-earth` catalog row (missing `collection`)."""
+
+    key = "aw3d30"
+    collection = None
+    default_band = "DSM"
+
+
+class _DatasetWithoutShortName:
+    """Stand-in for a malformed `gportal` catalog row (missing `short_name`)."""
+
+    key = "sgli"
+    short_name = None
 
 
 @pytest.fixture(autouse=True)
@@ -29,6 +49,21 @@ def _reset_catalog_cache():
     clear_catalog_cache()
     yield
     clear_catalog_cache()
+
+
+@pytest.fixture
+def degenerate_extents():
+    """Small unit bbox + single-day window for the import-error / bad-row tests."""
+    space = SpatialExtent(
+        latitude_min=0.0, latitude_max=1.0, longitude_min=0.0, longitude_max=1.0
+    )
+    time = TemporalExtent(
+        start_date=dt.datetime(2024, 1, 1),
+        end_date=dt.datetime(2024, 1, 2),
+        resolution="D",
+        dates=pd.date_range("2024-01-01", "2024-01-02", freq="D"),
+    )
+    return space, time
 
 
 @pytest.mark.jaxa
@@ -110,28 +145,17 @@ def test_auth_configure_idempotent_for_gportal(monkeypatch) -> None:
 
 @pytest.mark.jaxa
 @pytest.mark.unit
-def test_jaxa_earth_branch_friendly_import_error(monkeypatch, tmp_path) -> None:
+def test_jaxa_earth_branch_friendly_import_error(
+    monkeypatch, tmp_path, degenerate_extents
+) -> None:
     """A missing `jaxa.earth` install raises a friendly hint about [jaxa]."""
     for name in list(sys.modules):
         if name == "jaxa.earth" or name.startswith("jaxa.earth."):
             monkeypatch.setitem(sys.modules, name, None)
     monkeypatch.setitem(sys.modules, "jaxa.earth", None)
-    from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
     from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
 
-    space = SpatialExtent(
-        latitude_min=0.0, latitude_max=1.0, longitude_min=0.0, longitude_max=1.0
-    )
-    import datetime as dt
-
-    import pandas as pd
-
-    time = TemporalExtent(
-        start_date=dt.datetime(2024, 1, 1),
-        end_date=dt.datetime(2024, 1, 2),
-        resolution="D",
-        dates=pd.date_range("2024-01-01", "2024-01-02", freq="D"),
-    )
+    space, time = degenerate_extents
     ds = Dataset(
         key="aw3d30",
         protocol="jaxa-earth",
@@ -151,33 +175,16 @@ def test_jaxa_earth_branch_friendly_import_error(monkeypatch, tmp_path) -> None:
 
 @pytest.mark.jaxa
 @pytest.mark.unit
-def test_jaxa_earth_branch_rejects_missing_collection(tmp_path) -> None:
+def test_jaxa_earth_branch_rejects_missing_collection(
+    tmp_path, degenerate_extents
+) -> None:
     """A jaxa-earth row stripped of its collection raises at fetch time."""
-    from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
     from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
 
-    space = SpatialExtent(
-        latitude_min=0.0, latitude_max=1.0, longitude_min=0.0, longitude_max=1.0
-    )
-    import datetime as dt
-
-    import pandas as pd
-
-    time = TemporalExtent(
-        start_date=dt.datetime(2024, 1, 1),
-        end_date=dt.datetime(2024, 1, 2),
-        resolution="D",
-        dates=pd.date_range("2024-01-01", "2024-01-02", freq="D"),
-    )
-
-    class _FakeDataset:
-        key = "aw3d30"
-        collection = None
-        default_band = "DSM"
-
+    space, time = degenerate_extents
     with pytest.raises(ValueError, match="no collection"):
         fetch_jaxa_earth(
-            dataset=_FakeDataset(),  # type: ignore[arg-type]
+            dataset=_DatasetWithoutCollection(),  # type: ignore[arg-type]
             space=space,
             time=time,
             resolution=None,
@@ -188,25 +195,77 @@ def test_jaxa_earth_branch_rejects_missing_collection(tmp_path) -> None:
 
 @pytest.mark.jaxa
 @pytest.mark.unit
-def test_gportal_branch_friendly_import_error(monkeypatch, tmp_path) -> None:
+def test_jaxa_earth_branch_rejects_zero_pixel_array(
+    monkeypatch, tmp_path, degenerate_extents
+) -> None:
+    """A jaxa.earth fetch that returns a `(1, 0, 0, 1)` array raises a clear ValueError."""
+    fake_je = types.ModuleType("jaxa.earth.je")
+
+    class _ZeroRaster:
+        img = np.zeros((1, 0, 0, 1), dtype=np.float32)
+        latlim = np.array([[0.0, 1.0]])
+        lonlim = np.array([[0.0, 1.0]])
+
+    class _Result:
+        raster = _ZeroRaster()
+
+    class _Col:
+        def __init__(self, *, collection, **_kw):
+            self.collection = collection
+
+        def filter_date(self, *, dlim):
+            return self
+
+        def filter_resolution(self, *, ppu):
+            return self
+
+        def filter_bounds(self, *, bbox=None, geoj=None):
+            return self
+
+        def select(self, *, band):
+            return self
+
+        def get_images(self):
+            return _Result()
+
+    fake_je.ImageCollection = _Col  # type: ignore[attr-defined]
+    fake_earth = types.ModuleType("jaxa.earth")
+    fake_earth.je = fake_je  # type: ignore[attr-defined]
+    fake_pkg = types.ModuleType("jaxa")
+    fake_pkg.earth = fake_earth  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "jaxa", fake_pkg)
+    monkeypatch.setitem(sys.modules, "jaxa.earth", fake_earth)
+    monkeypatch.setitem(sys.modules, "jaxa.earth.je", fake_je)
+    from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
+
+    space, time = degenerate_extents
+    ds = Dataset(
+        key="aw3d30",
+        protocol="jaxa-earth",
+        collection="JAXA.foo",
+        default_band="DSM",
+    )
+    with pytest.raises(ValueError, match="zero-pixel"):
+        fetch_jaxa_earth(
+            dataset=ds,
+            space=space,
+            time=time,
+            resolution=None,
+            bands=None,
+            out_dir=tmp_path,
+        )
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_gportal_branch_friendly_import_error(
+    monkeypatch, tmp_path, degenerate_extents
+) -> None:
     """A missing `gportal` install raises a friendly hint about [jaxa]."""
     monkeypatch.setitem(sys.modules, "gportal", None)
-    from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
     from earthlens.jaxa._gportal import fetch_gportal
 
-    space = SpatialExtent(
-        latitude_min=0.0, latitude_max=1.0, longitude_min=0.0, longitude_max=1.0
-    )
-    import datetime as dt
-
-    import pandas as pd
-
-    time = TemporalExtent(
-        start_date=dt.datetime(2024, 1, 1),
-        end_date=dt.datetime(2024, 1, 2),
-        resolution="D",
-        dates=pd.date_range("2024-01-01", "2024-01-02", freq="D"),
-    )
+    space, time = degenerate_extents
     ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
     auth = JaxaAuth(JaxaCredentials(), protocol="gportal")
     with pytest.raises(ImportError, match=r"earthlens\[jaxa\]"):
@@ -217,43 +276,27 @@ def test_gportal_branch_friendly_import_error(monkeypatch, tmp_path) -> None:
 
 @pytest.mark.jaxa
 @pytest.mark.unit
-def test_gportal_branch_rejects_missing_short_name(monkeypatch, tmp_path) -> None:
+def test_gportal_branch_rejects_missing_short_name(
+    monkeypatch, tmp_path, degenerate_extents
+) -> None:
     """A gportal row stripped of its short_name raises at fetch time."""
     fake = types.ModuleType("gportal")
     fake.search = lambda **_kw: None  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "gportal", fake)
-    from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
     from earthlens.jaxa._gportal import fetch_gportal
 
-    space = SpatialExtent(
-        latitude_min=0.0, latitude_max=1.0, longitude_min=0.0, longitude_max=1.0
-    )
-    import datetime as dt
-
-    import pandas as pd
-
-    time = TemporalExtent(
-        start_date=dt.datetime(2024, 1, 1),
-        end_date=dt.datetime(2024, 1, 2),
-        resolution="D",
-        dates=pd.date_range("2024-01-01", "2024-01-02", freq="D"),
-    )
-
-    class _BadDataset:
-        key = "sgli"
-        short_name = None
-
+    space, time = degenerate_extents
     auth = JaxaAuth(
         JaxaCredentials(
             gportal_username="x",
-            gportal_password=__import__("pydantic").SecretStr("y"),
+            gportal_password=SecretStr("y"),
         ),
         protocol="gportal",
     )
     auth.configure()
     with pytest.raises(ValueError, match="no short_name"):
         fetch_gportal(
-            dataset=_BadDataset(),  # type: ignore[arg-type]
+            dataset=_DatasetWithoutShortName(),  # type: ignore[arg-type]
             space=space,
             time=time,
             auth=auth,
@@ -263,7 +306,9 @@ def test_gportal_branch_rejects_missing_short_name(monkeypatch, tmp_path) -> Non
 
 @pytest.mark.jaxa
 @pytest.mark.unit
-def test_gportal_branch_empty_products_returns_empty(monkeypatch, tmp_path) -> None:
+def test_gportal_branch_empty_products_returns_empty(
+    monkeypatch, tmp_path, degenerate_extents
+) -> None:
     """A matched>0 with empty products list still returns `[]`."""
     fake = types.ModuleType("gportal")
 
@@ -276,27 +321,14 @@ def test_gportal_branch_empty_products_returns_empty(monkeypatch, tmp_path) -> N
 
     fake.search = lambda **_kw: _Search()  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "gportal", fake)
-    from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
     from earthlens.jaxa._gportal import fetch_gportal
 
-    space = SpatialExtent(
-        latitude_min=0.0, latitude_max=1.0, longitude_min=0.0, longitude_max=1.0
-    )
-    import datetime as dt
-
-    import pandas as pd
-
-    time = TemporalExtent(
-        start_date=dt.datetime(2024, 1, 1),
-        end_date=dt.datetime(2024, 1, 2),
-        resolution="D",
-        dates=pd.date_range("2024-01-01", "2024-01-02", freq="D"),
-    )
+    space, time = degenerate_extents
     ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
     auth = JaxaAuth(
         JaxaCredentials(
             gportal_username="alice",
-            gportal_password=__import__("pydantic").SecretStr("topsecret"),
+            gportal_password=SecretStr("topsecret"),
         ),
         protocol="gportal",
     )
@@ -308,7 +340,6 @@ def test_gportal_branch_empty_products_returns_empty(monkeypatch, tmp_path) -> N
 
 def _fake_jaxa_earth(monkeypatch):
     """Inject a minimal fake `jaxa.earth.je` for the dispatch tests."""
-    import numpy as np
 
     class _Raster:
         img = np.ones((1, 2, 3, 1), dtype=np.float32)

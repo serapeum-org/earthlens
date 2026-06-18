@@ -20,7 +20,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
-from earthlens.jaxa.auth import JaxaAuth
+from earthlens.jaxa.auth import AuthenticationError, JaxaAuth
 from earthlens.jaxa.catalog import Dataset
 
 
@@ -69,8 +69,6 @@ def fetch_gportal(
         raise ValueError(
             f"dataset {dataset.key!r} has no short_name — bad catalog row."
         )
-
-    from earthlens.jaxa.auth import AuthenticationError
 
     if auth.username is None or auth.password is None:
         raise AuthenticationError(

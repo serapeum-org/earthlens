@@ -97,11 +97,17 @@ def _slice_to_2d(img: np.ndarray) -> np.ndarray:
             f"expected a 4-D `(time, lat, lon, band)` array from jaxa.earth; "
             f"got shape {img.shape!r}."
         )
-    n_time, _, _, n_band = img.shape
+    n_time, n_lat, n_lon, n_band = img.shape
     if n_time != 1 or n_band != 1:
         raise ValueError(
             f"multi-time / multi-band JAXA tensors are not supported yet; "
             f"got shape {img.shape!r}."
+        )
+    if n_lat == 0 or n_lon == 0:
+        raise ValueError(
+            f"jaxa.earth returned a zero-pixel array (shape {img.shape!r}); "
+            "the requested bbox + ppu combination yielded no pixels — widen "
+            "the bbox or raise the resolution."
         )
     return img[0, :, :, 0]
 

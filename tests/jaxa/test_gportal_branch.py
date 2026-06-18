@@ -73,15 +73,21 @@ def _fake_gportal(monkeypatch, *, matched: int, products: list, write_files: boo
     return state, fake
 
 
-def _make_product(pid: str):
-    """Build a tiny stand-in for `gportal.product.Product`."""
+class _Product:
+    """Tiny stand-in for `gportal.product.Product` — set `id` after construction."""
 
-    class _P:
-        id = pid
-        data_path = f"path/{pid}"
-        data_url = f"https://example.invalid/{pid}"
+    id: str = ""
+    data_path: str = ""
+    data_url: str = ""
 
-    return _P()
+
+def _make_product(pid: str) -> _Product:
+    """Build a `_Product` instance with the given id and derived paths."""
+    p = _Product()
+    p.id = pid
+    p.data_path = f"path/{pid}"
+    p.data_url = f"https://example.invalid/{pid}"
+    return p
 
 
 @pytest.fixture

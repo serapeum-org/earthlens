@@ -185,12 +185,13 @@ class JAXA(AbstractDataSource):
         Examples:
             - The auth object's protocol always matches the backend's:
                 ```python
+                >>> import tempfile
                 >>> from earthlens.jaxa import JAXA
                 >>> backend = JAXA(
                 ...     start="2020-01-01", end="2020-12-31",
                 ...     variables=["aw3d30"],
                 ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],
-                ...     path=".",
+                ...     path=tempfile.gettempdir(),
                 ... )
                 >>> backend.auth.protocol
                 'jaxa-earth'
@@ -209,12 +210,13 @@ class JAXA(AbstractDataSource):
         Examples:
             - Resolving an alias pins the protocol on construction:
                 ```python
+                >>> import tempfile
                 >>> from earthlens.jaxa import JAXA
                 >>> JAXA(
                 ...     start="2020-01-01", end="2020-12-31",
                 ...     variables=["elevation"],
                 ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],
-                ...     path=".",
+                ...     path=tempfile.gettempdir(),
                 ... ).protocol
                 'jaxa-earth'
 
@@ -349,12 +351,13 @@ class JAXA(AbstractDataSource):
             - Passing `aggregate=` raises because per-date stacks are not
               reduced yet:
                 ```python
+                >>> import tempfile
                 >>> from earthlens.jaxa import JAXA
                 >>> backend = JAXA(
                 ...     start="2020-01-01", end="2020-12-31",
                 ...     variables=["aw3d30"],
                 ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],
-                ...     path=".",
+                ...     path=tempfile.gettempdir(),
                 ... )
                 >>> backend.download(aggregate=object())  # doctest: +ELLIPSIS
                 Traceback (most recent call last):
