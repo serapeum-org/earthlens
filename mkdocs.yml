@@ -431,6 +431,14 @@ nav:
       - Covariates — nightlights: examples/worldpop/07_covariates_nightlights.ipynb
       - Dependency ratios (archive): examples/worldpop/08_dependency_ratios.ipynb
       - Global mosaics (URL resolution): examples/worldpop/09_global_mosaic.ipynb
+    - GBIF (species occurrences):
+      - Quickstart — occurrences over a bbox: examples/gbif/quickstart.ipynb
+    - OBIS (marine occurrences):
+      - Quickstart — marine occurrences: examples/obis/quickstart.ipynb
+    - Protected Planet (WDPA):
+      - Quickstart — protected-area polygons: examples/wdpa/quickstart.ipynb
+    - IUCN Red List (assessments):
+      - Quickstart — species assessments: examples/iucn/quickstart.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
