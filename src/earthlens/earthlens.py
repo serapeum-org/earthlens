@@ -296,12 +296,13 @@ class EarthLens:
             ['amazon-s3', 'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps',
              'cmems', 'dea', 'deafrica', 'digital-earth-africa',
              'digital-earth-australia', 'earth-search', 'earthdata', 'ecmwf',
-             'eumetsat', 'fdsn', 'firms', 'gdacs', 'gee', 'ghs', 'ghsl',
-             'google-earth-engine', 'hdx', 'human-settlement', 'landsat',
-             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'openaq',
-             'openeo', 'overture', 'planetary-computer', 'radar', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
-             'usgs-water', 'veda', 'world-pop', 'worldpop']
+             'eumetsat', 'fdsn', 'firms', 'g-portal', 'gdacs', 'gee', 'ghs',
+             'ghsl', 'google-earth-engine', 'hdx', 'human-settlement', 'jaxa',
+             'jaxa-earth', 'landsat', 'national-water-model', 'nexrad', 'nwis',
+             'nwm', 'nwp', 'openaq', 'openeo', 'overture', 'planetary-computer',
+             'radar', 'sentinel-hub', 'sentinelhub', 'stac', 'tropycal',
+             'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'world-pop',
+             'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -538,6 +539,14 @@ class EarthLens:
             # "world-pop". The default REST path needs no extra SDK.
             "worldpop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
             "world-pop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
+            # JAXA archive over two protocols: authless `jaxa-earth` (STAC +
+            # COG via the official jaxa.earth API) and credentialed
+            # `gportal` (G-Portal SFTP via the community gportal SDK).
+            # Per-dataset routing — the catalog's `protocol:` field picks
+            # the branch. `OUTPUT_KIND="raster"`.
+            "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
         }
     )
 
