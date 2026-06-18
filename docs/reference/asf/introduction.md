@@ -47,11 +47,15 @@ the credential ladder, and the error path are documented under
 
 ## Products and the `stackable` flag
 
-The catalog ships **29 curated rows** covering Sentinel-1
+The catalog ships **42 curated rows** covering Sentinel-1
 (SLC / BURST / GRD / OCN / RAW + per-satellite variants), ALOS
-PALSAR + ALOS-2, the OPERA-S1 family (RTC / CSLC / DIST-ALERT),
-ARIA GUNW, NISAR, ERS-1/2, JERS-1, RADARSAT-1, plus the SEASAT /
-SIR-C / AIRSAR / UAVSAR / SMAP archive completeness rows. Each
+PALSAR + ALOS-2, the OPERA-S1 family (RTC / CSLC / DIST-ALERT +
+the OPERA-S1-CALVAL calibration companion), ARIA GUNW, the full
+NISAR product family (RSLC / GSLC / GCOV / L0B / RIFG / RUNW /
+GUNW / ROFF / GOFF / LRCLK_UTC), the TROPO atmospheric
+corrections used by downstream InSAR processors, ERS-1/2,
+JERS-1, RADARSAT-1, plus the SEASAT / SIR-C / AIRSAR / UAVSAR /
+SMAP archive completeness rows. Each
 row carries either an `asf.PLATFORM` member or an `asf.DATASET`
 member, plus an `asf.PRODUCT_TYPE` member and a `stackable: bool`
 flag.

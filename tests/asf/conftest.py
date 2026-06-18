@@ -151,8 +151,10 @@ class _FakeAsfSearch(types.ModuleType):
             ALOS_2="ALOS-2",
             ARIA_S1_GUNW="ARIA S1 GUNW",
             OPERA_S1="OPERA-S1",
+            OPERA_S1_CALVAL="OPERA-S1-CALVAL",
             SLC_BURST="SLC-BURST",
             SENTINEL1="SENTINEL-1",
+            TROPO="TROPO",
         )
         self.PRODUCT_TYPE = _FakeConstants(
             AMPLITUDE="AMPLITUDE",
@@ -165,14 +167,25 @@ class _FakeAsfSearch(types.ModuleType):
             CSLC="CSLC",
             CSLC_STATIC="CSLC-STATIC",
             DIST_ALERT_S1="DIST-ALERT-S1",
+            ECMWF_TROPO="ECMWF_TROPO",
+            GCOV="GCOV",
+            GOFF="GOFF",
+            GSLC="GSLC",
+            GUNW="GUNW",
             GUNW_STD="GUNW_STD",
             L0="L0",
+            L0B="L0B",
             L1="L1",
             L1A_RADAR_HDF5="L1A_Radar_HDF5",
             L1_1="L1.1",
+            LRCLK_UTC="LRCLK_UTC",
             OCN="OCN",
             RAW="RAW",
+            RIFG="RIFG",
+            ROFF="ROFF",
             RSLC="RSLC",
+            RUNW="RUNW",
+            TROPO_ZENITH="TROPO-ZENITH",
         )
 
     def geo_search(self, **kwargs: Any) -> _FakeResults:

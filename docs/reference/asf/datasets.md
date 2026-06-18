@@ -1,10 +1,13 @@
 # ASF — curated products
 
-The `asf` catalog ships **29 curated product rows** covering every
-stackable product class in `asf_search` plus the legacy archives
-ASF mirrors. Each row maps a friendly product key to its raw
-`asf_search` enum values (`PLATFORM` or `DATASET`, plus
-`PRODUCT_TYPE`) and flags whether `ASFProduct.stack()` is
+The `asf` catalog ships **42 curated product rows** covering every
+stackable product class in `asf_search`, the legacy archives ASF
+mirrors, the full NISAR product family (anticipatory — image
+products land post-launch), the OPERA-S1-CALVAL calibration
+companion, and the TROPO atmospheric corrections used by
+downstream InSAR processors. Each row maps a friendly product key
+to its raw `asf_search` enum values (`PLATFORM` or `DATASET`,
+plus `PRODUCT_TYPE`) and flags whether `ASFProduct.stack()` is
 meaningful for it.
 
 Inspect the catalog at runtime:
@@ -35,8 +38,11 @@ them in stack mode with `reference=<granule id>`.
 | `alos-palsar-slc` | `alos-slc`, `palsar-slc`, `alos-l1.1` | `PLATFORM.ALOS` + `L1.1` | JAXA L-band PALSAR Level-1.1 SLC (2006-2011) |
 | `alos-2-l11` | `alos2-l11`, `palsar2-l11` | `DATASET.ALOS_2` + `L1.1` | ALOS-2 PALSAR-2 Level-1.1 SLC (2014+, restricted) |
 | `opera-cslc-s1` | `opera-cslc`, `opera-s1-cslc` | `DATASET.OPERA_S1` + `CSLC` | OPERA Coregistered Single Look Complex |
+| `opera-cslc-calval` | `opera-s1-cslc-calval` | `DATASET.OPERA_S1_CALVAL` + `CSLC` | OPERA-S1 CSLC calibration / validation (no live products yet) |
 | `aria-s1-gunw` | `aria-gunw`, `gunw` | `DATASET.ARIA_S1_GUNW` + `GUNW_STD` | ARIA precomputed unwrapped interferogram (stackable but search-only in practice) |
-| `nisar-rslc` | `nisar-slc` | `PLATFORM.NISAR` + `RSLC` | NISAR Radar Single Look Complex (post-launch) |
+| `nisar-rslc` | `nisar-slc` | `PLATFORM.NISAR` + `RSLC` | NISAR Range-Doppler SLC (Level-1 InSAR-ready, post-launch) |
+| `nisar-gslc` | `nisar-geocoded-slc` | `PLATFORM.NISAR` + `GSLC` | NISAR Geocoded SLC (Level-2, post-launch) |
+| `nisar-gcov` | `nisar-covariance` | `PLATFORM.NISAR` + `GCOV` | NISAR Geocoded Covariance (Level-2 polarimetric, post-launch) |
 | `ers-1-slc` | `ers1-slc` | `PLATFORM.ERS1` + `L1` | ERS-1 Level-1 SLC (1991-2000) — legacy C-band for long-baseline InSAR |
 | `ers-2-slc` | `ers2-slc` | `PLATFORM.ERS2` + `L1` | ERS-2 Level-1 SLC (1995-2011) |
 | `jers-1-l0` | `jers1-l0` | `PLATFORM.JERS` + `L0` | JERS-1 Level-0 raw downlink (L-band, 1992-1998) |
@@ -60,6 +66,16 @@ search mode (without `reference=`).
 | `opera-rtc-s1-static` | `opera-rtc-static` | `DATASET.OPERA_S1` + `RTC_STATIC` | OPERA RTC static-layer mask |
 | `opera-cslc-s1-static` | `opera-cslc-static` | `DATASET.OPERA_S1` + `CSLC_STATIC` | OPERA CSLC static-layer mask |
 | `opera-dist-alert-s1` | `opera-dist-s1`, `dist-alert-s1` | `DATASET.OPERA_S1` + `DIST_ALERT_S1` | OPERA land-surface disturbance alert |
+| `opera-rtc-calval` | `opera-s1-rtc-calval` | `DATASET.OPERA_S1_CALVAL` + `RTC` | OPERA-S1 RTC calibration / validation (no live products yet) |
+| `nisar-l0b` | `nisar-raw` | `PLATFORM.NISAR` + `L0B` | NISAR Level-0B raw downlink (post-launch) |
+| `nisar-rifg` | `nisar-interferogram` | `PLATFORM.NISAR` + `RIFG` | NISAR Range-Doppler Interferogram (Level-2 InSAR output) |
+| `nisar-runw` | `nisar-unwrapped` | `PLATFORM.NISAR` + `RUNW` | NISAR Range-Doppler Unwrapped (Level-2 InSAR output) |
+| `nisar-gunw` | `nisar-geocoded-unwrapped` | `PLATFORM.NISAR` + `GUNW` | NISAR Geocoded Unwrapped Interferogram (Level-3 InSAR output) |
+| `nisar-roff` | `nisar-offsets` | `PLATFORM.NISAR` + `ROFF` | NISAR Range-Doppler Pixel Offsets (Level-2 InSAR output) |
+| `nisar-goff` | `nisar-geocoded-offsets` | `PLATFORM.NISAR` + `GOFF` | NISAR Geocoded Pixel Offsets (Level-3 InSAR output) |
+| `nisar-lrclk-utc` | `nisar-clock` | `PLATFORM.NISAR` + `LRCLK_UTC` | NISAR L-band radar clock-correction files (the live NISAR data so far) |
+| `tropo-ecmwf` | `ecmwf-tropo` | `DATASET.TROPO` + `ECMWF_TROPO` | ECMWF-derived tropospheric phase-delay correction (atmospheric) |
+| `tropo-zenith` | `zenith-tropo` | `DATASET.TROPO` + `TROPO_ZENITH` | Tropospheric zenith-total-delay correction (atmospheric) |
 | `seasat-l1` | `seasat` | `PLATFORM.SEASAT` + `L1` | SEASAT-1 reprocessed L1 (1978 — the original spaceborne SAR) |
 | `sir-c-slc` | `sirc-slc`, `sir-c` | `PLATFORM.SIRC` + `SLC` | SIR-C / X-SAR Shuttle SAR campaigns (1994) |
 | `airsar-l1` | `airsar` | `PLATFORM.AIRSAR` + `L1` | AIRSAR airborne SAR (NASA / JPL, 1988-2004) |
@@ -128,7 +144,7 @@ exists on the installed `asf_search`:
 
 ```bash
 earthlens datasets validate asf
-# ok: 29 row(s) checked, 0 issue(s)
+# ok: 42 row(s) checked, 0 issue(s)
 ```
 
 That covers the failure mode the SDK actually exhibits — a

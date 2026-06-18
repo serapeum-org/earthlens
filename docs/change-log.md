@@ -8,9 +8,12 @@
   `asf_search`-backed search and the InSAR baseline `stack()`. Reuses NASA
   Earthdata Login auth from `earthlens.earthdata` (no second credential
   system); search runs anonymously, only download authenticates. Ships a
-  29-row curated product catalog (Sentinel-1 SLC/BURST/GRD/OCN + per-satellite
-  variants, ALOS PALSAR / ALOS-2, the OPERA-S1 family, ARIA GUNW, NISAR, ERS-1/2,
-  JERS-1, RADARSAT-1, plus SEASAT / SIR-C / AIRSAR / UAVSAR / SMAP). Aliases
+  42-row curated product catalog (Sentinel-1 SLC/BURST/GRD/OCN + per-satellite
+  variants, ALOS PALSAR / ALOS-2, the full OPERA-S1 family including
+  OPERA-S1-CALVAL, ARIA GUNW, the complete NISAR product family — RSLC /
+  GSLC / GCOV / L0B / RIFG / RUNW / GUNW / ROFF / GOFF / LRCLK_UTC — the
+  TROPO atmospheric corrections, ERS-1/2, JERS-1, RADARSAT-1, plus SEASAT /
+  SIR-C / AIRSAR / UAVSAR / SMAP). Aliases
   `asf` / `alaska-satellite-facility` / `insar`. `aggregate=` rejected with
   `NotImplementedError` — the MVP returns SAR product paths for downstream
   InSAR tooling (HyP3 / ISCE / SNAP / MintPy) rather than processing them

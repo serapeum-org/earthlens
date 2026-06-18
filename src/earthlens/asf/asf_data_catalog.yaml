@@ -34,10 +34,21 @@ available_products:
   - ers-1-slc
   - ers-2-slc
   - jers-1-l0
+  - nisar-gcov
+  - nisar-goff
+  - nisar-gslc
+  - nisar-gunw
+  - nisar-l0b
+  - nisar-lrclk-utc
+  - nisar-rifg
+  - nisar-roff
   - nisar-rslc
+  - nisar-runw
+  - opera-cslc-calval
   - opera-cslc-s1
   - opera-cslc-s1-static
   - opera-dist-alert-s1
+  - opera-rtc-calval
   - opera-rtc-s1
   - opera-rtc-s1-static
   - radarsat-1-l0
@@ -55,6 +66,8 @@ available_products:
   - sentinel-1d-slc
   - sir-c-slc
   - smap-l1
+  - tropo-ecmwf
+  - tropo-zenith
   - uavsar-amp
 
 products:
@@ -191,6 +204,27 @@ products:
     stackable: false
     description: OPERA Sentinel-1 land-surface disturbance alert (analysis-ready)
 
+  # ---------------------------------------------------------------
+  # OPERA-S1-CALVAL — calibration / validation companions to the
+  # operational OPERA-S1 family. The CALVAL dataset is registered
+  # in `asf_search` but does not yet publish products to the public
+  # archive; rows are anticipatory and live searches return zero
+  # until OPERA's calval workstream lands.
+  # ---------------------------------------------------------------
+  opera-cslc-calval:
+    aliases: [opera-s1-cslc-calval]
+    dataset: OPERA_S1_CALVAL
+    product_type: CSLC
+    stackable: true
+    description: OPERA-S1 CSLC calibration / validation companion (no live products yet)
+
+  opera-rtc-calval:
+    aliases: [opera-s1-rtc-calval]
+    dataset: OPERA_S1_CALVAL
+    product_type: RTC
+    stackable: false
+    description: OPERA-S1 RTC calibration / validation companion (no live products yet)
+
   aria-s1-gunw:
     aliases: [aria-gunw, gunw]
     dataset: ARIA_S1_GUNW
@@ -199,14 +233,106 @@ products:
     description: ARIA Sentinel-1 Geocoded Unwrapped Interferogram (precomputed)
 
   # ---------------------------------------------------------------
-  # NISAR — NASA-ISRO L+S-band; data starts after launch.
+  # NISAR — NASA-ISRO L+S-band. The mission launched in 2024 but
+  # the science archive is still being populated; only the
+  # LRCLK_UTC clock-correction files are live in mid-2026. Image
+  # product rows (RSLC / GSLC / GCOV / GUNW / …) are anticipatory.
+  # NISARProduct is `stackable=True` upstream, so the L1/L2 SLC-like
+  # rows (RSLC, GSLC) carry `stackable: true`; the InSAR *outputs*
+  # (RIFG / RUNW / GUNW / ROFF / GOFF) and the L0B raw downlink are
+  # search-only.
   # ---------------------------------------------------------------
   nisar-rslc:
     aliases: [nisar-slc]
     platform: NISAR
     product_type: RSLC
     stackable: true
-    description: NISAR Radar Single Look Complex (data starts arriving post-launch)
+    description: NISAR Range-Doppler SLC (Level-1 InSAR-ready, post-launch)
+
+  nisar-gslc:
+    aliases: [nisar-geocoded-slc]
+    platform: NISAR
+    product_type: GSLC
+    stackable: true
+    description: NISAR Geocoded SLC (Level-2, post-launch)
+
+  nisar-gcov:
+    aliases: [nisar-covariance]
+    platform: NISAR
+    product_type: GCOV
+    stackable: true
+    description: NISAR Geocoded Covariance (Level-2 polarimetric, post-launch)
+
+  nisar-l0b:
+    aliases: [nisar-raw]
+    platform: NISAR
+    product_type: L0B
+    stackable: false
+    description: NISAR Level-0B raw downlink (post-launch)
+
+  nisar-rifg:
+    aliases: [nisar-interferogram]
+    platform: NISAR
+    product_type: RIFG
+    stackable: false
+    description: NISAR Range-Doppler Interferogram (Level-2, InSAR output)
+
+  nisar-runw:
+    aliases: [nisar-unwrapped]
+    platform: NISAR
+    product_type: RUNW
+    stackable: false
+    description: NISAR Range-Doppler Unwrapped (Level-2, InSAR output)
+
+  nisar-gunw:
+    aliases: [nisar-geocoded-unwrapped]
+    platform: NISAR
+    product_type: GUNW
+    stackable: false
+    description: NISAR Geocoded Unwrapped Interferogram (Level-3, InSAR output)
+
+  nisar-roff:
+    aliases: [nisar-offsets]
+    platform: NISAR
+    product_type: ROFF
+    stackable: false
+    description: NISAR Range-Doppler Pixel Offsets (Level-2, InSAR output)
+
+  nisar-goff:
+    aliases: [nisar-geocoded-offsets]
+    platform: NISAR
+    product_type: GOFF
+    stackable: false
+    description: NISAR Geocoded Pixel Offsets (Level-3, InSAR output)
+
+  nisar-lrclk-utc:
+    aliases: [nisar-clock]
+    platform: NISAR
+    product_type: LRCLK_UTC
+    stackable: false
+    description: NISAR L-band radar clock-correction files (the live data so far)
+
+  # ---------------------------------------------------------------
+  # TROPO — atmospheric (tropospheric phase delay) corrections used
+  # by downstream InSAR processors to remove water-vapour artefacts.
+  # Not InSAR-stackable themselves; they are inputs to a stacking
+  # workflow, not stack members. ECMWF_TROPO is the global ECMWF
+  # weather-derived correction; TROPO-ZENITH is the zenith total
+  # delay product.
+  # ---------------------------------------------------------------
+  tropo-ecmwf:
+    aliases: [ecmwf-tropo]
+    dataset: TROPO
+    product_type: ECMWF_TROPO
+    stackable: false
+    description: ECMWF-derived tropospheric phase-delay correction (atmospheric)
+
+  tropo-zenith:
+    aliases: [zenith-tropo]
+    dataset: TROPO
+    product_type: TROPO_ZENITH
+    stackable: false
+    description: Tropospheric zenith-total-delay correction (atmospheric)
 
   # ---------------------------------------------------------------
   # ERS / JERS — legacy C/L-band SLC for historical baselines.
