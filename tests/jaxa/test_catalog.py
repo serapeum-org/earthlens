@@ -99,7 +99,8 @@ def test_catalog_by_protocol() -> None:
     jaxa_earth = cat.by_protocol("jaxa-earth")
     gportal = cat.by_protocol("gportal")
     assert "aw3d30" in jaxa_earth
-    assert "sgli-l380" in gportal
+    assert "sgli-l3-nwlr" in gportal
+    assert cat.resolve("sgli-l380") == "sgli-l3-nwlr"  # alias still resolves
     assert not (set(jaxa_earth) & set(gportal))
 
 

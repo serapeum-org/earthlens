@@ -56,12 +56,12 @@ slug is kept as an alias):
 | `gsmap-nrt` | `jaxa-earth` | GSMaP NRT daily precipitation |
 | `spi` | `jaxa-earth` | GSMaP-derived monthly SPI drought index |
 | `hrlulc` | `jaxa-earth` | High-resolution Japan land use / land cover |
-| `sgli-l380` | `gportal` | GCOM-C/SGLI L3 OCEAN L380 |
-| `amsr2-l1r` | `gportal` | GCOM-W/AMSR2 L1R brightness temperatures |
-| `alos2-palsar2-l1-1` | `gportal` | ALOS-2/PALSAR-2 L1.1 single-look complex |
-| `earthcare-cpr-l2` | `gportal` | EarthCARE CPR L2 cloud products |
-| `gpm-dpr-l1b` | `gportal` | GPM/DPR L1B precipitation radar |
-| `gosat-gw-amsr3-l1b` | `gportal` | GOSAT-GW/AMSR3 L1B (next-gen AMSR) |
+| `sgli-l3-nwlr` (aka `sgli-l380`) | `gportal` | GCOM-C/SGLI L3 Normalized Water-Leaving Radiance — id `10003001` |
+| `amsr2-l1r` | `gportal` | GCOM-W/AMSR2 L1R resampled brightness temperatures — id `11001002` |
+| `alos2-palsar2-uf-sp` (aka `palsar2`) | `gportal` | ALOS-2/PALSAR-2 L1.1 ultra-fine 3 m single-pol — id `27004001` |
+| `earthcare-cpr-eco` (aka `earthcare`) | `gportal` | EarthCARE/CPR L2 Echo Product — id `16002000` |
+| `gpm-dpr-kupr-l1b` (aka `gpm`) | `gportal` | GPM/DPR KuPR L1B received power — id `12001000` |
+| `gosat-gw-amsr3-l1b` | `gportal` | GOSAT-GW/AMSR3 L1B brightness temperatures (TBB) — id `31001001` |
 
 Every other live collection (e.g. JASMES MODIS NDVI / LST / SWR,
 G-Portal AMSR2 L3 SMC / SSW / SST half- and full-monthly re-hosts,

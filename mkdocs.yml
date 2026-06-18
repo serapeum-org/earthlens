@@ -163,6 +163,9 @@ nav:
       - Introduction: reference/gdacs/introduction.md
       - Usage: reference/gdacs/usage.md
       - Reference: reference/gdacs/gdacs.md
+    - JAXA (Earth-observation archive):
+      - Introduction: reference/jaxa/introduction.md
+      - Usage: reference/jaxa/usage.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
@@ -329,6 +332,10 @@ nav:
       - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
       - Earthquakes + cyclones overlay: examples/gdacs/eq_tc_overlay.ipynb
       - Country hazard profile: examples/gdacs/country_hazard_profile.ipynb
+    - JAXA (Earth-observation archive):
+      - Catalog explorer (no network): examples/jaxa/01_catalog_explorer.ipynb
+      - AW3D30 elevation quickstart (live): examples/jaxa/02_aw3d30_quickstart.ipynb
+      - G-Portal search (anonymous): examples/jaxa/03_gportal_search.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb

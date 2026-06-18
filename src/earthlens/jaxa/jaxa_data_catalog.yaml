@@ -495,33 +495,33 @@ datasets:
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_monthly-normal
     default_band: LST_2000_2022
-  sgli-l380:
-    aliases: [sgli-ocean-l380, gcom-c-l380]
+  sgli-l3-nwlr:
+    aliases: [sgli-l380, sgli-ocean-l380, gcom-c-nwlr]
     protocol: gportal
     short_name: "10003001"
-    description: GCOM-C/SGLI L3 OCEAN L380 (sample G-Portal product).
+    description: GCOM-C/SGLI L3 Normalized Water-Leaving Radiance (NWLR) — ocean.
   amsr2-l1r:
     aliases: [amsr2-l1, gcom-w-l1r]
     protocol: gportal
-    short_name: "10001000"
-    description: GCOM-W/AMSR2 L1R brightness temperature swaths (G-Portal SFTP).
-  alos2-palsar2-l1-1:
-    aliases: [palsar2, alos2-l1]
+    short_name: "11001002"
+    description: GCOM-W/AMSR2 L1R resampled brightness temperatures (TB).
+  alos2-palsar2-uf-sp:
+    aliases: [palsar2, alos2-l1, alos2-palsar2]
     protocol: gportal
-    short_name: "10004000"
-    description: ALOS-2/PALSAR-2 L1.1 (single-look complex) — SFTP via G-Portal.
-  earthcare-cpr-l2:
+    short_name: "27004001"
+    description: ALOS-2/PALSAR-2 L1.1 ultra-fine 3 m single-pol.
+  earthcare-cpr-eco:
     aliases: [earthcare, cpr]
     protocol: gportal
-    short_name: "10005000"
-    description: EarthCARE/CPR L2 cloud profile products (G-Portal SFTP).
-  gpm-dpr-l1b:
-    aliases: [gpm, dpr]
+    short_name: "16002000"
+    description: EarthCARE/CPR L2 Echo Product (CPR_ECO).
+  gpm-dpr-kupr-l1b:
+    aliases: [gpm, dpr, kupr]
     protocol: gportal
-    short_name: "10006000"
-    description: GPM/DPR L1B precipitation radar (G-Portal SFTP).
+    short_name: "12001000"
+    description: GPM/DPR KuPR L1B received power.
   gosat-gw-amsr3-l1b:
     aliases: [gosat-gw, amsr3]
     protocol: gportal
-    short_name: "10007000"
-    description: GOSAT-GW/AMSR3 L1B (next-gen AMSR; G-Portal SFTP).
+    short_name: "31001001"
+    description: GOSAT-GW/AMSR3 L1B brightness temperatures (TBB).

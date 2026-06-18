@@ -356,14 +356,14 @@ class Catalog(AbstractCatalog):
             list[str]: Sorted canonical keys filtered by protocol.
 
         Examples:
-            - The bundled catalog ships both protocols; ``aw3d30`` is jaxa-earth
-              and ``sgli-l380`` is gportal:
+            - The bundled catalog ships both protocols; `aw3d30` is jaxa-earth
+              and `sgli-l3-nwlr` is gportal:
                 ```python
                 >>> from earthlens.jaxa import Catalog
                 >>> cat = Catalog()
                 >>> "aw3d30" in cat.by_protocol("jaxa-earth")
                 True
-                >>> "sgli-l380" in cat.by_protocol("gportal")
+                >>> "sgli-l3-nwlr" in cat.by_protocol("gportal")
                 True
 
                 ```
