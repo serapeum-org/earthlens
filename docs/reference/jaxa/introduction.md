@@ -44,18 +44,34 @@ the file shapes and concurrency profiles differ; issue two calls.
 
 The bundled `jaxa_data_catalog.yaml` ships 124 rows: every one of the 118
 live `jaxa.earth` collections plus 6 strategic G-Portal mission products.
-Friendly canonical keys exist for the most popular ones (the auto-derived
-slug is kept as an alias):
+**Every collection has a short, friendly canonical key** (the long
+auto-derived slug stays as an alias).
+
+The naming scheme is `<mission>-<product>[-<d|n>][-<cadence>][-norm]`,
+where `d` / `n` mark daytime / nighttime variants, the cadence comes
+from the source (`daily`, `halfmonth`, `monthly`, `8day`, `hourly`,
+`yearly`), and `-norm` flags a climatological *normal*. The 14 mission
+families: `aw3d30`, `alos2`, `amsr2`, `amsre`, `gsmap`, `hrlulc`,
+`mod11`, `mod11c3`, `modis`, `myd11`, `proba`, `sgli`, `spi`, `temsm`.
+
+Headline keys (the long auto-slugs and a few English aliases also
+resolve via `cat.get(...)`):
 
 | Key | Protocol | Mission / product |
 |---|---|---|
-| `aw3d30` | `jaxa-earth` | ALOS PRISM AW3D30 v3.2 — 30 m global DSM |
-| `aw3d30-v41` | `jaxa-earth` | ALOS PRISM AW3D30 v4.1 |
-| `alos2-fnf` | `jaxa-earth` | ALOS-2 PALSAR-2 yearly forest / non-forest |
-| `gsmap` | `jaxa-earth` | GSMaP standard hourly precipitation v6 |
-| `gsmap-nrt` | `jaxa-earth` | GSMaP NRT daily precipitation |
+| `aw3d30` (aka `elevation`, `dem`) | `jaxa-earth` | ALOS PRISM AW3D30 v3.2 — 30 m global DSM |
+| `aw3d30-v41` (aka `elevation-v41`) | `jaxa-earth` | ALOS PRISM AW3D30 v4.1 |
+| `alos2-fnf` (aka `fnf`) | `jaxa-earth` | ALOS-2 PALSAR-2 yearly forest / non-forest |
+| `gsmap` (aka `precipitation`) | `jaxa-earth` | GSMaP standard hourly precipitation v6 |
+| `gsmap-nrt` / `gsmap-daily` / `gsmap-monthly` | `jaxa-earth` | GSMaP near-real-time + climatological variants |
 | `spi` | `jaxa-earth` | GSMaP-derived monthly SPI drought index |
-| `hrlulc` | `jaxa-earth` | High-resolution Japan land use / land cover |
+| `hrlulc` (aka `lulc`) | `jaxa-earth` | High-resolution Japan land use / land cover |
+| `proba-v-lccs` (aka `lccs`, `landcover`) | `jaxa-earth` | Copernicus C3S PROBA-V land cover |
+| `amsr2-smc-d-daily` (and 9 variants) | `jaxa-earth` | GCOM-W AMSR2 L3 soil moisture (day/night × daily / halfmonth / monthly × standard / normal) |
+| `sgli-lst-d-daily` / `sgli-ndvi-d-daily` / `sgli-chla-d-daily` / `sgli-arot-d-daily` | `jaxa-earth` | GCOM-C SGLI L3 family (LST, NDVI, chlorophyll, aerosol) |
+| `modis-ndvi-monthly` / `modis-aqua-swr-daily` / `modis-terra-swr-daily` | `jaxa-earth` | JASMES MODIS family (NDVI, surface shortwave radiation) |
+| `mod11-lst-d-daily` / `myd11-lst-d-daily` | `jaxa-earth` | NASA EOSDIS Terra/Aqua MODIS C1 LST re-hosts |
+| `temsm-outflw` / `temsm-flddph` / `temsm-fldfrc` (×7) | `jaxa-earth` | UTokyo TE-MSM Japan flood / river forecasts |
 | `sgli-l3-nwlr` (aka `sgli-l380`) | `gportal` | GCOM-C/SGLI L3 Normalized Water-Leaving Radiance — id `10003001` |
 | `amsr2-l1r` | `gportal` | GCOM-W/AMSR2 L1R resampled brightness temperatures — id `11001002` |
 | `alos2-palsar2-uf-sp` (aka `palsar2`) | `gportal` | ALOS-2/PALSAR-2 L1.1 ultra-fine 3 m single-pol — id `27004001` |
@@ -63,10 +79,8 @@ slug is kept as an alias):
 | `gpm-dpr-kupr-l1b` (aka `gpm`) | `gportal` | GPM/DPR KuPR L1B received power — id `12001000` |
 | `gosat-gw-amsr3-l1b` | `gportal` | GOSAT-GW/AMSR3 L1B brightness temperatures (TBB) — id `31001001` |
 
-Every other live collection (e.g. JASMES MODIS NDVI / LST / SWR,
-G-Portal AMSR2 L3 SMC / SSW / SST half- and full-monthly re-hosts,
-UTokyo TE-MSM Japan river/flood forecasts) is keyed by its auto-derived
-slug — see the YAML under `src/earthlens/jaxa/`. Use
+For the full list of friendly keys (104 of 118 are ≤25 characters) see
+the bundled YAML under `src/earthlens/jaxa/jaxa_data_catalog.yaml`. Use
 `Catalog().by_protocol("jaxa-earth")` and `.by_protocol("gportal")` to
 list them programmatically.
 

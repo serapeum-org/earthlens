@@ -16,359 +16,443 @@
 # Archive Service, not on G-Portal; ALOS-4/PALSAR-3 has no confirmed
 # non-commercial G-Portal access as of 2026-06.
 datasets:
-  c3s-proba-v-lccs-global-yearly:
+  proba-v-lccs:
+    aliases: [c3s-proba-v-lccs-global-yearly, lccs, landcover]
     protocol: jaxa-earth
     collection: Copernicus.C3S_PROBA-V_LCCS_global_yearly
     default_band: LCCS
   aw3d30:
-    aliases: [elevation, dem, alos-aw3d30, alos-prism-aw3d30-v3-2-global]
+    aliases: [alos-prism-aw3d30-v3-2-global, elevation, dem, alos-aw3d30]
     protocol: jaxa-earth
     collection: JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global
     default_band: DSM
   alos2-fnf:
-    aliases: [fnf, forest-non-forest, alos-2-palsar-2-fnf-v2-1-0-global-yearly]
+    aliases: [alos-2-palsar-2-fnf-v2-1-0-global-yearly, fnf, forest-non-forest]
     protocol: jaxa-earth
     collection: JAXA.EORC_ALOS-2.PALSAR-2_FNF.v2.1.0_global_yearly
     default_band: FNF
-  gsmap-gauge-00z-23z-v6-half-monthly-normal:
+  gsmap-halfmonth-norm:
+    aliases: [gsmap-gauge-00z-23z-v6-half-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_half-monthly-normal
     default_band: PRECIP_2012_2021
-  gsmap-gauge-00z-23z-v6-monthly-normal:
+  gsmap-monthly-norm:
+    aliases: [gsmap-gauge-00z-23z-v6-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_monthly-normal
     default_band: PRECIP_2012_2021
-  gp-gcom-w-amsr2-l3-smc-daytime-v3-global-half-monthly-normal:
+  amsr2-smc-d-halfmonth-norm:
+    aliases: [gp-gcom-w-amsr2-l3-smc-daytime-v3-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_half-monthly-normal
     default_band: SMC_2012_2021
-  gp-gcom-w-amsr2-l3-smc-daytime-v3-global-monthly-normal:
+  amsr2-smc-d-monthly-norm:
+    aliases: [gp-gcom-w-amsr2-l3-smc-daytime-v3-global-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_monthly-normal
     default_band: SMC_2012_2021
-  gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-half-monthly-normal:
+  amsr2-smc-n-halfmonth-norm:
+    aliases: [gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_half-monthly-normal
     default_band: SMC_2012_2021
-  gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-monthly-normal:
+  amsr2-smc-n-monthly-norm:
+    aliases: [gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_monthly-normal
     default_band: SMC_2012_2021
-  jasmes-aqua-modis-swr-v811-global-half-monthly-normal:
+  modis-aqua-swr-halfmonth-norm:
+    aliases: [jasmes-aqua-modis-swr-v811-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Aqua.MODIS_swr.v811_global_half-monthly-normal
     default_band: swr_2012_2021
-  jasmes-aqua-modis-swr-v811-global-monthly-normal:
+  modis-aqua-swr-monthly-norm:
+    aliases: [jasmes-aqua-modis-swr-v811-global-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Aqua.MODIS_swr.v811_global_monthly-normal
     default_band: swr_2012_2021
-  jasmes-terra-modis-swr-v811-global-half-monthly-normal:
+  modis-terra-swr-halfmonth-norm:
+    aliases: [jasmes-terra-modis-swr-v811-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS_swr.v811_global_half-monthly-normal
     default_band: swr_2012_2021
-  jasmes-terra-modis-swr-v811-global-monthly-normal:
+  modis-terra-swr-monthly-norm:
+    aliases: [jasmes-terra-modis-swr-v811-global-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS_swr.v811_global_monthly-normal
     default_band: swr_2012_2021
-  jasmes-terra-modis-aqua-modis-ndvi-v811-global-half-monthly-normal:
+  modis-ndvi-halfmonth-norm:
+    aliases: [jasmes-terra-modis-aqua-modis-ndvi-v811-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_half-monthly-normal
     default_band: ndvi_2012_2021
-  jasmes-terra-modis-aqua-modis-ndvi-v811-global-monthly-normal:
+  modis-ndvi-monthly-norm:
+    aliases: [jasmes-terra-modis-aqua-modis-ndvi-v811-global-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_monthly-normal
     default_band: ndvi_2012_2021
-  jasmes-terra-modis-aqua-modis-taua-v811-global-half-monthly-normal:
+  modis-taua-halfmonth-norm:
+    aliases: [jasmes-terra-modis-aqua-modis-taua-v811-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_half-monthly-normal
     default_band: taua_2012_2021
-  jasmes-terra-modis-aqua-modis-taua-v811-global-monthly-normal:
+  modis-taua-monthly-norm:
+    aliases: [jasmes-terra-modis-aqua-modis-taua-v811-global-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_monthly-normal
     default_band: taua_2012_2021
-  eosdis-aqua-modis-myd11c1-lst-daytime-v061-global-half-monthly-normal:
+  myd11-lst-d-halfmonth-norm:
+    aliases: [eosdis-aqua-modis-myd11c1-lst-daytime-v061-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.daytime.v061_global_half-monthly-normal
     default_band: LST_2012_2021
-  eosdis-aqua-modis-myd11c1-lst-daytime-v061-global-monthly-normal:
+  myd11-lst-d-monthly-norm:
+    aliases: [eosdis-aqua-modis-myd11c1-lst-daytime-v061-global-monthly-normal]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.daytime.v061_global_monthly-normal
     default_band: LST_2012_2021
-  eosdis-aqua-modis-myd11c1-lst-nighttime-v061-global-half-monthly-normal:
+  myd11-lst-n-halfmonth-norm:
+    aliases: [eosdis-aqua-modis-myd11c1-lst-nighttime-v061-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.nighttime.v061_global_half-monthly-normal
     default_band: LST_2012_2021
-  eosdis-aqua-modis-myd11c1-lst-nighttime-v061-global-monthly-normal:
+  myd11-lst-n-monthly-norm:
+    aliases: [eosdis-aqua-modis-myd11c1-lst-nighttime-v061-global-monthly-normal]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.nighttime.v061_global_monthly-normal
     default_band: LST_2012_2021
-  eosdis-terra-modis-mod11c1-lst-daytime-v061-global-half-monthly-normal:
+  mod11-lst-d-halfmonth-norm:
+    aliases: [eosdis-terra-modis-mod11c1-lst-daytime-v061-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_half-monthly-normal
     default_band: LST_2012_2021
-  eosdis-terra-modis-mod11c1-lst-daytime-v061-global-monthly-normal:
+  mod11-lst-d-monthly-norm:
+    aliases: [eosdis-terra-modis-mod11c1-lst-daytime-v061-global-monthly-normal]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_monthly-normal
     default_band: LST_2012_2021
-  eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-half-monthly-normal:
+  mod11-lst-n-halfmonth-norm:
+    aliases: [eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-half-monthly-normal]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_half-monthly-normal
     default_band: LST_2012_2021
-  eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-monthly-normal:
+  mod11-lst-n-monthly-norm:
+    aliases: [eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-monthly-normal]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_monthly-normal
     default_band: LST_2012_2021
-  gp-aqua-amsr-e-l3-smc-daytime-v3-global-daily:
+  amsre-smc-d-daily:
+    aliases: [gp-aqua-amsr-e-l3-smc-daytime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_daily
     default_band: SMC
-  gp-aqua-amsr-e-l3-smc-daytime-v3-global-half-monthly:
+  amsre-smc-d-halfmonth:
+    aliases: [gp-aqua-amsr-e-l3-smc-daytime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_half-monthly
     default_band: SMC
-  gp-aqua-amsr-e-l3-smc-daytime-v3-global-monthly:
+  amsre-smc-d-monthly:
+    aliases: [gp-aqua-amsr-e-l3-smc-daytime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_monthly
     default_band: SMC
-  gp-aqua-amsr-e-l3-smc-nighttime-v3-global-daily:
+  amsre-smc-n-daily:
+    aliases: [gp-aqua-amsr-e-l3-smc-nighttime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_daily
     default_band: SMC
-  gp-aqua-amsr-e-l3-smc-nighttime-v3-global-half-monthly:
+  amsre-smc-n-halfmonth:
+    aliases: [gp-aqua-amsr-e-l3-smc-nighttime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_half-monthly
     default_band: SMC
-  gp-aqua-amsr-e-l3-smc-nighttime-v3-global-monthly:
+  amsre-smc-n-monthly:
+    aliases: [gp-aqua-amsr-e-l3-smc-nighttime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_monthly
     default_band: SMC
-  gp-gcom-w-amsr2-l3-smc-daytime-v3-global-daily:
+  amsr2-smc-d-daily:
+    aliases: [gp-gcom-w-amsr2-l3-smc-daytime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_daily
     default_band: SMC
-  gp-gcom-w-amsr2-l3-smc-daytime-v3-global-half-monthly:
+  amsr2-smc-d-halfmonth:
+    aliases: [gp-gcom-w-amsr2-l3-smc-daytime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_half-monthly
     default_band: SMC
-  gp-gcom-w-amsr2-l3-smc-daytime-v3-global-monthly:
+  amsr2-smc-d-monthly:
+    aliases: [gp-gcom-w-amsr2-l3-smc-daytime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_monthly
     default_band: SMC
-  gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-daily:
+  amsr2-smc-n-daily:
+    aliases: [gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_daily
     default_band: SMC
-  gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-half-monthly:
+  amsr2-smc-n-halfmonth:
+    aliases: [gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_half-monthly
     default_band: SMC
-  gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-monthly:
+  amsr2-smc-n-monthly:
+    aliases: [gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_monthly
     default_band: SMC
-  gp-gcom-c-sgli-l3-lst-daytime-v3-global-daily:
+  sgli-lst-d-daily:
+    aliases: [gp-gcom-c-sgli-l3-lst-daytime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_daily
     default_band: LST
-  gp-gcom-c-sgli-l3-lst-daytime-v3-global-half-monthly:
+  sgli-lst-d-halfmonth:
+    aliases: [gp-gcom-c-sgli-l3-lst-daytime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_half-monthly
     default_band: LST
-  gp-gcom-c-sgli-l3-lst-daytime-v3-global-monthly:
+  sgli-lst-d-monthly:
+    aliases: [gp-gcom-c-sgli-l3-lst-daytime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_monthly
     default_band: LST
-  gp-gcom-c-sgli-l3-lst-nighttime-v3-global-daily:
+  sgli-lst-n-daily:
+    aliases: [gp-gcom-c-sgli-l3-lst-nighttime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_daily
     default_band: LST
-  gp-gcom-c-sgli-l3-lst-nighttime-v3-global-half-monthly:
+  sgli-lst-n-halfmonth:
+    aliases: [gp-gcom-c-sgli-l3-lst-nighttime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_half-monthly
     default_band: LST
-  gp-gcom-c-sgli-l3-lst-nighttime-v3-global-monthly:
+  sgli-lst-n-monthly:
+    aliases: [gp-gcom-c-sgli-l3-lst-nighttime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_monthly
     default_band: LST
-  gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-daily:
+  sgli-ndvi-d-daily:
+    aliases: [gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_daily
     default_band: NDVI
-  gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-half-monthly:
+  sgli-ndvi-d-halfmonth:
+    aliases: [gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_half-monthly
     default_band: NDVI
-  gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-monthly:
+  sgli-ndvi-d-monthly:
+    aliases: [gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_monthly
     default_band: NDVI
-  gp-gcom-c-sgli-l3-arot-daytime-v3-global-daily:
+  sgli-arot-d-daily:
+    aliases: [gp-gcom-c-sgli-l3-arot-daytime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_daily
     default_band: AROT
-  gp-gcom-c-sgli-l3-arot-daytime-v3-global-half-monthly:
+  sgli-arot-d-halfmonth:
+    aliases: [gp-gcom-c-sgli-l3-arot-daytime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_half-monthly
     default_band: AROT
-  gp-gcom-c-sgli-l3-arot-daytime-v3-global-monthly:
+  sgli-arot-d-monthly:
+    aliases: [gp-gcom-c-sgli-l3-arot-daytime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_monthly
     default_band: AROT
-  eosdis-terra-modis-mod11c1-lst-daytime-v061-global-daily:
+  mod11-lst-d-daily:
+    aliases: [eosdis-terra-modis-mod11c1-lst-daytime-v061-global-daily]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_daily
     default_band: LST
-  eosdis-terra-modis-mod11c1-lst-daytime-v061-global-half-monthly:
+  mod11-lst-d-halfmonth:
+    aliases: [eosdis-terra-modis-mod11c1-lst-daytime-v061-global-half-monthly]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_half-monthly
     default_band: LST
-  eosdis-terra-modis-mod11c3-lst-daytime-v061-global-monthly:
+  mod11c3-lst-d-monthly:
+    aliases: [eosdis-terra-modis-mod11c3-lst-daytime-v061-global-monthly]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.daytime.v061_global_monthly
     default_band: LST
-  eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-daily:
+  mod11-lst-n-daily:
+    aliases: [eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-daily]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_daily
     default_band: LST
-  eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-half-monthly:
+  mod11-lst-n-halfmonth:
+    aliases: [eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-half-monthly]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_half-monthly
     default_band: LST
-  eosdis-terra-modis-mod11c3-lst-nighttime-v061-global-monthly:
+  mod11c3-lst-n-monthly:
+    aliases: [eosdis-terra-modis-mod11c3-lst-nighttime-v061-global-monthly]
     protocol: jaxa-earth
     collection: NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.nighttime.v061_global_monthly
     default_band: LST
-  gsmap-gauge-00z-23z-v6-daily:
+  gsmap-daily:
+    aliases: [gsmap-gauge-00z-23z-v6-daily]
     protocol: jaxa-earth
     collection: JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_daily
     default_band: PRECIP
-  gsmap-gauge-00z-23z-v6-half-monthly:
+  gsmap-halfmonth:
+    aliases: [gsmap-gauge-00z-23z-v6-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_half-monthly
     default_band: PRECIP
-  gsmap-gauge-00z-23z-v6-monthly:
+  gsmap-monthly:
+    aliases: [gsmap-gauge-00z-23z-v6-monthly]
     protocol: jaxa-earth
     collection: JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_monthly
     default_band: PRECIP
-  jasmes-aqua-modis-swr-v811-global-daily:
+  modis-aqua-swr-daily:
+    aliases: [jasmes-aqua-modis-swr-v811-global-daily]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Aqua.MODIS_swr.v811_global_daily
     default_band: swr
-  jasmes-aqua-modis-swr-v811-global-half-monthly:
+  modis-aqua-swr-halfmonth:
+    aliases: [jasmes-aqua-modis-swr-v811-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Aqua.MODIS_swr.v811_global_half-monthly
     default_band: swr
-  jasmes-aqua-modis-swr-v811-global-monthly:
+  modis-aqua-swr-monthly:
+    aliases: [jasmes-aqua-modis-swr-v811-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Aqua.MODIS_swr.v811_global_monthly
     default_band: swr
-  jasmes-terra-modis-swr-v811-global-daily:
+  modis-terra-swr-daily:
+    aliases: [jasmes-terra-modis-swr-v811-global-daily]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS_swr.v811_global_daily
     default_band: swr
-  jasmes-terra-modis-swr-v811-global-half-monthly:
+  modis-terra-swr-halfmonth:
+    aliases: [jasmes-terra-modis-swr-v811-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS_swr.v811_global_half-monthly
     default_band: swr
-  jasmes-terra-modis-swr-v811-global-monthly:
+  modis-terra-swr-monthly:
+    aliases: [jasmes-terra-modis-swr-v811-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS_swr.v811_global_monthly
     default_band: swr
-  jasmes-terra-modis-aqua-modis-ndvi-v811-global-half-monthly:
+  modis-ndvi-halfmonth:
+    aliases: [jasmes-terra-modis-aqua-modis-ndvi-v811-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_half-monthly
     default_band: ndvi
-  jasmes-terra-modis-aqua-modis-ndvi-v811-global-monthly:
+  modis-ndvi-monthly:
+    aliases: [jasmes-terra-modis-aqua-modis-ndvi-v811-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_monthly
     default_band: ndvi
-  jasmes-terra-modis-aqua-modis-taua-v811-global-daily:
+  modis-taua-daily:
+    aliases: [jasmes-terra-modis-aqua-modis-taua-v811-global-daily]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_daily
     default_band: T500
-  jasmes-terra-modis-aqua-modis-taua-v811-global-half-monthly:
+  modis-taua-halfmonth:
+    aliases: [jasmes-terra-modis-aqua-modis-taua-v811-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_half-monthly
     default_band: T500
-  jasmes-terra-modis-aqua-modis-taua-v811-global-monthly:
+  modis-taua-monthly:
+    aliases: [jasmes-terra-modis-aqua-modis-taua-v811-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_monthly
     default_band: T500
-  jasmes-gcom-w-amsr2-ic0-v201-north-daily:
+  amsr2-seaice-north-daily:
+    aliases: [jasmes-gcom-w-amsr2-ic0-v201-north-daily]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-W.AMSR2_ic0.v201_north_daily
     default_band: IC0
-  jasmes-gcom-w-amsr2-ic0-v201-south-daily:
+  amsr2-seaice-south-daily:
+    aliases: [jasmes-gcom-w-amsr2-ic0-v201-south-daily]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-W.AMSR2_ic0.v201_south_daily
     default_band: IC0
-  gp-gcom-c-sgli-l3-chla-daytime-v3-global-daily:
+  sgli-chla-d-daily:
+    aliases: [gp-gcom-c-sgli-l3-chla-daytime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_daily
     default_band: CHLA
-  gp-gcom-c-sgli-l3-chla-daytime-v3-global-half-monthly:
+  sgli-chla-d-halfmonth:
+    aliases: [gp-gcom-c-sgli-l3-chla-daytime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_half-monthly
     default_band: CHLA
-  gp-gcom-c-sgli-l3-chla-daytime-v3-global-monthly:
+  sgli-chla-d-monthly:
+    aliases: [gp-gcom-c-sgli-l3-chla-daytime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_monthly
     default_band: CHLA
-  gp-gcom-c-sgli-l3-sst-daytime-v3-global-daily:
+  sgli-sst-d-daily:
+    aliases: [gp-gcom-c-sgli-l3-sst-daytime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_daily
     default_band: SST
-  gp-gcom-c-sgli-l3-sst-daytime-v3-global-half-monthly:
+  sgli-sst-d-halfmonth:
+    aliases: [gp-gcom-c-sgli-l3-sst-daytime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_half-monthly
     default_band: SST
-  gp-gcom-c-sgli-l3-sst-daytime-v3-global-monthly:
+  sgli-sst-d-monthly:
+    aliases: [gp-gcom-c-sgli-l3-sst-daytime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_monthly
     default_band: SST
-  gp-gcom-c-sgli-l3-sst-nighttime-v3-global-daily:
+  sgli-sst-n-daily:
+    aliases: [gp-gcom-c-sgli-l3-sst-nighttime-v3-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_daily
     default_band: SST
-  gp-gcom-c-sgli-l3-sst-nighttime-v3-global-half-monthly:
+  sgli-sst-n-halfmonth:
+    aliases: [gp-gcom-c-sgli-l3-sst-nighttime-v3-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_half-monthly
     default_band: SST
-  gp-gcom-c-sgli-l3-sst-nighttime-v3-global-monthly:
+  sgli-sst-n-monthly:
+    aliases: [gp-gcom-c-sgli-l3-sst-nighttime-v3-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_monthly
     default_band: SST
   hrlulc:
-    aliases: [lulc, alos-hrlulc-v25-04-japan]
+    aliases: [alos-hrlulc-v25-04-japan, lulc]
     protocol: jaxa-earth
     collection: JAXA.EORC_ALOS_HRLULC.v25.04_japan
     default_band: HRLULC
   aw3d30-v41:
-    aliases: [elevation-v41, dem-v41, alos-prism-aw3d30-v4-1-global]
+    aliases: [alos-prism-aw3d30-v4-1-global, elevation-v41, dem-v41]
     protocol: jaxa-earth
     collection: JAXA.EORC_ALOS.PRISM_AW3D30.v4.1_global
     default_band: DSM
-  jasmes-gcom-c-sgli-et-v1-global-8-day:
+  sgli-et-8day:
+    aliases: [jasmes-gcom-c-sgli-et-v1-global-8-day]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_8-day
     default_band: ET
-  jasmes-gcom-c-sgli-et-v1-global-half-monthly:
+  sgli-et-halfmonth:
+    aliases: [jasmes-gcom-c-sgli-et-v1-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_half-monthly
     default_band: ET
-  jasmes-gcom-c-sgli-et-v1-global-monthly:
+  sgli-et-monthly:
+    aliases: [jasmes-gcom-c-sgli-et-v1-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_monthly
     default_band: ET
-  jasmes-gcom-c-sgli-etidx-v1-global-8-day:
+  sgli-etidx-8day:
+    aliases: [jasmes-gcom-c-sgli-etidx-v1-global-8-day]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_8-day
     default_band: ETidx
-  jasmes-gcom-c-sgli-etidx-v1-global-half-monthly:
+  sgli-etidx-halfmonth:
+    aliases: [jasmes-gcom-c-sgli-etidx-v1-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_half-monthly
     default_band: ETidx
-  jasmes-gcom-c-sgli-etidx-v1-global-monthly:
+  sgli-etidx-monthly:
+    aliases: [jasmes-gcom-c-sgli-etidx-v1-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_monthly
     default_band: ETidx
@@ -377,84 +461,103 @@ datasets:
     protocol: jaxa-earth
     collection: JAXA.EORC_GSMaP_NRT.Gauge.Ext.00Z-23Z.v6_daily
     default_band: EXT
-  gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-daily:
+  amsr2-ssw-d-daily:
+    aliases: [gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_daily
     default_band: SSW
-  gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-half-monthly:
+  amsr2-ssw-d-halfmonth:
+    aliases: [gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_half-monthly
     default_band: SSW
-  gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-monthly:
+  amsr2-ssw-d-monthly:
+    aliases: [gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_monthly
     default_band: SSW
-  gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-daily:
+  amsr2-ssw-n-daily:
+    aliases: [gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_daily
     default_band: SSW
-  gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-half-monthly:
+  amsr2-ssw-n-halfmonth:
+    aliases: [gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-half-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_half-monthly
     default_band: SSW
-  gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-monthly:
+  amsr2-ssw-n-monthly:
+    aliases: [gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-monthly]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_monthly
     default_band: SSW
   gsmap:
-    aliases: [precipitation, rainfall, gsmap-gauge-v6-hourly]
+    aliases: [gsmap-gauge-v6-hourly, precipitation, rainfall]
     protocol: jaxa-earth
     collection: JAXA.EORC_GSMaP_standard.Gauge.v6_hourly
     default_band: PRECIP
-  utokyo-te-msm-outflw-v2-japan-hourly:
+  temsm-outflw:
+    aliases: [utokyo-te-msm-outflw-v2-japan-hourly]
     protocol: jaxa-earth
     collection: JAXA.UTokyo_TE_MSM.OUTFLW.v2_japan_hourly
     default_band: OUTFLW
-  utokyo-te-msm-rivout-v2-japan-hourly:
+  temsm-rivout:
+    aliases: [utokyo-te-msm-rivout-v2-japan-hourly]
     protocol: jaxa-earth
     collection: JAXA.UTokyo_TE_MSM.RIVOUT.v2_japan_hourly
     default_band: RIVOUT
-  utokyo-te-msm-fldout-v2-japan-hourly:
+  temsm-fldout:
+    aliases: [utokyo-te-msm-fldout-v2-japan-hourly]
     protocol: jaxa-earth
     collection: JAXA.UTokyo_TE_MSM.FLDOUT.v2_japan_hourly
     default_band: FLDOUT
-  utokyo-te-msm-rivdph-v2-japan-hourly:
+  temsm-rivdph:
+    aliases: [utokyo-te-msm-rivdph-v2-japan-hourly]
     protocol: jaxa-earth
     collection: JAXA.UTokyo_TE_MSM.RIVDPH.v2_japan_hourly
     default_band: RIVDPH
-  utokyo-te-msm-rprivdph-v2-japan-hourly:
+  temsm-rprivdph:
+    aliases: [utokyo-te-msm-rprivdph-v2-japan-hourly]
     protocol: jaxa-earth
     collection: JAXA.UTokyo_TE_MSM.RPRIVDPH.v2_japan_hourly
     default_band: RPRIVDPH
-  utokyo-te-msm-flddph-v2-japan-hourly:
+  temsm-flddph:
+    aliases: [utokyo-te-msm-flddph-v2-japan-hourly]
     protocol: jaxa-earth
     collection: JAXA.UTokyo_TE_MSM.FLDDPH.v2_japan_hourly
     default_band: FLDDPH
-  utokyo-te-msm-fldfrc-v2-japan-hourly:
+  temsm-fldfrc:
+    aliases: [utokyo-te-msm-fldfrc-v2-japan-hourly]
     protocol: jaxa-earth
     collection: JAXA.UTokyo_TE_MSM.FLDFRC.v2_japan_hourly
     default_band: FLDFRC
-  jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-8-day:
+  sgli-lst-n-8day:
+    aliases: [jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-8-day]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_8-day
     default_band: LST_AVE
-  jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-8-day:
+  sgli-lst-d-8day:
+    aliases: [jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-8-day]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_8-day
     default_band: LST_AVE
-  jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-8-day:
+  sgli-l2-lst-n-8day-jp:
+    aliases: [jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-8-day]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_8-day
     default_band: LST_AVE
-  jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-8-day:
+  sgli-l2-lst-d-8day-jp:
+    aliases: [jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-8-day]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_8-day
     default_band: LST_AVE
-  gp-gcom-w-amsr2-l3-sst-daytime-v4-global-daily:
+  amsr2-sst-d-daily:
+    aliases: [gp-gcom-w-amsr2-l3-sst-daytime-v4-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SST.daytime.v4_global_daily
     default_band: SST
-  gp-gcom-w-amsr2-l3-sst-nighttime-v4-global-daily:
+  amsr2-sst-n-daily:
+    aliases: [gp-gcom-w-amsr2-l3-sst-nighttime-v4-global-daily]
     protocol: jaxa-earth
     collection: JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SST.nighttime.v4_global_daily
     default_band: SST
@@ -463,35 +566,43 @@ datasets:
     protocol: jaxa-earth
     collection: JAXA.EORC_GSMaP_SPI.climate.gnrt6_monthly
     default_band: SPI
-  jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-8-day-normal:
+  sgli-lst-n-8day-norm:
+    aliases: [jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-8-day-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_8-day-normal
     default_band: LST_2000_2022
-  jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-8-day-normal:
+  sgli-lst-d-8day-norm:
+    aliases: [jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-8-day-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_8-day-normal
     default_band: LST_2000_2022
-  jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-monthly-normal:
+  sgli-lst-n-monthly-norm:
+    aliases: [jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_monthly-normal
     default_band: LST_2000_2022
-  jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-monthly-normal:
+  sgli-lst-d-monthly-norm:
+    aliases: [jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_monthly-normal
     default_band: LST_2000_2022
-  jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-8-day-normal:
+  sgli-l2-lst-n-8day-norm-jp:
+    aliases: [jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-8-day-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_8-day-normal
     default_band: LST_2000_2022
-  jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-8-day-normal:
+  sgli-l2-lst-d-8day-norm-jp:
+    aliases: [jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-8-day-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_8-day-normal
     default_band: LST_2000_2022
-  jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-monthly-normal:
+  sgli-l2-lst-n-monthly-norm-jp:
+    aliases: [jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_monthly-normal
     default_band: LST_2000_2022
-  jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-monthly-normal:
+  sgli-l2-lst-d-monthly-norm-jp:
+    aliases: [jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-monthly-normal]
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_monthly-normal
     default_band: LST_2000_2022
