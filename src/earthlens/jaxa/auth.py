@@ -196,6 +196,32 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
                 neither the explicit credentials nor the environment
                 variables supply a usable username + password pair. The
                 message names the env vars and the free-registration URL.
+
+        Examples:
+            - The jaxa-earth protocol's configure is a no-op:
+                ```python
+                >>> from earthlens.jaxa import JaxaAuth, JaxaCredentials
+                >>> auth = JaxaAuth(JaxaCredentials(), protocol="jaxa-earth")
+                >>> auth.configure()
+                >>> auth.is_authenticated()
+                True
+
+                ```
+            - With gportal credentials supplied explicitly, configure caches them
+              for the branch to read via `.username` / `.password`:
+                ```python
+                >>> from pydantic import SecretStr
+                >>> from earthlens.jaxa import JaxaAuth, JaxaCredentials
+                >>> creds = JaxaCredentials(
+                ...     gportal_username="alice",
+                ...     gportal_password=SecretStr("topsecret"),
+                ... )
+                >>> auth = JaxaAuth(creds, protocol="gportal")
+                >>> auth.configure()
+                >>> auth.username
+                'alice'
+
+                ```
         """
         if self._configured:
             return
@@ -220,5 +246,23 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
         self._configured = True
 
     def is_authenticated(self) -> bool:
-        """Return `True` once :meth:`configure` has run successfully."""
+        """Return `True` once :meth:`configure` has run successfully.
+
+        Returns:
+            bool: `True` after :meth:`configure` has completed without
+                raising; `False` before then.
+
+        Examples:
+            - Construction does not authenticate; configure flips the flag:
+                ```python
+                >>> from earthlens.jaxa import JaxaAuth, JaxaCredentials
+                >>> auth = JaxaAuth(JaxaCredentials(), protocol="jaxa-earth")
+                >>> auth.is_authenticated()
+                False
+                >>> auth.configure()
+                >>> auth.is_authenticated()
+                True
+
+                ```
+        """
         return self._configured

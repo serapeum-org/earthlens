@@ -181,6 +181,21 @@ class JAXA(AbstractDataSource):
             JaxaAuth: The optional-credentials auth object. `configure()`
             is a no-op for the `jaxa-earth` protocol and resolves
             G-Portal credentials for the `gportal` protocol.
+
+        Examples:
+            - The auth object's protocol always matches the backend's:
+                ```python
+                >>> from earthlens.jaxa import JAXA
+                >>> backend = JAXA(
+                ...     start="2020-01-01", end="2020-12-31",
+                ...     variables=["aw3d30"],
+                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],
+                ...     path=".",
+                ... )
+                >>> backend.auth.protocol
+                'jaxa-earth'
+
+                ```
         """
         return self._auth
 
@@ -190,6 +205,20 @@ class JAXA(AbstractDataSource):
 
         Returns:
             JaxaProtocol: Either `"jaxa-earth"` or `"gportal"`.
+
+        Examples:
+            - Resolving an alias pins the protocol on construction:
+                ```python
+                >>> from earthlens.jaxa import JAXA
+                >>> JAXA(
+                ...     start="2020-01-01", end="2020-12-31",
+                ...     variables=["elevation"],
+                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],
+                ...     path=".",
+                ... ).protocol
+                'jaxa-earth'
+
+                ```
         """
         return self._protocol
 
@@ -315,6 +344,24 @@ class JAXA(AbstractDataSource):
         Raises:
             NotImplementedError: When `aggregate` is non-`None`. See `G6`
                 in the planning doc.
+
+        Examples:
+            - Passing `aggregate=` raises because per-date stacks are not
+              reduced yet:
+                ```python
+                >>> from earthlens.jaxa import JAXA
+                >>> backend = JAXA(
+                ...     start="2020-01-01", end="2020-12-31",
+                ...     variables=["aw3d30"],
+                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],
+                ...     path=".",
+                ... )
+                >>> backend.download(aggregate=object())  # doctest: +ELLIPSIS
+                Traceback (most recent call last):
+                    ...
+                NotImplementedError: JAXA does not yet support the aggregate=...
+
+                ```
         """
         if aggregate is not None:
             raise NotImplementedError(

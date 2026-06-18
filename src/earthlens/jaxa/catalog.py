@@ -35,7 +35,19 @@ _CATALOG_CACHE: dict[tuple[str, int], Catalog] = {}
 
 
 def clear_catalog_cache() -> None:
-    """Empty the module-level JAXA catalog parse cache."""
+    """Empty the module-level JAXA catalog parse cache.
+
+    Examples:
+        - Calling it is a no-op when the cache is already empty, and
+          subsequent `Catalog()` calls re-read the YAML from disk:
+            ```python
+            >>> from earthlens.jaxa.catalog import clear_catalog_cache, Catalog
+            >>> clear_catalog_cache()
+            >>> "aw3d30" in Catalog()
+            True
+
+            ```
+    """
     _CATALOG_CACHE.clear()
 
 
@@ -244,6 +256,16 @@ class Catalog(AbstractCatalog):
 
         Returns:
             dict[str, Dataset]: Same object as :attr:`datasets`.
+
+        Examples:
+            - Inspect one of the rows by canonical key:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> cat = Catalog()
+                >>> cat.get_catalog()["aw3d30"].protocol
+                'jaxa-earth'
+
+                ```
         """
         return self.datasets
 
@@ -262,6 +284,28 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `key` is neither a canonical key nor a
                 registered alias.
+
+        Examples:
+            - A friendly alias resolves to the same row as the canonical key:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> cat = Catalog()
+                >>> cat.get("elevation").collection
+                'JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global'
+                >>> cat.get("aw3d30").default_band
+                'DSM'
+
+                ```
+            - An unknown key raises ValueError:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> try:
+                ...     Catalog().get("definitely-not-a-key")
+                ... except ValueError as exc:
+                ...     "JAXA catalog" in str(exc)
+                True
+
+                ```
         """
         canonical = self.resolve(key)
         return self.get_dataset(canonical)
@@ -279,6 +323,18 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: When `key` is neither, with a did-you-mean hint
                 drawn from the union of canonical keys and aliases.
+
+        Examples:
+            - A canonical key resolves to itself; an alias resolves to its row:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> cat = Catalog()
+                >>> cat.resolve("aw3d30")
+                'aw3d30'
+                >>> cat.resolve("elevation")
+                'aw3d30'
+
+                ```
         """
         try:
             return self.aliases[key]
@@ -298,6 +354,19 @@ class Catalog(AbstractCatalog):
 
         Returns:
             list[str]: Sorted canonical keys filtered by protocol.
+
+        Examples:
+            - The bundled catalog ships both protocols; ``aw3d30`` is jaxa-earth
+              and ``sgli-l380`` is gportal:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> cat = Catalog()
+                >>> "aw3d30" in cat.by_protocol("jaxa-earth")
+                True
+                >>> "sgli-l380" in cat.by_protocol("gportal")
+                True
+
+                ```
         """
         return sorted(k for k, ds in self.datasets.items() if ds.protocol == protocol)
 
@@ -307,6 +376,20 @@ class Catalog(AbstractCatalog):
         Overrides :meth:`AbstractCatalog.__contains__`, which only checks
         `self.datasets`, so the alias surface (`"elevation" in cat`)
         matches what `cat.get("elevation")` already accepts.
+
+        Examples:
+            - Aliases and canonical keys both resolve:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> cat = Catalog()
+                >>> "aw3d30" in cat
+                True
+                >>> "elevation" in cat
+                True
+                >>> "not-a-real-key" in cat
+                False
+
+                ```
         """
         return name in self.aliases
 
@@ -317,6 +400,16 @@ class Catalog(AbstractCatalog):
         lookup matches the same alias surface as :meth:`get`. Raises
         :class:`KeyError` on miss (the dict-style contract; callers that
         want a did-you-mean hint use :meth:`get` instead).
+
+        Examples:
+            - Lookup by alias returns the canonical row:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> cat = Catalog()
+                >>> cat["elevation"].key
+                'aw3d30'
+
+                ```
         """
         try:
             return self.get(name)
