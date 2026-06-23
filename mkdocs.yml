@@ -166,6 +166,9 @@ nav:
     - JAXA (Earth-observation archive):
       - Introduction: reference/jaxa/introduction.md
       - Usage: reference/jaxa/usage.md
+      - Authentication: reference/jaxa/authentication.md
+      - Available datasets: reference/jaxa/datasets.md
+      - Reference: reference/jaxa/jaxa.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md

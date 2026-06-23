@@ -143,3 +143,41 @@ def test_catalog_getitem_unknown_key_raises_key_error() -> None:
     cat = Catalog()
     with pytest.raises(KeyError):
         _ = cat["not-a-real-key"]
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_catalog_passthrough_raw_gportal_id() -> None:
+    """A raw 8-digit G-Portal id resolves + synthesizes a gportal row."""
+    cat = Catalog()
+    assert cat.resolve("11001002") == "11001002"
+    row = cat.get("11001002")
+    assert row.protocol == "gportal"
+    assert row.short_name == "11001002"
+    assert row.collection is None
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_catalog_passthrough_raw_jaxa_earth_collection() -> None:
+    """A raw JAXA.* STAC collection name passes through as a jaxa-earth row."""
+    cat = Catalog()
+    cid = "JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly"
+    assert cat.resolve(cid) == cid
+    row = cat.get(cid)
+    assert row.protocol == "jaxa-earth"
+    assert row.collection == cid
+    assert row.short_name is None
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_catalog_passthrough_accepts_nasa_and_copernicus_prefixes() -> None:
+    """Both `NASA.*` and `Copernicus.*` STAC names pass through too."""
+    cat = Catalog()
+    nasa = "NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_yearly"
+    cop = "Copernicus.C3S_PROBA-V_LCCS_global_monthly"
+    assert cat.resolve(nasa) == nasa
+    assert cat.resolve(cop) == cop
+    assert cat.get(nasa).protocol == "jaxa-earth"
+    assert cat.get(cop).protocol == "jaxa-earth"

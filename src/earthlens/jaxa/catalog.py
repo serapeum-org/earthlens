@@ -21,6 +21,7 @@ the `(path, mtime)` parse cache used by :meth:`Catalog.load`.
 from __future__ import annotations
 
 import difflib
+import re
 from pathlib import Path
 from typing import Any, Literal
 
@@ -32,6 +33,12 @@ from earthlens.base.yaml_loader import load_yaml_strict
 CATALOG_PATH: Path = Path(__file__).parent / "jaxa_data_catalog.yaml"
 
 _CATALOG_CACHE: dict[tuple[str, int], Catalog] = {}
+
+#: G-Portal dataset ids are 7- to 9-digit numeric strings (e.g. `11001002`).
+_GPORTAL_ID_RE = re.compile(r"^\d{7,9}$")
+
+#: jaxa.earth STAC collection names start with the data publisher prefix.
+_JAXA_EARTH_PREFIX_RE = re.compile(r"^(JAXA|NASA|Copernicus)\.")
 
 
 def clear_catalog_cache() -> None:
@@ -186,12 +193,18 @@ class Catalog(AbstractCatalog):
 
         `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read (used
-        in tests). Either way the `available_datasets` index and the
-        `aliases` map are derived from the loaded rows.
+        in tests). Either way the `aliases` map is derived from the loaded
+        rows. `available_datasets` is populated from the YAML's optional
+        `available_datasets:` block (the refresh CLI's `--write` target —
+        an informational index of every live SDK id across both protocols)
+        or, when that block is absent, defaults to the sorted curated keys
+        so the dict-like surface (`len(cat)` etc.) still works.
         """
         if not self.datasets:
             loaded = Catalog.load()
             self.datasets = loaded.datasets
+            if loaded.available_datasets and not self.available_datasets:
+                self.available_datasets = loaded.available_datasets
         # Build the alias index from the rows' `aliases` lists. Conflicts
         # (same alias on two rows) raise; canonical keys also resolve to
         # themselves so `resolve()` is total over both.
@@ -206,7 +219,8 @@ class Catalog(AbstractCatalog):
                     )
                 aliases[alias] = key
         self.aliases = aliases
-        self.available_datasets = sorted(self.datasets)
+        if not self.available_datasets:
+            self.available_datasets = sorted(self.datasets)
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
@@ -247,7 +261,8 @@ class Catalog(AbstractCatalog):
                 raise ValueError(
                     f"{path} dataset {key!r} failed validation:\n{exc}"
                 ) from exc
-        catalog = cls(datasets=datasets)
+        available = list(data.get("available_datasets") or [])
+        catalog = cls(datasets=datasets, available_datasets=available)
         _CATALOG_CACHE[cache_key] = catalog
         return catalog
 
@@ -270,20 +285,29 @@ class Catalog(AbstractCatalog):
         return self.datasets
 
     def get(self, key: str) -> Dataset:
-        """Return the :class:`Dataset` for `key` (canonical or alias).
+        """Return the :class:`Dataset` for `key` (canonical, alias, or raw id).
 
         Resolves `key` through :meth:`resolve` first, then returns the
-        matching row via :meth:`get_dataset` (did-you-mean hint on miss).
+        matching curated row when one exists. **Raw G-Portal numeric ids**
+        (e.g. ``"11001002"``) and **raw jaxa.earth STAC collection names**
+        (e.g. ``"JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly"``)
+        pass through unmapped: a passthrough :class:`Dataset` row is
+        synthesized on the fly with the right protocol so the backend
+        dispatches correctly — the full 799-entry G-Portal universe + the
+        ~119-entry JAXA Earth STAC catalogue are usable without bloating
+        the bundled YAML with hand-curated rows.
 
         Args:
-            key: A canonical key or a friendly alias.
+            key: A canonical key, friendly alias, raw G-Portal id, or raw
+                jaxa.earth STAC collection name.
 
         Returns:
-            Dataset: The matching dataset row.
+            Dataset: The matching curated row, or a synthesized passthrough
+            row when `key` is a raw id recognised by the live SDK.
 
         Raises:
-            ValueError: If `key` is neither a canonical key nor a
-                registered alias.
+            ValueError: If `key` is neither curated nor a syntactically
+                valid raw id.
 
         Examples:
             - A friendly alias resolves to the same row as the canonical key:
@@ -294,6 +318,14 @@ class Catalog(AbstractCatalog):
                 'JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global'
                 >>> cat.get("aw3d30").default_band
                 'DSM'
+
+                ```
+            - A raw G-Portal id passes through as a synthesized gportal row:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> row = Catalog().get("11001002")
+                >>> row.protocol, row.short_name
+                ('gportal', '11001002')
 
                 ```
             - An unknown key raises ValueError:
@@ -308,21 +340,29 @@ class Catalog(AbstractCatalog):
                 ```
         """
         canonical = self.resolve(key)
-        return self.get_dataset(canonical)
+        if canonical in self.datasets:
+            return self.datasets[canonical]
+        # Passthrough: synthesize a Dataset row for raw ids that match
+        # either protocol's id shape (resolve() has already accepted them).
+        if _GPORTAL_ID_RE.match(canonical):
+            return Dataset(key=canonical, protocol="gportal", short_name=canonical)
+        return Dataset(key=canonical, protocol="jaxa-earth", collection=canonical)
 
     def resolve(self, key: str) -> str:
-        """Map a friendly alias to its canonical key.
+        """Map a friendly alias / raw id to its canonical key.
 
         Args:
-            key: A canonical key (returns it unchanged) or a friendly
-                alias.
+            key: A canonical key, friendly alias, raw G-Portal numeric
+                id (e.g. ``"11001002"``), or raw jaxa.earth STAC
+                collection name (e.g. ``"JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global"``).
 
         Returns:
-            str: The canonical catalog key.
+            str: The canonical catalog key. Raw ids pass through unchanged.
 
         Raises:
-            ValueError: When `key` is neither, with a did-you-mean hint
-                drawn from the union of canonical keys and aliases.
+            ValueError: When `key` is neither curated nor a syntactically
+                valid raw id, with a did-you-mean hint drawn from the
+                union of canonical keys and aliases.
 
         Examples:
             - A canonical key resolves to itself; an alias resolves to its row:
@@ -335,16 +375,28 @@ class Catalog(AbstractCatalog):
                 'aw3d30'
 
                 ```
+            - Raw G-Portal numeric ids pass through unmapped:
+                ```python
+                >>> from earthlens.jaxa import Catalog
+                >>> Catalog().resolve("11001002")
+                '11001002'
+
+                ```
         """
-        try:
+        if key in self.aliases:
             return self.aliases[key]
-        except KeyError:
-            close = difflib.get_close_matches(key, self.aliases, n=1)
-            hint = f" Did you mean {close[0]!r}?" if close else ""
-            raise ValueError(
-                f"{key!r} is not in the JAXA catalog. "
-                f"Known keys: {sorted(self.datasets)}.{hint}"
-            ) from None
+        # Raw G-Portal id (7-9 digits) or raw jaxa.earth STAC collection name
+        # passes through unmapped, mirroring `usgs_water.Catalog.resolve` for
+        # raw 5-digit NWIS codes. The available_datasets: index lets a
+        # curator verify the id is real upstream.
+        if _GPORTAL_ID_RE.match(key) or _JAXA_EARTH_PREFIX_RE.match(key):
+            return key
+        close = difflib.get_close_matches(key, self.aliases, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"{key!r} is not in the JAXA catalog. "
+            f"Known keys: {sorted(self.datasets)}.{hint}"
+        )
 
     def by_protocol(self, protocol: JaxaProtocol) -> list[str]:
         """Return canonical keys whose `protocol` matches `protocol`.

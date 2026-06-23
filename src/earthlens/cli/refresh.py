@@ -1516,6 +1516,11 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "usgs_water": _write_usgs_water,
     "worldpop": _write_worldpop,
     "openaq": _write_openaq,
+    # JAXA's catalog YAML carries an `available_datasets:` block that lists
+    # every live id across both protocols (jaxa-earth + gportal). The
+    # flatten=True path unions the two protocol groups into a single sorted
+    # list; the curated `datasets:` block stays hand-authored.
+    "jaxa": _index_writer("available_datasets"),
 }
 
 
