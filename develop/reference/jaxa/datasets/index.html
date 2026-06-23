@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/asf/usage/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/jaxa/datasets/">
       
       
         <link rel="prev" href="../authentication/">
       
       
-        <link rel="next" href="../datasets/">
+        <link rel="next" href="../jaxa/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Usage - earthlens</title>
+        <title>Available datasets - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#asf-insar-backend-usage" class="md-skip">
+        <a href="#jaxa-available-datasets" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Usage
+              Available datasets
             
           </span>
         </div>
@@ -1085,336 +1085,6 @@
                 
   
   
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ASF (InSAR / SAR)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    ASF (InSAR / SAR)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Install
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#plain-sar-search" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Plain SAR search
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Plain SAR search">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#refinement-kwargs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Refinement kwargs
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#insar-baseline-stack" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        InSAR baseline stack
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#picking-a-product" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Picking a product
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-no-aggregate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why no aggregate=?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cross-link-asf-vs-earthdata" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cross-link: ASF vs earthdata
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available products
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../asf/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     
@@ -1429,10 +1099,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
             
   
   
@@ -1450,8 +1120,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1599,10 +1269,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
             
   
   
@@ -1620,8 +1290,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1797,10 +1467,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
             
   
   
@@ -1818,8 +1488,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1967,10 +1637,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
-          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
             
   
   
@@ -1988,8 +1658,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2193,10 +1863,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
         
           
-          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
             
   
   
@@ -2214,8 +1884,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2335,10 +2005,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
         
           
-          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
             
   
   
@@ -2356,8 +2026,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2533,10 +2203,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
         
           
-          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
             
   
   
@@ -2554,8 +2224,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2731,10 +2401,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
         
           
-          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
             
   
   
@@ -2752,8 +2422,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2827,6 +2497,303 @@
   
     <li class="md-nav__item">
       <a href="../../gdacs/gdacs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JAXA (Earth-observation archive)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    JAXA (Earth-observation archive)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available datasets
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#jaxa-earth-stac-cog-via-the-official-jaxaearth-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        jaxa-earth (STAC + COG via the official jaxa.earth API)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="jaxa-earth (STAC + COG via the official jaxa.earth API)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#full-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full list
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gportal-sftp-via-the-community-gportal-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gportal (SFTP via the community gportal SDK)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refreshing-against-the-live-sdk-universes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Refreshing against the live SDK universes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jaxa/" class="md-nav__link">
         
   
   
@@ -6474,7 +6441,7 @@
   <span class="md-ellipsis">
     
   
-    ASF (InSAR / SAR)
+    NASA Earthdata
   
 
     
@@ -6487,204 +6454,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    ASF (InSAR / SAR)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ASF catalog explorer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/quickstart_search/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ASF — quickstart (anonymous search)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/sentinel1_insar_stack/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sentinel-1 InSAR baseline stack
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/opera_rtc_workflow/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OPERA RTC-S1 — analysis-ready backscatter workflow
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/opera_rtc_backscatter/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OPERA RTC-S1 backscatter — download + read + plot
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NASA Earthdata
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6916,10 +6685,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
@@ -6937,8 +6706,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7282,10 +7051,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -7303,8 +7072,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7508,10 +7277,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
         
           
-          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
             
   
   
@@ -7529,8 +7298,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7650,10 +7419,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
             
   
   
@@ -7671,8 +7440,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8044,10 +7813,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
         
           
-          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
             
   
   
@@ -8065,8 +7834,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8298,10 +8067,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
@@ -8319,8 +8088,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8429,6 +8198,148 @@
     
   
     GDACS country hazard profile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JAXA (Earth-observation archive)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    JAXA (Earth-observation archive)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jaxa/01_catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JAXA catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jaxa/02_aw3d30_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AW3D30 elevation over Mt. Fuji — research scenario
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jaxa/03_gportal_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    G-Portal search + SFTP download — research scenario
   
 
     
@@ -11452,33 +11363,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#jaxa-earth-stac-cog-via-the-official-jaxaearth-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        jaxa-earth (STAC + COG via the official jaxa.earth API)
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#plain-sar-search" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Plain SAR search
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Plain SAR search">
+    <nav class="md-nav" aria-label="jaxa-earth (STAC + COG via the official jaxa.earth API)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#refinement-kwargs" class="md-nav__link">
+  <a href="#full-list" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Refinement kwargs
+        Full list
       
     </span>
   </a>
@@ -11491,10 +11391,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#insar-baseline-stack" class="md-nav__link">
+  <a href="#gportal-sftp-via-the-community-gportal-sdk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        InSAR baseline stack
+        gportal (SFTP via the community gportal SDK)
       
     </span>
   </a>
@@ -11502,32 +11402,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#picking-a-product" class="md-nav__link">
+  <a href="#refreshing-against-the-live-sdk-universes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Picking a product
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-no-aggregate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why no aggregate=?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cross-link-asf-vs-earthdata" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cross-link: ASF vs earthdata
+        Refreshing against the live SDK universes
       
     </span>
   </a>
@@ -11551,7 +11429,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/asf/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/jaxa/datasets.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -11560,213 +11438,884 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/asf/usage.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/jaxa/datasets.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="asf-insar-backend-usage"><a class="toclink" href="#asf-insar-backend-usage">ASF InSAR backend — usage</a><a class="headerlink" href="#asf-insar-backend-usage" title="Permanent link">#</a></h1>
-<p>This page walks through the two request shapes the <code>asf</code> backend
-supports: a <strong>plain SAR catalog search</strong> and an <strong>InSAR baseline
-stack</strong> from a reference granule. Both run through the same
-<code>EarthLens(data_source="asf", …)</code> facade; the mode is decided by
-whether a <code>reference=</code> granule id is set.</p>
-<h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>asf<span class="o">]</span>
+<h1 id="jaxa-available-datasets"><a class="toclink" href="#jaxa-available-datasets">JAXA — available datasets</a><a class="headerlink" href="#jaxa-available-datasets" title="Permanent link">#</a></h1>
+<p>The bundled catalog ships <strong>124 rows</strong>: 118 <code>jaxa-earth</code> STAC collections plus 6 <code>gportal</code> mission products. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via <code>cat.get(...)</code>.</p>
+<p>The naming scheme for jaxa-earth is <code>&lt;mission&gt;-&lt;product&gt;[-&lt;d|n&gt;][-&lt;cadence&gt;][-norm]</code> where <code>d</code>/<code>n</code> mark daytime / nighttime variants, the cadence comes from the source (<code>daily</code>, <code>halfmonth</code>, <code>monthly</code>, <code>8day</code>, <code>hourly</code>, <code>yearly</code>), and <code>-norm</code> flags a climatological <em>normal</em>.</p>
+<p>Resolve either form:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s1">&#39;elevation&#39;</span><span class="p">)</span>          <span class="c1"># -&gt; &#39;aw3d30&#39;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s1">&#39;aw3d30&#39;</span><span class="p">)</span>             <span class="c1"># -&gt; &#39;aw3d30&#39;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s1">&#39;alos-prism-aw3d30-v3-2-global&#39;</span><span class="p">)</span>   <span class="c1"># -&gt; &#39;aw3d30&#39;</span>
 </code></pre></div>
-<p>Set credentials (only needed for the <strong>download</strong> step — search
-runs anonymously):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">EARTHDATA_TOKEN</span><span class="o">=</span><span class="s2">&quot;&lt;your EDL bearer token&gt;&quot;</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># or</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">EARTHDATA_USERNAME</span><span class="o">=</span><span class="s2">&quot;you&quot;</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">EARTHDATA_PASSWORD</span><span class="o">=</span><span class="s2">&quot;••••&quot;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># or place a `urs.earthdata.nasa.gov` entry in ~/.netrc</span>
-</code></pre></div>
-<h2 id="plain-sar-search"><a class="toclink" href="#plain-sar-search">Plain SAR search</a><a class="headerlink" href="#plain-sar-search" title="Permanent link">#</a></h2>
-<p>Find every Sentinel-1 SLC over a bbox and time window:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;asf&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sentinel-1-slc&quot;</span><span class="p">],</span>   <span class="c1"># one curated product key per call</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-30&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">63.8</span><span class="p">,</span> <span class="mf">64.4</span><span class="p">],</span>          <span class="c1"># Iceland, central rift zone</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">21.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">21.0</span><span class="p">],</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;asf_out&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">flight_direction</span><span class="o">=</span><span class="s2">&quot;ASCENDING&quot;</span><span class="p">,</span>   <span class="c1"># ASF refinement kwargs</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">beam_mode</span><span class="o">=</span><span class="s2">&quot;IW&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;VV+VH&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="n">max_results</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">)</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<p><code>download()</code> returns a <code>list[Path]</code>. The first call downloads every
-matching product into <code>asf_out/</code>; a second call returns the same
-list without re-downloading (the backend skips files already on
-disk).</p>
-<h3 id="refinement-kwargs"><a class="toclink" href="#refinement-kwargs">Refinement kwargs</a><a class="headerlink" href="#refinement-kwargs" title="Permanent link">#</a></h3>
+<p>An unknown but close friendly name raises with a did-you-mean hint.</p>
+<h2 id="jaxa-earth-stac-cog-via-the-official-jaxaearth-api"><a class="toclink" href="#jaxa-earth-stac-cog-via-the-official-jaxaearth-api">jaxa-earth (STAC + COG via the official <code>jaxa.earth</code> API)</a><a class="headerlink" href="#jaxa-earth-stac-cog-via-the-official-jaxaearth-api" title="Permanent link">#</a></h2>
+<p>Open access, no credentials. The 14 mission families with their row counts:</p>
 <table>
 <thead>
 <tr>
-<th>Backend kwarg</th>
-<th>ASF search field</th>
-<th>Meaning</th>
+<th>Family</th>
+<th>Count</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>beam_mode</code></td>
-<td><code>beamMode</code></td>
-<td>e.g. <code>"IW"</code> (Sentinel-1 Interferometric Wide)</td>
+<td><code>alos2</code></td>
+<td>1</td>
+<td>ALOS-2 PALSAR-2 forest / non-forest</td>
 </tr>
 <tr>
-<td><code>flight_direction</code></td>
-<td><code>flightDirection</code></td>
-<td><code>"ASCENDING"</code> / <code>"DESCENDING"</code></td>
+<td><code>amsr2</code></td>
+<td>20</td>
+<td>GCOM-W AMSR2 L3 soil-moisture, sea-ice, SSW, SST + JASMES sea-ice</td>
 </tr>
 <tr>
-<td><code>polarization</code></td>
-<td><code>polarization</code></td>
-<td><code>"VV"</code>, <code>"VV+VH"</code>, <code>"HH"</code>, …</td>
+<td><code>amsre</code></td>
+<td>6</td>
+<td>Aqua AMSR-E L3 soil-moisture re-host</td>
 </tr>
 <tr>
-<td><code>max_results</code></td>
-<td><code>maxResults</code></td>
-<td>cap on the number of hits</td>
+<td><code>aw3d30</code></td>
+<td>2</td>
+<td>ALOS PRISM AW3D30 global DSM (v3.2 + v4.1)</td>
+</tr>
+<tr>
+<td><code>gsmap</code></td>
+<td>7</td>
+<td>GSMaP precipitation (standard hourly + climatological normals)</td>
+</tr>
+<tr>
+<td><code>hrlulc</code></td>
+<td>1</td>
+<td>HRLULC high-resolution Japan land use / land cover</td>
+</tr>
+<tr>
+<td><code>mod11</code></td>
+<td>8</td>
+<td>NASA EOSDIS Terra MODIS C1 LST</td>
+</tr>
+<tr>
+<td><code>mod11c3</code></td>
+<td>2</td>
+<td>NASA EOSDIS Terra MODIS C3 LST</td>
+</tr>
+<tr>
+<td><code>modis</code></td>
+<td>19</td>
+<td>JASMES Terra/Aqua MODIS family (NDVI, surface shortwave radiation, aerosol)</td>
+</tr>
+<tr>
+<td><code>myd11</code></td>
+<td>4</td>
+<td>NASA EOSDIS Aqua MODIS C1 LST</td>
+</tr>
+<tr>
+<td><code>proba</code></td>
+<td>1</td>
+<td>Copernicus C3S PROBA-V land cover (LCCS)</td>
+</tr>
+<tr>
+<td><code>sgli</code></td>
+<td>39</td>
+<td>GCOM-C SGLI L3/L2 family (LST, NDVI, chlorophyll, aerosol, SST, ET, ETidx)</td>
+</tr>
+<tr>
+<td><code>spi</code></td>
+<td>1</td>
+<td>GSMaP-derived SPI drought index</td>
+</tr>
+<tr>
+<td><code>temsm</code></td>
+<td>7</td>
+<td>UTokyo TE-MSM Japan river / flood / outflow forecasts (7 variables)</td>
 </tr>
 </tbody>
 </table>
-<h2 id="insar-baseline-stack"><a class="toclink" href="#insar-baseline-stack">InSAR baseline stack</a><a class="headerlink" href="#insar-baseline-stack" title="Permanent link">#</a></h2>
-<p>Build the coregistered stack from a reference SLC, windowed on the
-perpendicular and temporal baselines:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;insar&quot;</span><span class="p">,</span>             <span class="c1"># alias for &quot;asf&quot;</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sentinel-1-slc&quot;</span><span class="p">],</span>    <span class="c1"># must be a stackable product</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">reference</span><span class="o">=</span><span class="s2">&quot;S1A_IW_SLC__1SDV_20240601T072115_20240601T072143_054132_06960B_6FE8&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">perpendicular_baseline</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>  <span class="c1"># metres, (min, max)</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">temporal_baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>               <span class="c1"># whole days, (min, max)</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>   <span class="c1"># search-mode dates; ignored in stack mode</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-12-31&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;insar_stack&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">)</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<ul>
-<li><code>reference=</code> switches the backend into stack mode.</li>
-<li>The full reference-frame stack is fetched first
-  (<code>ASFProduct.stack()</code> returns every acquisition that shares the
-  reference scene's footprint and orbit).</li>
-<li><code>perpendicular_baseline=(min_m, max_m)</code> and
-  <code>temporal_baseline=(min_days, max_days)</code> are then applied as a
-  <strong>client-side post-filter</strong> on the returned stack. Empirically,
-  passing these as <code>ASFSearchOptions</code> makes the SDK's internal
-  search return zero products before the baseline calculator runs,
-  so the post-filter is the only working path.</li>
-</ul>
-<p>The bbox is <strong>not</strong> required in stack mode — the reference granule
-defines the area of interest. The two date kwargs (<code>start</code> / <code>end</code>)
-are still required by the facade but are advisory; the actual
-acquisitions returned are decided by the baseline windows.</p>
-<p>A stack mode call on a non-stackable product (<code>opera-rtc-s1</code>,
-<code>sentinel-1-grd</code>, <code>aria-s1-gunw</code>) raises <code>ValueError</code> at
-construction:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;asf&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="o">...</span>           <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opera-rtc-s1&quot;</span><span class="p">],</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="o">...</span>           <span class="n">reference</span><span class="o">=</span><span class="s2">&quot;OPERA_RTC_...&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="o">...</span>           <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-12-31&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="o">...</span>           <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="o">...</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="s1">&#39;opera-rtc-s1&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">InSAR</span><span class="o">-</span><span class="n">stackable</span><span class="p">;</span> <span class="o">...</span>
-</code></pre></div>
-<h2 id="picking-a-product"><a class="toclink" href="#picking-a-product">Picking a product</a><a class="headerlink" href="#picking-a-product" title="Permanent link">#</a></h2>
+<h3 id="full-list"><a class="toclink" href="#full-list">Full list</a><a class="headerlink" href="#full-list" title="Permanent link">#</a></h3>
 <table>
 <thead>
 <tr>
-<th>Product key</th>
-<th>Use it when</th>
-<th><code>stackable</code></th>
+<th>Key</th>
+<th>Aliases</th>
+<th>STAC collection</th>
+<th>Default band</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>sentinel-1-slc</code></td>
-<td>C-band InSAR over land; the default InSAR input</td>
-<td>yes</td>
+<td><code>alos2-fnf</code></td>
+<td><code>alos-2-palsar-2-fnf-v2-1-0-global-yearly</code>, <code>fnf</code>, <code>forest-non-forest</code></td>
+<td><code>JAXA.EORC_ALOS-2.PALSAR-2_FNF.v2.1.0_global_yearly</code></td>
+<td><code>FNF</code></td>
 </tr>
 <tr>
-<td><code>sentinel-1-burst</code></td>
-<td>only one burst is needed (smaller download)</td>
-<td>yes</td>
+<td><code>amsr2-seaice-north-daily</code></td>
+<td><code>jasmes-gcom-w-amsr2-ic0-v201-north-daily</code></td>
+<td><code>JAXA.JASMES_GCOM-W.AMSR2_ic0.v201_north_daily</code></td>
+<td><code>IC0</code></td>
 </tr>
 <tr>
-<td><code>alos-palsar-slc</code></td>
-<td>L-band InSAR for forest / agriculture; pre-2011 archive</td>
-<td>yes</td>
+<td><code>amsr2-seaice-south-daily</code></td>
+<td><code>jasmes-gcom-w-amsr2-ic0-v201-south-daily</code></td>
+<td><code>JAXA.JASMES_GCOM-W.AMSR2_ic0.v201_south_daily</code></td>
+<td><code>IC0</code></td>
 </tr>
 <tr>
-<td><code>opera-cslc-s1</code></td>
-<td>OPERA-coregistered S1 SLC (NASA-preprocessed)</td>
-<td>yes</td>
+<td><code>amsr2-smc-d-daily</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-daytime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_daily</code></td>
+<td><code>SMC</code></td>
 </tr>
 <tr>
-<td><code>sentinel-1-grd</code></td>
-<td>amplitude-only change detection (no phase)</td>
-<td>no</td>
+<td><code>amsr2-smc-d-halfmonth</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-daytime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_half-monthly</code></td>
+<td><code>SMC</code></td>
 </tr>
 <tr>
-<td><code>opera-rtc-s1</code></td>
-<td>terrain-corrected backscatter (analysis-ready)</td>
-<td>no</td>
+<td><code>amsr2-smc-d-halfmonth-norm</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-daytime-v3-global-half-monthly-normal</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_half-monthly-normal</code></td>
+<td><code>SMC_2012_2021</code></td>
 </tr>
 <tr>
-<td><code>aria-s1-gunw</code></td>
-<td>precomputed unwrapped interferograms</td>
-<td>no</td>
+<td><code>amsr2-smc-d-monthly</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-daytime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_monthly</code></td>
+<td><code>SMC</code></td>
 </tr>
 <tr>
-<td><code>nisar-rslc</code></td>
-<td>L+S-band SLC (data starts arriving post-launch)</td>
-<td>yes</td>
+<td><code>amsr2-smc-d-monthly-norm</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-daytime-v3-global-monthly-normal</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_monthly-normal</code></td>
+<td><code>SMC_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>amsr2-smc-n-daily</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_daily</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>amsr2-smc-n-halfmonth</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_half-monthly</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>amsr2-smc-n-halfmonth-norm</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-half-monthly-normal</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_half-monthly-normal</code></td>
+<td><code>SMC_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>amsr2-smc-n-monthly</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_monthly</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>amsr2-smc-n-monthly-norm</code></td>
+<td><code>gp-gcom-w-amsr2-l3-smc-nighttime-v3-global-monthly-normal</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_monthly-normal</code></td>
+<td><code>SMC_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>amsr2-sst-d-daily</code></td>
+<td><code>gp-gcom-w-amsr2-l3-sst-daytime-v4-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SST.daytime.v4_global_daily</code></td>
+<td><code>SST</code></td>
+</tr>
+<tr>
+<td><code>amsr2-sst-n-daily</code></td>
+<td><code>gp-gcom-w-amsr2-l3-sst-nighttime-v4-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SST.nighttime.v4_global_daily</code></td>
+<td><code>SST</code></td>
+</tr>
+<tr>
+<td><code>amsr2-ssw-d-daily</code></td>
+<td><code>gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_daily</code></td>
+<td><code>SSW</code></td>
+</tr>
+<tr>
+<td><code>amsr2-ssw-d-halfmonth</code></td>
+<td><code>gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_half-monthly</code></td>
+<td><code>SSW</code></td>
+</tr>
+<tr>
+<td><code>amsr2-ssw-d-monthly</code></td>
+<td><code>gp-gcom-w-amsr2-l3-ssw-daytime-v4-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_monthly</code></td>
+<td><code>SSW</code></td>
+</tr>
+<tr>
+<td><code>amsr2-ssw-n-daily</code></td>
+<td><code>gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_daily</code></td>
+<td><code>SSW</code></td>
+</tr>
+<tr>
+<td><code>amsr2-ssw-n-halfmonth</code></td>
+<td><code>gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_half-monthly</code></td>
+<td><code>SSW</code></td>
+</tr>
+<tr>
+<td><code>amsr2-ssw-n-monthly</code></td>
+<td><code>gp-gcom-w-amsr2-l3-ssw-nighttime-v4-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_monthly</code></td>
+<td><code>SSW</code></td>
+</tr>
+<tr>
+<td><code>amsre-smc-d-daily</code></td>
+<td><code>gp-aqua-amsr-e-l3-smc-daytime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_daily</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>amsre-smc-d-halfmonth</code></td>
+<td><code>gp-aqua-amsr-e-l3-smc-daytime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_half-monthly</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>amsre-smc-d-monthly</code></td>
+<td><code>gp-aqua-amsr-e-l3-smc-daytime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_monthly</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>amsre-smc-n-daily</code></td>
+<td><code>gp-aqua-amsr-e-l3-smc-nighttime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_daily</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>amsre-smc-n-halfmonth</code></td>
+<td><code>gp-aqua-amsr-e-l3-smc-nighttime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_half-monthly</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>amsre-smc-n-monthly</code></td>
+<td><code>gp-aqua-amsr-e-l3-smc-nighttime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_monthly</code></td>
+<td><code>SMC</code></td>
+</tr>
+<tr>
+<td><code>aw3d30</code></td>
+<td><code>alos-prism-aw3d30-v3-2-global</code>, <code>elevation</code>, <code>dem</code>, <code>alos-aw3d30</code></td>
+<td><code>JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global</code></td>
+<td><code>DSM</code></td>
+</tr>
+<tr>
+<td><code>aw3d30-v41</code></td>
+<td><code>alos-prism-aw3d30-v4-1-global</code>, <code>elevation-v41</code>, <code>dem-v41</code></td>
+<td><code>JAXA.EORC_ALOS.PRISM_AW3D30.v4.1_global</code></td>
+<td><code>DSM</code></td>
+</tr>
+<tr>
+<td><code>gsmap</code></td>
+<td><code>gsmap-gauge-v6-hourly</code>, <code>precipitation</code>, <code>rainfall</code></td>
+<td><code>JAXA.EORC_GSMaP_standard.Gauge.v6_hourly</code></td>
+<td><code>PRECIP</code></td>
+</tr>
+<tr>
+<td><code>gsmap-daily</code></td>
+<td><code>gsmap-gauge-00z-23z-v6-daily</code></td>
+<td><code>JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_daily</code></td>
+<td><code>PRECIP</code></td>
+</tr>
+<tr>
+<td><code>gsmap-halfmonth</code></td>
+<td><code>gsmap-gauge-00z-23z-v6-half-monthly</code></td>
+<td><code>JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_half-monthly</code></td>
+<td><code>PRECIP</code></td>
+</tr>
+<tr>
+<td><code>gsmap-halfmonth-norm</code></td>
+<td><code>gsmap-gauge-00z-23z-v6-half-monthly-normal</code></td>
+<td><code>JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_half-monthly-normal</code></td>
+<td><code>PRECIP_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>gsmap-monthly</code></td>
+<td><code>gsmap-gauge-00z-23z-v6-monthly</code></td>
+<td><code>JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_monthly</code></td>
+<td><code>PRECIP</code></td>
+</tr>
+<tr>
+<td><code>gsmap-monthly-norm</code></td>
+<td><code>gsmap-gauge-00z-23z-v6-monthly-normal</code></td>
+<td><code>JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_monthly-normal</code></td>
+<td><code>PRECIP_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>gsmap-nrt</code></td>
+<td><code>gsmap-nrt-gauge-ext-00z-23z-v6-daily</code></td>
+<td><code>JAXA.EORC_GSMaP_NRT.Gauge.Ext.00Z-23Z.v6_daily</code></td>
+<td><code>EXT</code></td>
+</tr>
+<tr>
+<td><code>hrlulc</code></td>
+<td><code>alos-hrlulc-v25-04-japan</code>, <code>lulc</code></td>
+<td><code>JAXA.EORC_ALOS_HRLULC.v25.04_japan</code></td>
+<td><code>HRLULC</code></td>
+</tr>
+<tr>
+<td><code>mod11-lst-d-daily</code></td>
+<td><code>eosdis-terra-modis-mod11c1-lst-daytime-v061-global-daily</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_daily</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>mod11-lst-d-halfmonth</code></td>
+<td><code>eosdis-terra-modis-mod11c1-lst-daytime-v061-global-half-monthly</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_half-monthly</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>mod11-lst-d-halfmonth-norm</code></td>
+<td><code>eosdis-terra-modis-mod11c1-lst-daytime-v061-global-half-monthly-normal</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_half-monthly-normal</code></td>
+<td><code>LST_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>mod11-lst-d-monthly-norm</code></td>
+<td><code>eosdis-terra-modis-mod11c1-lst-daytime-v061-global-monthly-normal</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_monthly-normal</code></td>
+<td><code>LST_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>mod11-lst-n-daily</code></td>
+<td><code>eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-daily</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_daily</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>mod11-lst-n-halfmonth</code></td>
+<td><code>eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-half-monthly</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_half-monthly</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>mod11-lst-n-halfmonth-norm</code></td>
+<td><code>eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-half-monthly-normal</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_half-monthly-normal</code></td>
+<td><code>LST_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>mod11-lst-n-monthly-norm</code></td>
+<td><code>eosdis-terra-modis-mod11c1-lst-nighttime-v061-global-monthly-normal</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_monthly-normal</code></td>
+<td><code>LST_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>mod11c3-lst-d-monthly</code></td>
+<td><code>eosdis-terra-modis-mod11c3-lst-daytime-v061-global-monthly</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.daytime.v061_global_monthly</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>mod11c3-lst-n-monthly</code></td>
+<td><code>eosdis-terra-modis-mod11c3-lst-nighttime-v061-global-monthly</code></td>
+<td><code>NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.nighttime.v061_global_monthly</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>modis-aqua-swr-daily</code></td>
+<td><code>jasmes-aqua-modis-swr-v811-global-daily</code></td>
+<td><code>JAXA.JASMES_Aqua.MODIS_swr.v811_global_daily</code></td>
+<td><code>swr</code></td>
+</tr>
+<tr>
+<td><code>modis-aqua-swr-halfmonth</code></td>
+<td><code>jasmes-aqua-modis-swr-v811-global-half-monthly</code></td>
+<td><code>JAXA.JASMES_Aqua.MODIS_swr.v811_global_half-monthly</code></td>
+<td><code>swr</code></td>
+</tr>
+<tr>
+<td><code>modis-aqua-swr-halfmonth-norm</code></td>
+<td><code>jasmes-aqua-modis-swr-v811-global-half-monthly-normal</code></td>
+<td><code>JAXA.JASMES_Aqua.MODIS_swr.v811_global_half-monthly-normal</code></td>
+<td><code>swr_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>modis-aqua-swr-monthly</code></td>
+<td><code>jasmes-aqua-modis-swr-v811-global-monthly</code></td>
+<td><code>JAXA.JASMES_Aqua.MODIS_swr.v811_global_monthly</code></td>
+<td><code>swr</code></td>
+</tr>
+<tr>
+<td><code>modis-aqua-swr-monthly-norm</code></td>
+<td><code>jasmes-aqua-modis-swr-v811-global-monthly-normal</code></td>
+<td><code>JAXA.JASMES_Aqua.MODIS_swr.v811_global_monthly-normal</code></td>
+<td><code>swr_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>modis-ndvi-halfmonth</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-ndvi-v811-global-half-monthly</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_half-monthly</code></td>
+<td><code>ndvi</code></td>
+</tr>
+<tr>
+<td><code>modis-ndvi-halfmonth-norm</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-ndvi-v811-global-half-monthly-normal</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_half-monthly-normal</code></td>
+<td><code>ndvi_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>modis-ndvi-monthly</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-ndvi-v811-global-monthly</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_monthly</code></td>
+<td><code>ndvi</code></td>
+</tr>
+<tr>
+<td><code>modis-ndvi-monthly-norm</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-ndvi-v811-global-monthly-normal</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_monthly-normal</code></td>
+<td><code>ndvi_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>modis-taua-daily</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-taua-v811-global-daily</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_daily</code></td>
+<td><code>T500</code></td>
+</tr>
+<tr>
+<td><code>modis-taua-halfmonth</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-taua-v811-global-half-monthly</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_half-monthly</code></td>
+<td><code>T500</code></td>
+</tr>
+<tr>
+<td><code>modis-taua-halfmonth-norm</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-taua-v811-global-half-monthly-normal</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_half-monthly-normal</code></td>
+<td><code>taua_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>modis-taua-monthly</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-taua-v811-global-monthly</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_monthly</code></td>
+<td><code>T500</code></td>
+</tr>
+<tr>
+<td><code>modis-taua-monthly-norm</code></td>
+<td><code>jasmes-terra-modis-aqua-modis-taua-v811-global-monthly-normal</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_monthly-normal</code></td>
+<td><code>taua_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>modis-terra-swr-daily</code></td>
+<td><code>jasmes-terra-modis-swr-v811-global-daily</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS_swr.v811_global_daily</code></td>
+<td><code>swr</code></td>
+</tr>
+<tr>
+<td><code>modis-terra-swr-halfmonth</code></td>
+<td><code>jasmes-terra-modis-swr-v811-global-half-monthly</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS_swr.v811_global_half-monthly</code></td>
+<td><code>swr</code></td>
+</tr>
+<tr>
+<td><code>modis-terra-swr-halfmonth-norm</code></td>
+<td><code>jasmes-terra-modis-swr-v811-global-half-monthly-normal</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS_swr.v811_global_half-monthly-normal</code></td>
+<td><code>swr_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>modis-terra-swr-monthly</code></td>
+<td><code>jasmes-terra-modis-swr-v811-global-monthly</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS_swr.v811_global_monthly</code></td>
+<td><code>swr</code></td>
+</tr>
+<tr>
+<td><code>modis-terra-swr-monthly-norm</code></td>
+<td><code>jasmes-terra-modis-swr-v811-global-monthly-normal</code></td>
+<td><code>JAXA.JASMES_Terra.MODIS_swr.v811_global_monthly-normal</code></td>
+<td><code>swr_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>myd11-lst-d-halfmonth-norm</code></td>
+<td><code>eosdis-aqua-modis-myd11c1-lst-daytime-v061-global-half-monthly-normal</code></td>
+<td><code>NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.daytime.v061_global_half-monthly-normal</code></td>
+<td><code>LST_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>myd11-lst-d-monthly-norm</code></td>
+<td><code>eosdis-aqua-modis-myd11c1-lst-daytime-v061-global-monthly-normal</code></td>
+<td><code>NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.daytime.v061_global_monthly-normal</code></td>
+<td><code>LST_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>myd11-lst-n-halfmonth-norm</code></td>
+<td><code>eosdis-aqua-modis-myd11c1-lst-nighttime-v061-global-half-monthly-normal</code></td>
+<td><code>NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.nighttime.v061_global_half-monthly-normal</code></td>
+<td><code>LST_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>myd11-lst-n-monthly-norm</code></td>
+<td><code>eosdis-aqua-modis-myd11c1-lst-nighttime-v061-global-monthly-normal</code></td>
+<td><code>NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.nighttime.v061_global_monthly-normal</code></td>
+<td><code>LST_2012_2021</code></td>
+</tr>
+<tr>
+<td><code>proba-v-lccs</code></td>
+<td><code>c3s-proba-v-lccs-global-yearly</code>, <code>lccs</code>, <code>landcover</code></td>
+<td><code>Copernicus.C3S_PROBA-V_LCCS_global_yearly</code></td>
+<td><code>LCCS</code></td>
+</tr>
+<tr>
+<td><code>sgli-arot-d-daily</code></td>
+<td><code>gp-gcom-c-sgli-l3-arot-daytime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_daily</code></td>
+<td><code>AROT</code></td>
+</tr>
+<tr>
+<td><code>sgli-arot-d-halfmonth</code></td>
+<td><code>gp-gcom-c-sgli-l3-arot-daytime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_half-monthly</code></td>
+<td><code>AROT</code></td>
+</tr>
+<tr>
+<td><code>sgli-arot-d-monthly</code></td>
+<td><code>gp-gcom-c-sgli-l3-arot-daytime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_monthly</code></td>
+<td><code>AROT</code></td>
+</tr>
+<tr>
+<td><code>sgli-chla-d-daily</code></td>
+<td><code>gp-gcom-c-sgli-l3-chla-daytime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_daily</code></td>
+<td><code>CHLA</code></td>
+</tr>
+<tr>
+<td><code>sgli-chla-d-halfmonth</code></td>
+<td><code>gp-gcom-c-sgli-l3-chla-daytime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_half-monthly</code></td>
+<td><code>CHLA</code></td>
+</tr>
+<tr>
+<td><code>sgli-chla-d-monthly</code></td>
+<td><code>gp-gcom-c-sgli-l3-chla-daytime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_monthly</code></td>
+<td><code>CHLA</code></td>
+</tr>
+<tr>
+<td><code>sgli-et-8day</code></td>
+<td><code>jasmes-gcom-c-sgli-et-v1-global-8-day</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_8-day</code></td>
+<td><code>ET</code></td>
+</tr>
+<tr>
+<td><code>sgli-et-halfmonth</code></td>
+<td><code>jasmes-gcom-c-sgli-et-v1-global-half-monthly</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_half-monthly</code></td>
+<td><code>ET</code></td>
+</tr>
+<tr>
+<td><code>sgli-et-monthly</code></td>
+<td><code>jasmes-gcom-c-sgli-et-v1-global-monthly</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_monthly</code></td>
+<td><code>ET</code></td>
+</tr>
+<tr>
+<td><code>sgli-etidx-8day</code></td>
+<td><code>jasmes-gcom-c-sgli-etidx-v1-global-8-day</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_8-day</code></td>
+<td><code>ETidx</code></td>
+</tr>
+<tr>
+<td><code>sgli-etidx-halfmonth</code></td>
+<td><code>jasmes-gcom-c-sgli-etidx-v1-global-half-monthly</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_half-monthly</code></td>
+<td><code>ETidx</code></td>
+</tr>
+<tr>
+<td><code>sgli-etidx-monthly</code></td>
+<td><code>jasmes-gcom-c-sgli-etidx-v1-global-monthly</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_monthly</code></td>
+<td><code>ETidx</code></td>
+</tr>
+<tr>
+<td><code>sgli-l2-lst-d-8day-jp</code></td>
+<td><code>jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-8-day</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_8-day</code></td>
+<td><code>LST_AVE</code></td>
+</tr>
+<tr>
+<td><code>sgli-l2-lst-d-8day-norm-jp</code></td>
+<td><code>jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-8-day-normal</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_8-day-normal</code></td>
+<td><code>LST_2000_2022</code></td>
+</tr>
+<tr>
+<td><code>sgli-l2-lst-d-monthly-norm-jp</code></td>
+<td><code>jasmes-gcom-c-sgli-l2-lst-daytime-v3-japan-monthly-normal</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_monthly-normal</code></td>
+<td><code>LST_2000_2022</code></td>
+</tr>
+<tr>
+<td><code>sgli-l2-lst-n-8day-jp</code></td>
+<td><code>jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-8-day</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_8-day</code></td>
+<td><code>LST_AVE</code></td>
+</tr>
+<tr>
+<td><code>sgli-l2-lst-n-8day-norm-jp</code></td>
+<td><code>jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-8-day-normal</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_8-day-normal</code></td>
+<td><code>LST_2000_2022</code></td>
+</tr>
+<tr>
+<td><code>sgli-l2-lst-n-monthly-norm-jp</code></td>
+<td><code>jasmes-gcom-c-sgli-l2-lst-nighttime-v3-japan-monthly-normal</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_monthly-normal</code></td>
+<td><code>LST_2000_2022</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-d-8day</code></td>
+<td><code>jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-8-day</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_8-day</code></td>
+<td><code>LST_AVE</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-d-8day-norm</code></td>
+<td><code>jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-8-day-normal</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_8-day-normal</code></td>
+<td><code>LST_2000_2022</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-d-daily</code></td>
+<td><code>gp-gcom-c-sgli-l3-lst-daytime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_daily</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-d-halfmonth</code></td>
+<td><code>gp-gcom-c-sgli-l3-lst-daytime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_half-monthly</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-d-monthly</code></td>
+<td><code>gp-gcom-c-sgli-l3-lst-daytime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_monthly</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-d-monthly-norm</code></td>
+<td><code>jasmes-gcom-c-sgli-l3-lst-daytime-v3-global-monthly-normal</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_monthly-normal</code></td>
+<td><code>LST_2000_2022</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-n-8day</code></td>
+<td><code>jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-8-day</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_8-day</code></td>
+<td><code>LST_AVE</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-n-8day-norm</code></td>
+<td><code>jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-8-day-normal</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_8-day-normal</code></td>
+<td><code>LST_2000_2022</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-n-daily</code></td>
+<td><code>gp-gcom-c-sgli-l3-lst-nighttime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_daily</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-n-halfmonth</code></td>
+<td><code>gp-gcom-c-sgli-l3-lst-nighttime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_half-monthly</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-n-monthly</code></td>
+<td><code>gp-gcom-c-sgli-l3-lst-nighttime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_monthly</code></td>
+<td><code>LST</code></td>
+</tr>
+<tr>
+<td><code>sgli-lst-n-monthly-norm</code></td>
+<td><code>jasmes-gcom-c-sgli-l3-lst-nighttime-v3-global-monthly-normal</code></td>
+<td><code>JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_monthly-normal</code></td>
+<td><code>LST_2000_2022</code></td>
+</tr>
+<tr>
+<td><code>sgli-ndvi-d-daily</code></td>
+<td><code>gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_daily</code></td>
+<td><code>NDVI</code></td>
+</tr>
+<tr>
+<td><code>sgli-ndvi-d-halfmonth</code></td>
+<td><code>gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_half-monthly</code></td>
+<td><code>NDVI</code></td>
+</tr>
+<tr>
+<td><code>sgli-ndvi-d-monthly</code></td>
+<td><code>gp-gcom-c-sgli-l3-ndvi-daytime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_monthly</code></td>
+<td><code>NDVI</code></td>
+</tr>
+<tr>
+<td><code>sgli-sst-d-daily</code></td>
+<td><code>gp-gcom-c-sgli-l3-sst-daytime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_daily</code></td>
+<td><code>SST</code></td>
+</tr>
+<tr>
+<td><code>sgli-sst-d-halfmonth</code></td>
+<td><code>gp-gcom-c-sgli-l3-sst-daytime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_half-monthly</code></td>
+<td><code>SST</code></td>
+</tr>
+<tr>
+<td><code>sgli-sst-d-monthly</code></td>
+<td><code>gp-gcom-c-sgli-l3-sst-daytime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_monthly</code></td>
+<td><code>SST</code></td>
+</tr>
+<tr>
+<td><code>sgli-sst-n-daily</code></td>
+<td><code>gp-gcom-c-sgli-l3-sst-nighttime-v3-global-daily</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_daily</code></td>
+<td><code>SST</code></td>
+</tr>
+<tr>
+<td><code>sgli-sst-n-halfmonth</code></td>
+<td><code>gp-gcom-c-sgli-l3-sst-nighttime-v3-global-half-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_half-monthly</code></td>
+<td><code>SST</code></td>
+</tr>
+<tr>
+<td><code>sgli-sst-n-monthly</code></td>
+<td><code>gp-gcom-c-sgli-l3-sst-nighttime-v3-global-monthly</code></td>
+<td><code>JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_monthly</code></td>
+<td><code>SST</code></td>
+</tr>
+<tr>
+<td><code>spi</code></td>
+<td><code>gsmap-spi-climate-gnrt6-monthly</code></td>
+<td><code>JAXA.EORC_GSMaP_SPI.climate.gnrt6_monthly</code></td>
+<td><code>SPI</code></td>
+</tr>
+<tr>
+<td><code>temsm-flddph</code></td>
+<td><code>utokyo-te-msm-flddph-v2-japan-hourly</code></td>
+<td><code>JAXA.UTokyo_TE_MSM.FLDDPH.v2_japan_hourly</code></td>
+<td><code>FLDDPH</code></td>
+</tr>
+<tr>
+<td><code>temsm-fldfrc</code></td>
+<td><code>utokyo-te-msm-fldfrc-v2-japan-hourly</code></td>
+<td><code>JAXA.UTokyo_TE_MSM.FLDFRC.v2_japan_hourly</code></td>
+<td><code>FLDFRC</code></td>
+</tr>
+<tr>
+<td><code>temsm-fldout</code></td>
+<td><code>utokyo-te-msm-fldout-v2-japan-hourly</code></td>
+<td><code>JAXA.UTokyo_TE_MSM.FLDOUT.v2_japan_hourly</code></td>
+<td><code>FLDOUT</code></td>
+</tr>
+<tr>
+<td><code>temsm-outflw</code></td>
+<td><code>utokyo-te-msm-outflw-v2-japan-hourly</code></td>
+<td><code>JAXA.UTokyo_TE_MSM.OUTFLW.v2_japan_hourly</code></td>
+<td><code>OUTFLW</code></td>
+</tr>
+<tr>
+<td><code>temsm-rivdph</code></td>
+<td><code>utokyo-te-msm-rivdph-v2-japan-hourly</code></td>
+<td><code>JAXA.UTokyo_TE_MSM.RIVDPH.v2_japan_hourly</code></td>
+<td><code>RIVDPH</code></td>
+</tr>
+<tr>
+<td><code>temsm-rivout</code></td>
+<td><code>utokyo-te-msm-rivout-v2-japan-hourly</code></td>
+<td><code>JAXA.UTokyo_TE_MSM.RIVOUT.v2_japan_hourly</code></td>
+<td><code>RIVOUT</code></td>
+</tr>
+<tr>
+<td><code>temsm-rprivdph</code></td>
+<td><code>utokyo-te-msm-rprivdph-v2-japan-hourly</code></td>
+<td><code>JAXA.UTokyo_TE_MSM.RPRIVDPH.v2_japan_hourly</code></td>
+<td><code>RPRIVDPH</code></td>
 </tr>
 </tbody>
 </table>
-<p>Aliases work — <code>variables=["s1-slc"]</code>, <code>variables=["opera-rtc"]</code>,
-etc. The catalog raises with a did-you-mean hint on an unknown name.</p>
-<h2 id="why-no-aggregate"><a class="toclink" href="#why-no-aggregate">Why no <code>aggregate=</code>?</a><a class="headerlink" href="#why-no-aggregate" title="Permanent link">#</a></h2>
-<p>The MVP returns SAR product paths and does <strong>not</strong> perform any
-in-flight processing. An SLC carries complex-valued (I/Q) samples
-that are meaningless after a plain bbox crop, and processed
-products (RTC, GUNW) are already gridded outputs from the InSAR
-pipeline — a temporal "mean across the stack" would not produce a
-useful artefact.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;asf&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="o">...</span>                <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sentinel-1-slc&quot;</span><span class="p">],</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="o">...</span>                <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="o">...</span>                <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-01-31&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="o">...</span>                <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>  <span class="c1"># doctest: +SKIP</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="o">...</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="ne">NotImplementedError</span><span class="p">:</span> <span class="n">ASF</span> <span class="n">returns</span> <span class="n">SAR</span> <span class="n">products</span> <span class="k">for</span> <span class="n">downstream</span> <span class="n">InSAR</span><span class="o">/</span><span class="n">RTC</span> <span class="n">tooling</span><span class="p">;</span> <span class="o">...</span>
+<h2 id="gportal-sftp-via-the-community-gportal-sdk"><a class="toclink" href="#gportal-sftp-via-the-community-gportal-sdk">gportal (SFTP via the community <code>gportal</code> SDK)</a><a class="headerlink" href="#gportal-sftp-via-the-community-gportal-sdk" title="Permanent link">#</a></h2>
+<p>Free G-Portal account required for the SFTP download step; search is anonymous. See <a href="../authentication/">Authentication</a> for the credential flow. The catalog ships a starter set of one representative product per major mission; the full G-Portal universe holds ~799 dataset ids — run <code>earthlens datasets refresh jaxa</code> to diff the bundled set against the live tree.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Aliases</th>
+<th>G-Portal id</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>alos2-palsar2-uf-sp</code></td>
+<td><code>palsar2</code>, <code>alos2-l1</code>, <code>alos2-palsar2</code></td>
+<td><code>27004001</code></td>
+<td>ALOS-2/PALSAR-2 L1.1 ultra-fine 3 m single-pol.</td>
+</tr>
+<tr>
+<td><code>amsr2-l1r</code></td>
+<td><code>amsr2-l1</code>, <code>gcom-w-l1r</code></td>
+<td><code>11001002</code></td>
+<td>GCOM-W/AMSR2 L1R resampled brightness temperatures (TB).</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-eco</code></td>
+<td><code>earthcare</code>, <code>cpr</code></td>
+<td><code>16002000</code></td>
+<td>EarthCARE/CPR L2 Echo Product (CPR_ECO).</td>
+</tr>
+<tr>
+<td><code>gosat-gw-amsr3-l1b</code></td>
+<td><code>gosat-gw</code>, <code>amsr3</code></td>
+<td><code>31001001</code></td>
+<td>GOSAT-GW/AMSR3 L1B brightness temperatures (TBB).</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-kupr-l1b</code></td>
+<td><code>gpm</code>, <code>dpr</code>, <code>kupr</code></td>
+<td><code>12001000</code></td>
+<td>GPM/DPR KuPR L1B received power.</td>
+</tr>
+<tr>
+<td><code>sgli-l3-nwlr</code></td>
+<td><code>sgli-l380</code>, <code>sgli-ocean-l380</code>, <code>gcom-c-nwlr</code></td>
+<td><code>10003001</code></td>
+<td>GCOM-C/SGLI L3 Normalized Water-Leaving Radiance (NWLR) — ocean.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="refreshing-against-the-live-sdk-universes"><a class="toclink" href="#refreshing-against-the-live-sdk-universes">Refreshing against the live SDK universes</a><a class="headerlink" href="#refreshing-against-the-live-sdk-universes" title="Permanent link">#</a></h2>
+<p>The CLI command <code>earthlens datasets refresh jaxa</code> walks <code>jaxa.earth.ImageCollectionList()</code> for the STAC half and <code>gportal.datasets()</code> for the G-Portal half, then diffs the live id sets against the bundled catalog so a curator can see drift at a glance:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>jaxa
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>jaxa<span class="w"> </span>--write<span class="w">     </span><span class="c1"># rewrite the bundled YAML&#39;s available_datasets:</span>
 </code></pre></div>
-<p>For downstream processing, hand the downloaded stack to
-<a href="https://hyp3-docs.asf.alaska.edu/">HyP3</a>,
-<a href="https://step.esa.int/main/toolboxes/snap/">SNAP</a>,
-<a href="https://github.com/isce-framework/isce2">ISCE2/3</a>, or
-<a href="https://mintpy.readthedocs.io/">MintPy</a>.</p>
-<h2 id="cross-link-asf-vs-earthdata"><a class="toclink" href="#cross-link-asf-vs-earthdata">Cross-link: ASF vs <code>earthdata</code></a><a class="headerlink" href="#cross-link-asf-vs-earthdata" title="Permanent link">#</a></h2>
-<p>For plain "find granule X and pull it" use either backend; the
-<code>earthdata</code> backend is more direct for a single named granule. For
-the InSAR baseline stack, <code>asf</code> is the only path —
-<code>earthlens.earthdata</code> cannot reach <code>ASFProduct.stack()</code>. The two
-backends share the same EDL auth handle, so a credential change
-takes effect for both.</p>
+<p>The <code>--write</code> form rewrites the YAML's <code>available_datasets:</code> index without touching the hand-curated <code>datasets:</code> rows, so the friendly aliases survive a refresh.</p>
 
 
 
@@ -11819,13 +12368,13 @@ takes effect for both.</p>
         
         
           
-          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Available products">
+          <a href="../jaxa/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Available products
+                Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">

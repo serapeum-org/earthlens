@@ -10,10 +10,10 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/asf/introduction/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/jaxa/usage/">
       
       
-        <link rel="prev" href="../../s3/reference/">
+        <link rel="prev" href="../introduction/">
       
       
         <link rel="next" href="../authentication/">
@@ -27,7 +27,7 @@
     
     
       
-        <title>Introduction - earthlens</title>
+        <title>Usage - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#asf-insar-backend-introduction" class="md-skip">
+        <a href="#jaxa-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Usage
             
           </span>
         </div>
@@ -1085,319 +1085,6 @@
                 
   
   
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ASF (InSAR / SAR)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    ASF (InSAR / SAR)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#why-a-separate-backend-asf-is-already-in-earthdata" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why a separate backend (ASF is already in earthdata)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Authentication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#products-and-the-stackable-flag" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Products and the stackable flag
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-a-request-returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What a request returns
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Install
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#aliases-at-the-facade" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Aliases at the facade
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available products
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../asf/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     
@@ -1412,10 +1099,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
             
   
   
@@ -1433,8 +1120,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1582,10 +1269,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
             
   
   
@@ -1603,8 +1290,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1780,10 +1467,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
             
   
   
@@ -1801,8 +1488,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1950,10 +1637,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
-          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
             
   
   
@@ -1971,8 +1658,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2176,10 +1863,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
         
           
-          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
             
   
   
@@ -2197,8 +1884,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2318,10 +2005,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
         
           
-          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
             
   
   
@@ -2339,8 +2026,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2516,10 +2203,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
         
           
-          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
             
   
   
@@ -2537,8 +2224,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2714,10 +2401,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
         
           
-          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
             
   
   
@@ -2735,8 +2422,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2810,6 +2497,330 @@
   
     <li class="md-nav__item">
       <a href="../../gdacs/gdacs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JAXA (Earth-observation archive)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    JAXA (Earth-observation archive)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start-aw3d30-elevation-tile-authless" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick start: AW3D30 elevation tile (authless)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start-alos-2-palsar-2-product-credentialed-sftp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick start: ALOS-2 PALSAR-2 product (credentialed SFTP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request shape
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listing-the-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listing the catalog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-aggregate-is-not-supported-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why aggregate= is not supported (yet)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refreshing-the-catalog-from-the-live-archive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Refreshing the catalog from the live archive
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-the-live-e2e-tests-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When the live e2e tests run
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jaxa/" class="md-nav__link">
         
   
   
@@ -6457,7 +6468,7 @@
   <span class="md-ellipsis">
     
   
-    ASF (InSAR / SAR)
+    NASA Earthdata
   
 
     
@@ -6470,204 +6481,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    ASF (InSAR / SAR)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ASF catalog explorer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/quickstart_search/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ASF — quickstart (anonymous search)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/sentinel1_insar_stack/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sentinel-1 InSAR baseline stack
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/opera_rtc_workflow/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OPERA RTC-S1 — analysis-ready backscatter workflow
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/asf/opera_rtc_backscatter/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OPERA RTC-S1 backscatter — download + read + plot
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NASA Earthdata
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6899,10 +6712,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
@@ -6920,8 +6733,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7265,10 +7078,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -7286,8 +7099,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7491,10 +7304,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
         
           
-          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
             
   
   
@@ -7512,8 +7325,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7633,10 +7446,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
             
   
   
@@ -7654,8 +7467,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8027,10 +7840,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
         
           
-          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
             
   
   
@@ -8048,8 +7861,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8281,10 +8094,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
@@ -8302,8 +8115,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8412,6 +8225,148 @@
     
   
     GDACS country hazard profile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JAXA (Earth-observation archive)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    JAXA (Earth-observation archive)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jaxa/01_catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JAXA catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jaxa/02_aw3d30_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AW3D30 elevation over Mt. Fuji — research scenario
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jaxa/03_gportal_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    G-Portal search + SFTP download — research scenario
   
 
     
@@ -11435,10 +11390,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-a-separate-backend-asf-is-already-in-earthdata" class="md-nav__link">
+  <a href="#quick-start-aw3d30-elevation-tile-authless" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why a separate backend (ASF is already in earthdata)
+        Quick start: AW3D30 elevation tile (authless)
       
     </span>
   </a>
@@ -11446,10 +11401,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#quick-start-alos-2-palsar-2-product-credentialed-sftp" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        Quick start: ALOS-2 PALSAR-2 product (credentialed SFTP)
       
     </span>
   </a>
@@ -11457,10 +11412,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#products-and-the-stackable-flag" class="md-nav__link">
+  <a href="#request-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Products and the stackable flag
+        Request shape
       
     </span>
   </a>
@@ -11468,10 +11423,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-a-request-returns" class="md-nav__link">
+  <a href="#listing-the-catalog" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What a request returns
+        Listing the catalog
       
     </span>
   </a>
@@ -11479,10 +11434,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#why-aggregate-is-not-supported-yet" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Why aggregate= is not supported (yet)
       
     </span>
   </a>
@@ -11490,10 +11445,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#aliases-at-the-facade" class="md-nav__link">
+  <a href="#refreshing-the-catalog-from-the-live-archive" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Aliases at the facade
+        Refreshing the catalog from the live archive
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-the-live-e2e-tests-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When the live e2e tests run
       
     </span>
   </a>
@@ -11517,7 +11483,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/asf/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/jaxa/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -11526,129 +11492,131 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/asf/introduction.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/jaxa/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="asf-insar-backend-introduction"><a class="toclink" href="#asf-insar-backend-introduction">ASF InSAR backend — introduction</a><a class="headerlink" href="#asf-insar-backend-introduction" title="Permanent link">#</a></h1>
-<p>The <a href="https://asf.alaska.edu/">Alaska Satellite Facility (ASF)</a> holds
-NASA's archive of synthetic aperture radar (SAR) — Sentinel-1, ALOS
-PALSAR, NISAR, the OPERA processed-SAR family, and older missions —
-and exposes search, download, and <strong>InSAR baseline <code>stack()</code></strong>
-through the official <a href="https://docs.asf.alaska.edu/asf_search/basics/"><code>asf_search</code></a>
-Python SDK. earthlens ships an <code>asf</code> backend that wraps that SDK,
-so a user can pull either a plain SAR catalog search or a
-coregistered acquisition stack from a reference granule through the
-same <code>download()</code> shape every other backend uses.</p>
-<p>This page orients the backend. For the hands-on walkthrough see
-<a href="../usage/">Usage</a>; the rendered API is the <a href="../asf/">Reference</a>
-page.</p>
-<h2 id="why-a-separate-backend-asf-is-already-in-earthdata"><a class="toclink" href="#why-a-separate-backend-asf-is-already-in-earthdata">Why a separate backend (ASF is already in <code>earthdata</code>)</a><a class="headerlink" href="#why-a-separate-backend-asf-is-already-in-earthdata" title="Permanent link">#</a></h2>
-<p>ASF SAR granules live behind NASA Earthdata Login (EDL) and are
-discoverable through CMR, so the existing <code>earthlens.earthdata</code>
-backend can already pull individual granules from ASF. The reason
-for a dedicated <code>asf</code> backend is <strong>InSAR</strong>: building a baseline
-stack — finding the coregistered set of acquisitions inside
-perpendicular- and temporal-baseline windows from a reference scene
-— is something CMR cannot do. <code>asf_search.ASFProduct.stack()</code> is
-the only path, and exposing it through earthlens makes the
-InSAR-ready stack available without leaving the <code>EarthLens()</code> /
-<code>download()</code> flow.</p>
-<p>The two backends are deliberately complementary:</p>
+<h1 id="jaxa-usage"><a class="toclink" href="#jaxa-usage">JAXA — usage</a><a class="headerlink" href="#jaxa-usage" title="Permanent link">#</a></h1>
+<h2 id="quick-start-aw3d30-elevation-tile-authless"><a class="toclink" href="#quick-start-aw3d30-elevation-tile-authless">Quick start: AW3D30 elevation tile (authless)</a><a class="headerlink" href="#quick-start-aw3d30-elevation-tile-authless" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jaxa&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;aw3d30&quot;</span><span class="p">],</span>        <span class="c1"># alias for ALOS PRISM AW3D30 v3.2</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span>          <span class="c1"># AW3D30 is a static product; pass any window</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2030-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.35</span><span class="p">,</span> <span class="mf">35.40</span><span class="p">],</span>      <span class="c1"># ~Mt. Fuji</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">138.70</span><span class="p">,</span> <span class="mf">138.78</span><span class="p">],</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">resolution</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>           <span class="c1"># pixels per degree (~110 m); SDK snaps to native</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out/jaxa&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">)</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">written</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nb">print</span><span class="p">(</span><span class="n">written</span><span class="p">)</span>  <span class="c1"># [PosixPath(&#39;out/jaxa/aw3d30_DSM.tif&#39;)]</span>
+</code></pre></div>
+<p>The output GeoTIFF is north-up, EPSG:4326, with one band per request
+(default band from the catalog, or one file per <code>bands=</code> entry).</p>
+<h2 id="quick-start-alos-2-palsar-2-product-credentialed-sftp"><a class="toclink" href="#quick-start-alos-2-palsar-2-product-credentialed-sftp">Quick start: ALOS-2 PALSAR-2 product (credentialed SFTP)</a><a class="headerlink" href="#quick-start-alos-2-palsar-2-product-credentialed-sftp" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jaxa&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alos2-palsar2-l1-1&quot;</span><span class="p">],</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-01-02&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">138.0</span><span class="p">,</span> <span class="mf">139.0</span><span class="p">],</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out/jaxa-palsar2&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="c1"># Either set env vars instead:</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="n">gportal_username</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">gportal_password</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">)</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">written</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  <span class="c1"># SFTP fetch via the gportal SDK</span>
+</code></pre></div>
+<p>Search is anonymous but <code>download()</code> needs credentials. Empty time / AOI
+windows return <code>[]</code> rather than raising.</p>
+<h2 id="request-shape"><a class="toclink" href="#request-shape">Request shape</a><a class="headerlink" href="#request-shape" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Job</th>
-<th>Use</th>
+<th>Parameter</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Pull a single named ASF granule by id</td>
-<td><code>earthdata</code> (CMR is good at "find by id")</td>
+<td><code>variables</code></td>
+<td>Catalog dataset key(s) — canonical or friendly alias. All keys must resolve to the <strong>same</strong> protocol; mixed-protocol calls are rejected.</td>
 </tr>
 <tr>
-<td>Find every Sentinel-1 SLC over a bbox + window</td>
-<td>either; <code>asf</code> is slightly more direct</td>
+<td><code>start</code> / <code>end</code></td>
+<td>Inclusive date window. For <code>jaxa-earth</code> static products like AW3D30, pass a wide window — the SDK picks the single available date.</td>
 </tr>
 <tr>
-<td>Build an InSAR baseline stack from a reference scene</td>
-<td><strong>only <code>asf</code></strong></td>
+<td><code>lat_lim</code> / <code>lon_lim</code></td>
+<td>WGS84 bbox <code>[min, max]</code>.</td>
 </tr>
 <tr>
-<td>Download the stack into a folder</td>
-<td><code>asf</code> (it reuses the EDL auth <code>earthdata</code> already minted)</td>
+<td><code>resolution</code></td>
+<td><code>jaxa-earth</code> only — pixels per degree (<code>ppu</code>). Ignored for <code>gportal</code>.</td>
+</tr>
+<tr>
+<td><code>bands</code></td>
+<td><code>jaxa-earth</code> only — list of band names. Overrides the catalog's <code>default_band</code>. One COG per band.</td>
+</tr>
+<tr>
+<td><code>gportal_username</code> / <code>gportal_password</code></td>
+<td>Explicit G-Portal credentials. When omitted, env vars <code>GPORTAL_USERNAME</code> / <code>GPORTAL_PASSWORD</code> are read.</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>Output directory (created if missing).</td>
 </tr>
 </tbody>
 </table>
-<h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
-<p><strong>Search runs anonymously</strong>; only the <strong>download</strong> step requires an
-EDL bearer token. The backend reuses
-<a href="../../earthdata/authentication/"><code>earthlens.earthdata.EarthdataAuth</code></a>
-— there is no second credential system to configure. Full setup,
-the credential ladder, and the error path are documented under
-<a href="../authentication/">Authentication</a>.</p>
-<h2 id="products-and-the-stackable-flag"><a class="toclink" href="#products-and-the-stackable-flag">Products and the <code>stackable</code> flag</a><a class="headerlink" href="#products-and-the-stackable-flag" title="Permanent link">#</a></h2>
-<p>The catalog ships <strong>42 curated rows</strong> covering Sentinel-1
-(SLC / BURST / GRD / OCN / RAW + per-satellite variants), ALOS
-PALSAR + ALOS-2, the OPERA-S1 family (RTC / CSLC / DIST-ALERT +
-the OPERA-S1-CALVAL calibration companion), ARIA GUNW, the full
-NISAR product family (RSLC / GSLC / GCOV / L0B / RIFG / RUNW /
-GUNW / ROFF / GOFF / LRCLK_UTC), the TROPO atmospheric
-corrections used by downstream InSAR processors, ERS-1/2,
-JERS-1, RADARSAT-1, plus the SEASAT / SIR-C / AIRSAR / UAVSAR /
-SMAP archive completeness rows. Each
-row carries either an <code>asf.PLATFORM</code> member or an <code>asf.DATASET</code>
-member, plus an <code>asf.PRODUCT_TYPE</code> member and a <code>stackable: bool</code>
-flag.</p>
-<p><code>stackable: false</code> means <code>ASFProduct.stack()</code> returns an empty
-result for that product class — those products are <em>outputs</em> of
-the InSAR pipeline (RTC, GUNW) or do not have a baseline-comparable
-acquisition (GRD). Trying to use them in stack mode raises a
-<code>ValueError</code> at construction.</p>
-<p>The full product table — every curated row with its SDK selector,
-description, and aliases — lives under
-<a href="../datasets/">Available products</a>.</p>
-<p>Pass a friendly alias (<code>s1-slc</code>, <code>opera-rtc</code>, …) and the catalog
-resolves it to the curated key with a did-you-mean hint on a typo.</p>
-<h2 id="what-a-request-returns"><a class="toclink" href="#what-a-request-returns">What a request returns</a><a class="headerlink" href="#what-a-request-returns" title="Permanent link">#</a></h2>
-<p><code>download()</code> returns the list of written SAR product paths
-(<code>list[Path]</code>), exactly as the file-writing backends (CHIRPS, S3,
-ECMWF, GEE, earthdata, …) do. Idempotent re-runs skip files
-already on disk — useful, because an SLC weighs in at hundreds
-of megabytes.</p>
-<p>The backend <strong>does not crop / convert / unpack</strong> the SAR products
-in the MVP. An SLC is complex-valued (I/Q phase data), not a plain
-raster you can bbox-crop; processed-derivative products (RTC, GRD)
-are real-valued but the MVP's job is <strong>retrieval + the stack</strong>,
-not InSAR processing. <code>download(aggregate=…)</code> therefore raises a
-clear <code>NotImplementedError</code> — post-process the stack with a
-dedicated InSAR tool (<a href="https://hyp3-docs.asf.alaska.edu/">HyP3</a>,
-<a href="https://step.esa.int/main/toolboxes/snap/">SNAP</a>,
-<a href="https://mintpy.readthedocs.io/">MintPy</a>,
-<a href="https://github.com/isce-framework/isce2">ISCE2/3</a>).</p>
-<h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<p><code>asf_search</code> is an optional dependency. Install the extra:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>asf<span class="o">]</span>
+<p>The <code>temporal_resolution=</code> / <code>cadence=</code> arguments are accepted (the
+facade requires them) but only the date-window bounds drive each
+protocol — neither SDK takes an interval cadence.</p>
+<h2 id="listing-the-catalog"><a class="toclink" href="#listing-the-catalog">Listing the catalog</a><a class="headerlink" href="#listing-the-catalog" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="p">))</span>                            <span class="c1"># 124</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">by_protocol</span><span class="p">(</span><span class="s2">&quot;jaxa-earth&quot;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">])</span>   <span class="c1"># 118 STAC collections</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">print</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">by_protocol</span><span class="p">(</span><span class="s2">&quot;gportal&quot;</span><span class="p">))</span>          <span class="c1"># 6 G-Portal mission products</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;elevation&quot;</span><span class="p">)</span>                       <span class="c1"># resolves &quot;elevation&quot; -&gt; &quot;aw3d30&quot;</span>
 </code></pre></div>
-<p>This pulls <code>asf_search &gt;=12.2.2</code> plus <code>earthlens[earthdata]</code> (for
-the EDL auth ladder). The <code>earthlens</code> package imports without the
-extra; only constructing the backend (or accessing the SDK) triggers
-the lazy <code>import asf_search</code>.</p>
-<h2 id="aliases-at-the-facade"><a class="toclink" href="#aliases-at-the-facade">Aliases at the facade</a><a class="headerlink" href="#aliases-at-the-facade" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;asf&quot;</span><span class="p">,</span>                    <span class="c1"># canonical key</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>          <span class="o">...</span><span class="p">)</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;alaska-satellite-facility&quot;</span><span class="p">,</span>  <span class="c1"># full-name alias</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>          <span class="o">...</span><span class="p">)</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;insar&quot;</span><span class="p">,</span>                  <span class="c1"># capability alias</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>          <span class="o">...</span><span class="p">)</span>
+<p>Unknown keys raise a <code>ValueError</code> with a did-you-mean hint.</p>
+<h2 id="why-aggregate-is-not-supported-yet"><a class="toclink" href="#why-aggregate-is-not-supported-yet">Why <code>aggregate=</code> is not supported (yet)</a><a class="headerlink" href="#why-aggregate-is-not-supported-yet" title="Permanent link">#</a></h2>
+<p><code>download(aggregate=…)</code> raises <code>NotImplementedError</code>. Both branches emit
+per-date files (<code>jaxa-earth</code> returns the per-date tensor for the
+requested window; <code>gportal.download</code> writes one file per matched
+product); the standard <code>earthlens.aggregate</code> reducer needs a per-window
+<em>stack</em> shape that the two branches don't both produce today. This is
+planning gap <strong>G6</strong> — to be unblocked once multi-time tensors flow
+through the <code>jaxa-earth</code> branch.</p>
+<h2 id="refreshing-the-catalog-from-the-live-archive"><a class="toclink" href="#refreshing-the-catalog-from-the-live-archive">Refreshing the catalog from the live archive</a><a class="headerlink" href="#refreshing-the-catalog-from-the-live-archive" title="Permanent link">#</a></h2>
+<p>The <code>earthlens</code> CLI ships a refresher that re-enumerates the live JAXA
+collections + G-Portal datasets so a stale local YAML can be regenerated:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>jaxa<span class="w">            </span><span class="c1"># validates the bundled YAML</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>jaxa<span class="w"> </span>--write<span class="w">    </span><span class="c1"># rewrites the bundled YAML</span>
 </code></pre></div>
-<p>All three resolve to <code>earthlens.asf.ASF</code>.</p>
+<p>The first form prints a summary (collection count, drift vs the bundled
+catalog) without touching disk. The second rewrites
+<code>src/earthlens/jaxa/jaxa_data_catalog.yaml</code> with the freshly probed
+collections (preserving the curated friendly aliases). See
+<code>planning/jaxa/captures/build_catalog.py</code> for the generator the CLI
+invokes under the hood.</p>
+<h2 id="when-the-live-e2e-tests-run"><a class="toclink" href="#when-the-live-e2e-tests-run">When the live e2e tests run</a><a class="headerlink" href="#when-the-live-e2e-tests-run" title="Permanent link">#</a></h2>
+<p>The end-to-end tests are gated:</p>
+<ul>
+<li><code>pytest tests/jaxa -m "jaxa and e2e"</code> — runs the live <code>jaxa-earth</code> pull
+  unconditionally (authless), and the live <code>gportal</code> search only when
+  <code>$GPORTAL_USERNAME</code> + <code>$GPORTAL_PASSWORD</code> are set in the environment.</li>
+<li>The default <code>pytest -m "not e2e"</code> run skips both, so the suite stays
+  fully offline.</li>
+</ul>
 
 
 
@@ -11684,7 +11652,7 @@ the lazy <code>import asf_search</code>.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../s3/reference/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
+          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -11694,7 +11662,7 @@ the lazy <code>import asf_search</code>.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Reference
+                Introduction
               </div>
             </div>
           </a>
