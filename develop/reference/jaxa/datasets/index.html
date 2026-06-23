@@ -11842,7 +11842,7 @@
 
 
 <h1 id="jaxa-available-datasets"><a class="toclink" href="#jaxa-available-datasets">JAXA — available datasets</a><a class="headerlink" href="#jaxa-available-datasets" title="Permanent link">#</a></h1>
-<p>The bundled catalog ships <strong>124 rows</strong>: 118 <code>jaxa-earth</code> STAC collections plus 6 <code>gportal</code> mission products. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via <code>cat.get(...)</code>.</p>
+<p>The bundled catalog ships <strong>917 rows</strong>: 118 <code>jaxa-earth</code> STAC collections plus 799 <code>gportal</code> mission products. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via <code>cat.get(...)</code>.</p>
 <p>The naming scheme for jaxa-earth is <code>&lt;mission&gt;-&lt;product&gt;[-&lt;d|n&gt;][-&lt;cadence&gt;][-norm]</code> where <code>d</code>/<code>n</code> mark daytime / nighttime variants, the cadence comes from the source (<code>daily</code>, <code>halfmonth</code>, <code>monthly</code>, <code>8day</code>, <code>hourly</code>, <code>yearly</code>), and <code>-norm</code> flags a climatological <em>normal</em>.</p>
 <p>Resolve either form:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
@@ -12669,40 +12669,4798 @@
 </thead>
 <tbody>
 <tr>
+<td><code>adeos-avnir-l1a-mu</code></td>
+<td>—</td>
+<td><code>22011000</code></td>
+<td>ADEOS — L1A MU</td>
+</tr>
+<tr>
+<td><code>adeos-avnir-l1a-pan</code></td>
+<td>—</td>
+<td><code>22011002</code></td>
+<td>ADEOS — L1A PAN</td>
+</tr>
+<tr>
+<td><code>adeos-avnir-l1b2-mu</code></td>
+<td>—</td>
+<td><code>22011001</code></td>
+<td>ADEOS — L1B2 MU</td>
+</tr>
+<tr>
+<td><code>adeos-avnir-l1b2-pan</code></td>
+<td>—</td>
+<td><code>22011003</code></td>
+<td>ADEOS — L1B2 PAN</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-ocean-color</code></td>
+<td>—</td>
+<td><code>22003000</code></td>
+<td>ADEOS — L3B.GACOC/GAC Ocean Color</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-ocean-color-3007</code></td>
+<td>—</td>
+<td><code>22003007</code></td>
+<td>ADEOS — L3BM.GACOCL/GAC Ocean Color</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-ocean-color-chlorophyll-a</code></td>
+<td>—</td>
+<td><code>22003009</code></td>
+<td>ADEOS — L3BM.GACOCC/GAC Ocean Color-Chlorophyll-a concentration</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-ocean-color-czcs-like-pigm</code></td>
+<td>—</td>
+<td><code>22003008</code></td>
+<td>ADEOS — L3BM.GACOCP/GAC Ocean Color-CZCS like pigment concentration</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-ocean-color1</code></td>
+<td>—</td>
+<td><code>22002000</code></td>
+<td>ADEOS — L2.GACOC1/GAC Ocean Color1</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-ocean-color2</code></td>
+<td>—</td>
+<td><code>22002001</code></td>
+<td>ADEOS — L2.GACOC2/GAC Ocean Color2</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-sea-surface-temperatur</code></td>
+<td>—</td>
+<td><code>22002003</code></td>
+<td>ADEOS — L2.GACSST/GAC Sea Surface Temperatur</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-sea-surface-temperture</code></td>
+<td>—</td>
+<td><code>22003012</code></td>
+<td>ADEOS — L3BM.GACSST/GAC Sea Surface Temperture</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-seasurface-temperatur</code></td>
+<td>—</td>
+<td><code>22003002</code></td>
+<td>ADEOS — L3B.GACSST/GAC SeaSurface Temperatur</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-thermal-infrared</code></td>
+<td>—</td>
+<td><code>22001001</code></td>
+<td>ADEOS — L1A.GACTI/GAC Thermal infrared</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-vegetation-index</code></td>
+<td>—</td>
+<td><code>22002002</code></td>
+<td>ADEOS — L2.GACVI/GAC Vegetation Index</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-vegetation-index-3001</code></td>
+<td>—</td>
+<td><code>22003001</code></td>
+<td>ADEOS — L3B.GACVI/GAC Vegetation Index</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-vegetation-index-3011</code></td>
+<td>—</td>
+<td><code>22003011</code></td>
+<td>ADEOS — L3BM.GACVI/GAC Vegetation Index</td>
+</tr>
+<tr>
+<td><code>adeos-octs-gac-visible-and-near-infrared</code></td>
+<td>—</td>
+<td><code>22001000</code></td>
+<td>ADEOS — L1A.GACVNI/GAC Visible and near infrared</td>
+</tr>
+<tr>
+<td><code>adeos-octs-k490</code></td>
+<td>—</td>
+<td><code>22003005</code></td>
+<td>ADEOS — L3M.RTCOCK/RTC Ocean Color-Diffuse attenuation coefficient at 490nm(K490)</td>
+</tr>
+<tr>
+<td><code>adeos-octs-k490-3010</code></td>
+<td>—</td>
+<td><code>22003010</code></td>
+<td>ADEOS — L3BM.GACOCK/GAC Ocean Color-Diffuse attenuation coefficient at 490nm(K490)</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-ocean-color-chlorophyll-a</code></td>
+<td>—</td>
+<td><code>22003004</code></td>
+<td>ADEOS — L3M.RTCOCC/RTC Ocean Color-Chlorophyll-a concentration</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-ocean-color-czcs-like-pigm</code></td>
+<td>—</td>
+<td><code>22003003</code></td>
+<td>ADEOS — L3M.RTCOCP/RTC Ocean Color-CZCS like pigment concentration</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-ocean-color1</code></td>
+<td>—</td>
+<td><code>22002004</code></td>
+<td>ADEOS — L2.RTCOC1/RTC Ocean Color1</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-ocean-color2</code></td>
+<td>—</td>
+<td><code>22002005</code></td>
+<td>ADEOS — L2.RTCOC2/RTC Ocean Color2</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-sea-surface-temperatur</code></td>
+<td>—</td>
+<td><code>22002007</code></td>
+<td>ADEOS — L2.RTCSST/RTC Sea Surface Temperatur</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-sea-surface-temperture</code></td>
+<td>—</td>
+<td><code>22003006</code></td>
+<td>ADEOS — L3M.RTCSST/RTC Sea Surface Temperture</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-thermal-infrared</code></td>
+<td>—</td>
+<td><code>22001003</code></td>
+<td>ADEOS — L1A.RTCTI/RTC Thermal infrared</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-vegetation-index</code></td>
+<td>—</td>
+<td><code>22002006</code></td>
+<td>ADEOS — L2.RTCVI/RTC Vegetation Index</td>
+</tr>
+<tr>
+<td><code>adeos-octs-rtc-visible-and-near-infrared</code></td>
+<td>—</td>
+<td><code>22001002</code></td>
+<td>ADEOS — L1A.RTCVNI/RTC Visible and near infrared</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l1a</code></td>
+<td>—</td>
+<td><code>23001000</code></td>
+<td>ADEOS-II — L1A/AMSR L1A</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l1b</code></td>
+<td>—</td>
+<td><code>23001001</code></td>
+<td>ADEOS-II — L1B/AMSR L1B</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l2-amount-of-precipitatio</code></td>
+<td>—</td>
+<td><code>23002002</code></td>
+<td>ADEOS-II — L2.AP/AMSR L2 Amount of Precipitation</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l2-cloud-liquid-water</code></td>
+<td>—</td>
+<td><code>23002001</code></td>
+<td>ADEOS-II — L2.CLW/AMSR L2 Cloud Liquid Water</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l2-ice-concentration</code></td>
+<td>—</td>
+<td><code>23002005</code></td>
+<td>ADEOS-II — L2.IC/AMSR L2 Ice Concentration</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l2-sea-surface-temperture</code></td>
+<td>—</td>
+<td><code>23002004</code></td>
+<td>ADEOS-II — L2.SST/AMSR L2 Sea Surface Temperture</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l2-sea-surface-wind-speed</code></td>
+<td>—</td>
+<td><code>23002003</code></td>
+<td>ADEOS-II — L2.SSW/AMSR L2 Sea Surface Wind Speed</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l2-snow-water-equivalence</code></td>
+<td>—</td>
+<td><code>23002007</code></td>
+<td>ADEOS-II — L2.SWE/AMSR L2 Snow Water Equivalence</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l2-soil-moisture</code></td>
+<td>—</td>
+<td><code>23002006</code></td>
+<td>ADEOS-II — L2.SM/AMSR L2 Soil Moisture</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l2-water-vapor</code></td>
+<td>—</td>
+<td><code>23002000</code></td>
+<td>ADEOS-II — L2.WV/AMSR L2 Water Vapor</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-amount-of-precipitatio</code></td>
+<td>—</td>
+<td><code>23003002</code></td>
+<td>ADEOS-II — L3.AP/AMSR L3 Amount of Precipitation</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-brightness-temperature</code></td>
+<td>—</td>
+<td><code>23003008</code></td>
+<td>ADEOS-II — L3.BT/AMSR L3 Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-cloud-liquid-water</code></td>
+<td>—</td>
+<td><code>23003001</code></td>
+<td>ADEOS-II — L3.CLW/AMSR L3 Cloud Liquid Water</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-ice-concentration</code></td>
+<td>—</td>
+<td><code>23003005</code></td>
+<td>ADEOS-II — L3.IC/AMSR L3 Ice Concentration</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-sea-surface-temperatur</code></td>
+<td>—</td>
+<td><code>23003004</code></td>
+<td>ADEOS-II — L3.SST/AMSR L3 Sea Surface Temperature</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-sea-surface-wind-speed</code></td>
+<td>—</td>
+<td><code>23003003</code></td>
+<td>ADEOS-II — L3.SSW/AMSR L3 Sea Surface Wind Speed</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-snow-water-equivalence</code></td>
+<td>—</td>
+<td><code>23003007</code></td>
+<td>ADEOS-II — L3.SWE/AMSR L3 Snow Water Equivalence</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-soil-moisture</code></td>
+<td>—</td>
+<td><code>23003006</code></td>
+<td>ADEOS-II — L3.SM/AMSR L3 Soil Moisture</td>
+</tr>
+<tr>
+<td><code>adeos2-amsr-amsr-l3-water-vapor</code></td>
+<td>—</td>
+<td><code>23003000</code></td>
+<td>ADEOS-II — L3.WV/AMSR L3 Water Vapor</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-absorption-of-colored-dissolve</code></td>
+<td>—</td>
+<td><code>23013036</code></td>
+<td>ADEOS-II — L3STAMAP.CDOM0/Absorption of colored dissolved organic matter</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-add-data-averaged</code></td>
+<td>—</td>
+<td><code>23013039</code></td>
+<td>ADEOS-II — L3STAMAP.STALL/Sea Surface Temperature(add data averaged)</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-aerosol</code></td>
+<td>—</td>
+<td><code>23013013</code></td>
+<td>ADEOS-II — L3B.LA000/Aerosol</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-aerosol-3033</code></td>
+<td>—</td>
+<td><code>23013033</code></td>
+<td>ADEOS-II — L3STAMAP.LA000/Aerosol</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-aerosol-angstrom-exponent</code></td>
+<td>—</td>
+<td><code>23012001</code></td>
+<td>ADEOS-II — L2.ARAEO/Aerosol Angstrom Exponent</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-aerosol-angstrom-exponent-3000</code></td>
+<td>—</td>
+<td><code>23013000</code></td>
+<td>ADEOS-II — L3B.ARAEO/Aerosol Angstrom Exponent</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-aerosol-angstrom-exponent-3020</code></td>
+<td>—</td>
+<td><code>23013020</code></td>
+<td>ADEOS-II — L3STAMAP.ARAEO/Aerosol Angstrom Exponent</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-aerosol-optical-thickness</code></td>
+<td>—</td>
+<td><code>23012002</code></td>
+<td>ADEOS-II — L2.AROP0/Aerosol Optical Thickness</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-aerosol-optical-thickness-3001</code></td>
+<td>—</td>
+<td><code>23013001</code></td>
+<td>ADEOS-II — L3B.AROP0/Aerosol Optical Thickness</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-aerosol-optical-thickness-3021</code></td>
+<td>—</td>
+<td><code>23013021</code></td>
+<td>ADEOS-II — L3STAMAP.AROP0/Aerosol Optical Thickness</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-atmospheric-corrected-data-for</code></td>
+<td>—</td>
+<td><code>23012018</code></td>
+<td>ADEOS-II — L2.ACLC0/Atmospheric Corrected Data For Land And Cryosphere</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-atmospheric-correction</code></td>
+<td>—</td>
+<td><code>23012013</code></td>
+<td>ADEOS-II — L2.NLLR0/Atmospheric Correction</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-attenuation-coefficent-at-490m</code></td>
+<td>—</td>
+<td><code>23013037</code></td>
+<td>ADEOS-II — L3STAMAP.K4900/Attenuation coefficent at 490mm</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-chlorophyll-a</code></td>
+<td>—</td>
+<td><code>23013034</code></td>
+<td>ADEOS-II — L3STAMAP.CHLA0/Chlorophyll-a</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-effective-particle-radiu</code></td>
+<td>—</td>
+<td><code>23012004</code></td>
+<td>ADEOS-II — L2.CERWR/Cloud Effective Particle Radius of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-effective-particle-radiu-2005</code></td>
+<td>—</td>
+<td><code>23012005</code></td>
+<td>ADEOS-II — L2.CERIE/Cloud Effective Particle Radius of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-effective-particle-radiu-3003</code></td>
+<td>—</td>
+<td><code>23013003</code></td>
+<td>ADEOS-II — L3B.CERWR/Cloud Effective Particle Radius of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-effective-particle-radiu-3004</code></td>
+<td>—</td>
+<td><code>23013004</code></td>
+<td>ADEOS-II — L3B.CERIE/Cloud Effective Particle Radius of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-effective-particle-radiu-3023</code></td>
+<td>—</td>
+<td><code>23013023</code></td>
+<td>ADEOS-II — L3STAMAP.CERWR/Cloud Effective Particle Radius of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-effective-particle-radiu-3024</code></td>
+<td>—</td>
+<td><code>23013024</code></td>
+<td>ADEOS-II — L3STAMAP.CERIE/Cloud Effective Particle Radius of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-flag</code></td>
+<td>—</td>
+<td><code>23012000</code></td>
+<td>ADEOS-II — L2.CLFLG/Cloud Flag</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-fraction</code></td>
+<td>—</td>
+<td><code>23012003</code></td>
+<td>ADEOS-II — L2.CLFR0/Cloud fraction</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-fraction-3002</code></td>
+<td>—</td>
+<td><code>23013002</code></td>
+<td>ADEOS-II — L3B.CLFR0/Cloud fraction</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-fraction-3022</code></td>
+<td>—</td>
+<td><code>23013022</code></td>
+<td>ADEOS-II — L3STAMAP.CLFR0/Cloud fraction</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-liquid-water-path-of-wat</code></td>
+<td>—</td>
+<td><code>23012012</code></td>
+<td>ADEOS-II — L2.CWPWR/Cloud Liquid Water Path of water cloud by reflaction method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-liquid-water-path-of-wat-3011</code></td>
+<td>—</td>
+<td><code>23013011</code></td>
+<td>ADEOS-II — L3B.CWPWR/Cloud Liquid Water Path of water cloud by reflaction method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-liquid-water-path-of-wat-3031</code></td>
+<td>—</td>
+<td><code>23013031</code></td>
+<td>ADEOS-II — L3STAMAP.CWPWR/Cloud Liquid Water Path of water cloud by reflaction method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-ice</code></td>
+<td>—</td>
+<td><code>23012007</code></td>
+<td>ADEOS-II — L2.COPIR/Cloud Optical Thickness of ice cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-ice-2008</code></td>
+<td>—</td>
+<td><code>23012008</code></td>
+<td>ADEOS-II — L2.COPIE/Cloud Optical Thickness of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-ice-3006</code></td>
+<td>—</td>
+<td><code>23013006</code></td>
+<td>ADEOS-II — L3B.COPIR/Cloud Optical Thickness of ice  cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-ice-3007</code></td>
+<td>—</td>
+<td><code>23013007</code></td>
+<td>ADEOS-II — L3B.COPIE/Cloud Optical Thickness of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-ice-3026</code></td>
+<td>—</td>
+<td><code>23013026</code></td>
+<td>ADEOS-II — L3STAMAP.COPIR/Cloud Optical Thickness of ice  cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-ice-3027</code></td>
+<td>—</td>
+<td><code>23013027</code></td>
+<td>ADEOS-II — L3STAMAP.COPIE/Cloud Optical Thickness of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-wat</code></td>
+<td>—</td>
+<td><code>23012006</code></td>
+<td>ADEOS-II — L2.COPWR/Cloud Optical Thickness of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-wat-3005</code></td>
+<td>—</td>
+<td><code>23013005</code></td>
+<td>ADEOS-II — L3B.COPWR/Cloud Optical Thickness of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-optical-thickness-of-wat-3025</code></td>
+<td>—</td>
+<td><code>23013025</code></td>
+<td>ADEOS-II — L3STAMAP.COPWR/Cloud Optical Thickness of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-height-of-water-clou</code></td>
+<td>—</td>
+<td><code>23012011</code></td>
+<td>ADEOS-II — L2.CHTWR/Cloud Top Height of water cloude by emmission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-height-of-water-clou-3010</code></td>
+<td>—</td>
+<td><code>23013010</code></td>
+<td>ADEOS-II — L3B.CHTWR/Cloud Top Height of water cloude by emmission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-height-of-water-clou-3030</code></td>
+<td>—</td>
+<td><code>23013030</code></td>
+<td>ADEOS-II — L3STAMAP.CHTWR/Cloud Top Height of water cloude by emmission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-temperature-of-ice-c</code></td>
+<td>—</td>
+<td><code>23012010</code></td>
+<td>ADEOS-II — L2.CTTIE/Cloud Top Temperature of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-temperature-of-ice-c-3009</code></td>
+<td>—</td>
+<td><code>23013009</code></td>
+<td>ADEOS-II — L3B.CTTIE/Cloud Top Temperature of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-temperature-of-ice-c-3029</code></td>
+<td>—</td>
+<td><code>23013029</code></td>
+<td>ADEOS-II — L3STAMAP.CTTIE/Cloud Top Temperature of ice cloud by emission method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-temperature-of-water</code></td>
+<td>—</td>
+<td><code>23012009</code></td>
+<td>ADEOS-II — L2.CTTWR/Cloud Top Temperature of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-temperature-of-water-3008</code></td>
+<td>—</td>
+<td><code>23013008</code></td>
+<td>ADEOS-II — L3B.CTTWR/Cloud Top Temperature of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-cloud-top-temperature-of-water-3028</code></td>
+<td>—</td>
+<td><code>23013028</code></td>
+<td>ADEOS-II — L3STAMAP.CTTWR/Cloud Top Temperature of water cloud by reflection method</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-day-night-separately-averaged</code></td>
+<td>—</td>
+<td><code>23013038</code></td>
+<td>ADEOS-II — L3STAMAP.STDN0/Sea Surface Temperature(day/night separately averaged)</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-in-water-particles</code></td>
+<td>—</td>
+<td><code>23012014</code></td>
+<td>ADEOS-II — L2.CSLR0/In-water Particles</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-in-water-particles-3014</code></td>
+<td>—</td>
+<td><code>23013014</code></td>
+<td>ADEOS-II — L3B.CS000/In-water Particles</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-land-and-cryosphere</code></td>
+<td>—</td>
+<td><code>23012021</code></td>
+<td>ADEOS-II — L2A.L2ALC/Land and Cryosphere</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-middle-and-thermal-infrared</code></td>
+<td>—</td>
+<td><code>23011002</code></td>
+<td>ADEOS-II — L1A.MTIR/Middle and thermal infrared</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-middle-and-thermal-infrared-1006</code></td>
+<td>—</td>
+<td><code>23011006</code></td>
+<td>ADEOS-II — L1B.MTIR/Middle and thermal infrared</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-normalized-water-leaving-radia</code></td>
+<td>—</td>
+<td><code>23013012</code></td>
+<td>ADEOS-II — L3B.NW000/Normalized water-leaving radiance</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-normalized-water-leaving-radia-3032</code></td>
+<td>—</td>
+<td><code>23013032</code></td>
+<td>ADEOS-II — L3STAMAP.NW000/Normalized water-leaving radiance</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-ocean-and-atmosphere</code></td>
+<td>—</td>
+<td><code>23012020</code></td>
+<td>ADEOS-II — L2A.L2AOA/Ocean and Atmosphere</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-precise-geometric-corrected-pa</code></td>
+<td>—</td>
+<td><code>23012017</code></td>
+<td>ADEOS-II — L2.PGCP0/Precise Geometric Corrected Parameter</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-sea-surface-temperature</code></td>
+<td>—</td>
+<td><code>23012015</code></td>
+<td>ADEOS-II — L2.STLR0/Sea Surface Temperature</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-sea-surface-temperature-3015</code></td>
+<td>—</td>
+<td><code>23013015</code></td>
+<td>ADEOS-II — L3B.ST000/Sea Surface Temperature</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-short-wavelength-infrared</code></td>
+<td>—</td>
+<td><code>23011001</code></td>
+<td>ADEOS-II — L1A.SWIR/Short-wavelength infrared</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-short-wavelength-infrared-1005</code></td>
+<td>—</td>
+<td><code>23011005</code></td>
+<td>ADEOS-II — L1B.SWIR/Short-wavelength infrared</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-slpt</code></td>
+<td>—</td>
+<td><code>23011007</code></td>
+<td>ADEOS-II — L1B.SLPT/ SLPT</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-grain-size-retrieved-with</code></td>
+<td>—</td>
+<td><code>23013016</code></td>
+<td>ADEOS-II — L3B.SNWG0/Snow grain size retrieved with 865nm band</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-grain-size-retrieved-with-3018</code></td>
+<td>—</td>
+<td><code>23013018</code></td>
+<td>ADEOS-II — L3B.SNWGS/Snow grain size retrieved with 1640nm band</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-grain-size-retrieved-with-3041</code></td>
+<td>—</td>
+<td><code>23013041</code></td>
+<td>ADEOS-II — L3STAMAP.SNWG0/Snow grain size retrieved with 865nm band</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-grain-size-retrieved-with-3043</code></td>
+<td>—</td>
+<td><code>23013043</code></td>
+<td>ADEOS-II — L3STAMAP.SNWGS/Snow grain size retrieved with 1640nm band</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-impurities</code></td>
+<td>—</td>
+<td><code>23013017</code></td>
+<td>ADEOS-II — L3B.SNWI0/Snow impurities</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-impurities-3042</code></td>
+<td>—</td>
+<td><code>23013042</code></td>
+<td>ADEOS-II — L3STAMAP.SNWI0/Snow impurities</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-property</code></td>
+<td>—</td>
+<td><code>23012019</code></td>
+<td>ADEOS-II — L2.SNGI0/Snow Property</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-surface-temperature</code></td>
+<td>—</td>
+<td><code>23013019</code></td>
+<td>ADEOS-II — L3B.SNWTS/Snow surface temperature</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-snow-surface-temperature-3044</code></td>
+<td>—</td>
+<td><code>23013044</code></td>
+<td>ADEOS-II — L3STAMAP.SNWTS/Snow surface temperature</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-suspended-solid-weight</code></td>
+<td>—</td>
+<td><code>23013035</code></td>
+<td>ADEOS-II — L3STAMAP.SS000/Suspended solid weight</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-vegetation-index</code></td>
+<td>—</td>
+<td><code>23012016</code></td>
+<td>ADEOS-II — L2.VGI00/Vegetation Index</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-vegetation-index-3040</code></td>
+<td>—</td>
+<td><code>23013040</code></td>
+<td>ADEOS-II — L3STAMAP.VGI00/Vegetation index</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-visible-and-near-infrared</code></td>
+<td>—</td>
+<td><code>23011000</code></td>
+<td>ADEOS-II — L1A.VNIR/Visible and near infrared</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-1km-visible-and-near-infrared-1004</code></td>
+<td>—</td>
+<td><code>23011004</code></td>
+<td>ADEOS-II — L1B.VNIR/Visible and near infrared</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-250m-l1a</code></td>
+<td>—</td>
+<td><code>23021000</code></td>
+<td>ADEOS-II — L1A</td>
+</tr>
+<tr>
+<td><code>adeos2-gli-250m-l1b</code></td>
+<td>—</td>
+<td><code>23021001</code></td>
+<td>ADEOS-II — L1B</td>
+</tr>
+<tr>
+<td><code>alos-avnir-2-observation</code></td>
+<td>—</td>
+<td><code>26014000</code></td>
+<td>ALOS — Observation</td>
+</tr>
+<tr>
+<td><code>alos-palsar-burst-mode-1</code></td>
+<td>—</td>
+<td><code>26024002</code></td>
+<td>ALOS — Wide Area Observation Mode (Burst mode 1)</td>
+</tr>
+<tr>
+<td><code>alos-palsar-burst-mode-2</code></td>
+<td>—</td>
+<td><code>26024003</code></td>
+<td>ALOS — Wide Area Observation Mode (Burst mode 2)</td>
+</tr>
+<tr>
+<td><code>alos-palsar-direct-downlink-mode</code></td>
+<td>—</td>
+<td><code>26024004</code></td>
+<td>ALOS — Direct Downlink Mode</td>
+</tr>
+<tr>
+<td><code>alos-palsar-fine-resolution-mode-dual-pola</code></td>
+<td>—</td>
+<td><code>26024001</code></td>
+<td>ALOS — Fine Resolution Mode, dual polarization</td>
+</tr>
+<tr>
+<td><code>alos-palsar-fine-resolution-mode-single-po</code></td>
+<td>—</td>
+<td><code>26024000</code></td>
+<td>ALOS — Fine Resolution Mode, Single polarization</td>
+</tr>
+<tr>
+<td><code>alos-palsar-polarimetry-mode</code></td>
+<td>—</td>
+<td><code>26024005</code></td>
+<td>ALOS — Polarimetry Mode</td>
+</tr>
+<tr>
+<td><code>alos-prism-35km</code></td>
+<td>—</td>
+<td><code>26004001</code></td>
+<td>ALOS — Nadir (70km) + Backward (35km)</td>
+</tr>
+<tr>
+<td><code>alos-prism-35km-4003</code></td>
+<td>—</td>
+<td><code>26004003</code></td>
+<td>ALOS — Nadir (35km) + Forward (35km)</td>
+</tr>
+<tr>
+<td><code>alos-prism-35km-4004</code></td>
+<td>—</td>
+<td><code>26004004</code></td>
+<td>ALOS — Nadir (35km) + Backward (35km)</td>
+</tr>
+<tr>
+<td><code>alos-prism-35km-4005</code></td>
+<td>—</td>
+<td><code>26004005</code></td>
+<td>ALOS — Forward (35km) + Backward (35km)</td>
+</tr>
+<tr>
+<td><code>alos-prism-35km-4006</code></td>
+<td>—</td>
+<td><code>26004006</code></td>
+<td>ALOS — Nadir (35km)</td>
+</tr>
+<tr>
+<td><code>alos-prism-35km-4007</code></td>
+<td>—</td>
+<td><code>26004007</code></td>
+<td>ALOS — Forward (35km)</td>
+</tr>
+<tr>
+<td><code>alos-prism-35km-4008</code></td>
+<td>—</td>
+<td><code>26004008</code></td>
+<td>ALOS — Backward (35km)</td>
+</tr>
+<tr>
+<td><code>alos-prism-70km</code></td>
+<td>—</td>
+<td><code>26004002</code></td>
+<td>ALOS — Nadir (70km)</td>
+</tr>
+<tr>
+<td><code>alos-prism-triplet-observation-mode</code></td>
+<td>—</td>
+<td><code>26004000</code></td>
+<td>ALOS — Triplet observation mode</td>
+</tr>
+<tr>
 <td><code>alos2-palsar2-uf-sp</code></td>
 <td><code>palsar2</code>, <code>alos2-l1</code>, <code>alos2-palsar2</code></td>
 <td><code>27004001</code></td>
-<td>ALOS-2/PALSAR-2 L1.1 ultra-fine 3 m single-pol.</td>
+<td>ALOS-2 — NA/Ultra-fine[3m] SP</td>
+</tr>
+<tr>
+<td><code>amsr2-l1-tb</code></td>
+<td>—</td>
+<td><code>11001001</code></td>
+<td>GCOM-W/AMSR2 — L1B-Brightness temperature（TB）</td>
 </tr>
 <tr>
 <td><code>amsr2-l1r</code></td>
 <td><code>amsr2-l1</code>, <code>gcom-w-l1r</code></td>
 <td><code>11001002</code></td>
-<td>GCOM-W/AMSR2 L1R resampled brightness temperatures (TB).</td>
+<td>GCOM-W/AMSR2 — L1R-Brightness temperature（TB）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-clw</code></td>
+<td>—</td>
+<td><code>11002010</code></td>
+<td>GCOM-W/AMSR2 — L2-Cloud Liquid Water（CLW）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-clw-2001</code></td>
+<td>—</td>
+<td><code>11002001</code></td>
+<td>GCOM-W/AMSR2 — L2-Cloud Liquid Water（CLW）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-prc</code></td>
+<td>—</td>
+<td><code>11002003</code></td>
+<td>GCOM-W/AMSR2 — L2-Precipitation（PRC）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-prc-2002</code></td>
+<td>—</td>
+<td><code>11002002</code></td>
+<td>GCOM-W/AMSR2 — L2-Precipitation（PRC）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-sic</code></td>
+<td>—</td>
+<td><code>11002013</code></td>
+<td>GCOM-W/AMSR2 — L2-Sea Ice Concentration（SIC）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-sic-2006</code></td>
+<td>—</td>
+<td><code>11002006</code></td>
+<td>GCOM-W/AMSR2 — L2-Sea Ice Concentration（SIC）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-smc</code></td>
+<td>—</td>
+<td><code>11002015</code></td>
+<td>GCOM-W/AMSR2 — L2-Soil Moisture Content（SMC）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-smc-2008</code></td>
+<td>—</td>
+<td><code>11002008</code></td>
+<td>GCOM-W/AMSR2 — L2-Soil Moisture Content（SMC）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-snd</code></td>
+<td>—</td>
+<td><code>11002014</code></td>
+<td>GCOM-W/AMSR2 — L2-Snow Depth（SND）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-snd-2007</code></td>
+<td>—</td>
+<td><code>11002007</code></td>
+<td>GCOM-W/AMSR2 — L2-Snow Depth（SND）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-sst</code></td>
+<td>—</td>
+<td><code>11002011</code></td>
+<td>GCOM-W/AMSR2 — L2-Sea Surface Temperture（SST）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-sst-2004</code></td>
+<td>—</td>
+<td><code>11002004</code></td>
+<td>GCOM-W/AMSR2 — L2-Sea Surface Temperture（SST）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-ssw</code></td>
+<td>—</td>
+<td><code>11002012</code></td>
+<td>GCOM-W/AMSR2 — L2-Sea Surface Wind Speed（SSW）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-ssw-2005</code></td>
+<td>—</td>
+<td><code>11002005</code></td>
+<td>GCOM-W/AMSR2 — L2-Sea Surface Wind Speed（SSW）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-tpw</code></td>
+<td>—</td>
+<td><code>11002009</code></td>
+<td>GCOM-W/AMSR2 — L2-Integrated Water Vapor（TPW）</td>
+</tr>
+<tr>
+<td><code>amsr2-l2-tpw-2000</code></td>
+<td>—</td>
+<td><code>11002000</code></td>
+<td>GCOM-W/AMSR2 — L2-Integrated Water Vapor（TPW）</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu</code></td>
+<td>—</td>
+<td><code>11003017</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_6GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3016</code></td>
+<td>—</td>
+<td><code>11003016</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_6GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3018</code></td>
+<td>—</td>
+<td><code>11003018</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_7GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3019</code></td>
+<td>—</td>
+<td><code>11003019</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_7GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3020</code></td>
+<td>—</td>
+<td><code>11003020</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_10GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3021</code></td>
+<td>—</td>
+<td><code>11003021</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_10GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3022</code></td>
+<td>—</td>
+<td><code>11003022</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_18GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3023</code></td>
+<td>—</td>
+<td><code>11003023</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_18GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3024</code></td>
+<td>—</td>
+<td><code>11003024</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_23GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3025</code></td>
+<td>—</td>
+<td><code>11003025</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_23GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3026</code></td>
+<td>—</td>
+<td><code>11003026</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_36GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3027</code></td>
+<td>—</td>
+<td><code>11003027</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_36GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3028</code></td>
+<td>—</td>
+<td><code>11003028</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_89GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-brightness-temperatu-3029</code></td>
+<td>—</td>
+<td><code>11003029</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_89GHz_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-cloud-liquid-water-c</code></td>
+<td>—</td>
+<td><code>11003003</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Cloud Liquid Water（CLW）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-cloud-liquid-water-c-3002</code></td>
+<td>—</td>
+<td><code>11003002</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Cloud Liquid Water（CLW）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-ice-concentration-si</code></td>
+<td>—</td>
+<td><code>11003011</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Ice Concentration（SIC）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-ice-concentration-si-3010</code></td>
+<td>—</td>
+<td><code>11003010</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Ice Concentration（SIC）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-integrated-water-vap</code></td>
+<td>—</td>
+<td><code>11003001</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Integrated Water Vapor（TPW）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-integrated-water-vap-3000</code></td>
+<td>—</td>
+<td><code>11003000</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Integrated Water Vapor（TPW）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-precipitation-prc-0</code></td>
+<td>—</td>
+<td><code>11003005</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Precipitation（PRC）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-precipitation-prc-0-3004</code></td>
+<td>—</td>
+<td><code>11003004</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Precipitation（PRC）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-sea-surface-tempertu</code></td>
+<td>—</td>
+<td><code>11003007</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Sea Surface Temperture（SST）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-sea-surface-tempertu-3006</code></td>
+<td>—</td>
+<td><code>11003006</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Sea Surface Temperture（SST）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-sea-surface-wind-spe</code></td>
+<td>—</td>
+<td><code>11003009</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Sea Surface Wind Speed（SSW）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-sea-surface-wind-spe-3008</code></td>
+<td>—</td>
+<td><code>11003008</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Sea Surface Wind Speed（SSW）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-snow-depth-snd-0-1de</code></td>
+<td>—</td>
+<td><code>11003013</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Snow Depth（SND）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-snow-depth-snd-0-1de-3012</code></td>
+<td>—</td>
+<td><code>11003012</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Snow Depth（SND）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-soil-moisture-conten</code></td>
+<td>—</td>
+<td><code>11003015</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Soil Moisture Content（SMC）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-1deg-l3-soil-moisture-conten-3014</code></td>
+<td>—</td>
+<td><code>11003014</code></td>
+<td>GCOM-W/AMSR2 — 10km/0.1deg/L3-Soil Moisture Content（SMC）_0.1deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat</code></td>
+<td>—</td>
+<td><code>11003047</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_6GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3046</code></td>
+<td>—</td>
+<td><code>11003046</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_6GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3048</code></td>
+<td>—</td>
+<td><code>11003048</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_7GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3049</code></td>
+<td>—</td>
+<td><code>11003049</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_7GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3050</code></td>
+<td>—</td>
+<td><code>11003050</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_10GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3051</code></td>
+<td>—</td>
+<td><code>11003051</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_10GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3052</code></td>
+<td>—</td>
+<td><code>11003052</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_18GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3053</code></td>
+<td>—</td>
+<td><code>11003053</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_18GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3054</code></td>
+<td>—</td>
+<td><code>11003054</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_23GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3055</code></td>
+<td>—</td>
+<td><code>11003055</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_23GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3056</code></td>
+<td>—</td>
+<td><code>11003056</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_36GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3057</code></td>
+<td>—</td>
+<td><code>11003057</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_36GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3058</code></td>
+<td>—</td>
+<td><code>11003058</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_89GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-brightness-temperat-3059</code></td>
+<td>—</td>
+<td><code>11003059</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_89GHz_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-cloud-liquid-water</code></td>
+<td>—</td>
+<td><code>11003033</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Cloud Liquid Water（CLW）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-cloud-liquid-water-3032</code></td>
+<td>—</td>
+<td><code>11003032</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Cloud Liquid Water（CLW）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-integrated-water-va</code></td>
+<td>—</td>
+<td><code>11003031</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Integrated Water Vapor（TPW）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-integrated-water-va-3030</code></td>
+<td>—</td>
+<td><code>11003030</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Integrated Water Vapor（TPW）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-precipitation-prc-0</code></td>
+<td>—</td>
+<td><code>11003035</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Precipitation（PRC）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-precipitation-prc-0-3034</code></td>
+<td>—</td>
+<td><code>11003034</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Precipitation（PRC）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-sea-ice-concentrati</code></td>
+<td>—</td>
+<td><code>11003041</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Ice Concentration（SIC）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-sea-ice-concentrati-3040</code></td>
+<td>—</td>
+<td><code>11003040</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Ice Concentration（SIC）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-sea-surface-tempert</code></td>
+<td>—</td>
+<td><code>11003037</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Surface Temperture（SST）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-sea-surface-tempert-3036</code></td>
+<td>—</td>
+<td><code>11003036</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Surface Temperture（SST）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-sea-surface-wind-sp</code></td>
+<td>—</td>
+<td><code>11003039</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Surface Wind Speed（SSW）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-sea-surface-wind-sp-3038</code></td>
+<td>—</td>
+<td><code>11003038</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Surface Wind Speed（SSW）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-snow-depth-snd-0-25</code></td>
+<td>—</td>
+<td><code>11003043</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Snow Depth（SND）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-snow-depth-snd-0-25-3042</code></td>
+<td>—</td>
+<td><code>11003042</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Snow Depth（SND）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-soil-moisture-conte</code></td>
+<td>—</td>
+<td><code>11003045</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Soil Moisture Content（SMC）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr2-l3-0-25deg-l3-soil-moisture-conte-3044</code></td>
+<td>—</td>
+<td><code>11003044</code></td>
+<td>GCOM-W/AMSR2 — 25km/0.25deg/L3-Soil Moisture Content（SMC）_0.25deg</td>
+</tr>
+<tr>
+<td><code>amsr3-l1-tbr</code></td>
+<td>—</td>
+<td><code>31001002</code></td>
+<td>GOSAT-GW/AMSR3 — L1R - Resampled Brightness Temperature (TBR)</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-asw</code></td>
+<td>—</td>
+<td><code>31002005</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - All-weather Sea Surface Wind Speed（ASW）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-clw</code></td>
+<td>—</td>
+<td><code>31002001</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - Cloud Liquid Water Content（CLW）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-hsi</code></td>
+<td>—</td>
+<td><code>31002007</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - High-resolution Sea Ice Concentration（HSI）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-prc</code></td>
+<td>—</td>
+<td><code>31002002</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - Precipitation （PRC）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-sic</code></td>
+<td>—</td>
+<td><code>31002006</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - Sea Ice Concentration （SIC）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-smc</code></td>
+<td>—</td>
+<td><code>31002008</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - Soil Moisture Content （SMC）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-snd</code></td>
+<td>—</td>
+<td><code>31002009</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - Snow Depth （SND）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-sst</code></td>
+<td>—</td>
+<td><code>31002003</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - Sea Surface Temperature （SST）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-ssw</code></td>
+<td>—</td>
+<td><code>31002004</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - Sea Surface Wind Speed （SSW）</td>
+</tr>
+<tr>
+<td><code>amsr3-l2-tpw</code></td>
+<td>—</td>
+<td><code>31002000</code></td>
+<td>GOSAT-GW/AMSR3 — L2 - Total Precipitable Water （TPW）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-asw</code></td>
+<td>—</td>
+<td><code>31003016</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - All-weather Sea Surface Wind Speed（ASW）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-clw</code></td>
+<td>—</td>
+<td><code>31003012</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Cloud Liquid Water Content （CLW）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-hsi</code></td>
+<td>—</td>
+<td><code>31003018</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - High-resolution Sea Ice Concentration（HSI）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-prc</code></td>
+<td>—</td>
+<td><code>31003013</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Precipitation （PRC）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-sic</code></td>
+<td>—</td>
+<td><code>31003017</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Sea Ice Concentration （SIC）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-smc</code></td>
+<td>—</td>
+<td><code>31003019</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Soil Moisture Content （SMC）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-snd</code></td>
+<td>—</td>
+<td><code>31003020</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Snow Depth （SND）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-sst</code></td>
+<td>—</td>
+<td><code>31003014</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Sea Surface Temperature （SST）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-ssw</code></td>
+<td>—</td>
+<td><code>31003015</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Sea Surface Wind Speed （SSW）</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-th1</code></td>
+<td>—</td>
+<td><code>31003007</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 89.0GHz (TH1)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-th2</code></td>
+<td>—</td>
+<td><code>31003008</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 165.5GHz (TH2)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-th3</code></td>
+<td>—</td>
+<td><code>31003009</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 183.31+/-3GHz (TH3)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-th4</code></td>
+<td>—</td>
+<td><code>31003010</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 183.31+/-7GHz (TH4)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-tl1</code></td>
+<td>—</td>
+<td><code>31003000</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 6.925GHz (TL1)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-tl2</code></td>
+<td>—</td>
+<td><code>31003001</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 7.3GHz (TL2)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-tl3</code></td>
+<td>—</td>
+<td><code>31003002</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 10.25GHz (TL3)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-tl4</code></td>
+<td>—</td>
+<td><code>31003003</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 10.65GHz (TL4)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-tl5</code></td>
+<td>—</td>
+<td><code>31003004</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 18.7GHz (TL5)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-tl6</code></td>
+<td>—</td>
+<td><code>31003005</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 23.8GH (TL6)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-tl7</code></td>
+<td>—</td>
+<td><code>31003006</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Brightness temperature 36.42GHz (TL7)</td>
+</tr>
+<tr>
+<td><code>amsr3-l3-tpw</code></td>
+<td>—</td>
+<td><code>31003011</code></td>
+<td>GOSAT-GW/AMSR3 — L3 - Total Precipitable Water （TPW）</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l1-tb</code></td>
+<td>—</td>
+<td><code>25001000</code></td>
+<td>AQUA — LEVEL1/L1B Brightness Temperatures (TB)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l1-tb-1001</code></td>
+<td>—</td>
+<td><code>25001001</code></td>
+<td>AQUA — LEVEL1/L1R Brightness Temperatures (TB)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-clw</code></td>
+<td>—</td>
+<td><code>25002001</code></td>
+<td>AQUA — LEVEL2/L2 Cloud Liquid Water (CLW)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-prc</code></td>
+<td>—</td>
+<td><code>25002003</code></td>
+<td>AQUA — LEVEL2/L2 Precipitation (PRC)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-prc-2002</code></td>
+<td>—</td>
+<td><code>25002002</code></td>
+<td>AQUA — LEVEL2/L2 Precipitation (PRC)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-sic</code></td>
+<td>—</td>
+<td><code>25002006</code></td>
+<td>AQUA — LEVEL2/L2 Sea Ice Concentration (SIC)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-smc</code></td>
+<td>—</td>
+<td><code>25002007</code></td>
+<td>AQUA — LEVEL2/L2 Soil Moisture Content (SMC)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-snd</code></td>
+<td>—</td>
+<td><code>25002008</code></td>
+<td>AQUA — LEVEL2/L2 Snow Depth (SND)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-sst</code></td>
+<td>—</td>
+<td><code>25002004</code></td>
+<td>AQUA — LEVEL2/L2 Sea Surface Temperature (SST)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-ssw</code></td>
+<td>—</td>
+<td><code>25002005</code></td>
+<td>AQUA — LEVEL2/L2 Sea Surface Wind speed (SSW)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l2-tpw</code></td>
+<td>—</td>
+<td><code>25002000</code></td>
+<td>AQUA — LEVEL2/L2 Total Precipitable Water (TPW)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1</code></td>
+<td>—</td>
+<td><code>25003001</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Total Precipitable Water (TPW)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3000</code></td>
+<td>—</td>
+<td><code>25003000</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Total Precipitable Water (TPW)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3002</code></td>
+<td>—</td>
+<td><code>25003002</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Cloud Liquid Water (CLW)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3003</code></td>
+<td>—</td>
+<td><code>25003003</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Cloud Liquid Water (CLW)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3004</code></td>
+<td>—</td>
+<td><code>25003004</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Precipitation (PRC)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3005</code></td>
+<td>—</td>
+<td><code>25003005</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Precipitation (PRC)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3006</code></td>
+<td>—</td>
+<td><code>25003006</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Sea Surface Temperature (SST)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3007</code></td>
+<td>—</td>
+<td><code>25003007</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Sea Surface Temperature (SST)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3008</code></td>
+<td>—</td>
+<td><code>25003008</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Sea Surface Wind speed (SSW)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3009</code></td>
+<td>—</td>
+<td><code>25003009</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Sea Surface Wind speed (SSW)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3010</code></td>
+<td>—</td>
+<td><code>25003010</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Sea Ice Concentration (SIC)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3011</code></td>
+<td>—</td>
+<td><code>25003011</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Sea Ice Concentration (SIC)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3012</code></td>
+<td>—</td>
+<td><code>25003012</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Soil Moisture Content (SMC)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3013</code></td>
+<td>—</td>
+<td><code>25003013</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Soil Moisture Content (SMC)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3014</code></td>
+<td>—</td>
+<td><code>25003014</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Snow Depth (SND)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3015</code></td>
+<td>—</td>
+<td><code>25003015</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Snow Depth (SND)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3016</code></td>
+<td>—</td>
+<td><code>25003016</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 6GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3017</code></td>
+<td>—</td>
+<td><code>25003017</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 6GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3018</code></td>
+<td>—</td>
+<td><code>25003018</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 10GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3019</code></td>
+<td>—</td>
+<td><code>25003019</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 10GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3020</code></td>
+<td>—</td>
+<td><code>25003020</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 18GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3021</code></td>
+<td>—</td>
+<td><code>25003021</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 18GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3022</code></td>
+<td>—</td>
+<td><code>25003022</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 23GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3023</code></td>
+<td>—</td>
+<td><code>25003023</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 23GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3024</code></td>
+<td>—</td>
+<td><code>25003024</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 36GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3025</code></td>
+<td>—</td>
+<td><code>25003025</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 36GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3026</code></td>
+<td>—</td>
+<td><code>25003026</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 89GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-1-3027</code></td>
+<td>—</td>
+<td><code>25003027</code></td>
+<td>AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 89GHz (TB)(0.1°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25</code></td>
+<td>—</td>
+<td><code>25003029</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Total Precipitable Water (TPW)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3028</code></td>
+<td>—</td>
+<td><code>25003028</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Total Precipitable Water (TPW)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3030</code></td>
+<td>—</td>
+<td><code>25003030</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Cloud Liquid Water (CLW)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3031</code></td>
+<td>—</td>
+<td><code>25003031</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Cloud Liquid Water (CLW)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3032</code></td>
+<td>—</td>
+<td><code>25003032</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Precipitation (PRC)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3033</code></td>
+<td>—</td>
+<td><code>25003033</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Precipitation (PRC)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3034</code></td>
+<td>—</td>
+<td><code>25003034</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Sea Surface Temperature (SST)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3035</code></td>
+<td>—</td>
+<td><code>25003035</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Sea Surface Temperature (SST)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3036</code></td>
+<td>—</td>
+<td><code>25003036</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Sea Surface Wind speed (SSW)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3037</code></td>
+<td>—</td>
+<td><code>25003037</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Sea Surface Wind speed (SSW)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3038</code></td>
+<td>—</td>
+<td><code>25003038</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Sea Ice Concentration (SIC)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3039</code></td>
+<td>—</td>
+<td><code>25003039</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Sea Ice Concentration (SIC)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3040</code></td>
+<td>—</td>
+<td><code>25003040</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Soil Moisture Content (SMC)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3041</code></td>
+<td>—</td>
+<td><code>25003041</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Soil Moisture Content (SMC)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3042</code></td>
+<td>—</td>
+<td><code>25003042</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Snow Depth (SND)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3043</code></td>
+<td>—</td>
+<td><code>25003043</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Snow Depth (SND)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3044</code></td>
+<td>—</td>
+<td><code>25003044</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 6GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3045</code></td>
+<td>—</td>
+<td><code>25003045</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 6GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3046</code></td>
+<td>—</td>
+<td><code>25003046</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 10GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3047</code></td>
+<td>—</td>
+<td><code>25003047</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 10GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3048</code></td>
+<td>—</td>
+<td><code>25003048</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 18GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3049</code></td>
+<td>—</td>
+<td><code>25003049</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 18GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3050</code></td>
+<td>—</td>
+<td><code>25003050</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 23GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3051</code></td>
+<td>—</td>
+<td><code>25003051</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 23GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3052</code></td>
+<td>—</td>
+<td><code>25003052</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 36GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3053</code></td>
+<td>—</td>
+<td><code>25003053</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 36GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3054</code></td>
+<td>—</td>
+<td><code>25003054</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 89GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-amsr2format-l3-0-25-3055</code></td>
+<td>—</td>
+<td><code>25003055</code></td>
+<td>AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 89GHz (TB)(0.25°)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l1-l1b-brightness-temperature</code></td>
+<td>—</td>
+<td><code>24001001</code></td>
+<td>AQUA — LEVEL1/L1B Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l2-ap</code></td>
+<td>—</td>
+<td><code>24002002</code></td>
+<td>AQUA — LEVEL2/L2 Amount of Precipitation (AP)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l2-clw</code></td>
+<td>—</td>
+<td><code>24002001</code></td>
+<td>AQUA — LEVEL2/L2 Cloud Liquid Water (CLW)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l2-ic</code></td>
+<td>—</td>
+<td><code>24002005</code></td>
+<td>AQUA — LEVEL2/L2 Ice Concentration (IC)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l2-sm</code></td>
+<td>—</td>
+<td><code>24002006</code></td>
+<td>AQUA — LEVEL2/L2 Soil Moisture (SM)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l2-sst</code></td>
+<td>—</td>
+<td><code>24002004</code></td>
+<td>AQUA — LEVEL2/L2 Sea Surface Temperature (SST)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l2-ssw</code></td>
+<td>—</td>
+<td><code>24002003</code></td>
+<td>AQUA — LEVEL2/L2 Sea SurfaceWind Speed (SSW)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l2-swe</code></td>
+<td>—</td>
+<td><code>24002007</code></td>
+<td>AQUA — LEVEL2/L2 Snow Water Equivalence (SWE)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l2-wv</code></td>
+<td>—</td>
+<td><code>24002000</code></td>
+<td>AQUA — LEVEL2/L2 Water Vapor (WV)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-ap</code></td>
+<td>—</td>
+<td><code>24003002</code></td>
+<td>AQUA — LEVEL3/L3 Amount of Precipitation (AP)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-clw</code></td>
+<td>—</td>
+<td><code>24003001</code></td>
+<td>AQUA — LEVEL3/L3 Cloud Liquid Water (CLW)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-ic</code></td>
+<td>—</td>
+<td><code>24003005</code></td>
+<td>AQUA — LEVEL3/L3 Ice Concentration (IC)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-sm</code></td>
+<td>—</td>
+<td><code>24003006</code></td>
+<td>AQUA — LEVEL3/L3 Soid Moisture (SM)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-sst</code></td>
+<td>—</td>
+<td><code>24003004</code></td>
+<td>AQUA — LEVEL3/L3 Sea Surface Temperature (SST)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-ssw</code></td>
+<td>—</td>
+<td><code>24003003</code></td>
+<td>AQUA — LEVEL3/L3 Sea SurfaceWind Speed (SSW)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-swe</code></td>
+<td>—</td>
+<td><code>24003007</code></td>
+<td>AQUA — LEVEL3/L3 Snow Water Equivalence (SWE)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb10ghz-h</code></td>
+<td>—</td>
+<td><code>24003011</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 10GHz-H (TB10GHz_H)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb10ghz-v</code></td>
+<td>—</td>
+<td><code>24003010</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 10GHz-V (TB10GHz_V)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb18ghz-h</code></td>
+<td>—</td>
+<td><code>24003013</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 18GHz-H (TB18GHz_H)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb18ghz-v</code></td>
+<td>—</td>
+<td><code>24003012</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 18GHz-V (TB18GHz_V)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb23ghz-h</code></td>
+<td>—</td>
+<td><code>24003015</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 23GHz-H (TB23GHz_H)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb23ghz-v</code></td>
+<td>—</td>
+<td><code>24003014</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 23GHz-V (TB23GHz_V)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb36ghz-h</code></td>
+<td>—</td>
+<td><code>24003017</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 36GHz-H (TB36GHz_H)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb36ghz-v</code></td>
+<td>—</td>
+<td><code>24003016</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 36GHz-V (TB36GHz_V)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb6ghz-h</code></td>
+<td>—</td>
+<td><code>24003009</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 6GHz-H (TB6GHz_H)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb6ghz-v</code></td>
+<td>—</td>
+<td><code>24003008</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 6GHz-V (TB6GHz_V)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb89ghz-h</code></td>
+<td>—</td>
+<td><code>24003019</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 89GHz-H (TB89GHz_H)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-tb89ghz-v</code></td>
+<td>—</td>
+<td><code>24003018</code></td>
+<td>AQUA — LEVEL3/L3 Brightness Temperature 89GHz-V (TB89GHz_V)</td>
+</tr>
+<tr>
+<td><code>aqua-amsr-e-l3-wv</code></td>
+<td>—</td>
+<td><code>24003000</code></td>
+<td>AQUA — LEVEL3/L3 Water Vapor (WV)</td>
+</tr>
+<tr>
+<td><code>circ-alos-2-alos-2-circ-l1-rad</code></td>
+<td>—</td>
+<td><code>21001000</code></td>
+<td>CIRC — ALOS-2 CIRC L1 RAD</td>
+</tr>
+<tr>
+<td><code>circ-alos-2-alos-2-circ-lst</code></td>
+<td>—</td>
+<td><code>21001001</code></td>
+<td>CIRC — ALOS-2 CIRC LST</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l1-atl-nom</code></td>
+<td>—</td>
+<td><code>16011000</code></td>
+<td>EarthCARE — LEVEL1/L1b Backscatter Coefficient（ATL_NOM）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l2-atl-aer</code></td>
+<td>—</td>
+<td><code>16012002</code></td>
+<td>EarthCARE — LEVEL2/Aerosol Profiles（ATL_AER）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l2-atl-af</code></td>
+<td>—</td>
+<td><code>16012001</code></td>
+<td>EarthCARE — LEVEL2/Feature Mask（ATL_AF_）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l2-atl-ald</code></td>
+<td>—</td>
+<td><code>16012007</code></td>
+<td>EarthCARE — LEVEL2/Aerosol Layer Descriptor（ATL_ALD）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l2-atl-cla</code></td>
+<td>—</td>
+<td><code>16012000</code></td>
+<td>EarthCARE — LEVEL2/Cloud and Aerosol（ATL_CLA）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l2-atl-cth</code></td>
+<td>—</td>
+<td><code>16012006</code></td>
+<td>EarthCARE — LEVEL2/Cloud Top Height（ATL_CTH）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l2-atl-ebd</code></td>
+<td>—</td>
+<td><code>16012003</code></td>
+<td>EarthCARE — LEVEL2/Extinction, Backscatter, Depolarisation（ATL_EBD）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l2-atl-ice</code></td>
+<td>—</td>
+<td><code>16012005</code></td>
+<td>EarthCARE — LEVEL2/Ice Cloud Properties（ATL_ICE）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-l2-atl-tc</code></td>
+<td>—</td>
+<td><code>16012004</code></td>
+<td>EarthCARE — LEVEL2/Target Classification（ATL_TC_）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-msi-bbr-l2-bm-flx</code></td>
+<td>—</td>
+<td><code>16082001</code></td>
+<td>EarthCARE — LEVEL2/BBR-estimated TOA fluxes (BM__FLX)</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-msi-l2-am-acd</code></td>
+<td>—</td>
+<td><code>16072001</code></td>
+<td>EarthCARE — LEVEL2/Aerosol column descriptor（AM__ACD）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-msi-l2-am-cth</code></td>
+<td>—</td>
+<td><code>16072000</code></td>
+<td>EarthCARE — LEVEL2/Cloud top height（AM__CTH）</td>
+</tr>
+<tr>
+<td><code>earthcare-atlid-msi-l2-am-mo</code></td>
+<td>—</td>
+<td><code>16082000</code></td>
+<td>EarthCARE — LEVEL2/Merged observations（AM_MO_）</td>
+</tr>
+<tr>
+<td><code>earthcare-bbr-l1-bbr-nom</code></td>
+<td>—</td>
+<td><code>16031000</code></td>
+<td>EarthCARE — LEVEL1/L1b Radiometric（BBR_NOM）</td>
+</tr>
+<tr>
+<td><code>earthcare-bbr-msi-l2-bm-rad</code></td>
+<td>—</td>
+<td><code>16092000</code></td>
+<td>EarthCARE — LEVEL2/BBR unfiltered radiances（BM__RAD）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-l2-ac-clp</code></td>
+<td>—</td>
+<td><code>16042000</code></td>
+<td>EarthCARE — LEVEL2/CPR-ATLID Synergy Cloud（AC__CLP）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-l2-ac-tc</code></td>
+<td>—</td>
+<td><code>16042001</code></td>
+<td>EarthCARE — LEVEL2/CPR-ATLID target classification (AC__TC_)</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-msi-bbr-l2-all-3d</code></td>
+<td>—</td>
+<td><code>16052004</code></td>
+<td>EarthCARE — LEVEL2/Constructed 3D scene indecees（ALL_3D_）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-msi-bbr-l2-all-df</code></td>
+<td>—</td>
+<td><code>16062001</code></td>
+<td>EarthCARE — LEVEL2/Difference 1D-Modelled and BBR-Estimated TOA Fluxes（ALL_DF_）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-msi-bbr-l2-all-rad</code></td>
+<td>—</td>
+<td><code>16062000</code></td>
+<td>EarthCARE — LEVEL2/Four Sensors Synergy Radiation Budget（ALL_RAD）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-msi-l2-acm-cap</code></td>
+<td>—</td>
+<td><code>16052002</code></td>
+<td>EarthCARE — LEVEL2/Cloud and precipitation best estimates（ACM_CAP）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-msi-l2-acm-clp</code></td>
+<td>—</td>
+<td><code>16052000</code></td>
+<td>EarthCARE — LEVEL2/CPR-ATLID-MSI Synergy Cloud（ACM_CLP）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-msi-l2-acm-com</code></td>
+<td>—</td>
+<td><code>16052003</code></td>
+<td>EarthCARE — LEVEL2/Composite cloud /aerosol profiles derived from L2a（ACM_COM）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-atlid-msi-l2-acm-rt</code></td>
+<td>—</td>
+<td><code>16052001</code></td>
+<td>EarthCARE — LEVEL2/Radiative flux and heating rate profiles &amp; TOA (ACM_RT)</td>
 </tr>
 <tr>
 <td><code>earthcare-cpr-eco</code></td>
 <td><code>earthcare</code>, <code>cpr</code></td>
 <td><code>16002000</code></td>
-<td>EarthCARE/CPR L2 Echo Product (CPR_ECO).</td>
+<td>EarthCARE — LEVEL2/Echo Product（CPR_ECO）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-l1-cpr-nom</code></td>
+<td>—</td>
+<td><code>16001000</code></td>
+<td>EarthCARE — LEVEL1/CPR L1b（CPR_NOM）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-l2-cpr-cd</code></td>
+<td>—</td>
+<td><code>16002003</code></td>
+<td>EarthCARE — LEVEL2/Corrected CPR Doppler Measurements（CPR_CD_）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-l2-cpr-cld</code></td>
+<td>—</td>
+<td><code>16002005</code></td>
+<td>EarthCARE — LEVEL2/Cloud profiles（CPR_CLD）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-l2-cpr-clp</code></td>
+<td>—</td>
+<td><code>16002001</code></td>
+<td>EarthCARE — LEVEL2/Cloud Product（CPR_CLP）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-l2-cpr-fmr</code></td>
+<td>—</td>
+<td><code>16002002</code></td>
+<td>EarthCARE — LEVEL2/Feature Mask and Corrected Reflectivity（CPR_FMR）</td>
+</tr>
+<tr>
+<td><code>earthcare-cpr-l2-cpr-tc</code></td>
+<td>—</td>
+<td><code>16002004</code></td>
+<td>EarthCARE — LEVEL2/Target Classification（CPR_TC_）</td>
+</tr>
+<tr>
+<td><code>earthcare-msi-l1-msi-nom-1b</code></td>
+<td>—</td>
+<td><code>16021000</code></td>
+<td>EarthCARE — LEVEL1/L1b Radiance（MSI_NOM_1B）</td>
+</tr>
+<tr>
+<td><code>earthcare-msi-l1-msi-rgr-1c</code></td>
+<td>—</td>
+<td><code>16021001</code></td>
+<td>EarthCARE — LEVEL1/L1c Radiance（MSI_RGR_1C）</td>
+</tr>
+<tr>
+<td><code>earthcare-msi-l2-msi-aot</code></td>
+<td>—</td>
+<td><code>16022003</code></td>
+<td>EarthCARE — LEVEL2/Aerosol Optical Thickness （MSI_AOT）</td>
+</tr>
+<tr>
+<td><code>earthcare-msi-l2-msi-clp</code></td>
+<td>—</td>
+<td><code>16022000</code></td>
+<td>EarthCARE — LEVEL2/Cloud Product（MSI_CLP）</td>
+</tr>
+<tr>
+<td><code>earthcare-msi-l2-msi-cm</code></td>
+<td>—</td>
+<td><code>16022001</code></td>
+<td>EarthCARE — LEVEL2/Cloud Mask （MSI_CM_）</td>
+</tr>
+<tr>
+<td><code>earthcare-msi-l2-msi-cop</code></td>
+<td>—</td>
+<td><code>16022002</code></td>
+<td>EarthCARE — LEVEL2/Cloud Microphysical Parameters（MSI_COP）</td>
+</tr>
+<tr>
+<td><code>earthcare-supprt-data-aux-2d</code></td>
+<td>—</td>
+<td><code>16104000</code></td>
+<td>EarthCARE — Environment Auxiliary（AUX_2D_）</td>
+</tr>
+<tr>
+<td><code>earthcare-supprt-data-aux-3d</code></td>
+<td>—</td>
+<td><code>16104001</code></td>
+<td>EarthCARE — Environment Auxiliary（AUX_3D_）</td>
+</tr>
+<tr>
+<td><code>earthcare-supprt-data-x-jsg</code></td>
+<td>—</td>
+<td><code>16101000</code></td>
+<td>EarthCARE — L1d Joint Standard Grid (X-JSG)</td>
 </tr>
 <tr>
 <td><code>gosat-gw-amsr3-l1b</code></td>
 <td><code>gosat-gw</code>, <code>amsr3</code></td>
 <td><code>31001001</code></td>
-<td>GOSAT-GW/AMSR3 L1B brightness temperatures (TBB).</td>
+<td>GOSAT-GW/AMSR3 — L1B - Brightness Temperature (TBB)</td>
 </tr>
 <tr>
 <td><code>gpm-dpr-kupr-l1b</code></td>
 <td><code>gpm</code>, <code>dpr</code>, <code>kupr</code></td>
 <td><code>12001000</code></td>
-<td>GPM/DPR KuPR L1B received power.</td>
+<td>GPM — LEVEL1/KuPR L1B Received Power</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l1-kapr-l1b-received-power</code></td>
+<td>—</td>
+<td><code>12001001</code></td>
+<td>GPM — LEVEL1/KaPR L1B Received Power</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l2-dpr-l2-precipitation</code></td>
+<td>—</td>
+<td><code>12002002</code></td>
+<td>GPM — LEVEL2/DPR L2 Precipitation</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l2-dpr-l2-spectral-latent-heating</code></td>
+<td>—</td>
+<td><code>12002003</code></td>
+<td>GPM — LEVEL2/DPR L2 Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l2-kapr-l2-precipitation</code></td>
+<td>—</td>
+<td><code>12002001</code></td>
+<td>GPM — LEVEL2/KaPR L2 Precipitation</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l2-kupr-l2-precipitation</code></td>
+<td>—</td>
+<td><code>12002000</code></td>
+<td>GPM — LEVEL2/KuPR L2 Precipitation</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l3-daily-hdf</code></td>
+<td>—</td>
+<td><code>12003000</code></td>
+<td>GPM — LEVEL3/DPR L3 Precipitation (Daily HDF)</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l3-daily-text</code></td>
+<td>—</td>
+<td><code>12003001</code></td>
+<td>GPM — LEVEL3/DPR L3 Precipitation (Daily TEXT)</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l3-dpr-l3-gridded-orbital-spectra</code></td>
+<td>—</td>
+<td><code>12003006</code></td>
+<td>GPM — LEVEL3/DPR L3 Gridded Orbital Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l3-dpr-l3-monthly-spectral-latent</code></td>
+<td>—</td>
+<td><code>12003007</code></td>
+<td>GPM — LEVEL3/DPR L3 Monthly Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>gpm-dpr-l3-monthly-hdf</code></td>
+<td>—</td>
+<td><code>12003004</code></td>
+<td>GPM — LEVEL3/DPR L3  Precipitation (Monthly HDF)</td>
+</tr>
+<tr>
+<td><code>gpm-environment-auxiliary-dpr-environment-auxiliary</code></td>
+<td>—</td>
+<td><code>12032002</code></td>
+<td>GPM — DPR Environment Auxiliary</td>
+</tr>
+<tr>
+<td><code>gpm-environment-auxiliary-kapr-environment-auxiliary</code></td>
+<td>—</td>
+<td><code>12032001</code></td>
+<td>GPM — KaPR Environment Auxiliary</td>
+</tr>
+<tr>
+<td><code>gpm-environment-auxiliary-kupr-environment-auxiliary</code></td>
+<td>—</td>
+<td><code>12032000</code></td>
+<td>GPM — KuPR Environment Auxiliary</td>
+</tr>
+<tr>
+<td><code>gpm-gmi-comb-l2-comb-l2-precipitation</code></td>
+<td>—</td>
+<td><code>12022000</code></td>
+<td>GPM — LEVEL2/COMB L2 Precipitation</td>
+</tr>
+<tr>
+<td><code>gpm-gmi-comb-l3-comb-dpr-gmi-l3-precipitation</code></td>
+<td>—</td>
+<td><code>12023000</code></td>
+<td>GPM — LEVEL3/Comb DPR/GMI L3 Precipitation</td>
+</tr>
+<tr>
+<td><code>gpm-gmi-comb-l3-comb-l3-gridded-orbital-spectr</code></td>
+<td>—</td>
+<td><code>12023001</code></td>
+<td>GPM — LEVEL3/COMB L3 Gridded Orbital Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>gpm-gmi-comb-l3-comb-l3-monthly-spectral-laten</code></td>
+<td>—</td>
+<td><code>12023002</code></td>
+<td>GPM — LEVEL3/COMB L3 Monthly Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>gpm-gmi-l1-gmi-l1b-brightness-temperature</code></td>
+<td>—</td>
+<td><code>12011000</code></td>
+<td>GPM — LEVEL1/GMI L1B Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpm-gmi-l1-gmi-l1c-inter-calibrated-brigh</code></td>
+<td>—</td>
+<td><code>12011001</code></td>
+<td>GPM — LEVEL1/GMI L1C Inter- Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpm-gmi-l2-gmi-l2-precipitation</code></td>
+<td>—</td>
+<td><code>12012000</code></td>
+<td>GPM — LEVEL2/GMI L2 Precipitation</td>
+</tr>
+<tr>
+<td><code>gpm-gmi-l3-gmi-l3-precipitation</code></td>
+<td>—</td>
+<td><code>12013000</code></td>
+<td>GPM — LEVEL3/GMI L3 Precipitation</td>
+</tr>
+<tr>
+<td><code>gpmc-amsr2-l1-gcom-w-amsr2-l1c-inter-calibra</code></td>
+<td>—</td>
+<td><code>13011000</code></td>
+<td>GPM Constellation satellites — LEVEL1/GCOM-W AMSR2 L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-atms-l1-npp-atms-l1c-inter-calibrated</code></td>
+<td>—</td>
+<td><code>13041000</code></td>
+<td>GPM Constellation satellites — LEVEL1/NPP ATMS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-mhs-l1-metop-a-mhs-l1c-inter-calibrat</code></td>
+<td>—</td>
+<td><code>13031002</code></td>
+<td>GPM Constellation satellites — LEVEL1/METOP-A MHS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-mhs-l1-metop-b-mhs-l1c-inter-calibrat</code></td>
+<td>—</td>
+<td><code>13031003</code></td>
+<td>GPM Constellation satellites — LEVEL1/METOP-B MHS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-mhs-l1-noaa-18-mhs-l1c-inter-calibrat</code></td>
+<td>—</td>
+<td><code>13031000</code></td>
+<td>GPM Constellation satellites — LEVEL1/NOAA-18 MHS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-mhs-l1-noaa-19-mhs-l1c-inter-calibrat</code></td>
+<td>—</td>
+<td><code>13031001</code></td>
+<td>GPM Constellation satellites — LEVEL1/NOAA-19 MHS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-saphir-l1-megha-tropiques-saphir-l1c-int</code></td>
+<td>—</td>
+<td><code>13051000</code></td>
+<td>GPM Constellation satellites — LEVEL1/Megha Tropiques SAPHIR L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-ssmis-l1-dmsp-f16-ssmis-l1c-inter-calib</code></td>
+<td>—</td>
+<td><code>13021000</code></td>
+<td>GPM Constellation satellites — LEVEL1/DMSP F16 SSMIS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-ssmis-l1-dmsp-f17-ssmis-l1c-inter-calib</code></td>
+<td>—</td>
+<td><code>13021001</code></td>
+<td>GPM Constellation satellites — LEVEL1/DMSP F17 SSMIS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-ssmis-l1-dmsp-f18-ssmis-l1c-inter-calib</code></td>
+<td>—</td>
+<td><code>13021002</code></td>
+<td>GPM Constellation satellites — LEVEL1/DMSP F18 SSMIS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-ssmis-l1-dmsp-f19-ssmis-l1c-inter-calib</code></td>
+<td>—</td>
+<td><code>13021003</code></td>
+<td>GPM Constellation satellites — LEVEL1/DMSP F19 SSMIS L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gpmc-tmi-l1-trmm-tmi-l1c-inter-calibrated</code></td>
+<td>—</td>
+<td><code>13001000</code></td>
+<td>GPM Constellation satellites — LEVEL1/TRMM TMI L1C Inter-Calibrated Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>gsmap-gp-l3-hourly-hdf</code></td>
+<td>—</td>
+<td><code>14003000</code></td>
+<td>GSMaP — GSMaP Precipitation(Hourly HDF)</td>
+</tr>
+<tr>
+<td><code>gsmap-gp-l3-hourly-text</code></td>
+<td>—</td>
+<td><code>14003001</code></td>
+<td>GSMaP — GSMaP Precipitation(Hourly TEXT)</td>
+</tr>
+<tr>
+<td><code>gsmap-gp-l3-monthly-hdf</code></td>
+<td>—</td>
+<td><code>14003004</code></td>
+<td>GSMaP — GSMaP Precipitation(Monthly HDF)</td>
+</tr>
+<tr>
+<td><code>jers1-sar-l0</code></td>
+<td>—</td>
+<td><code>17020000</code></td>
+<td>JERS-1 — SAR/L0/SAR（L0)</td>
+</tr>
+<tr>
+<td><code>jers1-sar-l2-1-sar</code></td>
+<td>—</td>
+<td><code>17022000</code></td>
+<td>JERS-1 — SAR/L2.1/SAR</td>
+</tr>
+<tr>
+<td><code>jers1-swir-l2-swir</code></td>
+<td>—</td>
+<td><code>17012000</code></td>
+<td>JERS-1 — SWIR/L2/SWIR</td>
+</tr>
+<tr>
+<td><code>jers1-vnir-l2-vnir</code></td>
+<td>—</td>
+<td><code>17002000</code></td>
+<td>JERS-1 — VNIR/L2/VNIR</td>
+</tr>
+<tr>
+<td><code>mos1-messr-messr</code></td>
+<td>—</td>
+<td><code>19004000</code></td>
+<td>MOS-1 — MOS-1/MESSR</td>
+</tr>
+<tr>
+<td><code>mos1b-messr-messr</code></td>
+<td>—</td>
+<td><code>20004000</code></td>
+<td>MOS-1b — MOS-1b/MESSR</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-aerosol-5-min-l2-sw</code></td>
+<td>—</td>
+<td><code>28002002</code></td>
+<td>NASA-CMR — Level2/MODIS/Aqua Aerosol 5-Min L2 Swath 3km</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-aerosol-5-min-l2-sw-2003</code></td>
+<td>—</td>
+<td><code>28002003</code></td>
+<td>NASA-CMR — Level2/MODIS/Aqua Aerosol 5-Min L2 Swath 10km</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-aerosol-cloud-water</code></td>
+<td>—</td>
+<td><code>28003013</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water Vapor Ozone Daily L3 Global 1Deg CMG</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-aerosol-cloud-water-3014</code></td>
+<td>—</td>
+<td><code>28003014</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water Vapor Ozone 8-Day L3 Global 1Deg CMG</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-aerosol-cloud-water-3015</code></td>
+<td>—</td>
+<td><code>28003015</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water Vapor Ozone Monthly L3 Global 1Deg CMG</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-clouds-5-min-l2-swa</code></td>
+<td>—</td>
+<td><code>28002004</code></td>
+<td>NASA-CMR — Level2/MODIS/Aqua Clouds 5-Min L2 Swath 1km and 5km</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-land-surface-temper</code></td>
+<td>—</td>
+<td><code>28003000</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-land-surface-temper-3001</code></td>
+<td>—</td>
+<td><code>28003001</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity 8-Day L3 Global 1km SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-land-surface-temper-3002</code></td>
+<td>—</td>
+<td><code>28003002</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity Daily L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-land-surface-temper-3003</code></td>
+<td>—</td>
+<td><code>28003003</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity 8-Day L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-land-surface-temper-3004</code></td>
+<td>—</td>
+<td><code>28003004</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-sea-surface-tempera</code></td>
+<td>—</td>
+<td><code>28002000</code></td>
+<td>NASA-CMR — Level2/MODIS/Aqua Sea Surface Temperature L2</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-sea-surface-tempera-3011</code></td>
+<td>—</td>
+<td><code>28003011</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Sea Surface Temperature L3 Monthly</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-snow-cover-8-day-l3</code></td>
+<td>—</td>
+<td><code>28003017</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Snow Cover 8-Day L3 Global 0.05Deg CMG V005</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-snow-cover-daily-l3</code></td>
+<td>—</td>
+<td><code>28003016</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Snow Cover Daily L3 Global 0.05Deg CMG V005</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-vegetation-indices</code></td>
+<td>—</td>
+<td><code>28003005</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day L3 Global 500m SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-vegetation-indices-3006</code></td>
+<td>—</td>
+<td><code>28003006</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day L3 Global 1km SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-vegetation-indices-3007</code></td>
+<td>—</td>
+<td><code>28003007</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Vegetation Indices Monthly L3 Global 1km SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-vegetation-indices-3008</code></td>
+<td>—</td>
+<td><code>28003008</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-vegetation-indices-3009</code></td>
+<td>—</td>
+<td><code>28003009</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Vegetation Indices Monthly L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modis-aqua-vegetation-indices-3010</code></td>
+<td>—</td>
+<td><code>28003010</code></td>
+<td>NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day L3 Global 250m SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modisa-l2-ocean-color</code></td>
+<td>—</td>
+<td><code>28002001</code></td>
+<td>NASA-CMR — Level2/MODISA_L2_Ocean Color</td>
+</tr>
+<tr>
+<td><code>nasacmr-aqua-modisa-l3m-chlorophyll-a</code></td>
+<td>—</td>
+<td><code>28003012</code></td>
+<td>NASA-CMR — Level3/MODISA_L3m_Chlorophyll-a</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-aerosol-5-min-l2-s</code></td>
+<td>—</td>
+<td><code>29002002</code></td>
+<td>NASA-CMR — Level2/MODIS/Terra Aerosol 5-Min L2 Swath 3km</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-aerosol-5-min-l2-s-2003</code></td>
+<td>—</td>
+<td><code>29002003</code></td>
+<td>NASA-CMR — Level2/MODIS/Terra Aerosol 5-Min L2 Swath 10km</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-aerosol-cloud-wate</code></td>
+<td>—</td>
+<td><code>29003013</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water Vapor Ozone Daily L3 Global 1Deg CMG</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-aerosol-cloud-wate-3014</code></td>
+<td>—</td>
+<td><code>29003014</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water Vapor Ozone 8-Day L3 Global 1Deg CMG</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-aerosol-cloud-wate-3015</code></td>
+<td>—</td>
+<td><code>29003015</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water Vapor Ozone Monthly L3 Global 1Deg CMG</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-clouds-5-min-l2-sw</code></td>
+<td>—</td>
+<td><code>29002004</code></td>
+<td>NASA-CMR — Level2/MODIS/Terra Clouds 5-Min L2 Swath 1km and 5km</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-land-surface-tempe</code></td>
+<td>—</td>
+<td><code>29003000</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-land-surface-tempe-3001</code></td>
+<td>—</td>
+<td><code>29003001</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity 8-Day L3 Global 1km SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-land-surface-tempe-3002</code></td>
+<td>—</td>
+<td><code>29003002</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-land-surface-tempe-3003</code></td>
+<td>—</td>
+<td><code>29003003</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity 8-Day L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-land-surface-tempe-3004</code></td>
+<td>—</td>
+<td><code>29003004</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-snow-cover-8-day-l</code></td>
+<td>—</td>
+<td><code>29003017</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Snow Cover 8-Day L3 Global 0.05Deg CMG V005</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-snow-cover-daily-l</code></td>
+<td>—</td>
+<td><code>29003016</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Snow Cover Daily L3 Global 0.05Deg CMG V005</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-vegetation-indices</code></td>
+<td>—</td>
+<td><code>29003005</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Vegetation Indices 16-Day L3 Global 500m SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-vegetation-indices-3006</code></td>
+<td>—</td>
+<td><code>29003006</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Vegetation Indices 16-Day L3 Global 1km SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-vegetation-indices-3007</code></td>
+<td>—</td>
+<td><code>29003007</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Vegetation Indices Monthly L3 Global 1km SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-vegetation-indices-3008</code></td>
+<td>—</td>
+<td><code>29003008</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Vegetation Indices 16-Day L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-vegetation-indices-3009</code></td>
+<td>—</td>
+<td><code>29003009</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Vegetation Indices Monthly L3 Global 0.05Deg CMG V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modis-terra-vegetation-indices-3010</code></td>
+<td>—</td>
+<td><code>29003010</code></td>
+<td>NASA-CMR — Level3/MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V006</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modist-l2-oc</code></td>
+<td>—</td>
+<td><code>29002001</code></td>
+<td>NASA-CMR — Level2/MODIST_L2_OC</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modist-l2-sst</code></td>
+<td>—</td>
+<td><code>29002000</code></td>
+<td>NASA-CMR — Level2/MODIST_L2_SST</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modist-l3m-chl</code></td>
+<td>—</td>
+<td><code>29003012</code></td>
+<td>NASA-CMR — Level3/MODIST_L3m_CHL</td>
+</tr>
+<tr>
+<td><code>nasacmr-terra-modist-l3m-sst</code></td>
+<td>—</td>
+<td><code>29003011</code></td>
+<td>NASA-CMR — Level3/MODIST_L3m_SST</td>
+</tr>
+<tr>
+<td><code>palsar2-fine-dp</code></td>
+<td>—</td>
+<td><code>27004007</code></td>
+<td>ALOS-2 — NA/Fine[10m] DP</td>
+</tr>
+<tr>
+<td><code>palsar2-fine-qp</code></td>
+<td>—</td>
+<td><code>27004008</code></td>
+<td>ALOS-2 — NA/Fine[10m] QP</td>
+</tr>
+<tr>
+<td><code>palsar2-fine-sp</code></td>
+<td>—</td>
+<td><code>27004006</code></td>
+<td>ALOS-2 — NA/Fine[10m] SP</td>
+</tr>
+<tr>
+<td><code>palsar2-hight-sensitive-dp</code></td>
+<td>—</td>
+<td><code>27004004</code></td>
+<td>ALOS-2 — NA/Hight-sensitive[6m] DP</td>
+</tr>
+<tr>
+<td><code>palsar2-hight-sensitive-qp</code></td>
+<td>—</td>
+<td><code>27004005</code></td>
+<td>ALOS-2 — NA/Hight-sensitive[6m] QP</td>
+</tr>
+<tr>
+<td><code>palsar2-hight-sensitive-sp</code></td>
+<td>—</td>
+<td><code>27004003</code></td>
+<td>ALOS-2 — NA/Hight-sensitive[6m] SP</td>
+</tr>
+<tr>
+<td><code>palsar2-scansar-14mhz-dp</code></td>
+<td>—</td>
+<td><code>27004010</code></td>
+<td>ALOS-2 — NA/ScanSAR<a href="14MHz">350㎞</a> DP</td>
+</tr>
+<tr>
+<td><code>palsar2-scansar-14mhz-sp</code></td>
+<td>—</td>
+<td><code>27004009</code></td>
+<td>ALOS-2 — NA/ScanSAR<a href="14MHz">350㎞</a> SP</td>
+</tr>
+<tr>
+<td><code>palsar2-scansar-28mhz-dp</code></td>
+<td>—</td>
+<td><code>27004012</code></td>
+<td>ALOS-2 — NA/ScanSAR<a href="28MHz">350㎞</a> DP</td>
+</tr>
+<tr>
+<td><code>palsar2-scansar-28mhz-sp</code></td>
+<td>—</td>
+<td><code>27004011</code></td>
+<td>ALOS-2 — NA/ScanSAR<a href="28MHz">350㎞</a> SP</td>
+</tr>
+<tr>
+<td><code>palsar2-scansar-sp</code></td>
+<td>—</td>
+<td><code>27004013</code></td>
+<td>ALOS-2 — NA/ScanSAR[490km] SP</td>
+</tr>
+<tr>
+<td><code>palsar2-scansardp</code></td>
+<td>—</td>
+<td><code>27004014</code></td>
+<td>ALOS-2 — NA/ScanSAR[490km]DP</td>
+</tr>
+<tr>
+<td><code>palsar2-spotlight-sp</code></td>
+<td>—</td>
+<td><code>27004000</code></td>
+<td>ALOS-2 — NA/Spotlight SP</td>
+</tr>
+<tr>
+<td><code>palsar2-ultra-fine-dp</code></td>
+<td>—</td>
+<td><code>27004002</code></td>
+<td>ALOS-2 — NA/Ultra-fine[3m] DP</td>
+</tr>
+<tr>
+<td><code>sgli-l1-swi-tir</code></td>
+<td>—</td>
+<td><code>10001002</code></td>
+<td>GCOM-C/SGLI — L1A-SWI &amp; TIR</td>
+</tr>
+<tr>
+<td><code>sgli-l1-swi-tir-1005</code></td>
+<td>—</td>
+<td><code>10001005</code></td>
+<td>GCOM-C/SGLI — L1B-SWI &amp; TIR</td>
+</tr>
+<tr>
+<td><code>sgli-l1-visible-near-infrared-pol</code></td>
+<td>—</td>
+<td><code>10001001</code></td>
+<td>GCOM-C/SGLI — L1A-Visible &amp; Near Infrared, POL</td>
+</tr>
+<tr>
+<td><code>sgli-l1-visible-near-infrared-pol-1004</code></td>
+<td>—</td>
+<td><code>10001004</code></td>
+<td>GCOM-C/SGLI — L1B-Visible &amp; Near Infrared, POL</td>
+</tr>
+<tr>
+<td><code>sgli-l1-visible-near-infrared-vnr</code></td>
+<td>—</td>
+<td><code>10001000</code></td>
+<td>GCOM-C/SGLI — L1A-Visible &amp; Near Infrared, VNR</td>
+</tr>
+<tr>
+<td><code>sgli-l1-visible-near-infrared-vnr-1003</code></td>
+<td>—</td>
+<td><code>10001003</code></td>
+<td>GCOM-C/SGLI — L1B-Visible &amp; Near Infrared, VNR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-arnp</code></td>
+<td>—</td>
+<td><code>10002079</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-ARNP</td>
+</tr>
+<tr>
+<td><code>sgli-l2-arnp-ver-2</code></td>
+<td>—</td>
+<td><code>10002060</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-ARNP Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-arnp-ver-2-2059</code></td>
+<td>—</td>
+<td><code>10002059</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-ARNP Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-arpl-ver-2</code></td>
+<td>—</td>
+<td><code>10002062</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-ARPL Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-arpl-ver-2-2061</code></td>
+<td>—</td>
+<td><code>10002061</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-ARPL Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-ar</code></td>
+<td>—</td>
+<td><code>10002080</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-ARNP</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-ar-2071</code></td>
+<td>—</td>
+<td><code>10002071</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-ARNP Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-ar-2072</code></td>
+<td>—</td>
+<td><code>10002072</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-ARNP Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-ar-2073</code></td>
+<td>—</td>
+<td><code>10002073</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-ARPL Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-ar-2074</code></td>
+<td>—</td>
+<td><code>10002074</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-ARPL Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-cl</code></td>
+<td>—</td>
+<td><code>10002068</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-CLFG</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-cl-2067</code></td>
+<td>—</td>
+<td><code>10002067</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-CLFG</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-cl-2069</code></td>
+<td>—</td>
+<td><code>10002069</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-CLPR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-cl-2070</code></td>
+<td>—</td>
+<td><code>10002070</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-CLPR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-lc</code></td>
+<td>—</td>
+<td><code>10002063</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-LCLR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-lt</code></td>
+<td>—</td>
+<td><code>10002066</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-lt-2064</code></td>
+<td>—</td>
+<td><code>10002064</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-atmosphere-global-l2-global-lt-2065</code></td>
+<td>—</td>
+<td><code>10002065</code></td>
+<td>GCOM-C/SGLI — Atmosphere global/L2 global-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-clfg</code></td>
+<td>—</td>
+<td><code>10002056</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-CLFG</td>
+</tr>
+<tr>
+<td><code>sgli-l2-clfg-2055</code></td>
+<td>—</td>
+<td><code>10002055</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-CLFG</td>
+</tr>
+<tr>
+<td><code>sgli-l2-clpr</code></td>
+<td>—</td>
+<td><code>10002058</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-CLPR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-clpr-2057</code></td>
+<td>—</td>
+<td><code>10002057</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L2-CLPR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-cryosphere-statistics-l2-stati</code></td>
+<td>—</td>
+<td><code>10002009</code></td>
+<td>GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SICE</td>
+</tr>
+<tr>
+<td><code>sgli-l2-cryosphere-statistics-l2-stati-2008</code></td>
+<td>—</td>
+<td><code>10002008</code></td>
+<td>GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SICE</td>
+</tr>
+<tr>
+<td><code>sgli-l2-cryosphere-statistics-l2-stati-2010</code></td>
+<td>—</td>
+<td><code>10002010</code></td>
+<td>GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SIST</td>
+</tr>
+<tr>
+<td><code>sgli-l2-cryosphere-statistics-l2-stati-2011</code></td>
+<td>—</td>
+<td><code>10002011</code></td>
+<td>GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SGSL</td>
+</tr>
+<tr>
+<td><code>sgli-l2-cryosphere-statistics-l2-stati-2077</code></td>
+<td>—</td>
+<td><code>10002077</code></td>
+<td>GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SALB</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-l2-agb</code></td>
+<td>—</td>
+<td><code>10002018</code></td>
+<td>GCOM-C/SGLI — Land area/L2-AGB</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-l2-lai</code></td>
+<td>—</td>
+<td><code>10002017</code></td>
+<td>GCOM-C/SGLI — Land area/L2-LAI</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-l2-lst</code></td>
+<td>—</td>
+<td><code>10002019</code></td>
+<td>GCOM-C/SGLI — Land area/L2-LST</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-l2-ltoa</code></td>
+<td>—</td>
+<td><code>10002014</code></td>
+<td>GCOM-C/SGLI — Land area/L2-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-l2-ltoa-2012</code></td>
+<td>—</td>
+<td><code>10002012</code></td>
+<td>GCOM-C/SGLI — Land area/L2-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-l2-ltoa-2013</code></td>
+<td>—</td>
+<td><code>10002013</code></td>
+<td>GCOM-C/SGLI — Land area/L2-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-l2-rsrf</code></td>
+<td>—</td>
+<td><code>10002015</code></td>
+<td>GCOM-C/SGLI — Land area/L2-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-l2-vgi</code></td>
+<td>—</td>
+<td><code>10002016</code></td>
+<td>GCOM-C/SGLI — Land area/L2-VGI</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis</code></td>
+<td>—</td>
+<td><code>10002022</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2020</code></td>
+<td>—</td>
+<td><code>10002020</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2021</code></td>
+<td>—</td>
+<td><code>10002021</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2023</code></td>
+<td>—</td>
+<td><code>10002023</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2024</code></td>
+<td>—</td>
+<td><code>10002024</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2025</code></td>
+<td>—</td>
+<td><code>10002025</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2026</code></td>
+<td>—</td>
+<td><code>10002026</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2027</code></td>
+<td>—</td>
+<td><code>10002027</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2028</code></td>
+<td>—</td>
+<td><code>10002028</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2029</code></td>
+<td>—</td>
+<td><code>10002029</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2030</code></td>
+<td>—</td>
+<td><code>10002030</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2031</code></td>
+<td>—</td>
+<td><code>10002031</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2032</code></td>
+<td>—</td>
+<td><code>10002032</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2033</code></td>
+<td>—</td>
+<td><code>10002033</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2034</code></td>
+<td>—</td>
+<td><code>10002034</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2035</code></td>
+<td>—</td>
+<td><code>10002035</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2036</code></td>
+<td>—</td>
+<td><code>10002036</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2037</code></td>
+<td>—</td>
+<td><code>10002037</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2038</code></td>
+<td>—</td>
+<td><code>10002038</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2039</code></td>
+<td>—</td>
+<td><code>10002039</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2040</code></td>
+<td>—</td>
+<td><code>10002040</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2041</code></td>
+<td>—</td>
+<td><code>10002041</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2042</code></td>
+<td>—</td>
+<td><code>10002042</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2043</code></td>
+<td>—</td>
+<td><code>10002043</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2044</code></td>
+<td>—</td>
+<td><code>10002044</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2045</code></td>
+<td>—</td>
+<td><code>10002045</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2046</code></td>
+<td>—</td>
+<td><code>10002046</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2047</code></td>
+<td>—</td>
+<td><code>10002047</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-NDVI</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2048</code></td>
+<td>—</td>
+<td><code>10002048</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-EVI</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2049</code></td>
+<td>—</td>
+<td><code>10002049</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-SDI</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2050</code></td>
+<td>—</td>
+<td><code>10002050</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-FPAR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2051</code></td>
+<td>—</td>
+<td><code>10002051</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-LAI</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2052</code></td>
+<td>—</td>
+<td><code>10002052</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-VRI</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2053</code></td>
+<td>—</td>
+<td><code>10002053</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-AGB</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2054</code></td>
+<td>—</td>
+<td><code>10002054</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-LST</td>
+</tr>
+<tr>
+<td><code>sgli-l2-land-area-statistics-l2-statis-2078</code></td>
+<td>—</td>
+<td><code>10002078</code></td>
+<td>GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l2-oceanic-sphere-l2-iwpr</code></td>
+<td>—</td>
+<td><code>10002001</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L2-IWPR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-oceanic-sphere-l2-nwlr</code></td>
+<td>—</td>
+<td><code>10002000</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L2-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-oceanic-sphere-l2-sst</code></td>
+<td>—</td>
+<td><code>10002002</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L2-SST</td>
+</tr>
+<tr>
+<td><code>sgli-l2-okid</code></td>
+<td>—</td>
+<td><code>10002003</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L2-OKID</td>
+</tr>
+<tr>
+<td><code>sgli-l2-sice</code></td>
+<td>—</td>
+<td><code>10002005</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L2-SICE</td>
+</tr>
+<tr>
+<td><code>sgli-l2-sice-2004</code></td>
+<td>—</td>
+<td><code>10002004</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L2-SICE</td>
+</tr>
+<tr>
+<td><code>sgli-l2-sipr</code></td>
+<td>—</td>
+<td><code>10002076</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L2-SIPR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-sipr-2075</code></td>
+<td>—</td>
+<td><code>10002075</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L2-SIPR</td>
+</tr>
+<tr>
+<td><code>sgli-l2-sipr-ver-2</code></td>
+<td>—</td>
+<td><code>10002007</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L2-SIPR ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l2-sipr-ver-2-2006</code></td>
+<td>—</td>
+<td><code>10002006</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L2-SIPR ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aael-ver-2</code></td>
+<td>—</td>
+<td><code>10003165</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AAEL Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aael-ver-2-3164</code></td>
+<td>—</td>
+<td><code>10003164</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AAEL Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aaeo-ver-2</code></td>
+<td>—</td>
+<td><code>10003163</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AAEO Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aaeo-ver-2-3162</code></td>
+<td>—</td>
+<td><code>10003162</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AAEO Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aaep-ver-2</code></td>
+<td>—</td>
+<td><code>10003169</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AAEP Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aaep-ver-2-3168</code></td>
+<td>—</td>
+<td><code>10003168</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AAEP Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aotl-ver-2</code></td>
+<td>—</td>
+<td><code>10003161</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AOTL Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aotl-ver-2-3160</code></td>
+<td>—</td>
+<td><code>10003160</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AOTL Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aoto-ver-2</code></td>
+<td>—</td>
+<td><code>10003159</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AOTO Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aoto-ver-2-3158</code></td>
+<td>—</td>
+<td><code>10003158</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AOTO Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aotp-ver-2</code></td>
+<td>—</td>
+<td><code>10003167</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AOTP Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-aotp-ver-2-3166</code></td>
+<td>—</td>
+<td><code>10003166</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AOTP Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-arae</code></td>
+<td>—</td>
+<td><code>10003175</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-ARAE</td>
+</tr>
+<tr>
+<td><code>sgli-l3-arae-3174</code></td>
+<td>—</td>
+<td><code>10003174</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-ARAE</td>
+</tr>
+<tr>
+<td><code>sgli-l3-arot</code></td>
+<td>—</td>
+<td><code>10003173</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AROT</td>
+</tr>
+<tr>
+<td><code>sgli-l3-arot-3172</code></td>
+<td>—</td>
+<td><code>10003172</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-AROT</td>
+</tr>
+<tr>
+<td><code>sgli-l3-assa</code></td>
+<td>—</td>
+<td><code>10003177</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-ASSA</td>
+</tr>
+<tr>
+<td><code>sgli-l3-assa-3176</code></td>
+<td>—</td>
+<td><code>10003176</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-ASSA</td>
+</tr>
+<tr>
+<td><code>sgli-l3-assa-ver-2</code></td>
+<td>—</td>
+<td><code>10003171</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-ASSA Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-assa-ver-2-3170</code></td>
+<td>—</td>
+<td><code>10003170</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-ASSA Ver.2</td>
+</tr>
+<tr>
+<td><code>sgli-l3-cerw</code></td>
+<td>—</td>
+<td><code>10003155</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CERW</td>
+</tr>
+<tr>
+<td><code>sgli-l3-cerw-3154</code></td>
+<td>—</td>
+<td><code>10003154</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CERW</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr</code></td>
+<td>—</td>
+<td><code>10003147</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3122</code></td>
+<td>—</td>
+<td><code>10003122</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3123</code></td>
+<td>—</td>
+<td><code>10003123</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3124</code></td>
+<td>—</td>
+<td><code>10003124</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3125</code></td>
+<td>—</td>
+<td><code>10003125</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3126</code></td>
+<td>—</td>
+<td><code>10003126</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3127</code></td>
+<td>—</td>
+<td><code>10003127</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3128</code></td>
+<td>—</td>
+<td><code>10003128</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3129</code></td>
+<td>—</td>
+<td><code>10003129</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3130</code></td>
+<td>—</td>
+<td><code>10003130</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3131</code></td>
+<td>—</td>
+<td><code>10003131</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3132</code></td>
+<td>—</td>
+<td><code>10003132</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3133</code></td>
+<td>—</td>
+<td><code>10003133</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3134</code></td>
+<td>—</td>
+<td><code>10003134</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3135</code></td>
+<td>—</td>
+<td><code>10003135</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3136</code></td>
+<td>—</td>
+<td><code>10003136</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3137</code></td>
+<td>—</td>
+<td><code>10003137</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3138</code></td>
+<td>—</td>
+<td><code>10003138</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3139</code></td>
+<td>—</td>
+<td><code>10003139</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3140</code></td>
+<td>—</td>
+<td><code>10003140</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3141</code></td>
+<td>—</td>
+<td><code>10003141</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3142</code></td>
+<td>—</td>
+<td><code>10003142</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3143</code></td>
+<td>—</td>
+<td><code>10003143</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3144</code></td>
+<td>—</td>
+<td><code>10003144</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3145</code></td>
+<td>—</td>
+<td><code>10003145</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clfr-3146</code></td>
+<td>—</td>
+<td><code>10003146</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLFR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clth</code></td>
+<td>—</td>
+<td><code>10003151</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLTH</td>
+</tr>
+<tr>
+<td><code>sgli-l3-clth-3150</code></td>
+<td>—</td>
+<td><code>10003150</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLTH</td>
+</tr>
+<tr>
+<td><code>sgli-l3-cltt</code></td>
+<td>—</td>
+<td><code>10003149</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLTT</td>
+</tr>
+<tr>
+<td><code>sgli-l3-cltt-3148</code></td>
+<td>—</td>
+<td><code>10003148</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-CLTT</td>
+</tr>
+<tr>
+<td><code>sgli-l3-coti</code></td>
+<td>—</td>
+<td><code>10003157</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-COTI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-coti-3156</code></td>
+<td>—</td>
+<td><code>10003156</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-COTI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-cotw</code></td>
+<td>—</td>
+<td><code>10003153</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-COTW</td>
+</tr>
+<tr>
+<td><code>sgli-l3-cotw-3152</code></td>
+<td>—</td>
+<td><code>10003152</code></td>
+<td>GCOM-C/SGLI — Atmosphere/L3-COTW</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-agb</code></td>
+<td>—</td>
+<td><code>10003117</code></td>
+<td>GCOM-C/SGLI — Land area/L3-AGB</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-agb-3116</code></td>
+<td>—</td>
+<td><code>10003116</code></td>
+<td>GCOM-C/SGLI — Land area/L3-AGB</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-evi</code></td>
+<td>—</td>
+<td><code>10003109</code></td>
+<td>GCOM-C/SGLI — Land area/L3-EVI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-evi-3108</code></td>
+<td>—</td>
+<td><code>10003108</code></td>
+<td>GCOM-C/SGLI — Land area/L3-EVI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-fpar</code></td>
+<td>—</td>
+<td><code>10003113</code></td>
+<td>GCOM-C/SGLI — Land area/L3-FPAR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-fpar-3112</code></td>
+<td>—</td>
+<td><code>10003112</code></td>
+<td>GCOM-C/SGLI — Land area/L3-FPAR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-lai</code></td>
+<td>—</td>
+<td><code>10003115</code></td>
+<td>GCOM-C/SGLI — Land area/L3-LAI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-lai-3114</code></td>
+<td>—</td>
+<td><code>10003114</code></td>
+<td>GCOM-C/SGLI — Land area/L3-LAI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-lst</code></td>
+<td>—</td>
+<td><code>10003121</code></td>
+<td>GCOM-C/SGLI — Land area/L3-LST</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-lst-3120</code></td>
+<td>—</td>
+<td><code>10003120</code></td>
+<td>GCOM-C/SGLI — Land area/L3-LST</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-ndvi</code></td>
+<td>—</td>
+<td><code>10003107</code></td>
+<td>GCOM-C/SGLI — Land area/L3-NDVI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-ndvi-3106</code></td>
+<td>—</td>
+<td><code>10003106</code></td>
+<td>GCOM-C/SGLI — Land area/L3-NDVI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf</code></td>
+<td>—</td>
+<td><code>10003105</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3040</code></td>
+<td>—</td>
+<td><code>10003040</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3041</code></td>
+<td>—</td>
+<td><code>10003041</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3042</code></td>
+<td>—</td>
+<td><code>10003042</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3043</code></td>
+<td>—</td>
+<td><code>10003043</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3044</code></td>
+<td>—</td>
+<td><code>10003044</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3045</code></td>
+<td>—</td>
+<td><code>10003045</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3046</code></td>
+<td>—</td>
+<td><code>10003046</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3047</code></td>
+<td>—</td>
+<td><code>10003047</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3048</code></td>
+<td>—</td>
+<td><code>10003048</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3049</code></td>
+<td>—</td>
+<td><code>10003049</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3050</code></td>
+<td>—</td>
+<td><code>10003050</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3051</code></td>
+<td>—</td>
+<td><code>10003051</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3052</code></td>
+<td>—</td>
+<td><code>10003052</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3053</code></td>
+<td>—</td>
+<td><code>10003053</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3054</code></td>
+<td>—</td>
+<td><code>10003054</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3055</code></td>
+<td>—</td>
+<td><code>10003055</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3056</code></td>
+<td>—</td>
+<td><code>10003056</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3057</code></td>
+<td>—</td>
+<td><code>10003057</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3058</code></td>
+<td>—</td>
+<td><code>10003058</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3059</code></td>
+<td>—</td>
+<td><code>10003059</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3060</code></td>
+<td>—</td>
+<td><code>10003060</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3061</code></td>
+<td>—</td>
+<td><code>10003061</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3062</code></td>
+<td>—</td>
+<td><code>10003062</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3063</code></td>
+<td>—</td>
+<td><code>10003063</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3064</code></td>
+<td>—</td>
+<td><code>10003064</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3065</code></td>
+<td>—</td>
+<td><code>10003065</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3066</code></td>
+<td>—</td>
+<td><code>10003066</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3067</code></td>
+<td>—</td>
+<td><code>10003067</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3068</code></td>
+<td>—</td>
+<td><code>10003068</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3069</code></td>
+<td>—</td>
+<td><code>10003069</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3070</code></td>
+<td>—</td>
+<td><code>10003070</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3071</code></td>
+<td>—</td>
+<td><code>10003071</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3072</code></td>
+<td>—</td>
+<td><code>10003072</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3073</code></td>
+<td>—</td>
+<td><code>10003073</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3074</code></td>
+<td>—</td>
+<td><code>10003074</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3075</code></td>
+<td>—</td>
+<td><code>10003075</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3076</code></td>
+<td>—</td>
+<td><code>10003076</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3077</code></td>
+<td>—</td>
+<td><code>10003077</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3078</code></td>
+<td>—</td>
+<td><code>10003078</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3079</code></td>
+<td>—</td>
+<td><code>10003079</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3080</code></td>
+<td>—</td>
+<td><code>10003080</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3081</code></td>
+<td>—</td>
+<td><code>10003081</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3082</code></td>
+<td>—</td>
+<td><code>10003082</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3083</code></td>
+<td>—</td>
+<td><code>10003083</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3084</code></td>
+<td>—</td>
+<td><code>10003084</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3085</code></td>
+<td>—</td>
+<td><code>10003085</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3086</code></td>
+<td>—</td>
+<td><code>10003086</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3087</code></td>
+<td>—</td>
+<td><code>10003087</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3088</code></td>
+<td>—</td>
+<td><code>10003088</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3089</code></td>
+<td>—</td>
+<td><code>10003089</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3090</code></td>
+<td>—</td>
+<td><code>10003090</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3091</code></td>
+<td>—</td>
+<td><code>10003091</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3092</code></td>
+<td>—</td>
+<td><code>10003092</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3093</code></td>
+<td>—</td>
+<td><code>10003093</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3094</code></td>
+<td>—</td>
+<td><code>10003094</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3095</code></td>
+<td>—</td>
+<td><code>10003095</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3096</code></td>
+<td>—</td>
+<td><code>10003096</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3097</code></td>
+<td>—</td>
+<td><code>10003097</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3098</code></td>
+<td>—</td>
+<td><code>10003098</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3099</code></td>
+<td>—</td>
+<td><code>10003099</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3100</code></td>
+<td>—</td>
+<td><code>10003100</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3101</code></td>
+<td>—</td>
+<td><code>10003101</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3102</code></td>
+<td>—</td>
+<td><code>10003102</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3103</code></td>
+<td>—</td>
+<td><code>10003103</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-rsrf-3104</code></td>
+<td>—</td>
+<td><code>10003104</code></td>
+<td>GCOM-C/SGLI — Land area/L3-RSRF</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-sdi</code></td>
+<td>—</td>
+<td><code>10003111</code></td>
+<td>GCOM-C/SGLI — Land area/L3-SDI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-sdi-3110</code></td>
+<td>—</td>
+<td><code>10003110</code></td>
+<td>GCOM-C/SGLI — Land area/L3-SDI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-vri</code></td>
+<td>—</td>
+<td><code>10003119</code></td>
+<td>GCOM-C/SGLI — Land area/L3-VRI</td>
+</tr>
+<tr>
+<td><code>sgli-l3-land-area-l3-vri-3118</code></td>
+<td>—</td>
+<td><code>10003118</code></td>
+<td>GCOM-C/SGLI — Land area/L3-VRI</td>
 </tr>
 <tr>
 <td><code>sgli-l3-nwlr</code></td>
 <td><code>sgli-l380</code>, <code>sgli-ocean-l380</code>, <code>gcom-c-nwlr</code></td>
 <td><code>10003001</code></td>
-<td>GCOM-C/SGLI L3 Normalized Water-Leaving Radiance (NWLR) — ocean.</td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-acp</code></td>
+<td>—</td>
+<td><code>10003017</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-ACP</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-acp-3014</code></td>
+<td>—</td>
+<td><code>10003014</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-ACP</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-acp-3015</code></td>
+<td>—</td>
+<td><code>10003015</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-ACP</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-acp-3016</code></td>
+<td>—</td>
+<td><code>10003016</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-ACP</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-cdom</code></td>
+<td>—</td>
+<td><code>10003025</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-CDOM</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-cdom-3024</code></td>
+<td>—</td>
+<td><code>10003024</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-CDOM</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-chla</code></td>
+<td>—</td>
+<td><code>10003021</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-CHLA</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-chla-3020</code></td>
+<td>—</td>
+<td><code>10003020</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-CHLA</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr</code></td>
+<td>—</td>
+<td><code>10003013</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3000</code></td>
+<td>—</td>
+<td><code>10003000</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3002</code></td>
+<td>—</td>
+<td><code>10003002</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3003</code></td>
+<td>—</td>
+<td><code>10003003</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3004</code></td>
+<td>—</td>
+<td><code>10003004</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3005</code></td>
+<td>—</td>
+<td><code>10003005</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3006</code></td>
+<td>—</td>
+<td><code>10003006</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3007</code></td>
+<td>—</td>
+<td><code>10003007</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3008</code></td>
+<td>—</td>
+<td><code>10003008</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3009</code></td>
+<td>—</td>
+<td><code>10003009</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3010</code></td>
+<td>—</td>
+<td><code>10003010</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3011</code></td>
+<td>—</td>
+<td><code>10003011</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-nwlr-3012</code></td>
+<td>—</td>
+<td><code>10003012</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-NWLR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-par</code></td>
+<td>—</td>
+<td><code>10003019</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-PAR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-par-3018</code></td>
+<td>—</td>
+<td><code>10003018</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-PAR</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-sst</code></td>
+<td>—</td>
+<td><code>10003027</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-SST</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-sst-3026</code></td>
+<td>—</td>
+<td><code>10003026</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-SST</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-tsm</code></td>
+<td>—</td>
+<td><code>10003023</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-TSM</td>
+</tr>
+<tr>
+<td><code>sgli-l3-oceanic-sphere-l3-tsm-3022</code></td>
+<td>—</td>
+<td><code>10003022</code></td>
+<td>GCOM-C/SGLI — Oceanic sphere/L3-TSM</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sgsl</code></td>
+<td>—</td>
+<td><code>10003039</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SGSL</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sgsl-3036</code></td>
+<td>—</td>
+<td><code>10003036</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SGSL</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sgsl-3037</code></td>
+<td>—</td>
+<td><code>10003037</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SGSL</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sgsl-3038</code></td>
+<td>—</td>
+<td><code>10003038</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SGSL</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sice</code></td>
+<td>—</td>
+<td><code>10003031</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SICE</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sice-3028</code></td>
+<td>—</td>
+<td><code>10003028</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SICE</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sice-3029</code></td>
+<td>—</td>
+<td><code>10003029</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SICE</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sice-3030</code></td>
+<td>—</td>
+<td><code>10003030</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SICE</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sist</code></td>
+<td>—</td>
+<td><code>10003035</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SIST</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sist-3032</code></td>
+<td>—</td>
+<td><code>10003032</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SIST</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sist-3033</code></td>
+<td>—</td>
+<td><code>10003033</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SIST</td>
+</tr>
+<tr>
+<td><code>sgli-l3-sist-3034</code></td>
+<td>—</td>
+<td><code>10003034</code></td>
+<td>GCOM-C/SGLI — Cryosphere/L3-SIST</td>
+</tr>
+<tr>
+<td><code>slats-shirop-panchromatic-image</code></td>
+<td>—</td>
+<td><code>30000000</code></td>
+<td>SLATS — Panchromatic Image</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l1-pr-received-power</code></td>
+<td>—</td>
+<td><code>18001000</code></td>
+<td>TRMM — LEVEL1/PR Received Power [1B21]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l1-pr-reflectivities</code></td>
+<td>—</td>
+<td><code>18001001</code></td>
+<td>TRMM — LEVEL1/PR Reflectivities [1C21]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l2-pr-qualitative</code></td>
+<td>—</td>
+<td><code>18002001</code></td>
+<td>TRMM — LEVEL2/PR Qualitative [2A23]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l2-pr-rainfall-profile</code></td>
+<td>—</td>
+<td><code>18002002</code></td>
+<td>TRMM — LEVEL2/PR Rainfall Profile [2A25]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l2-pr-spectral-latent-heating</code></td>
+<td>—</td>
+<td><code>18002003</code></td>
+<td>TRMM — LEVEL2/PR Spectral Latent Heating [2H25]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l2-pr-surface-cross-section</code></td>
+<td>—</td>
+<td><code>18002000</code></td>
+<td>TRMM — LEVEL2/PR Surface Cross Section [2A21]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l3-pr-gridded-orbital-spectral-la</code></td>
+<td>—</td>
+<td><code>18003002</code></td>
+<td>TRMM — LEVEL3/PR Gridded Orbital Spectral Latent Heating [3G25]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l3-pr-monthly-rainfall</code></td>
+<td>—</td>
+<td><code>18003000</code></td>
+<td>TRMM — LEVEL3/PR Monthly Rainfall [3A25]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l3-pr-monthly-spectral-latent-hea</code></td>
+<td>—</td>
+<td><code>18003003</code></td>
+<td>TRMM — LEVEL3/PR Monthly Spectral Latent Heating [3H25]</td>
+</tr>
+<tr>
+<td><code>trmm-pr-l3-pr-monthly-surface-rain</code></td>
+<td>—</td>
+<td><code>18003001</code></td>
+<td>TRMM — LEVEL3/PR Monthly Surface Rain [3A26]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-comb-l2-comb-convective-stratiform-hea</code></td>
+<td>—</td>
+<td><code>18032001</code></td>
+<td>TRMM — LEVEL2/COMB Convective Stratiform Heating [2H31]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-comb-l2-comb-rain-profile</code></td>
+<td>—</td>
+<td><code>18032000</code></td>
+<td>TRMM — LEVEL2/COMB Rain Profile [2B31]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-comb-l3-comb-gridded-orbital-convectiv</code></td>
+<td>—</td>
+<td><code>18033003</code></td>
+<td>TRMM — LEVEL3/COMB Gridded Orbital Convective Stratiform Heating [3G31]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-comb-l3-comb-gridded-orbital-convectiv-3001</code></td>
+<td>—</td>
+<td><code>15023001</code></td>
+<td>TRMM — LEVEL3/COMB Gridded Orbital Convective Stratiform Heating [3G31]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-comb-l3-comb-monthly-convective-strati</code></td>
+<td>—</td>
+<td><code>18033004</code></td>
+<td>TRMM — LEVEL3/COMB Monthly Convective Stratiform Heating [3H31]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-comb-l3-comb-monthly-rainfall</code></td>
+<td>—</td>
+<td><code>18033000</code></td>
+<td>TRMM — LEVEL3/COMB Monthly Rainfall [3B31]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-comb-l3-trmm-and-other-sensors-3-hourl</code></td>
+<td>—</td>
+<td><code>18033001</code></td>
+<td>TRMM — LEVEL3/TRMM and Other Sensors 3-Hourly Rainfall [342]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-comb-l3-trmm-and-other-sensors-monthly</code></td>
+<td>—</td>
+<td><code>18033002</code></td>
+<td>TRMM — LEVEL3/TRMM and Other Sensors Monthly Rainfall [3B43]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-l1-tmi-brightness-temperatures</code></td>
+<td>—</td>
+<td><code>18011000</code></td>
+<td>TRMM — LEVEL1/TMI Brightness Temperatures [1B11]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-l2-tmi-rainfall-profile</code></td>
+<td>—</td>
+<td><code>18012000</code></td>
+<td>TRMM — LEVEL2/TMI Rainfall Profile [2A12]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-l3-tmi-monthly-emisssion</code></td>
+<td>—</td>
+<td><code>18013000</code></td>
+<td>TRMM — LEVEL3/TMI Monthly Emisssion [3A11]</td>
+</tr>
+<tr>
+<td><code>trmm-tmi-l3-tmi-monthly-rainfall-profile</code></td>
+<td>—</td>
+<td><code>18013001</code></td>
+<td>TRMM — LEVEL3/TMI Monthly Rainfall Profile [3A12]</td>
+</tr>
+<tr>
+<td><code>trmm-virs-l1-virs-radiance</code></td>
+<td>—</td>
+<td><code>18021000</code></td>
+<td>TRMM — LEVEL1/VIRS Radiance [1B01]</td>
+</tr>
+<tr>
+<td><code>trmmgpm-environment-auxiliary-pr-environment-auxiliary</code></td>
+<td>—</td>
+<td><code>15042000</code></td>
+<td>TRMM_GPMFormat — PR Environment Auxiliary</td>
+</tr>
+<tr>
+<td><code>trmmgpm-pr-l1-pr-l1b-received-power</code></td>
+<td>—</td>
+<td><code>15001000</code></td>
+<td>TRMM_GPMFormat — LEVEL1/PR L1B Received Power</td>
+</tr>
+<tr>
+<td><code>trmmgpm-pr-l2-pr-l2-precipitation</code></td>
+<td>—</td>
+<td><code>15002000</code></td>
+<td>TRMM_GPMFormat — LEVEL2/PR L2 Precipitation</td>
+</tr>
+<tr>
+<td><code>trmmgpm-pr-l2-pr-l2-spectral-latent-heating</code></td>
+<td>—</td>
+<td><code>15002001</code></td>
+<td>TRMM_GPMFormat — LEVEL2/PR L2 Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>trmmgpm-pr-l3-daily-hdf</code></td>
+<td>—</td>
+<td><code>15003000</code></td>
+<td>TRMM_GPMFormat — LEVEL3/PR L3 Precipitation (Daily HDF)</td>
+</tr>
+<tr>
+<td><code>trmmgpm-pr-l3-daily-text</code></td>
+<td>—</td>
+<td><code>15003001</code></td>
+<td>TRMM_GPMFormat — LEVEL3/PR L3 Precipitation (Daily TEXT)</td>
+</tr>
+<tr>
+<td><code>trmmgpm-pr-l3-monthly-hdf</code></td>
+<td>—</td>
+<td><code>15003002</code></td>
+<td>TRMM_GPMFormat — LEVEL3/PR L3 Precipitation (Monthly HDF)</td>
+</tr>
+<tr>
+<td><code>trmmgpm-pr-l3-pr-l3-gridded-orbital-spectral</code></td>
+<td>—</td>
+<td><code>15003003</code></td>
+<td>TRMM_GPMFormat — LEVEL3/PR L3 Gridded Orbital Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>trmmgpm-pr-l3-pr-l3-monthly-spectral-latent</code></td>
+<td>—</td>
+<td><code>15003004</code></td>
+<td>TRMM_GPMFormat — LEVEL3/PR L3 Monthly Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>trmmgpm-tmi-comb-l2-comb-l2-precipitation</code></td>
+<td>—</td>
+<td><code>15022000</code></td>
+<td>TRMM_GPMFormat — LEVEL2/COMB L2 Precipitation</td>
+</tr>
+<tr>
+<td><code>trmmgpm-tmi-comb-l3-comb-l3-gridded-orbital-spectr</code></td>
+<td>—</td>
+<td><code>15023001</code></td>
+<td>TRMM_GPMFormat — LEVEL3/COMB L3 Gridded Orbital Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>trmmgpm-tmi-comb-l3-comb-l3-monthly-spectral-laten</code></td>
+<td>—</td>
+<td><code>15023002</code></td>
+<td>TRMM_GPMFormat — LEVEL3/COMB L3 Monthly Spectral Latent Heating</td>
+</tr>
+<tr>
+<td><code>trmmgpm-tmi-comb-l3-comb-l3-precipitation</code></td>
+<td>—</td>
+<td><code>15023000</code></td>
+<td>TRMM_GPMFormat — LEVEL3/COMB L3 Precipitation</td>
+</tr>
+<tr>
+<td><code>trmmgpm-tmi-l1-tmi-l1b-brightness-temperature</code></td>
+<td>—</td>
+<td><code>15011000</code></td>
+<td>TRMM_GPMFormat — LEVEL1/TMI L1B Brightness Temperature</td>
+</tr>
+<tr>
+<td><code>trmmgpm-tmi-l2-tmi-l2-precipitation</code></td>
+<td>—</td>
+<td><code>15012000</code></td>
+<td>TRMM_GPMFormat — LEVEL2/TMI L2 Precipitation</td>
+</tr>
+<tr>
+<td><code>trmmgpm-tmi-l3-tmi-l3-precipitation</code></td>
+<td>—</td>
+<td><code>15013000</code></td>
+<td>TRMM_GPMFormat — LEVEL3/TMI L3 Precipitation</td>
+</tr>
+<tr>
+<td><code>trmmgpm-virs-l1-virs-l1b-radiance</code></td>
+<td>—</td>
+<td><code>15031000</code></td>
+<td>TRMM_GPMFormat — LEVEL1/VIRS L1B Radiance</td>
 </tr>
 </tbody>
 </table>
