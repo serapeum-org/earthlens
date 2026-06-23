@@ -1,0 +1,184 @@
+"""Private helpers for the ASF backend.
+
+Holds the small stateless helpers used by `backend.py`:
+
+* :func:`wkt_from_extent` — convert a :class:`SpatialExtent` bbox
+  to the WKT polygon string `asf_search.geo_search` expects via its
+  `intersectsWith=` argument.
+* :func:`apply_baseline_windows` — the **load-bearing**
+  client-side filter that drops stacked products whose
+  `perpendicularBaseline` / `temporalBaseline` properties fall
+  outside the requested windows. Passing `ASFSearchOptions(
+  minBaselinePerp, maxBaselinePerp, temporalBaselineDays)` to
+  `ASFProduct.stack()` empirically breaks the SDK's internal
+  `search()` call (it returns zero products before the baseline
+  calculator runs), so the backend hands `.stack()` empty options
+  and this helper applies the windows after the full reference-frame
+  stack returns.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from shapely.geometry import box
+
+from earthlens.base import SpatialExtent
+
+
+def wkt_from_extent(space: SpatialExtent) -> str:
+    """Convert a :class:`SpatialExtent` bbox to a WKT polygon.
+
+    `asf_search.geo_search` accepts a WKT geometry as
+    `intersectsWith=`. The bbox is taken as a flat WGS84 rectangle
+    (`POLYGON((west south, east south, east north, west north, west
+    south))`) — no antimeridian splitting; ASF accepts a single
+    polygon and clips internally.
+
+    Args:
+        space: The backend's resolved :class:`SpatialExtent`. Must
+            have `latitude_min <= latitude_max` and `longitude_min
+            <= longitude_max` (the model validator enforces this).
+
+    Returns:
+        str: A WKT `POLYGON((...))` literal.
+
+    Examples:
+        - Round-trip a bbox through shapely:
+            ```python
+            >>> from earthlens.base import SpatialExtent
+            >>> from earthlens.asf._helpers import wkt_from_extent
+            >>> ext = SpatialExtent(latitude_min=0.0, latitude_max=1.0,
+            ...                     longitude_min=2.0, longitude_max=3.0)
+            >>> wkt_from_extent(ext).startswith("POLYGON")
+            True
+
+            ```
+    """
+    return box(
+        space.longitude_min,
+        space.latitude_min,
+        space.longitude_max,
+        space.latitude_max,
+    ).wkt
+
+
+def _in_window(value: float | int | None, window: tuple[float, float] | None) -> bool:
+    """Return whether `value` lies inside the closed `window`.
+
+    `window=None` is a wildcard (no filter applied); a `None`
+    `value` against a non-`None` window fails (the SDK should never
+    leave a stacked product without these properties, but the
+    defensive check here keeps the filter total).
+
+    Args:
+        value: A baseline value pulled from
+            `product.properties[<key>]`.
+        window: A `(min, max)` tuple of inclusive bounds, or `None`
+            to disable the filter.
+
+    Returns:
+        bool: `True` when the value is in the window or no window
+            was requested.
+
+    Examples:
+        - In-window, inclusive bounds:
+            ```python
+            >>> from earthlens.asf._helpers import _in_window
+            >>> _in_window(0.0, (-100.0, 100.0))
+            True
+            >>> _in_window(-100.0, (-100.0, 100.0))
+            True
+            >>> _in_window(100.0, (-100.0, 100.0))
+            True
+
+            ```
+        - Out-of-window and missing values:
+            ```python
+            >>> from earthlens.asf._helpers import _in_window
+            >>> _in_window(150.0, (-100.0, 100.0))
+            False
+            >>> _in_window(None, (-100.0, 100.0))
+            False
+
+            ```
+        - Wildcard window:
+            ```python
+            >>> from earthlens.asf._helpers import _in_window
+            >>> _in_window(999.0, None)
+            True
+            >>> _in_window(None, None)
+            True
+
+            ```
+    """
+    if window is None:
+        return True
+    if value is None:
+        return False
+    return window[0] <= value <= window[1]
+
+
+def apply_baseline_windows(
+    products: list[Any],
+    perpendicular_baseline: tuple[float, float] | None,
+    temporal_baseline: tuple[int, int] | None,
+) -> list[Any]:
+    """Drop stacked products outside the requested baseline windows.
+
+    Load-bearing client-side filter for the public-API
+    `perpendicular_baseline` / `temporal_baseline` kwargs. The SDK's
+    `ASFSearchOptions(minBaselinePerp, maxBaselinePerp,
+    temporalBaselineDays)` are *not* honoured by `ASFProduct.stack()`
+    — adding them makes the SDK's internal `search()` return zero
+    products before the baseline calculator runs (`No products found
+    matching stack parameters`). The backend therefore hands
+    `.stack()` an empty options bundle and relies on this filter to
+    apply the requested windows after the full reference-frame stack
+    returns.
+
+    Args:
+        products: The stacked products (each an
+            `asf_search.ASFProduct`), as returned by
+            `ASFProduct.stack()`.
+        perpendicular_baseline: `(min_m, max_m)` perpendicular
+            baseline bounds in metres, or `None` to disable.
+        temporal_baseline: `(min_days, max_days)` temporal baseline
+            bounds in days, or `None` to disable.
+
+    Returns:
+        list[Any]: The subset of `products` whose baseline
+            properties lie inside both windows. Ordering preserved.
+
+    Examples:
+        - Drop a product that fails the perpendicular window:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.asf._helpers import apply_baseline_windows
+            >>> inside = SimpleNamespace(properties={"perpendicularBaseline": 50.0, "temporalBaseline": 12})
+            >>> too_far = SimpleNamespace(properties={"perpendicularBaseline": 999.0, "temporalBaseline": 12})
+            >>> kept = apply_baseline_windows([inside, too_far], (-100.0, 100.0), (0, 60))
+            >>> [p.properties["perpendicularBaseline"] for p in kept]
+            [50.0]
+
+            ```
+        - Wildcard windows keep every product, including ones with missing baseline values:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.asf._helpers import apply_baseline_windows
+            >>> products = [SimpleNamespace(properties={"perpendicularBaseline": None, "temporalBaseline": None})]
+            >>> len(apply_baseline_windows(products, None, None))
+            1
+
+            ```
+    """
+    return [
+        product
+        for product in products
+        if _in_window(
+            product.properties.get("perpendicularBaseline"), perpendicular_baseline
+        )
+        and _in_window(
+            product.properties.get("temporalBaseline"), temporal_baseline
+        )
+    ]
