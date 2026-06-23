@@ -135,7 +135,7 @@ def test_auth_protocol_property_reads_bound_value() -> None:
 def test_auth_configure_idempotent_for_gportal(monkeypatch) -> None:
     """A second `configure()` for the gportal protocol is a no-op."""
     monkeypatch.setenv("GPORTAL_USERNAME", "bob")
-    monkeypatch.setenv("GPORTAL_PASSWORD", "envpass")
+    monkeypatch.setenv("GPORTAL_PASSWORD", "pytest-fixture-env-not-real")
     auth = JaxaAuth(JaxaCredentials(), protocol="gportal")
     auth.configure()
     monkeypatch.delenv("GPORTAL_PASSWORD")
@@ -328,7 +328,7 @@ def test_gportal_branch_empty_products_returns_empty(
     auth = JaxaAuth(
         JaxaCredentials(
             gportal_username="alice",
-            gportal_password=SecretStr("topsecret"),
+            gportal_password=SecretStr("pytest-fixture-not-a-real-pw"),
         ),
         protocol="gportal",
     )
@@ -421,7 +421,7 @@ def test_backend_download_dispatches_to_gportal(monkeypatch, tmp_path) -> None:
     fake.download = _download  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "gportal", fake)
     monkeypatch.setenv("GPORTAL_USERNAME", "alice")
-    monkeypatch.setenv("GPORTAL_PASSWORD", "topsecret")
+    monkeypatch.setenv("GPORTAL_PASSWORD", "pytest-fixture-not-a-real-pw")
     backend = JAXA(
         start="2024-01-01",
         end="2024-01-02",

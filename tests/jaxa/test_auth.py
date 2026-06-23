@@ -37,14 +37,14 @@ def test_gportal_credentials_from_explicit_kwargs(monkeypatch) -> None:
     auth = JaxaAuth(
         JaxaCredentials(
             gportal_username="alice",
-            gportal_password=SecretStr("topsecret"),
+            gportal_password=SecretStr("pytest-fixture-not-a-real-pw"),
         ),
         protocol="gportal",
     )
     auth.configure()
     assert auth.username == "alice"
     assert auth.password is not None
-    assert auth.password.get_secret_value() == "topsecret"
+    assert auth.password.get_secret_value() == "pytest-fixture-not-a-real-pw"
     assert auth.is_authenticated()
 
 
@@ -53,12 +53,12 @@ def test_gportal_credentials_from_explicit_kwargs(monkeypatch) -> None:
 def test_gportal_credentials_from_environment(monkeypatch) -> None:
     """When kwargs are absent, env vars are read."""
     monkeypatch.setenv("GPORTAL_USERNAME", "bob")
-    monkeypatch.setenv("GPORTAL_PASSWORD", "envpass")
+    monkeypatch.setenv("GPORTAL_PASSWORD", "pytest-fixture-env-not-real")
     auth = JaxaAuth(JaxaCredentials(), protocol="gportal")
     auth.configure()
     assert auth.username == "bob"
     assert auth.password is not None
-    assert auth.password.get_secret_value() == "envpass"
+    assert auth.password.get_secret_value() == "pytest-fixture-env-not-real"
 
 
 @pytest.mark.jaxa
@@ -98,7 +98,7 @@ def test_auth_does_not_mutate_sdk_globals(monkeypatch) -> None:
     auth = JaxaAuth(
         JaxaCredentials(
             gportal_username="alice",
-            gportal_password=SecretStr("topsecret"),
+            gportal_password=SecretStr("pytest-fixture-not-a-real-pw"),
         ),
         protocol="gportal",
     )

@@ -118,7 +118,7 @@ def configured_auth():
     auth = JaxaAuth(
         JaxaCredentials(
             gportal_username="alice",
-            gportal_password=SecretStr("topsecret"),
+            gportal_password=SecretStr("pytest-fixture-not-a-real-pw"),
         ),
         protocol="gportal",
     )
@@ -156,7 +156,7 @@ def test_gportal_search_and_download(
     # Credentials flowed through to download() as kwargs
     call = state["download_calls"][0]
     assert call["username"] == "alice"
-    assert call["password"] == "topsecret"
+    assert call["password"] == "pytest-fixture-not-a-real-pw"
 
 
 @pytest.mark.jaxa
