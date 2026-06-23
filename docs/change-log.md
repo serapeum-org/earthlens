@@ -20,9 +20,10 @@
   in-flight. Catalog refresh is hand-maintained; `earthlens datasets validate
   asf` checks every row's PLATFORM / DATASET / PRODUCT_TYPE member against the
   installed asf_search. Adds intro / authentication / usage / available products
-  docs pages, four example notebooks (catalog explorer + anonymous quickstart
-  + InSAR stack walkthrough + OPERA RTC workflow), and an `e2e-asf` weekly-cron
-  CI lane.
+  docs pages, five example notebooks (catalog explorer + anonymous quickstart
+  + InSAR stack walkthrough + OPERA RTC search workflow + an end-to-end
+  backscatter demo that downloads, opens with pyramids, and plots a 6 MB
+  OPERA RTC tile in decibels), and an `e2e-asf` weekly-cron CI lane.
 
 ## 0.9.0 (2026-06-17)
 
