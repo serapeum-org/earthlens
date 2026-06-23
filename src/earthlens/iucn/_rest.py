@@ -121,6 +121,35 @@ def _category(assessment: dict) -> str | None:
     return assessment.get("red_list_category_code")
 
 
+def _flatten_label(value: Any) -> str | None:
+    """Flatten a v4 `{description: {en: ...}, code: ...}` wrapper to a string.
+
+    Several v4 detail fields (`population_trend`, sometimes `criteria`) come
+    back as a wrapped object rather than a bare string. Prefer the English
+    description; fall back to the code; pass strings through unchanged.
+
+    Args:
+        value: A bare string, a `{description, code}` wrapper, or `None`.
+
+    Returns:
+        The flattened label, or `None`.
+    """
+    if value is None or isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        description = value.get("description")
+        if isinstance(description, dict):
+            english = description.get("en")
+            if english:
+                return english
+        if isinstance(description, str) and description:
+            return description
+        code = value.get("code")
+        if code is not None:
+            return str(code)
+    return None
+
+
 def _row(scientific_name: str | None, assessment: dict) -> dict[str, Any]:
     """Build one assessment row from a summary assessment dict.
 
@@ -135,8 +164,8 @@ def _row(scientific_name: str | None, assessment: dict) -> dict[str, Any]:
         "scientific_name": scientific_name,
         "assessment_id": assessment.get("assessment_id"),
         "category": _category(assessment),
-        "criteria": assessment.get("criteria"),
-        "population_trend": assessment.get("population_trend"),
+        "criteria": _flatten_label(assessment.get("criteria")),
+        "population_trend": _flatten_label(assessment.get("population_trend")),
         "year_published": assessment.get("year_published"),
         "latest": assessment.get("latest"),
         "possibly_extinct": assessment.get("possibly_extinct"),
@@ -181,8 +210,10 @@ def fetch_species(
         if assessment.get("latest") and assessment.get("assessment_id") is not None:
             detail = _get(http, token, f"assessment/{assessment['assessment_id']}")
             row["category"] = _category(detail) or row["category"]
-            row["criteria"] = detail.get("criteria") or row["criteria"]
-            row["population_trend"] = detail.get("population_trend") or row["population_trend"]
+            row["criteria"] = _flatten_label(detail.get("criteria")) or row["criteria"]
+            row["population_trend"] = (
+                _flatten_label(detail.get("population_trend")) or row["population_trend"]
+            )
         rows.append(row)
     return rows
 
