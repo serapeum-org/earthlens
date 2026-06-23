@@ -68,6 +68,9 @@ nwm = [
     "pyramids-gis[parquet] >=0.35.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
+# ASF InSAR backend reuses the EDL token already minted by `[earthdata]`, so
+# the asf extra pulls earthdata transitively rather than re-declaring its deps.
+asf = ["asf_search >=12.2.2", "earthlens[earthdata]"]
 hdx = ["hdx-python-api >=6,<7"]
 eumetsat = ["eumdac >=3.1"]
 # herbie/cfgrib decode GRIB through the ecCodes C library. On Linux/macOS the
@@ -94,7 +97,7 @@ ghsl = []
 worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop]",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop]",
 ]
 
 [dependency-groups]
@@ -250,6 +253,7 @@ markers = [
     "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
     "earthdata: tests for the NASA Earthdata backend (requires the `earthdata` extra: earthaccess; Python >=3.12).",
+    "asf: tests for the ASF InSAR backend (requires the `asf` extra: asf_search; reuses EDL auth from `earthdata`).",
     "hdx: tests for the Humanitarian Data Exchange backend (requires the `hdx` extra: hdx-python-api).",
     "eumetsat: tests for the EUMETSAT Data Store backend (requires the `eumetsat` extra: eumdac).",
     "stac: tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",

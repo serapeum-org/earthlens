@@ -120,6 +120,12 @@ nav:
       - Usage: reference/s3/usage.md
       - Available datasets: reference/s3/datasets.md
       - Reference: reference/s3/reference.md
+    - ASF (InSAR / SAR):
+      - Introduction: reference/asf/introduction.md
+      - Authentication: reference/asf/authentication.md
+      - Usage: reference/asf/usage.md
+      - Available products: reference/asf/datasets.md
+      - Reference: reference/asf/asf.md
     - CMEMS (Copernicus Marine):
       - Introduction: reference/cmems/introduction.md
       - Usage: reference/cmems/usage.md
@@ -272,6 +278,12 @@ nav:
       - Sea ice — Arctic thickness map: examples/cmems/seaice_arctic_thickness.ipynb
       - Waves — significant wave height: examples/cmems/global_wave_significant_height.ipynb
       - Mediterranean — surface temperature map: examples/cmems/mediterranean_sst_map.ipynb
+    - ASF (InSAR / SAR):
+      - Catalog explorer (no network): examples/asf/catalog_explorer.ipynb
+      - Quickstart — anonymous search: examples/asf/quickstart_search.ipynb
+      - Sentinel-1 InSAR baseline stack: examples/asf/sentinel1_insar_stack.ipynb
+      - OPERA RTC-S1 — search workflow: examples/asf/opera_rtc_workflow.ipynb
+      - OPERA RTC-S1 — backscatter (live download + plot): examples/asf/opera_rtc_backscatter.ipynb
     - NASA Earthdata:
       - Catalog explorer (no network): examples/earthdata/catalog_explorer.ipynb
       - Per-dataset output kind: examples/earthdata/output_kinds.ipynb

@@ -202,3 +202,33 @@ jobs:
         # transiently unavailable.
         run: |
           pixi run -e dev pytest -m "e2e and nwp" -v
+
+  e2e-asf:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        with:
+          # asf_search reuses the EDL auth from `earthdata`, which needs
+          # Python >=3.12 for earthaccess >=0.18.
+          environments: py312
+          activate-environment: py312
+          cache: true
+
+      - name: Run live ASF (InSAR) e2e tests
+        # Anonymous search and stack run with no secrets; the authed
+        # download branch skips itself when neither EARTHDATA_TOKEN nor
+        # EARTHDATA_USERNAME/PASSWORD is set, so the job is harmless if
+        # those secrets are unconfigured.
+        env:
+          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+          EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+        run: |
+          pixi run -e py312 pytest -m "e2e and asf" -v
