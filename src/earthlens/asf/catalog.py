@@ -329,6 +329,18 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If the file has no `products:` block, or a
                 row fails :class:`Product` validation.
+
+        Examples:
+            - Load the bundled catalog and inspect a curated row:
+                ```python
+                >>> from earthlens.asf import Catalog
+                >>> cat = Catalog.load()
+                >>> "sentinel-1-slc" in cat.products
+                True
+                >>> cat.get_product("sentinel-1-slc").product_type
+                'SLC'
+
+                ```
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
@@ -420,5 +432,19 @@ class Catalog(AbstractCatalog):
         Returns:
             list[str]: Every curated key where
                 :attr:`Product.stackable` is `True`, sorted.
+
+        Examples:
+            - Inspect the InSAR-ready subset:
+                ```python
+                >>> from earthlens.asf import Catalog
+                >>> stackable = Catalog().stackable_products()
+                >>> "sentinel-1-slc" in stackable
+                True
+                >>> "opera-rtc-s1" in stackable
+                False
+                >>> stackable == sorted(stackable)
+                True
+
+                ```
         """
         return sorted(k for k, p in self.datasets.items() if p.stackable)

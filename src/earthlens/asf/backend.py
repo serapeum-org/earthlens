@@ -74,6 +74,28 @@ class ASF(AbstractDataSource):
         a plain :class:`pathlib.Path` rather than a pyramids object.
         Use a dedicated SAR reader (`asf_search.export.read`, ISCE,
         SNAP, `sarsen`, …) to open the archive.
+
+    Examples:
+        - Inspect the class-level `OUTPUT_KIND` declaration without
+          constructing an instance:
+            ```python
+            >>> from earthlens.asf import ASF
+            >>> ASF.OUTPUT_KIND
+            'raster'
+
+            ```
+        - Construct in search mode (requires bbox) — `# doctest: +SKIP`
+          because a live search would need the `[asf]` extra installed:
+            ```python
+            >>> from earthlens.asf import ASF
+            >>> backend = ASF(                          # doctest: +SKIP
+            ...     start="2024-06-01", end="2024-06-15",
+            ...     variables=["sentinel-1-slc"],
+            ...     lat_lim=[37.0, 37.5], lon_lim=[-122.5, -122.0],
+            ...     path="asf_out",
+            ... )
+
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -516,6 +538,27 @@ class ASF(AbstractDataSource):
 
         Raises:
             NotImplementedError: When `aggregate` is not `None`.
+
+        Examples:
+            - Construct in search mode and reject an `aggregate=`
+              argument before any network call (the check happens
+              entirely client-side):
+                ```python
+                >>> import tempfile
+                >>> from earthlens.asf import ASF
+                >>> backend = ASF(
+                ...     start="2024-06-01", end="2024-06-15",
+                ...     variables=["sentinel-1-slc"],
+                ...     lat_lim=[37.0, 37.5], lon_lim=[-122.5, -122.0],
+                ...     path=tempfile.mkdtemp(),
+                ... )
+                >>> try:
+                ...     backend.download(aggregate=object())
+                ... except NotImplementedError as exc:
+                ...     "InSAR" in str(exc)
+                True
+
+                ```
         """
         if aggregate is not None:
             raise NotImplementedError(

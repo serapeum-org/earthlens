@@ -80,6 +80,37 @@ def _in_window(value: float | int | None, window: tuple[float, float] | None) ->
     Returns:
         bool: `True` when the value is in the window or no window
             was requested.
+
+    Examples:
+        - In-window, inclusive bounds:
+            ```python
+            >>> from earthlens.asf._helpers import _in_window
+            >>> _in_window(0.0, (-100.0, 100.0))
+            True
+            >>> _in_window(-100.0, (-100.0, 100.0))
+            True
+            >>> _in_window(100.0, (-100.0, 100.0))
+            True
+
+            ```
+        - Out-of-window and missing values:
+            ```python
+            >>> from earthlens.asf._helpers import _in_window
+            >>> _in_window(150.0, (-100.0, 100.0))
+            False
+            >>> _in_window(None, (-100.0, 100.0))
+            False
+
+            ```
+        - Wildcard window:
+            ```python
+            >>> from earthlens.asf._helpers import _in_window
+            >>> _in_window(999.0, None)
+            True
+            >>> _in_window(None, None)
+            True
+
+            ```
     """
     if window is None:
         return True
@@ -118,6 +149,28 @@ def apply_baseline_windows(
     Returns:
         list[Any]: The subset of `products` whose baseline
             properties lie inside both windows. Ordering preserved.
+
+    Examples:
+        - Drop a product that fails the perpendicular window:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.asf._helpers import apply_baseline_windows
+            >>> inside = SimpleNamespace(properties={"perpendicularBaseline": 50.0, "temporalBaseline": 12})
+            >>> too_far = SimpleNamespace(properties={"perpendicularBaseline": 999.0, "temporalBaseline": 12})
+            >>> kept = apply_baseline_windows([inside, too_far], (-100.0, 100.0), (0, 60))
+            >>> [p.properties["perpendicularBaseline"] for p in kept]
+            [50.0]
+
+            ```
+        - Wildcard windows keep every product, including ones with missing baseline values:
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.asf._helpers import apply_baseline_windows
+            >>> products = [SimpleNamespace(properties={"perpendicularBaseline": None, "temporalBaseline": None})]
+            >>> len(apply_baseline_windows(products, None, None))
+            1
+
+            ```
     """
     return [
         product
