@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/batch_walkthrough/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/asf/opera_rtc_backscatter/">
       
       
-        <link rel="prev" href="../aggregate_monthly/">
+        <link rel="prev" href="../opera_rtc_workflow/">
       
       
-        <link rel="next" href="../../tropycal/quickstart/">
+        <link rel="next" href="../../earthdata/catalog_explorer/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Batch Processing walkthrough (S3) - earthlens</title>
+        <title>OPERA RTC-S1 backscatter — download + read + plot - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#batch-processing-walkthrough-s3" class="md-skip">
+        <a href="#opera-rtc-s1-backscatter-download-read-plot" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Batch Processing walkthrough (S3)
+              OPERA RTC-S1 backscatter — download + read + plot
             
           </span>
         </div>
@@ -6318,6 +6318,8 @@
                 
   
   
+    
+  
   
   
     
@@ -6328,11 +6330,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" checked>
         
           
           <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
@@ -6353,7 +6355,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
@@ -6371,7 +6373,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/catalog_explorer/" class="md-nav__link">
+      <a href="../catalog_explorer/" class="md-nav__link">
         
   
   
@@ -6399,7 +6401,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/quickstart_search/" class="md-nav__link">
+      <a href="../quickstart_search/" class="md-nav__link">
         
   
   
@@ -6427,7 +6429,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/sentinel1_insar_stack/" class="md-nav__link">
+      <a href="../sentinel1_insar_stack/" class="md-nav__link">
         
   
   
@@ -6455,7 +6457,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/opera_rtc_workflow/" class="md-nav__link">
+      <a href="../opera_rtc_workflow/" class="md-nav__link">
         
   
   
@@ -6480,10 +6482,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../asf/opera_rtc_backscatter/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPERA RTC-S1 backscatter — download + read + plot
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -6499,6 +6528,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-discover-an-opera-rtc-s1-scene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Discover an OPERA RTC-S1 scene
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-download-the-scene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Download the scene
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-open-with-pyramids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Open with pyramids
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-convert-to-decibels-and-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Convert to decibels and plot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-in-the-rest-of-the-bundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's in the rest of the bundle?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-go-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to go next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -8690,8 +8816,6 @@
                 
   
   
-    
-  
   
   
     
@@ -8702,11 +8826,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
         
           
           <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
@@ -8727,7 +8851,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_18">
             <span class="md-nav__icon md-icon"></span>
             
@@ -8745,7 +8869,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../catalog_explorer/" class="md-nav__link">
+      <a href="../../sentinel-hub/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -8773,7 +8897,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart_ndvi/" class="md-nav__link">
+      <a href="../../sentinel-hub/quickstart_ndvi/" class="md-nav__link">
         
   
   
@@ -8801,7 +8925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../true_colour/" class="md-nav__link">
+      <a href="../../sentinel-hub/true_colour/" class="md-nav__link">
         
   
   
@@ -8829,7 +8953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../custom_evalscript/" class="md-nav__link">
+      <a href="../../sentinel-hub/custom_evalscript/" class="md-nav__link">
         
   
   
@@ -8857,7 +8981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../local_tiling/" class="md-nav__link">
+      <a href="../../sentinel-hub/local_tiling/" class="md-nav__link">
         
   
   
@@ -8885,7 +9009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../statistical_zonal_stats/" class="md-nav__link">
+      <a href="../../sentinel-hub/statistical_zonal_stats/" class="md-nav__link">
         
   
   
@@ -8913,7 +9037,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../aggregate_monthly/" class="md-nav__link">
+      <a href="../../sentinel-hub/aggregate_monthly/" class="md-nav__link">
         
   
   
@@ -8938,37 +9062,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Batch Processing walkthrough (S3)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../sentinel-hub/batch_walkthrough/" class="md-nav__link">
         
   
   
@@ -8984,59 +9081,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#credentials-guard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Credentials guard
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configure-s3-delivery-edit-for-your-bucket" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configure S3 delivery (edit for your bucket)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#build-submit-when-both-creds-and-a-bucket-are-set" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Build + submit (when both creds and a bucket are set)
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -11402,10 +11446,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#credentials-guard" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Credentials guard
+        Setup
       
     </span>
   </a>
@@ -11413,10 +11457,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configure-s3-delivery-edit-for-your-bucket" class="md-nav__link">
+  <a href="#1-discover-an-opera-rtc-s1-scene" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configure S3 delivery (edit for your bucket)
+        1 · Discover an OPERA RTC-S1 scene
       
     </span>
   </a>
@@ -11424,10 +11468,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#build-submit-when-both-creds-and-a-bucket-are-set" class="md-nav__link">
+  <a href="#2-download-the-scene" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Build + submit (when both creds and a bucket are set)
+        2 · Download the scene
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-open-with-pyramids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Open with pyramids
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-convert-to-decibels-and-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Convert to decibels and plot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-in-the-rest-of-the-bundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's in the rest of the bundle?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-go-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to go next
       
     </span>
   </a>
@@ -11451,7 +11539,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/sentinel-hub/batch_walkthrough.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/asf/opera_rtc_backscatter.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -11460,7 +11548,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/sentinel-hub/batch_walkthrough.ipynb" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/asf/opera_rtc_backscatter.ipynb" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -12188,29 +12276,30 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9a04c57d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ce7243a3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="batch-processing-walkthrough-s3">Batch Processing walkthrough (S3)<a class="anchor-link" href="#batch-processing-walkthrough-s3">¶</a></h1><p>For continental / global AOIs the <strong>Batch</strong> plane tiles server-side and delivers to <strong>your S3 bucket</strong> (it needs an IAM role the Sentinel Hub service can assume). This notebook shows the request shape; it only runs end-to-end against your own bucket, so the download is guarded on both credentials <strong>and</strong> a configured <code>batch_output</code>.</p>
+<h1 id="opera-rtc-s1-backscatter-download-read-plot">OPERA RTC-S1 backscatter — download + read + plot<a class="anchor-link" href="#opera-rtc-s1-backscatter-download-read-plot">¶</a></h1><p>A full real-world workflow with the <code>asf</code> backend: discover an OPERA Sentinel-1 Radiometric-Terrain-Corrected scene over a small bbox, download the VH-polarised GeoTIFF (~6 MB), open it with <a href="https://github.com/serapeum-org/pyramids">pyramids</a>, and render the backscatter in decibels — the standard SAR visualisation for flood mapping, urban classification, and land-surface monitoring.</p>
+<p>Needs the <code>[asf]</code> extra (<code>pip install earthlens[asf]</code>) and <strong>NASA Earthdata Login credentials</strong>. The download step calls <code>asf_search</code>'s authed S3 path; set <code>EARTHDATA_USERNAME</code> + <code>EARTHDATA_PASSWORD</code> (or <code>EARTHDATA_TOKEN</code>, or a <code>~/.netrc</code> entry for <code>urs.earthdata.nasa.gov</code>) before running. See <a href="../../reference/asf/authentication.md">Authentication</a>.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cddc72b7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=29424652">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="credentials-guard">Credentials guard<a class="anchor-link" href="#credentials-guard">¶</a></h2>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Imports and the output directory. <code>earthlens</code> provides the unified <code>EarthLens</code> entry point; <code>pyramids</code> reads the GeoTIFF; matplotlib + numpy render it.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=392472be">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a2939a1a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12228,85 +12317,45 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">has_sh_credentials</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Whether Sentinel Hub OAuth client-credentials are available."""</span>
-    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"SENTINELHUB_CLIENT_ID"</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"SENTINELHUB_CLIENT_SECRET"</span><span class="p">)</span>
-    <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-
-<span class="k">def</span><span class="w"> </span><span class="nf">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">,</span> <span class="o">**</span><span class="n">download_kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Run the live download when credentials exist, else print a skip note.</span>
-
-<span class="sd">    Keeps the notebook executing top-to-bottom with no errors whether or not</span>
-<span class="sd">    Sentinel Hub credentials are configured (so the docs build never needs</span>
-<span class="sd">    secrets). Set SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET to run the cell for real.</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_sh_credentials</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="s2">"No Sentinel Hub credentials found - skipping the live download.</span><span class="se">\n</span><span class="s2">"</span>
-            <span class="s2">"Mint an OAuth client_credentials pair in the CDSE Dashboard and set</span><span class="se">\n</span><span class="s2">"</span>
-            <span class="s2">"SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET (see the Authentication page)."</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">[]</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">facade</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">**</span><span class="n">download_kwargs</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">results</span>
+<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'asf_opera_output'</span><span class="p">)</span>
+<span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os
-from pathlib import Path
+<div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
+import matplotlib.pyplot as plt
+import numpy as np
+from pyramids.dataset import Dataset
 
-def has_sh_credentials() -&gt; bool:
-    """Whether Sentinel Hub OAuth client-credentials are available."""
-    return bool(
-        os.environ.get("SENTINELHUB_CLIENT_ID")
-        and os.environ.get("SENTINELHUB_CLIENT_SECRET")
-    )
+from earthlens.earthlens import EarthLens
 
-
-def run_or_skip(facade, **download_kwargs):
-    """Run the live download when credentials exist, else print a skip note.
-
-    Keeps the notebook executing top-to-bottom with no errors whether or not
-    Sentinel Hub credentials are configured (so the docs build never needs
-    secrets). Set SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET to run the cell for real.
-    """
-    if not has_sh_credentials():
-        print(
-            "No Sentinel Hub credentials found - skipping the live download.\n"
-            "Mint an OAuth client_credentials pair in the CDSE Dashboard and set\n"
-            "SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET (see the Authentication page)."
-        )
-        return []
-    results = facade.download(**download_kwargs)
-    for item in results:
-        print(item)
-    return results</div>
+OUT_DIR = Path('asf_opera_output')
+OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f794a14f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7653c1aa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="configure-s3-delivery-edit-for-your-bucket">Configure S3 delivery (edit for your bucket)<a class="anchor-link" href="#configure-s3-delivery-edit-for-your-bucket">¶</a></h2>
+<h2 id="1-discover-an-opera-rtc-s1-scene">1 · Discover an OPERA RTC-S1 scene<a class="anchor-link" href="#1-discover-an-opera-rtc-s1-scene">¶</a></h2><p>OPERA RTC scenes are small (~6 MB per polarisation channel), tiled, and analysis-ready. Search over a 0.1° × 0.1° patch of the San Francisco Bay over a 7-day window and take the first scene as the target.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2e3aab80">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=25994bc1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12324,47 +12373,53 @@ def run_or_skip(facade, **download_kwargs):
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">batch_output</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'bucket'</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="s1">'SENTINELHUB_BATCH_BUCKET'</span><span class="p">,</span> <span class="s1">''</span>
-    <span class="p">),</span>  <span class="c1"># e.g. 's3://my-bucket/out'</span>
-    <span class="s1">'iam_role_arn'</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="s1">'SENTINELHUB_BATCH_IAM_ROLE'</span><span class="p">,</span> <span class="s1">''</span>
-    <span class="p">),</span>  <span class="c1"># e.g. 'arn:aws:iam::123:role/sh'</span>
-    <span class="s1">'grid_id'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-<span class="p">}</span>
-<span class="n">have_bucket</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">batch_output</span><span class="p">[</span><span class="s1">'bucket'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">batch_output</span><span class="p">[</span><span class="s1">'iam_role_arn'</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'S3 configured:'</span><span class="p">,</span> <span class="n">have_bucket</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'asf'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'opera-rtc-s1'</span><span class="p">],</span>            <span class="c1"># alias 'opera-rtc' also works</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-08'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.2</span><span class="p">,</span> <span class="mf">37.3</span><span class="p">],</span>                  <span class="c1"># SF Bay, ~10 km × 10 km</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">122.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.2</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
+    <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="p">[</span><span class="n">scene</span><span class="p">]</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'scene  :'</span><span class="p">,</span> <span class="n">scene</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'file   :'</span><span class="p">,</span> <span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'fileName'</span><span class="p">])</span>
+<span class="n">size_mb</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'product'</span><span class="p">]</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'fileName'</span><span class="p">],</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e6</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'size   : </span><span class="si">{</span><span class="n">size_mb</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">batch_output = {
-    'bucket': os.environ.get(
-        'SENTINELHUB_BATCH_BUCKET', ''
-    ),  # e.g. 's3://my-bucket/out'
-    'iam_role_arn': os.environ.get(
-        'SENTINELHUB_BATCH_IAM_ROLE', ''
-    ),  # e.g. 'arn:aws:iam::123:role/sh'
-    'grid_id': 2,
-}
-have_bucket = bool(batch_output['bucket'] and batch_output['iam_role_arn'])
-print('S3 configured:', have_bucket)</div>
+<div class="clipboard-copy-txt" id="cell-2">el = EarthLens(
+    data_source='asf',
+    variables=['opera-rtc-s1'],            # alias 'opera-rtc' also works
+    start='2024-06-01', end='2024-06-08',
+    lat_lim=[37.2, 37.3],                  # SF Bay, ~10 km × 10 km
+    lon_lim=[-122.3, -122.2],
+    path=str(OUT_DIR),
+    max_results=1,
+)
+[scene] = el.datasource._search()
+print('scene  :', scene.id)
+print('file   :', scene.metadata['fileName'])
+size_mb = scene.metadata['product'].properties.get('bytes', {}).get(scene.metadata['fileName'], {}).get('bytes', 0) / 1e6
+print(f'size   : {size_mb:.1f} MB')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e6474c11">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=98973e68">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="build-submit-when-both-creds-and-a-bucket-are-set">Build + submit (when both creds and a bucket are set)<a class="anchor-link" href="#build-submit-when-both-creds-and-a-bucket-are-set">¶</a></h2>
+<h2 id="2-download-the-scene">2 · Download the scene<a class="anchor-link" href="#2-download-the-scene">¶</a></h2><p><code>download()</code> runs the EDL login (lazy — only the first call authenticates) and pulls the VH GeoTIFF to <code>OUT_DIR</code>. A second <code>download()</code> would short-circuit on the existing file (idempotent). The returned <code>list[Path]</code> is what every file-writing earthlens backend returns.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f7572e4c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2e675bda">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12382,53 +12437,186 @@ print('S3 configured:', have_bucket)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-
-<span class="k">if</span> <span class="n">has_sh_credentials</span><span class="p">()</span> <span class="ow">and</span> <span class="n">have_bucket</span><span class="p">:</span>
-    <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s1">'sentinel-hub'</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a-ndvi'</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
-        <span class="n">start</span><span class="o">=</span><span class="s1">'2020-06-10'</span><span class="p">,</span>
-        <span class="n">end</span><span class="o">=</span><span class="s1">'2020-06-20'</span><span class="p">,</span>
-        <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">],</span>
-        <span class="n">path</span><span class="o">=</span><span class="s1">'data/sh-batch'</span><span class="p">,</span>
-        <span class="n">resolution</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-        <span class="n">api</span><span class="o">=</span><span class="s1">'batch'</span><span class="p">,</span>
-        <span class="n">batch_output</span><span class="o">=</span><span class="n">batch_output</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">uris</span> <span class="o">=</span> <span class="n">facade</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">uris</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="s1">'Set SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET and SENTINELHUB_BATCH_BUCKET / '</span>
-        <span class="s1">'SENTINELHUB_BATCH_IAM_ROLE to run the Batch job against your bucket.'</span>
-    <span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s1"> file(s) on disk:'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">   (</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB)'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">from earthlens import EarthLens
+<div class="clipboard-copy-txt" id="cell-3">paths = el.download()
+print(f'{len(paths)} file(s) on disk:')
+for p in paths:
+    print(f'  {p.name}   ({p.stat().st_size / 1e6:.1f} MB)')</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b07072d5">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="3-open-with-pyramids">3 · Open with pyramids<a class="anchor-link" href="#3-open-with-pyramids">¶</a></h2><p>OPERA RTC is shipped as a Cloud-Optimized GeoTIFF in <strong>linear power units</strong>. Read it with <code>pyramids.Dataset.read_file()</code> and inspect the array.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a7aaaed3">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">vh_path</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">vh_path</span><span class="p">))</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float32'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'shape: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">, dtype: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'value range: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> .. </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (linear power, unitless)'</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-4">vh_path = paths[0]
+ds = Dataset.read_file(str(vh_path))
+arr = ds.read_array().astype('float32')
+print(f'shape: {arr.shape}, dtype: {arr.dtype}')
+print(f'value range: {np.nanmin(arr):.4f} .. {np.nanmax(arr):.4f}  (linear power, unitless)')</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0f8ac711">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="4-convert-to-decibels-and-plot">4 · Convert to decibels and plot<a class="anchor-link" href="#4-convert-to-decibels-and-plot">¶</a></h2><p>Backscatter values in linear units span 5-6 orders of magnitude, so SAR is universally visualised in decibels (<code>10 · log10(σ)</code>). Typical land surfaces sit in the −25 dB to 0 dB range:</p>
+<ul>
+<li>water / smooth surfaces → very low (−25 dB and below; specular reflection)</li>
+<li>bare ground → moderate (−15 to −10 dB)</li>
+<li>vegetation → higher (−10 to −5 dB; volume scattering)</li>
+<li>urban / corner reflectors → highest (0 dB+; double-bounce)</li>
+</ul>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=02fc051b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">arr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>         <span class="c1"># mask non-positive samples</span>
+<span class="n">db</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
-if has_sh_credentials() and have_bucket:
-    facade = EarthLens(
-        data_source='sentinel-hub',
-        dataset='sentinel-2-l2a-ndvi',
-        variables=[],
-        start='2020-06-10',
-        end='2020-06-20',
-        aoi=[0.0, 10.0, 30.0, 40.0],
-        path='data/sh-batch',
-        resolution=20,
-        api='batch',
-        batch_output=batch_output,
-    )
-    uris = facade.download()
-    print(uris)
-else:
-    print(
-        'Set SENTINELHUB_CLIENT_ID / SENTINELHUB_CLIENT_SECRET and SENTINELHUB_BATCH_BUCKET / '
-        'SENTINELHUB_BATCH_IAM_ROLE to run the Batch job against your bucket.'
-    )</div>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">25</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'VH backscatter (dB)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'OPERA RTC-S1 VH backscatter</span><span class="se">\n</span><span class="si">{</span><span class="n">vh_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">arr = np.where(arr &gt; 0, arr, np.nan)         # mask non-positive samples
+db = 10 * np.log10(arr)
+
+fig, ax = plt.subplots(figsize=(8, 7))
+im = ax.imshow(db, cmap='gray', vmin=-25, vmax=0)
+fig.colorbar(im, ax=ax, label='VH backscatter (dB)')
+ax.set_title(f'OPERA RTC-S1 VH backscatter\n{vh_path.name}', fontsize=10)
+ax.set_axis_off()
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3f9ab634">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="whats-in-the-rest-of-the-bundle">What's in the rest of the bundle?<a class="anchor-link" href="#whats-in-the-rest-of-the-bundle">¶</a></h2><p>Each OPERA RTC scene actually carries 5 files (the SDK exposes them in <code>product.properties['bytes']</code>): the <strong>VH</strong> GeoTIFF (downloaded here, ~6 MB), a <strong>VV</strong> GeoTIFF (also ~6 MB), a <strong>mask</strong> GeoTIFF flagging shadow / layover / water (~50 KB), an <strong>HDF5</strong> metadata file (~100 KB), and an <strong>ISO XML</strong> sidecar (~160 KB). The backend's <code>_fetch</code> follows the SDK's default — one primary file per product — so a routine call lands the VH. To pull the VV channel as well, set up a second backend instance and walk the bundle URLs from <code>product.properties['bytes']</code> directly with the authenticated <code>ASFSession</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=504fbd1a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'product'</span><span class="p">]</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="p">{})</span>
+<span class="k">for</span> <span class="n">fname</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">bundle</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">sz</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'format'</span><span class="p">,</span> <span class="s1">'?'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">fname</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">:</span><span class="s1">80s</span><span class="si">}</span><span class="s1">  </span><span class="si">{</span><span class="n">sz</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s1">&gt;6.2f</span><span class="si">}</span><span class="s1"> MB  </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-6">bundle = scene.metadata['product'].properties.get('bytes', {})
+for fname, info in bundle.items():
+    sz = info.get('bytes', 0)
+    fmt = info.get('format', '?')
+    print(f'  {fname[:80]:80s}  {sz/1e6:&gt;6.2f} MB  {fmt}')</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9e3fd912">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="where-to-go-next">Where to go next<a class="anchor-link" href="#where-to-go-next">¶</a></h2><ul>
+<li>Tile a larger AOI by raising <code>max_results=</code> and looping over the returned paths.</li>
+<li>Pair with <a href="../../reference/asf/datasets.md"><code>opera-dist-alert-s1</code></a> for an analysis-ready land-surface disturbance flag derived from the RTC time series.</li>
+<li>For the <strong>InSAR</strong> workflow (phase-aware Sentinel-1 SLC + baseline stack), see <a href="sentinel1_insar_stack.ipynb"><code>sentinel1_insar_stack.ipynb</code></a>.</li>
+</ul>
 </div>
 </div>
 </div>
@@ -12475,7 +12663,7 @@ else:
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../aggregate_monthly/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Windowed — a monthly NDVI series">
+          <a href="../opera_rtc_workflow/" class="md-footer__link md-footer__link--prev" aria-label="Previous: OPERA RTC-S1 — analysis-ready backscatter workflow">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -12485,20 +12673,20 @@ else:
                 Previous
               </span>
               <div class="md-ellipsis">
-                Windowed — a monthly NDVI series
+                OPERA RTC-S1 — analysis-ready backscatter workflow
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../tropycal/quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: Tropycal quickstart — one Atlantic season">
+          <a href="../../earthdata/catalog_explorer/" class="md-footer__link md-footer__link--next" aria-label="Next: Earthdata catalog explorer">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Tropycal quickstart — one Atlantic season
+                Earthdata catalog explorer
               </div>
             </div>
             <div class="md-footer__button md-icon">
