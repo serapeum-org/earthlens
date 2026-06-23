@@ -606,36 +606,3208 @@ datasets:
     protocol: jaxa-earth
     collection: JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_monthly-normal
     default_band: LST_2000_2022
+  sgli-l1-visible-near-infrared-vnr:
+    protocol: gportal
+    short_name: "10001000"
+    description: "GCOM-C/SGLI — L1A-Visible & Near Infrared, VNR"
+  sgli-l1-visible-near-infrared-pol:
+    protocol: gportal
+    short_name: "10001001"
+    description: "GCOM-C/SGLI — L1A-Visible & Near Infrared, POL"
+  sgli-l1-swi-tir:
+    protocol: gportal
+    short_name: "10001002"
+    description: "GCOM-C/SGLI — L1A-SWI & TIR"
+  sgli-l1-visible-near-infrared-vnr-1003:
+    protocol: gportal
+    short_name: "10001003"
+    description: "GCOM-C/SGLI — L1B-Visible & Near Infrared, VNR"
+  sgli-l1-visible-near-infrared-pol-1004:
+    protocol: gportal
+    short_name: "10001004"
+    description: "GCOM-C/SGLI — L1B-Visible & Near Infrared, POL"
+  sgli-l1-swi-tir-1005:
+    protocol: gportal
+    short_name: "10001005"
+    description: "GCOM-C/SGLI — L1B-SWI & TIR"
+  sgli-l2-oceanic-sphere-l2-nwlr:
+    protocol: gportal
+    short_name: "10002000"
+    description: GCOM-C/SGLI — Oceanic sphere/L2-NWLR
+  sgli-l2-oceanic-sphere-l2-iwpr:
+    protocol: gportal
+    short_name: "10002001"
+    description: GCOM-C/SGLI — Oceanic sphere/L2-IWPR
+  sgli-l2-oceanic-sphere-l2-sst:
+    protocol: gportal
+    short_name: "10002002"
+    description: GCOM-C/SGLI — Oceanic sphere/L2-SST
+  sgli-l2-okid:
+    protocol: gportal
+    short_name: "10002003"
+    description: GCOM-C/SGLI — Cryosphere/L2-OKID
+  sgli-l2-sice:
+    protocol: gportal
+    short_name: "10002005"
+    description: GCOM-C/SGLI — Cryosphere/L2-SICE
+  sgli-l2-sice-2004:
+    protocol: gportal
+    short_name: "10002004"
+    description: GCOM-C/SGLI — Cryosphere/L2-SICE
+  sgli-l2-sipr:
+    protocol: gportal
+    short_name: "10002076"
+    description: GCOM-C/SGLI — Cryosphere/L2-SIPR
+  sgli-l2-sipr-2075:
+    protocol: gportal
+    short_name: "10002075"
+    description: GCOM-C/SGLI — Cryosphere/L2-SIPR
+  sgli-l2-sipr-ver-2:
+    protocol: gportal
+    short_name: "10002007"
+    description: GCOM-C/SGLI — Cryosphere/L2-SIPR ver.2
+  sgli-l2-sipr-ver-2-2006:
+    protocol: gportal
+    short_name: "10002006"
+    description: GCOM-C/SGLI — Cryosphere/L2-SIPR ver.2
+  sgli-l2-cryosphere-statistics-l2-stati:
+    protocol: gportal
+    short_name: "10002009"
+    description: GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SICE
+  sgli-l2-cryosphere-statistics-l2-stati-2008:
+    protocol: gportal
+    short_name: "10002008"
+    description: GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SICE
+  sgli-l2-cryosphere-statistics-l2-stati-2010:
+    protocol: gportal
+    short_name: "10002010"
+    description: GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SIST
+  sgli-l2-cryosphere-statistics-l2-stati-2011:
+    protocol: gportal
+    short_name: "10002011"
+    description: GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SGSL
+  sgli-l2-cryosphere-statistics-l2-stati-2077:
+    protocol: gportal
+    short_name: "10002077"
+    description: GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SALB
+  sgli-l2-land-area-l2-ltoa:
+    protocol: gportal
+    short_name: "10002014"
+    description: GCOM-C/SGLI — Land area/L2-LTOA
+  sgli-l2-land-area-l2-ltoa-2013:
+    protocol: gportal
+    short_name: "10002013"
+    description: GCOM-C/SGLI — Land area/L2-LTOA
+  sgli-l2-land-area-l2-ltoa-2012:
+    protocol: gportal
+    short_name: "10002012"
+    description: GCOM-C/SGLI — Land area/L2-LTOA
+  sgli-l2-land-area-l2-rsrf:
+    protocol: gportal
+    short_name: "10002015"
+    description: GCOM-C/SGLI — Land area/L2-RSRF
+  sgli-l2-land-area-l2-vgi:
+    protocol: gportal
+    short_name: "10002016"
+    description: GCOM-C/SGLI — Land area/L2-VGI
+  sgli-l2-land-area-l2-lai:
+    protocol: gportal
+    short_name: "10002017"
+    description: GCOM-C/SGLI — Land area/L2-LAI
+  sgli-l2-land-area-l2-agb:
+    protocol: gportal
+    short_name: "10002018"
+    description: GCOM-C/SGLI — Land area/L2-AGB
+  sgli-l2-land-area-l2-lst:
+    protocol: gportal
+    short_name: "10002019"
+    description: GCOM-C/SGLI — Land area/L2-LST
+  sgli-l2-land-area-statistics-l2-statis:
+    protocol: gportal
+    short_name: "10002022"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA
+  sgli-l2-land-area-statistics-l2-statis-2021:
+    protocol: gportal
+    short_name: "10002021"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA
+  sgli-l2-land-area-statistics-l2-statis-2020:
+    protocol: gportal
+    short_name: "10002020"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA
+  sgli-l2-land-area-statistics-l2-statis-2078:
+    protocol: gportal
+    short_name: "10002078"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2046:
+    protocol: gportal
+    short_name: "10002046"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2045:
+    protocol: gportal
+    short_name: "10002045"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2044:
+    protocol: gportal
+    short_name: "10002044"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2043:
+    protocol: gportal
+    short_name: "10002043"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2042:
+    protocol: gportal
+    short_name: "10002042"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2041:
+    protocol: gportal
+    short_name: "10002041"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2040:
+    protocol: gportal
+    short_name: "10002040"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2039:
+    protocol: gportal
+    short_name: "10002039"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2038:
+    protocol: gportal
+    short_name: "10002038"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2037:
+    protocol: gportal
+    short_name: "10002037"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2036:
+    protocol: gportal
+    short_name: "10002036"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2035:
+    protocol: gportal
+    short_name: "10002035"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2034:
+    protocol: gportal
+    short_name: "10002034"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2033:
+    protocol: gportal
+    short_name: "10002033"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2032:
+    protocol: gportal
+    short_name: "10002032"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2031:
+    protocol: gportal
+    short_name: "10002031"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2030:
+    protocol: gportal
+    short_name: "10002030"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2029:
+    protocol: gportal
+    short_name: "10002029"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2028:
+    protocol: gportal
+    short_name: "10002028"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2027:
+    protocol: gportal
+    short_name: "10002027"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2026:
+    protocol: gportal
+    short_name: "10002026"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2025:
+    protocol: gportal
+    short_name: "10002025"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2024:
+    protocol: gportal
+    short_name: "10002024"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2023:
+    protocol: gportal
+    short_name: "10002023"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF
+  sgli-l2-land-area-statistics-l2-statis-2047:
+    protocol: gportal
+    short_name: "10002047"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-NDVI
+  sgli-l2-land-area-statistics-l2-statis-2048:
+    protocol: gportal
+    short_name: "10002048"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-EVI
+  sgli-l2-land-area-statistics-l2-statis-2049:
+    protocol: gportal
+    short_name: "10002049"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-SDI
+  sgli-l2-land-area-statistics-l2-statis-2050:
+    protocol: gportal
+    short_name: "10002050"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-FPAR
+  sgli-l2-land-area-statistics-l2-statis-2051:
+    protocol: gportal
+    short_name: "10002051"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-LAI
+  sgli-l2-land-area-statistics-l2-statis-2053:
+    protocol: gportal
+    short_name: "10002053"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-AGB
+  sgli-l2-land-area-statistics-l2-statis-2052:
+    protocol: gportal
+    short_name: "10002052"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-VRI
+  sgli-l2-land-area-statistics-l2-statis-2054:
+    protocol: gportal
+    short_name: "10002054"
+    description: GCOM-C/SGLI — Land area statistics/L2 statistics-LST
+  sgli-l2-clfg:
+    protocol: gportal
+    short_name: "10002056"
+    description: GCOM-C/SGLI — Atmosphere/L2-CLFG
+  sgli-l2-clfg-2055:
+    protocol: gportal
+    short_name: "10002055"
+    description: GCOM-C/SGLI — Atmosphere/L2-CLFG
+  sgli-l2-clpr:
+    protocol: gportal
+    short_name: "10002058"
+    description: GCOM-C/SGLI — Atmosphere/L2-CLPR
+  sgli-l2-clpr-2057:
+    protocol: gportal
+    short_name: "10002057"
+    description: GCOM-C/SGLI — Atmosphere/L2-CLPR
+  sgli-l2-arnp:
+    protocol: gportal
+    short_name: "10002079"
+    description: GCOM-C/SGLI — Atmosphere/L2-ARNP
+  sgli-l2-arnp-ver-2:
+    protocol: gportal
+    short_name: "10002060"
+    description: GCOM-C/SGLI — Atmosphere/L2-ARNP Ver.2
+  sgli-l2-arnp-ver-2-2059:
+    protocol: gportal
+    short_name: "10002059"
+    description: GCOM-C/SGLI — Atmosphere/L2-ARNP Ver.2
+  sgli-l2-arpl-ver-2:
+    protocol: gportal
+    short_name: "10002062"
+    description: GCOM-C/SGLI — Atmosphere/L2-ARPL Ver.2
+  sgli-l2-arpl-ver-2-2061:
+    protocol: gportal
+    short_name: "10002061"
+    description: GCOM-C/SGLI — Atmosphere/L2-ARPL Ver.2
+  sgli-l2-atmosphere-global-l2-global-lc:
+    protocol: gportal
+    short_name: "10002063"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-LCLR
+  sgli-l2-atmosphere-global-l2-global-lt:
+    protocol: gportal
+    short_name: "10002066"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-LTOA
+  sgli-l2-atmosphere-global-l2-global-lt-2065:
+    protocol: gportal
+    short_name: "10002065"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-LTOA
+  sgli-l2-atmosphere-global-l2-global-lt-2064:
+    protocol: gportal
+    short_name: "10002064"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-LTOA
+  sgli-l2-atmosphere-global-l2-global-cl:
+    protocol: gportal
+    short_name: "10002068"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-CLFG
+  sgli-l2-atmosphere-global-l2-global-cl-2067:
+    protocol: gportal
+    short_name: "10002067"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-CLFG
+  sgli-l2-atmosphere-global-l2-global-cl-2070:
+    protocol: gportal
+    short_name: "10002070"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-CLPR
+  sgli-l2-atmosphere-global-l2-global-cl-2069:
+    protocol: gportal
+    short_name: "10002069"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-CLPR
+  sgli-l2-atmosphere-global-l2-global-ar:
+    protocol: gportal
+    short_name: "10002080"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-ARNP
+  sgli-l2-atmosphere-global-l2-global-ar-2072:
+    protocol: gportal
+    short_name: "10002072"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-ARNP Ver.2
+  sgli-l2-atmosphere-global-l2-global-ar-2071:
+    protocol: gportal
+    short_name: "10002071"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-ARNP Ver.2
+  sgli-l2-atmosphere-global-l2-global-ar-2074:
+    protocol: gportal
+    short_name: "10002074"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-ARPL Ver.2
+  sgli-l2-atmosphere-global-l2-global-ar-2073:
+    protocol: gportal
+    short_name: "10002073"
+    description: GCOM-C/SGLI — Atmosphere global/L2 global-ARPL Ver.2
+  sgli-l3-oceanic-sphere-l3-nwlr:
+    protocol: gportal
+    short_name: "10003013"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3012:
+    protocol: gportal
+    short_name: "10003012"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3011:
+    protocol: gportal
+    short_name: "10003011"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3010:
+    protocol: gportal
+    short_name: "10003010"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3009:
+    protocol: gportal
+    short_name: "10003009"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3008:
+    protocol: gportal
+    short_name: "10003008"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3007:
+    protocol: gportal
+    short_name: "10003007"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3006:
+    protocol: gportal
+    short_name: "10003006"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3005:
+    protocol: gportal
+    short_name: "10003005"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3004:
+    protocol: gportal
+    short_name: "10003004"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3003:
+    protocol: gportal
+    short_name: "10003003"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3002:
+    protocol: gportal
+    short_name: "10003002"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
   sgli-l3-nwlr:
     aliases: [sgli-l380, sgli-ocean-l380, gcom-c-nwlr]
     protocol: gportal
     short_name: "10003001"
-    description: GCOM-C/SGLI L3 Normalized Water-Leaving Radiance (NWLR) — ocean.
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-nwlr-3000:
+    protocol: gportal
+    short_name: "10003000"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-NWLR
+  sgli-l3-oceanic-sphere-l3-acp:
+    protocol: gportal
+    short_name: "10003017"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-ACP
+  sgli-l3-oceanic-sphere-l3-acp-3016:
+    protocol: gportal
+    short_name: "10003016"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-ACP
+  sgli-l3-oceanic-sphere-l3-acp-3015:
+    protocol: gportal
+    short_name: "10003015"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-ACP
+  sgli-l3-oceanic-sphere-l3-acp-3014:
+    protocol: gportal
+    short_name: "10003014"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-ACP
+  sgli-l3-oceanic-sphere-l3-par:
+    protocol: gportal
+    short_name: "10003019"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-PAR
+  sgli-l3-oceanic-sphere-l3-par-3018:
+    protocol: gportal
+    short_name: "10003018"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-PAR
+  sgli-l3-oceanic-sphere-l3-chla:
+    protocol: gportal
+    short_name: "10003021"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-CHLA
+  sgli-l3-oceanic-sphere-l3-chla-3020:
+    protocol: gportal
+    short_name: "10003020"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-CHLA
+  sgli-l3-oceanic-sphere-l3-tsm:
+    protocol: gportal
+    short_name: "10003023"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-TSM
+  sgli-l3-oceanic-sphere-l3-tsm-3022:
+    protocol: gportal
+    short_name: "10003022"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-TSM
+  sgli-l3-oceanic-sphere-l3-cdom:
+    protocol: gportal
+    short_name: "10003025"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-CDOM
+  sgli-l3-oceanic-sphere-l3-cdom-3024:
+    protocol: gportal
+    short_name: "10003024"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-CDOM
+  sgli-l3-oceanic-sphere-l3-sst:
+    protocol: gportal
+    short_name: "10003027"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-SST
+  sgli-l3-oceanic-sphere-l3-sst-3026:
+    protocol: gportal
+    short_name: "10003026"
+    description: GCOM-C/SGLI — Oceanic sphere/L3-SST
+  sgli-l3-sice:
+    protocol: gportal
+    short_name: "10003031"
+    description: GCOM-C/SGLI — Cryosphere/L3-SICE
+  sgli-l3-sice-3030:
+    protocol: gportal
+    short_name: "10003030"
+    description: GCOM-C/SGLI — Cryosphere/L3-SICE
+  sgli-l3-sice-3029:
+    protocol: gportal
+    short_name: "10003029"
+    description: GCOM-C/SGLI — Cryosphere/L3-SICE
+  sgli-l3-sice-3028:
+    protocol: gportal
+    short_name: "10003028"
+    description: GCOM-C/SGLI — Cryosphere/L3-SICE
+  sgli-l3-sist:
+    protocol: gportal
+    short_name: "10003035"
+    description: GCOM-C/SGLI — Cryosphere/L3-SIST
+  sgli-l3-sist-3034:
+    protocol: gportal
+    short_name: "10003034"
+    description: GCOM-C/SGLI — Cryosphere/L3-SIST
+  sgli-l3-sist-3033:
+    protocol: gportal
+    short_name: "10003033"
+    description: GCOM-C/SGLI — Cryosphere/L3-SIST
+  sgli-l3-sist-3032:
+    protocol: gportal
+    short_name: "10003032"
+    description: GCOM-C/SGLI — Cryosphere/L3-SIST
+  sgli-l3-sgsl:
+    protocol: gportal
+    short_name: "10003039"
+    description: GCOM-C/SGLI — Cryosphere/L3-SGSL
+  sgli-l3-sgsl-3038:
+    protocol: gportal
+    short_name: "10003038"
+    description: GCOM-C/SGLI — Cryosphere/L3-SGSL
+  sgli-l3-sgsl-3037:
+    protocol: gportal
+    short_name: "10003037"
+    description: GCOM-C/SGLI — Cryosphere/L3-SGSL
+  sgli-l3-sgsl-3036:
+    protocol: gportal
+    short_name: "10003036"
+    description: GCOM-C/SGLI — Cryosphere/L3-SGSL
+  sgli-l3-land-area-l3-rsrf:
+    protocol: gportal
+    short_name: "10003105"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3104:
+    protocol: gportal
+    short_name: "10003104"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3103:
+    protocol: gportal
+    short_name: "10003103"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3102:
+    protocol: gportal
+    short_name: "10003102"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3101:
+    protocol: gportal
+    short_name: "10003101"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3100:
+    protocol: gportal
+    short_name: "10003100"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3099:
+    protocol: gportal
+    short_name: "10003099"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3098:
+    protocol: gportal
+    short_name: "10003098"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3097:
+    protocol: gportal
+    short_name: "10003097"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3096:
+    protocol: gportal
+    short_name: "10003096"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3095:
+    protocol: gportal
+    short_name: "10003095"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3094:
+    protocol: gportal
+    short_name: "10003094"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3093:
+    protocol: gportal
+    short_name: "10003093"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3092:
+    protocol: gportal
+    short_name: "10003092"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3091:
+    protocol: gportal
+    short_name: "10003091"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3090:
+    protocol: gportal
+    short_name: "10003090"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3089:
+    protocol: gportal
+    short_name: "10003089"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3088:
+    protocol: gportal
+    short_name: "10003088"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3087:
+    protocol: gportal
+    short_name: "10003087"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3086:
+    protocol: gportal
+    short_name: "10003086"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3085:
+    protocol: gportal
+    short_name: "10003085"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3084:
+    protocol: gportal
+    short_name: "10003084"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3083:
+    protocol: gportal
+    short_name: "10003083"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3082:
+    protocol: gportal
+    short_name: "10003082"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3081:
+    protocol: gportal
+    short_name: "10003081"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3080:
+    protocol: gportal
+    short_name: "10003080"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3079:
+    protocol: gportal
+    short_name: "10003079"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3078:
+    protocol: gportal
+    short_name: "10003078"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3077:
+    protocol: gportal
+    short_name: "10003077"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3076:
+    protocol: gportal
+    short_name: "10003076"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3075:
+    protocol: gportal
+    short_name: "10003075"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3074:
+    protocol: gportal
+    short_name: "10003074"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3073:
+    protocol: gportal
+    short_name: "10003073"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3072:
+    protocol: gportal
+    short_name: "10003072"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3071:
+    protocol: gportal
+    short_name: "10003071"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3070:
+    protocol: gportal
+    short_name: "10003070"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3069:
+    protocol: gportal
+    short_name: "10003069"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3068:
+    protocol: gportal
+    short_name: "10003068"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3067:
+    protocol: gportal
+    short_name: "10003067"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3066:
+    protocol: gportal
+    short_name: "10003066"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3065:
+    protocol: gportal
+    short_name: "10003065"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3064:
+    protocol: gportal
+    short_name: "10003064"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3063:
+    protocol: gportal
+    short_name: "10003063"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3062:
+    protocol: gportal
+    short_name: "10003062"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3061:
+    protocol: gportal
+    short_name: "10003061"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3060:
+    protocol: gportal
+    short_name: "10003060"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3059:
+    protocol: gportal
+    short_name: "10003059"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3058:
+    protocol: gportal
+    short_name: "10003058"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3057:
+    protocol: gportal
+    short_name: "10003057"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3056:
+    protocol: gportal
+    short_name: "10003056"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3055:
+    protocol: gportal
+    short_name: "10003055"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3054:
+    protocol: gportal
+    short_name: "10003054"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3053:
+    protocol: gportal
+    short_name: "10003053"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3052:
+    protocol: gportal
+    short_name: "10003052"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3051:
+    protocol: gportal
+    short_name: "10003051"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3050:
+    protocol: gportal
+    short_name: "10003050"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3049:
+    protocol: gportal
+    short_name: "10003049"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3048:
+    protocol: gportal
+    short_name: "10003048"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3047:
+    protocol: gportal
+    short_name: "10003047"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3046:
+    protocol: gportal
+    short_name: "10003046"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3045:
+    protocol: gportal
+    short_name: "10003045"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3044:
+    protocol: gportal
+    short_name: "10003044"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3043:
+    protocol: gportal
+    short_name: "10003043"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3042:
+    protocol: gportal
+    short_name: "10003042"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3041:
+    protocol: gportal
+    short_name: "10003041"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-rsrf-3040:
+    protocol: gportal
+    short_name: "10003040"
+    description: GCOM-C/SGLI — Land area/L3-RSRF
+  sgli-l3-land-area-l3-ndvi:
+    protocol: gportal
+    short_name: "10003107"
+    description: GCOM-C/SGLI — Land area/L3-NDVI
+  sgli-l3-land-area-l3-ndvi-3106:
+    protocol: gportal
+    short_name: "10003106"
+    description: GCOM-C/SGLI — Land area/L3-NDVI
+  sgli-l3-land-area-l3-evi:
+    protocol: gportal
+    short_name: "10003109"
+    description: GCOM-C/SGLI — Land area/L3-EVI
+  sgli-l3-land-area-l3-evi-3108:
+    protocol: gportal
+    short_name: "10003108"
+    description: GCOM-C/SGLI — Land area/L3-EVI
+  sgli-l3-land-area-l3-sdi:
+    protocol: gportal
+    short_name: "10003111"
+    description: GCOM-C/SGLI — Land area/L3-SDI
+  sgli-l3-land-area-l3-sdi-3110:
+    protocol: gportal
+    short_name: "10003110"
+    description: GCOM-C/SGLI — Land area/L3-SDI
+  sgli-l3-land-area-l3-fpar:
+    protocol: gportal
+    short_name: "10003113"
+    description: GCOM-C/SGLI — Land area/L3-FPAR
+  sgli-l3-land-area-l3-fpar-3112:
+    protocol: gportal
+    short_name: "10003112"
+    description: GCOM-C/SGLI — Land area/L3-FPAR
+  sgli-l3-land-area-l3-lai:
+    protocol: gportal
+    short_name: "10003115"
+    description: GCOM-C/SGLI — Land area/L3-LAI
+  sgli-l3-land-area-l3-lai-3114:
+    protocol: gportal
+    short_name: "10003114"
+    description: GCOM-C/SGLI — Land area/L3-LAI
+  sgli-l3-land-area-l3-agb:
+    protocol: gportal
+    short_name: "10003117"
+    description: GCOM-C/SGLI — Land area/L3-AGB
+  sgli-l3-land-area-l3-agb-3116:
+    protocol: gportal
+    short_name: "10003116"
+    description: GCOM-C/SGLI — Land area/L3-AGB
+  sgli-l3-land-area-l3-vri:
+    protocol: gportal
+    short_name: "10003119"
+    description: GCOM-C/SGLI — Land area/L3-VRI
+  sgli-l3-land-area-l3-vri-3118:
+    protocol: gportal
+    short_name: "10003118"
+    description: GCOM-C/SGLI — Land area/L3-VRI
+  sgli-l3-land-area-l3-lst:
+    protocol: gportal
+    short_name: "10003121"
+    description: GCOM-C/SGLI — Land area/L3-LST
+  sgli-l3-land-area-l3-lst-3120:
+    protocol: gportal
+    short_name: "10003120"
+    description: GCOM-C/SGLI — Land area/L3-LST
+  sgli-l3-clfr:
+    protocol: gportal
+    short_name: "10003147"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3146:
+    protocol: gportal
+    short_name: "10003146"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3145:
+    protocol: gportal
+    short_name: "10003145"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3144:
+    protocol: gportal
+    short_name: "10003144"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3143:
+    protocol: gportal
+    short_name: "10003143"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3142:
+    protocol: gportal
+    short_name: "10003142"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3141:
+    protocol: gportal
+    short_name: "10003141"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3140:
+    protocol: gportal
+    short_name: "10003140"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3139:
+    protocol: gportal
+    short_name: "10003139"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3138:
+    protocol: gportal
+    short_name: "10003138"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3137:
+    protocol: gportal
+    short_name: "10003137"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3136:
+    protocol: gportal
+    short_name: "10003136"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3135:
+    protocol: gportal
+    short_name: "10003135"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3134:
+    protocol: gportal
+    short_name: "10003134"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3133:
+    protocol: gportal
+    short_name: "10003133"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3132:
+    protocol: gportal
+    short_name: "10003132"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3131:
+    protocol: gportal
+    short_name: "10003131"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3130:
+    protocol: gportal
+    short_name: "10003130"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3129:
+    protocol: gportal
+    short_name: "10003129"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3128:
+    protocol: gportal
+    short_name: "10003128"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3127:
+    protocol: gportal
+    short_name: "10003127"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3126:
+    protocol: gportal
+    short_name: "10003126"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3125:
+    protocol: gportal
+    short_name: "10003125"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3124:
+    protocol: gportal
+    short_name: "10003124"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3123:
+    protocol: gportal
+    short_name: "10003123"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-clfr-3122:
+    protocol: gportal
+    short_name: "10003122"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLFR
+  sgli-l3-cltt:
+    protocol: gportal
+    short_name: "10003149"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLTT
+  sgli-l3-cltt-3148:
+    protocol: gportal
+    short_name: "10003148"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLTT
+  sgli-l3-clth:
+    protocol: gportal
+    short_name: "10003151"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLTH
+  sgli-l3-clth-3150:
+    protocol: gportal
+    short_name: "10003150"
+    description: GCOM-C/SGLI — Atmosphere/L3-CLTH
+  sgli-l3-cotw:
+    protocol: gportal
+    short_name: "10003153"
+    description: GCOM-C/SGLI — Atmosphere/L3-COTW
+  sgli-l3-cotw-3152:
+    protocol: gportal
+    short_name: "10003152"
+    description: GCOM-C/SGLI — Atmosphere/L3-COTW
+  sgli-l3-cerw:
+    protocol: gportal
+    short_name: "10003155"
+    description: GCOM-C/SGLI — Atmosphere/L3-CERW
+  sgli-l3-cerw-3154:
+    protocol: gportal
+    short_name: "10003154"
+    description: GCOM-C/SGLI — Atmosphere/L3-CERW
+  sgli-l3-coti:
+    protocol: gportal
+    short_name: "10003157"
+    description: GCOM-C/SGLI — Atmosphere/L3-COTI
+  sgli-l3-coti-3156:
+    protocol: gportal
+    short_name: "10003156"
+    description: GCOM-C/SGLI — Atmosphere/L3-COTI
+  sgli-l3-arot:
+    protocol: gportal
+    short_name: "10003173"
+    description: GCOM-C/SGLI — Atmosphere/L3-AROT
+  sgli-l3-arot-3172:
+    protocol: gportal
+    short_name: "10003172"
+    description: GCOM-C/SGLI — Atmosphere/L3-AROT
+  sgli-l3-arae:
+    protocol: gportal
+    short_name: "10003175"
+    description: GCOM-C/SGLI — Atmosphere/L3-ARAE
+  sgli-l3-arae-3174:
+    protocol: gportal
+    short_name: "10003174"
+    description: GCOM-C/SGLI — Atmosphere/L3-ARAE
+  sgli-l3-assa:
+    protocol: gportal
+    short_name: "10003177"
+    description: GCOM-C/SGLI — Atmosphere/L3-ASSA
+  sgli-l3-assa-3176:
+    protocol: gportal
+    short_name: "10003176"
+    description: GCOM-C/SGLI — Atmosphere/L3-ASSA
+  sgli-l3-aoto-ver-2:
+    protocol: gportal
+    short_name: "10003159"
+    description: GCOM-C/SGLI — Atmosphere/L3-AOTO Ver.2
+  sgli-l3-aoto-ver-2-3158:
+    protocol: gportal
+    short_name: "10003158"
+    description: GCOM-C/SGLI — Atmosphere/L3-AOTO Ver.2
+  sgli-l3-aotl-ver-2:
+    protocol: gportal
+    short_name: "10003161"
+    description: GCOM-C/SGLI — Atmosphere/L3-AOTL Ver.2
+  sgli-l3-aotl-ver-2-3160:
+    protocol: gportal
+    short_name: "10003160"
+    description: GCOM-C/SGLI — Atmosphere/L3-AOTL Ver.2
+  sgli-l3-aaeo-ver-2:
+    protocol: gportal
+    short_name: "10003163"
+    description: GCOM-C/SGLI — Atmosphere/L3-AAEO Ver.2
+  sgli-l3-aaeo-ver-2-3162:
+    protocol: gportal
+    short_name: "10003162"
+    description: GCOM-C/SGLI — Atmosphere/L3-AAEO Ver.2
+  sgli-l3-aael-ver-2:
+    protocol: gportal
+    short_name: "10003165"
+    description: GCOM-C/SGLI — Atmosphere/L3-AAEL Ver.2
+  sgli-l3-aael-ver-2-3164:
+    protocol: gportal
+    short_name: "10003164"
+    description: GCOM-C/SGLI — Atmosphere/L3-AAEL Ver.2
+  sgli-l3-aotp-ver-2:
+    protocol: gportal
+    short_name: "10003167"
+    description: GCOM-C/SGLI — Atmosphere/L3-AOTP Ver.2
+  sgli-l3-aotp-ver-2-3166:
+    protocol: gportal
+    short_name: "10003166"
+    description: GCOM-C/SGLI — Atmosphere/L3-AOTP Ver.2
+  sgli-l3-aaep-ver-2:
+    protocol: gportal
+    short_name: "10003169"
+    description: GCOM-C/SGLI — Atmosphere/L3-AAEP Ver.2
+  sgli-l3-aaep-ver-2-3168:
+    protocol: gportal
+    short_name: "10003168"
+    description: GCOM-C/SGLI — Atmosphere/L3-AAEP Ver.2
+  sgli-l3-assa-ver-2:
+    protocol: gportal
+    short_name: "10003171"
+    description: GCOM-C/SGLI — Atmosphere/L3-ASSA Ver.2
+  sgli-l3-assa-ver-2-3170:
+    protocol: gportal
+    short_name: "10003170"
+    description: GCOM-C/SGLI — Atmosphere/L3-ASSA Ver.2
+  amsr2-l1-tb:
+    protocol: gportal
+    short_name: "11001001"
+    description: GCOM-W/AMSR2 — L1B-Brightness temperature（TB）
   amsr2-l1r:
     aliases: [amsr2-l1, gcom-w-l1r]
     protocol: gportal
     short_name: "11001002"
-    description: GCOM-W/AMSR2 L1R resampled brightness temperatures (TB).
-  alos2-palsar2-uf-sp:
-    aliases: [palsar2, alos2-l1, alos2-palsar2]
+    description: GCOM-W/AMSR2 — L1R-Brightness temperature（TB）
+  amsr2-l2-tpw:
     protocol: gportal
-    short_name: "27004001"
-    description: ALOS-2/PALSAR-2 L1.1 ultra-fine 3 m single-pol.
-  earthcare-cpr-eco:
-    aliases: [earthcare, cpr]
+    short_name: "11002009"
+    description: GCOM-W/AMSR2 — L2-Integrated Water Vapor（TPW）
+  amsr2-l2-tpw-2000:
     protocol: gportal
-    short_name: "16002000"
-    description: EarthCARE/CPR L2 Echo Product (CPR_ECO).
+    short_name: "11002000"
+    description: GCOM-W/AMSR2 — L2-Integrated Water Vapor（TPW）
+  amsr2-l2-clw:
+    protocol: gportal
+    short_name: "11002010"
+    description: GCOM-W/AMSR2 — L2-Cloud Liquid Water（CLW）
+  amsr2-l2-clw-2001:
+    protocol: gportal
+    short_name: "11002001"
+    description: GCOM-W/AMSR2 — L2-Cloud Liquid Water（CLW）
+  amsr2-l2-prc:
+    protocol: gportal
+    short_name: "11002003"
+    description: GCOM-W/AMSR2 — L2-Precipitation（PRC）
+  amsr2-l2-prc-2002:
+    protocol: gportal
+    short_name: "11002002"
+    description: GCOM-W/AMSR2 — L2-Precipitation（PRC）
+  amsr2-l2-sst:
+    protocol: gportal
+    short_name: "11002011"
+    description: GCOM-W/AMSR2 — L2-Sea Surface Temperture（SST）
+  amsr2-l2-sst-2004:
+    protocol: gportal
+    short_name: "11002004"
+    description: GCOM-W/AMSR2 — L2-Sea Surface Temperture（SST）
+  amsr2-l2-ssw:
+    protocol: gportal
+    short_name: "11002012"
+    description: GCOM-W/AMSR2 — L2-Sea Surface Wind Speed（SSW）
+  amsr2-l2-ssw-2005:
+    protocol: gportal
+    short_name: "11002005"
+    description: GCOM-W/AMSR2 — L2-Sea Surface Wind Speed（SSW）
+  amsr2-l2-sic:
+    protocol: gportal
+    short_name: "11002013"
+    description: GCOM-W/AMSR2 — L2-Sea Ice Concentration（SIC）
+  amsr2-l2-sic-2006:
+    protocol: gportal
+    short_name: "11002006"
+    description: GCOM-W/AMSR2 — L2-Sea Ice Concentration（SIC）
+  amsr2-l2-snd:
+    protocol: gportal
+    short_name: "11002014"
+    description: GCOM-W/AMSR2 — L2-Snow Depth（SND）
+  amsr2-l2-snd-2007:
+    protocol: gportal
+    short_name: "11002007"
+    description: GCOM-W/AMSR2 — L2-Snow Depth（SND）
+  amsr2-l2-smc:
+    protocol: gportal
+    short_name: "11002015"
+    description: GCOM-W/AMSR2 — L2-Soil Moisture Content（SMC）
+  amsr2-l2-smc-2008:
+    protocol: gportal
+    short_name: "11002008"
+    description: GCOM-W/AMSR2 — L2-Soil Moisture Content（SMC）
+  amsr2-l3-0-1deg-l3-integrated-water-vap:
+    protocol: gportal
+    short_name: "11003001"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Integrated Water Vapor（TPW）_0.1deg
+  amsr2-l3-0-1deg-l3-integrated-water-vap-3000:
+    protocol: gportal
+    short_name: "11003000"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Integrated Water Vapor（TPW）_0.1deg
+  amsr2-l3-0-1deg-l3-cloud-liquid-water-c:
+    protocol: gportal
+    short_name: "11003003"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Cloud Liquid Water（CLW）_0.1deg
+  amsr2-l3-0-1deg-l3-cloud-liquid-water-c-3002:
+    protocol: gportal
+    short_name: "11003002"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Cloud Liquid Water（CLW）_0.1deg
+  amsr2-l3-0-1deg-l3-precipitation-prc-0:
+    protocol: gportal
+    short_name: "11003005"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Precipitation（PRC）_0.1deg
+  amsr2-l3-0-1deg-l3-precipitation-prc-0-3004:
+    protocol: gportal
+    short_name: "11003004"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Precipitation（PRC）_0.1deg
+  amsr2-l3-0-1deg-l3-sea-surface-tempertu:
+    protocol: gportal
+    short_name: "11003007"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Sea Surface Temperture（SST）_0.1deg
+  amsr2-l3-0-1deg-l3-sea-surface-tempertu-3006:
+    protocol: gportal
+    short_name: "11003006"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Sea Surface Temperture（SST）_0.1deg
+  amsr2-l3-0-1deg-l3-sea-surface-wind-spe:
+    protocol: gportal
+    short_name: "11003009"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Sea Surface Wind Speed（SSW）_0.1deg
+  amsr2-l3-0-1deg-l3-sea-surface-wind-spe-3008:
+    protocol: gportal
+    short_name: "11003008"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Sea Surface Wind Speed（SSW）_0.1deg
+  amsr2-l3-0-1deg-l3-ice-concentration-si:
+    protocol: gportal
+    short_name: "11003011"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Ice Concentration（SIC）_0.1deg
+  amsr2-l3-0-1deg-l3-ice-concentration-si-3010:
+    protocol: gportal
+    short_name: "11003010"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Ice Concentration（SIC）_0.1deg
+  amsr2-l3-0-1deg-l3-snow-depth-snd-0-1de:
+    protocol: gportal
+    short_name: "11003013"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Snow Depth（SND）_0.1deg
+  amsr2-l3-0-1deg-l3-snow-depth-snd-0-1de-3012:
+    protocol: gportal
+    short_name: "11003012"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Snow Depth（SND）_0.1deg
+  amsr2-l3-0-1deg-l3-soil-moisture-conten:
+    protocol: gportal
+    short_name: "11003015"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Soil Moisture Content（SMC）_0.1deg
+  amsr2-l3-0-1deg-l3-soil-moisture-conten-3014:
+    protocol: gportal
+    short_name: "11003014"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Soil Moisture Content（SMC）_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu:
+    protocol: gportal
+    short_name: "11003017"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_6GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3016:
+    protocol: gportal
+    short_name: "11003016"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_6GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3019:
+    protocol: gportal
+    short_name: "11003019"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_7GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3018:
+    protocol: gportal
+    short_name: "11003018"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_7GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3021:
+    protocol: gportal
+    short_name: "11003021"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_10GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3020:
+    protocol: gportal
+    short_name: "11003020"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_10GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3023:
+    protocol: gportal
+    short_name: "11003023"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_18GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3022:
+    protocol: gportal
+    short_name: "11003022"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_18GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3025:
+    protocol: gportal
+    short_name: "11003025"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_23GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3024:
+    protocol: gportal
+    short_name: "11003024"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_23GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3027:
+    protocol: gportal
+    short_name: "11003027"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_36GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3026:
+    protocol: gportal
+    short_name: "11003026"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_36GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3029:
+    protocol: gportal
+    short_name: "11003029"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_89GHz_0.1deg
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3028:
+    protocol: gportal
+    short_name: "11003028"
+    description: GCOM-W/AMSR2 — 10km/0.1deg/L3-Brightness temperature（TB）_89GHz_0.1deg
+  amsr2-l3-0-25deg-l3-integrated-water-va:
+    protocol: gportal
+    short_name: "11003031"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Integrated Water Vapor（TPW）_0.25deg
+  amsr2-l3-0-25deg-l3-integrated-water-va-3030:
+    protocol: gportal
+    short_name: "11003030"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Integrated Water Vapor（TPW）_0.25deg
+  amsr2-l3-0-25deg-l3-cloud-liquid-water:
+    protocol: gportal
+    short_name: "11003033"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Cloud Liquid Water（CLW）_0.25deg
+  amsr2-l3-0-25deg-l3-cloud-liquid-water-3032:
+    protocol: gportal
+    short_name: "11003032"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Cloud Liquid Water（CLW）_0.25deg
+  amsr2-l3-0-25deg-l3-precipitation-prc-0:
+    protocol: gportal
+    short_name: "11003035"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Precipitation（PRC）_0.25deg
+  amsr2-l3-0-25deg-l3-precipitation-prc-0-3034:
+    protocol: gportal
+    short_name: "11003034"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Precipitation（PRC）_0.25deg
+  amsr2-l3-0-25deg-l3-sea-surface-tempert:
+    protocol: gportal
+    short_name: "11003037"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Surface Temperture（SST）_0.25deg
+  amsr2-l3-0-25deg-l3-sea-surface-tempert-3036:
+    protocol: gportal
+    short_name: "11003036"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Surface Temperture（SST）_0.25deg
+  amsr2-l3-0-25deg-l3-sea-surface-wind-sp:
+    protocol: gportal
+    short_name: "11003039"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Surface Wind Speed（SSW）_0.25deg
+  amsr2-l3-0-25deg-l3-sea-surface-wind-sp-3038:
+    protocol: gportal
+    short_name: "11003038"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Surface Wind Speed（SSW）_0.25deg
+  amsr2-l3-0-25deg-l3-sea-ice-concentrati:
+    protocol: gportal
+    short_name: "11003041"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Ice Concentration（SIC）_0.25deg
+  amsr2-l3-0-25deg-l3-sea-ice-concentrati-3040:
+    protocol: gportal
+    short_name: "11003040"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Sea Ice Concentration（SIC）_0.25deg
+  amsr2-l3-0-25deg-l3-snow-depth-snd-0-25:
+    protocol: gportal
+    short_name: "11003043"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Snow Depth（SND）_0.25deg
+  amsr2-l3-0-25deg-l3-snow-depth-snd-0-25-3042:
+    protocol: gportal
+    short_name: "11003042"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Snow Depth（SND）_0.25deg
+  amsr2-l3-0-25deg-l3-soil-moisture-conte:
+    protocol: gportal
+    short_name: "11003045"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Soil Moisture Content（SMC）_0.25deg
+  amsr2-l3-0-25deg-l3-soil-moisture-conte-3044:
+    protocol: gportal
+    short_name: "11003044"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Soil Moisture Content（SMC）_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat:
+    protocol: gportal
+    short_name: "11003047"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_6GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3046:
+    protocol: gportal
+    short_name: "11003046"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_6GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3049:
+    protocol: gportal
+    short_name: "11003049"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_7GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3048:
+    protocol: gportal
+    short_name: "11003048"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_7GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3051:
+    protocol: gportal
+    short_name: "11003051"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_10GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3050:
+    protocol: gportal
+    short_name: "11003050"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_10GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3053:
+    protocol: gportal
+    short_name: "11003053"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_18GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3052:
+    protocol: gportal
+    short_name: "11003052"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_18GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3055:
+    protocol: gportal
+    short_name: "11003055"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_23GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3054:
+    protocol: gportal
+    short_name: "11003054"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_23GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3057:
+    protocol: gportal
+    short_name: "11003057"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_36GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3056:
+    protocol: gportal
+    short_name: "11003056"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_36GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3059:
+    protocol: gportal
+    short_name: "11003059"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_89GHz_0.25deg
+  amsr2-l3-0-25deg-l3-brightness-temperat-3058:
+    protocol: gportal
+    short_name: "11003058"
+    description: GCOM-W/AMSR2 — 25km/0.25deg/L3-Brightness temperature（TB）_89GHz_0.25deg
   gpm-dpr-kupr-l1b:
     aliases: [gpm, dpr, kupr]
     protocol: gportal
     short_name: "12001000"
-    description: GPM/DPR KuPR L1B received power.
+    description: GPM — LEVEL1/KuPR L1B Received Power
+  gpm-dpr-l1-kapr-l1b-received-power:
+    protocol: gportal
+    short_name: "12001001"
+    description: GPM — LEVEL1/KaPR L1B Received Power
+  gpm-dpr-l2-kupr-l2-precipitation:
+    protocol: gportal
+    short_name: "12002000"
+    description: GPM — LEVEL2/KuPR L2 Precipitation
+  gpm-dpr-l2-kapr-l2-precipitation:
+    protocol: gportal
+    short_name: "12002001"
+    description: GPM — LEVEL2/KaPR L2 Precipitation
+  gpm-dpr-l2-dpr-l2-precipitation:
+    protocol: gportal
+    short_name: "12002002"
+    description: GPM — LEVEL2/DPR L2 Precipitation
+  gpm-dpr-l2-dpr-l2-spectral-latent-heating:
+    protocol: gportal
+    short_name: "12002003"
+    description: GPM — LEVEL2/DPR L2 Spectral Latent Heating
+  gpm-dpr-l3-daily-hdf:
+    protocol: gportal
+    short_name: "12003000"
+    description: GPM — LEVEL3/DPR L3 Precipitation (Daily HDF)
+  gpm-dpr-l3-daily-text:
+    protocol: gportal
+    short_name: "12003001"
+    description: GPM — LEVEL3/DPR L3 Precipitation (Daily TEXT)
+  gpm-dpr-l3-monthly-hdf:
+    protocol: gportal
+    short_name: "12003004"
+    description: GPM — LEVEL3/DPR L3  Precipitation (Monthly HDF)
+  gpm-dpr-l3-dpr-l3-gridded-orbital-spectra:
+    protocol: gportal
+    short_name: "12003006"
+    description: GPM — LEVEL3/DPR L3 Gridded Orbital Spectral Latent Heating
+  gpm-dpr-l3-dpr-l3-monthly-spectral-latent:
+    protocol: gportal
+    short_name: "12003007"
+    description: GPM — LEVEL3/DPR L3 Monthly Spectral Latent Heating
+  gpm-gmi-l1-gmi-l1b-brightness-temperature:
+    protocol: gportal
+    short_name: "12011000"
+    description: GPM — LEVEL1/GMI L1B Brightness Temperature
+  gpm-gmi-l1-gmi-l1c-inter-calibrated-brigh:
+    protocol: gportal
+    short_name: "12011001"
+    description: GPM — LEVEL1/GMI L1C Inter- Calibrated Brightness Temperature
+  gpm-gmi-l2-gmi-l2-precipitation:
+    protocol: gportal
+    short_name: "12012000"
+    description: GPM — LEVEL2/GMI L2 Precipitation
+  gpm-gmi-l3-gmi-l3-precipitation:
+    protocol: gportal
+    short_name: "12013000"
+    description: GPM — LEVEL3/GMI L3 Precipitation
+  gpm-gmi-comb-l2-comb-l2-precipitation:
+    protocol: gportal
+    short_name: "12022000"
+    description: GPM — LEVEL2/COMB L2 Precipitation
+  gpm-gmi-comb-l3-comb-dpr-gmi-l3-precipitation:
+    protocol: gportal
+    short_name: "12023000"
+    description: GPM — LEVEL3/Comb DPR/GMI L3 Precipitation
+  gpm-gmi-comb-l3-comb-l3-gridded-orbital-spectr:
+    protocol: gportal
+    short_name: "12023001"
+    description: GPM — LEVEL3/COMB L3 Gridded Orbital Spectral Latent Heating
+  gpm-gmi-comb-l3-comb-l3-monthly-spectral-laten:
+    protocol: gportal
+    short_name: "12023002"
+    description: GPM — LEVEL3/COMB L3 Monthly Spectral Latent Heating
+  gpm-environment-auxiliary-kupr-environment-auxiliary:
+    protocol: gportal
+    short_name: "12032000"
+    description: GPM — KuPR Environment Auxiliary
+  gpm-environment-auxiliary-kapr-environment-auxiliary:
+    protocol: gportal
+    short_name: "12032001"
+    description: GPM — KaPR Environment Auxiliary
+  gpm-environment-auxiliary-dpr-environment-auxiliary:
+    protocol: gportal
+    short_name: "12032002"
+    description: GPM — DPR Environment Auxiliary
+  gpmc-tmi-l1-trmm-tmi-l1c-inter-calibrated:
+    protocol: gportal
+    short_name: "13001000"
+    description: GPM Constellation satellites — LEVEL1/TRMM TMI L1C Inter-Calibrated Brightness Temperature
+  gpmc-amsr2-l1-gcom-w-amsr2-l1c-inter-calibra:
+    protocol: gportal
+    short_name: "13011000"
+    description: GPM Constellation satellites — LEVEL1/GCOM-W AMSR2 L1C Inter-Calibrated Brightness Temperature
+  gpmc-ssmis-l1-dmsp-f16-ssmis-l1c-inter-calib:
+    protocol: gportal
+    short_name: "13021000"
+    description: GPM Constellation satellites — LEVEL1/DMSP F16 SSMIS L1C Inter-Calibrated Brightness Temperature
+  gpmc-ssmis-l1-dmsp-f17-ssmis-l1c-inter-calib:
+    protocol: gportal
+    short_name: "13021001"
+    description: GPM Constellation satellites — LEVEL1/DMSP F17 SSMIS L1C Inter-Calibrated Brightness Temperature
+  gpmc-ssmis-l1-dmsp-f18-ssmis-l1c-inter-calib:
+    protocol: gportal
+    short_name: "13021002"
+    description: GPM Constellation satellites — LEVEL1/DMSP F18 SSMIS L1C Inter-Calibrated Brightness Temperature
+  gpmc-ssmis-l1-dmsp-f19-ssmis-l1c-inter-calib:
+    protocol: gportal
+    short_name: "13021003"
+    description: GPM Constellation satellites — LEVEL1/DMSP F19 SSMIS L1C Inter-Calibrated Brightness Temperature
+  gpmc-mhs-l1-noaa-18-mhs-l1c-inter-calibrat:
+    protocol: gportal
+    short_name: "13031000"
+    description: GPM Constellation satellites — LEVEL1/NOAA-18 MHS L1C Inter-Calibrated Brightness Temperature
+  gpmc-mhs-l1-noaa-19-mhs-l1c-inter-calibrat:
+    protocol: gportal
+    short_name: "13031001"
+    description: GPM Constellation satellites — LEVEL1/NOAA-19 MHS L1C Inter-Calibrated Brightness Temperature
+  gpmc-mhs-l1-metop-a-mhs-l1c-inter-calibrat:
+    protocol: gportal
+    short_name: "13031002"
+    description: GPM Constellation satellites — LEVEL1/METOP-A MHS L1C Inter-Calibrated Brightness Temperature
+  gpmc-mhs-l1-metop-b-mhs-l1c-inter-calibrat:
+    protocol: gportal
+    short_name: "13031003"
+    description: GPM Constellation satellites — LEVEL1/METOP-B MHS L1C Inter-Calibrated Brightness Temperature
+  gpmc-atms-l1-npp-atms-l1c-inter-calibrated:
+    protocol: gportal
+    short_name: "13041000"
+    description: GPM Constellation satellites — LEVEL1/NPP ATMS L1C Inter-Calibrated Brightness Temperature
+  gpmc-saphir-l1-megha-tropiques-saphir-l1c-int:
+    protocol: gportal
+    short_name: "13051000"
+    description: GPM Constellation satellites — LEVEL1/Megha Tropiques SAPHIR L1C Inter-Calibrated Brightness Temperature
+  gsmap-gp-l3-hourly-hdf:
+    protocol: gportal
+    short_name: "14003000"
+    description: GSMaP — GSMaP Precipitation(Hourly HDF)
+  gsmap-gp-l3-hourly-text:
+    protocol: gportal
+    short_name: "14003001"
+    description: GSMaP — GSMaP Precipitation(Hourly TEXT)
+  gsmap-gp-l3-monthly-hdf:
+    protocol: gportal
+    short_name: "14003004"
+    description: GSMaP — GSMaP Precipitation(Monthly HDF)
+  trmmgpm-pr-l1-pr-l1b-received-power:
+    protocol: gportal
+    short_name: "15001000"
+    description: TRMM_GPMFormat — LEVEL1/PR L1B Received Power
+  trmmgpm-pr-l2-pr-l2-precipitation:
+    protocol: gportal
+    short_name: "15002000"
+    description: TRMM_GPMFormat — LEVEL2/PR L2 Precipitation
+  trmmgpm-pr-l2-pr-l2-spectral-latent-heating:
+    protocol: gportal
+    short_name: "15002001"
+    description: TRMM_GPMFormat — LEVEL2/PR L2 Spectral Latent Heating
+  trmmgpm-pr-l3-daily-hdf:
+    protocol: gportal
+    short_name: "15003000"
+    description: TRMM_GPMFormat — LEVEL3/PR L3 Precipitation (Daily HDF)
+  trmmgpm-pr-l3-daily-text:
+    protocol: gportal
+    short_name: "15003001"
+    description: TRMM_GPMFormat — LEVEL3/PR L3 Precipitation (Daily TEXT)
+  trmmgpm-pr-l3-monthly-hdf:
+    protocol: gportal
+    short_name: "15003002"
+    description: TRMM_GPMFormat — LEVEL3/PR L3 Precipitation (Monthly HDF)
+  trmmgpm-pr-l3-pr-l3-gridded-orbital-spectral:
+    protocol: gportal
+    short_name: "15003003"
+    description: TRMM_GPMFormat — LEVEL3/PR L3 Gridded Orbital Spectral Latent Heating
+  trmmgpm-pr-l3-pr-l3-monthly-spectral-latent:
+    protocol: gportal
+    short_name: "15003004"
+    description: TRMM_GPMFormat — LEVEL3/PR L3 Monthly Spectral Latent Heating
+  trmmgpm-tmi-l1-tmi-l1b-brightness-temperature:
+    protocol: gportal
+    short_name: "15011000"
+    description: TRMM_GPMFormat — LEVEL1/TMI L1B Brightness Temperature
+  trmmgpm-tmi-l2-tmi-l2-precipitation:
+    protocol: gportal
+    short_name: "15012000"
+    description: TRMM_GPMFormat — LEVEL2/TMI L2 Precipitation
+  trmmgpm-tmi-l3-tmi-l3-precipitation:
+    protocol: gportal
+    short_name: "15013000"
+    description: TRMM_GPMFormat — LEVEL3/TMI L3 Precipitation
+  trmmgpm-tmi-comb-l2-comb-l2-precipitation:
+    protocol: gportal
+    short_name: "15022000"
+    description: TRMM_GPMFormat — LEVEL2/COMB L2 Precipitation
+  trmmgpm-tmi-comb-l3-comb-l3-precipitation:
+    protocol: gportal
+    short_name: "15023000"
+    description: TRMM_GPMFormat — LEVEL3/COMB L3 Precipitation
+  trmmgpm-tmi-comb-l3-comb-l3-gridded-orbital-spectr:
+    protocol: gportal
+    short_name: "15023001"
+    description: TRMM_GPMFormat — LEVEL3/COMB L3 Gridded Orbital Spectral Latent Heating
+  trmmgpm-tmi-comb-l3-comb-l3-monthly-spectral-laten:
+    protocol: gportal
+    short_name: "15023002"
+    description: TRMM_GPMFormat — LEVEL3/COMB L3 Monthly Spectral Latent Heating
+  trmmgpm-virs-l1-virs-l1b-radiance:
+    protocol: gportal
+    short_name: "15031000"
+    description: TRMM_GPMFormat — LEVEL1/VIRS L1B Radiance
+  trmmgpm-environment-auxiliary-pr-environment-auxiliary:
+    protocol: gportal
+    short_name: "15042000"
+    description: TRMM_GPMFormat — PR Environment Auxiliary
+  earthcare-cpr-l1-cpr-nom:
+    protocol: gportal
+    short_name: "16001000"
+    description: EarthCARE — LEVEL1/CPR L1b（CPR_NOM）
+  earthcare-cpr-eco:
+    aliases: [earthcare, cpr]
+    protocol: gportal
+    short_name: "16002000"
+    description: EarthCARE — LEVEL2/Echo Product（CPR_ECO）
+  earthcare-cpr-l2-cpr-clp:
+    protocol: gportal
+    short_name: "16002001"
+    description: EarthCARE — LEVEL2/Cloud Product（CPR_CLP）
+  earthcare-cpr-l2-cpr-fmr:
+    protocol: gportal
+    short_name: "16002002"
+    description: EarthCARE — LEVEL2/Feature Mask and Corrected Reflectivity（CPR_FMR）
+  earthcare-cpr-l2-cpr-cd:
+    protocol: gportal
+    short_name: "16002003"
+    description: EarthCARE — LEVEL2/Corrected CPR Doppler Measurements（CPR_CD_）
+  earthcare-cpr-l2-cpr-tc:
+    protocol: gportal
+    short_name: "16002004"
+    description: EarthCARE — LEVEL2/Target Classification（CPR_TC_）
+  earthcare-cpr-l2-cpr-cld:
+    protocol: gportal
+    short_name: "16002005"
+    description: EarthCARE — LEVEL2/Cloud profiles（CPR_CLD）
+  earthcare-atlid-l1-atl-nom:
+    protocol: gportal
+    short_name: "16011000"
+    description: EarthCARE — LEVEL1/L1b Backscatter Coefficient（ATL_NOM）
+  earthcare-atlid-l2-atl-cla:
+    protocol: gportal
+    short_name: "16012000"
+    description: EarthCARE — LEVEL2/Cloud and Aerosol（ATL_CLA）
+  earthcare-atlid-l2-atl-af:
+    protocol: gportal
+    short_name: "16012001"
+    description: EarthCARE — LEVEL2/Feature Mask（ATL_AF_）
+  earthcare-atlid-l2-atl-aer:
+    protocol: gportal
+    short_name: "16012002"
+    description: EarthCARE — LEVEL2/Aerosol Profiles（ATL_AER）
+  earthcare-atlid-l2-atl-ebd:
+    protocol: gportal
+    short_name: "16012003"
+    description: EarthCARE — LEVEL2/Extinction, Backscatter, Depolarisation（ATL_EBD）
+  earthcare-atlid-l2-atl-tc:
+    protocol: gportal
+    short_name: "16012004"
+    description: EarthCARE — LEVEL2/Target Classification（ATL_TC_）
+  earthcare-atlid-l2-atl-ice:
+    protocol: gportal
+    short_name: "16012005"
+    description: EarthCARE — LEVEL2/Ice Cloud Properties（ATL_ICE）
+  earthcare-atlid-l2-atl-cth:
+    protocol: gportal
+    short_name: "16012006"
+    description: EarthCARE — LEVEL2/Cloud Top Height（ATL_CTH）
+  earthcare-atlid-l2-atl-ald:
+    protocol: gportal
+    short_name: "16012007"
+    description: EarthCARE — LEVEL2/Aerosol Layer Descriptor（ATL_ALD）
+  earthcare-msi-l1-msi-nom-1b:
+    protocol: gportal
+    short_name: "16021000"
+    description: EarthCARE — LEVEL1/L1b Radiance（MSI_NOM_1B）
+  earthcare-msi-l1-msi-rgr-1c:
+    protocol: gportal
+    short_name: "16021001"
+    description: EarthCARE — LEVEL1/L1c Radiance（MSI_RGR_1C）
+  earthcare-msi-l2-msi-clp:
+    protocol: gportal
+    short_name: "16022000"
+    description: EarthCARE — LEVEL2/Cloud Product（MSI_CLP）
+  earthcare-msi-l2-msi-cm:
+    protocol: gportal
+    short_name: "16022001"
+    description: EarthCARE — LEVEL2/Cloud Mask （MSI_CM_）
+  earthcare-msi-l2-msi-cop:
+    protocol: gportal
+    short_name: "16022002"
+    description: EarthCARE — LEVEL2/Cloud Microphysical Parameters（MSI_COP）
+  earthcare-msi-l2-msi-aot:
+    protocol: gportal
+    short_name: "16022003"
+    description: EarthCARE — LEVEL2/Aerosol Optical Thickness （MSI_AOT）
+  earthcare-bbr-l1-bbr-nom:
+    protocol: gportal
+    short_name: "16031000"
+    description: EarthCARE — LEVEL1/L1b Radiometric（BBR_NOM）
+  earthcare-cpr-atlid-l2-ac-clp:
+    protocol: gportal
+    short_name: "16042000"
+    description: EarthCARE — LEVEL2/CPR-ATLID Synergy Cloud（AC__CLP）
+  earthcare-cpr-atlid-l2-ac-tc:
+    protocol: gportal
+    short_name: "16042001"
+    description: EarthCARE — LEVEL2/CPR-ATLID target classification (AC__TC_)
+  earthcare-cpr-atlid-msi-l2-acm-clp:
+    protocol: gportal
+    short_name: "16052000"
+    description: EarthCARE — LEVEL2/CPR-ATLID-MSI Synergy Cloud（ACM_CLP）
+  earthcare-cpr-atlid-msi-l2-acm-rt:
+    protocol: gportal
+    short_name: "16052001"
+    description: "EarthCARE — LEVEL2/Radiative flux and heating rate profiles & TOA (ACM_RT)"
+  earthcare-cpr-atlid-msi-l2-acm-cap:
+    protocol: gportal
+    short_name: "16052002"
+    description: EarthCARE — LEVEL2/Cloud and precipitation best estimates（ACM_CAP）
+  earthcare-cpr-atlid-msi-l2-acm-com:
+    protocol: gportal
+    short_name: "16052003"
+    description: EarthCARE — LEVEL2/Composite cloud /aerosol profiles derived from L2a（ACM_COM）
+  earthcare-cpr-atlid-msi-bbr-l2-all-rad:
+    protocol: gportal
+    short_name: "16062000"
+    description: EarthCARE — LEVEL2/Four Sensors Synergy Radiation Budget（ALL_RAD）
+  earthcare-cpr-atlid-msi-bbr-l2-all-df:
+    protocol: gportal
+    short_name: "16062001"
+    description: EarthCARE — LEVEL2/Difference 1D-Modelled and BBR-Estimated TOA Fluxes（ALL_DF_）
+  earthcare-cpr-atlid-msi-bbr-l2-all-3d:
+    protocol: gportal
+    short_name: "16052004"
+    description: EarthCARE — LEVEL2/Constructed 3D scene indecees（ALL_3D_）
+  earthcare-atlid-msi-l2-am-cth:
+    protocol: gportal
+    short_name: "16072000"
+    description: EarthCARE — LEVEL2/Cloud top height（AM__CTH）
+  earthcare-atlid-msi-l2-am-acd:
+    protocol: gportal
+    short_name: "16072001"
+    description: EarthCARE — LEVEL2/Aerosol column descriptor（AM__ACD）
+  earthcare-atlid-msi-l2-am-mo:
+    protocol: gportal
+    short_name: "16082000"
+    description: EarthCARE — LEVEL2/Merged observations（AM_MO_）
+  earthcare-atlid-msi-bbr-l2-bm-flx:
+    protocol: gportal
+    short_name: "16082001"
+    description: EarthCARE — LEVEL2/BBR-estimated TOA fluxes (BM__FLX)
+  earthcare-bbr-msi-l2-bm-rad:
+    protocol: gportal
+    short_name: "16092000"
+    description: EarthCARE — LEVEL2/BBR unfiltered radiances（BM__RAD）
+  earthcare-supprt-data-x-jsg:
+    protocol: gportal
+    short_name: "16101000"
+    description: EarthCARE — L1d Joint Standard Grid (X-JSG)
+  earthcare-supprt-data-aux-2d:
+    protocol: gportal
+    short_name: "16104000"
+    description: EarthCARE — Environment Auxiliary（AUX_2D_）
+  earthcare-supprt-data-aux-3d:
+    protocol: gportal
+    short_name: "16104001"
+    description: EarthCARE — Environment Auxiliary（AUX_3D_）
+  alos-prism-triplet-observation-mode:
+    protocol: gportal
+    short_name: "26004000"
+    description: ALOS — Triplet observation mode
+  alos-prism-35km:
+    protocol: gportal
+    short_name: "26004001"
+    description: ALOS — Nadir (70km) + Backward (35km)
+  alos-prism-70km:
+    protocol: gportal
+    short_name: "26004002"
+    description: ALOS — Nadir (70km)
+  alos-prism-35km-4003:
+    protocol: gportal
+    short_name: "26004003"
+    description: ALOS — Nadir (35km) + Forward (35km)
+  alos-prism-35km-4004:
+    protocol: gportal
+    short_name: "26004004"
+    description: ALOS — Nadir (35km) + Backward (35km)
+  alos-prism-35km-4005:
+    protocol: gportal
+    short_name: "26004005"
+    description: ALOS — Forward (35km) + Backward (35km)
+  alos-prism-35km-4006:
+    protocol: gportal
+    short_name: "26004006"
+    description: ALOS — Nadir (35km)
+  alos-prism-35km-4007:
+    protocol: gportal
+    short_name: "26004007"
+    description: ALOS — Forward (35km)
+  alos-prism-35km-4008:
+    protocol: gportal
+    short_name: "26004008"
+    description: ALOS — Backward (35km)
+  alos-avnir-2-observation:
+    protocol: gportal
+    short_name: "26014000"
+    description: ALOS — Observation
+  alos-palsar-fine-resolution-mode-single-po:
+    protocol: gportal
+    short_name: "26024000"
+    description: ALOS — Fine Resolution Mode, Single polarization
+  alos-palsar-fine-resolution-mode-dual-pola:
+    protocol: gportal
+    short_name: "26024001"
+    description: ALOS — Fine Resolution Mode, dual polarization
+  alos-palsar-burst-mode-1:
+    protocol: gportal
+    short_name: "26024002"
+    description: ALOS — Wide Area Observation Mode (Burst mode 1)
+  alos-palsar-burst-mode-2:
+    protocol: gportal
+    short_name: "26024003"
+    description: ALOS — Wide Area Observation Mode (Burst mode 2)
+  alos-palsar-direct-downlink-mode:
+    protocol: gportal
+    short_name: "26024004"
+    description: ALOS — Direct Downlink Mode
+  alos-palsar-polarimetry-mode:
+    protocol: gportal
+    short_name: "26024005"
+    description: ALOS — Polarimetry Mode
+  palsar2-spotlight-sp:
+    protocol: gportal
+    short_name: "27004000"
+    description: ALOS-2 — NA/Spotlight SP
+  alos2-palsar2-uf-sp:
+    aliases: [palsar2, alos2-l1, alos2-palsar2]
+    protocol: gportal
+    short_name: "27004001"
+    description: "ALOS-2 — NA/Ultra-fine[3m] SP"
+  palsar2-ultra-fine-dp:
+    protocol: gportal
+    short_name: "27004002"
+    description: "ALOS-2 — NA/Ultra-fine[3m] DP"
+  palsar2-hight-sensitive-sp:
+    protocol: gportal
+    short_name: "27004003"
+    description: "ALOS-2 — NA/Hight-sensitive[6m] SP"
+  palsar2-hight-sensitive-dp:
+    protocol: gportal
+    short_name: "27004004"
+    description: "ALOS-2 — NA/Hight-sensitive[6m] DP"
+  palsar2-hight-sensitive-qp:
+    protocol: gportal
+    short_name: "27004005"
+    description: "ALOS-2 — NA/Hight-sensitive[6m] QP"
+  palsar2-fine-sp:
+    protocol: gportal
+    short_name: "27004006"
+    description: "ALOS-2 — NA/Fine[10m] SP"
+  palsar2-fine-dp:
+    protocol: gportal
+    short_name: "27004007"
+    description: "ALOS-2 — NA/Fine[10m] DP"
+  palsar2-fine-qp:
+    protocol: gportal
+    short_name: "27004008"
+    description: "ALOS-2 — NA/Fine[10m] QP"
+  palsar2-scansar-14mhz-sp:
+    protocol: gportal
+    short_name: "27004009"
+    description: "ALOS-2 — NA/ScanSAR[350㎞](14MHz) SP"
+  palsar2-scansar-14mhz-dp:
+    protocol: gportal
+    short_name: "27004010"
+    description: "ALOS-2 — NA/ScanSAR[350㎞](14MHz) DP"
+  palsar2-scansar-28mhz-sp:
+    protocol: gportal
+    short_name: "27004011"
+    description: "ALOS-2 — NA/ScanSAR[350㎞](28MHz) SP"
+  palsar2-scansar-28mhz-dp:
+    protocol: gportal
+    short_name: "27004012"
+    description: "ALOS-2 — NA/ScanSAR[350㎞](28MHz) DP"
+  palsar2-scansar-sp:
+    protocol: gportal
+    short_name: "27004013"
+    description: "ALOS-2 — NA/ScanSAR[490km] SP"
+  palsar2-scansardp:
+    protocol: gportal
+    short_name: "27004014"
+    description: "ALOS-2 — NA/ScanSAR[490km]DP"
+  circ-alos-2-alos-2-circ-l1-rad:
+    protocol: gportal
+    short_name: "21001000"
+    description: CIRC — ALOS-2 CIRC L1 RAD
+  circ-alos-2-alos-2-circ-lst:
+    protocol: gportal
+    short_name: "21001001"
+    description: CIRC — ALOS-2 CIRC LST
+  adeos-octs-gac-visible-and-near-infrared:
+    protocol: gportal
+    short_name: "22001000"
+    description: ADEOS — L1A.GACVNI/GAC Visible and near infrared
+  adeos-octs-gac-thermal-infrared:
+    protocol: gportal
+    short_name: "22001001"
+    description: ADEOS — L1A.GACTI/GAC Thermal infrared
+  adeos-octs-rtc-visible-and-near-infrared:
+    protocol: gportal
+    short_name: "22001002"
+    description: ADEOS — L1A.RTCVNI/RTC Visible and near infrared
+  adeos-octs-rtc-thermal-infrared:
+    protocol: gportal
+    short_name: "22001003"
+    description: ADEOS — L1A.RTCTI/RTC Thermal infrared
+  adeos-octs-gac-ocean-color1:
+    protocol: gportal
+    short_name: "22002000"
+    description: ADEOS — L2.GACOC1/GAC Ocean Color1
+  adeos-octs-gac-ocean-color2:
+    protocol: gportal
+    short_name: "22002001"
+    description: ADEOS — L2.GACOC2/GAC Ocean Color2
+  adeos-octs-gac-vegetation-index:
+    protocol: gportal
+    short_name: "22002002"
+    description: ADEOS — L2.GACVI/GAC Vegetation Index
+  adeos-octs-gac-sea-surface-temperatur:
+    protocol: gportal
+    short_name: "22002003"
+    description: ADEOS — L2.GACSST/GAC Sea Surface Temperatur
+  adeos-octs-rtc-ocean-color1:
+    protocol: gportal
+    short_name: "22002004"
+    description: ADEOS — L2.RTCOC1/RTC Ocean Color1
+  adeos-octs-rtc-ocean-color2:
+    protocol: gportal
+    short_name: "22002005"
+    description: ADEOS — L2.RTCOC2/RTC Ocean Color2
+  adeos-octs-rtc-vegetation-index:
+    protocol: gportal
+    short_name: "22002006"
+    description: ADEOS — L2.RTCVI/RTC Vegetation Index
+  adeos-octs-rtc-sea-surface-temperatur:
+    protocol: gportal
+    short_name: "22002007"
+    description: ADEOS — L2.RTCSST/RTC Sea Surface Temperatur
+  adeos-octs-gac-ocean-color:
+    protocol: gportal
+    short_name: "22003000"
+    description: ADEOS — L3B.GACOC/GAC Ocean Color
+  adeos-octs-gac-vegetation-index-3001:
+    protocol: gportal
+    short_name: "22003001"
+    description: ADEOS — L3B.GACVI/GAC Vegetation Index
+  adeos-octs-gac-seasurface-temperatur:
+    protocol: gportal
+    short_name: "22003002"
+    description: ADEOS — L3B.GACSST/GAC SeaSurface Temperatur
+  adeos-octs-rtc-ocean-color-czcs-like-pigm:
+    protocol: gportal
+    short_name: "22003003"
+    description: ADEOS — L3M.RTCOCP/RTC Ocean Color-CZCS like pigment concentration
+  adeos-octs-rtc-ocean-color-chlorophyll-a:
+    protocol: gportal
+    short_name: "22003004"
+    description: ADEOS — L3M.RTCOCC/RTC Ocean Color-Chlorophyll-a concentration
+  adeos-octs-k490:
+    protocol: gportal
+    short_name: "22003005"
+    description: ADEOS — L3M.RTCOCK/RTC Ocean Color-Diffuse attenuation coefficient at 490nm(K490)
+  adeos-octs-rtc-sea-surface-temperture:
+    protocol: gportal
+    short_name: "22003006"
+    description: ADEOS — L3M.RTCSST/RTC Sea Surface Temperture
+  adeos-octs-gac-ocean-color-3007:
+    protocol: gportal
+    short_name: "22003007"
+    description: ADEOS — L3BM.GACOCL/GAC Ocean Color
+  adeos-octs-gac-ocean-color-czcs-like-pigm:
+    protocol: gportal
+    short_name: "22003008"
+    description: ADEOS — L3BM.GACOCP/GAC Ocean Color-CZCS like pigment concentration
+  adeos-octs-gac-ocean-color-chlorophyll-a:
+    protocol: gportal
+    short_name: "22003009"
+    description: ADEOS — L3BM.GACOCC/GAC Ocean Color-Chlorophyll-a concentration
+  adeos-octs-k490-3010:
+    protocol: gportal
+    short_name: "22003010"
+    description: ADEOS — L3BM.GACOCK/GAC Ocean Color-Diffuse attenuation coefficient at 490nm(K490)
+  adeos-octs-gac-vegetation-index-3011:
+    protocol: gportal
+    short_name: "22003011"
+    description: ADEOS — L3BM.GACVI/GAC Vegetation Index
+  adeos-octs-gac-sea-surface-temperture:
+    protocol: gportal
+    short_name: "22003012"
+    description: ADEOS — L3BM.GACSST/GAC Sea Surface Temperture
+  adeos-avnir-l1a-mu:
+    protocol: gportal
+    short_name: "22011000"
+    description: ADEOS — L1A MU
+  adeos-avnir-l1b2-mu:
+    protocol: gportal
+    short_name: "22011001"
+    description: ADEOS — L1B2 MU
+  adeos-avnir-l1a-pan:
+    protocol: gportal
+    short_name: "22011002"
+    description: ADEOS — L1A PAN
+  adeos-avnir-l1b2-pan:
+    protocol: gportal
+    short_name: "22011003"
+    description: ADEOS — L1B2 PAN
+  adeos2-amsr-amsr-l1a:
+    protocol: gportal
+    short_name: "23001000"
+    description: ADEOS-II — L1A/AMSR L1A
+  adeos2-amsr-amsr-l1b:
+    protocol: gportal
+    short_name: "23001001"
+    description: ADEOS-II — L1B/AMSR L1B
+  adeos2-amsr-amsr-l2-water-vapor:
+    protocol: gportal
+    short_name: "23002000"
+    description: ADEOS-II — L2.WV/AMSR L2 Water Vapor
+  adeos2-amsr-amsr-l2-cloud-liquid-water:
+    protocol: gportal
+    short_name: "23002001"
+    description: ADEOS-II — L2.CLW/AMSR L2 Cloud Liquid Water
+  adeos2-amsr-amsr-l2-amount-of-precipitatio:
+    protocol: gportal
+    short_name: "23002002"
+    description: ADEOS-II — L2.AP/AMSR L2 Amount of Precipitation
+  adeos2-amsr-amsr-l2-sea-surface-wind-speed:
+    protocol: gportal
+    short_name: "23002003"
+    description: ADEOS-II — L2.SSW/AMSR L2 Sea Surface Wind Speed
+  adeos2-amsr-amsr-l2-sea-surface-temperture:
+    protocol: gportal
+    short_name: "23002004"
+    description: ADEOS-II — L2.SST/AMSR L2 Sea Surface Temperture
+  adeos2-amsr-amsr-l2-ice-concentration:
+    protocol: gportal
+    short_name: "23002005"
+    description: ADEOS-II — L2.IC/AMSR L2 Ice Concentration
+  adeos2-amsr-amsr-l2-soil-moisture:
+    protocol: gportal
+    short_name: "23002006"
+    description: ADEOS-II — L2.SM/AMSR L2 Soil Moisture
+  adeos2-amsr-amsr-l2-snow-water-equivalence:
+    protocol: gportal
+    short_name: "23002007"
+    description: ADEOS-II — L2.SWE/AMSR L2 Snow Water Equivalence
+  adeos2-amsr-amsr-l3-water-vapor:
+    protocol: gportal
+    short_name: "23003000"
+    description: ADEOS-II — L3.WV/AMSR L3 Water Vapor
+  adeos2-amsr-amsr-l3-cloud-liquid-water:
+    protocol: gportal
+    short_name: "23003001"
+    description: ADEOS-II — L3.CLW/AMSR L3 Cloud Liquid Water
+  adeos2-amsr-amsr-l3-amount-of-precipitatio:
+    protocol: gportal
+    short_name: "23003002"
+    description: ADEOS-II — L3.AP/AMSR L3 Amount of Precipitation
+  adeos2-amsr-amsr-l3-sea-surface-wind-speed:
+    protocol: gportal
+    short_name: "23003003"
+    description: ADEOS-II — L3.SSW/AMSR L3 Sea Surface Wind Speed
+  adeos2-amsr-amsr-l3-sea-surface-temperatur:
+    protocol: gportal
+    short_name: "23003004"
+    description: ADEOS-II — L3.SST/AMSR L3 Sea Surface Temperature
+  adeos2-amsr-amsr-l3-ice-concentration:
+    protocol: gportal
+    short_name: "23003005"
+    description: ADEOS-II — L3.IC/AMSR L3 Ice Concentration
+  adeos2-amsr-amsr-l3-soil-moisture:
+    protocol: gportal
+    short_name: "23003006"
+    description: ADEOS-II — L3.SM/AMSR L3 Soil Moisture
+  adeos2-amsr-amsr-l3-snow-water-equivalence:
+    protocol: gportal
+    short_name: "23003007"
+    description: ADEOS-II — L3.SWE/AMSR L3 Snow Water Equivalence
+  adeos2-amsr-amsr-l3-brightness-temperature:
+    protocol: gportal
+    short_name: "23003008"
+    description: ADEOS-II — L3.BT/AMSR L3 Brightness Temperature
+  adeos2-gli-1km-visible-and-near-infrared:
+    protocol: gportal
+    short_name: "23011000"
+    description: ADEOS-II — L1A.VNIR/Visible and near infrared
+  adeos2-gli-1km-short-wavelength-infrared:
+    protocol: gportal
+    short_name: "23011001"
+    description: ADEOS-II — L1A.SWIR/Short-wavelength infrared
+  adeos2-gli-1km-middle-and-thermal-infrared:
+    protocol: gportal
+    short_name: "23011002"
+    description: ADEOS-II — L1A.MTIR/Middle and thermal infrared
+  adeos2-gli-1km-visible-and-near-infrared-1004:
+    protocol: gportal
+    short_name: "23011004"
+    description: ADEOS-II — L1B.VNIR/Visible and near infrared
+  adeos2-gli-1km-short-wavelength-infrared-1005:
+    protocol: gportal
+    short_name: "23011005"
+    description: ADEOS-II — L1B.SWIR/Short-wavelength infrared
+  adeos2-gli-1km-middle-and-thermal-infrared-1006:
+    protocol: gportal
+    short_name: "23011006"
+    description: ADEOS-II — L1B.MTIR/Middle and thermal infrared
+  adeos2-gli-1km-slpt:
+    protocol: gportal
+    short_name: "23011007"
+    description: ADEOS-II — L1B.SLPT/ SLPT
+  adeos2-gli-1km-cloud-flag:
+    protocol: gportal
+    short_name: "23012000"
+    description: ADEOS-II — L2.CLFLG/Cloud Flag
+  adeos2-gli-1km-aerosol-angstrom-exponent:
+    protocol: gportal
+    short_name: "23012001"
+    description: ADEOS-II — L2.ARAEO/Aerosol Angstrom Exponent
+  adeos2-gli-1km-aerosol-optical-thickness:
+    protocol: gportal
+    short_name: "23012002"
+    description: ADEOS-II — L2.AROP0/Aerosol Optical Thickness
+  adeos2-gli-1km-cloud-fraction:
+    protocol: gportal
+    short_name: "23012003"
+    description: ADEOS-II — L2.CLFR0/Cloud fraction
+  adeos2-gli-1km-cloud-effective-particle-radiu:
+    protocol: gportal
+    short_name: "23012004"
+    description: ADEOS-II — L2.CERWR/Cloud Effective Particle Radius of water cloud by reflection method
+  adeos2-gli-1km-cloud-effective-particle-radiu-2005:
+    protocol: gportal
+    short_name: "23012005"
+    description: ADEOS-II — L2.CERIE/Cloud Effective Particle Radius of ice cloud by emission method
+  adeos2-gli-1km-cloud-optical-thickness-of-wat:
+    protocol: gportal
+    short_name: "23012006"
+    description: ADEOS-II — L2.COPWR/Cloud Optical Thickness of water cloud by reflection method
+  adeos2-gli-1km-cloud-optical-thickness-of-ice:
+    protocol: gportal
+    short_name: "23012007"
+    description: ADEOS-II — L2.COPIR/Cloud Optical Thickness of ice cloud by reflection method
+  adeos2-gli-1km-cloud-optical-thickness-of-ice-2008:
+    protocol: gportal
+    short_name: "23012008"
+    description: ADEOS-II — L2.COPIE/Cloud Optical Thickness of ice cloud by emission method
+  adeos2-gli-1km-cloud-top-temperature-of-water:
+    protocol: gportal
+    short_name: "23012009"
+    description: ADEOS-II — L2.CTTWR/Cloud Top Temperature of water cloud by reflection method
+  adeos2-gli-1km-cloud-top-temperature-of-ice-c:
+    protocol: gportal
+    short_name: "23012010"
+    description: ADEOS-II — L2.CTTIE/Cloud Top Temperature of ice cloud by emission method
+  adeos2-gli-1km-cloud-liquid-water-path-of-wat:
+    protocol: gportal
+    short_name: "23012012"
+    description: ADEOS-II — L2.CWPWR/Cloud Liquid Water Path of water cloud by reflaction method
+  adeos2-gli-1km-atmospheric-correction:
+    protocol: gportal
+    short_name: "23012013"
+    description: ADEOS-II — L2.NLLR0/Atmospheric Correction
+  adeos2-gli-1km-in-water-particles:
+    protocol: gportal
+    short_name: "23012014"
+    description: ADEOS-II — L2.CSLR0/In-water Particles
+  adeos2-gli-1km-sea-surface-temperature:
+    protocol: gportal
+    short_name: "23012015"
+    description: ADEOS-II — L2.STLR0/Sea Surface Temperature
+  adeos2-gli-1km-vegetation-index:
+    protocol: gportal
+    short_name: "23012016"
+    description: ADEOS-II — L2.VGI00/Vegetation Index
+  adeos2-gli-1km-precise-geometric-corrected-pa:
+    protocol: gportal
+    short_name: "23012017"
+    description: ADEOS-II — L2.PGCP0/Precise Geometric Corrected Parameter
+  adeos2-gli-1km-atmospheric-corrected-data-for:
+    protocol: gportal
+    short_name: "23012018"
+    description: ADEOS-II — L2.ACLC0/Atmospheric Corrected Data For Land And Cryosphere
+  adeos2-gli-1km-snow-property:
+    protocol: gportal
+    short_name: "23012019"
+    description: ADEOS-II — L2.SNGI0/Snow Property
+  adeos2-gli-1km-ocean-and-atmosphere:
+    protocol: gportal
+    short_name: "23012020"
+    description: ADEOS-II — L2A.L2AOA/Ocean and Atmosphere
+  adeos2-gli-1km-cloud-top-height-of-water-clou:
+    protocol: gportal
+    short_name: "23012011"
+    description: ADEOS-II — L2.CHTWR/Cloud Top Height of water cloude by emmission method
+  adeos2-gli-1km-land-and-cryosphere:
+    protocol: gportal
+    short_name: "23012021"
+    description: ADEOS-II — L2A.L2ALC/Land and Cryosphere
+  adeos2-gli-1km-aerosol-angstrom-exponent-3000:
+    protocol: gportal
+    short_name: "23013000"
+    description: ADEOS-II — L3B.ARAEO/Aerosol Angstrom Exponent
+  adeos2-gli-1km-aerosol-optical-thickness-3001:
+    protocol: gportal
+    short_name: "23013001"
+    description: ADEOS-II — L3B.AROP0/Aerosol Optical Thickness
+  adeos2-gli-1km-cloud-fraction-3002:
+    protocol: gportal
+    short_name: "23013002"
+    description: ADEOS-II — L3B.CLFR0/Cloud fraction
+  adeos2-gli-1km-cloud-effective-particle-radiu-3003:
+    protocol: gportal
+    short_name: "23013003"
+    description: ADEOS-II — L3B.CERWR/Cloud Effective Particle Radius of water cloud by reflection method
+  adeos2-gli-1km-cloud-effective-particle-radiu-3004:
+    protocol: gportal
+    short_name: "23013004"
+    description: ADEOS-II — L3B.CERIE/Cloud Effective Particle Radius of ice cloud by emission method
+  adeos2-gli-1km-cloud-optical-thickness-of-wat-3005:
+    protocol: gportal
+    short_name: "23013005"
+    description: ADEOS-II — L3B.COPWR/Cloud Optical Thickness of water cloud by reflection method
+  adeos2-gli-1km-cloud-optical-thickness-of-ice-3006:
+    protocol: gportal
+    short_name: "23013006"
+    description: ADEOS-II — L3B.COPIR/Cloud Optical Thickness of ice  cloud by reflection method
+  adeos2-gli-1km-cloud-optical-thickness-of-ice-3007:
+    protocol: gportal
+    short_name: "23013007"
+    description: ADEOS-II — L3B.COPIE/Cloud Optical Thickness of ice cloud by emission method
+  adeos2-gli-1km-cloud-top-temperature-of-water-3008:
+    protocol: gportal
+    short_name: "23013008"
+    description: ADEOS-II — L3B.CTTWR/Cloud Top Temperature of water cloud by reflection method
+  adeos2-gli-1km-cloud-top-temperature-of-ice-c-3009:
+    protocol: gportal
+    short_name: "23013009"
+    description: ADEOS-II — L3B.CTTIE/Cloud Top Temperature of ice cloud by emission method
+  adeos2-gli-1km-cloud-top-height-of-water-clou-3010:
+    protocol: gportal
+    short_name: "23013010"
+    description: ADEOS-II — L3B.CHTWR/Cloud Top Height of water cloude by emmission method
+  adeos2-gli-1km-cloud-liquid-water-path-of-wat-3011:
+    protocol: gportal
+    short_name: "23013011"
+    description: ADEOS-II — L3B.CWPWR/Cloud Liquid Water Path of water cloud by reflaction method
+  adeos2-gli-1km-normalized-water-leaving-radia:
+    protocol: gportal
+    short_name: "23013012"
+    description: ADEOS-II — L3B.NW000/Normalized water-leaving radiance
+  adeos2-gli-1km-aerosol:
+    protocol: gportal
+    short_name: "23013013"
+    description: ADEOS-II — L3B.LA000/Aerosol
+  adeos2-gli-1km-in-water-particles-3014:
+    protocol: gportal
+    short_name: "23013014"
+    description: ADEOS-II — L3B.CS000/In-water Particles
+  adeos2-gli-1km-sea-surface-temperature-3015:
+    protocol: gportal
+    short_name: "23013015"
+    description: ADEOS-II — L3B.ST000/Sea Surface Temperature
+  adeos2-gli-1km-snow-grain-size-retrieved-with:
+    protocol: gportal
+    short_name: "23013016"
+    description: ADEOS-II — L3B.SNWG0/Snow grain size retrieved with 865nm band
+  adeos2-gli-1km-snow-impurities:
+    protocol: gportal
+    short_name: "23013017"
+    description: ADEOS-II — L3B.SNWI0/Snow impurities
+  adeos2-gli-1km-snow-grain-size-retrieved-with-3018:
+    protocol: gportal
+    short_name: "23013018"
+    description: ADEOS-II — L3B.SNWGS/Snow grain size retrieved with 1640nm band
+  adeos2-gli-1km-snow-surface-temperature:
+    protocol: gportal
+    short_name: "23013019"
+    description: ADEOS-II — L3B.SNWTS/Snow surface temperature
+  adeos2-gli-1km-aerosol-angstrom-exponent-3020:
+    protocol: gportal
+    short_name: "23013020"
+    description: ADEOS-II — L3STAMAP.ARAEO/Aerosol Angstrom Exponent
+  adeos2-gli-1km-aerosol-optical-thickness-3021:
+    protocol: gportal
+    short_name: "23013021"
+    description: ADEOS-II — L3STAMAP.AROP0/Aerosol Optical Thickness
+  adeos2-gli-1km-cloud-fraction-3022:
+    protocol: gportal
+    short_name: "23013022"
+    description: ADEOS-II — L3STAMAP.CLFR0/Cloud fraction
+  adeos2-gli-1km-cloud-effective-particle-radiu-3023:
+    protocol: gportal
+    short_name: "23013023"
+    description: ADEOS-II — L3STAMAP.CERWR/Cloud Effective Particle Radius of water cloud by reflection method
+  adeos2-gli-1km-cloud-effective-particle-radiu-3024:
+    protocol: gportal
+    short_name: "23013024"
+    description: ADEOS-II — L3STAMAP.CERIE/Cloud Effective Particle Radius of ice cloud by emission method
+  adeos2-gli-1km-cloud-optical-thickness-of-wat-3025:
+    protocol: gportal
+    short_name: "23013025"
+    description: ADEOS-II — L3STAMAP.COPWR/Cloud Optical Thickness of water cloud by reflection method
+  adeos2-gli-1km-cloud-optical-thickness-of-ice-3026:
+    protocol: gportal
+    short_name: "23013026"
+    description: ADEOS-II — L3STAMAP.COPIR/Cloud Optical Thickness of ice  cloud by reflection method
+  adeos2-gli-1km-cloud-optical-thickness-of-ice-3027:
+    protocol: gportal
+    short_name: "23013027"
+    description: ADEOS-II — L3STAMAP.COPIE/Cloud Optical Thickness of ice cloud by emission method
+  adeos2-gli-1km-cloud-top-temperature-of-water-3028:
+    protocol: gportal
+    short_name: "23013028"
+    description: ADEOS-II — L3STAMAP.CTTWR/Cloud Top Temperature of water cloud by reflection method
+  adeos2-gli-1km-cloud-top-temperature-of-ice-c-3029:
+    protocol: gportal
+    short_name: "23013029"
+    description: ADEOS-II — L3STAMAP.CTTIE/Cloud Top Temperature of ice cloud by emission method
+  adeos2-gli-1km-cloud-top-height-of-water-clou-3030:
+    protocol: gportal
+    short_name: "23013030"
+    description: ADEOS-II — L3STAMAP.CHTWR/Cloud Top Height of water cloude by emmission method
+  adeos2-gli-1km-cloud-liquid-water-path-of-wat-3031:
+    protocol: gportal
+    short_name: "23013031"
+    description: ADEOS-II — L3STAMAP.CWPWR/Cloud Liquid Water Path of water cloud by reflaction method
+  adeos2-gli-1km-normalized-water-leaving-radia-3032:
+    protocol: gportal
+    short_name: "23013032"
+    description: ADEOS-II — L3STAMAP.NW000/Normalized water-leaving radiance
+  adeos2-gli-1km-aerosol-3033:
+    protocol: gportal
+    short_name: "23013033"
+    description: ADEOS-II — L3STAMAP.LA000/Aerosol
+  adeos2-gli-1km-chlorophyll-a:
+    protocol: gportal
+    short_name: "23013034"
+    description: ADEOS-II — L3STAMAP.CHLA0/Chlorophyll-a
+  adeos2-gli-1km-suspended-solid-weight:
+    protocol: gportal
+    short_name: "23013035"
+    description: ADEOS-II — L3STAMAP.SS000/Suspended solid weight
+  adeos2-gli-1km-absorption-of-colored-dissolve:
+    protocol: gportal
+    short_name: "23013036"
+    description: ADEOS-II — L3STAMAP.CDOM0/Absorption of colored dissolved organic matter
+  adeos2-gli-1km-attenuation-coefficent-at-490m:
+    protocol: gportal
+    short_name: "23013037"
+    description: ADEOS-II — L3STAMAP.K4900/Attenuation coefficent at 490mm
+  adeos2-gli-1km-day-night-separately-averaged:
+    protocol: gportal
+    short_name: "23013038"
+    description: ADEOS-II — L3STAMAP.STDN0/Sea Surface Temperature(day/night separately averaged)
+  adeos2-gli-1km-add-data-averaged:
+    protocol: gportal
+    short_name: "23013039"
+    description: ADEOS-II — L3STAMAP.STALL/Sea Surface Temperature(add data averaged)
+  adeos2-gli-1km-vegetation-index-3040:
+    protocol: gportal
+    short_name: "23013040"
+    description: ADEOS-II — L3STAMAP.VGI00/Vegetation index
+  adeos2-gli-1km-snow-grain-size-retrieved-with-3041:
+    protocol: gportal
+    short_name: "23013041"
+    description: ADEOS-II — L3STAMAP.SNWG0/Snow grain size retrieved with 865nm band
+  adeos2-gli-1km-snow-impurities-3042:
+    protocol: gportal
+    short_name: "23013042"
+    description: ADEOS-II — L3STAMAP.SNWI0/Snow impurities
+  adeos2-gli-1km-snow-grain-size-retrieved-with-3043:
+    protocol: gportal
+    short_name: "23013043"
+    description: ADEOS-II — L3STAMAP.SNWGS/Snow grain size retrieved with 1640nm band
+  adeos2-gli-1km-snow-surface-temperature-3044:
+    protocol: gportal
+    short_name: "23013044"
+    description: ADEOS-II — L3STAMAP.SNWTS/Snow surface temperature
+  adeos2-gli-250m-l1a:
+    protocol: gportal
+    short_name: "23021000"
+    description: ADEOS-II — L1A
+  adeos2-gli-250m-l1b:
+    protocol: gportal
+    short_name: "23021001"
+    description: ADEOS-II — L1B
+  aqua-amsr-e-l1-l1b-brightness-temperature:
+    protocol: gportal
+    short_name: "24001001"
+    description: AQUA — LEVEL1/L1B Brightness Temperature
+  aqua-amsr-e-l2-wv:
+    protocol: gportal
+    short_name: "24002000"
+    description: AQUA — LEVEL2/L2 Water Vapor (WV)
+  aqua-amsr-e-l2-clw:
+    protocol: gportal
+    short_name: "24002001"
+    description: AQUA — LEVEL2/L2 Cloud Liquid Water (CLW)
+  aqua-amsr-e-l2-ap:
+    protocol: gportal
+    short_name: "24002002"
+    description: AQUA — LEVEL2/L2 Amount of Precipitation (AP)
+  aqua-amsr-e-l2-ssw:
+    protocol: gportal
+    short_name: "24002003"
+    description: AQUA — LEVEL2/L2 Sea SurfaceWind Speed (SSW)
+  aqua-amsr-e-l2-sst:
+    protocol: gportal
+    short_name: "24002004"
+    description: AQUA — LEVEL2/L2 Sea Surface Temperature (SST)
+  aqua-amsr-e-l2-ic:
+    protocol: gportal
+    short_name: "24002005"
+    description: AQUA — LEVEL2/L2 Ice Concentration (IC)
+  aqua-amsr-e-l2-sm:
+    protocol: gportal
+    short_name: "24002006"
+    description: AQUA — LEVEL2/L2 Soil Moisture (SM)
+  aqua-amsr-e-l2-swe:
+    protocol: gportal
+    short_name: "24002007"
+    description: AQUA — LEVEL2/L2 Snow Water Equivalence (SWE)
+  aqua-amsr-e-l3-wv:
+    protocol: gportal
+    short_name: "24003000"
+    description: AQUA — LEVEL3/L3 Water Vapor (WV)
+  aqua-amsr-e-l3-clw:
+    protocol: gportal
+    short_name: "24003001"
+    description: AQUA — LEVEL3/L3 Cloud Liquid Water (CLW)
+  aqua-amsr-e-l3-ap:
+    protocol: gportal
+    short_name: "24003002"
+    description: AQUA — LEVEL3/L3 Amount of Precipitation (AP)
+  aqua-amsr-e-l3-ssw:
+    protocol: gportal
+    short_name: "24003003"
+    description: AQUA — LEVEL3/L3 Sea SurfaceWind Speed (SSW)
+  aqua-amsr-e-l3-sst:
+    protocol: gportal
+    short_name: "24003004"
+    description: AQUA — LEVEL3/L3 Sea Surface Temperature (SST)
+  aqua-amsr-e-l3-ic:
+    protocol: gportal
+    short_name: "24003005"
+    description: AQUA — LEVEL3/L3 Ice Concentration (IC)
+  aqua-amsr-e-l3-sm:
+    protocol: gportal
+    short_name: "24003006"
+    description: AQUA — LEVEL3/L3 Soid Moisture (SM)
+  aqua-amsr-e-l3-swe:
+    protocol: gportal
+    short_name: "24003007"
+    description: AQUA — LEVEL3/L3 Snow Water Equivalence (SWE)
+  aqua-amsr-e-l3-tb6ghz-v:
+    protocol: gportal
+    short_name: "24003008"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 6GHz-V (TB6GHz_V)
+  aqua-amsr-e-l3-tb6ghz-h:
+    protocol: gportal
+    short_name: "24003009"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 6GHz-H (TB6GHz_H)
+  aqua-amsr-e-l3-tb10ghz-v:
+    protocol: gportal
+    short_name: "24003010"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 10GHz-V (TB10GHz_V)
+  aqua-amsr-e-l3-tb10ghz-h:
+    protocol: gportal
+    short_name: "24003011"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 10GHz-H (TB10GHz_H)
+  aqua-amsr-e-l3-tb18ghz-v:
+    protocol: gportal
+    short_name: "24003012"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 18GHz-V (TB18GHz_V)
+  aqua-amsr-e-l3-tb18ghz-h:
+    protocol: gportal
+    short_name: "24003013"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 18GHz-H (TB18GHz_H)
+  aqua-amsr-e-l3-tb23ghz-v:
+    protocol: gportal
+    short_name: "24003014"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 23GHz-V (TB23GHz_V)
+  aqua-amsr-e-l3-tb23ghz-h:
+    protocol: gportal
+    short_name: "24003015"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 23GHz-H (TB23GHz_H)
+  aqua-amsr-e-l3-tb36ghz-v:
+    protocol: gportal
+    short_name: "24003016"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 36GHz-V (TB36GHz_V)
+  aqua-amsr-e-l3-tb36ghz-h:
+    protocol: gportal
+    short_name: "24003017"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 36GHz-H (TB36GHz_H)
+  aqua-amsr-e-l3-tb89ghz-v:
+    protocol: gportal
+    short_name: "24003018"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 89GHz-V (TB89GHz_V)
+  aqua-amsr-e-l3-tb89ghz-h:
+    protocol: gportal
+    short_name: "24003019"
+    description: AQUA — LEVEL3/L3 Brightness Temperature 89GHz-H (TB89GHz_H)
+  aqua-amsr-e-amsr2format-l1-tb:
+    protocol: gportal
+    short_name: "25001000"
+    description: AQUA — LEVEL1/L1B Brightness Temperatures (TB)
+  aqua-amsr-e-amsr2format-l1-tb-1001:
+    protocol: gportal
+    short_name: "25001001"
+    description: AQUA — LEVEL1/L1R Brightness Temperatures (TB)
+  aqua-amsr-e-amsr2format-l2-tpw:
+    protocol: gportal
+    short_name: "25002000"
+    description: AQUA — LEVEL2/L2 Total Precipitable Water (TPW)
+  aqua-amsr-e-amsr2format-l2-clw:
+    protocol: gportal
+    short_name: "25002001"
+    description: AQUA — LEVEL2/L2 Cloud Liquid Water (CLW)
+  aqua-amsr-e-amsr2format-l2-prc:
+    protocol: gportal
+    short_name: "25002003"
+    description: AQUA — LEVEL2/L2 Precipitation (PRC)
+  aqua-amsr-e-amsr2format-l2-prc-2002:
+    protocol: gportal
+    short_name: "25002002"
+    description: AQUA — LEVEL2/L2 Precipitation (PRC)
+  aqua-amsr-e-amsr2format-l2-ssw:
+    protocol: gportal
+    short_name: "25002005"
+    description: AQUA — LEVEL2/L2 Sea Surface Wind speed (SSW)
+  aqua-amsr-e-amsr2format-l2-sst:
+    protocol: gportal
+    short_name: "25002004"
+    description: AQUA — LEVEL2/L2 Sea Surface Temperature (SST)
+  aqua-amsr-e-amsr2format-l2-sic:
+    protocol: gportal
+    short_name: "25002006"
+    description: AQUA — LEVEL2/L2 Sea Ice Concentration (SIC)
+  aqua-amsr-e-amsr2format-l2-smc:
+    protocol: gportal
+    short_name: "25002007"
+    description: AQUA — LEVEL2/L2 Soil Moisture Content (SMC)
+  aqua-amsr-e-amsr2format-l2-snd:
+    protocol: gportal
+    short_name: "25002008"
+    description: AQUA — LEVEL2/L2 Snow Depth (SND)
+  aqua-amsr-e-amsr2format-l3-0-1:
+    protocol: gportal
+    short_name: "25003001"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Total Precipitable Water (TPW)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3000:
+    protocol: gportal
+    short_name: "25003000"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Total Precipitable Water (TPW)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3003:
+    protocol: gportal
+    short_name: "25003003"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Cloud Liquid Water (CLW)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3002:
+    protocol: gportal
+    short_name: "25003002"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Cloud Liquid Water (CLW)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3005:
+    protocol: gportal
+    short_name: "25003005"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Precipitation (PRC)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3004:
+    protocol: gportal
+    short_name: "25003004"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Precipitation (PRC)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3007:
+    protocol: gportal
+    short_name: "25003007"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Sea Surface Temperature (SST)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3006:
+    protocol: gportal
+    short_name: "25003006"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Sea Surface Temperature (SST)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3009:
+    protocol: gportal
+    short_name: "25003009"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Sea Surface Wind speed (SSW)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3008:
+    protocol: gportal
+    short_name: "25003008"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Sea Surface Wind speed (SSW)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3011:
+    protocol: gportal
+    short_name: "25003011"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Sea Ice Concentration (SIC)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3010:
+    protocol: gportal
+    short_name: "25003010"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Sea Ice Concentration (SIC)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3015:
+    protocol: gportal
+    short_name: "25003015"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Snow Depth (SND)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3014:
+    protocol: gportal
+    short_name: "25003014"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Snow Depth (SND)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3013:
+    protocol: gportal
+    short_name: "25003013"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Soil Moisture Content (SMC)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3012:
+    protocol: gportal
+    short_name: "25003012"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Soil Moisture Content (SMC)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3017:
+    protocol: gportal
+    short_name: "25003017"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 6GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3016:
+    protocol: gportal
+    short_name: "25003016"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 6GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3019:
+    protocol: gportal
+    short_name: "25003019"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 10GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3018:
+    protocol: gportal
+    short_name: "25003018"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 10GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3021:
+    protocol: gportal
+    short_name: "25003021"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 18GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3020:
+    protocol: gportal
+    short_name: "25003020"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 18GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3023:
+    protocol: gportal
+    short_name: "25003023"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 23GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3022:
+    protocol: gportal
+    short_name: "25003022"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 23GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3025:
+    protocol: gportal
+    short_name: "25003025"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 36GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3024:
+    protocol: gportal
+    short_name: "25003024"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 36GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3027:
+    protocol: gportal
+    short_name: "25003027"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 89GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-1-3026:
+    protocol: gportal
+    short_name: "25003026"
+    description: AQUA — LEVEL3/10km/0.1deg/L3 Brightness Temperatures 89GHz (TB)(0.1°)
+  aqua-amsr-e-amsr2format-l3-0-25:
+    protocol: gportal
+    short_name: "25003029"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Total Precipitable Water (TPW)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3028:
+    protocol: gportal
+    short_name: "25003028"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Total Precipitable Water (TPW)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3031:
+    protocol: gportal
+    short_name: "25003031"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Cloud Liquid Water (CLW)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3030:
+    protocol: gportal
+    short_name: "25003030"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Cloud Liquid Water (CLW)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3033:
+    protocol: gportal
+    short_name: "25003033"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Precipitation (PRC)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3032:
+    protocol: gportal
+    short_name: "25003032"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Precipitation (PRC)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3035:
+    protocol: gportal
+    short_name: "25003035"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Sea Surface Temperature (SST)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3034:
+    protocol: gportal
+    short_name: "25003034"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Sea Surface Temperature (SST)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3037:
+    protocol: gportal
+    short_name: "25003037"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Sea Surface Wind speed (SSW)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3036:
+    protocol: gportal
+    short_name: "25003036"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Sea Surface Wind speed (SSW)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3039:
+    protocol: gportal
+    short_name: "25003039"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Sea Ice Concentration (SIC)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3038:
+    protocol: gportal
+    short_name: "25003038"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Sea Ice Concentration (SIC)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3043:
+    protocol: gportal
+    short_name: "25003043"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Snow Depth (SND)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3042:
+    protocol: gportal
+    short_name: "25003042"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Snow Depth (SND)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3041:
+    protocol: gportal
+    short_name: "25003041"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Soil Moisture Content (SMC)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3040:
+    protocol: gportal
+    short_name: "25003040"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Soil Moisture Content (SMC)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3045:
+    protocol: gportal
+    short_name: "25003045"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 6GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3044:
+    protocol: gportal
+    short_name: "25003044"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 6GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3047:
+    protocol: gportal
+    short_name: "25003047"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 10GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3046:
+    protocol: gportal
+    short_name: "25003046"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 10GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3049:
+    protocol: gportal
+    short_name: "25003049"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 18GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3048:
+    protocol: gportal
+    short_name: "25003048"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 18GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3051:
+    protocol: gportal
+    short_name: "25003051"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 23GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3050:
+    protocol: gportal
+    short_name: "25003050"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 23GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3053:
+    protocol: gportal
+    short_name: "25003053"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 36GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3052:
+    protocol: gportal
+    short_name: "25003052"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 36GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3055:
+    protocol: gportal
+    short_name: "25003055"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 89GHz (TB)(0.25°)
+  aqua-amsr-e-amsr2format-l3-0-25-3054:
+    protocol: gportal
+    short_name: "25003054"
+    description: AQUA — LEVEL3/25km/0.25deg/L3 Brightness Temperatures 89GHz (TB)(0.25°)
+  trmm-pr-l1-pr-received-power:
+    protocol: gportal
+    short_name: "18001000"
+    description: "TRMM — LEVEL1/PR Received Power [1B21]"
+  trmm-pr-l1-pr-reflectivities:
+    protocol: gportal
+    short_name: "18001001"
+    description: "TRMM — LEVEL1/PR Reflectivities [1C21]"
+  trmm-pr-l2-pr-surface-cross-section:
+    protocol: gportal
+    short_name: "18002000"
+    description: "TRMM — LEVEL2/PR Surface Cross Section [2A21]"
+  trmm-pr-l2-pr-qualitative:
+    protocol: gportal
+    short_name: "18002001"
+    description: "TRMM — LEVEL2/PR Qualitative [2A23]"
+  trmm-pr-l2-pr-rainfall-profile:
+    protocol: gportal
+    short_name: "18002002"
+    description: "TRMM — LEVEL2/PR Rainfall Profile [2A25]"
+  trmm-pr-l2-pr-spectral-latent-heating:
+    protocol: gportal
+    short_name: "18002003"
+    description: "TRMM — LEVEL2/PR Spectral Latent Heating [2H25]"
+  trmm-pr-l3-pr-monthly-rainfall:
+    protocol: gportal
+    short_name: "18003000"
+    description: "TRMM — LEVEL3/PR Monthly Rainfall [3A25]"
+  trmm-pr-l3-pr-monthly-surface-rain:
+    protocol: gportal
+    short_name: "18003001"
+    description: "TRMM — LEVEL3/PR Monthly Surface Rain [3A26]"
+  trmm-pr-l3-pr-gridded-orbital-spectral-la:
+    protocol: gportal
+    short_name: "18003002"
+    description: "TRMM — LEVEL3/PR Gridded Orbital Spectral Latent Heating [3G25]"
+  trmm-pr-l3-pr-monthly-spectral-latent-hea:
+    protocol: gportal
+    short_name: "18003003"
+    description: "TRMM — LEVEL3/PR Monthly Spectral Latent Heating [3H25]"
+  trmm-tmi-l1-tmi-brightness-temperatures:
+    protocol: gportal
+    short_name: "18011000"
+    description: "TRMM — LEVEL1/TMI Brightness Temperatures [1B11]"
+  trmm-tmi-l2-tmi-rainfall-profile:
+    protocol: gportal
+    short_name: "18012000"
+    description: "TRMM — LEVEL2/TMI Rainfall Profile [2A12]"
+  trmm-tmi-l3-tmi-monthly-emisssion:
+    protocol: gportal
+    short_name: "18013000"
+    description: "TRMM — LEVEL3/TMI Monthly Emisssion [3A11]"
+  trmm-tmi-l3-tmi-monthly-rainfall-profile:
+    protocol: gportal
+    short_name: "18013001"
+    description: "TRMM — LEVEL3/TMI Monthly Rainfall Profile [3A12]"
+  trmm-tmi-comb-l2-comb-rain-profile:
+    protocol: gportal
+    short_name: "18032000"
+    description: "TRMM — LEVEL2/COMB Rain Profile [2B31]"
+  trmm-tmi-comb-l2-comb-convective-stratiform-hea:
+    protocol: gportal
+    short_name: "18032001"
+    description: "TRMM — LEVEL2/COMB Convective Stratiform Heating [2H31]"
+  trmm-tmi-comb-l3-comb-monthly-rainfall:
+    protocol: gportal
+    short_name: "18033000"
+    description: "TRMM — LEVEL3/COMB Monthly Rainfall [3B31]"
+  trmm-tmi-comb-l3-trmm-and-other-sensors-3-hourl:
+    protocol: gportal
+    short_name: "18033001"
+    description: "TRMM — LEVEL3/TRMM and Other Sensors 3-Hourly Rainfall [342]"
+  trmm-tmi-comb-l3-trmm-and-other-sensors-monthly:
+    protocol: gportal
+    short_name: "18033002"
+    description: "TRMM — LEVEL3/TRMM and Other Sensors Monthly Rainfall [3B43]"
+  trmm-tmi-comb-l3-comb-gridded-orbital-convectiv:
+    protocol: gportal
+    short_name: "18033003"
+    description: "TRMM — LEVEL3/COMB Gridded Orbital Convective Stratiform Heating [3G31]"
+  trmm-tmi-comb-l3-comb-gridded-orbital-convectiv-3001:
+    protocol: gportal
+    short_name: "15023001"
+    description: "TRMM — LEVEL3/COMB Gridded Orbital Convective Stratiform Heating [3G31]"
+  trmm-tmi-comb-l3-comb-monthly-convective-strati:
+    protocol: gportal
+    short_name: "18033004"
+    description: "TRMM — LEVEL3/COMB Monthly Convective Stratiform Heating [3H31]"
+  trmm-virs-l1-virs-radiance:
+    protocol: gportal
+    short_name: "18021000"
+    description: "TRMM — LEVEL1/VIRS Radiance [1B01]"
+  jers1-vnir-l2-vnir:
+    protocol: gportal
+    short_name: "17002000"
+    description: JERS-1 — VNIR/L2/VNIR
+  jers1-swir-l2-swir:
+    protocol: gportal
+    short_name: "17012000"
+    description: JERS-1 — SWIR/L2/SWIR
+  jers1-sar-l0:
+    protocol: gportal
+    short_name: "17020000"
+    description: JERS-1 — SAR/L0/SAR（L0)
+  jers1-sar-l2-1-sar:
+    protocol: gportal
+    short_name: "17022000"
+    description: JERS-1 — SAR/L2.1/SAR
+  mos1-messr-messr:
+    protocol: gportal
+    short_name: "19004000"
+    description: MOS-1 — MOS-1/MESSR
+  mos1b-messr-messr:
+    protocol: gportal
+    short_name: "20004000"
+    description: MOS-1b — MOS-1b/MESSR
+  nasacmr-aqua-modis-aqua-sea-surface-tempera:
+    protocol: gportal
+    short_name: "28002000"
+    description: NASA-CMR — Level2/MODIS/Aqua Sea Surface Temperature L2
+  nasacmr-aqua-modisa-l2-ocean-color:
+    protocol: gportal
+    short_name: "28002001"
+    description: NASA-CMR — Level2/MODISA_L2_Ocean Color
+  nasacmr-aqua-modis-aqua-aerosol-5-min-l2-sw:
+    protocol: gportal
+    short_name: "28002002"
+    description: NASA-CMR — Level2/MODIS/Aqua Aerosol 5-Min L2 Swath 3km
+  nasacmr-aqua-modis-aqua-aerosol-5-min-l2-sw-2003:
+    protocol: gportal
+    short_name: "28002003"
+    description: NASA-CMR — Level2/MODIS/Aqua Aerosol 5-Min L2 Swath 10km
+  nasacmr-aqua-modis-aqua-clouds-5-min-l2-swa:
+    protocol: gportal
+    short_name: "28002004"
+    description: NASA-CMR — Level2/MODIS/Aqua Clouds 5-Min L2 Swath 1km and 5km
+  nasacmr-aqua-modis-aqua-land-surface-temper:
+    protocol: gportal
+    short_name: "28003000"
+    description: NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V006
+  nasacmr-aqua-modis-aqua-land-surface-temper-3001:
+    protocol: gportal
+    short_name: "28003001"
+    description: NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity 8-Day L3 Global 1km SIN Grid V006
+  nasacmr-aqua-modis-aqua-land-surface-temper-3002:
+    protocol: gportal
+    short_name: "28003002"
+    description: NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity Daily L3 Global 0.05Deg CMG V006
+  nasacmr-aqua-modis-aqua-land-surface-temper-3003:
+    protocol: gportal
+    short_name: "28003003"
+    description: NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity 8-Day L3 Global 0.05Deg CMG V006
+  nasacmr-aqua-modis-aqua-land-surface-temper-3004:
+    protocol: gportal
+    short_name: "28003004"
+    description: NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006
+  nasacmr-aqua-modis-aqua-vegetation-indices:
+    protocol: gportal
+    short_name: "28003005"
+    description: NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day L3 Global 500m SIN Grid V006
+  nasacmr-aqua-modis-aqua-vegetation-indices-3006:
+    protocol: gportal
+    short_name: "28003006"
+    description: NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day L3 Global 1km SIN Grid V006
+  nasacmr-aqua-modis-aqua-vegetation-indices-3007:
+    protocol: gportal
+    short_name: "28003007"
+    description: NASA-CMR — Level3/MODIS/Aqua Vegetation Indices Monthly L3 Global 1km SIN Grid V006
+  nasacmr-aqua-modis-aqua-vegetation-indices-3008:
+    protocol: gportal
+    short_name: "28003008"
+    description: NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day L3 Global 0.05Deg CMG V006
+  nasacmr-aqua-modis-aqua-vegetation-indices-3009:
+    protocol: gportal
+    short_name: "28003009"
+    description: NASA-CMR — Level3/MODIS/Aqua Vegetation Indices Monthly L3 Global 0.05Deg CMG V006
+  nasacmr-aqua-modis-aqua-vegetation-indices-3010:
+    protocol: gportal
+    short_name: "28003010"
+    description: NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day L3 Global 250m SIN Grid V006
+  nasacmr-aqua-modis-aqua-sea-surface-tempera-3011:
+    protocol: gportal
+    short_name: "28003011"
+    description: NASA-CMR — Level3/MODIS/Aqua Sea Surface Temperature L3 Monthly
+  nasacmr-aqua-modisa-l3m-chlorophyll-a:
+    protocol: gportal
+    short_name: "28003012"
+    description: NASA-CMR — Level3/MODISA_L3m_Chlorophyll-a
+  nasacmr-aqua-modis-aqua-aerosol-cloud-water:
+    protocol: gportal
+    short_name: "28003013"
+    description: NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water Vapor Ozone Daily L3 Global 1Deg CMG
+  nasacmr-aqua-modis-aqua-aerosol-cloud-water-3014:
+    protocol: gportal
+    short_name: "28003014"
+    description: NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water Vapor Ozone 8-Day L3 Global 1Deg CMG
+  nasacmr-aqua-modis-aqua-aerosol-cloud-water-3015:
+    protocol: gportal
+    short_name: "28003015"
+    description: NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water Vapor Ozone Monthly L3 Global 1Deg CMG
+  nasacmr-aqua-modis-aqua-snow-cover-daily-l3:
+    protocol: gportal
+    short_name: "28003016"
+    description: NASA-CMR — Level3/MODIS/Aqua Snow Cover Daily L3 Global 0.05Deg CMG V005
+  nasacmr-aqua-modis-aqua-snow-cover-8-day-l3:
+    protocol: gportal
+    short_name: "28003017"
+    description: NASA-CMR — Level3/MODIS/Aqua Snow Cover 8-Day L3 Global 0.05Deg CMG V005
+  nasacmr-terra-modist-l2-sst:
+    protocol: gportal
+    short_name: "29002000"
+    description: NASA-CMR — Level2/MODIST_L2_SST
+  nasacmr-terra-modist-l2-oc:
+    protocol: gportal
+    short_name: "29002001"
+    description: NASA-CMR — Level2/MODIST_L2_OC
+  nasacmr-terra-modis-terra-aerosol-5-min-l2-s:
+    protocol: gportal
+    short_name: "29002002"
+    description: NASA-CMR — Level2/MODIS/Terra Aerosol 5-Min L2 Swath 3km
+  nasacmr-terra-modis-terra-aerosol-5-min-l2-s-2003:
+    protocol: gportal
+    short_name: "29002003"
+    description: NASA-CMR — Level2/MODIS/Terra Aerosol 5-Min L2 Swath 10km
+  nasacmr-terra-modis-terra-clouds-5-min-l2-sw:
+    protocol: gportal
+    short_name: "29002004"
+    description: NASA-CMR — Level2/MODIS/Terra Clouds 5-Min L2 Swath 1km and 5km
+  nasacmr-terra-modis-terra-land-surface-tempe:
+    protocol: gportal
+    short_name: "29003000"
+    description: NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V006
+  nasacmr-terra-modis-terra-land-surface-tempe-3001:
+    protocol: gportal
+    short_name: "29003001"
+    description: NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity 8-Day L3 Global 1km SIN Grid V006
+  nasacmr-terra-modis-terra-land-surface-tempe-3002:
+    protocol: gportal
+    short_name: "29003002"
+    description: NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 0.05Deg CMG V006
+  nasacmr-terra-modis-terra-land-surface-tempe-3003:
+    protocol: gportal
+    short_name: "29003003"
+    description: NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity 8-Day L3 Global 0.05Deg CMG V006
+  nasacmr-terra-modis-terra-land-surface-tempe-3004:
+    protocol: gportal
+    short_name: "29003004"
+    description: NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006
+  nasacmr-terra-modis-terra-vegetation-indices:
+    protocol: gportal
+    short_name: "29003005"
+    description: NASA-CMR — Level3/MODIS/Terra Vegetation Indices 16-Day L3 Global 500m SIN Grid V006
+  nasacmr-terra-modis-terra-vegetation-indices-3006:
+    protocol: gportal
+    short_name: "29003006"
+    description: NASA-CMR — Level3/MODIS/Terra Vegetation Indices 16-Day L3 Global 1km SIN Grid V006
+  nasacmr-terra-modis-terra-vegetation-indices-3007:
+    protocol: gportal
+    short_name: "29003007"
+    description: NASA-CMR — Level3/MODIS/Terra Vegetation Indices Monthly L3 Global 1km SIN Grid V006
+  nasacmr-terra-modis-terra-vegetation-indices-3008:
+    protocol: gportal
+    short_name: "29003008"
+    description: NASA-CMR — Level3/MODIS/Terra Vegetation Indices 16-Day L3 Global 0.05Deg CMG V006
+  nasacmr-terra-modis-terra-vegetation-indices-3009:
+    protocol: gportal
+    short_name: "29003009"
+    description: NASA-CMR — Level3/MODIS/Terra Vegetation Indices Monthly L3 Global 0.05Deg CMG V006
+  nasacmr-terra-modis-terra-vegetation-indices-3010:
+    protocol: gportal
+    short_name: "29003010"
+    description: NASA-CMR — Level3/MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V006
+  nasacmr-terra-modist-l3m-sst:
+    protocol: gportal
+    short_name: "29003011"
+    description: NASA-CMR — Level3/MODIST_L3m_SST
+  nasacmr-terra-modist-l3m-chl:
+    protocol: gportal
+    short_name: "29003012"
+    description: NASA-CMR — Level3/MODIST_L3m_CHL
+  nasacmr-terra-modis-terra-aerosol-cloud-wate:
+    protocol: gportal
+    short_name: "29003013"
+    description: NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water Vapor Ozone Daily L3 Global 1Deg CMG
+  nasacmr-terra-modis-terra-aerosol-cloud-wate-3014:
+    protocol: gportal
+    short_name: "29003014"
+    description: NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water Vapor Ozone 8-Day L3 Global 1Deg CMG
+  nasacmr-terra-modis-terra-aerosol-cloud-wate-3015:
+    protocol: gportal
+    short_name: "29003015"
+    description: NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water Vapor Ozone Monthly L3 Global 1Deg CMG
+  nasacmr-terra-modis-terra-snow-cover-daily-l:
+    protocol: gportal
+    short_name: "29003016"
+    description: NASA-CMR — Level3/MODIS/Terra Snow Cover Daily L3 Global 0.05Deg CMG V005
+  nasacmr-terra-modis-terra-snow-cover-8-day-l:
+    protocol: gportal
+    short_name: "29003017"
+    description: NASA-CMR — Level3/MODIS/Terra Snow Cover 8-Day L3 Global 0.05Deg CMG V005
+  slats-shirop-panchromatic-image:
+    protocol: gportal
+    short_name: "30000000"
+    description: SLATS — Panchromatic Image
   gosat-gw-amsr3-l1b:
     aliases: [gosat-gw, amsr3]
     protocol: gportal
     short_name: "31001001"
-    description: GOSAT-GW/AMSR3 L1B brightness temperatures (TBB).
+    description: GOSAT-GW/AMSR3 — L1B - Brightness Temperature (TBB)
+  amsr3-l1-tbr:
+    protocol: gportal
+    short_name: "31001002"
+    description: GOSAT-GW/AMSR3 — L1R - Resampled Brightness Temperature (TBR)
+  amsr3-l2-tpw:
+    protocol: gportal
+    short_name: "31002000"
+    description: GOSAT-GW/AMSR3 — L2 - Total Precipitable Water （TPW）
+  amsr3-l2-clw:
+    protocol: gportal
+    short_name: "31002001"
+    description: GOSAT-GW/AMSR3 — L2 - Cloud Liquid Water Content（CLW）
+  amsr3-l2-prc:
+    protocol: gportal
+    short_name: "31002002"
+    description: GOSAT-GW/AMSR3 — L2 - Precipitation （PRC）
+  amsr3-l2-sst:
+    protocol: gportal
+    short_name: "31002003"
+    description: GOSAT-GW/AMSR3 — L2 - Sea Surface Temperature （SST）
+  amsr3-l2-ssw:
+    protocol: gportal
+    short_name: "31002004"
+    description: GOSAT-GW/AMSR3 — L2 - Sea Surface Wind Speed （SSW）
+  amsr3-l2-asw:
+    protocol: gportal
+    short_name: "31002005"
+    description: GOSAT-GW/AMSR3 — L2 - All-weather Sea Surface Wind Speed（ASW）
+  amsr3-l2-sic:
+    protocol: gportal
+    short_name: "31002006"
+    description: GOSAT-GW/AMSR3 — L2 - Sea Ice Concentration （SIC）
+  amsr3-l2-hsi:
+    protocol: gportal
+    short_name: "31002007"
+    description: GOSAT-GW/AMSR3 — L2 - High-resolution Sea Ice Concentration（HSI）
+  amsr3-l2-smc:
+    protocol: gportal
+    short_name: "31002008"
+    description: GOSAT-GW/AMSR3 — L2 - Soil Moisture Content （SMC）
+  amsr3-l2-snd:
+    protocol: gportal
+    short_name: "31002009"
+    description: GOSAT-GW/AMSR3 — L2 - Snow Depth （SND）
+  amsr3-l3-tl1:
+    protocol: gportal
+    short_name: "31003000"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 6.925GHz (TL1)
+  amsr3-l3-tl2:
+    protocol: gportal
+    short_name: "31003001"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 7.3GHz (TL2)
+  amsr3-l3-tl3:
+    protocol: gportal
+    short_name: "31003002"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 10.25GHz (TL3)
+  amsr3-l3-tl4:
+    protocol: gportal
+    short_name: "31003003"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 10.65GHz (TL4)
+  amsr3-l3-tl5:
+    protocol: gportal
+    short_name: "31003004"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 18.7GHz (TL5)
+  amsr3-l3-tl6:
+    protocol: gportal
+    short_name: "31003005"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 23.8GH (TL6)
+  amsr3-l3-tl7:
+    protocol: gportal
+    short_name: "31003006"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 36.42GHz (TL7)
+  amsr3-l3-th1:
+    protocol: gportal
+    short_name: "31003007"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 89.0GHz (TH1)
+  amsr3-l3-th2:
+    protocol: gportal
+    short_name: "31003008"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 165.5GHz (TH2)
+  amsr3-l3-th3:
+    protocol: gportal
+    short_name: "31003009"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 183.31+/-3GHz (TH3)
+  amsr3-l3-th4:
+    protocol: gportal
+    short_name: "31003010"
+    description: GOSAT-GW/AMSR3 — L3 - Brightness temperature 183.31+/-7GHz (TH4)
+  amsr3-l3-tpw:
+    protocol: gportal
+    short_name: "31003011"
+    description: GOSAT-GW/AMSR3 — L3 - Total Precipitable Water （TPW）
+  amsr3-l3-clw:
+    protocol: gportal
+    short_name: "31003012"
+    description: GOSAT-GW/AMSR3 — L3 - Cloud Liquid Water Content （CLW）
+  amsr3-l3-prc:
+    protocol: gportal
+    short_name: "31003013"
+    description: GOSAT-GW/AMSR3 — L3 - Precipitation （PRC）
+  amsr3-l3-sst:
+    protocol: gportal
+    short_name: "31003014"
+    description: GOSAT-GW/AMSR3 — L3 - Sea Surface Temperature （SST）
+  amsr3-l3-ssw:
+    protocol: gportal
+    short_name: "31003015"
+    description: GOSAT-GW/AMSR3 — L3 - Sea Surface Wind Speed （SSW）
+  amsr3-l3-asw:
+    protocol: gportal
+    short_name: "31003016"
+    description: GOSAT-GW/AMSR3 — L3 - All-weather Sea Surface Wind Speed（ASW）
+  amsr3-l3-sic:
+    protocol: gportal
+    short_name: "31003017"
+    description: GOSAT-GW/AMSR3 — L3 - Sea Ice Concentration （SIC）
+  amsr3-l3-hsi:
+    protocol: gportal
+    short_name: "31003018"
+    description: GOSAT-GW/AMSR3 — L3 - High-resolution Sea Ice Concentration（HSI）
+  amsr3-l3-smc:
+    protocol: gportal
+    short_name: "31003019"
+    description: GOSAT-GW/AMSR3 — L3 - Soil Moisture Content （SMC）
+  amsr3-l3-snd:
+    protocol: gportal
+    short_name: "31003020"
+    description: GOSAT-GW/AMSR3 — L3 - Snow Depth （SND）
 
 # Informational index of every live id across both protocols
 # (118 jaxa-earth STAC collections + 799 G-Portal numeric ids).
@@ -643,921 +3815,4 @@ datasets:
 #   earthlens datasets refresh jaxa --write
 # The curated `datasets:` block above is the dispatch table and
 # stays hand-authored; this list is purely for discoverability.
-available_datasets:
-- '10001000'
-- '10001001'
-- '10001002'
-- '10001003'
-- '10001004'
-- '10001005'
-- '10002000'
-- '10002001'
-- '10002002'
-- '10002003'
-- '10002004'
-- '10002005'
-- '10002006'
-- '10002007'
-- '10002008'
-- '10002009'
-- '10002010'
-- '10002011'
-- '10002012'
-- '10002013'
-- '10002014'
-- '10002015'
-- '10002016'
-- '10002017'
-- '10002018'
-- '10002019'
-- '10002020'
-- '10002021'
-- '10002022'
-- '10002023'
-- '10002024'
-- '10002025'
-- '10002026'
-- '10002027'
-- '10002028'
-- '10002029'
-- '10002030'
-- '10002031'
-- '10002032'
-- '10002033'
-- '10002034'
-- '10002035'
-- '10002036'
-- '10002037'
-- '10002038'
-- '10002039'
-- '10002040'
-- '10002041'
-- '10002042'
-- '10002043'
-- '10002044'
-- '10002045'
-- '10002046'
-- '10002047'
-- '10002048'
-- '10002049'
-- '10002050'
-- '10002051'
-- '10002052'
-- '10002053'
-- '10002054'
-- '10002055'
-- '10002056'
-- '10002057'
-- '10002058'
-- '10002059'
-- '10002060'
-- '10002061'
-- '10002062'
-- '10002063'
-- '10002064'
-- '10002065'
-- '10002066'
-- '10002067'
-- '10002068'
-- '10002069'
-- '10002070'
-- '10002071'
-- '10002072'
-- '10002073'
-- '10002074'
-- '10002075'
-- '10002076'
-- '10002077'
-- '10002078'
-- '10002079'
-- '10002080'
-- '10003000'
-- '10003001'
-- '10003002'
-- '10003003'
-- '10003004'
-- '10003005'
-- '10003006'
-- '10003007'
-- '10003008'
-- '10003009'
-- '10003010'
-- '10003011'
-- '10003012'
-- '10003013'
-- '10003014'
-- '10003015'
-- '10003016'
-- '10003017'
-- '10003018'
-- '10003019'
-- '10003020'
-- '10003021'
-- '10003022'
-- '10003023'
-- '10003024'
-- '10003025'
-- '10003026'
-- '10003027'
-- '10003028'
-- '10003029'
-- '10003030'
-- '10003031'
-- '10003032'
-- '10003033'
-- '10003034'
-- '10003035'
-- '10003036'
-- '10003037'
-- '10003038'
-- '10003039'
-- '10003040'
-- '10003041'
-- '10003042'
-- '10003043'
-- '10003044'
-- '10003045'
-- '10003046'
-- '10003047'
-- '10003048'
-- '10003049'
-- '10003050'
-- '10003051'
-- '10003052'
-- '10003053'
-- '10003054'
-- '10003055'
-- '10003056'
-- '10003057'
-- '10003058'
-- '10003059'
-- '10003060'
-- '10003061'
-- '10003062'
-- '10003063'
-- '10003064'
-- '10003065'
-- '10003066'
-- '10003067'
-- '10003068'
-- '10003069'
-- '10003070'
-- '10003071'
-- '10003072'
-- '10003073'
-- '10003074'
-- '10003075'
-- '10003076'
-- '10003077'
-- '10003078'
-- '10003079'
-- '10003080'
-- '10003081'
-- '10003082'
-- '10003083'
-- '10003084'
-- '10003085'
-- '10003086'
-- '10003087'
-- '10003088'
-- '10003089'
-- '10003090'
-- '10003091'
-- '10003092'
-- '10003093'
-- '10003094'
-- '10003095'
-- '10003096'
-- '10003097'
-- '10003098'
-- '10003099'
-- '10003100'
-- '10003101'
-- '10003102'
-- '10003103'
-- '10003104'
-- '10003105'
-- '10003106'
-- '10003107'
-- '10003108'
-- '10003109'
-- '10003110'
-- '10003111'
-- '10003112'
-- '10003113'
-- '10003114'
-- '10003115'
-- '10003116'
-- '10003117'
-- '10003118'
-- '10003119'
-- '10003120'
-- '10003121'
-- '10003122'
-- '10003123'
-- '10003124'
-- '10003125'
-- '10003126'
-- '10003127'
-- '10003128'
-- '10003129'
-- '10003130'
-- '10003131'
-- '10003132'
-- '10003133'
-- '10003134'
-- '10003135'
-- '10003136'
-- '10003137'
-- '10003138'
-- '10003139'
-- '10003140'
-- '10003141'
-- '10003142'
-- '10003143'
-- '10003144'
-- '10003145'
-- '10003146'
-- '10003147'
-- '10003148'
-- '10003149'
-- '10003150'
-- '10003151'
-- '10003152'
-- '10003153'
-- '10003154'
-- '10003155'
-- '10003156'
-- '10003157'
-- '10003158'
-- '10003159'
-- '10003160'
-- '10003161'
-- '10003162'
-- '10003163'
-- '10003164'
-- '10003165'
-- '10003166'
-- '10003167'
-- '10003168'
-- '10003169'
-- '10003170'
-- '10003171'
-- '10003172'
-- '10003173'
-- '10003174'
-- '10003175'
-- '10003176'
-- '10003177'
-- '11001001'
-- '11001002'
-- '11002000'
-- '11002001'
-- '11002002'
-- '11002003'
-- '11002004'
-- '11002005'
-- '11002006'
-- '11002007'
-- '11002008'
-- '11002009'
-- '11002010'
-- '11002011'
-- '11002012'
-- '11002013'
-- '11002014'
-- '11002015'
-- '11003000'
-- '11003001'
-- '11003002'
-- '11003003'
-- '11003004'
-- '11003005'
-- '11003006'
-- '11003007'
-- '11003008'
-- '11003009'
-- '11003010'
-- '11003011'
-- '11003012'
-- '11003013'
-- '11003014'
-- '11003015'
-- '11003016'
-- '11003017'
-- '11003018'
-- '11003019'
-- '11003020'
-- '11003021'
-- '11003022'
-- '11003023'
-- '11003024'
-- '11003025'
-- '11003026'
-- '11003027'
-- '11003028'
-- '11003029'
-- '11003030'
-- '11003031'
-- '11003032'
-- '11003033'
-- '11003034'
-- '11003035'
-- '11003036'
-- '11003037'
-- '11003038'
-- '11003039'
-- '11003040'
-- '11003041'
-- '11003042'
-- '11003043'
-- '11003044'
-- '11003045'
-- '11003046'
-- '11003047'
-- '11003048'
-- '11003049'
-- '11003050'
-- '11003051'
-- '11003052'
-- '11003053'
-- '11003054'
-- '11003055'
-- '11003056'
-- '11003057'
-- '11003058'
-- '11003059'
-- '12001000'
-- '12001001'
-- '12002000'
-- '12002001'
-- '12002002'
-- '12002003'
-- '12003000'
-- '12003001'
-- '12003004'
-- '12003006'
-- '12003007'
-- '12011000'
-- '12011001'
-- '12012000'
-- '12013000'
-- '12022000'
-- '12023000'
-- '12023001'
-- '12023002'
-- '12032000'
-- '12032001'
-- '12032002'
-- '13001000'
-- '13011000'
-- '13021000'
-- '13021001'
-- '13021002'
-- '13021003'
-- '13031000'
-- '13031001'
-- '13031002'
-- '13031003'
-- '13041000'
-- '13051000'
-- '14003000'
-- '14003001'
-- '14003004'
-- '15001000'
-- '15002000'
-- '15002001'
-- '15003000'
-- '15003001'
-- '15003002'
-- '15003003'
-- '15003004'
-- '15011000'
-- '15012000'
-- '15013000'
-- '15022000'
-- '15023000'
-- '15023001'
-- '15023002'
-- '15031000'
-- '15042000'
-- '16001000'
-- '16002000'
-- '16002001'
-- '16002002'
-- '16002003'
-- '16002004'
-- '16002005'
-- '16011000'
-- '16012000'
-- '16012001'
-- '16012002'
-- '16012003'
-- '16012004'
-- '16012005'
-- '16012006'
-- '16012007'
-- '16021000'
-- '16021001'
-- '16022000'
-- '16022001'
-- '16022002'
-- '16022003'
-- '16031000'
-- '16042000'
-- '16042001'
-- '16052000'
-- '16052001'
-- '16052002'
-- '16052003'
-- '16052004'
-- '16062000'
-- '16062001'
-- '16072000'
-- '16072001'
-- '16082000'
-- '16082001'
-- '16092000'
-- '16101000'
-- '16104000'
-- '16104001'
-- '17002000'
-- '17012000'
-- '17020000'
-- '17022000'
-- '18001000'
-- '18001001'
-- '18002000'
-- '18002001'
-- '18002002'
-- '18002003'
-- '18003000'
-- '18003001'
-- '18003002'
-- '18003003'
-- '18011000'
-- '18012000'
-- '18013000'
-- '18013001'
-- '18021000'
-- '18032000'
-- '18032001'
-- '18033000'
-- '18033001'
-- '18033002'
-- '18033003'
-- '18033004'
-- '19004000'
-- '20004000'
-- '21001000'
-- '21001001'
-- '22001000'
-- '22001001'
-- '22001002'
-- '22001003'
-- '22002000'
-- '22002001'
-- '22002002'
-- '22002003'
-- '22002004'
-- '22002005'
-- '22002006'
-- '22002007'
-- '22003000'
-- '22003001'
-- '22003002'
-- '22003003'
-- '22003004'
-- '22003005'
-- '22003006'
-- '22003007'
-- '22003008'
-- '22003009'
-- '22003010'
-- '22003011'
-- '22003012'
-- '22011000'
-- '22011001'
-- '22011002'
-- '22011003'
-- '23001000'
-- '23001001'
-- '23002000'
-- '23002001'
-- '23002002'
-- '23002003'
-- '23002004'
-- '23002005'
-- '23002006'
-- '23002007'
-- '23003000'
-- '23003001'
-- '23003002'
-- '23003003'
-- '23003004'
-- '23003005'
-- '23003006'
-- '23003007'
-- '23003008'
-- '23011000'
-- '23011001'
-- '23011002'
-- '23011004'
-- '23011005'
-- '23011006'
-- '23011007'
-- '23012000'
-- '23012001'
-- '23012002'
-- '23012003'
-- '23012004'
-- '23012005'
-- '23012006'
-- '23012007'
-- '23012008'
-- '23012009'
-- '23012010'
-- '23012011'
-- '23012012'
-- '23012013'
-- '23012014'
-- '23012015'
-- '23012016'
-- '23012017'
-- '23012018'
-- '23012019'
-- '23012020'
-- '23012021'
-- '23013000'
-- '23013001'
-- '23013002'
-- '23013003'
-- '23013004'
-- '23013005'
-- '23013006'
-- '23013007'
-- '23013008'
-- '23013009'
-- '23013010'
-- '23013011'
-- '23013012'
-- '23013013'
-- '23013014'
-- '23013015'
-- '23013016'
-- '23013017'
-- '23013018'
-- '23013019'
-- '23013020'
-- '23013021'
-- '23013022'
-- '23013023'
-- '23013024'
-- '23013025'
-- '23013026'
-- '23013027'
-- '23013028'
-- '23013029'
-- '23013030'
-- '23013031'
-- '23013032'
-- '23013033'
-- '23013034'
-- '23013035'
-- '23013036'
-- '23013037'
-- '23013038'
-- '23013039'
-- '23013040'
-- '23013041'
-- '23013042'
-- '23013043'
-- '23013044'
-- '23021000'
-- '23021001'
-- '24001001'
-- '24002000'
-- '24002001'
-- '24002002'
-- '24002003'
-- '24002004'
-- '24002005'
-- '24002006'
-- '24002007'
-- '24003000'
-- '24003001'
-- '24003002'
-- '24003003'
-- '24003004'
-- '24003005'
-- '24003006'
-- '24003007'
-- '24003008'
-- '24003009'
-- '24003010'
-- '24003011'
-- '24003012'
-- '24003013'
-- '24003014'
-- '24003015'
-- '24003016'
-- '24003017'
-- '24003018'
-- '24003019'
-- '25001000'
-- '25001001'
-- '25002000'
-- '25002001'
-- '25002002'
-- '25002003'
-- '25002004'
-- '25002005'
-- '25002006'
-- '25002007'
-- '25002008'
-- '25003000'
-- '25003001'
-- '25003002'
-- '25003003'
-- '25003004'
-- '25003005'
-- '25003006'
-- '25003007'
-- '25003008'
-- '25003009'
-- '25003010'
-- '25003011'
-- '25003012'
-- '25003013'
-- '25003014'
-- '25003015'
-- '25003016'
-- '25003017'
-- '25003018'
-- '25003019'
-- '25003020'
-- '25003021'
-- '25003022'
-- '25003023'
-- '25003024'
-- '25003025'
-- '25003026'
-- '25003027'
-- '25003028'
-- '25003029'
-- '25003030'
-- '25003031'
-- '25003032'
-- '25003033'
-- '25003034'
-- '25003035'
-- '25003036'
-- '25003037'
-- '25003038'
-- '25003039'
-- '25003040'
-- '25003041'
-- '25003042'
-- '25003043'
-- '25003044'
-- '25003045'
-- '25003046'
-- '25003047'
-- '25003048'
-- '25003049'
-- '25003050'
-- '25003051'
-- '25003052'
-- '25003053'
-- '25003054'
-- '25003055'
-- '26004000'
-- '26004001'
-- '26004002'
-- '26004003'
-- '26004004'
-- '26004005'
-- '26004006'
-- '26004007'
-- '26004008'
-- '26014000'
-- '26024000'
-- '26024001'
-- '26024002'
-- '26024003'
-- '26024004'
-- '26024005'
-- '27004000'
-- '27004001'
-- '27004002'
-- '27004003'
-- '27004004'
-- '27004005'
-- '27004006'
-- '27004007'
-- '27004008'
-- '27004009'
-- '27004010'
-- '27004011'
-- '27004012'
-- '27004013'
-- '27004014'
-- '28002000'
-- '28002001'
-- '28002002'
-- '28002003'
-- '28002004'
-- '28003000'
-- '28003001'
-- '28003002'
-- '28003003'
-- '28003004'
-- '28003005'
-- '28003006'
-- '28003007'
-- '28003008'
-- '28003009'
-- '28003010'
-- '28003011'
-- '28003012'
-- '28003013'
-- '28003014'
-- '28003015'
-- '28003016'
-- '28003017'
-- '29002000'
-- '29002001'
-- '29002002'
-- '29002003'
-- '29002004'
-- '29003000'
-- '29003001'
-- '29003002'
-- '29003003'
-- '29003004'
-- '29003005'
-- '29003006'
-- '29003007'
-- '29003008'
-- '29003009'
-- '29003010'
-- '29003011'
-- '29003012'
-- '29003013'
-- '29003014'
-- '29003015'
-- '29003016'
-- '29003017'
-- '30000000'
-- '31001001'
-- '31001002'
-- '31002000'
-- '31002001'
-- '31002002'
-- '31002003'
-- '31002004'
-- '31002005'
-- '31002006'
-- '31002007'
-- '31002008'
-- '31002009'
-- '31003000'
-- '31003001'
-- '31003002'
-- '31003003'
-- '31003004'
-- '31003005'
-- '31003006'
-- '31003007'
-- '31003008'
-- '31003009'
-- '31003010'
-- '31003011'
-- '31003012'
-- '31003013'
-- '31003014'
-- '31003015'
-- '31003016'
-- '31003017'
-- '31003018'
-- '31003019'
-- '31003020'
-- Copernicus.C3S_PROBA-V_LCCS_global_yearly
-- JAXA.EORC_ALOS-2.PALSAR-2_FNF.v2.1.0_global_yearly
-- JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global
-- JAXA.EORC_ALOS.PRISM_AW3D30.v4.1_global
-- JAXA.EORC_ALOS_HRLULC.v25.04_japan
-- JAXA.EORC_GSMaP_NRT.Gauge.Ext.00Z-23Z.v6_daily
-- JAXA.EORC_GSMaP_SPI.climate.gnrt6_monthly
-- JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_daily
-- JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_half-monthly
-- JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_half-monthly-normal
-- JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_monthly
-- JAXA.EORC_GSMaP_standard.Gauge.00Z-23Z.v6_monthly-normal
-- JAXA.EORC_GSMaP_standard.Gauge.v6_hourly
-- JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_daily
-- JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_half-monthly
-- JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.daytime.v3_global_monthly
-- JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_daily
-- JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_half-monthly
-- JAXA.G-Portal_Aqua.AMSR-E_standard.L3-SMC.nighttime.v3_global_monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_daily
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-AROT.daytime.v3_global_monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_daily
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-CHLA.daytime.v3_global_monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_daily
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_daily
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_daily
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-NDVI.daytime.v3_global_monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_daily
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.daytime.v3_global_monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_daily
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-C.SGLI_standard.L3-SST.nighttime.v3_global_monthly
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_daily
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_half-monthly-normal
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_monthly
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.daytime.v3_global_monthly-normal
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_daily
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_half-monthly
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_half-monthly-normal
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_monthly
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SMC.nighttime.v3_global_monthly-normal
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SST.daytime.v4_global_daily
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SST.nighttime.v4_global_daily
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_daily
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_half-monthly
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_monthly
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_daily
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_half-monthly
-- JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.nighttime.v4_global_monthly
-- JAXA.JASMES_Aqua.MODIS_swr.v811_global_daily
-- JAXA.JASMES_Aqua.MODIS_swr.v811_global_half-monthly
-- JAXA.JASMES_Aqua.MODIS_swr.v811_global_half-monthly-normal
-- JAXA.JASMES_Aqua.MODIS_swr.v811_global_monthly
-- JAXA.JASMES_Aqua.MODIS_swr.v811_global_monthly-normal
-- JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_8-day
-- JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_half-monthly
-- JAXA.JASMES_GCOM-C.SGLI_ET.v1_global_monthly
-- JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_8-day
-- JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_half-monthly
-- JAXA.JASMES_GCOM-C.SGLI_ETidx.v1_global_monthly
-- JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_8-day
-- JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_8-day-normal
-- JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.daytime.v3_japan_monthly-normal
-- JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_8-day
-- JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_8-day-normal
-- JAXA.JASMES_GCOM-C.SGLI_standard.L2-LST.nighttime.v3_japan_monthly-normal
-- JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_8-day
-- JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_8-day-normal
-- JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.daytime.v3_global_monthly-normal
-- JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_8-day
-- JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_8-day-normal
-- JAXA.JASMES_GCOM-C.SGLI_standard.L3-LST.nighttime.v3_global_monthly-normal
-- JAXA.JASMES_GCOM-W.AMSR2_ic0.v201_north_daily
-- JAXA.JASMES_GCOM-W.AMSR2_ic0.v201_south_daily
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_half-monthly
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_half-monthly-normal
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_monthly
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_ndvi.v811_global_monthly-normal
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_daily
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_half-monthly
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_half-monthly-normal
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_monthly
-- JAXA.JASMES_Terra.MODIS-Aqua.MODIS_taua.v811_global_monthly-normal
-- JAXA.JASMES_Terra.MODIS_swr.v811_global_daily
-- JAXA.JASMES_Terra.MODIS_swr.v811_global_half-monthly
-- JAXA.JASMES_Terra.MODIS_swr.v811_global_half-monthly-normal
-- JAXA.JASMES_Terra.MODIS_swr.v811_global_monthly
-- JAXA.JASMES_Terra.MODIS_swr.v811_global_monthly-normal
-- JAXA.UTokyo_TE_MSM.FLDDPH.v2_japan_hourly
-- JAXA.UTokyo_TE_MSM.FLDFRC.v2_japan_hourly
-- JAXA.UTokyo_TE_MSM.FLDOUT.v2_japan_hourly
-- JAXA.UTokyo_TE_MSM.OUTFLW.v2_japan_hourly
-- JAXA.UTokyo_TE_MSM.RIVDPH.v2_japan_hourly
-- JAXA.UTokyo_TE_MSM.RIVOUT.v2_japan_hourly
-- JAXA.UTokyo_TE_MSM.RPRIVDPH.v2_japan_hourly
-- JMA_COBE-SST-interpolation_SST.v2_global_daily-normal
-- NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.daytime.v061_global_half-monthly-normal
-- NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.daytime.v061_global_monthly-normal
-- NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.nighttime.v061_global_half-monthly-normal
-- NASA.EOSDIS_Aqua.MODIS_MYD11C1-LST.nighttime.v061_global_monthly-normal
-- NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_daily
-- NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_half-monthly
-- NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_half-monthly-normal
-- NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.daytime.v061_global_monthly-normal
-- NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_daily
-- NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_half-monthly
-- NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_half-monthly-normal
-- NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_monthly-normal
-- NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.daytime.v061_global_monthly
-- NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.nighttime.v061_global_monthly
+available_datasets: []
