@@ -75,3 +75,39 @@ def test_gportal_search_lives() -> None:
         count=3,
     )
     assert (search.matched() or 0) >= 1
+
+
+@pytest.mark.slow
+@pytest.mark.skipif(
+    not (os.environ.get("GPORTAL_USERNAME") and os.environ.get("GPORTAL_PASSWORD")),
+    reason="needs $GPORTAL_USERNAME + $GPORTAL_PASSWORD",
+)
+def test_gportal_sftp_download_lives(tmp_path: Path) -> None:
+    """A credentialed JAXA request actually pulls files over SFTP.
+
+    Drives the full backend chain through the gportal protocol: resolves
+    `sgli-l3-nwlr`, authenticates against `$GPORTAL_USERNAME` /
+    `$GPORTAL_PASSWORD`, runs `gportal.search`, then `gportal.download`
+    over SFTP into `tmp_path`. Asserts at least one non-empty HDF5
+    product lands on disk so a regression that breaks the credentialed
+    path surfaces here (the other e2e test only exercises the anonymous
+    search half). The 1-day window over a large bbox returns ~6 daily
+    L3 mosaics totalling ~10 MB.
+    """
+    pytest.importorskip("gportal")
+    from earthlens import EarthLens
+
+    lens = EarthLens(
+        data_source="jaxa",
+        variables=["sgli-l3-nwlr"],
+        start="2024-01-01",
+        end="2024-01-02",
+        lat_lim=[0.0, 30.0],
+        lon_lim=[120.0, 150.0],
+        path=tmp_path,
+    )
+    written = lens.download()
+    assert len(written) >= 1
+    assert all(p.exists() for p in written)
+    assert all(p.stat().st_size > 0 for p in written)
+    assert all(p.suffix == ".h5" for p in written)
