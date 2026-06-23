@@ -30,12 +30,16 @@ only from `_fetch`.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
 from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
+
+if TYPE_CHECKING:
+    import asf_search
 
 _REGISTER_URL = "https://urs.earthdata.nasa.gov"
 
@@ -263,7 +267,7 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
         """
         return self._session is not None
 
-    def session(self):
+    def session(self) -> asf_search.ASFSession:
         """Return the bound `ASFSession`, configuring on first use.
 
         The download path (`asf_search.ASFSearchResults.download`)

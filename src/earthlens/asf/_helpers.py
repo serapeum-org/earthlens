@@ -5,14 +5,16 @@ Holds the small stateless helpers used by `backend.py`:
 * :func:`wkt_from_extent` — convert a :class:`SpatialExtent` bbox
   to the WKT polygon string `asf_search.geo_search` expects via its
   `intersectsWith=` argument.
-* :func:`apply_baseline_windows` — a defensive post-filter that
-  drops stacked products whose `perpendicularBaseline` /
-  `temporalBaseline` properties fall outside the requested windows.
-  In practice the backend passes the windows as
-  `ASFSearchOptions(minBaselinePerp, maxBaselinePerp,
-  temporalBaselineDays)` and the SDK enforces them server-side, but
-  this helper backs that up against partial-match bugs in older
-  catalogs.
+* :func:`apply_baseline_windows` — the **load-bearing**
+  client-side filter that drops stacked products whose
+  `perpendicularBaseline` / `temporalBaseline` properties fall
+  outside the requested windows. Passing `ASFSearchOptions(
+  minBaselinePerp, maxBaselinePerp, temporalBaselineDays)` to
+  `ASFProduct.stack()` empirically breaks the SDK's internal
+  `search()` call (it returns zero products before the baseline
+  calculator runs), so the backend hands `.stack()` empty options
+  and this helper applies the windows after the full reference-frame
+  stack returns.
 """
 
 from __future__ import annotations
@@ -93,11 +95,16 @@ def apply_baseline_windows(
 ) -> list[Any]:
     """Drop stacked products outside the requested baseline windows.
 
-    Defensive post-filter — the backend passes the windows as real
-    `ASFSearchOptions` so `asf_search` enforces them server-side
-    already, but a server-side regression that lets edge values
-    through would be silently wrong. This filter keeps the windows
-    authoritative on the client too.
+    Load-bearing client-side filter for the public-API
+    `perpendicular_baseline` / `temporal_baseline` kwargs. The SDK's
+    `ASFSearchOptions(minBaselinePerp, maxBaselinePerp,
+    temporalBaselineDays)` are *not* honoured by `ASFProduct.stack()`
+    — adding them makes the SDK's internal `search()` return zero
+    products before the baseline calculator runs (`No products found
+    matching stack parameters`). The backend therefore hands
+    `.stack()` an empty options bundle and relies on this filter to
+    apply the requested windows after the full reference-frame stack
+    returns.
 
     Args:
         products: The stacked products (each an

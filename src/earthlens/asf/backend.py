@@ -250,13 +250,18 @@ class ASF(AbstractDataSource):
         """Parse the `[start, end]` window into a :class:`TemporalExtent`.
 
         ASF issues a single query spanning the whole window (no
-        per-date loop), so the resolution is the sentinel `"all"`
-        and `dates` collapses to the two endpoints.
+        per-date loop), so the resolution is always coerced to the
+        sentinel `"all"` regardless of the user-supplied value (the
+        `EarthLens` facade defaults `temporal_resolution="daily"`
+        for every backend; ASF does not chunk by cadence, so the
+        value is silently ignored rather than warned about).
+        `dates` collapses to the two endpoints.
 
         Args:
             start: Inclusive start date string.
             end: Inclusive end date string.
-            temporal_resolution: Ignored beyond being recorded.
+            temporal_resolution: Ignored — ASF queries always span
+                the full window in one call.
             fmt: `strptime` format applied to `start` and `end`.
 
         Returns:
@@ -310,16 +315,24 @@ class ASF(AbstractDataSource):
         In search mode: `geo_search(intersectsWith=<WKT>,
         platform=..., processingLevel=..., dataset=..., start=...,
         end=..., …)`. In stack mode: `granule_search([reference])`
-        → `ref.stack(opts=…)`. The baseline windows are applied via
-        `ASFSearchOptions` (so the SDK enforces them server-side)
-        and re-checked client-side as a defensive backstop.
+        → `ref.stack(opts=…)`, then the perpendicular- /
+        temporal-baseline windows are applied client-side via
+        :func:`apply_baseline_windows` (the SDK's
+        `ASFSearchOptions` baseline fields break `.stack()` and
+        are not used; see :meth:`_stack_opts`).
 
         Returns:
             list[RemoteProduct]: One product per matching ASF
                 product, in result order. `id` is
-                `product.properties["sceneName"]`; `metadata`
-                carries the raw `ASFProduct` plus `fileName` and
-                the two baseline values.
+                `product.properties["sceneName"]` (with `fileID`
+                as a fallback); `metadata` always carries the raw
+                `ASFProduct` and `fileName`. In **stack mode**
+                `metadata` also carries `perpendicularBaseline` and
+                `temporalBaseline`; search-mode metadata omits
+                those keys because `geo_search` results do not
+                carry baseline properties (including them as
+                `None` would silently mis-match downstream
+                filters).
 
         Raises:
             ValueError: When stack mode references an unknown
