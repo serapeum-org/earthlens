@@ -12281,8 +12281,8 @@ multi-provider verbs) a comma-separated list or the literal <code>all</code>:</p
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>all<span class="w">                </span><span class="c1"># every provider</span>
 </code></pre></div>
 <p>Canonical ids: <code>chc</code>, <code>s3</code>, <code>cmems</code>, <code>ecmwf</code>, <code>earthdata</code>, <code>eumetsat</code>, <code>fdsn</code>, <code>firms</code>, <code>gdacs</code>, <code>gee</code>,
-<code>ghsl</code>, <code>hdx</code>, <code>nwp</code>, <code>openaq</code>, <code>openeo</code>, <code>overture</code>, <code>radar</code>, <code>sentinel_hub</code>, <code>stac</code>, <code>tropycal</code>,
-<code>usgs_water</code>, <code>worldpop</code>. Common aliases include <code>amazon-s3</code>, <code>chirps</code>, <code>google-earth-engine</code>,
+<code>ghsl</code>, <code>hdx</code>, <code>jaxa</code>, <code>nwp</code>, <code>openaq</code>, <code>openeo</code>, <code>overture</code>, <code>radar</code>, <code>sentinel_hub</code>, <code>stac</code>,
+<code>tropycal</code>, <code>usgs_water</code>, <code>worldpop</code>. Common aliases include <code>amazon-s3</code>, <code>chirps</code>, <code>google-earth-engine</code>,
 <code>sentinel-hub</code>/<code>sentinelhub</code>, <code>nexrad</code>, <code>nwis</code>/<code>usgs-water</code>, <code>world-pop</code>, <code>human-settlement</code>/<code>ghs</code>,
 <code>earth-search</code>/<code>planetary-computer</code>/<code>cdse</code> (STAC endpoints). An unknown selector is a <strong>usage error</strong>
 (exit code <code>2</code>).</p>
@@ -12604,7 +12604,7 @@ on-disk schema (e.g. CMEMS opens the NetCDF, ECMWF retrieves a tiny slice, Earth
 <p>The authoring companion to <code>probe</code>: fetches one upstream id's metadata and emits a paste-ready
 <code>datasets:</code> YAML row (inferring <code>output_kind</code> / <code>format</code> / bands where it can). By default it prints the
 row to vet and paste; <code>--write</code> appends it into the catalog file. Supported providers: <code>earthdata</code>,
-<code>hdx</code>, <code>usgs_water</code>, <code>eumetsat</code>, <code>gee</code>.</p>
+<code>hdx</code>, <code>usgs_water</code>, <code>eumetsat</code>, <code>gee</code>, <code>jaxa</code>.</p>
 <table>
 <thead>
 <tr>
@@ -12659,6 +12659,8 @@ row to vet and paste; <code>--write</code> appends it into the catalog file. Sup
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>gee<span class="w"> </span>NASA/GDDP-CMIP6<span class="w"> </span>--write<span class="w">     </span><span class="c1"># auto-categorised file</span>
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>earthdata<span class="w"> </span>GPM_3IMERGHH<span class="w"> </span>--version<span class="w"> </span><span class="m">07</span><span class="w"> </span>--cmr-provider<span class="w"> </span>GES_DISC
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>gee<span class="w"> </span>--fill-empty<span class="w"> </span>--write<span class="w">       </span><span class="c1"># bulk-hydrate placeholders</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>jaxa<span class="w"> </span>JAXA.AW3D30.v3.2<span class="w">           </span><span class="c1"># jaxa-earth STAC seed</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>curate<span class="w"> </span>jaxa<span class="w"> </span><span class="m">11001002</span><span class="w">                   </span><span class="c1"># G-Portal numeric id seed</span>
 </code></pre></div>
 <hr />
 <h2 id="earthlens-providers"><a class="toclink" href="#earthlens-providers"><code>earthlens providers</code></a><a class="headerlink" href="#earthlens-providers" title="Permanent link">#</a></h2>
