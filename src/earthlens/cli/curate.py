@@ -1302,6 +1302,47 @@ _DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
 }
 
 
+def _jaxa_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Probe one JAXA row's live schema (band list for jaxa-earth, props for gportal).
+
+    For a `jaxa-earth` row, look the collection up in
+    `je.ImageCollectionList().filter_name()` (which returns
+    `(ids, bands_per_id)` tuples — the SDK's catalog dump used by the
+    refresh path) and return one entry per band. For a `gportal` row,
+    run an anonymous `gportal.search` for a 1-day window and return the
+    first product's flattened properties as the schema. Both paths are
+    network-bound; the SDKs are imported lazily via the catalog row's
+    branch module.
+
+    Args:
+        catalog: The loaded JAXA `Catalog` (resolves a key's protocol +
+            upstream id).
+        dataset: A curated key, a raw STAC collection name, or a raw
+            G-Portal numeric id.
+
+    Returns:
+        Mapping of schema-entry name to `{...}` info dict.
+    """
+    row = catalog.get(dataset)
+    if row.protocol == "jaxa-earth":
+        from jaxa.earth import je  # type: ignore[import-not-found]
+
+        ids, bands_per_id = je.ImageCollectionList().filter_name()
+        try:
+            idx = list(ids).index(row.collection)
+        except ValueError:
+            return {}
+        return {b: {"role": "band"} for b in bands_per_id[idx]}
+    import gportal  # type: ignore[import-not-found]
+
+    result = gportal.search(dataset_ids=[row.short_name], count=1)
+    products = list(result.products())
+    if not products:
+        return {}
+    flat = products[0].flatten_properties()
+    return {k: {"value": str(v)[:80]} for k, v in flat.items()}
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
@@ -1322,6 +1363,7 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "chc": _chc_probe,
     "tropycal": _tropycal_probe,
     "nwp": _nwp_probe,
+    "jaxa": _jaxa_probe,
 }
 
 
