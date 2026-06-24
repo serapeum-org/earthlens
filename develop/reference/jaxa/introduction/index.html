@@ -11941,10 +11941,14 @@ API is the <a href="../jaxa/">Reference</a> page.</p>
 <p>Mixing keys from both protocols in <strong>one</strong> <code>JAXA(...)</code> call is rejected —
 the file shapes and concurrency profiles differ; issue two calls.</p>
 <h2 id="catalog-highlights"><a class="toclink" href="#catalog-highlights">Catalog highlights</a><a class="headerlink" href="#catalog-highlights" title="Permanent link">#</a></h2>
-<p>The bundled <code>jaxa_data_catalog.yaml</code> ships 124 rows: every one of the 118
-live <code>jaxa.earth</code> collections plus 6 strategic G-Portal mission products.
-<strong>Every collection has a short, friendly canonical key</strong> (the long
-auto-derived slug stays as an alias).</p>
+<p>The bundled catalog ships <strong>917 rows</strong> — every one of the 118 live
+<code>jaxa.earth</code> collections plus the entire 799-product G-Portal universe
+— sharded into per-mission YAML files under
+<code>src/earthlens/jaxa/catalog/</code> (<code>jaxa-earth.yaml</code>, <code>sgli.yaml</code>,
+<code>amsr.yaml</code>, <code>alos-palsar.yaml</code>, <code>earthcare.yaml</code>,
+<code>precipitation.yaml</code>, …), matching the layout used by the <code>gee</code> and
+<code>ecmwf</code> siblings. <strong>Every collection has a short, friendly canonical key</strong>
+(the long auto-derived slug stays as an alias).</p>
 <p>The naming scheme is <code>&lt;mission&gt;-&lt;product&gt;[-&lt;d|n&gt;][-&lt;cadence&gt;][-norm]</code>,
 where <code>d</code> / <code>n</code> mark daytime / nighttime variants, the cadence comes
 from the source (<code>daily</code>, <code>halfmonth</code>, <code>monthly</code>, <code>8day</code>, <code>hourly</code>,
@@ -12060,7 +12064,7 @@ resolve via <code>cat.get(...)</code>):</p>
 </tbody>
 </table>
 <p>For the full list of friendly keys (104 of 118 are ≤25 characters) see
-the bundled YAML under <code>src/earthlens/jaxa/jaxa_data_catalog.yaml</code>. Use
+the per-mission shards under <code>src/earthlens/jaxa/catalog/</code>. Use
 <code>Catalog().by_protocol("jaxa-earth")</code> and <code>.by_protocol("gportal")</code> to
 list them programmatically.</p>
 <p><strong>Two intentional exclusions:</strong></p>

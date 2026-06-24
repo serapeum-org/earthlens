@@ -11999,11 +11999,12 @@ collections + G-Portal datasets so a stale local YAML can be regenerated:</p>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>jaxa<span class="w"> </span>--write<span class="w">    </span><span class="c1"># rewrites the bundled YAML</span>
 </code></pre></div>
 <p>The first form prints a summary (collection count, drift vs the bundled
-catalog) without touching disk. The second rewrites
-<code>src/earthlens/jaxa/jaxa_data_catalog.yaml</code> with the freshly probed
-collections (preserving the curated friendly aliases). See
-<code>planning/jaxa/captures/build_catalog.py</code> for the generator the CLI
-invokes under the hood.</p>
+catalog) without touching disk. The second rewrites the
+<code>available_datasets:</code> index in <code>src/earthlens/jaxa/catalog/_index.yaml</code>
+with the freshly probed ids (the curated per-mission shards under the
+same <code>catalog/</code> directory are not touched). See
+<code>planning/jaxa/captures/build_catalog.py</code> for the generator that builds
+the per-mission shards from scratch.</p>
 <h2 id="when-the-live-e2e-tests-run"><a class="toclink" href="#when-the-live-e2e-tests-run">When the live e2e tests run</a><a class="headerlink" href="#when-the-live-e2e-tests-run" title="Permanent link">#</a></h2>
 <p>The end-to-end tests are gated:</p>
 <ul>
