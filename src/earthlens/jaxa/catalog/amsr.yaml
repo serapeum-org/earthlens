@@ -1,0 +1,560 @@
+# AMSR-2 (GCOM-W) and AMSR-3 (GOSAT-GW) microwave radiometer products via G-Portal.
+# AUTO-GENERATED from the upstream SDK catalog by
+# `python planning/jaxa/captures/build_catalog.py`. Hand-edit the script
+# (e.g. friendly slugs, descriptions, default bands) rather than this file,
+# or new ids will revert on the next regeneration.
+
+datasets:
+  amsr2-l1-tb:
+    protocol: gportal
+    short_name: '11001001'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L1B-Brightness temperature\xEF\xBC\
+      \u02C6TB\xEF\xBC\u2030"
+  amsr2-l1r:
+    aliases:
+    - amsr2-l1
+    - gcom-w-l1r
+    protocol: gportal
+    short_name: '11001002'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L1R-Brightness temperature\xEF\xBC\
+      \u02C6TB\xEF\xBC\u2030"
+  amsr2-l2-clw:
+    protocol: gportal
+    short_name: '11002010'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Cloud Liquid Water\xEF\xBC\u02C6\
+      CLW\xEF\xBC\u2030"
+  amsr2-l2-clw-2001:
+    protocol: gportal
+    short_name: '11002001'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Cloud Liquid Water\xEF\xBC\u02C6\
+      CLW\xEF\xBC\u2030"
+  amsr2-l2-prc:
+    protocol: gportal
+    short_name: '11002003'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Precipitation\xEF\xBC\u02C6PRC\xEF\
+      \xBC\u2030"
+  amsr2-l2-prc-2002:
+    protocol: gportal
+    short_name: '11002002'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Precipitation\xEF\xBC\u02C6PRC\xEF\
+      \xBC\u2030"
+  amsr2-l2-sic:
+    protocol: gportal
+    short_name: '11002013'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Sea Ice Concentration\xEF\xBC\u02C6\
+      SIC\xEF\xBC\u2030"
+  amsr2-l2-sic-2006:
+    protocol: gportal
+    short_name: '11002006'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Sea Ice Concentration\xEF\xBC\u02C6\
+      SIC\xEF\xBC\u2030"
+  amsr2-l2-smc:
+    protocol: gportal
+    short_name: '11002015'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Soil Moisture Content\xEF\xBC\u02C6\
+      SMC\xEF\xBC\u2030"
+  amsr2-l2-smc-2008:
+    protocol: gportal
+    short_name: '11002008'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Soil Moisture Content\xEF\xBC\u02C6\
+      SMC\xEF\xBC\u2030"
+  amsr2-l2-snd:
+    protocol: gportal
+    short_name: '11002014'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Snow Depth\xEF\xBC\u02C6SND\xEF\
+      \xBC\u2030"
+  amsr2-l2-snd-2007:
+    protocol: gportal
+    short_name: '11002007'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Snow Depth\xEF\xBC\u02C6SND\xEF\
+      \xBC\u2030"
+  amsr2-l2-sst:
+    protocol: gportal
+    short_name: '11002011'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Sea Surface Temperture\xEF\xBC\u02C6\
+      SST\xEF\xBC\u2030"
+  amsr2-l2-sst-2004:
+    protocol: gportal
+    short_name: '11002004'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Sea Surface Temperture\xEF\xBC\u02C6\
+      SST\xEF\xBC\u2030"
+  amsr2-l2-ssw:
+    protocol: gportal
+    short_name: '11002012'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Sea Surface Wind Speed\xEF\xBC\u02C6\
+      SSW\xEF\xBC\u2030"
+  amsr2-l2-ssw-2005:
+    protocol: gportal
+    short_name: '11002005'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Sea Surface Wind Speed\xEF\xBC\u02C6\
+      SSW\xEF\xBC\u2030"
+  amsr2-l2-tpw:
+    protocol: gportal
+    short_name: '11002009'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Integrated Water Vapor\xEF\xBC\u02C6\
+      TPW\xEF\xBC\u2030"
+  amsr2-l2-tpw-2000:
+    protocol: gportal
+    short_name: '11002000'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D L2-Integrated Water Vapor\xEF\xBC\u02C6\
+      TPW\xEF\xBC\u2030"
+  amsr2-l3-0-1deg-l3-brightness-temperatu:
+    protocol: gportal
+    short_name: '11003017'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_6GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3016:
+    protocol: gportal
+    short_name: '11003016'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_6GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3018:
+    protocol: gportal
+    short_name: '11003018'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_7GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3019:
+    protocol: gportal
+    short_name: '11003019'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_7GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3020:
+    protocol: gportal
+    short_name: '11003020'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_10GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3021:
+    protocol: gportal
+    short_name: '11003021'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_10GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3022:
+    protocol: gportal
+    short_name: '11003022'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_18GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3023:
+    protocol: gportal
+    short_name: '11003023'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_18GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3024:
+    protocol: gportal
+    short_name: '11003024'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_23GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3025:
+    protocol: gportal
+    short_name: '11003025'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_23GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3026:
+    protocol: gportal
+    short_name: '11003026'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_36GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3027:
+    protocol: gportal
+    short_name: '11003027'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_36GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3028:
+    protocol: gportal
+    short_name: '11003028'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_89GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-brightness-temperatu-3029:
+    protocol: gportal
+    short_name: '11003029'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_89GHz_0.1deg"
+  amsr2-l3-0-1deg-l3-cloud-liquid-water-c:
+    protocol: gportal
+    short_name: '11003003'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Cloud Liquid Water\xEF\
+      \xBC\u02C6CLW\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-cloud-liquid-water-c-3002:
+    protocol: gportal
+    short_name: '11003002'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Cloud Liquid Water\xEF\
+      \xBC\u02C6CLW\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-ice-concentration-si:
+    protocol: gportal
+    short_name: '11003011'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Ice Concentration\xEF\
+      \xBC\u02C6SIC\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-ice-concentration-si-3010:
+    protocol: gportal
+    short_name: '11003010'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Ice Concentration\xEF\
+      \xBC\u02C6SIC\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-integrated-water-vap:
+    protocol: gportal
+    short_name: '11003001'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Integrated Water Vapor\xEF\
+      \xBC\u02C6TPW\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-integrated-water-vap-3000:
+    protocol: gportal
+    short_name: '11003000'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Integrated Water Vapor\xEF\
+      \xBC\u02C6TPW\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-precipitation-prc-0:
+    protocol: gportal
+    short_name: '11003005'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Precipitation\xEF\xBC\
+      \u02C6PRC\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-precipitation-prc-0-3004:
+    protocol: gportal
+    short_name: '11003004'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Precipitation\xEF\xBC\
+      \u02C6PRC\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-sea-surface-tempertu:
+    protocol: gportal
+    short_name: '11003007'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Sea Surface Temperture\xEF\
+      \xBC\u02C6SST\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-sea-surface-tempertu-3006:
+    protocol: gportal
+    short_name: '11003006'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Sea Surface Temperture\xEF\
+      \xBC\u02C6SST\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-sea-surface-wind-spe:
+    protocol: gportal
+    short_name: '11003009'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Sea Surface Wind Speed\xEF\
+      \xBC\u02C6SSW\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-sea-surface-wind-spe-3008:
+    protocol: gportal
+    short_name: '11003008'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Sea Surface Wind Speed\xEF\
+      \xBC\u02C6SSW\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-snow-depth-snd-0-1de:
+    protocol: gportal
+    short_name: '11003013'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Snow Depth\xEF\xBC\u02C6\
+      SND\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-snow-depth-snd-0-1de-3012:
+    protocol: gportal
+    short_name: '11003012'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Snow Depth\xEF\xBC\u02C6\
+      SND\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-soil-moisture-conten:
+    protocol: gportal
+    short_name: '11003015'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Soil Moisture Content\xEF\
+      \xBC\u02C6SMC\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-1deg-l3-soil-moisture-conten-3014:
+    protocol: gportal
+    short_name: '11003014'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 10km/0.1deg/L3-Soil Moisture Content\xEF\
+      \xBC\u02C6SMC\xEF\xBC\u2030_0.1deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat:
+    protocol: gportal
+    short_name: '11003047'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_6GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3046:
+    protocol: gportal
+    short_name: '11003046'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_6GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3048:
+    protocol: gportal
+    short_name: '11003048'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_7GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3049:
+    protocol: gportal
+    short_name: '11003049'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_7GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3050:
+    protocol: gportal
+    short_name: '11003050'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_10GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3051:
+    protocol: gportal
+    short_name: '11003051'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_10GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3052:
+    protocol: gportal
+    short_name: '11003052'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_18GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3053:
+    protocol: gportal
+    short_name: '11003053'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_18GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3054:
+    protocol: gportal
+    short_name: '11003054'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_23GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3055:
+    protocol: gportal
+    short_name: '11003055'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_23GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3056:
+    protocol: gportal
+    short_name: '11003056'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_36GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3057:
+    protocol: gportal
+    short_name: '11003057'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_36GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3058:
+    protocol: gportal
+    short_name: '11003058'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_89GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-brightness-temperat-3059:
+    protocol: gportal
+    short_name: '11003059'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Brightness temperature\xEF\
+      \xBC\u02C6TB\xEF\xBC\u2030_89GHz_0.25deg"
+  amsr2-l3-0-25deg-l3-cloud-liquid-water:
+    protocol: gportal
+    short_name: '11003033'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Cloud Liquid Water\xEF\
+      \xBC\u02C6CLW\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-cloud-liquid-water-3032:
+    protocol: gportal
+    short_name: '11003032'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Cloud Liquid Water\xEF\
+      \xBC\u02C6CLW\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-integrated-water-va:
+    protocol: gportal
+    short_name: '11003031'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Integrated Water Vapor\xEF\
+      \xBC\u02C6TPW\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-integrated-water-va-3030:
+    protocol: gportal
+    short_name: '11003030'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Integrated Water Vapor\xEF\
+      \xBC\u02C6TPW\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-precipitation-prc-0:
+    protocol: gportal
+    short_name: '11003035'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Precipitation\xEF\xBC\
+      \u02C6PRC\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-precipitation-prc-0-3034:
+    protocol: gportal
+    short_name: '11003034'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Precipitation\xEF\xBC\
+      \u02C6PRC\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-sea-ice-concentrati:
+    protocol: gportal
+    short_name: '11003041'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Sea Ice Concentration\xEF\
+      \xBC\u02C6SIC\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-sea-ice-concentrati-3040:
+    protocol: gportal
+    short_name: '11003040'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Sea Ice Concentration\xEF\
+      \xBC\u02C6SIC\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-sea-surface-tempert:
+    protocol: gportal
+    short_name: '11003037'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Sea Surface Temperture\xEF\
+      \xBC\u02C6SST\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-sea-surface-tempert-3036:
+    protocol: gportal
+    short_name: '11003036'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Sea Surface Temperture\xEF\
+      \xBC\u02C6SST\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-sea-surface-wind-sp:
+    protocol: gportal
+    short_name: '11003039'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Sea Surface Wind Speed\xEF\
+      \xBC\u02C6SSW\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-sea-surface-wind-sp-3038:
+    protocol: gportal
+    short_name: '11003038'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Sea Surface Wind Speed\xEF\
+      \xBC\u02C6SSW\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-snow-depth-snd-0-25:
+    protocol: gportal
+    short_name: '11003043'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Snow Depth\xEF\xBC\
+      \u02C6SND\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-snow-depth-snd-0-25-3042:
+    protocol: gportal
+    short_name: '11003042'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Snow Depth\xEF\xBC\
+      \u02C6SND\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-soil-moisture-conte:
+    protocol: gportal
+    short_name: '11003045'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Soil Moisture Content\xEF\
+      \xBC\u02C6SMC\xEF\xBC\u2030_0.25deg"
+  amsr2-l3-0-25deg-l3-soil-moisture-conte-3044:
+    protocol: gportal
+    short_name: '11003044'
+    description: "GCOM-W/AMSR2 \xE2\u20AC\u201D 25km/0.25deg/L3-Soil Moisture Content\xEF\
+      \xBC\u02C6SMC\xEF\xBC\u2030_0.25deg"
+  amsr3-l1-tbr:
+    protocol: gportal
+    short_name: '31001002'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L1R - Resampled Brightness Temperature\
+      \ (TBR)"
+  amsr3-l2-asw:
+    protocol: gportal
+    short_name: '31002005'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - All-weather Sea Surface Wind\
+      \ Speed\xEF\xBC\u02C6ASW\xEF\xBC\u2030"
+  amsr3-l2-clw:
+    protocol: gportal
+    short_name: '31002001'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - Cloud Liquid Water Content\xEF\
+      \xBC\u02C6CLW\xEF\xBC\u2030"
+  amsr3-l2-hsi:
+    protocol: gportal
+    short_name: '31002007'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - High-resolution Sea Ice Concentration\xEF\
+      \xBC\u02C6HSI\xEF\xBC\u2030"
+  amsr3-l2-prc:
+    protocol: gportal
+    short_name: '31002002'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - Precipitation \xEF\xBC\u02C6\
+      PRC\xEF\xBC\u2030"
+  amsr3-l2-sic:
+    protocol: gportal
+    short_name: '31002006'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - Sea Ice Concentration \xEF\xBC\
+      \u02C6SIC\xEF\xBC\u2030"
+  amsr3-l2-smc:
+    protocol: gportal
+    short_name: '31002008'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - Soil Moisture Content \xEF\xBC\
+      \u02C6SMC\xEF\xBC\u2030"
+  amsr3-l2-snd:
+    protocol: gportal
+    short_name: '31002009'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - Snow Depth \xEF\xBC\u02C6SND\xEF\
+      \xBC\u2030"
+  amsr3-l2-sst:
+    protocol: gportal
+    short_name: '31002003'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - Sea Surface Temperature \xEF\
+      \xBC\u02C6SST\xEF\xBC\u2030"
+  amsr3-l2-ssw:
+    protocol: gportal
+    short_name: '31002004'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - Sea Surface Wind Speed \xEF\
+      \xBC\u02C6SSW\xEF\xBC\u2030"
+  amsr3-l2-tpw:
+    protocol: gportal
+    short_name: '31002000'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L2 - Total Precipitable Water \xEF\
+      \xBC\u02C6TPW\xEF\xBC\u2030"
+  amsr3-l3-asw:
+    protocol: gportal
+    short_name: '31003016'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - All-weather Sea Surface Wind\
+      \ Speed\xEF\xBC\u02C6ASW\xEF\xBC\u2030"
+  amsr3-l3-clw:
+    protocol: gportal
+    short_name: '31003012'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Cloud Liquid Water Content\
+      \ \xEF\xBC\u02C6CLW\xEF\xBC\u2030"
+  amsr3-l3-hsi:
+    protocol: gportal
+    short_name: '31003018'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - High-resolution Sea Ice Concentration\xEF\
+      \xBC\u02C6HSI\xEF\xBC\u2030"
+  amsr3-l3-prc:
+    protocol: gportal
+    short_name: '31003013'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Precipitation \xEF\xBC\u02C6\
+      PRC\xEF\xBC\u2030"
+  amsr3-l3-sic:
+    protocol: gportal
+    short_name: '31003017'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Sea Ice Concentration \xEF\xBC\
+      \u02C6SIC\xEF\xBC\u2030"
+  amsr3-l3-smc:
+    protocol: gportal
+    short_name: '31003019'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Soil Moisture Content \xEF\xBC\
+      \u02C6SMC\xEF\xBC\u2030"
+  amsr3-l3-snd:
+    protocol: gportal
+    short_name: '31003020'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Snow Depth \xEF\xBC\u02C6SND\xEF\
+      \xBC\u2030"
+  amsr3-l3-sst:
+    protocol: gportal
+    short_name: '31003014'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Sea Surface Temperature \xEF\
+      \xBC\u02C6SST\xEF\xBC\u2030"
+  amsr3-l3-ssw:
+    protocol: gportal
+    short_name: '31003015'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Sea Surface Wind Speed \xEF\
+      \xBC\u02C6SSW\xEF\xBC\u2030"
+  amsr3-l3-th1:
+    protocol: gportal
+    short_name: '31003007'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 89.0GHz\
+      \ (TH1)"
+  amsr3-l3-th2:
+    protocol: gportal
+    short_name: '31003008'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 165.5GHz\
+      \ (TH2)"
+  amsr3-l3-th3:
+    protocol: gportal
+    short_name: '31003009'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 183.31+/-3GHz\
+      \ (TH3)"
+  amsr3-l3-th4:
+    protocol: gportal
+    short_name: '31003010'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 183.31+/-7GHz\
+      \ (TH4)"
+  amsr3-l3-tl1:
+    protocol: gportal
+    short_name: '31003000'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 6.925GHz\
+      \ (TL1)"
+  amsr3-l3-tl2:
+    protocol: gportal
+    short_name: '31003001'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 7.3GHz\
+      \ (TL2)"
+  amsr3-l3-tl3:
+    protocol: gportal
+    short_name: '31003002'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 10.25GHz\
+      \ (TL3)"
+  amsr3-l3-tl4:
+    protocol: gportal
+    short_name: '31003003'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 10.65GHz\
+      \ (TL4)"
+  amsr3-l3-tl5:
+    protocol: gportal
+    short_name: '31003004'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 18.7GHz\
+      \ (TL5)"
+  amsr3-l3-tl6:
+    protocol: gportal
+    short_name: '31003005'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 23.8GH\
+      \ (TL6)"
+  amsr3-l3-tl7:
+    protocol: gportal
+    short_name: '31003006'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Brightness temperature 36.42GHz\
+      \ (TL7)"
+  amsr3-l3-tpw:
+    protocol: gportal
+    short_name: '31003011'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L3 - Total Precipitable Water \xEF\
+      \xBC\u02C6TPW\xEF\xBC\u2030"

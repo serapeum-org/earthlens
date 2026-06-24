@@ -1,0 +1,27 @@
+# Miscellaneous G-Portal products that do not fit a mission-specific shard.
+# AUTO-GENERATED from the upstream SDK catalog by
+# `python planning/jaxa/captures/build_catalog.py`. Hand-edit the script
+# (e.g. friendly slugs, descriptions, default bands) rather than this file,
+# or new ids will revert on the next regeneration.
+
+datasets:
+  circ-alos-2-alos-2-circ-l1-rad:
+    protocol: gportal
+    short_name: '21001000'
+    description: "CIRC \xE2\u20AC\u201D ALOS-2 CIRC L1 RAD"
+  circ-alos-2-alos-2-circ-lst:
+    protocol: gportal
+    short_name: '21001001'
+    description: "CIRC \xE2\u20AC\u201D ALOS-2 CIRC LST"
+  mos1-messr-messr:
+    protocol: gportal
+    short_name: '19004000'
+    description: "MOS-1 \xE2\u20AC\u201D MOS-1/MESSR"
+  mos1b-messr-messr:
+    protocol: gportal
+    short_name: '20004000'
+    description: "MOS-1b \xE2\u20AC\u201D MOS-1b/MESSR"
+  slats-shirop-panchromatic-image:
+    protocol: gportal
+    short_name: '30000000'
+    description: "SLATS \xE2\u20AC\u201D Panchromatic Image"

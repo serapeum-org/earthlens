@@ -1,21 +1,28 @@
 """Dataset catalog for the JAXA backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
-`jaxa_data_catalog.yaml`. Each catalog row is a `Dataset` carrying a
-`protocol` discriminator (`"jaxa-earth"` or `"gportal"`) plus the
-protocol-specific identifier — a `jaxa.earth` STAC collection name for the
-former or a G-Portal numeric dataset id for the latter. The catalog's
-`by_protocol(...)` view + dataset-level validator together let the backend
-route a request to the right SDK branch without re-parsing the YAML at every
-fetch.
+Hosts :class:`Catalog`, the pydantic-backed reader for the bundled JAXA
+catalog. The catalog ships as a directory of per-mission YAML files at
+`src/earthlens/jaxa/catalog/` (`jaxa-earth.yaml`, `sgli.yaml`,
+`amsr.yaml`, `alos-palsar.yaml`, `earthcare.yaml`,
+`precipitation.yaml`, …), plus a single `_index.yaml` carrying the merged
+`available_datasets:` list — the same sharded layout used by the
+`gee` and `ecmwf` siblings.
+
+Each catalog row is a `Dataset` carrying a `protocol` discriminator
+(`"jaxa-earth"` or `"gportal"`) plus the protocol-specific identifier
+— a `jaxa.earth` STAC collection name for the former or a G-Portal
+numeric dataset id for the latter. The catalog's `by_protocol(...)`
+view + dataset-level validator together let the backend route a request
+to the right SDK branch without re-parsing the YAML at every fetch.
 
 The aliases map is a separate small index resolved by :meth:`Catalog.resolve`,
 giving every dataset a friendly key (``"elevation"`` → ``"aw3d30"``) on top
 of its canonical key. The model is `extra="forbid"` so typos in the bundled
 YAML fail loudly on first load rather than silently being ignored.
 
-`CATALOG_PATH` points at the bundled YAML; :func:`clear_catalog_cache` empties
-the `(path, mtime)` parse cache used by :meth:`Catalog.load`.
+`CATALOG_PATH` points at the bundled catalog directory (or, for tests
+that monkey-patch it, a single `*.yaml` file); :func:`clear_catalog_cache`
+empties the `(path, mtime)` parse cache used by :meth:`Catalog.load`.
 """
 
 from __future__ import annotations
@@ -30,9 +37,23 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
-CATALOG_PATH: Path = Path(__file__).parent / "jaxa_data_catalog.yaml"
+CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
-_CATALOG_CACHE: dict[tuple[str, int], Catalog] = {}
+#: Keyed on the resolved path + every contributing file's mtime so editing any
+#: per-mission YAML invalidates the cache without re-walking the whole tree.
+_CATALOG_CACHE: dict[Any, Catalog] = {}
+
+
+def _yaml_files_for(path: Path) -> list[Path]:
+    """Return the sorted YAML files that contribute to a catalog load.
+
+    `path` may be a directory of per-mission `*.yaml` files (the default
+    layout) or a single `*.yaml` file (back-compat for tests that
+    monkey-patch :data:`CATALOG_PATH` to a temp file).
+    """
+    if path.is_dir():
+        return sorted(path.glob("*.yaml"))
+    return [path]
 
 #: G-Portal dataset ids are 7- to 9-digit numeric strings (e.g. `11001002`).
 _GPORTAL_ID_RE = re.compile(r"^\d{7,9}$")
@@ -227,41 +248,62 @@ class Catalog(AbstractCatalog):
         """Read and validate the JAXA catalog from disk (cached).
 
         Args:
-            catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+            catalog_path: Path to the catalog directory (the sharded
+                default) or a single YAML file (tests / legacy). Defaults
+                to the module-level :data:`CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated :class:`Catalog` merged across every
+            contributing file.
 
         Raises:
-            ValueError: If the file has no `datasets:` block, or any row
-                fails validation (missing identifier, alias conflict).
+            ValueError: If the path has no `datasets:` rows across any
+                file, or any row fails validation (missing identifier,
+                alias conflict), or a key is declared in two shards.
             FileNotFoundError: If `catalog_path` does not exist (the
-                bundled YAML ships with the wheel, so this only fires
+                bundled catalog ships with the wheel, so this only fires
                 when a caller passes an explicit, missing path).
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        cache_key = (str(path.resolve()), path.stat().st_mtime_ns)
+        files = _yaml_files_for(path)
+        try:
+            mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
+        except FileNotFoundError:
+            mtime_tuple = ((str(path.resolve()), 0),)
+        cache_key = (str(path.resolve()), mtime_tuple)
         cached = _CATALOG_CACHE.get(cache_key)
         if cached is not None:
             return cached
 
-        data = load_yaml_strict(path) or {}
-        rows = data.get("datasets") or {}
-        if not rows:
+        merged_rows: dict[str, dict[str, Any]] = {}
+        row_origin: dict[str, Path] = {}
+        available: list[str] = []
+        for file_path in files:
+            data = load_yaml_strict(file_path) or {}
+            for ident in data.get("available_datasets") or []:
+                available.append(str(ident))
+            for key, body in (data.get("datasets") or {}).items():
+                if key in merged_rows:
+                    raise ValueError(
+                        f"dataset {key!r} declared in two catalog files: "
+                        f"{row_origin[key]} and {file_path}"
+                    )
+                merged_rows[key] = dict(body or {})
+                row_origin[key] = file_path
+
+        if not merged_rows:
             raise ValueError(
                 f"{path} is missing or has an empty 'datasets:' block. "
                 "The JAXA catalog must list at least one dataset."
             )
         datasets: dict[str, Dataset] = {}
-        for key, body in rows.items():
+        for key, body in merged_rows.items():
             try:
-                datasets[key] = Dataset(key=key, **dict(body or {}))
+                datasets[key] = Dataset(key=key, **body)
             except ValidationError as exc:
                 raise ValueError(
-                    f"{path} dataset {key!r} failed validation:\n{exc}"
+                    f"{row_origin[key]} dataset {key!r} failed validation:\n{exc}"
                 ) from exc
-        available = list(data.get("available_datasets") or [])
         catalog = cls(datasets=datasets, available_datasets=available)
         _CATALOG_CACHE[cache_key] = catalog
         return catalog

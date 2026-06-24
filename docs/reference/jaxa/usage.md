@@ -95,11 +95,12 @@ earthlens datasets refresh jaxa --write    # rewrites the bundled YAML
 ```
 
 The first form prints a summary (collection count, drift vs the bundled
-catalog) without touching disk. The second rewrites
-`src/earthlens/jaxa/jaxa_data_catalog.yaml` with the freshly probed
-collections (preserving the curated friendly aliases). See
-`planning/jaxa/captures/build_catalog.py` for the generator the CLI
-invokes under the hood.
+catalog) without touching disk. The second rewrites the
+`available_datasets:` index in `src/earthlens/jaxa/catalog/_index.yaml`
+with the freshly probed ids (the curated per-mission shards under the
+same `catalog/` directory are not touched). See
+`planning/jaxa/captures/build_catalog.py` for the generator that builds
+the per-mission shards from scratch.
 
 ## When the live e2e tests run
 

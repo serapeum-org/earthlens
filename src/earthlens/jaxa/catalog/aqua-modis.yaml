@@ -1,0 +1,447 @@
+# Aqua/MODIS NASA cross-archive products distributed via G-Portal.
+# AUTO-GENERATED from the upstream SDK catalog by
+# `python planning/jaxa/captures/build_catalog.py`. Hand-edit the script
+# (e.g. friendly slugs, descriptions, default bands) rather than this file,
+# or new ids will revert on the next regeneration.
+
+datasets:
+  aqua-amsr-e-amsr2format-l1-tb:
+    protocol: gportal
+    short_name: '25001000'
+    description: "AQUA \xE2\u20AC\u201D LEVEL1/L1B Brightness Temperatures (TB)"
+  aqua-amsr-e-amsr2format-l1-tb-1001:
+    protocol: gportal
+    short_name: '25001001'
+    description: "AQUA \xE2\u20AC\u201D LEVEL1/L1R Brightness Temperatures (TB)"
+  aqua-amsr-e-amsr2format-l2-clw:
+    protocol: gportal
+    short_name: '25002001'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Cloud Liquid Water (CLW)"
+  aqua-amsr-e-amsr2format-l2-prc:
+    protocol: gportal
+    short_name: '25002003'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Precipitation (PRC)"
+  aqua-amsr-e-amsr2format-l2-prc-2002:
+    protocol: gportal
+    short_name: '25002002'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Precipitation (PRC)"
+  aqua-amsr-e-amsr2format-l2-sic:
+    protocol: gportal
+    short_name: '25002006'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Sea Ice Concentration (SIC)"
+  aqua-amsr-e-amsr2format-l2-smc:
+    protocol: gportal
+    short_name: '25002007'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Soil Moisture Content (SMC)"
+  aqua-amsr-e-amsr2format-l2-snd:
+    protocol: gportal
+    short_name: '25002008'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Snow Depth (SND)"
+  aqua-amsr-e-amsr2format-l2-sst:
+    protocol: gportal
+    short_name: '25002004'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Sea Surface Temperature (SST)"
+  aqua-amsr-e-amsr2format-l2-ssw:
+    protocol: gportal
+    short_name: '25002005'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Sea Surface Wind speed (SSW)"
+  aqua-amsr-e-amsr2format-l2-tpw:
+    protocol: gportal
+    short_name: '25002000'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Total Precipitable Water (TPW)"
+  aqua-amsr-e-amsr2format-l3-0-1:
+    protocol: gportal
+    short_name: '25003001'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Total Precipitable Water\
+      \ (TPW)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3000:
+    protocol: gportal
+    short_name: '25003000'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Total Precipitable Water\
+      \ (TPW)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3002:
+    protocol: gportal
+    short_name: '25003002'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Cloud Liquid Water (CLW)(0.1\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3003:
+    protocol: gportal
+    short_name: '25003003'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Cloud Liquid Water (CLW)(0.1\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3004:
+    protocol: gportal
+    short_name: '25003004'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Precipitation (PRC)(0.1\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3005:
+    protocol: gportal
+    short_name: '25003005'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Precipitation (PRC)(0.1\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3006:
+    protocol: gportal
+    short_name: '25003006'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Sea Surface Temperature\
+      \ (SST)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3007:
+    protocol: gportal
+    short_name: '25003007'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Sea Surface Temperature\
+      \ (SST)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3008:
+    protocol: gportal
+    short_name: '25003008'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Sea Surface Wind speed\
+      \ (SSW)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3009:
+    protocol: gportal
+    short_name: '25003009'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Sea Surface Wind speed\
+      \ (SSW)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3010:
+    protocol: gportal
+    short_name: '25003010'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Sea Ice Concentration\
+      \ (SIC)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3011:
+    protocol: gportal
+    short_name: '25003011'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Sea Ice Concentration\
+      \ (SIC)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3012:
+    protocol: gportal
+    short_name: '25003012'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Soil Moisture Content\
+      \ (SMC)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3013:
+    protocol: gportal
+    short_name: '25003013'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Soil Moisture Content\
+      \ (SMC)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3014:
+    protocol: gportal
+    short_name: '25003014'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Snow Depth (SND)(0.1\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3015:
+    protocol: gportal
+    short_name: '25003015'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Snow Depth (SND)(0.1\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3016:
+    protocol: gportal
+    short_name: '25003016'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 6GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3017:
+    protocol: gportal
+    short_name: '25003017'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 6GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3018:
+    protocol: gportal
+    short_name: '25003018'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 10GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3019:
+    protocol: gportal
+    short_name: '25003019'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 10GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3020:
+    protocol: gportal
+    short_name: '25003020'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 18GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3021:
+    protocol: gportal
+    short_name: '25003021'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 18GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3022:
+    protocol: gportal
+    short_name: '25003022'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 23GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3023:
+    protocol: gportal
+    short_name: '25003023'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 23GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3024:
+    protocol: gportal
+    short_name: '25003024'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 36GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3025:
+    protocol: gportal
+    short_name: '25003025'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 36GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3026:
+    protocol: gportal
+    short_name: '25003026'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 89GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-1-3027:
+    protocol: gportal
+    short_name: '25003027'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/10km/0.1deg/L3 Brightness Temperatures\
+      \ 89GHz (TB)(0.1\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25:
+    protocol: gportal
+    short_name: '25003029'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Total Precipitable\
+      \ Water (TPW)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3028:
+    protocol: gportal
+    short_name: '25003028'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Total Precipitable\
+      \ Water (TPW)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3030:
+    protocol: gportal
+    short_name: '25003030'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Cloud Liquid Water\
+      \ (CLW)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3031:
+    protocol: gportal
+    short_name: '25003031'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Cloud Liquid Water\
+      \ (CLW)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3032:
+    protocol: gportal
+    short_name: '25003032'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Precipitation (PRC)(0.25\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3033:
+    protocol: gportal
+    short_name: '25003033'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Precipitation (PRC)(0.25\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3034:
+    protocol: gportal
+    short_name: '25003034'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Sea Surface Temperature\
+      \ (SST)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3035:
+    protocol: gportal
+    short_name: '25003035'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Sea Surface Temperature\
+      \ (SST)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3036:
+    protocol: gportal
+    short_name: '25003036'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Sea Surface Wind speed\
+      \ (SSW)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3037:
+    protocol: gportal
+    short_name: '25003037'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Sea Surface Wind speed\
+      \ (SSW)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3038:
+    protocol: gportal
+    short_name: '25003038'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Sea Ice Concentration\
+      \ (SIC)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3039:
+    protocol: gportal
+    short_name: '25003039'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Sea Ice Concentration\
+      \ (SIC)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3040:
+    protocol: gportal
+    short_name: '25003040'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Soil Moisture Content\
+      \ (SMC)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3041:
+    protocol: gportal
+    short_name: '25003041'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Soil Moisture Content\
+      \ (SMC)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3042:
+    protocol: gportal
+    short_name: '25003042'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Snow Depth (SND)(0.25\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3043:
+    protocol: gportal
+    short_name: '25003043'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Snow Depth (SND)(0.25\xC2\
+      \xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3044:
+    protocol: gportal
+    short_name: '25003044'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 6GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3045:
+    protocol: gportal
+    short_name: '25003045'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 6GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3046:
+    protocol: gportal
+    short_name: '25003046'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 10GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3047:
+    protocol: gportal
+    short_name: '25003047'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 10GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3048:
+    protocol: gportal
+    short_name: '25003048'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 18GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3049:
+    protocol: gportal
+    short_name: '25003049'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 18GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3050:
+    protocol: gportal
+    short_name: '25003050'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 23GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3051:
+    protocol: gportal
+    short_name: '25003051'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 23GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3052:
+    protocol: gportal
+    short_name: '25003052'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 36GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3053:
+    protocol: gportal
+    short_name: '25003053'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 36GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3054:
+    protocol: gportal
+    short_name: '25003054'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 89GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-amsr2format-l3-0-25-3055:
+    protocol: gportal
+    short_name: '25003055'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/25km/0.25deg/L3 Brightness Temperatures\
+      \ 89GHz (TB)(0.25\xC2\xB0)"
+  aqua-amsr-e-l1-l1b-brightness-temperature:
+    protocol: gportal
+    short_name: '24001001'
+    description: "AQUA \xE2\u20AC\u201D LEVEL1/L1B Brightness Temperature"
+  aqua-amsr-e-l2-ap:
+    protocol: gportal
+    short_name: '24002002'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Amount of Precipitation (AP)"
+  aqua-amsr-e-l2-clw:
+    protocol: gportal
+    short_name: '24002001'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Cloud Liquid Water (CLW)"
+  aqua-amsr-e-l2-ic:
+    protocol: gportal
+    short_name: '24002005'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Ice Concentration (IC)"
+  aqua-amsr-e-l2-sm:
+    protocol: gportal
+    short_name: '24002006'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Soil Moisture (SM)"
+  aqua-amsr-e-l2-sst:
+    protocol: gportal
+    short_name: '24002004'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Sea Surface Temperature (SST)"
+  aqua-amsr-e-l2-ssw:
+    protocol: gportal
+    short_name: '24002003'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Sea SurfaceWind Speed (SSW)"
+  aqua-amsr-e-l2-swe:
+    protocol: gportal
+    short_name: '24002007'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Snow Water Equivalence (SWE)"
+  aqua-amsr-e-l2-wv:
+    protocol: gportal
+    short_name: '24002000'
+    description: "AQUA \xE2\u20AC\u201D LEVEL2/L2 Water Vapor (WV)"
+  aqua-amsr-e-l3-ap:
+    protocol: gportal
+    short_name: '24003002'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Amount of Precipitation (AP)"
+  aqua-amsr-e-l3-clw:
+    protocol: gportal
+    short_name: '24003001'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Cloud Liquid Water (CLW)"
+  aqua-amsr-e-l3-ic:
+    protocol: gportal
+    short_name: '24003005'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Ice Concentration (IC)"
+  aqua-amsr-e-l3-sm:
+    protocol: gportal
+    short_name: '24003006'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Soid Moisture (SM)"
+  aqua-amsr-e-l3-sst:
+    protocol: gportal
+    short_name: '24003004'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Sea Surface Temperature (SST)"
+  aqua-amsr-e-l3-ssw:
+    protocol: gportal
+    short_name: '24003003'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Sea SurfaceWind Speed (SSW)"
+  aqua-amsr-e-l3-swe:
+    protocol: gportal
+    short_name: '24003007'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Snow Water Equivalence (SWE)"
+  aqua-amsr-e-l3-tb10ghz-h:
+    protocol: gportal
+    short_name: '24003011'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 10GHz-H (TB10GHz_H)"
+  aqua-amsr-e-l3-tb10ghz-v:
+    protocol: gportal
+    short_name: '24003010'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 10GHz-V (TB10GHz_V)"
+  aqua-amsr-e-l3-tb18ghz-h:
+    protocol: gportal
+    short_name: '24003013'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 18GHz-H (TB18GHz_H)"
+  aqua-amsr-e-l3-tb18ghz-v:
+    protocol: gportal
+    short_name: '24003012'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 18GHz-V (TB18GHz_V)"
+  aqua-amsr-e-l3-tb23ghz-h:
+    protocol: gportal
+    short_name: '24003015'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 23GHz-H (TB23GHz_H)"
+  aqua-amsr-e-l3-tb23ghz-v:
+    protocol: gportal
+    short_name: '24003014'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 23GHz-V (TB23GHz_V)"
+  aqua-amsr-e-l3-tb36ghz-h:
+    protocol: gportal
+    short_name: '24003017'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 36GHz-H (TB36GHz_H)"
+  aqua-amsr-e-l3-tb36ghz-v:
+    protocol: gportal
+    short_name: '24003016'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 36GHz-V (TB36GHz_V)"
+  aqua-amsr-e-l3-tb6ghz-h:
+    protocol: gportal
+    short_name: '24003009'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 6GHz-H (TB6GHz_H)"
+  aqua-amsr-e-l3-tb6ghz-v:
+    protocol: gportal
+    short_name: '24003008'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 6GHz-V (TB6GHz_V)"
+  aqua-amsr-e-l3-tb89ghz-h:
+    protocol: gportal
+    short_name: '24003019'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 89GHz-H (TB89GHz_H)"
+  aqua-amsr-e-l3-tb89ghz-v:
+    protocol: gportal
+    short_name: '24003018'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Brightness Temperature 89GHz-V (TB89GHz_V)"
+  aqua-amsr-e-l3-wv:
+    protocol: gportal
+    short_name: '24003000'
+    description: "AQUA \xE2\u20AC\u201D LEVEL3/L3 Water Vapor (WV)"

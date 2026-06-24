@@ -42,10 +42,14 @@ the file shapes and concurrency profiles differ; issue two calls.
 
 ## Catalog highlights
 
-The bundled `jaxa_data_catalog.yaml` ships 124 rows: every one of the 118
-live `jaxa.earth` collections plus 6 strategic G-Portal mission products.
-**Every collection has a short, friendly canonical key** (the long
-auto-derived slug stays as an alias).
+The bundled catalog ships **917 rows** — every one of the 118 live
+`jaxa.earth` collections plus the entire 799-product G-Portal universe
+— sharded into per-mission YAML files under
+`src/earthlens/jaxa/catalog/` (`jaxa-earth.yaml`, `sgli.yaml`,
+`amsr.yaml`, `alos-palsar.yaml`, `earthcare.yaml`,
+`precipitation.yaml`, …), matching the layout used by the `gee` and
+`ecmwf` siblings. **Every collection has a short, friendly canonical key**
+(the long auto-derived slug stays as an alias).
 
 The naming scheme is `<mission>-<product>[-<d|n>][-<cadence>][-norm]`,
 where `d` / `n` mark daytime / nighttime variants, the cadence comes
@@ -80,7 +84,7 @@ resolve via `cat.get(...)`):
 | `gosat-gw-amsr3-l1b` | `gportal` | GOSAT-GW/AMSR3 L1B brightness temperatures (TBB) — id `31001001` |
 
 For the full list of friendly keys (104 of 118 are ≤25 characters) see
-the bundled YAML under `src/earthlens/jaxa/jaxa_data_catalog.yaml`. Use
+the per-mission shards under `src/earthlens/jaxa/catalog/`. Use
 `Catalog().by_protocol("jaxa-earth")` and `.by_protocol("gportal")` to
 list them programmatically.
 

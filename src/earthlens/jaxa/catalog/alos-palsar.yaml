@@ -1,0 +1,151 @@
+# ALOS / ALOS-2 / PALSAR / JERS-1 SAR products via G-Portal.
+# AUTO-GENERATED from the upstream SDK catalog by
+# `python planning/jaxa/captures/build_catalog.py`. Hand-edit the script
+# (e.g. friendly slugs, descriptions, default bands) rather than this file,
+# or new ids will revert on the next regeneration.
+
+datasets:
+  alos-avnir-2-observation:
+    protocol: gportal
+    short_name: '26014000'
+    description: "ALOS \xE2\u20AC\u201D Observation"
+  alos-palsar-burst-mode-1:
+    protocol: gportal
+    short_name: '26024002'
+    description: "ALOS \xE2\u20AC\u201D Wide Area Observation Mode (Burst mode 1)"
+  alos-palsar-burst-mode-2:
+    protocol: gportal
+    short_name: '26024003'
+    description: "ALOS \xE2\u20AC\u201D Wide Area Observation Mode (Burst mode 2)"
+  alos-palsar-direct-downlink-mode:
+    protocol: gportal
+    short_name: '26024004'
+    description: "ALOS \xE2\u20AC\u201D Direct Downlink Mode"
+  alos-palsar-fine-resolution-mode-dual-pola:
+    protocol: gportal
+    short_name: '26024001'
+    description: "ALOS \xE2\u20AC\u201D Fine Resolution Mode, dual polarization"
+  alos-palsar-fine-resolution-mode-single-po:
+    protocol: gportal
+    short_name: '26024000'
+    description: "ALOS \xE2\u20AC\u201D Fine Resolution Mode, Single polarization"
+  alos-palsar-polarimetry-mode:
+    protocol: gportal
+    short_name: '26024005'
+    description: "ALOS \xE2\u20AC\u201D Polarimetry Mode"
+  alos-prism-35km:
+    protocol: gportal
+    short_name: '26004001'
+    description: "ALOS \xE2\u20AC\u201D Nadir (70km) + Backward (35km)"
+  alos-prism-35km-4003:
+    protocol: gportal
+    short_name: '26004003'
+    description: "ALOS \xE2\u20AC\u201D Nadir (35km) + Forward (35km)"
+  alos-prism-35km-4004:
+    protocol: gportal
+    short_name: '26004004'
+    description: "ALOS \xE2\u20AC\u201D Nadir (35km) + Backward (35km)"
+  alos-prism-35km-4005:
+    protocol: gportal
+    short_name: '26004005'
+    description: "ALOS \xE2\u20AC\u201D Forward (35km) + Backward (35km)"
+  alos-prism-35km-4006:
+    protocol: gportal
+    short_name: '26004006'
+    description: "ALOS \xE2\u20AC\u201D Nadir (35km)"
+  alos-prism-35km-4007:
+    protocol: gportal
+    short_name: '26004007'
+    description: "ALOS \xE2\u20AC\u201D Forward (35km)"
+  alos-prism-35km-4008:
+    protocol: gportal
+    short_name: '26004008'
+    description: "ALOS \xE2\u20AC\u201D Backward (35km)"
+  alos-prism-70km:
+    protocol: gportal
+    short_name: '26004002'
+    description: "ALOS \xE2\u20AC\u201D Nadir (70km)"
+  alos-prism-triplet-observation-mode:
+    protocol: gportal
+    short_name: '26004000'
+    description: "ALOS \xE2\u20AC\u201D Triplet observation mode"
+  alos2-palsar2-uf-sp:
+    aliases:
+    - palsar2
+    - alos2-l1
+    - alos2-palsar2
+    protocol: gportal
+    short_name: '27004001'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Ultra-fine[3m] SP"
+  jers1-sar-l0:
+    protocol: gportal
+    short_name: '17020000'
+    description: "JERS-1 \xE2\u20AC\u201D SAR/L0/SAR\xEF\xBC\u02C6L0)"
+  jers1-sar-l2-1-sar:
+    protocol: gportal
+    short_name: '17022000'
+    description: "JERS-1 \xE2\u20AC\u201D SAR/L2.1/SAR"
+  jers1-swir-l2-swir:
+    protocol: gportal
+    short_name: '17012000'
+    description: "JERS-1 \xE2\u20AC\u201D SWIR/L2/SWIR"
+  jers1-vnir-l2-vnir:
+    protocol: gportal
+    short_name: '17002000'
+    description: "JERS-1 \xE2\u20AC\u201D VNIR/L2/VNIR"
+  palsar2-fine-dp:
+    protocol: gportal
+    short_name: '27004007'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Fine[10m] DP"
+  palsar2-fine-qp:
+    protocol: gportal
+    short_name: '27004008'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Fine[10m] QP"
+  palsar2-fine-sp:
+    protocol: gportal
+    short_name: '27004006'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Fine[10m] SP"
+  palsar2-hight-sensitive-dp:
+    protocol: gportal
+    short_name: '27004004'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Hight-sensitive[6m] DP"
+  palsar2-hight-sensitive-qp:
+    protocol: gportal
+    short_name: '27004005'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Hight-sensitive[6m] QP"
+  palsar2-hight-sensitive-sp:
+    protocol: gportal
+    short_name: '27004003'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Hight-sensitive[6m] SP"
+  palsar2-scansar-14mhz-dp:
+    protocol: gportal
+    short_name: '27004010'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/ScanSAR[350\xE3\u017D\u017E](14MHz) DP"
+  palsar2-scansar-14mhz-sp:
+    protocol: gportal
+    short_name: '27004009'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/ScanSAR[350\xE3\u017D\u017E](14MHz) SP"
+  palsar2-scansar-28mhz-dp:
+    protocol: gportal
+    short_name: '27004012'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/ScanSAR[350\xE3\u017D\u017E](28MHz) DP"
+  palsar2-scansar-28mhz-sp:
+    protocol: gportal
+    short_name: '27004011'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/ScanSAR[350\xE3\u017D\u017E](28MHz) SP"
+  palsar2-scansar-sp:
+    protocol: gportal
+    short_name: '27004013'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/ScanSAR[490km] SP"
+  palsar2-scansardp:
+    protocol: gportal
+    short_name: '27004014'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/ScanSAR[490km]DP"
+  palsar2-spotlight-sp:
+    protocol: gportal
+    short_name: '27004000'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Spotlight SP"
+  palsar2-ultra-fine-dp:
+    protocol: gportal
+    short_name: '27004002'
+    description: "ALOS-2 \xE2\u20AC\u201D NA/Ultra-fine[3m] DP"
