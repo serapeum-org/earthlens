@@ -151,3 +151,46 @@ def test_catalog_path_missing_raises():
     """A non-existent catalog path raises a clear ValueError."""
     with pytest.raises(ValueError, match="does not exist"):
         catalog_module._yaml_files_for(Path("does/not/exist"))
+
+
+def test_catalog_cache_hit_returns_same_payload(tmp_path, monkeypatch):
+    """A repeat `_load_catalog_data` call reuses the cached parse."""
+    (tmp_path / "a.yaml").write_text(
+        """
+available_datasets:
+  - mini
+datasets:
+  mini:
+    source: "test"
+    transport: usdm-geojson
+    endpoint: "https://example.com/{ymd}.json"
+    output_kind: vector
+    cadence: weekly
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(catalog_module, "CATALOG_PATH", tmp_path)
+    catalog_module.clear_catalog_cache()
+    first = catalog_module._load_catalog_data(tmp_path)
+    second = catalog_module._load_catalog_data(tmp_path)
+    assert second is first
+
+
+def test_yaml_files_for_accepts_single_file(tmp_path):
+    """Pointing CATALOG_PATH at a single YAML still loads it."""
+    p = tmp_path / "one.yaml"
+    p.write_text(
+        """
+available_datasets: [mini]
+datasets:
+  mini:
+    source: "test"
+    transport: usdm-geojson
+    endpoint: "https://example.com/{ymd}.json"
+    output_kind: vector
+    cadence: weekly
+""",
+        encoding="utf-8",
+    )
+    files = catalog_module._yaml_files_for(p)
+    assert files == [p]

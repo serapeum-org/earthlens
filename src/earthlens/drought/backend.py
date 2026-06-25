@@ -22,8 +22,6 @@ restricted-redistribution clause.
 from __future__ import annotations
 
 import datetime as dt
-import io
-import zipfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -331,8 +329,14 @@ class Drought(AbstractDataSource):
         if not frames:
             return self._empty_vector()
         merged = pd.concat(frames, ignore_index=True)
-        gdf = gpd.GeoDataFrame(merged, geometry="geometry", crs="EPSG:4326")
-        if gdf.crs is None or str(gdf.crs).upper() not in {"EPSG:4326"}:
+        # Honour the input frame's CRS: `pd.concat` of GeoDataFrames yields
+        # one whose CRS is the first frame's; do NOT pass `crs=...` to the
+        # constructor (that re-labels coords without transforming and
+        # silently strands a non-4326 payload at the wrong epsg).
+        gdf = gpd.GeoDataFrame(merged, geometry="geometry")
+        if gdf.crs is None:
+            gdf = gdf.set_crs("EPSG:4326")
+        elif gdf.crs.to_epsg() != 4326:
             gdf = gdf.to_crs("EPSG:4326")
         bbox = bbox_from_extent(self.space)
         within = gdf.cx[bbox[0] : bbox[2], bbox[1] : bbox[3]]
@@ -373,11 +377,13 @@ class Drought(AbstractDataSource):
         """
         import geopandas as gpd
 
-        gdf = gpd.GeoDataFrame.from_features(
-            payload.get("features") or [], crs="EPSG:4326"
-        )
-        if not len(gdf):
-            return gdf
+        features = payload.get("features") or []
+        if not features:
+            return gpd.GeoDataFrame(
+                {"geometry": gpd.GeoSeries([], crs="EPSG:4326")},
+                crs="EPSG:4326",
+            )
+        gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
         gdf["release_date"] = period.isoformat()
         return gdf
 
@@ -558,27 +564,3 @@ def _http_download(url: str, target: Path) -> None:
     tmp.replace(target)
 
 
-def _extract_zipped_shp(blob: bytes, dest_dir: Path) -> Path:
-    """Unzip a USDM `.zip` shapefile bundle into `dest_dir` and return its `.shp`.
-
-    Kept module-scope (per no-nested-defs) so a future code path that
-    prefers shapefile over GeoJSON can reuse it; the JSON path
-    (`_fetch_usdm`) does not call it today.
-
-    Args:
-        blob: The zip bundle bytes.
-        dest_dir: The directory to extract into.
-
-    Returns:
-        Path: The path of the extracted `.shp` file inside `dest_dir`.
-
-    Raises:
-        ValueError: When the zip contains no `.shp` member.
-    """
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(io.BytesIO(blob)) as zf:
-        zf.extractall(dest_dir)
-        for name in zf.namelist():
-            if name.lower().endswith(".shp"):
-                return dest_dir / name
-    raise ValueError("USDM zip bundle contains no .shp member.")

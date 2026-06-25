@@ -400,3 +400,156 @@ def test_drought_src_does_not_import_owslib_or_xarray():
         ):
             offenders.append(py_file)
     assert offenders == [], f"owslib/xarray import leak in: {offenders}"
+
+
+class _FakeResponse:
+    """Minimal `requests.Response` stand-in for the HTTP helpers."""
+
+    def __init__(
+        self,
+        *,
+        status: int = 200,
+        body: bytes = b"",
+        json_body: Any | None = None,
+    ):
+        self.status_code = status
+        self._body = body
+        self._json = json_body
+        self.headers = {"content-type": "application/json"}
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            import requests
+
+            raise requests.HTTPError(f"HTTP {self.status_code}")
+
+    def json(self) -> Any:
+        return self._json
+
+    def iter_content(self, chunk_size: int = 1024):
+        view = memoryview(self._body)
+        for offset in range(0, len(view), chunk_size):
+            yield bytes(view[offset : offset + chunk_size])
+
+    def __enter__(self) -> _FakeResponse:
+        return self
+
+    def __exit__(self, *exc_info) -> None:
+        return None
+
+
+def test_http_get_json_decodes_payload(monkeypatch):
+    """`_http_get_json` raises for status then returns the JSON body."""
+    import requests
+
+    payload = {"hello": "world"}
+
+    def _fake_get(url, timeout, headers):
+        assert "User-Agent" in headers
+        return _FakeResponse(json_body=payload)
+
+    monkeypatch.setattr(requests, "get", _fake_get)
+    assert backend_module._http_get_json("https://example.com") == payload
+
+
+def test_http_get_json_raises_on_http_error(monkeypatch):
+    """A non-2xx response surfaces as `requests.HTTPError`."""
+    import requests
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda url, timeout, headers: _FakeResponse(status=500, json_body=None),
+    )
+    with pytest.raises(requests.HTTPError):
+        backend_module._http_get_json("https://example.com/oops")
+
+
+def test_http_download_streams_to_target(monkeypatch, tmp_path):
+    """`_http_download` writes the full body then atomically renames."""
+    import requests
+
+    body = b"x" * (1 << 17)  # two chunks at the 64 KiB stream size
+
+    def _fake_get(url, timeout, stream, headers):
+        assert stream is True
+        return _FakeResponse(body=body)
+
+    monkeypatch.setattr(requests, "get", _fake_get)
+    target = tmp_path / "nested" / "file.nc"
+    backend_module._http_download("https://example.com/file.nc", target)
+    assert target.exists()
+    assert target.read_bytes() == body
+    assert not (target.with_suffix(target.suffix + ".partial").exists())
+
+
+def test_usdm_reprojects_non_4326_payload(monkeypatch, tmp_path):
+    """A payload arriving in EPSG:3857 is reprojected to 4326."""
+    # Inject a payload through a custom `_geojson_to_gdf` shim that hands
+    # back an EPSG:3857 frame — exercises the defensive `to_crs("EPSG:4326")`
+    # branch (the live USDM ships 4326 today, but the guard must hold).
+    original = backend_module.Drought._geojson_to_gdf
+
+    def _wrap(payload, period):
+        gdf = original(payload, period)
+        if not len(gdf):
+            return gdf
+        return gdf.set_crs("EPSG:4326", allow_override=True).to_crs("EPSG:3857")
+
+    monkeypatch.setattr(
+        backend_module.Drought,
+        "_geojson_to_gdf",
+        staticmethod(_wrap),
+    )
+    monkeypatch.setattr(
+        backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD
+    )
+    backend = Drought(
+        start="2026-06-23",
+        end="2026-06-23",
+        lat_lim=[-90.0, 90.0],
+        lon_lim=[-180.0, 180.0],
+        dataset="usdm",
+        path=str(tmp_path),
+    )
+    fc = backend.download(progress_bar=False)
+    assert fc.crs.to_epsg() == 4326
+    assert len(fc) == 2
+
+
+def test_empty_period_returns_empty_fc(monkeypatch, tmp_path):
+    """A USDM payload with zero features returns the empty-schema FC."""
+    monkeypatch.setattr(
+        backend_module,
+        "_http_get_json",
+        lambda url: {"type": "FeatureCollection", "features": []},
+    )
+    backend = Drought(
+        start="2026-06-23",
+        end="2026-06-23",
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="usdm",
+        path=str(tmp_path),
+    )
+    fc = backend.download(progress_bar=False)
+    assert len(fc) == 0
+    assert {"OBJECTID", "DM", "release_date"}.issubset(set(fc.columns))
+
+
+def test_unknown_transport_on_row_raises(monkeypatch, tmp_path):
+    """A row whose transport drifts out of sync surfaces a clear ValueError."""
+    backend = Drought(
+        start="2026-06-23",
+        end="2026-06-23",
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="usdm",
+        path=str(tmp_path),
+    )
+    rogue = backend._dataset.model_copy(
+        update={"transport": "future-tx"}, deep=False
+    )
+    monkeypatch.setattr(backend, "_dataset", rogue)
+    with pytest.raises(ValueError, match="unknown drought transport"):
+        backend._fetch(backend._search())
