@@ -296,14 +296,15 @@ class EarthLens:
             ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bdc',
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
-             'earth-search', 'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms',
-             'g-portal', 'gbif', 'gdacs', 'gee', 'ghs', 'ghsl',
-             'google-earth-engine', 'hdx', 'human-settlement', 'insar', 'iucn',
-             'jaxa', 'jaxa-earth', 'landsat', 'national-water-model', 'nexrad',
-             'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo', 'overture',
-             'planetary-computer', 'protected-planet', 'radar', 'redlist',
-             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
+             'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo', 'eumetsat',
+             'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gdo', 'gee', 'ghs',
+             'ghsl', 'google-earth-engine', 'hdx', 'human-settlement', 'insar',
+             'iucn', 'jaxa', 'jaxa-earth', 'landsat', 'national-water-model',
+             'nexrad', 'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo',
+             'overture', 'planetary-computer', 'protected-planet', 'radar',
+             'redlist', 'sentinel-hub', 'sentinelhub', 'stac', 'tropycal',
+             'usdm', 'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'wdpa',
+             'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -407,6 +408,13 @@ class EarthLens:
         :class:`earthlens.obis.OBIS`: OBIS marine occurrences via
             `pyobis` (anonymous); `vector` occurrence-point
             FeatureCollection; key `"obis"`.
+        :class:`earthlens.drought.Drought`: Drought-indicator backend over
+            three live services — US Drought Monitor (vector polygons via
+            GeoJSON), Copernicus EDO/GDO (raster via OGC WCS — pending the
+            pyramids temporal `read_wcs` extension), and CSIC SPEIbase
+            (raster via NetCDF). Per-instance `OUTPUT_KIND`. No SDK extra.
+            Keys `"drought"` / `"usdm"` (pre-binds `dataset="usdm"`) /
+            `"edo"` / `"gdo"`.
         :class:`earthlens.wdpa.WDPA`: Protected Planet (WDPA)
             protected-area polygons via the direct v4 REST API
             (`?token=`); `vector` polygon FeatureCollection; keys
@@ -585,6 +593,19 @@ class EarthLens:
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            # Drought-indicator backend over three live public services:
+            # USDM (vector GeoJSON polygon classes), Copernicus EDO/GDO (raster
+            # OGC WCS — waits on pyramids PY-A temporal `read_wcs`), and CSIC
+            # SPEIbase (raster NetCDF). Per-instance OUTPUT_KIND from the
+            # resolved `dataset=` row. No SDK extra (requests + pyramids are
+            # core). The `usdm` / `edo` / `gdo` aliases pre-bind the
+            # `dataset=` keyword so a user can write
+            # `EarthLens("usdm", ...)` for the most common request without
+            # repeating `dataset="usdm"`.
+            "drought": ("earthlens.drought", "Drought", "", {}),
+            "usdm": ("earthlens.drought", "Drought", "", {"dataset": "usdm"}),
+            "edo": ("earthlens.drought", "Drought", "", {}),
+            "gdo": ("earthlens.drought", "Drought", "", {}),
         }
     )
 
