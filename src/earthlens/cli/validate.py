@@ -89,7 +89,9 @@ def _validate_nwp(catalog: Any) -> tuple[int, list[str]]:
     models = catalog.datasets
     for key, record in models.items():
         backend = getattr(record, "backend", None)
-        if backend in _DIRECT_URL_BACKENDS and not getattr(record, "url_template", None):
+        if backend in _DIRECT_URL_BACKENDS and not getattr(
+            record, "url_template", None
+        ):
             issues.append(f"{key}: {backend} model has no url_template")
         if backend == "herbie" and not getattr(record, "model_family", None):
             issues.append(f"{key}: herbie model has no model_family")
@@ -193,9 +195,7 @@ def _validate_asf(catalog: Any) -> tuple[int, list[str]]:
         if row.dataset is not None and not hasattr(asf.DATASET, row.dataset):
             issues.append(f"{key}: DATASET.{row.dataset} not in asf_search")
         if not hasattr(asf.PRODUCT_TYPE, row.product_type):
-            issues.append(
-                f"{key}: PRODUCT_TYPE.{row.product_type} not in asf_search"
-            )
+            issues.append(f"{key}: PRODUCT_TYPE.{row.product_type} not in asf_search")
     return len(products), issues
 
 
@@ -477,6 +477,23 @@ def _validate_jaxa(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
+def _validate_bathymetry(catalog: Any) -> tuple[int, list[str]]:
+    """Each bathymetry DEM row needs an endpoint, coverage id, and band.
+
+    The `Dataset` model already enforces those required fields, so a clean
+    load reaches this validator well-formed; the lint additionally flags any
+    curated id missing from the bundled `available_datasets:` index (the
+    `_index.yaml`), which a hand-edit could desync.
+    """
+    available = set(catalog.available_datasets or ())
+    issues: list[str] = []
+    for key, row in catalog.datasets.items():
+        issues.extend(_require(key, row, ("endpoint", "dataset_id", "variable")))
+        if available and key not in available:
+            issues.append(f"{key}: id not in the bundled `available_datasets:` index")
+    return len(catalog.datasets), issues
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -500,6 +517,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "wdpa": _validate_wdpa,
     "iucn": _validate_iucn,
     "jaxa": _validate_jaxa,
+    "bathymetry": _validate_bathymetry,
 }
 
 

@@ -293,11 +293,11 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bdc',
+            ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bathymetry', 'bdc',
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
-             'earth-search', 'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms',
-             'g-portal', 'gbif', 'gdacs', 'gee', 'ghs', 'ghsl',
+             'earth-search', 'earthdata', 'ecmwf', 'etopo', 'eumetsat', 'fdsn',
+             'firms', 'g-portal', 'gbif', 'gdacs', 'gebco', 'gee', 'ghs', 'ghsl',
              'google-earth-engine', 'hdx', 'human-settlement', 'insar', 'iucn',
              'jaxa', 'jaxa-earth', 'landsat', 'national-water-model', 'nexrad',
              'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo', 'overture',
@@ -585,6 +585,14 @@ class EarthLens:
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            # Global topography / bathymetry DEMs (GEBCO 2020 + ETOPO1
+            # ice/bedrock) subset via NOAA ERDDAP griddap -> pyramids ->
+            # GeoTIFF. Open data (requests + pyramids are core), so no extra
+            # to hint. Aliases "gebco" / "etopo" — pass dataset= to pick the
+            # DEM (e.g. dataset="gebco_2020" / "etopo1_ice" / "etopo1_bedrock").
+            "bathymetry": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            "gebco": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            "etopo": ("earthlens.bathymetry", "Bathymetry", "", {}),
         }
     )
 

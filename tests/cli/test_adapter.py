@@ -36,7 +36,7 @@ class TestListBackends:
         backends = list_backends()
         providers = [b.provider for b in backends]
         assert len(providers) == len(set(providers)), "provider ids must be unique"
-        assert len(backends) == 29, f"expected 29 backends, got {len(backends)}"
+        assert len(backends) == 30, f"expected 30 backends, got {len(backends)}"
 
     def test_sorted_by_provider(self):
         """Backends are returned sorted by canonical provider id."""
