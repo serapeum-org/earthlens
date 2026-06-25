@@ -28,15 +28,14 @@ per-source attribution as a single info line on success (`G6`).
 
 Public surface (re-exported from this package):
 
+* `Drought` — the backend itself. Instantiate via the facade
+  (`EarthLens("drought", dataset="usdm", lat_lim=[...], lon_lim=[...],
+  start=..., end=...)`).
 * `Catalog` — the sharded catalog loader (USDM, EDO, GDO, SPEIbase).
 * `Dataset` — one curated row (transport, endpoint, coverage,
   output_kind, cadence, native_crs, license_note).
 * `CATALOG_PATH` — absolute path to the bundled `catalog/` directory.
 * `clear_catalog_cache` — drop the parse cache (tests).
-
-The `Drought` backend class and the `EarthLens("drought", ...)` facade
-entry land in the next task; this module ships the catalog + helpers
-skeleton (`C1`).
 
 The backend pulls no new SDK extra: USDM uses core `requests`, SPEIbase
 reads through pyramids' shipped NetCDF stack, and the WCS reader lives in
@@ -46,6 +45,7 @@ from `pyproject.toml`.
 
 from __future__ import annotations
 
+from earthlens.drought.backend import Drought
 from earthlens.drought.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -57,5 +57,6 @@ __all__ = [
     "CATALOG_PATH",
     "Catalog",
     "Dataset",
+    "Drought",
     "clear_catalog_cache",
 ]
