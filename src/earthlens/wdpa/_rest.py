@@ -22,11 +22,13 @@ a pyramids `FeatureCollection`.
 
 from __future__ import annotations
 
+import time
 from typing import Any
 
 import geopandas as gpd
 import pandas as pd
 import requests
+from loguru import logger
 from shapely.geometry import shape
 
 from earthlens.wdpa.auth import AuthenticationError
@@ -39,6 +41,13 @@ CRS = "EPSG:4326"
 
 #: Protected Planet caps `per_page` at 50 for the search endpoint.
 PER_PAGE = 50
+
+#: Retry policy for transient upstream failures (5xx / 429 / connection errors).
+MAX_RETRIES = 5
+BACKOFF_FACTOR = 1.0
+
+#: HTTP statuses considered transient and worth retrying.
+_RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
 
 #: Polygon geometry types kept; point-only protected areas are dropped.
 _POLYGON_TYPES = {"Polygon", "MultiPolygon"}
@@ -68,8 +77,26 @@ def _session(session: requests.Session | None) -> requests.Session:
     return requests.Session()
 
 
+def _parse_retry_after(value: str | None) -> float | None:
+    """Parse a `Retry-After` header value into seconds, or `None` if absent."""
+    if not value:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
-    """GET a v4 endpoint and return the parsed JSON, mapping 401 to auth error.
+    """GET a v4 endpoint and return the parsed JSON, with retries on transient failure.
+
+    Retries on `429` (honouring `Retry-After`) and on `500`/`502`/`503`/`504` using
+    capped exponential back-off (`BACKOFF_FACTOR * 2**attempt`). A 401 maps to
+    :class:`AuthenticationError` immediately (never retried). Any non-401 HTTP
+    error that exhausts retries — or any other status — is re-raised as a
+    :class:`RuntimeError` whose message names the path and status but **never**
+    the URL or query parameters, because the WDPA token rides as a `?token=`
+    query param and a raw `requests.HTTPError` would echo it.
 
     Args:
         session: The HTTP session.
@@ -82,16 +109,58 @@ def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
 
     Raises:
         AuthenticationError: On an HTTP 401 (missing/invalid token).
+        RuntimeError: On any other non-2xx response after retries are exhausted,
+            or on a non-recoverable transport error. The token is never echoed.
     """
-    response = session.get(f"{BASE_URL}/{path}", params=params, timeout=60)
-    if getattr(response, "status_code", None) == 401:
-        raise AuthenticationError(
-            "Protected Planet rejected the WDPA token (HTTP 401). Check "
-            "WDPA_TOKEN / the token= argument, or request one at "
-            "https://api.protectedplanet.net/request."
-        )
-    response.raise_for_status()
-    return response.json()
+    url = f"{BASE_URL}/{path}"
+    last_status: int | None = None
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            response = session.get(url, params=params, timeout=60)
+        except requests.RequestException as exc:
+            if attempt < MAX_RETRIES:
+                wait = BACKOFF_FACTOR * (2**attempt)
+                logger.warning(
+                    f"WDPA transport error on {path!r}: {type(exc).__name__}; "
+                    f"retry {attempt + 1}/{MAX_RETRIES} after {wait:.1f}s"
+                )
+                time.sleep(wait)
+                continue
+            raise RuntimeError(
+                f"Protected Planet transport error on /{path} "
+                f"({type(exc).__name__}); the WDPA token has been redacted."
+            ) from None
+        status = getattr(response, "status_code", None)
+        if status == 401:
+            raise AuthenticationError(
+                "Protected Planet rejected the WDPA token (HTTP 401). Check "
+                "WDPA_TOKEN / the token= argument, or request one at "
+                "https://api.protectedplanet.net/request."
+            )
+        last_status = status
+        if status in _RETRY_STATUSES and attempt < MAX_RETRIES:
+            retry_after = _parse_retry_after(response.headers.get("Retry-After"))
+            wait = (
+                retry_after
+                if retry_after is not None
+                else BACKOFF_FACTOR * (2**attempt)
+            )
+            logger.warning(
+                f"Protected Planet returned HTTP {status} on {path!r}; "
+                f"retry {attempt + 1}/{MAX_RETRIES} after {wait:.1f}s"
+            )
+            time.sleep(wait)
+            continue
+        if status is None or status >= 400:
+            raise RuntimeError(
+                f"Protected Planet returned HTTP {status} for /{path} "
+                "(the WDPA token has been redacted from this error)."
+            )
+        return response.json()
+    raise RuntimeError(
+        f"Protected Planet exhausted {MAX_RETRIES} retries on /{path} "
+        f"(last status {last_status}); the WDPA token has been redacted."
+    )
 
 
 def _row(area: dict) -> dict[str, Any] | None:
@@ -143,7 +212,10 @@ def _to_gdf(rows: list[dict]) -> gpd.GeoDataFrame:
     if not rows:
         frame = pd.DataFrame({c: pd.Series([], dtype=t) for c, t in WDPA_COLUMNS.items()})
         return gpd.GeoDataFrame(frame, geometry=gpd.GeoSeries([], crs=CRS), crs=CRS)
-    geometry = gpd.GeoSeries([r.pop("geometry") for r in rows], crs=CRS)
+    # Read geometry without mutating the caller's rows (no `.pop`): a future
+    # caller may want to inspect the original records after the GeoDataFrame
+    # is built.
+    geometry = gpd.GeoSeries([r["geometry"] for r in rows], crs=CRS)
     frame = pd.DataFrame(rows, columns=list(WDPA_COLUMNS))
     for column, dtype in WDPA_COLUMNS.items():
         frame[column] = frame[column].astype(dtype)

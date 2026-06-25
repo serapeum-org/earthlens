@@ -5,36 +5,58 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
+import requests
 
 
 class _FakeResponse:
     """Stand-in for a `requests.Response` with a canned JSON body."""
 
-    def __init__(self, payload: dict, status_code: int = 200):
-        """Hold the JSON payload and HTTP status code."""
+    def __init__(
+        self,
+        payload: dict,
+        status_code: int = 200,
+        headers: dict | None = None,
+        url: str = "https://api.protectedplanet.net/v4/protected_areas/search?token=SECRET-TOKEN-HERE",
+    ):
+        """Hold the JSON payload, HTTP status code, headers, and origin URL."""
         self._payload = payload
         self.status_code = status_code
+        self.headers = headers or {}
+        self.url = url
 
     def json(self) -> dict:
         """Return the canned JSON body."""
         return self._payload
 
     def raise_for_status(self) -> None:
-        """No-op for the 2xx responses these tests use."""
+        """Mimic `requests.Response.raise_for_status` for ≥400 statuses.
+
+        The real method raises `HTTPError` whose message includes `response.url`,
+        so the WDPA `_get` shim must intercept the status BEFORE this fires.
+        Tests verify the shim does so (no token in any propagating exception).
+        """
+        if self.status_code >= 400:
+            raise requests.HTTPError(
+                f"{self.status_code} Server Error: url={self.url}",
+                response=self,
+            )
 
 
 class _FakeSession:
-    """Records GET calls and returns queued responses in order."""
+    """Records GET calls and returns queued responses or raises transport errors."""
 
     def __init__(self, state: _FakeState):
         """Bind the shared state holding queued responses and calls."""
         self._state = state
 
     def get(self, url, params=None, timeout=None):
-        """Record the call and return the next queued response."""
+        """Record the call and either raise the queued exception or return the next response."""
         self._state.calls.append({"url": url, "params": params or {}})
         index = min(len(self._state.calls) - 1, len(self._state.responses) - 1)
-        return self._state.responses[index]
+        item = self._state.responses[index]
+        if isinstance(item, BaseException):
+            raise item
+        return item
 
 
 class _FakeState:
@@ -75,14 +97,20 @@ def _area(wdpa_id="555", geometry=None, **fields):
 
 @pytest.fixture
 def fake_wdpa(monkeypatch):
-    """Install a fake `requests.Session` for the WDPA REST client."""
+    """Install a fake `requests.Session` for the WDPA REST client; neuter sleep."""
     state = _FakeState()
+    sleeps: list[float] = []
     monkeypatch.setattr(
         "earthlens.wdpa._rest.requests.Session", lambda: _FakeSession(state)
+    )
+    monkeypatch.setattr(
+        "earthlens.wdpa._rest.time.sleep", lambda seconds: sleeps.append(seconds)
     )
     return SimpleNamespace(
         state=state,
         response=_FakeResponse,
         area=_area,
         polygon=_polygon,
+        sleeps=sleeps,
+        ConnectionError=requests.ConnectionError,
     )
