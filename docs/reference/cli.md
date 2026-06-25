@@ -45,8 +45,8 @@ earthlens datasets validate all                # every provider
 ```
 
 Canonical ids: `chc`, `s3`, `cmems`, `ecmwf`, `earthdata`, `eumetsat`, `fdsn`, `firms`, `gdacs`, `gee`,
-`ghsl`, `hdx`, `nwp`, `openaq`, `openeo`, `overture`, `radar`, `sentinel_hub`, `stac`, `tropycal`,
-`usgs_water`, `worldpop`. Common aliases include `amazon-s3`, `chirps`, `google-earth-engine`,
+`ghsl`, `hdx`, `jaxa`, `nwp`, `openaq`, `openeo`, `overture`, `radar`, `sentinel_hub`, `stac`,
+`tropycal`, `usgs_water`, `worldpop`. Common aliases include `amazon-s3`, `chirps`, `google-earth-engine`,
 `sentinel-hub`/`sentinelhub`, `nexrad`, `nwis`/`usgs-water`, `world-pop`, `human-settlement`/`ghs`,
 `earth-search`/`planetary-computer`/`cdse` (STAC endpoints). An unknown selector is a **usage error**
 (exit code `2`).
@@ -258,7 +258,7 @@ earthlens datasets probe nwp icon-global          # which band tokens are in the
 The authoring companion to `probe`: fetches one upstream id's metadata and emits a paste-ready
 `datasets:` YAML row (inferring `output_kind` / `format` / bands where it can). By default it prints the
 row to vet and paste; `--write` appends it into the catalog file. Supported providers: `earthdata`,
-`hdx`, `usgs_water`, `eumetsat`, `gee`.
+`hdx`, `usgs_water`, `eumetsat`, `gee`, `jaxa`.
 
 | Option | Meaning |
 |--------|---------|
@@ -278,6 +278,8 @@ earthlens datasets curate usgs_water 00060 --key discharge --units ft3/s
 earthlens datasets curate gee NASA/GDDP-CMIP6 --write     # auto-categorised file
 earthlens datasets curate earthdata GPM_3IMERGHH --version 07 --cmr-provider GES_DISC
 earthlens datasets curate gee --fill-empty --write       # bulk-hydrate placeholders
+earthlens datasets curate jaxa JAXA.AW3D30.v3.2           # jaxa-earth STAC seed
+earthlens datasets curate jaxa 11001002                   # G-Portal numeric id seed
 ```
 
 ---
