@@ -133,3 +133,18 @@ class TestFetchAndDownload:
         fake_obis.occurrences.set_frame(fake_obis.frame([fake_obis.row()]))
         _backend(tmp_path, file_format="geojson").download()
         assert (tmp_path / "obis_occurrences.geojson").exists()
+
+    def test_empty_path_opts_out_of_writing(self, tmp_path, fake_obis):
+        """`path=""` returns the in-memory FC but writes no file."""
+        fake_obis.occurrences.set_frame(fake_obis.frame([fake_obis.row()]))
+        backend = OBIS(
+            start="2015-01-01",
+            end="2020-12-31",
+            variables=["common-dolphin"],
+            lat_lim=[30.0, 45.0],
+            lon_lim=[-10.0, 5.0],
+            path="",
+        )
+        fc = backend.download()
+        assert len(fc) == 1
+        assert not any(tmp_path.glob("*.parquet"))

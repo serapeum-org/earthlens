@@ -25,9 +25,11 @@ larger pulls.
 
 from __future__ import annotations
 
+import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
+import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
@@ -164,6 +166,11 @@ class GBIF(AbstractDataSource):
             )
         self._file_format: FileFormat = file_format
         self._max_records = max_records
+        # Capture the user's original `path` so download() can honour `path=""`
+        # as "do not write a file" — the parent class absolutises path into a
+        # `Path` (always non-empty), so the original value is the only way to
+        # detect an explicit opt-out.
+        self._user_path = path
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -217,10 +224,6 @@ class GBIF(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        import datetime as dt
-
-        import pandas as pd
-
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
         return TemporalExtent(
@@ -357,7 +360,7 @@ class GBIF(AbstractDataSource):
                 "FeatureCollection (a GeoDataFrame) directly."
             )
         collection = self._fetch()
-        if str(self.root_dir) and len(collection):
+        if self._user_path and len(collection):
             written = self._write(collection)
             logger.info(
                 f"GBIF download summary: {len(collection)} occurrence(s) "

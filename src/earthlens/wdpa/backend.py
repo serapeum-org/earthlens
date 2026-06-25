@@ -20,6 +20,7 @@ permission, redistribution is restricted), so every fetch raises a
 
 from __future__ import annotations
 
+import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -123,6 +124,9 @@ class WDPA(AbstractDataSource):
         self._file_format: FileFormat = file_format
         self._token_arg = token
         self._auth: WdpaAuth | None = None
+        # Preserve the user's original `path` so download() can honour
+        # `path=""` as "do not write a file".
+        self._user_path = path
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -181,8 +185,6 @@ class WDPA(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        import datetime as dt
-
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
         return TemporalExtent(
@@ -265,13 +267,14 @@ class WDPA(AbstractDataSource):
                 "FeatureCollection (a GeoDataFrame) directly."
             )
         collection = FeatureCollection(self._fetch())
-        warn_license(
-            WDPA_LICENSE,
-            "wdpa",
-            detail="UNEP-WCMC terms: commercial use needs written permission "
-            "and redistribution is restricted",
-        )
-        if str(self.root_dir) and len(collection):
+        if len(collection):
+            warn_license(
+                WDPA_LICENSE,
+                "wdpa",
+                detail="UNEP-WCMC terms: commercial use needs written permission "
+                "and redistribution is restricted",
+            )
+        if self._user_path and len(collection):
             written = self._write(collection)
             logger.info(
                 f"WDPA download summary: {len(collection)} protected area(s) "

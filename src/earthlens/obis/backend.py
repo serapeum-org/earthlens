@@ -21,6 +21,7 @@ set, writes it (GeoParquet by default). Like GBIF the facade rejects an
 
 from __future__ import annotations
 
+import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -154,6 +155,9 @@ class OBIS(AbstractDataSource):
             )
         self._file_format: FileFormat = file_format
         self._size = size
+        # Preserve the user's original `path` so download() can honour
+        # `path=""` as "do not write a file".
+        self._user_path = path
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -207,8 +211,6 @@ class OBIS(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        import datetime as dt
-
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
         return TemporalExtent(
@@ -312,7 +314,7 @@ class OBIS(AbstractDataSource):
                 "FeatureCollection (a GeoDataFrame) directly."
             )
         collection = self._fetch()
-        if str(self.root_dir) and len(collection):
+        if self._user_path and len(collection):
             written = self._write(collection)
             logger.info(
                 f"OBIS download summary: {len(collection)} occurrence(s) "

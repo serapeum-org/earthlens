@@ -174,6 +174,9 @@ def warn_license(license_id: str, label: str, *, detail: str | None = None) -> b
         f"obligations"
     )
     if detail:
+        # ASCII hyphen (not an em-dash) on purpose: this string is printed by
+        # `warnings.warn` to stderr, which on a default Windows cp1252 console
+        # would `UnicodeEncodeError` on `—`. Keep this ASCII.
         message += f" - {detail}"
     message += ". Honour attribution and do not redistribute without permission."
     warnings.warn(message, LicenseWarning, stacklevel=2)

@@ -165,3 +165,22 @@ class TestFetchAndDownload:
         )
         _backend(tmp_path, file_format="geojson").download()
         assert (tmp_path / "gbif_occurrences.geojson").exists()
+
+    def test_empty_path_opts_out_of_writing(self, tmp_path, fake_gbif):
+        """`path=""` returns the in-memory FC but writes no file."""
+        fake_gbif.occurrences.set_pages(
+            [{"results": [fake_gbif.record()], "count": 1, "endOfRecords": True}]
+        )
+        backend = GBIF(
+            start="2020-01-01",
+            end="2020-12-31",
+            variables=["birds"],
+            lat_lim=[0.0, 10.0],
+            lon_lim=[0.0, 10.0],
+            path="",
+        )
+        fc = backend.download()
+        assert len(fc) == 1
+        # The parent class still resolves an absolute path under cwd; nothing
+        # should be written there with our user-supplied path being empty.
+        assert not any(p.exists() for p in (tmp_path.glob("*.parquet")))

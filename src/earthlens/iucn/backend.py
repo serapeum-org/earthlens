@@ -20,6 +20,7 @@ shipped as package data — the token stays user-supplied.
 
 from __future__ import annotations
 
+import datetime as dt
 from pathlib import Path
 from typing import Literal
 
@@ -117,6 +118,9 @@ class IUCN(AbstractDataSource):
         self._file_format: FileFormat = file_format
         self._token_arg = token
         self._auth: IucnAuth | None = None
+        # Preserve the user's original `path` so download() can honour
+        # `path=""` as "do not write a file".
+        self._user_path = path
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -175,8 +179,6 @@ class IUCN(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        import datetime as dt
-
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
         return TemporalExtent(
@@ -201,11 +203,12 @@ class IUCN(AbstractDataSource):
         rows: list[dict] = []
         for selector in self.vars:
             rows.extend(self._fetch_one(token, selector))
-        warn_license(
-            IUCN_LICENSE,
-            "iucn",
-            detail="CC-BY-NC; redistribution needs a written IUCN waiver",
-        )
+        if rows:
+            warn_license(
+                IUCN_LICENSE,
+                "iucn",
+                detail="CC-BY-NC; redistribution needs a written IUCN waiver",
+            )
         return _frame(rows)
 
     def _fetch_one(self, token: str, selector: str) -> list[dict]:
@@ -265,7 +268,7 @@ class IUCN(AbstractDataSource):
                 "DataFrame directly."
             )
         frame = self._fetch()
-        if str(self.root_dir) and len(frame):
+        if self._user_path and len(frame):
             written = self._write(frame)
             logger.info(
                 f"IUCN download summary: {len(frame)} assessment(s) written to {written}"
