@@ -9,6 +9,7 @@ time axis — the DEMs are static) was pinned live in the A1 gate; see
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,6 +17,63 @@ if TYPE_CHECKING:
 
 #: Default sampling stride for a griddap axis range (`1` = full resolution).
 _DEFAULT_STEP = 1
+
+#: Parses a `"<value> arc-(second|minute)"` native-resolution label.
+_RESOLUTION_RE = re.compile(r"\s*([\d.]+)\s*arc-(second|minute)", re.IGNORECASE)
+
+
+def resolution_degrees(native_resolution: str) -> float | None:
+    """Convert a `"<n> arc-second"` / `"arc-minute"` label to degrees.
+
+    Args:
+        native_resolution: A catalog row's `native_resolution` label
+            (`"15 arc-second"`, `"1 arc-minute"`).
+
+    Returns:
+        float | None: The cell size in degrees, or `None` when the label
+            is not a recognised arc-second / arc-minute string.
+
+    Examples:
+        - Arc-seconds and arc-minutes convert to degrees:
+            ```python
+            >>> from earthlens.bathymetry._helpers import resolution_degrees
+            >>> round(resolution_degrees("15 arc-second"), 6)
+            0.004167
+            >>> resolution_degrees("1 arc-minute")
+            0.016666666666666666
+            >>> resolution_degrees("native") is None
+            True
+
+            ```
+    """
+    match = _RESOLUTION_RE.match(native_resolution or "")
+    if match is None:
+        return None
+    value = float(match.group(1))
+    unit = match.group(2).lower()
+    return value / 3600.0 if unit == "second" else value / 60.0
+
+
+def estimate_grid_pixels(
+    bbox: tuple[float, float, float, float], native_resolution: str
+) -> tuple[int, int] | None:
+    """Estimate the `(width, height)` pixel dimensions of a bbox subset.
+
+    Args:
+        bbox: `(west, south, east, north)` in degrees.
+        native_resolution: The DEM's `native_resolution` label.
+
+    Returns:
+        tuple[int, int] | None: `(width_px, height_px)`, each at least 1, or
+            `None` when the resolution label is not parseable.
+    """
+    degrees = resolution_degrees(native_resolution)
+    if degrees is None or degrees <= 0:
+        return None
+    west, south, east, north = bbox
+    width = max(1, round(abs(east - west) / degrees))
+    height = max(1, round(abs(north - south) / degrees))
+    return width, height
 
 
 def _normalise_lon(lon: float, lon_convention: str) -> float:
