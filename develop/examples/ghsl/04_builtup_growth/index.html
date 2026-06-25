@@ -2944,7 +2944,7 @@
   <span class="md-ellipsis">
     
   
-    ERDDAP (multi-server client)
+    Bathymetry (topography / bathymetry DEMs)
   
 
     
@@ -2960,7 +2960,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    ERDDAP (multi-server client)
+    Bathymetry (topography / bathymetry DEMs)
   
 
           </label>
@@ -2973,7 +2973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/erddap/introduction/" class="md-nav__link">
+      <a href="../../../reference/bathymetry/introduction/" class="md-nav__link">
         
   
   
@@ -3001,7 +3001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/erddap/usage/" class="md-nav__link">
+      <a href="../../../reference/bathymetry/usage/" class="md-nav__link">
         
   
   
@@ -3029,7 +3029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/erddap/datasets/" class="md-nav__link">
+      <a href="../../../reference/bathymetry/datasets/" class="md-nav__link">
         
   
   
@@ -3057,7 +3057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/erddap/erddap/" class="md-nav__link">
+      <a href="../../../reference/bathymetry/bathymetry/" class="md-nav__link">
         
   
   
@@ -8856,7 +8856,7 @@
   <span class="md-ellipsis">
     
   
-    ERDDAP (multi-server client)
+    Bathymetry (topography / bathymetry DEMs)
   
 
     
@@ -8872,7 +8872,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    ERDDAP (multi-server client)
+    Bathymetry (topography / bathymetry DEMs)
   
 
           </label>
@@ -8885,70 +8885,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../erddap/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ERDDAP catalog explorer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../erddap/02_griddap_sst_anomaly/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Coral Reef Watch SST anomaly (griddap -&gt; raster)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../erddap/03_tabledap_buoys/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NDBC buoys (tabledap -&gt; DataFrame)
+    Bathymetry — DEM quickstart
   
 
     
@@ -12862,7 +12806,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=448bc5fa">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aed63a54">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12874,7 +12818,7 @@ across them with <code>aggregate=</code> to map the <strong>maximum</strong> bui
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f27c8169">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d1ed58a8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12887,7 +12831,7 @@ point, and <code>AggregationConfig</code> to describe the across-epoch reduction
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d9864cef">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=56b25d86">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12928,7 +12872,7 @@ from earthlens.aggregate import AggregationConfig</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=23d608a7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0678efbf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12940,7 +12884,7 @@ and describe the request: GHS-BUILT-S over a small AOI around Lisbon, at the 200
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0baec499">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=418f85d2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12985,7 +12929,7 @@ growth = EarthLens(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f526c9a9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21b581fa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12998,7 +12942,7 @@ The call returns the list of written paths.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9c104c8a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a4058391">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13033,7 +12977,7 @@ rasters</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ae3daaaa">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b979aabb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13045,7 +12989,7 @@ and render the maximum built-up surface for the Lisbon AOI.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e951d89e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a280e67a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

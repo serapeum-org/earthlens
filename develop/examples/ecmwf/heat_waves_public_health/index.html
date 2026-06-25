@@ -2944,7 +2944,7 @@
   <span class="md-ellipsis">
     
   
-    ERDDAP (multi-server client)
+    Bathymetry (topography / bathymetry DEMs)
   
 
     
@@ -2960,7 +2960,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    ERDDAP (multi-server client)
+    Bathymetry (topography / bathymetry DEMs)
   
 
           </label>
@@ -2973,7 +2973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/erddap/introduction/" class="md-nav__link">
+      <a href="../../../reference/bathymetry/introduction/" class="md-nav__link">
         
   
   
@@ -3001,7 +3001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/erddap/usage/" class="md-nav__link">
+      <a href="../../../reference/bathymetry/usage/" class="md-nav__link">
         
   
   
@@ -3029,7 +3029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/erddap/datasets/" class="md-nav__link">
+      <a href="../../../reference/bathymetry/datasets/" class="md-nav__link">
         
   
   
@@ -3057,7 +3057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/erddap/erddap/" class="md-nav__link">
+      <a href="../../../reference/bathymetry/bathymetry/" class="md-nav__link">
         
   
   
@@ -9010,7 +9010,7 @@
   <span class="md-ellipsis">
     
   
-    ERDDAP (multi-server client)
+    Bathymetry (topography / bathymetry DEMs)
   
 
     
@@ -9026,7 +9026,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    ERDDAP (multi-server client)
+    Bathymetry (topography / bathymetry DEMs)
   
 
           </label>
@@ -9039,70 +9039,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../erddap/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ERDDAP catalog explorer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../erddap/02_griddap_sst_anomaly/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Coral Reef Watch SST anomaly (griddap -&gt; raster)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../erddap/03_tabledap_buoys/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NDBC buoys (tabledap -&gt; DataFrame)
+    Bathymetry — DEM quickstart
   
 
     
@@ -13012,7 +12956,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aeb4545a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=73c6dd27">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13034,7 +12978,7 @@ $T_d$ via Davies-Jones / Stull approximations.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=de2c0346">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=08ba90ad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13048,7 +12992,7 @@ means); <code>pyramids</code> supplies <code>Dataset</code> for reading the writ
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eea3fd5b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=61efa0c7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13089,7 +13033,7 @@ from earthlens import AggregationConfig, EarthLens</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=db3e87f6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=84fbf5c6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13103,7 +13047,7 @@ variability that monthly aggregation would smooth out.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=05ede1c5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=922e1b06">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13117,7 +13061,7 @@ separate from running it.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9ab2e9f6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cd477787">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13174,7 +13118,7 @@ earthlens = EarthLens(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=28b95b49">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=089d3d8a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13187,7 +13131,7 @@ call: the hourly CDS NetCDFs are folded to daily means (<code>freq="1D"</code>,
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3b5345e9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e8d7b1c4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13214,7 +13158,7 @@ call: the hourly CDS NetCDFs are folded to daily means (<code>freq="1D"</code>,
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3015ab53">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=90956d3a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13226,7 +13170,7 @@ call: the hourly CDS NetCDFs are folded to daily means (<code>freq="1D"</code>,
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4894a176">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f7713d2d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13238,7 +13182,7 @@ array and convert from kelvin to °C.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=310e7e59">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5317c78e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13301,7 +13245,7 @@ t_dew = (
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b043495e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=25083aa3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13314,7 +13258,7 @@ pressures.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=77ce8808">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6853338b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13355,7 +13299,7 @@ rh = 100.0 * es(t_dew) / es(t_air)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d3f6b450">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b93d8298">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13367,7 +13311,7 @@ air temperature and RH; it is valid for <code>rh &gt; 5%</code> and <code>t</cod
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4dfc939d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=63417341">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13420,7 +13364,7 @@ t_wet_bulb = wet_bulb(t_air, rh)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=77af5c42">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3cad7649">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13432,7 +13376,7 @@ tidy <code>DataFrame</code> indexed by date.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b5d466f4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=805f4413">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13485,7 +13429,7 @@ summary.head()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=302b8b36">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fddb5892">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13498,7 +13442,7 @@ healthy adults; &gt; 35 °C is the theoretical limit of human survival
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af192026">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6db56b1a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13510,7 +13454,7 @@ healthy adults; &gt; 35 °C is the theoretical limit of human survival
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f1f71e65">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eefbb493">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13573,7 +13517,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ba48e67a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b400fb72">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
