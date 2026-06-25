@@ -20,10 +20,12 @@
   SST, Aqua MODIS chlorophyll [historical 2003–2022], NDBC buoys), the `[erddap]`
   optional extra (`erddapy`), aliases `erddap` / `ioos`, intro / usage / datasets
   / reference docs, and three example notebooks (catalog explorer + griddap +
-  tabledap). `earthlens datasets validate erddap` lints the rows and
-  `earthlens datasets refresh erddap [--write]` regenerates the
-  `available_datasets:` index by walking each curated server's `allDatasets`
-  table. Public servers only (no auth module).
+  tabledap). Full `earthlens datasets` CLI integration: `validate erddap` lints
+  the rows, `refresh erddap [--write]` regenerates the `available_datasets:`
+  index by walking each curated server's `allDatasets` table, `audit erddap`
+  diffs curated-vs-live, and `audit erddap --coverage` classifies the universe
+  into DONE / addressable (griddap) / table (tabledap) / thin (test datasets) /
+  missing. Public servers only (no auth module).
 - **asf**: add `earthlens.asf` — Alaska Satellite Facility SAR backend with
   `asf_search`-backed search and the InSAR baseline `stack()`. Reuses NASA
   Earthdata Login auth from `earthlens.earthdata` (no second credential

@@ -1926,11 +1926,98 @@ def _gee_coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
     return counts, sorted(buckets.get("addressable", []))
 
 
+def _erddap_structures(catalog: Any) -> dict[str, str]:
+    """Map every dataset id to its `dataStructure` across the curated servers.
+
+    Reads each distinct curated `server_url`'s `allDatasets` table asking for
+    `datasetID,dataStructure`, so the coverage classifier can tell a griddap
+    (`"grid"`) dataset from a tabledap (`"table"`) one without a per-id query.
+
+    Args:
+        catalog: The loaded ERDDAP `Catalog`.
+
+    Returns:
+        `{dataset_id: "grid" | "table"}` across every curated server.
+    """
+    servers = sorted({row.server_url for row in catalog.datasets.values()})
+    structures: dict[str, str] = {}
+    for server in servers:
+        base = server.rstrip("/")
+        body = _get_json(f"{base}/tabledap/allDatasets.json?datasetID,dataStructure")
+        for dataset_id, structure in body["table"]["rows"]:
+            if dataset_id != "allDatasets":
+                structures[dataset_id] = structure
+    return structures
+
+
+def _erddap_classify(dataset_id: str, structure: str | None, curated: set[str]) -> str:
+    """Bucket one ERDDAP dataset id by curation status and data structure.
+
+    * `DONE` — already in the curated `datasets:` map.
+    * `thin` — an ERDDAP test / demo dataset (id starts with `"test"`).
+    * `addressable` — a `grid` (griddap) dataset, the raster universe worth
+      curating next.
+    * `table` — a `table` (tabledap) dataset, the separate tabular track.
+    * `missing` — in the index but the server no longer lists a structure.
+
+    Args:
+        dataset_id: The ERDDAP dataset id.
+        structure: Its `dataStructure` (`"grid"` / `"table"`), or `None`.
+        curated: The set of already-curated dataset ids.
+
+    Returns:
+        The bucket name (one of :data:`_COVERAGE_BUCKETS`).
+    """
+    if dataset_id in curated:
+        return "DONE"
+    if dataset_id.lower().startswith("test"):
+        return "thin"
+    if structure == "grid":
+        return "addressable"
+    if structure == "table":
+        return "table"
+    return "missing"
+
+
+def _erddap_coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
+    """Classify every `available_datasets:` id of the ERDDAP catalog.
+
+    griddap (`grid`) datasets are the addressable raster universe worth
+    curating next; tabledap (`table`) datasets are the separate tabular
+    track; ERDDAP test/demo ids are thin; an id the server no longer lists
+    is missing.
+
+    Args:
+        catalog: The loaded ERDDAP `Catalog`.
+
+    Returns:
+        `(counts, todo)` — per-bucket counts and the sorted `addressable`
+        (griddap) ids not yet curated.
+
+    Raises:
+        ValueError: If the `available_datasets:` index is empty.
+    """
+    available = [str(ident) for ident in getattr(catalog, "available_datasets", [])]
+    if not available:
+        raise ValueError(
+            "available_datasets: is empty — run `refresh erddap --write` first"
+        )
+    curated = set(catalog.datasets)
+    structures = _erddap_structures(catalog)
+    buckets: dict[str, list[str]] = {}
+    for dataset_id in available:
+        bucket = _erddap_classify(dataset_id, structures.get(dataset_id), curated)
+        buckets.setdefault(bucket, []).append(dataset_id)
+    counts = {bucket: len(buckets.get(bucket, [])) for bucket in _COVERAGE_BUCKETS}
+    return counts, sorted(buckets.get("addressable", []))
+
+
 #: Provider id -> a callable returning `(counts, todo)` for `audit --coverage`.
 #: Only providers with a discoverable available-universe distinct from their
-#: curated rows (currently only gee's `available_datasets:` index) qualify.
+#: curated rows (gee's STAC index, erddap's `allDatasets` crawl) qualify.
 _COVERAGE: dict[str, Callable[[Any], tuple[dict[str, int], list[str]]]] = {
     "gee": _gee_coverage,
+    "erddap": _erddap_coverage,
 }
 
 

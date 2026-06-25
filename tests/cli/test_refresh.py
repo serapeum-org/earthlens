@@ -156,6 +156,70 @@ class TestErddapRefresher:
         assert "erddap" in supported_providers()
 
 
+class TestErddapCoverage:
+    """Tests for the ERDDAP `audit --coverage` classifier."""
+
+    def test_classify_each_bucket(self):
+        """Each (structure, curation) combination maps to the right bucket."""
+        from earthlens.cli.refresh import _erddap_classify
+
+        curated = {"NOAA_DHW"}
+        assert _erddap_classify("NOAA_DHW", "grid", curated) == "DONE"
+        assert _erddap_classify("testGridWav", "grid", curated) == "thin"
+        assert _erddap_classify("someGrid", "grid", curated) == "addressable"
+        assert _erddap_classify("someTable", "table", curated) == "table"
+        assert _erddap_classify("vanished", None, curated) == "missing"
+
+    def test_coverage_counts_and_todo(self, monkeypatch):
+        """Coverage buckets the available index and lists addressable griddap."""
+        from earthlens.cli.refresh import _erddap_coverage
+        from earthlens.erddap.catalog import Dataset
+
+        row = Dataset(
+            server_url="https://x/erddap",
+            dataset_id="NOAA_DHW",
+            protocol="griddap",
+            variables=["v"],
+        )
+        catalog = SimpleNamespace(
+            available_datasets=["NOAA_DHW", "g1", "t1", "testX"],
+            datasets={"NOAA_DHW": row},
+        )
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "table": {
+                    "columnNames": ["datasetID", "dataStructure"],
+                    "rows": [
+                        ["allDatasets", "table"],
+                        ["NOAA_DHW", "grid"],
+                        ["g1", "grid"],
+                        ["t1", "table"],
+                        ["testX", "grid"],
+                    ],
+                }
+            },
+        )
+        counts, todo = _erddap_coverage(catalog)
+        assert counts == {
+            "DONE": 1,
+            "addressable": 1,
+            "thin": 1,
+            "table": 1,
+            "missing": 0,
+        }
+        assert todo == ["g1"]
+
+    def test_coverage_empty_index_raises(self):
+        """An empty available index asks the user to refresh first."""
+        from earthlens.cli.refresh import _erddap_coverage
+
+        catalog = SimpleNamespace(available_datasets=[], datasets={})
+        with pytest.raises(ValueError, match="refresh erddap"):
+            _erddap_coverage(catalog)
+
+
 class TestOpeneoRefresher:
     """Tests for the openEO lister."""
 
