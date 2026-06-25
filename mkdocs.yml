@@ -356,6 +356,8 @@ nav:
       - Catalog explorer (no network): examples/jaxa/01_catalog_explorer.ipynb
       - AW3D30 elevation quickstart (live): examples/jaxa/02_aw3d30_quickstart.ipynb
       - G-Portal search (anonymous): examples/jaxa/03_gportal_search.ipynb
+    - Bathymetry (topography / bathymetry DEMs):
+      - DEM quickstart (live): examples/bathymetry/01_bathymetry_quickstart.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
