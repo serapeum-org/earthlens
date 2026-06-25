@@ -119,6 +119,41 @@ class ERDDAP(AbstractDataSource):
             resolved dataset's `protocol` (`griddap` → `"raster"`,
             `tabledap` → `"tabular"`) — the sanctioned earthdata /
             eumetsat override. The facade reads it to gate `aggregate=`.
+
+    Examples:
+        - A griddap dataset writes raster NetCDF (marked `+SKIP` — it hits
+          the live NOAA CoastWatch server):
+
+            ```python
+            >>> from earthlens.earthlens import EarthLens
+            >>> paths = EarthLens(  # doctest: +SKIP
+            ...     data_source="erddap",
+            ...     dataset="NOAA_DHW",
+            ...     variables=["CRW_SSTANOMALY"],
+            ...     start="2023-06-01",
+            ...     end="2023-06-01",
+            ...     lat_lim=[0.0, 5.0],
+            ...     lon_lim=[150.0, 155.0],
+            ...     path="erddap_out",
+            ... ).download()  # -> [Path('erddap_out/NOAA_DHW.nc')]
+
+            ```
+        - A tabledap dataset returns a `pandas.DataFrame` (also `+SKIP`):
+
+            ```python
+            >>> from earthlens.earthlens import EarthLens
+            >>> df = EarthLens(  # doctest: +SKIP
+            ...     data_source="erddap",
+            ...     dataset="cwwcNDBCMet",
+            ...     variables=["station", "time", "wtmp"],
+            ...     start="2023-01-01",
+            ...     end="2023-01-02",
+            ...     lat_lim=[36.0, 37.0],
+            ...     lon_lim=[-123.0, -122.0],
+            ...     path="erddap_out",
+            ... ).download()
+
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "raster"
