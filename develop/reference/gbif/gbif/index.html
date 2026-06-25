@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13762,7 +13762,11 @@ row (the framework field).</p>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Taxon catalog for the GBIF occurrence backend.</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    Reads the bundled `gbif_data_catalog.yaml` (shipped as package data)</span>
@@ -13819,66 +13823,70 @@ row (the framework field).</p>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached);</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        passing `datasets=...` skips the disk read (used in tests).</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            ValueError: Propagated from :func:`_load_catalog_data` when</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                the YAML is missing, empty, or has a malformed row.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">))</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the GBIF taxon catalog from disk (cached).</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            __context: Opaque context handed in by the pydantic v2 model</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                lifecycle; forwarded to the base class unchanged.</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            ValueError: Propagated from :func:`_load_catalog_data` when</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">                the YAML is missing, empty, or has a malformed row.</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">))</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the GBIF taxon catalog from disk (cached).</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            ValueError: If the file has no `taxa:` block, or a row fails</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">                :class:`Taxon` validation.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Taxon</span><span class="p">]:</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the taxon map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            dict[str, Taxon]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_taxon_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to a GBIF backbone `taxonKey`.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Accepts a raw integer (or digit string) key, a `taxon:&lt;scientific</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        name&gt;` live lookup, or a friendly catalog key (`&quot;birds&quot;`).</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            selector: One `variables` entry — an `int`, a digit string, a</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">                `&quot;taxon:&lt;name&gt;&quot;` string, or a friendly taxon name.</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            ValueError: If the file has no `taxa:` block, or a row fails</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">                :class:`Taxon` validation.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Taxon</span><span class="p">]:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the taxon map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            dict[str, Taxon]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_taxon_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to a GBIF backbone `taxonKey`.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Accepts a raw integer (or digit string) key, a `taxon:&lt;scientific</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        name&gt;` live lookup, or a friendly catalog key (`&quot;birds&quot;`).</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            The resolved backbone `taxonKey`.</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            ValueError: If a friendly key is unknown (with a did-you-mean</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                hint) or a name lookup finds no backbone match.</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="k">return</span> <span class="n">selector</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">):</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="k">return</span> <span class="n">_name_backbone_key</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">taxon_key</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            selector: One `variables` entry — an `int`, a digit string, a</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                `&quot;taxon:&lt;name&gt;&quot;` string, or a friendly taxon name.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            The resolved backbone `taxonKey`.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            ValueError: If a friendly key is unknown (with a did-you-mean</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">                hint) or a name lookup finds no backbone match.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="k">return</span> <span class="n">selector</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">):</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="k">return</span> <span class="n">_name_backbone_key</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">taxon_key</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -13934,19 +13942,19 @@ row (the framework field).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/gbif/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-238">238</a></span>
-<span class="normal"><a href="#__codelineno-0-239">239</a></span>
-<span class="normal"><a href="#__codelineno-0-240">240</a></span>
-<span class="normal"><a href="#__codelineno-0-241">241</a></span>
-<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-242">242</a></span>
 <span class="normal"><a href="#__codelineno-0-243">243</a></span>
-<span class="normal"><a href="#__codelineno-0-244">244</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Taxon</span><span class="p">]:</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the taxon map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        dict[str, Taxon]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Taxon</span><span class="p">]:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the taxon map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        dict[str, Taxon]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -14052,11 +14060,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/gbif/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span>
-<span class="normal"><a href="#__codelineno-0-221">221</a></span>
-<span class="normal"><a href="#__codelineno-0-222">222</a></span>
-<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
 <span class="normal"><a href="#__codelineno-0-225">225</a></span>
 <span class="normal"><a href="#__codelineno-0-226">226</a></span>
@@ -14069,24 +14073,28 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
-<span class="normal"><a href="#__codelineno-0-236">236</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the GBIF taxon catalog from disk (cached).</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the GBIF taxon catalog from disk (cached).</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        ValueError: If the file has no `taxa:` block, or a row fails</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            :class:`Taxon` validation.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">rows</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        ValueError: If the file has no `taxa:` block, or a row fails</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">            :class:`Taxon` validation.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="n">rows</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -14107,6 +14115,38 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
         <p>Auto-load the bundled catalog when no rows were supplied.</p>
 <p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached);
 passing <code>datasets=...</code> skips the disk read (used in tests).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>__context</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Opaque context handed in by the pydantic v2 model
+lifecycle; forwarded to the base class unchanged.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Raises:</span></p>
@@ -14147,19 +14187,27 @@ the YAML is missing, empty, or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-214">214</a></span>
 <span class="normal"><a href="#__codelineno-0-215">215</a></span>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
-<span class="normal"><a href="#__codelineno-0-217">217</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-217">217</a></span>
+<span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no rows were supplied.</span>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached);</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    passing `datasets=...` skips the disk read (used in tests).</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        ValueError: Propagated from :func:`_load_catalog_data` when</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            the YAML is missing, empty, or has a malformed row.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">))</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        __context: Opaque context handed in by the pydantic v2 model</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            lifecycle; forwarded to the base class unchanged.</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        ValueError: Propagated from :func:`_load_catalog_data` when</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            the YAML is missing, empty, or has a malformed row.</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">))</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -14263,11 +14311,7 @@ hint) or a name lookup finds no backbone match.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/gbif/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
 <span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
@@ -14287,31 +14331,35 @@ hint) or a name lookup finds no backbone match.</p>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_taxon_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to a GBIF backbone `taxonKey`.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Accepts a raw integer (or digit string) key, a `taxon:&lt;scientific</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    name&gt;` live lookup, or a friendly catalog key (`&quot;birds&quot;`).</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        selector: One `variables` entry — an `int`, a digit string, a</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            `&quot;taxon:&lt;name&gt;&quot;` string, or a friendly taxon name.</span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_taxon_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to a GBIF backbone `taxonKey`.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    Accepts a raw integer (or digit string) key, a `taxon:&lt;scientific</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    name&gt;` live lookup, or a friendly catalog key (`&quot;birds&quot;`).</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        The resolved backbone `taxonKey`.</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        ValueError: If a friendly key is unknown (with a did-you-mean</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            hint) or a name lookup finds no backbone match.</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="n">selector</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">):</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">return</span> <span class="n">_name_backbone_key</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">taxon_key</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        selector: One `variables` entry — an `int`, a digit string, a</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            `&quot;taxon:&lt;name&gt;&quot;` string, or a friendly taxon name.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        The resolved backbone `taxonKey`.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        ValueError: If a friendly key is unknown (with a did-you-mean</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            hint) or a name lookup finds no backbone match.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">return</span> <span class="n">selector</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">):</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="k">return</span> <span class="n">_name_backbone_key</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">taxon_key</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17414,7 +17462,11 @@ row (the framework field).</p>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Taxon catalog for the GBIF occurrence backend.</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    Reads the bundled `gbif_data_catalog.yaml` (shipped as package data)</span>
@@ -17471,66 +17523,70 @@ row (the framework field).</p>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached);</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        passing `datasets=...` skips the disk read (used in tests).</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            ValueError: Propagated from :func:`_load_catalog_data` when</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                the YAML is missing, empty, or has a malformed row.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">))</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the GBIF taxon catalog from disk (cached).</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            __context: Opaque context handed in by the pydantic v2 model</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                lifecycle; forwarded to the base class unchanged.</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            ValueError: Propagated from :func:`_load_catalog_data` when</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">                the YAML is missing, empty, or has a malformed row.</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">))</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the GBIF taxon catalog from disk (cached).</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            ValueError: If the file has no `taxa:` block, or a row fails</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">                :class:`Taxon` validation.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Taxon</span><span class="p">]:</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the taxon map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            dict[str, Taxon]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_taxon_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to a GBIF backbone `taxonKey`.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Accepts a raw integer (or digit string) key, a `taxon:&lt;scientific</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        name&gt;` live lookup, or a friendly catalog key (`&quot;birds&quot;`).</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            selector: One `variables` entry — an `int`, a digit string, a</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">                `&quot;taxon:&lt;name&gt;&quot;` string, or a friendly taxon name.</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            ValueError: If the file has no `taxa:` block, or a row fails</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">                :class:`Taxon` validation.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Taxon</span><span class="p">]:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the taxon map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            dict[str, Taxon]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_taxon_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to a GBIF backbone `taxonKey`.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Accepts a raw integer (or digit string) key, a `taxon:&lt;scientific</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        name&gt;` live lookup, or a friendly catalog key (`&quot;birds&quot;`).</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            The resolved backbone `taxonKey`.</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            ValueError: If a friendly key is unknown (with a did-you-mean</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                hint) or a name lookup finds no backbone match.</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="k">return</span> <span class="n">selector</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">):</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="k">return</span> <span class="n">_name_backbone_key</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">taxon_key</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            selector: One `variables` entry — an `int`, a digit string, a</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                `&quot;taxon:&lt;name&gt;&quot;` string, or a friendly taxon name.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            The resolved backbone `taxonKey`.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            ValueError: If a friendly key is unknown (with a did-you-mean</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">                hint) or a name lookup finds no backbone match.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="k">return</span> <span class="n">selector</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">):</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="k">return</span> <span class="n">_name_backbone_key</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">taxon_key</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -17586,19 +17642,19 @@ row (the framework field).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/gbif/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-238">238</a></span>
-<span class="normal"><a href="#__codelineno-0-239">239</a></span>
-<span class="normal"><a href="#__codelineno-0-240">240</a></span>
-<span class="normal"><a href="#__codelineno-0-241">241</a></span>
-<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-242">242</a></span>
 <span class="normal"><a href="#__codelineno-0-243">243</a></span>
-<span class="normal"><a href="#__codelineno-0-244">244</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Taxon</span><span class="p">]:</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the taxon map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        dict[str, Taxon]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Taxon</span><span class="p">]:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the taxon map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        dict[str, Taxon]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17704,11 +17760,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/gbif/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span>
-<span class="normal"><a href="#__codelineno-0-221">221</a></span>
-<span class="normal"><a href="#__codelineno-0-222">222</a></span>
-<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
 <span class="normal"><a href="#__codelineno-0-225">225</a></span>
 <span class="normal"><a href="#__codelineno-0-226">226</a></span>
@@ -17721,24 +17773,28 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
-<span class="normal"><a href="#__codelineno-0-236">236</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the GBIF taxon catalog from disk (cached).</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the GBIF taxon catalog from disk (cached).</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        ValueError: If the file has no `taxa:` block, or a row fails</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            :class:`Taxon` validation.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">rows</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        ValueError: If the file has no `taxa:` block, or a row fails</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">            :class:`Taxon` validation.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="n">rows</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17759,6 +17815,38 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
         <p>Auto-load the bundled catalog when no rows were supplied.</p>
 <p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached);
 passing <code>datasets=...</code> skips the disk read (used in tests).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>__context</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Opaque context handed in by the pydantic v2 model
+lifecycle; forwarded to the base class unchanged.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 <p><span class="doc-section-title">Raises:</span></p>
@@ -17799,19 +17887,27 @@ the YAML is missing, empty, or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-214">214</a></span>
 <span class="normal"><a href="#__codelineno-0-215">215</a></span>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
-<span class="normal"><a href="#__codelineno-0-217">217</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-217">217</a></span>
+<span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no rows were supplied.</span>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached);</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    passing `datasets=...` skips the disk read (used in tests).</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        ValueError: Propagated from :func:`_load_catalog_data` when</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            the YAML is missing, empty, or has a malformed row.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">))</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        __context: Opaque context handed in by the pydantic v2 model</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            lifecycle; forwarded to the base class unchanged.</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        ValueError: Propagated from :func:`_load_catalog_data` when</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            the YAML is missing, empty, or has a malformed row.</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">))</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17915,11 +18011,7 @@ hint) or a name lookup finds no backbone match.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/gbif/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
 <span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
@@ -17939,31 +18031,35 @@ hint) or a name lookup finds no backbone match.</p>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_taxon_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to a GBIF backbone `taxonKey`.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Accepts a raw integer (or digit string) key, a `taxon:&lt;scientific</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    name&gt;` live lookup, or a friendly catalog key (`&quot;birds&quot;`).</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        selector: One `variables` entry — an `int`, a digit string, a</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            `&quot;taxon:&lt;name&gt;&quot;` string, or a friendly taxon name.</span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_taxon_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to a GBIF backbone `taxonKey`.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    Accepts a raw integer (or digit string) key, a `taxon:&lt;scientific</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    name&gt;` live lookup, or a friendly catalog key (`&quot;birds&quot;`).</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        The resolved backbone `taxonKey`.</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        ValueError: If a friendly key is unknown (with a did-you-mean</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            hint) or a name lookup finds no backbone match.</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="n">selector</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">):</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">return</span> <span class="n">_name_backbone_key</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">taxon_key</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        selector: One `variables` entry — an `int`, a digit string, a</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            `&quot;taxon:&lt;name&gt;&quot;` string, or a friendly taxon name.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        The resolved backbone `taxonKey`.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        ValueError: If a friendly key is unknown (with a did-you-mean</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            hint) or a name lookup finds no backbone match.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">return</span> <span class="n">selector</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">):</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="k">return</span> <span class="n">_name_backbone_key</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">TAXON_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">taxon_key</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
