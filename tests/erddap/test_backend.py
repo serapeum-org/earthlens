@@ -249,6 +249,23 @@ class TestGriddap:
         backend.download(aggregate=AggregationConfig(freq="1D"))
         assert seen["CRW_SSTANOMALY"] is True
 
+    def test_aggregate_respects_explicit_out_dir(
+        self, tmp_path, fake_nc_get, monkeypatch
+    ):
+        """An aggregate config with an explicit out_dir is used as-is."""
+        seen = {}
+
+        def _fake_aggregate(nc_path, var_info, config):
+            seen["out_dir"] = config.out_dir
+            return [("2023-06-01", None, tmp_path / "agg.tif")]
+
+        monkeypatch.setattr("earthlens.aggregate.aggregate_netcdf", _fake_aggregate)
+        custom = tmp_path / "custom_out"
+        _grid_backend(tmp_path).download(
+            aggregate=AggregationConfig(freq="1D", out_dir=custom)
+        )
+        assert seen["out_dir"] == custom
+
     def test_griddap_http_error_becomes_valueerror(self, tmp_path, monkeypatch):
         """An out-of-coverage griddap response surfaces as a clear ValueError."""
         from tests.erddap.conftest import FakeResponse

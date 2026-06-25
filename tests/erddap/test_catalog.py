@@ -119,6 +119,30 @@ class TestLoaderEdgeCases:
         with pytest.raises(ValueError, match="does not exist"):
             _yaml_files_for(tmp_path / "nope")
 
+    def test_vanished_file_stat_falls_back_to_default_cache_key(
+        self, tmp_path, monkeypatch
+    ):
+        """A file that vanishes during the mtime build still loads (degraded key)."""
+        from pathlib import Path
+
+        (tmp_path / "c.yaml").write_text(
+            "datasets:\n"
+            "  ds1:\n"
+            "    server_url: https://x/erddap\n"
+            "    dataset_id: ds1\n"
+            "    protocol: tabledap\n"
+        )
+        real_stat = Path.stat
+
+        def _stat(self, *args, **kwargs):
+            if self.suffix == ".yaml":
+                raise FileNotFoundError(self)
+            return real_stat(self, *args, **kwargs)
+
+        monkeypatch.setattr(Path, "stat", _stat)
+        datasets = _load_catalog_data(tmp_path)
+        assert datasets["ds1"].protocol == "tabledap"
+
     def test_invalid_protocol_rejected(self, tmp_path):
         """A row with an out-of-domain protocol fails validation."""
         (tmp_path / "bad.yaml").write_text(
