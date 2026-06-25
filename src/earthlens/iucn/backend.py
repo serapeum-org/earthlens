@@ -59,6 +59,24 @@ class IUCN(AbstractDataSource):
 
     Attributes:
         OUTPUT_KIND: `"tabular"` — the facade rejects `aggregate=`.
+
+    Examples:
+        - Build a backend for a species query (token is resolved early
+          but no HTTP call is made until `download()`):
+            ```python
+            >>> from earthlens.iucn import IUCN
+            >>> backend = IUCN(
+            ...     start="2024-01-01", end="2024-12-31",
+            ...     variables=["species:Panthera leo"],
+            ...     lat_lim=[-90.0, 90.0], lon_lim=[-180.0, 180.0],
+            ...     token="placeholder-token",
+            ... )
+            >>> backend.OUTPUT_KIND
+            'tabular'
+            >>> backend.vars
+            ['species:Panthera leo']
+
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "tabular"

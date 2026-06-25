@@ -159,6 +159,10 @@ class Catalog(AbstractCatalog):
         `Catalog()` with no args reads :data:`CATALOG_PATH` (cached);
         passing `datasets=...` skips the disk read (used in tests).
 
+        Args:
+            __context: Opaque context handed in by the pydantic v2 model
+                lifecycle; forwarded to the base class unchanged.
+
         Raises:
             ValueError: Propagated from :func:`_load_catalog_data` when the
                 YAML is missing, empty, or has a malformed row.

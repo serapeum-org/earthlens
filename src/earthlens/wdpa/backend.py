@@ -64,6 +64,24 @@ class WDPA(AbstractDataSource):
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the facade rejects `aggregate=`.
+
+    Examples:
+        - Build a backend for a country query (no network call until
+          `download()`; token is resolved early but not yet sent):
+            ```python
+            >>> from earthlens.wdpa import WDPA
+            >>> backend = WDPA(
+            ...     start="2024-01-01", end="2024-12-31",
+            ...     variables=["KEN"],
+            ...     lat_lim=[-90.0, 90.0], lon_lim=[-180.0, 180.0],
+            ...     token="placeholder-token",
+            ... )
+            >>> backend.OUTPUT_KIND
+            'vector'
+            >>> sorted(backend.vars)
+            ['KEN']
+
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "vector"
