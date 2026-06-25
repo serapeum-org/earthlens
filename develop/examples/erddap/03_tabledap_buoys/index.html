@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/bathymetry/02_catalog_explorer/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/erddap/03_tabledap_buoys/">
       
       
-        <link rel="prev" href="../01_bathymetry_quickstart/">
+        <link rel="prev" href="../02_griddap_sst_anomaly/">
       
       
-        <link rel="next" href="../03_coastal_depth_profile/">
+        <link rel="next" href="../../openaq/quickstart/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Bathymetry — catalog explorer (offline) - earthlens</title>
+        <title>NDBC buoys (tabledap -> DataFrame) - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#bathymetry-catalog-explorer-offline" class="md-skip">
+        <a href="#ndbc-buoys-tabledap-dataframe" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Bathymetry — catalog explorer (offline)
+              NDBC buoys (tabledap -&gt; DataFrame)
             
           </span>
         </div>
@@ -2944,7 +2944,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -2960,7 +2960,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -2973,7 +2973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/introduction/" class="md-nav__link">
+      <a href="../../../reference/erddap/introduction/" class="md-nav__link">
         
   
   
@@ -3001,7 +3001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/usage/" class="md-nav__link">
+      <a href="../../../reference/erddap/usage/" class="md-nav__link">
         
   
   
@@ -3029,7 +3029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/datasets/" class="md-nav__link">
+      <a href="../../../reference/erddap/datasets/" class="md-nav__link">
         
   
   
@@ -3057,7 +3057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/bathymetry/" class="md-nav__link">
+      <a href="../../../reference/erddap/erddap/" class="md-nav__link">
         
   
   
@@ -9596,7 +9596,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -9612,7 +9612,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -9625,14 +9625,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../01_bathymetry_quickstart/" class="md-nav__link">
+      <a href="../01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Bathymetry — DEM quickstart
+    ERDDAP catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_griddap_sst_anomaly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coral Reef Watch SST anomaly (griddap -&gt; raster)
   
 
     
@@ -9669,7 +9697,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry — catalog explorer (offline)
+    NDBC buoys (tabledap -&gt; DataFrame)
   
 
     
@@ -9687,7 +9715,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry — catalog explorer (offline)
+    NDBC buoys (tabledap -&gt; DataFrame)
   
 
     
@@ -9713,10 +9741,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-shipped-dems" class="md-nav__link">
+  <a href="#setup-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The shipped DEMs
+        Setup + request
       
     </span>
   </a>
@@ -9724,10 +9752,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#endpoints-and-attribution" class="md-nav__link">
+  <a href="#peek-at-the-records" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Endpoints and attribution
+        Peek at the records
       
     </span>
   </a>
@@ -9735,10 +9763,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#build-a-request-url" class="md-nav__link">
+  <a href="#per-station-water-temperature" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Build a request URL
+        Per-station water temperature
       
     </span>
   </a>
@@ -9749,118 +9777,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../03_coastal_depth_profile/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bathymetry — coastal depth profile
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../04_gebco_vs_etopo_resolution/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bathymetry — GEBCO vs ETOPO1 resolution
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../05_shaded_relief/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bathymetry — shaded relief
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../06_depth_histogram/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bathymetry — depth distribution
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -13332,10 +13248,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-shipped-dems" class="md-nav__link">
+  <a href="#setup-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The shipped DEMs
+        Setup + request
       
     </span>
   </a>
@@ -13343,10 +13259,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#endpoints-and-attribution" class="md-nav__link">
+  <a href="#peek-at-the-records" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Endpoints and attribution
+        Peek at the records
       
     </span>
   </a>
@@ -13354,10 +13270,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#build-a-request-url" class="md-nav__link">
+  <a href="#per-station-water-temperature" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Build a request URL
+        Per-station water temperature
       
     </span>
   </a>
@@ -13381,7 +13297,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/bathymetry/02_catalog_explorer.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/erddap/03_tabledap_buoys.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -13390,7 +13306,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/bathymetry/02_catalog_explorer.ipynb" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/erddap/03_tabledap_buoys.ipynb" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -14118,26 +14034,34 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9fb90df2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=86cdf21c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="bathymetry-catalog-explorer-offline">Bathymetry — catalog explorer (offline)<a class="anchor-link" href="#bathymetry-catalog-explorer-offline">¶</a></h1><p>Inspect the bundled DEM catalog without touching the network: which DEMs
-ship, their resolutions, the elevation band each exposes, the ERDDAP
-<code>griddap</code> endpoint behind each, and the licence note. This is the no-network
-companion to the live quickstart.</p>
+<h1 id="ndbc-buoys-tabledap-dataframe">NDBC buoys (tabledap -&gt; DataFrame)<a class="anchor-link" href="#ndbc-buoys-tabledap-dataframe">¶</a></h1><p>A <code>tabledap</code> dataset returns record tables as a <code>pandas.DataFrame</code>. Here we pull a day of NDBC standard-meteorological buoy water-temperature observations off the U.S. west coast.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=29c079cd">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=da9c7038">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup-request">Setup + request<a class="anchor-link" href="#setup-request">¶</a></h2><p><code>OUTPUT_KIND</code> is <code>tabular</code>, so <code>download()</code> returns a frame (also written to CSV). <code>aggregate=</code> would be rejected for a table.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9b3da958">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -14150,37 +14074,89 @@ companion to the live quickstart.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.bathymetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
+<span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'earthlens-erddap-ndbc-'</span><span class="p">))</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'erddap'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'cwwcNDBCMet'</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'station'</span><span class="p">,</span> <span class="s1">'time'</span><span class="p">,</span> <span class="s1">'wtmp'</span><span class="p">],</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">124.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">'shape  :'</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'columns:'</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import pandas as pd
+<div class="clipboard-copy-txt" id="cell-1">import tempfile
+from pathlib import Path
 
-from earthlens.bathymetry import Catalog</div>
+from earthlens import EarthLens
+
+out_dir = Path(tempfile.mkdtemp(prefix='earthlens-erddap-ndbc-'))
+df = EarthLens(
+    data_source='erddap',
+    dataset='cwwcNDBCMet',
+    variables=['station', 'time', 'wtmp'],
+    start='2023-01-01',
+    end='2023-01-01',
+    lat_lim=[36.0, 38.0],
+    lon_lim=[-124.0, -122.0],
+    path=out_dir,
+).download()
+
+print('shape  :', df.shape)
+print('columns:', list(df.columns))</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre><span class="ansi-green-fg">2026-06-25 19:51:13.301</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.erddap.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">491</span> - <span class="ansi-bold">ERDDAP cwwcNDBCMet: 17 row(s) written to C:\Users\main\AppData\Local\Temp\earthlens-erddap-ndbc-0pk_is6v\cwwcNDBCMet.csv</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>shape  : (17, 3)
+columns: ['station', 'time (UTC)', 'wtmp (degree_C)']
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a42680de">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c7dcf8aa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="the-shipped-dems">The shipped DEMs<a class="anchor-link" href="#the-shipped-dems">¶</a></h2><p><code>Catalog()</code> loads the sharded <code>catalog/</code> directory (a per-family YAML per
-source plus an <code>_index.yaml</code>). Each row is a frozen pydantic <code>Dataset</code>.</p>
+<h2 id="peek-at-the-records">Peek at the records<a class="anchor-link" href="#peek-at-the-records">¶</a></h2><p>ERDDAP appends units to the column names (e.g. <code>wtmp (degree_C)</code>).</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=be47e85d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8d09750b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -14193,55 +14169,100 @@ source plus an <code>_index.yaml</code>). Each row is a frozen pydantic <code>Da
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span>
-        <span class="s1">'id'</span><span class="p">:</span> <span class="n">d</span><span class="p">,</span>
-        <span class="s1">'resolution'</span><span class="p">:</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">native_resolution</span><span class="p">,</span>
-        <span class="s1">'band'</span><span class="p">:</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span>
-        <span class="s1">'lon'</span><span class="p">:</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">lon_convention</span><span class="p">,</span>
-        <span class="s1">'transport'</span><span class="p">:</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">transport</span><span class="p">,</span>
-    <span class="p">}</span>
-    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<span class="p">]</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'id'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">catalog = Catalog()
-rows = [
-    {
-        'id': d,
-        'resolution': catalog.get(d).native_resolution,
-        'band': catalog.get(d).variable,
-        'lon': catalog.get(d).lon_convention,
-        'transport': catalog.get(d).transport,
+<div class="clipboard-copy-txt" id="cell-2">df.head()</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
-    for d in sorted(catalog.datasets)
-]
-pd.DataFrame(rows).set_index('id')</div>
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>station</th>
+<th>time (UTC)</th>
+<th>wtmp (degree_C)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>46012</td>
+<td>2023-01-01T00:00:00Z</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>1</th>
+<td>46026</td>
+<td>2023-01-01T00:00:00Z</td>
+<td>12.3</td>
+</tr>
+<tr>
+<th>2</th>
+<td>46042</td>
+<td>2023-01-01T00:00:00Z</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>3</th>
+<td>46237</td>
+<td>2023-01-01T00:00:00Z</td>
+<td>11.7</td>
+</tr>
+<tr>
+<th>4</th>
+<td>46269</td>
+<td>2023-01-01T00:00:00Z</td>
+<td>12.5</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ab1f5680">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7345d639">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="endpoints-and-attribution">Endpoints and attribution<a class="anchor-link" href="#endpoints-and-attribution">¶</a></h2><p>Every DEM is one uniform NOAA ERDDAP <code>griddap</code> coverage. The <code>endpoint</code> +
-<code>dataset_id</code> are what the backend turns into a bbox-subset <code>.nc</code> URL.</p>
+<h2 id="per-station-water-temperature">Per-station water temperature<a class="anchor-link" href="#per-station-water-temperature">¶</a></h2>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=68869ae2">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=72a12a6b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -14254,62 +14275,134 @@ pd.DataFrame(rows).set_index('id')</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">):</span>
-    <span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="se">\n</span><span class="s1">  </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s1">/griddap/</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">dataset_id</span><span class="si">}</span><span class="se">\n</span><span class="s1">  </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">license_note</span><span class="si">}</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-3">for d in sorted(catalog.datasets):
-    row = catalog.get(d)
-    print(f'{d}\n  {row.endpoint}/griddap/{row.dataset_id}\n  {row.license_note}\n')</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9468703b">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="build-a-request-url">Build a request URL<a class="anchor-link" href="#build-a-request-url">¶</a></h2><p>The same helper the backend uses turns a row + bbox into the exact <code>griddap</code>
-<code>.nc</code> subset URL — handy for inspecting or fetching by hand.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d7b665ca">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.bathymetry._helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">griddap_subset_url</span>
-
-<span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'gebco_2020'</span><span class="p">)</span>
-<span class="n">griddap_subset_url</span><span class="p">(</span>
-    <span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mf">18.0</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">17.0</span><span class="p">,</span> <span class="mf">26.0</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">wtmp_col</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'wtmp'</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">wtmp_col</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'station'</span><span class="p">)[</span><span class="n">wtmp_col</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">'count'</span><span class="p">,</span> <span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'min'</span><span class="p">,</span> <span class="s1">'max'</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span><span class="si">}</span><span class="s1"> station(s) reported water temperature:'</span><span class="p">)</span>
+<span class="n">summary</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">from earthlens.bathymetry._helpers import griddap_subset_url
+<div class="clipboard-copy-txt" id="cell-3">wtmp_col = [c for c in df.columns if c.startswith('wtmp')][0]
+summary = (
+    df.dropna(subset=[wtmp_col])
+    .groupby('station')[wtmp_col]
+    .agg(['count', 'mean', 'min', 'max'])
+    .round(2)
+)
+print(f'{len(summary)} station(s) reported water temperature:')
+summary</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>8 station(s) reported water temperature:
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-row = catalog.get('gebco_2020')
-griddap_subset_url(
-    row.endpoint, row.dataset_id, row.variable, (-18.0, 25.0, -17.0, 26.0)
-)</div>
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>count</th>
+<th>mean</th>
+<th>min</th>
+<th>max</th>
+</tr>
+<tr>
+<th>station</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>46026</th>
+<td>1</td>
+<td>12.3</td>
+<td>12.3</td>
+<td>12.3</td>
+</tr>
+<tr>
+<th>46237</th>
+<td>1</td>
+<td>11.7</td>
+<td>11.7</td>
+<td>11.7</td>
+</tr>
+<tr>
+<th>46269</th>
+<td>1</td>
+<td>12.5</td>
+<td>12.5</td>
+<td>12.5</td>
+</tr>
+<tr>
+<th>AAMC1</th>
+<td>1</td>
+<td>11.4</td>
+<td>11.4</td>
+<td>11.4</td>
+</tr>
+<tr>
+<th>FTPC1</th>
+<td>1</td>
+<td>12.8</td>
+<td>12.8</td>
+<td>12.8</td>
+</tr>
+<tr>
+<th>PRYC1</th>
+<td>1</td>
+<td>11.9</td>
+<td>11.9</td>
+<td>11.9</td>
+</tr>
+<tr>
+<th>RCMC1</th>
+<td>1</td>
+<td>11.9</td>
+<td>11.9</td>
+<td>11.9</td>
+</tr>
+<tr>
+<th>RTYC1</th>
+<td>1</td>
+<td>13.3</td>
+<td>13.3</td>
+<td>13.3</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -14358,7 +14451,7 @@ griddap_subset_url(
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../01_bathymetry_quickstart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Bathymetry — DEM quickstart">
+          <a href="../02_griddap_sst_anomaly/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Coral Reef Watch SST anomaly (griddap -&amp;gt; raster)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -14368,20 +14461,20 @@ griddap_subset_url(
                 Previous
               </span>
               <div class="md-ellipsis">
-                Bathymetry — DEM quickstart
+                Coral Reef Watch SST anomaly (griddap -&gt; raster)
               </div>
             </div>
           </a>
         
         
           
-          <a href="../03_coastal_depth_profile/" class="md-footer__link md-footer__link--next" aria-label="Next: Bathymetry — coastal depth profile">
+          <a href="../../openaq/quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: OpenAQ quickstart — PM2.5 over a city">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Bathymetry — coastal depth profile
+                OpenAQ quickstart — PM2.5 over a city
               </div>
             </div>
             <div class="md-footer__button md-icon">

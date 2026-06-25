@@ -2944,7 +2944,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -2960,7 +2960,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -2973,7 +2973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/bathymetry/introduction/" class="md-nav__link">
+      <a href="../reference/erddap/introduction/" class="md-nav__link">
         
   
   
@@ -3001,7 +3001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/bathymetry/usage/" class="md-nav__link">
+      <a href="../reference/erddap/usage/" class="md-nav__link">
         
   
   
@@ -3029,7 +3029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/bathymetry/datasets/" class="md-nav__link">
+      <a href="../reference/erddap/datasets/" class="md-nav__link">
         
   
   
@@ -3057,7 +3057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/bathymetry/bathymetry/" class="md-nav__link">
+      <a href="../reference/erddap/erddap/" class="md-nav__link">
         
   
   
@@ -9589,7 +9589,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -9605,7 +9605,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -9618,14 +9618,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
+      <a href="../examples/erddap/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Bathymetry — DEM quickstart
+    ERDDAP catalog explorer
   
 
     
@@ -9646,14 +9646,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/bathymetry/02_catalog_explorer/" class="md-nav__link">
+      <a href="../examples/erddap/02_griddap_sst_anomaly/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Bathymetry — catalog explorer (offline)
+    Coral Reef Watch SST anomaly (griddap -&gt; raster)
   
 
     
@@ -9674,98 +9674,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/bathymetry/03_coastal_depth_profile/" class="md-nav__link">
+      <a href="../examples/erddap/03_tabledap_buoys/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Bathymetry — coastal depth profile
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/bathymetry/04_gebco_vs_etopo_resolution/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bathymetry — GEBCO vs ETOPO1 resolution
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/bathymetry/05_shaded_relief/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bathymetry — shaded relief
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/bathymetry/06_depth_histogram/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Bathymetry — depth distribution
+    NDBC buoys (tabledap -&gt; DataFrame)
   
 
     
@@ -14001,6 +13917,29 @@
 <h2 id="unreleased"><a class="toclink" href="#unreleased">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
 <h3 id="feat"><a class="toclink" href="#feat">Feat</a><a class="headerlink" href="#feat" title="Permanent link">#</a></h3>
 <ul>
+<li><strong>erddap</strong>: add <code>earthlens.erddap</code> — a generic ERDDAP client that reaches many
+  public ERDDAP servers (NOAA CoastWatch / Coral Reef Watch, NCEI, …) from one
+  backend. A curated sharded catalog pins each dataset to a concrete
+  <code>(server_url, dataset_id, protocol)</code>; the <code>protocol</code> sets a <strong>per-instance</strong>
+  <code>OUTPUT_KIND</code> — <code>griddap</code> → raster NetCDF (accepts <code>aggregate=</code>, routed through
+  the pyramids <code>aggregate_netcdf</code> flow), <code>tabledap</code> → tabular <code>pandas.DataFrame</code>.
+  Built on IOOS <code>erddapy</code> (the tabledap <code>to_pandas()</code> path only); the griddap
+  path builds the OPeNDAP <code>.nc</code> URL directly and downloads it (erddapy's instance
+  <code>dataset_id</code> setter eagerly fetches the full coordinate axis and hangs), reading
+  it back via pyramids — earthlens never imports <code>xarray</code>. Validates NetCDF magic
+  bytes before writing (an ERDDAP HTML error page can arrive with a 200), and
+  flux variables are catalog-driven (<code>flux_variables</code> → <code>op="auto"</code> sums). Ships
+  four verified-public CoastWatch datasets (CRW SST anomaly + DHW, NCEI Pathfinder
+  SST, Aqua MODIS chlorophyll [historical 2003–2022], NDBC buoys), the <code>[erddap]</code>
+  optional extra (<code>erddapy</code>), aliases <code>erddap</code> / <code>ioos</code>, intro / usage / datasets
+  / reference docs, and three example notebooks (catalog explorer + griddap +
+  tabledap). Full <code>earthlens datasets</code> CLI integration: <code>validate erddap</code> lints
+  the rows, <code>refresh erddap [--write]</code> regenerates the <code>available_datasets:</code>
+  index by walking each curated server's <code>allDatasets</code> table, <code>audit erddap</code>
+  diffs curated-vs-live, <code>audit erddap --coverage</code> classifies the universe
+  into DONE / addressable (griddap) / table (tabledap) / thin (test datasets) /
+  missing, and <code>curate erddap &lt;id&gt; [--server …]</code> seeds a catalog row from a
+  dataset's <code>/info</code> metadata. Public servers only (no auth module).</li>
 <li><strong>asf</strong>: add <code>earthlens.asf</code> — Alaska Satellite Facility SAR backend with
   <code>asf_search</code>-backed search and the InSAR baseline <code>stack()</code>. Reuses NASA
   Earthdata Login auth from <code>earthlens.earthdata</code> (no second credential
