@@ -32,6 +32,7 @@ module.
 
 from __future__ import annotations
 
+import datetime as dt
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -279,10 +280,8 @@ class ERDDAP(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        import datetime as _dt
-
-        start_dt = _dt.datetime.strptime(start, fmt)
-        end_dt = _dt.datetime.strptime(end, fmt)
+        start_dt = dt.datetime.strptime(start, fmt)
+        end_dt = dt.datetime.strptime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
