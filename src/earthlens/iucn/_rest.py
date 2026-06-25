@@ -29,14 +29,47 @@ import time
 from typing import Any
 
 import requests
+from loguru import logger
 
 from earthlens.iucn.auth import AuthenticationError
 
 #: Base URL of the IUCN Red List v4 API (v3 is retired).
 BASE_URL = "https://api.iucnredlist.org/api/v4"
 
-#: IUCN advises ~2 s between calls; slept before each request (patched in tests).
+#: IUCN advises ~2 s **between** calls. The first call in a session is not
+#: delayed; subsequent calls within this window wait the remainder.
 THROTTLE_SECONDS = 2.0
+
+#: Module-level monotonic time of the last successful `_get` request, and a
+#: companion "has any call happened yet" flag. The flag is what gates the first
+#: call — a `0.0` value alone is ambiguous under a simulated (test) clock that
+#: starts at zero. Tests reset both via :func:`clear_throttle_state`.
+_LAST_CALL_MONOTONIC: float = 0.0
+_CALLED_ONCE: bool = False
+
+#: Retry policy for transient upstream failures (5xx / 429 / connection errors).
+MAX_RETRIES = 5
+BACKOFF_FACTOR = 1.0
+
+#: HTTP statuses considered transient and worth retrying.
+_RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
+
+
+def clear_throttle_state() -> None:
+    """Reset the inter-call throttle (used by tests to isolate runs)."""
+    global _LAST_CALL_MONOTONIC, _CALLED_ONCE
+    _LAST_CALL_MONOTONIC = 0.0
+    _CALLED_ONCE = False
+
+
+def _parse_retry_after(value: str | None) -> float | None:
+    """Parse a `Retry-After` header value into seconds, or `None` if absent."""
+    if not value:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 #: Ordered assessment attribute columns and their pandas dtypes.
 IUCN_COLUMNS: dict[str, str] = {
@@ -64,6 +97,22 @@ def _session(session: requests.Session | None) -> requests.Session:
     return session if session is not None else requests.Session()
 
 
+def _throttle() -> None:
+    """Wait so that consecutive calls are at least `THROTTLE_SECONDS` apart.
+
+    The first call in a session does not wait; subsequent calls sleep only the
+    remaining portion of the window. Tests patch `time.sleep`, making this
+    instant under the fake clock.
+    """
+    global _LAST_CALL_MONOTONIC, _CALLED_ONCE
+    if _CALLED_ONCE:
+        elapsed = time.monotonic() - _LAST_CALL_MONOTONIC
+        if elapsed < THROTTLE_SECONDS:
+            time.sleep(THROTTLE_SECONDS - elapsed)
+    _LAST_CALL_MONOTONIC = time.monotonic()
+    _CALLED_ONCE = True
+
+
 def _get(
     session: requests.Session,
     token: str,
@@ -72,8 +121,14 @@ def _get(
 ) -> dict:
     """GET a v4 endpoint with the Bearer header and return parsed JSON.
 
-    Sleeps :data:`THROTTLE_SECONDS` before the request (IUCN's advisory) and
-    maps an HTTP 401 to :class:`AuthenticationError`.
+    Throttles consecutive calls to at most one every :data:`THROTTLE_SECONDS`
+    (the IUCN advisory; the first call does not wait). Retries on `429`
+    (honouring `Retry-After`) and on `500`/`502`/`503`/`504` with capped
+    exponential back-off. Maps `401` to :class:`AuthenticationError`, `404`
+    to a clear :class:`ValueError` naming the path so a typo'd species /
+    country reads as "not found in the IUCN Red List" rather than a raw
+    `HTTPError`. The Bearer token is held by the session and never echoed
+    by `requests` in error messages.
 
     Args:
         session: The HTTP session.
@@ -87,21 +142,63 @@ def _get(
 
     Raises:
         AuthenticationError: On an HTTP 401 (missing/invalid token).
+        ValueError: On an HTTP 404 (unknown species / country / endpoint).
+        RuntimeError: On any other non-2xx status after retries are exhausted,
+            or on a non-recoverable transport error.
     """
-    time.sleep(THROTTLE_SECONDS)
-    response = session.get(
-        f"{BASE_URL}/{path}",
-        params=params or {},
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=60,
+    url = f"{BASE_URL}/{path}"
+    headers = {"Authorization": f"Bearer {token}"}
+    last_status: int | None = None
+    for attempt in range(MAX_RETRIES + 1):
+        _throttle()
+        try:
+            response = session.get(url, params=params or {}, headers=headers, timeout=60)
+        except requests.RequestException as exc:
+            if attempt < MAX_RETRIES:
+                wait = BACKOFF_FACTOR * (2**attempt)
+                logger.warning(
+                    f"IUCN transport error on {path!r}: {type(exc).__name__}; "
+                    f"retry {attempt + 1}/{MAX_RETRIES} after {wait:.1f}s"
+                )
+                time.sleep(wait)
+                continue
+            raise RuntimeError(
+                f"IUCN Red List transport error on /{path} ({type(exc).__name__})."
+            ) from None
+        status = getattr(response, "status_code", None)
+        if status == 401:
+            raise AuthenticationError(
+                "IUCN rejected the token (HTTP 401). Check IUCN_TOKEN / the token= "
+                "argument, or sign up at https://api.iucnredlist.org/users/sign_up."
+            )
+        if status == 404:
+            raise ValueError(
+                f"IUCN Red List returned 404 for /{path}; check the species "
+                "binomial or country code."
+            )
+        last_status = status
+        if status in _RETRY_STATUSES and attempt < MAX_RETRIES:
+            retry_after = _parse_retry_after(response.headers.get("Retry-After"))
+            wait = (
+                retry_after
+                if retry_after is not None
+                else BACKOFF_FACTOR * (2**attempt)
+            )
+            logger.warning(
+                f"IUCN Red List returned HTTP {status} on {path!r}; "
+                f"retry {attempt + 1}/{MAX_RETRIES} after {wait:.1f}s"
+            )
+            time.sleep(wait)
+            continue
+        if status is None or status >= 400:
+            raise RuntimeError(
+                f"IUCN Red List returned HTTP {status} for /{path}."
+            )
+        return response.json()
+    raise RuntimeError(
+        f"IUCN Red List exhausted {MAX_RETRIES} retries on /{path} "
+        f"(last status {last_status})."
     )
-    if getattr(response, "status_code", None) == 401:
-        raise AuthenticationError(
-            "IUCN rejected the token (HTTP 401). Check IUCN_TOKEN / the token= "
-            "argument, or sign up at https://api.iucnredlist.org/users/sign_up."
-        )
-    response.raise_for_status()
-    return response.json()
 
 
 def _category(assessment: dict) -> str | None:
@@ -126,16 +223,23 @@ def _flatten_label(value: Any) -> str | None:
 
     Several v4 detail fields (`population_trend`, sometimes `criteria`) come
     back as a wrapped object rather than a bare string. Prefer the English
-    description; fall back to the code; pass strings through unchanged.
+    description; fall back to the code; pass strings through unchanged; flatten
+    a list of any of the above to a `"; "`-joined string so future v4 changes
+    that wrap a field in a list cannot silently drop the data.
 
     Args:
-        value: A bare string, a `{description, code}` wrapper, or `None`.
+        value: A bare string, a `{description, code}` wrapper, a list of either,
+            or `None`.
 
     Returns:
         The flattened label, or `None`.
     """
     if value is None or isinstance(value, str):
         return value
+    if isinstance(value, list):
+        parts = [_flatten_label(v) for v in value if v is not None]
+        joined = "; ".join(p for p in parts if p)
+        return joined or None
     if isinstance(value, dict):
         description = value.get("description")
         if isinstance(description, dict):

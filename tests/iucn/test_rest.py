@@ -36,6 +36,22 @@ class TestFlattenLabel:
         """A dict with neither description nor code yields `None`."""
         assert _flatten_label({}) is None
 
+    def test_list_of_strings_joined(self):
+        """A list of strings is `'; '`-joined so the data is not silently dropped."""
+        assert _flatten_label(["A2c", "B1ab"]) == "A2c; B1ab"
+
+    def test_list_of_wrappers_flattened(self):
+        """A list of `{description, code}` wrappers flattens each then joins."""
+        wrappers = [
+            {"description": {"en": "Decreasing"}, "code": "1"},
+            {"description": {"en": "Stable"}, "code": "2"},
+        ]
+        assert _flatten_label(wrappers) == "Decreasing; Stable"
+
+    def test_empty_list_is_none(self):
+        """An empty list yields `None`, not an empty string."""
+        assert _flatten_label([]) is None
+
 
 @pytest.mark.iucn
 class TestCategory:
