@@ -1490,7 +1490,15 @@ def _erddap_grouped(catalog: Any) -> dict[str, list[str]]:
     by many independent servers — so the live "available" set is the union
     of the `allDatasets` table of each distinct `server_url` the curated
     rows reference. Grouped per server so the diff shows which server a new
-    id came from (and a single unreachable server doesn't lose the rest).
+    id came from.
+
+    Fails fast if any curated server is unreachable (the `_get_json` error
+    propagates and `refresh_one` / `audit_one` report `"error"`). This is
+    deliberate: under `--write`, a partial crawl would rewrite `_index.yaml`
+    without a down server's ids, and the loader's `curated ⊆ available`
+    invariant would then reject that server's curated rows. The empty-fetch
+    seatbelt only guards the all-servers-down case, so a partial result must
+    abort rather than persist.
 
     Args:
         catalog: The loaded ERDDAP `Catalog`.
@@ -1954,7 +1962,10 @@ def _erddap_classify(dataset_id: str, structure: str | None, curated: set[str]) 
     """Bucket one ERDDAP dataset id by curation status and data structure.
 
     * `DONE` — already in the curated `datasets:` map.
-    * `thin` — an ERDDAP test / demo dataset (id starts with `"test"`).
+    * `thin` — an ERDDAP test / demo dataset, detected by the heuristic
+      `id.lower().startswith("test")` (ERDDAP's convention for its `testGrid…`
+      / `testTable…` fixtures). A legitimately `test`-prefixed dataset would
+      be misclassified here, but coverage is advisory only.
     * `addressable` — a `grid` (griddap) dataset, the raster universe worth
       curating next.
     * `table` — a `table` (tabledap) dataset, the separate tabular track.
