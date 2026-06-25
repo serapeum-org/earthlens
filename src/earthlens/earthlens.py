@@ -296,13 +296,14 @@ class EarthLens:
             ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bdc',
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
-             'earth-search', 'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms',
-             'g-portal', 'gdacs', 'gee', 'ghs', 'ghsl', 'google-earth-engine',
-             'hdx', 'human-settlement', 'insar', 'jaxa', 'jaxa-earth',
-             'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
-             'openaq', 'openeo', 'overture', 'planetary-computer', 'radar',
-             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'world-pop', 'worldpop']
+             'earth-search', 'earthdata', 'ecmwf', 'erddap', 'eumetsat',
+             'fdsn', 'firms', 'g-portal', 'gdacs', 'gee', 'ghs', 'ghsl',
+             'google-earth-engine', 'hdx', 'human-settlement', 'insar', 'ioos',
+             'jaxa', 'jaxa-earth', 'landsat', 'national-water-model', 'nexrad',
+             'nwis', 'nwm', 'nwp', 'openaq', 'openeo', 'overture',
+             'planetary-computer', 'radar', 'sentinel-hub', 'sentinelhub',
+             'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis', 'usgs-water',
+             'veda', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -559,6 +560,13 @@ class EarthLens:
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            # Generic ERDDAP client — one backend for many public ERDDAP
+            # servers (NOAA CoastWatch / CRW, NCEI, …). `dataset=<id>`
+            # picks a curated row; its `protocol` sets the per-instance
+            # OUTPUT_KIND (griddap -> raster, tabledap -> tabular). Alias
+            # "ioos".
+            "erddap": ("earthlens.erddap", "ERDDAP", "erddap", {}),
+            "ioos": ("earthlens.erddap", "ERDDAP", "erddap", {}),
         }
     )
 
