@@ -12723,6 +12723,24 @@
 <h2 id="unreleased"><a class="toclink" href="#unreleased">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
 <h3 id="feat"><a class="toclink" href="#feat">Feat</a><a class="headerlink" href="#feat" title="Permanent link">#</a></h3>
 <ul>
+<li><strong>erddap</strong>: add <code>earthlens.erddap</code> — a generic ERDDAP client that reaches many
+  public ERDDAP servers (NOAA CoastWatch / Coral Reef Watch, NCEI, …) from one
+  backend. A curated sharded catalog pins each dataset to a concrete
+  <code>(server_url, dataset_id, protocol)</code>; the <code>protocol</code> sets a <strong>per-instance</strong>
+  <code>OUTPUT_KIND</code> — <code>griddap</code> → raster NetCDF (accepts <code>aggregate=</code>, routed through
+  the pyramids <code>aggregate_netcdf</code> flow), <code>tabledap</code> → tabular <code>pandas.DataFrame</code>.
+  Built on IOOS <code>erddapy</code> (the tabledap <code>to_pandas()</code> path only); the griddap
+  path builds the OPeNDAP <code>.nc</code> URL directly and downloads it (erddapy's instance
+  <code>dataset_id</code> setter eagerly fetches the full coordinate axis and hangs), reading
+  it back via pyramids — earthlens never imports <code>xarray</code>. Validates NetCDF magic
+  bytes before writing (an ERDDAP HTML error page can arrive with a 200), and
+  flux variables are catalog-driven (<code>flux_variables</code> → <code>op="auto"</code> sums). Ships
+  four verified-public CoastWatch datasets (CRW SST anomaly + DHW, NCEI Pathfinder
+  SST, Aqua MODIS chlorophyll [historical 2003–2022], NDBC buoys), the <code>[erddap]</code>
+  optional extra (<code>erddapy</code>), aliases <code>erddap</code> / <code>ioos</code>, intro / usage / datasets
+  / reference docs, and three example notebooks (catalog explorer + griddap +
+  tabledap). Public servers only (no auth module); a catalog-refresh crawler is a
+  follow-on.</li>
 <li><strong>asf</strong>: add <code>earthlens.asf</code> — Alaska Satellite Facility SAR backend with
   <code>asf_search</code>-backed search and the InSAR baseline <code>stack()</code>. Reuses NASA
   Earthdata Login auth from <code>earthlens.earthdata</code> (no second credential
