@@ -6,10 +6,14 @@
 
 datasets:
   circ-alos-2-alos-2-circ-l1-rad:
+    aliases:
+    - alos-2-alos-2-circ-l1-rad
     protocol: gportal
     short_name: '21001000'
     description: "CIRC \xE2\u20AC\u201D ALOS-2 CIRC L1 RAD"
   circ-alos-2-alos-2-circ-lst:
+    aliases:
+    - alos-2-alos-2-circ-lst
     protocol: gportal
     short_name: '21001001'
     description: "CIRC \xE2\u20AC\u201D ALOS-2 CIRC LST"
@@ -22,6 +26,8 @@ datasets:
     short_name: '20004000'
     description: "MOS-1b \xE2\u20AC\u201D MOS-1b/MESSR"
   slats-shirop-panchromatic-image:
+    aliases:
+    - shirop-panchromatic-image
     protocol: gportal
     short_name: '30000000'
     description: "SLATS \xE2\u20AC\u201D Panchromatic Image"

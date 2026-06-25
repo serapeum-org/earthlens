@@ -6,120 +6,169 @@
 
 datasets:
   earthcare-atlid-l1-atl-nom:
+    aliases:
+    - atlid-l1-atl-nom
     protocol: gportal
     short_name: '16011000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL1/L1b Backscatter Coefficient\xEF\
       \xBC\u02C6ATL_NOM\xEF\xBC\u2030"
   earthcare-atlid-l2-atl-aer:
+    aliases:
+    - atlid-l2-atl-aer
     protocol: gportal
     short_name: '16012002'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Aerosol Profiles\xEF\xBC\u02C6\
       ATL_AER\xEF\xBC\u2030"
   earthcare-atlid-l2-atl-af:
+    aliases:
+    - atlid-l2-atl-af
     protocol: gportal
     short_name: '16012001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Feature Mask\xEF\xBC\u02C6ATL_AF_\xEF\
       \xBC\u2030"
   earthcare-atlid-l2-atl-ald:
+    aliases:
+    - atlid-l2-atl-ald
     protocol: gportal
     short_name: '16012007'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Aerosol Layer Descriptor\xEF\xBC\
       \u02C6ATL_ALD\xEF\xBC\u2030"
   earthcare-atlid-l2-atl-cla:
+    aliases:
+    - atlid-l2-atl-cla
     protocol: gportal
     short_name: '16012000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud and Aerosol\xEF\xBC\u02C6\
       ATL_CLA\xEF\xBC\u2030"
   earthcare-atlid-l2-atl-cth:
+    aliases:
+    - atlid-l2-atl-cth
     protocol: gportal
     short_name: '16012006'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud Top Height\xEF\xBC\u02C6\
       ATL_CTH\xEF\xBC\u2030"
   earthcare-atlid-l2-atl-ebd:
+    aliases:
+    - atlid-l2-atl-ebd
     protocol: gportal
     short_name: '16012003'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Extinction, Backscatter, Depolarisation\xEF\
       \xBC\u02C6ATL_EBD\xEF\xBC\u2030"
   earthcare-atlid-l2-atl-ice:
+    aliases:
+    - atlid-l2-atl-ice
     protocol: gportal
     short_name: '16012005'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Ice Cloud Properties\xEF\xBC\u02C6\
       ATL_ICE\xEF\xBC\u2030"
   earthcare-atlid-l2-atl-tc:
+    aliases:
+    - atlid-l2-atl-tc
     protocol: gportal
     short_name: '16012004'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Target Classification\xEF\xBC\u02C6\
       ATL_TC_\xEF\xBC\u2030"
   earthcare-atlid-msi-bbr-l2-bm-flx:
+    aliases:
+    - atlid-msi-bbr-l2-bm-flx
     protocol: gportal
     short_name: '16082001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/BBR-estimated TOA fluxes (BM__FLX)"
   earthcare-atlid-msi-l2-am-acd:
+    aliases:
+    - atlid-msi-l2-am-acd
     protocol: gportal
     short_name: '16072001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Aerosol column descriptor\xEF\xBC\
       \u02C6AM__ACD\xEF\xBC\u2030"
   earthcare-atlid-msi-l2-am-cth:
+    aliases:
+    - atlid-msi-l2-am-cth
     protocol: gportal
     short_name: '16072000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud top height\xEF\xBC\u02C6\
       AM__CTH\xEF\xBC\u2030"
   earthcare-atlid-msi-l2-am-mo:
+    aliases:
+    - atlid-msi-l2-am-mo
     protocol: gportal
     short_name: '16082000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Merged observations\xEF\xBC\u02C6\
       AM_MO_\xEF\xBC\u2030"
   earthcare-bbr-l1-bbr-nom:
+    aliases:
+    - bbr-l1-bbr-nom
     protocol: gportal
     short_name: '16031000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL1/L1b Radiometric\xEF\xBC\u02C6\
       BBR_NOM\xEF\xBC\u2030"
   earthcare-bbr-msi-l2-bm-rad:
+    aliases:
+    - bbr-msi-l2-bm-rad
     protocol: gportal
     short_name: '16092000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/BBR unfiltered radiances\xEF\xBC\
       \u02C6BM__RAD\xEF\xBC\u2030"
   earthcare-cpr-atlid-l2-ac-clp:
+    aliases:
+    - cpr-atlid-l2-ac-clp
     protocol: gportal
     short_name: '16042000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/CPR-ATLID Synergy Cloud\xEF\xBC\
       \u02C6AC__CLP\xEF\xBC\u2030"
   earthcare-cpr-atlid-l2-ac-tc:
+    aliases:
+    - cpr-atlid-l2-ac-tc
     protocol: gportal
     short_name: '16042001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/CPR-ATLID target classification\
       \ (AC__TC_)"
   earthcare-cpr-atlid-msi-bbr-l2-all-3d:
+    aliases:
+    - cpr-atlid-msi-bbr-l2-all-3d
     protocol: gportal
     short_name: '16052004'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Constructed 3D scene indecees\xEF\
       \xBC\u02C6ALL_3D_\xEF\xBC\u2030"
   earthcare-cpr-atlid-msi-bbr-l2-all-df:
+    aliases:
+    - cpr-atlid-msi-bbr-l2-all-df
     protocol: gportal
     short_name: '16062001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Difference 1D-Modelled and BBR-Estimated\
       \ TOA Fluxes\xEF\xBC\u02C6ALL_DF_\xEF\xBC\u2030"
   earthcare-cpr-atlid-msi-bbr-l2-all-rad:
+    aliases:
+    - cpr-atlid-msi-bbr-l2-all-rad
     protocol: gportal
     short_name: '16062000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Four Sensors Synergy Radiation\
       \ Budget\xEF\xBC\u02C6ALL_RAD\xEF\xBC\u2030"
   earthcare-cpr-atlid-msi-l2-acm-cap:
+    aliases:
+    - cpr-atlid-msi-l2-acm-cap
+    - earthcare-precip
     protocol: gportal
     short_name: '16052002'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud and precipitation best estimates\xEF\
       \xBC\u02C6ACM_CAP\xEF\xBC\u2030"
   earthcare-cpr-atlid-msi-l2-acm-clp:
+    aliases:
+    - cpr-atlid-msi-l2-acm-clp
     protocol: gportal
     short_name: '16052000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/CPR-ATLID-MSI Synergy Cloud\xEF\
       \xBC\u02C6ACM_CLP\xEF\xBC\u2030"
   earthcare-cpr-atlid-msi-l2-acm-com:
+    aliases:
+    - cpr-atlid-msi-l2-acm-com
     protocol: gportal
     short_name: '16052003'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Composite cloud /aerosol profiles\
       \ derived from L2a\xEF\xBC\u02C6ACM_COM\xEF\xBC\u2030"
   earthcare-cpr-atlid-msi-l2-acm-rt:
+    aliases:
+    - cpr-atlid-msi-l2-acm-rt
     protocol: gportal
     short_name: '16052001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Radiative flux and heating rate\
@@ -128,81 +177,112 @@ datasets:
     aliases:
     - earthcare
     - cpr
+    - cpr-eco
     protocol: gportal
     short_name: '16002000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Echo Product\xEF\xBC\u02C6CPR_ECO\xEF\
       \xBC\u2030"
   earthcare-cpr-l1-cpr-nom:
+    aliases:
+    - cpr-l1-cpr-nom
     protocol: gportal
     short_name: '16001000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL1/CPR L1b\xEF\xBC\u02C6CPR_NOM\xEF\
       \xBC\u2030"
   earthcare-cpr-l2-cpr-cd:
+    aliases:
+    - cpr-l2-cpr-cd
     protocol: gportal
     short_name: '16002003'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Corrected CPR Doppler Measurements\xEF\
       \xBC\u02C6CPR_CD_\xEF\xBC\u2030"
   earthcare-cpr-l2-cpr-cld:
+    aliases:
+    - cpr-l2-cpr-cld
     protocol: gportal
     short_name: '16002005'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud profiles\xEF\xBC\u02C6CPR_CLD\xEF\
       \xBC\u2030"
   earthcare-cpr-l2-cpr-clp:
+    aliases:
+    - cpr-l2-cpr-clp
     protocol: gportal
     short_name: '16002001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud Product\xEF\xBC\u02C6CPR_CLP\xEF\
       \xBC\u2030"
   earthcare-cpr-l2-cpr-fmr:
+    aliases:
+    - cpr-l2-cpr-fmr
     protocol: gportal
     short_name: '16002002'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Feature Mask and Corrected Reflectivity\xEF\
       \xBC\u02C6CPR_FMR\xEF\xBC\u2030"
   earthcare-cpr-l2-cpr-tc:
+    aliases:
+    - cpr-l2-cpr-tc
     protocol: gportal
     short_name: '16002004'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Target Classification\xEF\xBC\u02C6\
       CPR_TC_\xEF\xBC\u2030"
   earthcare-msi-l1-msi-nom-1b:
+    aliases:
+    - msi-l1-msi-nom-1b
     protocol: gportal
     short_name: '16021000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL1/L1b Radiance\xEF\xBC\u02C6MSI_NOM_1B\xEF\
       \xBC\u2030"
   earthcare-msi-l1-msi-rgr-1c:
+    aliases:
+    - msi-l1-msi-rgr-1c
     protocol: gportal
     short_name: '16021001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL1/L1c Radiance\xEF\xBC\u02C6MSI_RGR_1C\xEF\
       \xBC\u2030"
   earthcare-msi-l2-msi-aot:
+    aliases:
+    - msi-l2-msi-aot
     protocol: gportal
     short_name: '16022003'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Aerosol Optical Thickness \xEF\
       \xBC\u02C6MSI_AOT\xEF\xBC\u2030"
   earthcare-msi-l2-msi-clp:
+    aliases:
+    - msi-l2-msi-clp
     protocol: gportal
     short_name: '16022000'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud Product\xEF\xBC\u02C6MSI_CLP\xEF\
       \xBC\u2030"
   earthcare-msi-l2-msi-cm:
+    aliases:
+    - msi-l2-msi-cm
     protocol: gportal
     short_name: '16022001'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud Mask \xEF\xBC\u02C6MSI_CM_\xEF\
       \xBC\u2030"
   earthcare-msi-l2-msi-cop:
+    aliases:
+    - msi-l2-msi-cop
     protocol: gportal
     short_name: '16022002'
     description: "EarthCARE \xE2\u20AC\u201D LEVEL2/Cloud Microphysical Parameters\xEF\
       \xBC\u02C6MSI_COP\xEF\xBC\u2030"
   earthcare-supprt-data-aux-2d:
+    aliases:
+    - supprt-data-aux-2d
     protocol: gportal
     short_name: '16104000'
     description: "EarthCARE \xE2\u20AC\u201D Environment Auxiliary\xEF\xBC\u02C6AUX_2D_\xEF\
       \xBC\u2030"
   earthcare-supprt-data-aux-3d:
+    aliases:
+    - supprt-data-aux-3d
     protocol: gportal
     short_name: '16104001'
     description: "EarthCARE \xE2\u20AC\u201D Environment Auxiliary\xEF\xBC\u02C6AUX_3D_\xEF\
       \xBC\u2030"
   earthcare-supprt-data-x-jsg:
+    aliases:
+    - supprt-data-x-jsg
     protocol: gportal
     short_name: '16101000'
     description: "EarthCARE \xE2\u20AC\u201D L1d Joint Standard Grid (X-JSG)"
