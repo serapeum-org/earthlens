@@ -87,12 +87,15 @@ class TestSupportedProviders:
         """CHC's FTP product-tree walk is wired up."""
         assert "chc" in supported_providers()
 
-    def test_twenty_refreshable_providers(self):
-        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm, jaxa)."""
-        assert len(supported_providers()) == 20, sorted(supported_providers())
+    def test_twentyone_refreshable_providers(self):
+        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm, jaxa, erddap)."""
+        assert len(supported_providers()) == 21, sorted(supported_providers())
         assert "s3" in supported_providers(), "s3 regenerates its index from curated"
         assert "nwm" in supported_providers(), "nwm walks its operational bucket"
         assert "jaxa" in supported_providers(), "jaxa lists both SDK universes"
+        assert (
+            "erddap" in supported_providers()
+        ), "erddap crawls each server's allDatasets"
 
 
 class TestEcmwfRefresher:
@@ -108,6 +111,49 @@ class TestEcmwfRefresher:
         outcome = refresh_one(_info("ecmwf"))
         assert outcome.status == "ok", "ecmwf refresh ran"
         assert outcome.live_count == 1, "one CDS dataset id listed"
+
+
+class TestErddapRefresher:
+    """Tests for the ERDDAP `allDatasets` crawler."""
+
+    @staticmethod
+    def _all_datasets(*ids):
+        """A faked ERDDAP allDatasets.json body (with the meta-row first)."""
+        rows = [["allDatasets"]] + [[i] for i in ids]
+        return {"table": {"columnNames": ["datasetID"], "rows": rows}}
+
+    def test_dataset_ids_drops_meta_row_and_dedupes(self, monkeypatch):
+        """The synthetic `allDatasets` row is excluded; ids are sorted + unique."""
+        from earthlens.cli.refresh import _erddap_dataset_ids
+
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: self._all_datasets("b", "a", "a"),
+        )
+        assert _erddap_dataset_ids("https://x/erddap/") == ["a", "b"]
+
+    def test_grouped_queries_each_curated_server_once(self, monkeypatch):
+        """Each distinct curated server_url is hit once at its allDatasets table."""
+        from earthlens.cli.refresh import _erddap_grouped
+
+        calls = []
+
+        def fake(url, **kw):
+            calls.append(url)
+            return self._all_datasets("NOAA_DHW", "cwwcNDBCMet")
+
+        monkeypatch.setattr(refresh_mod, "_get_json", fake)
+        grouped = _erddap_grouped(load_catalog(_info("erddap")))
+        assert len(grouped) == 1, "the shipped catalog references one server"
+        assert all(
+            u.endswith("/tabledap/allDatasets.json?datasetID") for u in calls
+        ), f"unexpected endpoint(s): {calls}"
+        assert _flatten(grouped) == ["NOAA_DHW", "cwwcNDBCMet"]
+
+    def test_erddap_is_supported(self):
+        """erddap is a registered live refresher."""
+        assert "erddap" in supported_providers()
 
 
 class TestOpeneoRefresher:

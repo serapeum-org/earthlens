@@ -1464,6 +1464,44 @@ def refresh_ghsl_tiles() -> tuple[str, int]:
     return str(TILE_SCHEMA_PATH), len(frame)
 
 
+def _erddap_dataset_ids(server_url: str) -> list[str]:
+    """List every dataset id one ERDDAP server publishes.
+
+    Reads the server's synthetic `allDatasets` table (every ERDDAP exposes
+    it) via tabledap JSON, asking only for the `datasetID` column. The
+    `allDatasets` meta-row that the table lists for itself is dropped.
+
+    Args:
+        server_url: An ERDDAP base URL (a trailing slash is tolerated).
+
+    Returns:
+        The server's dataset ids, sorted and de-duplicated.
+    """
+    base = server_url.rstrip("/")
+    body = _get_json(f"{base}/tabledap/allDatasets.json?datasetID")
+    rows = body["table"]["rows"]
+    return sorted({row[0] for row in rows if row[0] != "allDatasets"})
+
+
+def _erddap_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every dataset on each ERDDAP server the catalog curates from.
+
+    ERDDAP has no single global dataset universe — it is a protocol spoken
+    by many independent servers — so the live "available" set is the union
+    of the `allDatasets` table of each distinct `server_url` the curated
+    rows reference. Grouped per server so the diff shows which server a new
+    id came from (and a single unreachable server doesn't lose the rest).
+
+    Args:
+        catalog: The loaded ERDDAP `Catalog`.
+
+    Returns:
+        `{server_url: [dataset_id, …]}` for every distinct curated server.
+    """
+    servers = sorted({row.server_url for row in catalog.datasets.values()})
+    return {server: _erddap_dataset_ids(server) for server in servers}
+
+
 #: Provider id -> a callable regenerating a bundled GIS artefact (not an
 #: `available_*` index). Surfaced by `refresh <provider> --tiles`.
 _TILE_REGENS: dict[str, Callable[[], tuple[str, int]]] = {"ghsl": refresh_ghsl_tiles}
@@ -1493,6 +1531,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "s3": _s3_grouped,
     "nwm": _nwm_grouped,
     "jaxa": _jaxa_grouped,
+    "erddap": _erddap_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -1521,6 +1560,11 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     # flatten=True path unions the two protocol groups into a single sorted
     # list; the curated `datasets:` block stays hand-authored.
     "jaxa": _index_writer("available_datasets"),
+    # ERDDAP's `_index.yaml` carries an `available_datasets:` block listing
+    # every dataset id across the curated servers; the flatten path unions
+    # the per-server groups. The curated `datasets:` rows stay hand-authored
+    # in the per-slice YAML files.
+    "erddap": _index_writer("available_datasets"),
 }
 
 

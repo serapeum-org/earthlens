@@ -78,7 +78,7 @@ class TestLoaderEdgeCases:
             "    dataset_id: ds1\n"
             "    protocol: tabledap\n"
         )
-        datasets = _load_catalog_data(f)
+        _available, datasets = _load_catalog_data(f)
         assert datasets["ds1"].protocol == "tabledap"
 
     def test_duplicate_key_across_files_rejected(self, tmp_path):
@@ -140,7 +140,7 @@ class TestLoaderEdgeCases:
             return real_stat(self, *args, **kwargs)
 
         monkeypatch.setattr(Path, "stat", _stat)
-        datasets = _load_catalog_data(tmp_path)
+        _available, datasets = _load_catalog_data(tmp_path)
         assert datasets["ds1"].protocol == "tabledap"
 
     def test_invalid_protocol_rejected(self, tmp_path):
