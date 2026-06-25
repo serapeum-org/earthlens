@@ -1,0 +1,506 @@
+# GPM / TRMM / GSMaP precipitation products via G-Portal.
+# AUTO-GENERATED from the upstream SDK catalog by
+# `python planning/jaxa/captures/build_catalog.py`. Hand-edit the script
+# (e.g. friendly slugs, descriptions, default bands) rather than this file,
+# or new ids will revert on the next regeneration.
+
+datasets:
+  gpm-dpr-kupr-l1b:
+    aliases:
+    - gpm
+    - dpr
+    - kupr
+    - dpr-kupr-l1b
+    protocol: gportal
+    short_name: '12001000'
+    description: "GPM \xE2\u20AC\u201D LEVEL1/KuPR L1B Received Power"
+  gpm-dpr-l1-kapr-l1b-received-power:
+    aliases:
+    - dpr-l1-kapr-l1b-received-power
+    protocol: gportal
+    short_name: '12001001'
+    description: "GPM \xE2\u20AC\u201D LEVEL1/KaPR L1B Received Power"
+  gpm-dpr-l2-dpr-l2-precipitation:
+    aliases:
+    - dpr-l2-dpr-l2-precipitation
+    protocol: gportal
+    short_name: '12002002'
+    description: "GPM \xE2\u20AC\u201D LEVEL2/DPR L2 Precipitation"
+  gpm-dpr-l2-dpr-l2-spectral-latent-heating:
+    aliases:
+    - dpr-l2-dpr-l2-spectral-latent-heating
+    protocol: gportal
+    short_name: '12002003'
+    description: "GPM \xE2\u20AC\u201D LEVEL2/DPR L2 Spectral Latent Heating"
+  gpm-dpr-l2-kapr-l2-precipitation:
+    aliases:
+    - dpr-l2-kapr-l2-precipitation
+    protocol: gportal
+    short_name: '12002001'
+    description: "GPM \xE2\u20AC\u201D LEVEL2/KaPR L2 Precipitation"
+  gpm-dpr-l2-kupr-l2-precipitation:
+    aliases:
+    - dpr-l2-kupr-l2-precipitation
+    protocol: gportal
+    short_name: '12002000'
+    description: "GPM \xE2\u20AC\u201D LEVEL2/KuPR L2 Precipitation"
+  gpm-dpr-l3-daily-hdf:
+    aliases:
+    - dpr-l3-daily-hdf
+    protocol: gportal
+    short_name: '12003000'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/DPR L3 Precipitation (Daily HDF)"
+  gpm-dpr-l3-daily-text:
+    aliases:
+    - dpr-l3-daily-text
+    protocol: gportal
+    short_name: '12003001'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/DPR L3 Precipitation (Daily TEXT)"
+  gpm-dpr-l3-dpr-l3-gridded-orbital-spectra:
+    aliases:
+    - dpr-l3-dpr-l3-gridded-orbital-spectra
+    protocol: gportal
+    short_name: '12003006'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/DPR L3 Gridded Orbital Spectral Latent\
+      \ Heating"
+  gpm-dpr-l3-dpr-l3-monthly-spectral-latent:
+    aliases:
+    - dpr-l3-dpr-l3-monthly-spectral-latent
+    protocol: gportal
+    short_name: '12003007'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/DPR L3 Monthly Spectral Latent Heating"
+  gpm-dpr-l3-monthly-hdf:
+    aliases:
+    - dpr-l3-monthly-hdf
+    protocol: gportal
+    short_name: '12003004'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/DPR L3  Precipitation (Monthly HDF)"
+  gpm-environment-auxiliary-dpr-environment-auxiliary:
+    aliases:
+    - environment-auxiliary-dpr-environment-auxiliary
+    protocol: gportal
+    short_name: '12032002'
+    description: "GPM \xE2\u20AC\u201D DPR Environment Auxiliary"
+  gpm-environment-auxiliary-kapr-environment-auxiliary:
+    aliases:
+    - environment-auxiliary-kapr-environment-auxiliary
+    protocol: gportal
+    short_name: '12032001'
+    description: "GPM \xE2\u20AC\u201D KaPR Environment Auxiliary"
+  gpm-environment-auxiliary-kupr-environment-auxiliary:
+    aliases:
+    - environment-auxiliary-kupr-environment-auxiliary
+    protocol: gportal
+    short_name: '12032000'
+    description: "GPM \xE2\u20AC\u201D KuPR Environment Auxiliary"
+  gpm-gmi-comb-l2-comb-l2-precipitation:
+    aliases:
+    - gmi-comb-l2-comb-l2-precipitation
+    protocol: gportal
+    short_name: '12022000'
+    description: "GPM \xE2\u20AC\u201D LEVEL2/COMB L2 Precipitation"
+  gpm-gmi-comb-l3-comb-dpr-gmi-l3-precipitation:
+    aliases:
+    - gmi-comb-l3-comb-dpr-gmi-l3-precipitation
+    protocol: gportal
+    short_name: '12023000'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/Comb DPR/GMI L3 Precipitation"
+  gpm-gmi-comb-l3-comb-l3-gridded-orbital-spectr:
+    aliases:
+    - gmi-comb-l3-comb-l3-gridded-orbital-spectr
+    protocol: gportal
+    short_name: '12023001'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/COMB L3 Gridded Orbital Spectral Latent\
+      \ Heating"
+  gpm-gmi-comb-l3-comb-l3-monthly-spectral-laten:
+    aliases:
+    - gmi-comb-l3-comb-l3-monthly-spectral-laten
+    protocol: gportal
+    short_name: '12023002'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/COMB L3 Monthly Spectral Latent Heating"
+  gpm-gmi-l1-gmi-l1b-brightness-temperature:
+    aliases:
+    - gmi-l1-gmi-l1b-brightness-temperature
+    protocol: gportal
+    short_name: '12011000'
+    description: "GPM \xE2\u20AC\u201D LEVEL1/GMI L1B Brightness Temperature"
+  gpm-gmi-l1-gmi-l1c-inter-calibrated-brigh:
+    aliases:
+    - gmi-l1-gmi-l1c-inter-calibrated-brigh
+    protocol: gportal
+    short_name: '12011001'
+    description: "GPM \xE2\u20AC\u201D LEVEL1/GMI L1C Inter- Calibrated Brightness\
+      \ Temperature"
+  gpm-gmi-l2-gmi-l2-precipitation:
+    aliases:
+    - gmi-l2-gmi-l2-precipitation
+    protocol: gportal
+    short_name: '12012000'
+    description: "GPM \xE2\u20AC\u201D LEVEL2/GMI L2 Precipitation"
+  gpm-gmi-l3-gmi-l3-precipitation:
+    aliases:
+    - gmi-l3-gmi-l3-precipitation
+    protocol: gportal
+    short_name: '12013000'
+    description: "GPM \xE2\u20AC\u201D LEVEL3/GMI L3 Precipitation"
+  gpmc-amsr2-l1-gcom-w-amsr2-l1c-inter-calibra:
+    aliases:
+    - amsr2-l1-gcom-w-amsr2-l1c-inter-calibra
+    protocol: gportal
+    short_name: '13011000'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/GCOM-W AMSR2\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-atms-l1-npp-atms-l1c-inter-calibrated:
+    aliases:
+    - atms-l1-npp-atms-l1c-inter-calibrated
+    protocol: gportal
+    short_name: '13041000'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/NPP ATMS L1C\
+      \ Inter-Calibrated Brightness Temperature"
+  gpmc-mhs-l1-metop-a-mhs-l1c-inter-calibrat:
+    aliases:
+    - mhs-l1-metop-a-mhs-l1c-inter-calibrat
+    protocol: gportal
+    short_name: '13031002'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/METOP-A MHS\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-mhs-l1-metop-b-mhs-l1c-inter-calibrat:
+    aliases:
+    - mhs-l1-metop-b-mhs-l1c-inter-calibrat
+    protocol: gportal
+    short_name: '13031003'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/METOP-B MHS\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-mhs-l1-noaa-18-mhs-l1c-inter-calibrat:
+    aliases:
+    - mhs-l1-noaa-18-mhs-l1c-inter-calibrat
+    protocol: gportal
+    short_name: '13031000'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/NOAA-18 MHS\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-mhs-l1-noaa-19-mhs-l1c-inter-calibrat:
+    aliases:
+    - mhs-l1-noaa-19-mhs-l1c-inter-calibrat
+    protocol: gportal
+    short_name: '13031001'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/NOAA-19 MHS\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-saphir-l1-megha-tropiques-saphir-l1c-int:
+    aliases:
+    - saphir-l1-megha-tropiques-saphir-l1c-int
+    protocol: gportal
+    short_name: '13051000'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/Megha Tropiques\
+      \ SAPHIR L1C Inter-Calibrated Brightness Temperature"
+  gpmc-ssmis-l1-dmsp-f16-ssmis-l1c-inter-calib:
+    aliases:
+    - ssmis-l1-dmsp-f16-ssmis-l1c-inter-calib
+    protocol: gportal
+    short_name: '13021000'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/DMSP F16 SSMIS\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-ssmis-l1-dmsp-f17-ssmis-l1c-inter-calib:
+    aliases:
+    - ssmis-l1-dmsp-f17-ssmis-l1c-inter-calib
+    protocol: gportal
+    short_name: '13021001'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/DMSP F17 SSMIS\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-ssmis-l1-dmsp-f18-ssmis-l1c-inter-calib:
+    aliases:
+    - ssmis-l1-dmsp-f18-ssmis-l1c-inter-calib
+    protocol: gportal
+    short_name: '13021002'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/DMSP F18 SSMIS\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-ssmis-l1-dmsp-f19-ssmis-l1c-inter-calib:
+    aliases:
+    - ssmis-l1-dmsp-f19-ssmis-l1c-inter-calib
+    protocol: gportal
+    short_name: '13021003'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/DMSP F19 SSMIS\
+      \ L1C Inter-Calibrated Brightness Temperature"
+  gpmc-tmi-l1-trmm-tmi-l1c-inter-calibrated:
+    aliases:
+    - tmi-l1-trmm-tmi-l1c-inter-calibrated
+    protocol: gportal
+    short_name: '13001000'
+    description: "GPM Constellation satellites \xE2\u20AC\u201D LEVEL1/TRMM TMI L1C\
+      \ Inter-Calibrated Brightness Temperature"
+  gsmap-gp-l3-hourly-hdf:
+    aliases:
+    - l3-hourly-hdf
+    protocol: gportal
+    short_name: '14003000'
+    description: "GSMaP \xE2\u20AC\u201D GSMaP Precipitation(Hourly HDF)"
+  gsmap-gp-l3-hourly-text:
+    aliases:
+    - l3-hourly-text
+    protocol: gportal
+    short_name: '14003001'
+    description: "GSMaP \xE2\u20AC\u201D GSMaP Precipitation(Hourly TEXT)"
+  gsmap-gp-l3-monthly-hdf:
+    aliases:
+    - l3-monthly-hdf
+    protocol: gportal
+    short_name: '14003004'
+    description: "GSMaP \xE2\u20AC\u201D GSMaP Precipitation(Monthly HDF)"
+  trmm-pr-l1-pr-received-power:
+    aliases:
+    - pr-l1-pr-received-power
+    protocol: gportal
+    short_name: '18001000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL1/PR Received Power [1B21]"
+  trmm-pr-l1-pr-reflectivities:
+    aliases:
+    - pr-l1-pr-reflectivities
+    protocol: gportal
+    short_name: '18001001'
+    description: "TRMM \xE2\u20AC\u201D LEVEL1/PR Reflectivities [1C21]"
+  trmm-pr-l2-pr-qualitative:
+    aliases:
+    - pr-l2-pr-qualitative
+    protocol: gportal
+    short_name: '18002001'
+    description: "TRMM \xE2\u20AC\u201D LEVEL2/PR Qualitative [2A23]"
+  trmm-pr-l2-pr-rainfall-profile:
+    aliases:
+    - pr-l2-pr-rainfall-profile
+    protocol: gportal
+    short_name: '18002002'
+    description: "TRMM \xE2\u20AC\u201D LEVEL2/PR Rainfall Profile [2A25]"
+  trmm-pr-l2-pr-spectral-latent-heating:
+    aliases:
+    - pr-l2-pr-spectral-latent-heating
+    protocol: gportal
+    short_name: '18002003'
+    description: "TRMM \xE2\u20AC\u201D LEVEL2/PR Spectral Latent Heating [2H25]"
+  trmm-pr-l2-pr-surface-cross-section:
+    aliases:
+    - pr-l2-pr-surface-cross-section
+    protocol: gportal
+    short_name: '18002000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL2/PR Surface Cross Section [2A21]"
+  trmm-pr-l3-pr-gridded-orbital-spectral-la:
+    aliases:
+    - pr-l3-pr-gridded-orbital-spectral-la
+    protocol: gportal
+    short_name: '18003002'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/PR Gridded Orbital Spectral Latent\
+      \ Heating [3G25]"
+  trmm-pr-l3-pr-monthly-rainfall:
+    aliases:
+    - pr-l3-pr-monthly-rainfall
+    protocol: gportal
+    short_name: '18003000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/PR Monthly Rainfall [3A25]"
+  trmm-pr-l3-pr-monthly-spectral-latent-hea:
+    aliases:
+    - pr-l3-pr-monthly-spectral-latent-hea
+    protocol: gportal
+    short_name: '18003003'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/PR Monthly Spectral Latent Heating\
+      \ [3H25]"
+  trmm-pr-l3-pr-monthly-surface-rain:
+    aliases:
+    - pr-l3-pr-monthly-surface-rain
+    protocol: gportal
+    short_name: '18003001'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/PR Monthly Surface Rain [3A26]"
+  trmm-tmi-comb-l2-comb-convective-stratiform-hea:
+    aliases:
+    - tmi-comb-l2-comb-convective-stratiform-hea
+    protocol: gportal
+    short_name: '18032001'
+    description: "TRMM \xE2\u20AC\u201D LEVEL2/COMB Convective Stratiform Heating\
+      \ [2H31]"
+  trmm-tmi-comb-l2-comb-rain-profile:
+    aliases:
+    - tmi-comb-l2-comb-rain-profile
+    protocol: gportal
+    short_name: '18032000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL2/COMB Rain Profile [2B31]"
+  trmm-tmi-comb-l3-comb-gridded-orbital-convectiv:
+    aliases:
+    - tmi-comb-l3-comb-gridded-orbital-convectiv
+    protocol: gportal
+    short_name: '18033003'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/COMB Gridded Orbital Convective Stratiform\
+      \ Heating [3G31]"
+  trmm-tmi-comb-l3-comb-gridded-orbital-convectiv-3001:
+    aliases:
+    - tmi-comb-l3-comb-gridded-orbital-convectiv-3001
+    protocol: gportal
+    short_name: '15023001'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/COMB Gridded Orbital Convective Stratiform\
+      \ Heating [3G31]"
+  trmm-tmi-comb-l3-comb-monthly-convective-strati:
+    aliases:
+    - tmi-comb-l3-comb-monthly-convective-strati
+    protocol: gportal
+    short_name: '18033004'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/COMB Monthly Convective Stratiform\
+      \ Heating [3H31]"
+  trmm-tmi-comb-l3-comb-monthly-rainfall:
+    aliases:
+    - tmi-comb-l3-comb-monthly-rainfall
+    protocol: gportal
+    short_name: '18033000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/COMB Monthly Rainfall [3B31]"
+  trmm-tmi-comb-l3-trmm-and-other-sensors-3-hourl:
+    aliases:
+    - tmi-comb-l3-trmm-and-other-sensors-3-hourl
+    protocol: gportal
+    short_name: '18033001'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/TRMM and Other Sensors 3-Hourly Rainfall\
+      \ [342]"
+  trmm-tmi-comb-l3-trmm-and-other-sensors-monthly:
+    aliases:
+    - tmi-comb-l3-trmm-and-other-sensors-monthly
+    protocol: gportal
+    short_name: '18033002'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/TRMM and Other Sensors Monthly Rainfall\
+      \ [3B43]"
+  trmm-tmi-l1-tmi-brightness-temperatures:
+    aliases:
+    - tmi-l1-tmi-brightness-temperatures
+    - trmm-tb
+    protocol: gportal
+    short_name: '18011000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL1/TMI Brightness Temperatures [1B11]"
+  trmm-tmi-l2-tmi-rainfall-profile:
+    aliases:
+    - tmi-l2-tmi-rainfall-profile
+    protocol: gportal
+    short_name: '18012000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL2/TMI Rainfall Profile [2A12]"
+  trmm-tmi-l3-tmi-monthly-emisssion:
+    aliases:
+    - tmi-l3-tmi-monthly-emisssion
+    protocol: gportal
+    short_name: '18013000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/TMI Monthly Emisssion [3A11]"
+  trmm-tmi-l3-tmi-monthly-rainfall-profile:
+    aliases:
+    - tmi-l3-tmi-monthly-rainfall-profile
+    protocol: gportal
+    short_name: '18013001'
+    description: "TRMM \xE2\u20AC\u201D LEVEL3/TMI Monthly Rainfall Profile [3A12]"
+  trmm-virs-l1-virs-radiance:
+    aliases:
+    - virs-l1-virs-radiance
+    - trmm-rad
+    protocol: gportal
+    short_name: '18021000'
+    description: "TRMM \xE2\u20AC\u201D LEVEL1/VIRS Radiance [1B01]"
+  trmmgpm-environment-auxiliary-pr-environment-auxiliary:
+    aliases:
+    - environment-auxiliary-pr-environment-auxiliary
+    protocol: gportal
+    short_name: '15042000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D PR Environment Auxiliary"
+  trmmgpm-pr-l1-pr-l1b-received-power:
+    aliases:
+    - pr-l1-pr-l1b-received-power
+    protocol: gportal
+    short_name: '15001000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL1/PR L1B Received Power"
+  trmmgpm-pr-l2-pr-l2-precipitation:
+    aliases:
+    - pr-l2-pr-l2-precipitation
+    protocol: gportal
+    short_name: '15002000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL2/PR L2 Precipitation"
+  trmmgpm-pr-l2-pr-l2-spectral-latent-heating:
+    aliases:
+    - pr-l2-pr-l2-spectral-latent-heating
+    protocol: gportal
+    short_name: '15002001'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL2/PR L2 Spectral Latent Heating"
+  trmmgpm-pr-l3-daily-hdf:
+    aliases:
+    - pr-l3-daily-hdf
+    protocol: gportal
+    short_name: '15003000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/PR L3 Precipitation (Daily\
+      \ HDF)"
+  trmmgpm-pr-l3-daily-text:
+    aliases:
+    - pr-l3-daily-text
+    protocol: gportal
+    short_name: '15003001'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/PR L3 Precipitation (Daily\
+      \ TEXT)"
+  trmmgpm-pr-l3-monthly-hdf:
+    aliases:
+    - pr-l3-monthly-hdf
+    protocol: gportal
+    short_name: '15003002'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/PR L3 Precipitation (Monthly\
+      \ HDF)"
+  trmmgpm-pr-l3-pr-l3-gridded-orbital-spectral:
+    aliases:
+    - pr-l3-pr-l3-gridded-orbital-spectral
+    protocol: gportal
+    short_name: '15003003'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/PR L3 Gridded Orbital Spectral\
+      \ Latent Heating"
+  trmmgpm-pr-l3-pr-l3-monthly-spectral-latent:
+    aliases:
+    - pr-l3-pr-l3-monthly-spectral-latent
+    protocol: gportal
+    short_name: '15003004'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/PR L3 Monthly Spectral Latent\
+      \ Heating"
+  trmmgpm-tmi-comb-l2-comb-l2-precipitation:
+    aliases:
+    - tmi-comb-l2-comb-l2-precipitation
+    protocol: gportal
+    short_name: '15022000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL2/COMB L2 Precipitation"
+  trmmgpm-tmi-comb-l3-comb-l3-gridded-orbital-spectr:
+    aliases:
+    - tmi-comb-l3-comb-l3-gridded-orbital-spectr
+    protocol: gportal
+    short_name: '15023001'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/COMB L3 Gridded Orbital Spectral\
+      \ Latent Heating"
+  trmmgpm-tmi-comb-l3-comb-l3-monthly-spectral-laten:
+    aliases:
+    - tmi-comb-l3-comb-l3-monthly-spectral-laten
+    protocol: gportal
+    short_name: '15023002'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/COMB L3 Monthly Spectral\
+      \ Latent Heating"
+  trmmgpm-tmi-comb-l3-comb-l3-precipitation:
+    aliases:
+    - tmi-comb-l3-comb-l3-precipitation
+    protocol: gportal
+    short_name: '15023000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/COMB L3 Precipitation"
+  trmmgpm-tmi-l1-tmi-l1b-brightness-temperature:
+    aliases:
+    - tmi-l1-tmi-l1b-brightness-temperature
+    - trmmgpm-tb
+    protocol: gportal
+    short_name: '15011000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL1/TMI L1B Brightness Temperature"
+  trmmgpm-tmi-l2-tmi-l2-precipitation:
+    aliases:
+    - tmi-l2-tmi-l2-precipitation
+    protocol: gportal
+    short_name: '15012000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL2/TMI L2 Precipitation"
+  trmmgpm-tmi-l3-tmi-l3-precipitation:
+    aliases:
+    - tmi-l3-tmi-l3-precipitation
+    protocol: gportal
+    short_name: '15013000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL3/TMI L3 Precipitation"
+  trmmgpm-virs-l1-virs-l1b-radiance:
+    aliases:
+    - virs-l1-virs-l1b-radiance
+    - trmmgpm-rad
+    protocol: gportal
+    short_name: '15031000'
+    description: "TRMM_GPMFormat \xE2\u20AC\u201D LEVEL1/VIRS L1B Radiance"

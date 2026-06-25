@@ -1199,6 +1199,45 @@ def _chc_ftp_bases(catalog: Any) -> list[str]:
     )
 
 
+def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
+    """List every live JAXA dataset id from both protocols.
+
+    Walks the two SDKs' authoritative listings: `jaxa.earth`'s STAC
+    catalog (118 COG collections at A1 capture time) for the
+    `jaxa-earth` group, and `gportal.datasets()` (799 numeric dataset
+    ids at A1 capture time) for the `gportal` group. The result feeds
+    `earthlens datasets refresh jaxa` so a curator can diff the
+    bundled YAML against the live universes.
+
+    Args:
+        catalog: The loaded JAXA `Catalog` (unused; the SDKs are the
+            authoritative sources).
+
+    Returns:
+        Two-group mapping:
+        `{"jaxa-earth": [STAC collection ids], "gportal": [numeric ids]}`.
+    """
+    del catalog
+    from jaxa.earth import je as _je  # type: ignore[import-not-found]
+    import gportal as _gportal  # type: ignore[import-not-found]
+
+    je_ids, _ = _je.ImageCollectionList().filter_name()
+    gp_tree = _gportal.datasets()
+
+    gp_ids: list[str] = []
+    stack: list[Any] = [gp_tree]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, dict):
+            stack.extend(node.values())
+        elif isinstance(node, list):
+            gp_ids.extend(str(x) for x in node)
+    return {
+        "jaxa-earth": sorted(set(str(c) for c in je_ids)),
+        "gportal": sorted(set(gp_ids)),
+    }
+
+
 #: Region the unsigned NWM operational bucket is listed from.
 _NWM_REGION = "us-east-1"
 
@@ -1453,6 +1492,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "chc": _chc_grouped,
     "s3": _s3_grouped,
     "nwm": _nwm_grouped,
+    "jaxa": _jaxa_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -1476,6 +1516,11 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "usgs_water": _write_usgs_water,
     "worldpop": _write_worldpop,
     "openaq": _write_openaq,
+    # JAXA's catalog YAML carries an `available_datasets:` block that lists
+    # every live id across both protocols (jaxa-earth + gportal). The
+    # flatten=True path unions the two protocol groups into a single sorted
+    # list; the curated `datasets:` block stays hand-authored.
+    "jaxa": _index_writer("available_datasets"),
 }
 
 

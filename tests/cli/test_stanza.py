@@ -27,6 +27,7 @@ class TestSupportedProviders:
             "hdx",
             "eumetsat",
             "gee",
+            "jaxa",
         }
 
 

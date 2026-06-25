@@ -82,6 +82,7 @@ class TestSupportedProviders:
             "earthdata",
             "hdx",
             "firms",
+            "jaxa",
         } <= set(supported_providers())
 
 

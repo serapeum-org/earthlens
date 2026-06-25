@@ -1,0 +1,14 @@
+# GOSAT atmospheric column products via G-Portal.
+# AUTO-GENERATED from the upstream SDK catalog by
+# `python planning/jaxa/captures/build_catalog.py`. Hand-edit the script
+# (e.g. friendly slugs, descriptions, default bands) rather than this file,
+# or new ids will revert on the next regeneration.
+
+datasets:
+  gosat-gw-amsr3-l1b:
+    aliases:
+    - gosat-gw
+    - amsr3
+    protocol: gportal
+    short_name: '31001001'
+    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L1B - Brightness Temperature (TBB)"

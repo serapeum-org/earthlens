@@ -105,6 +105,7 @@ Supported data sources
 | Amazon S3    | ERA5 on AWS `era5-pds`            | S3 (unsigned)       | monthly         | none             | `[s3]`               |
 | ECMWF / CDS  | Copernicus Climate Data Store     | `cdsapi` (HTTPS)    | daily, monthly  | `~/.cdsapirc`    | `[ecmwf]`            |
 | GEE          | Google Earth Engine               | `earthengine-api`   | varies          | service account  | `[gee]`              |
+| JAXA         | JAXA Earth API + G-Portal         | HTTPS + SFTP        | varies          | optional         | `[jaxa]`             |
 
 
 Installation

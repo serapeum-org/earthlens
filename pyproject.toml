@@ -97,9 +97,20 @@ ghsl = []
 worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
 gbif = ["pygbif >=0.6.6"]
 obis = ["pyobis >=1.6.1"]
+# JAXA backend — two protocols, both SDKs are optional:
+#   * jaxa.earth: the official authless STAC + COG API. Pin tight on the
+#     prototype 0.x line (the SDK has no public source repo; behaviour
+#     pinning is by snapshot tests against the installed wheel).
+#   * gportal: community SFTP client for the G-Portal mission archive
+#     (single-maintainer, last release 2023-05; do NOT pull its [gcomc]
+#     extra — it pins numpy<2 which conflicts with this repo's numpy 2.x).
+jaxa = [
+    "jaxa.earth >=0.1.6,<0.2",
+    "gportal >=0.4,<0.5",
+]
 # Self-referential: the union of every backend extra, without re-listing deps.
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis]",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa]",
 ]
 
 [dependency-groups]
@@ -278,6 +289,7 @@ markers = [
     "obis: tests for the OBIS marine-occurrence backend (requires the `obis` extra: pyobis; search is anonymous).",
     "wdpa: tests for the Protected Planet (WDPA) backend (no extra SDK; direct v4 REST via core `requests`; needs a token).",
     "iucn: tests for the IUCN Red List v4 backend (no extra SDK; direct v4 REST via core `requests`; needs a Bearer token).",
+    "jaxa: tests for the JAXA backend (requires the `jaxa` extra: jaxa.earth + gportal; two protocols — authless STAC/COG via jaxa.earth, credentialed SFTP via gportal).",
 ]
 
 [tool.pixi.workspace]

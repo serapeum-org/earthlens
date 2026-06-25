@@ -297,13 +297,13 @@ class EarthLens:
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms',
-             'gbif', 'gdacs', 'gee', 'ghs', 'ghsl', 'google-earth-engine', 'hdx',
-             'human-settlement', 'insar', 'iucn', 'landsat',
-             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'obis',
-             'openaq', 'openeo', 'overture', 'planetary-computer',
-             'protected-planet', 'radar', 'redlist', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
-             'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
+             'g-portal', 'gbif', 'gdacs', 'gee', 'ghs', 'ghsl',
+             'google-earth-engine', 'hdx', 'human-settlement', 'insar', 'iucn',
+             'jaxa', 'jaxa-earth', 'landsat', 'national-water-model', 'nexrad',
+             'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo', 'overture',
+             'planetary-computer', 'protected-planet', 'radar', 'redlist',
+             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal', 'usgs-landsat',
+             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -577,6 +577,14 @@ class EarthLens:
             "protected-planet": ("earthlens.wdpa", "WDPA", "", {}),
             "iucn": ("earthlens.iucn", "IUCN", "", {}),
             "redlist": ("earthlens.iucn", "IUCN", "", {}),
+            # JAXA archive over two protocols: authless `jaxa-earth` (STAC +
+            # COG via the official jaxa.earth API) and credentialed
+            # `gportal` (G-Portal SFTP via the community gportal SDK).
+            # Per-dataset routing — the catalog's `protocol:` field picks
+            # the branch. `OUTPUT_KIND="raster"`.
+            "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
         }
     )
 

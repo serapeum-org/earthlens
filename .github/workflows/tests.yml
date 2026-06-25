@@ -66,5 +66,8 @@ jobs:
       - name: Run USGS Water tests
         run: pixi run -e ${{ matrix.environment }} test-backend usgs_water
 
+      - name: Run JAXA tests
+        run: pixi run -e ${{ matrix.environment }} test-backend jaxa
+
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v5
