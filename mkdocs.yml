@@ -252,6 +252,26 @@ nav:
       - Available datasets: reference/worldpop/datasets.md
       - WorldPopPy & no-xarray: reference/worldpop/worldpoppy.md
       - Reference: reference/worldpop/worldpop.md
+    - Biodiversity (overview):
+      - Introduction: reference/biodiversity/introduction.md
+    - GBIF (species occurrences):
+      - Introduction: reference/gbif/introduction.md
+      - Usage: reference/gbif/usage.md
+      - Reference: reference/gbif/gbif.md
+    - OBIS (marine occurrences):
+      - Introduction: reference/obis/introduction.md
+      - Usage: reference/obis/usage.md
+      - Reference: reference/obis/obis.md
+    - Protected Planet (WDPA):
+      - Introduction: reference/wdpa/introduction.md
+      - Usage: reference/wdpa/usage.md
+      - Authentication: reference/wdpa/authentication.md
+      - Reference: reference/wdpa/wdpa.md
+    - IUCN Red List (assessments):
+      - Introduction: reference/iucn/introduction.md
+      - Usage: reference/iucn/usage.md
+      - Authentication: reference/iucn/authentication.md
+      - Reference: reference/iucn/iucn.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -272,6 +292,7 @@ nav:
       - NYC wildfire-smoke air quality (OpenAQ): examples/showcase/wildfire_smoke_air_quality.ipynb
       - Hurricane Harvey rainfall (NASA GPM/Earthdata): examples/showcase/hurricane_harvey_rainfall.ipynb
       - Hurricane Ian from GOES (geostationary, S3): examples/showcase/goes_hurricane_ian.ipynb
+      - Sea-turtle occurrences (GBIF + OBIS): examples/showcase/species_occurrences_gbif_obis.ipynb
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
       - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
@@ -442,6 +463,18 @@ nav:
       - Covariates — nightlights: examples/worldpop/07_covariates_nightlights.ipynb
       - Dependency ratios (archive): examples/worldpop/08_dependency_ratios.ipynb
       - Global mosaics (URL resolution): examples/worldpop/09_global_mosaic.ipynb
+    - GBIF (species occurrences):
+      - Quickstart — occurrences over a bbox: examples/gbif/quickstart.ipynb
+    - OBIS (marine occurrences):
+      - Quickstart — marine occurrences: examples/obis/quickstart.ipynb
+    - Protected Planet (WDPA):
+      - Catalog explorer (no network): examples/wdpa/catalog_explorer.ipynb
+      - Quickstart — protected-area polygons: examples/wdpa/quickstart.ipynb
+      - Comparing countries (live): examples/wdpa/regional_comparison.ipynb
+    - IUCN Red List (assessments):
+      - Catalog explorer (no network): examples/iucn/catalog_explorer.ipynb
+      - Quickstart — species assessments: examples/iucn/quickstart.ipynb
+      - Country Red List breakdown (live): examples/iucn/country_redlist_breakdown.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md

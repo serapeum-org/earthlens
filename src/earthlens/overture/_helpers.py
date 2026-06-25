@@ -33,6 +33,11 @@ import warnings
 
 import pandas as pd
 
+# `LicenseWarning` is shared across backends, so it lives in the biodiversity
+# cluster's helper module; Overture re-exports it here (same class object) so
+# `warn_if_odbl` and `overture.__init__` keep working unchanged.
+from earthlens.biodiversity._helpers import LicenseWarning
+
 #: Share-alike license OSM-derived rows carry; the value the warning keys off.
 ODBL = "ODbL-1.0"
 
@@ -42,16 +47,14 @@ CDLA_PERMISSIVE = "CDLA-Permissive-2.0"
 #: Dataset name that marks an OSM-derived source (the ODbL fallback trigger).
 _OSM_DATASET = "OpenStreetMap"
 
-
-class LicenseWarning(UserWarning):
-    """Warns that a download contains share-alike (`ODbL-1.0`) rows.
-
-    Emitted by `warn_if_odbl` when any feature's derived `license_id` is
-    `ODbL-1.0`. `ODbL-1.0` (OSM-derived data) carries attribution and
-    share-alike obligations that `CDLA-Permissive-2.0` does not, so a
-    downstream commercial user must be told the obligation rides along
-    with those rows rather than discovering it silently.
-    """
+__all__ = [
+    "CDLA_PERMISSIVE",
+    "LicenseWarning",
+    "ODBL",
+    "derive_license_ids",
+    "row_license",
+    "warn_if_odbl",
+]
 
 
 def _coerce_sources(sources: object) -> list[dict]:
