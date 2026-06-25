@@ -21,6 +21,9 @@ is open data — there is no authentication and no `auth` module.
 
 Public surface (re-exported from this package):
 
+* :class:`ARGO` — the backend; instantiate with a date range, a bbox
+  (or a `float:` / `profile:` selector in `variables`), then call
+  :meth:`ARGO.download`.
 * :class:`Catalog` — pydantic-backed loader for the bundled
   `argo_data_catalog.yaml` parameter-family vocabulary.
 * :class:`Family` — one dataset family's parameter row.
@@ -29,9 +32,11 @@ Public surface (re-exported from this package):
 
 from __future__ import annotations
 
+from earthlens.argo.backend import ARGO
 from earthlens.argo.catalog import CATALOG_PATH, Catalog, Family, clear_catalog_cache
 
 __all__ = [
+    "ARGO",
     "CATALOG_PATH",
     "Catalog",
     "Family",
