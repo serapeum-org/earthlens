@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2944,7 +2944,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -2960,7 +2960,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -2973,7 +2973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/introduction/" class="md-nav__link">
+      <a href="../../../reference/erddap/introduction/" class="md-nav__link">
         
   
   
@@ -3001,7 +3001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/usage/" class="md-nav__link">
+      <a href="../../../reference/erddap/usage/" class="md-nav__link">
         
   
   
@@ -3029,7 +3029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/datasets/" class="md-nav__link">
+      <a href="../../../reference/erddap/datasets/" class="md-nav__link">
         
   
   
@@ -3057,7 +3057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/bathymetry/" class="md-nav__link">
+      <a href="../../../reference/erddap/erddap/" class="md-nav__link">
         
   
   
@@ -8856,7 +8856,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -8872,7 +8872,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -8885,14 +8885,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
+      <a href="../../erddap/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Bathymetry — DEM quickstart
+    ERDDAP catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../erddap/02_griddap_sst_anomaly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coral Reef Watch SST anomaly (griddap -&gt; raster)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../erddap/03_tabledap_buoys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NDBC buoys (tabledap -&gt; DataFrame)
   
 
     
@@ -12896,7 +12952,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5429cc5c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4dc47b5d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12907,7 +12963,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bad221cf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=afaa5273">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12918,7 +12974,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ae549122">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f2212244">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12959,7 +13015,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=37df1b6e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8ebd94d0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12970,7 +13026,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8800b5e2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b988091e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12999,7 +13055,7 @@ print('FIRMS_MAP_KEY set:', HAS_KEY)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2386905c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cfa303d0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13010,7 +13066,7 @@ print('FIRMS_MAP_KEY set:', HAS_KEY)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e5adeaf0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c81c3a7a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13021,7 +13077,7 @@ print('FIRMS_MAP_KEY set:', HAS_KEY)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=982bb86b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=486bf47d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13074,7 +13130,7 @@ if HAS_KEY:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f097e132">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=489d16ab">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13085,7 +13141,7 @@ if HAS_KEY:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c752242f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b65000cd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13122,7 +13178,7 @@ if HAS_KEY:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=27ea5b69">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=316bf135">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13133,7 +13189,7 @@ if HAS_KEY:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dc80ac95">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9032255c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13164,7 +13220,7 @@ if HAS_KEY:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8c375245">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f052cbe4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13175,7 +13231,7 @@ if HAS_KEY:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6e5e1305">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3f635b92">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

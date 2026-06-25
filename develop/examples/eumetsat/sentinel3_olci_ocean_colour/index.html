@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2944,7 +2944,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -2960,7 +2960,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -2973,7 +2973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/introduction/" class="md-nav__link">
+      <a href="../../../reference/erddap/introduction/" class="md-nav__link">
         
   
   
@@ -3001,7 +3001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/usage/" class="md-nav__link">
+      <a href="../../../reference/erddap/usage/" class="md-nav__link">
         
   
   
@@ -3029,7 +3029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/datasets/" class="md-nav__link">
+      <a href="../../../reference/erddap/datasets/" class="md-nav__link">
         
   
   
@@ -3057,7 +3057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/bathymetry/" class="md-nav__link">
+      <a href="../../../reference/erddap/erddap/" class="md-nav__link">
         
   
   
@@ -8927,7 +8927,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -8943,7 +8943,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -8956,14 +8956,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
+      <a href="../../erddap/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Bathymetry — DEM quickstart
+    ERDDAP catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../erddap/02_griddap_sst_anomaly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coral Reef Watch SST anomaly (griddap -&gt; raster)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../erddap/03_tabledap_buoys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NDBC buoys (tabledap -&gt; DataFrame)
   
 
     
@@ -12762,7 +12818,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=29f7f921">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=053830c0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12773,7 +12829,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1c2d6561">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b8c04dbe">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12784,7 +12840,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2826e842">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a778a118">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12795,7 +12851,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a310ebbe">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f5298d27">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12832,7 +12888,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0a6e1b06">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=31e644c9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12843,7 +12899,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ed5281a8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d513d82e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12886,7 +12942,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=90f2891c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fad412a5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12897,7 +12953,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9e255645">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5f410356">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12938,7 +12994,7 @@ except Exception as exc:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bb41316c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=49f7e371">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2944,7 +2944,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -2960,7 +2960,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -2973,7 +2973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/introduction/" class="md-nav__link">
+      <a href="../../../reference/erddap/introduction/" class="md-nav__link">
         
   
   
@@ -3001,7 +3001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/usage/" class="md-nav__link">
+      <a href="../../../reference/erddap/usage/" class="md-nav__link">
         
   
   
@@ -3029,7 +3029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/datasets/" class="md-nav__link">
+      <a href="../../../reference/erddap/datasets/" class="md-nav__link">
         
   
   
@@ -3057,7 +3057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/bathymetry/bathymetry/" class="md-nav__link">
+      <a href="../../../reference/erddap/erddap/" class="md-nav__link">
         
   
   
@@ -9016,7 +9016,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -9032,7 +9032,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -9045,14 +9045,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
+      <a href="../../erddap/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Bathymetry — DEM quickstart
+    ERDDAP catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../erddap/02_griddap_sst_anomaly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coral Reef Watch SST anomaly (griddap -&gt; raster)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../erddap/03_tabledap_buoys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NDBC buoys (tabledap -&gt; DataFrame)
   
 
     
@@ -12940,7 +12996,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f83df36a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a4923cb9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12965,7 +13021,7 @@ credential-source ladder.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df3323c4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7df3b7be">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -12988,7 +13044,7 @@ that file automatically.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=016f1a08">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=705f7e27">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13001,7 +13057,7 @@ output directory the downloads will land in.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9f593572">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1c6200f2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13044,7 +13100,7 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0b7fdc4a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0fe84590">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13057,7 +13113,7 @@ backend then falls back to the cached credentials file.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f407c611">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=226367b0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13086,7 +13142,7 @@ SERVICE_PASSWORD = os.environ.get('COPERNICUSMARINE_SERVICE_PASSWORD')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=53dcf2d3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c8b84dfb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13099,7 +13155,7 @@ bounds (a hardcoded date eventually falls off the back).</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c055111d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f06c644b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13130,7 +13186,7 @@ END = (_recent + dt.timedelta(days=6)).strftime('%Y-%m-%d')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=be545a26">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1547c4dc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13144,7 +13200,7 @@ still work — pass any id that <code>copernicusmarine.describe()</code> recogni
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b119c7ec">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=36912e2d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13187,7 +13243,7 @@ for name, var in sorted(ds.variables.items()):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fa290be3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=34b156dc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13204,7 +13260,7 @@ verbatim.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8cd36c0e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7732a6ad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13216,7 +13272,7 @@ tweak before any network call.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=21bcc145">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a42a8159">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13265,7 +13321,7 @@ tweak before any network call.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f6f44307">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=699bc6c2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13277,7 +13333,7 @@ NetCDF paths.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=495522cc">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a579e160">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13308,7 +13364,7 @@ for p in paths:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=64d26eb7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=698ebdf0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13320,7 +13376,7 @@ check against the <code>CMEMS</code> class directly.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0fe78ce1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c92eb066">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13332,7 +13388,7 @@ the object first.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=73eaf283">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=24d1c792">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13383,7 +13439,7 @@ the object first.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c93f3f21">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7dad52e2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13394,7 +13450,7 @@ the object first.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2481d7f5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=61354b12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13423,7 +13479,7 @@ print(paths)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17088437">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=eb054a12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13437,7 +13493,7 @@ CMEMS NetCDFs.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fc2ee389">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e8ba84ab">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13449,7 +13505,7 @@ subset landed as expected.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ca884f49">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a051fd52">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13482,7 +13538,7 @@ print('variables:', list(nc.meta_data.variables.keys()))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f1ff9750">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0809db20">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13494,7 +13550,7 @@ handle. The shape is <code>(time, lat, lon)</code>.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7abdb297">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=06b424ea">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13533,7 +13589,7 @@ nc.close()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d88bc903">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1758cb64">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
