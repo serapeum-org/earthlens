@@ -106,9 +106,14 @@ jaxa = [
     "jaxa.earth >=0.1.6,<0.2",
     "gportal >=0.4,<0.5",
 ]
+# Generic ERDDAP client (IOOS erddapy, BSD-3). Used only on the tabledap
+# to_pandas() path; the griddap path builds the OPeNDAP .nc URL directly and
+# downloads it with core `requests`, then reads it back via pyramids — earthlens
+# never imports xarray. Floor pinned from the A1 gate (erddapy 3.2.1 verified).
+erddap = ["erddapy >=3.0"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,jaxa]",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,jaxa,erddap]",
 ]
 
 [dependency-groups]
@@ -283,6 +288,7 @@ markers = [
     "worldpop: tests for the WorldPop population data hub backend (open CC-BY-4.0; default REST path needs only core requests + pyramids, optional `worldpop` extra adds worldpoppy).",
     "cli: tests for the `earthlens` console script / federated catalog-query CLI (typer and rich are core dependencies; no extra needed).",
     "jaxa: tests for the JAXA backend (requires the `jaxa` extra: jaxa.earth + gportal; two protocols — authless STAC/COG via jaxa.earth, credentialed SFTP via gportal).",
+    "erddap: tests for the generic ERDDAP backend (requires the `erddap` extra: erddapy; griddap raster via direct .nc download + pyramids, tabledap tabular via to_pandas; public servers only).",
 ]
 
 [tool.pixi.workspace]
