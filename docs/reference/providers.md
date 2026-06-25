@@ -40,6 +40,7 @@ Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core inst
 | USGS Water — NWIS / Water Data | `usgs-water`, `usgs-nwis`, `nwis` | tabular | none | `usgs-water` | [USGS Water](usgs-water/introduction.md) |
 | JRC Global Human Settlement Layer | `ghsl`, `ghs`, `human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
 | WorldPop population data hub | `worldpop`, `world-pop` | mixed (rasters + age/sex tables) | none (CC-BY-4.0) | `worldpop` (optional) | [WorldPop](worldpop/introduction.md) |
+| Generic ERDDAP servers (NOAA CoastWatch / Coral Reef Watch / NCEI / …) | `erddap`, `ioos` | per-dataset (raster griddap / tabular tabledap) | none (public servers) | `erddap` | [ERDDAP](erddap/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)

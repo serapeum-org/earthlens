@@ -175,6 +175,11 @@ nav:
       - Authentication: reference/jaxa/authentication.md
       - Available datasets: reference/jaxa/datasets.md
       - Reference: reference/jaxa/jaxa.md
+    - ERDDAP (multi-server client):
+      - Introduction: reference/erddap/introduction.md
+      - Usage: reference/erddap/usage.md
+      - Available datasets: reference/erddap/datasets.md
+      - Reference: reference/erddap/erddap.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
