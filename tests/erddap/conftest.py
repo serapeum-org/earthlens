@@ -53,10 +53,17 @@ def fake_erddapy(monkeypatch):
     return FakeErddapClient
 
 
+#: Canned griddap body — valid NetCDF-3 magic (`CDF\x01`) so the backend's
+#: magic-byte guard accepts it as real data.
+FAKE_NETCDF_BYTES = b"CDF\x01earthlens-fake-netcdf-body"
+
+
 class FakeResponse:
     """Minimal `requests` response carrying canned NetCDF bytes."""
 
-    def __init__(self, content: bytes = b"FAKE_NETCDF", error: Exception | None = None):
+    def __init__(
+        self, content: bytes = FAKE_NETCDF_BYTES, error: Exception | None = None
+    ):
         self.content = content
         self._error = error
 

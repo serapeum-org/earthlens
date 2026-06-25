@@ -167,12 +167,13 @@ class TestTabledap:
             backend.download(aggregate=AggregationConfig(freq="1D"))
 
     def test_empty_result_returns_canonical_frame(self, tmp_path, fake_erddapy):
-        """A no-match 404 yields an empty frame with the requested columns."""
+        """A no-match 404 yields an empty frame whose warning echoes the extent."""
         fake_erddapy.error = requests.exceptions.HTTPError(
             "Error 404: Your query produced no matching results."
         )
         backend = _table_backend(tmp_path, variables=["time", "wtmp"])
-        with pytest.warns(UserWarning, match="matched no rows"):
+        # The warning echoes the bbox so a typo'd extent is debuggable.
+        with pytest.warns(UserWarning, match=r"matched no rows over bbox \[-123.0"):
             result = backend.download()
         assert list(result.columns) == ["time", "wtmp"]
         assert len(result) == 0
@@ -192,9 +193,11 @@ class TestGriddap:
         backend = _grid_backend(tmp_path)
         result = backend.download()
 
+        from tests.erddap.conftest import FAKE_NETCDF_BYTES
+
         assert isinstance(result, list)
         assert result == [tmp_path / f"{GRIDDAP_ID}.nc"]
-        assert result[0].read_bytes() == b"FAKE_NETCDF"
+        assert result[0].read_bytes() == FAKE_NETCDF_BYTES
         assert len(fake_nc_get) == 1
         url = fake_nc_get[0]
         assert f"/griddap/{GRIDDAP_ID}.nc?CRW_SSTANOMALY" in url
@@ -239,3 +242,15 @@ class TestGriddap:
         monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)
         with pytest.raises(ValueError, match="outside the dataset's coverage"):
             _grid_backend(tmp_path).download()
+
+    def test_griddap_non_netcdf_body_rejected(self, tmp_path, monkeypatch):
+        """A 200 response with an HTML error body is rejected, not written."""
+        from tests.erddap.conftest import FakeResponse
+
+        def _get(url, timeout=None):
+            return FakeResponse(content=b"<html><body>Resource not found</body></html>")
+
+        monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)
+        with pytest.raises(ValueError, match="non-NetCDF body"):
+            _grid_backend(tmp_path).download()
+        assert not (tmp_path / f"{GRIDDAP_ID}.nc").exists()

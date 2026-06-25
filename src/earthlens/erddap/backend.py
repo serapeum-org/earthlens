@@ -18,6 +18,14 @@ the per-instance :attr:`ERDDAP.OUTPUT_KIND` and the realisation path:
   written NetCDF is read back only via **pyramids** when an `aggregate=`
   reduction is requested, so earthlens never imports `xarray`.
 
+An empty result is handled **asymmetrically by design**: a tabledap
+query that matches no rows returns an empty frame plus a warning (a table
+of zero rows is a valid, recoverable answer), whereas a griddap request
+outside the dataset's coverage raises a clear `ValueError` (a raster has
+no "zero pixels" — an out-of-coverage grid request is an error). A script
+moved from a tabledap to a griddap dataset should expect the same empty
+query to hard-fail rather than return empty.
+
 Only public (no-auth) servers ship in the catalog, so there is no auth
 module.
 """
@@ -55,8 +63,18 @@ OutputFormat = Literal["csv", "parquet"]
 #: Accepted on-disk table formats for a tabledap result.
 OUTPUT_FORMATS: tuple[str, ...] = ("csv", "parquet")
 
-#: Substring ERDDAP returns in the 404 body when a query matches nothing.
-_NO_MATCH_MARKER = "no matching results"
+#: Distinctive phrase ERDDAP returns in its 404 body when a tabledap query
+#: matches no rows (`"Your query produced no matching results."`). Matched
+#: case-insensitively, and only alongside a 404 status when one is available
+#: (erddapy re-raises a bare `HTTPError` with no `response`, so the status is
+#: usually absent — the phrase then decides on its own).
+_NO_MATCH_MARKER = "produced no matching results"
+
+#: Leading magic bytes of the NetCDF container formats ERDDAP serves —
+#: classic NetCDF-3 (`CDF\x01/02/05`) and NetCDF-4/HDF5 (`\x89HDF`). A griddap
+#: body that does not start with one of these is an error page (ERDDAP serves
+#: those as HTML, sometimes with a 200), not data.
+_NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HDF")
 
 
 @dataclass(frozen=True)
@@ -298,13 +316,20 @@ class ERDDAP(AbstractDataSource):
         try:
             return client.to_pandas()
         except requests.exceptions.HTTPError as exc:
-            if _NO_MATCH_MARKER in str(exc).lower():
+            # ERDDAP signals "no rows" with a 404 whose body carries the
+            # marker phrase. Gate on the phrase, and additionally on a 404
+            # when a status is present, so a 500/403 error page that merely
+            # mentions the phrase is not silently downgraded to "empty".
+            status = getattr(exc.response, "status_code", None)
+            if _NO_MATCH_MARKER in str(exc).lower() and status in (None, 404):
+                extent = self._extent_label()
                 logger.warning(
-                    f"ERDDAP tabledap {row.dataset_id}: no rows matched the "
-                    f"bbox/time window; returning an empty frame."
+                    f"ERDDAP tabledap {row.dataset_id}: no rows over {extent}; "
+                    f"returning an empty frame."
                 )
                 warnings.warn(
-                    f"ERDDAP query for {row.dataset_id!r} matched no rows.",
+                    f"ERDDAP query for {row.dataset_id!r} matched no rows over "
+                    f"{extent}.",
                     stacklevel=2,
                 )
                 return empty_canonical(variables)
@@ -326,8 +351,10 @@ class ERDDAP(AbstractDataSource):
             Path: The written NetCDF at `<root_dir>/<dataset_id>.nc`.
 
         Raises:
-            ValueError: When the ERDDAP server rejects the request (e.g.
-                the bbox/time is outside the dataset's coverage).
+            ValueError: When the ERDDAP server rejects the request, or
+                returns a non-NetCDF body (an HTML error page, sometimes
+                served with a 200) — e.g. the bbox/time is outside the
+                dataset's coverage.
         """
         constraints = build_constraints(self.space, self.time, "griddap")
         url = build_griddap_url(
@@ -341,13 +368,34 @@ class ERDDAP(AbstractDataSource):
         except requests.exceptions.HTTPError as exc:
             raise ValueError(
                 f"ERDDAP griddap request for {row.dataset_id!r} failed over "
-                f"bbox [{self.space.west}, {self.space.south}, "
-                f"{self.space.east}, {self.space.north}] / "
-                f"[{self.time.start_date:%Y-%m-%d}..{self.time.end_date:%Y-%m-%d}]: "
-                f"{exc}. The window may be outside the dataset's coverage."
+                f"{self._extent_label()}: {exc}. The window may be outside "
+                f"the dataset's coverage."
             ) from exc
-        dest.write_bytes(response.content)
+        # ERDDAP does not uniformly use 4xx/5xx for griddap problems: an
+        # out-of-coverage request, a maintenance notice, or a proxy
+        # interstitial can arrive as a 200 with an HTML body. Writing that
+        # to `<id>.nc` would yield a corrupt file that only fails much later
+        # (in pyramids or the user's own read). Validate the magic bytes and
+        # fail loud here instead.
+        content = response.content
+        if not content.startswith(_NETCDF_MAGIC):
+            raise ValueError(
+                f"ERDDAP griddap {row.dataset_id!r} returned a non-NetCDF "
+                f"body ({len(content)} bytes, starts {content[:24]!r}) over "
+                f"{self._extent_label()}. The server likely returned an error "
+                f"page instead of data; the bbox/time may be outside the "
+                f"dataset's coverage."
+            )
+        dest.write_bytes(content)
         return dest
+
+    def _extent_label(self) -> str:
+        """Render the request bbox + window for error / warning messages."""
+        return (
+            f"bbox [{self.space.west}, {self.space.south}, "
+            f"{self.space.east}, {self.space.north}] / "
+            f"[{self.time.start_date:%Y-%m-%d}..{self.time.end_date:%Y-%m-%d}]"
+        )
 
     def download(
         self,
