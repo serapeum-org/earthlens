@@ -138,3 +138,55 @@ class TestLicenseWarningPromotion:
 
         assert overture_helper is LicenseWarning
         assert overture_public is LicenseWarning
+
+
+@pytest.mark.biodiversity
+class TestParseRetryAfter:
+    """`parse_retry_after` covers both RFC 9110 §10.2.3 forms."""
+
+    def test_seconds_integer(self):
+        """An integer number of seconds parses to a float."""
+        from earthlens.biodiversity import parse_retry_after
+
+        assert parse_retry_after("7") == 7.0
+
+    def test_seconds_float(self):
+        """A float number of seconds parses too (RFC allows decimal)."""
+        from earthlens.biodiversity import parse_retry_after
+
+        assert parse_retry_after("1.5") == 1.5
+
+    def test_none_and_empty(self):
+        """`None` or an empty string yields `None`."""
+        from earthlens.biodiversity import parse_retry_after
+
+        assert parse_retry_after(None) is None
+        assert parse_retry_after("") is None
+
+    def test_http_date_far_future(self):
+        """An HTTP-date in the distant future yields a positive delta."""
+        from earthlens.biodiversity import parse_retry_after
+
+        wait = parse_retry_after("Fri, 31 Dec 2099 23:59:59 GMT")
+        assert wait is not None and wait > 365 * 24 * 3600
+
+    def test_http_date_past_clamps_to_zero(self):
+        """An HTTP-date already past yields `0.0`, not a negative wait."""
+        from earthlens.biodiversity import parse_retry_after
+
+        assert parse_retry_after("Fri, 31 Dec 1999 23:59:59 GMT") == 0.0
+
+    def test_malformed_value_is_none(self):
+        """An unparseable value yields `None` so the caller can fall back."""
+        from earthlens.biodiversity import parse_retry_after
+
+        assert parse_retry_after("definitely not a date") is None
+
+    def test_both_shims_reach_the_same_function(self):
+        """The IUCN and WDPA shims re-export the shared helper as the same object."""
+        from earthlens.biodiversity import parse_retry_after
+        from earthlens.iucn._rest import _parse_retry_after as iucn_alias
+        from earthlens.wdpa._rest import _parse_retry_after as wdpa_alias
+
+        assert iucn_alias is parse_retry_after
+        assert wdpa_alias is parse_retry_after

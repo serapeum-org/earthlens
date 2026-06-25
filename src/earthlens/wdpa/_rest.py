@@ -31,6 +31,7 @@ import requests
 from loguru import logger
 from shapely.geometry import shape
 
+from earthlens.biodiversity import parse_retry_after
 from earthlens.wdpa.auth import AuthenticationError
 
 #: Base URL of the current Protected Planet API (v3 retires 2026-05-01).
@@ -77,32 +78,9 @@ def _session(session: requests.Session | None) -> requests.Session:
     return requests.Session()
 
 
-def _parse_retry_after(value: str | None) -> float | None:
-    """Parse a `Retry-After` header value into seconds, or `None` if absent.
-
-    RFC 9110 §10.2.3 allows either an integer number of seconds or an
-    HTTP-date (e.g. `Fri, 31 Dec 2027 23:59:59 GMT`). Both forms are
-    handled; an unparseable value falls back to `None` so the caller can
-    use exponential back-off.
-    """
-    if not value:
-        return None
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        pass
-    try:
-        from email.utils import parsedate_to_datetime
-
-        target = parsedate_to_datetime(value)
-    except (TypeError, ValueError):
-        return None
-    if target is None:
-        return None
-    import datetime as _dt
-
-    now = _dt.datetime.now(tz=target.tzinfo)
-    return max(0.0, (target - now).total_seconds())
+#: Backward-compatible alias for the shared helper. Kept so any external
+#: caller that imported the private name still resolves.
+_parse_retry_after = parse_retry_after
 
 
 def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
@@ -157,7 +135,7 @@ def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
             )
         last_status = status
         if status in _RETRY_STATUSES and attempt < MAX_RETRIES:
-            retry_after = _parse_retry_after(response.headers.get("Retry-After"))
+            retry_after = parse_retry_after(response.headers.get("Retry-After"))
             wait = (
                 retry_after
                 if retry_after is not None

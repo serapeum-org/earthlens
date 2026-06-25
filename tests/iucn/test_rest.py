@@ -54,72 +54,76 @@ class TestFlattenLabel:
 
 
 @pytest.mark.iucn
-class TestParseRetryAfter:
-    """`_parse_retry_after` accepts seconds and HTTP-date forms."""
-
-    def test_seconds_integer(self):
-        """An integer number of seconds parses to a float."""
-        from earthlens.iucn._rest import _parse_retry_after
-
-        assert _parse_retry_after("7") == 7.0
-
-    def test_none_and_empty(self):
-        """`None` or an empty string yields `None`."""
-        from earthlens.iucn._rest import _parse_retry_after
-
-        assert _parse_retry_after(None) is None
-        assert _parse_retry_after("") is None
-
-    def test_http_date_far_future(self):
-        """An HTTP-date in the distant future yields a positive `delta` in seconds."""
-        from earthlens.iucn._rest import _parse_retry_after
-
-        wait = _parse_retry_after("Fri, 31 Dec 2099 23:59:59 GMT")
-        assert wait is not None and wait > 365 * 24 * 3600
-
-    def test_http_date_past_clamps_to_zero(self):
-        """An HTTP-date already in the past yields `0.0`, not a negative wait."""
-        from earthlens.iucn._rest import _parse_retry_after
-
-        assert _parse_retry_after("Fri, 31 Dec 1999 23:59:59 GMT") == 0.0
-
-    def test_malformed_value_is_none(self):
-        """An unparseable value yields `None` so the caller can fall back."""
-        from earthlens.iucn._rest import _parse_retry_after
-
-        assert _parse_retry_after("definitely not a date") is None
-
-
-@pytest.mark.iucn
 class TestThrottleThreadSafety:
     """`_throttle` serializes concurrent callers via a module-level lock."""
 
-    def test_concurrent_calls_serialise(self, fake_iucn):
-        """Two threads calling `_throttle` race through the lock cleanly.
+    def test_throttle_acquires_the_module_lock(self, monkeypatch, fake_iucn):
+        """`_throttle` enters and exits `_THROTTLE_LOCK` on every call.
 
-        Without the lock both threads could read `_CALLED_ONCE = False`,
-        skip the wait, and update `_LAST_CALL_MONOTONIC` non-monotonically.
-        With the lock the second thread always observes the first's update
-        and the resulting state reflects two calls (call count 2).
+        Asserting on `time.sleep` calls is not a real proof of thread safety
+        in Python: the read-update of `_CALLED_ONCE` is short enough that
+        the GIL almost always serializes it even without a lock. So we
+        instead test the strict contract the M2 fix introduced — every
+        `_throttle()` invocation must acquire and release the shared lock.
+
+        Verified by replacing `_THROTTLE_LOCK` with an instrumented mock
+        whose `__enter__`/`__exit__` count their invocations: a future
+        contributor who removes the `with _THROTTLE_LOCK:` block leaves
+        `enters == 0` and the test fails loudly.
+        """
+        from earthlens.iucn import _rest
+
+        enters = 0
+        exits = 0
+
+        class _CountingLock:
+            def __enter__(self_inner):
+                nonlocal enters
+                enters += 1
+                return self_inner
+
+            def __exit__(self_inner, *exc):
+                nonlocal exits
+                exits += 1
+                return False
+
+        monkeypatch.setattr(_rest, "_THROTTLE_LOCK", _CountingLock())
+        _rest._throttle()
+        _rest._throttle()
+        assert enters == 2, (
+            f"_throttle did not acquire _THROTTLE_LOCK; got {enters} enters. "
+            "A future contributor likely removed the `with _THROTTLE_LOCK:` "
+            "block — restore it to keep the throttle thread-safe."
+        )
+        assert exits == 2, f"lock left in acquired state; got {exits} exits"
+
+    def test_throttle_under_concurrency_returns_cleanly(self, fake_iucn):
+        """Two threads calling `_throttle` concurrently both return.
+
+        The Python GIL plus the lock makes the read-modify-write of the
+        shared state safe; this test is the smoke check that the lock does
+        not deadlock or starve a thread under contention.
         """
         import threading
 
         from earthlens.iucn._rest import _throttle
 
-        counts = {"calls": 0}
+        completed: list[int] = []
         barrier = threading.Barrier(2)
 
-        def worker() -> None:
+        def worker(index: int) -> None:
             barrier.wait()
             _throttle()
-            counts["calls"] += 1
+            completed.append(index)
 
-        threads = [threading.Thread(target=worker) for _ in range(2)]
+        threads = [threading.Thread(target=worker, args=(i,)) for i in range(2)]
         for thread in threads:
             thread.start()
         for thread in threads:
             thread.join(timeout=5)
-        assert counts["calls"] == 2
+        assert sorted(completed) == [0, 1], (
+            f"a thread did not complete; got {completed!r}"
+        )
 
 
 @pytest.mark.iucn

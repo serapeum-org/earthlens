@@ -20,8 +20,10 @@ rows and the `Point` geometry column.
 
 from __future__ import annotations
 
+import datetime as dt
 import warnings
 from collections.abc import Iterable, Mapping
+from email.utils import parsedate_to_datetime
 
 import geopandas as gpd
 import pandas as pd
@@ -181,6 +183,67 @@ def warn_license(license_id: str, label: str, *, detail: str | None = None) -> b
     message += ". Honour attribution and do not redistribute without permission."
     warnings.warn(message, LicenseWarning, stacklevel=2)
     return True
+
+
+def parse_retry_after(value: str | None) -> float | None:
+    """Parse a `Retry-After` header value into seconds.
+
+    RFC 9110 §10.2.3 allows either an integer number of seconds (`"7"`) or an
+    HTTP-date (`"Fri, 31 Dec 2027 23:59:59 GMT"`). Both forms are handled; an
+    unparseable value or `None` yields `None` so the caller can fall back to
+    its own back-off strategy. A past HTTP-date clamps to `0.0` (don't sleep
+    backwards in time).
+
+    Shared between the IUCN and WDPA REST shims, which both use it to
+    implement `429`-aware retry back-off.
+
+    Args:
+        value: The raw header value, or `None` if the response did not
+            carry a `Retry-After` header.
+
+    Returns:
+        The wait in seconds (>= 0), or `None` if the value is missing or
+        unparseable.
+
+    Examples:
+        - Integer seconds:
+            ```python
+            >>> from earthlens.biodiversity import parse_retry_after
+            >>> parse_retry_after("7")
+            7.0
+
+            ```
+        - A past HTTP-date clamps to zero:
+            ```python
+            >>> from earthlens.biodiversity import parse_retry_after
+            >>> parse_retry_after("Fri, 31 Dec 1999 23:59:59 GMT")
+            0.0
+
+            ```
+        - Missing / unparseable values yield `None`:
+            ```python
+            >>> from earthlens.biodiversity import parse_retry_after
+            >>> parse_retry_after(None) is None
+            True
+            >>> parse_retry_after("not a date") is None
+            True
+
+            ```
+    """
+    if not value:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        pass
+    try:
+        target = parsedate_to_datetime(value)
+    except (TypeError, ValueError):
+        return None
+    if target is None:
+        return None
+    now = dt.datetime.now(tz=target.tzinfo)
+    return max(0.0, (target - now).total_seconds())
 
 
 def _empty_fc(columns: Mapping[str, str]) -> FeatureCollection:

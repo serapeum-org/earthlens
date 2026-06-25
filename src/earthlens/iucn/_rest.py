@@ -32,6 +32,7 @@ from typing import Any
 import requests
 from loguru import logger
 
+from earthlens.biodiversity import parse_retry_after
 from earthlens.iucn.auth import AuthenticationError
 
 #: Base URL of the IUCN Red List v4 API (v3 is retired).
@@ -66,32 +67,10 @@ def clear_throttle_state() -> None:
     _CALLED_ONCE = False
 
 
-def _parse_retry_after(value: str | None) -> float | None:
-    """Parse a `Retry-After` header value into seconds, or `None` if absent.
+#: Backward-compatible alias for the shared helper. External tests imported
+#: this name; re-export so a name change is not a public-surface break.
+_parse_retry_after = parse_retry_after
 
-    RFC 9110 §10.2.3 allows either an integer number of seconds or an
-    HTTP-date (e.g. `Fri, 31 Dec 2027 23:59:59 GMT`). Both forms are
-    handled; an unparseable value falls back to `None` so the caller can
-    use exponential back-off.
-    """
-    if not value:
-        return None
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        pass
-    try:
-        from email.utils import parsedate_to_datetime
-
-        target = parsedate_to_datetime(value)
-    except (TypeError, ValueError):
-        return None
-    if target is None:
-        return None
-    import datetime as _dt
-
-    now = _dt.datetime.now(tz=target.tzinfo)
-    return max(0.0, (target - now).total_seconds())
 
 #: Ordered assessment attribute columns and their pandas dtypes.
 IUCN_COLUMNS: dict[str, str] = {
@@ -129,6 +108,15 @@ def _throttle() -> None:
     inter-call window is honoured against the same upstream API.
     """
     global _LAST_CALL_MONOTONIC, _CALLED_ONCE
+    # `time.sleep` is intentionally held inside the lock. The throttle
+    # enforces "at most one call per THROTTLE_SECONDS" against the same
+    # upstream API, so the next thread must observe the updated
+    # `_LAST_CALL_MONOTONIC` after the sleep finishes — otherwise multiple
+    # threads would all see `elapsed < THROTTLE_SECONDS`, all sleep
+    # concurrently, and all hit the API simultaneously. Concurrent callers
+    # therefore serialize cumulatively (the Nth thread waits ~(N-1) *
+    # THROTTLE_SECONDS before its own request), which is exactly what
+    # IUCN's rate-limit advisory requires.
     with _THROTTLE_LOCK:
         if _CALLED_ONCE:
             elapsed = time.monotonic() - _LAST_CALL_MONOTONIC
@@ -203,7 +191,7 @@ def _get(
             )
         last_status = status
         if status in _RETRY_STATUSES and attempt < MAX_RETRIES:
-            retry_after = _parse_retry_after(response.headers.get("Retry-After"))
+            retry_after = parse_retry_after(response.headers.get("Retry-After"))
             wait = (
                 retry_after
                 if retry_after is not None

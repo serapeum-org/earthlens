@@ -28,6 +28,7 @@ from earthlens.biodiversity._helpers import (
     WDPA_LICENSE,
     LicenseWarning,
     occurrences_to_fc,
+    parse_retry_after,
     warn_license,
     wkt_from_bbox,
 )
@@ -38,6 +39,7 @@ __all__ = [
     "RESTRICTIVE_LICENSES",
     "WDPA_LICENSE",
     "occurrences_to_fc",
+    "parse_retry_after",
     "warn_license",
     "wkt_from_bbox",
 ]
