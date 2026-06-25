@@ -1,0 +1,17 @@
+# Informational index: every dataset key the shipped ERDDAP catalog
+# curates. The curated rows live in the per-slice *.yaml files in this
+# directory; every curated `datasets:` key must be a member of this
+# list (the loader enforces it). Edit the slice files, then mirror the
+# key here.
+#
+# ERDDAP has no single global "all datasets" universe (it is a protocol
+# spoken by hundreds of independent servers), so unlike the cmems /
+# earthdata indices this list is just the curated keys, not an upstream
+# crawl. A catalog-refresh tool that walks a server's `allDatasets`
+# table is a follow-on (see the plan's scope guards).
+
+available_datasets:
+  - NOAA_DHW
+  - erdMH1chla8day
+  - nceiPH53sstd1day
+  - cwwcNDBCMet
