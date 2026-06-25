@@ -188,6 +188,12 @@ class Dataset(BaseModel):
             (e.g. `"CRW_SSTANOMALY"`); for tabledap, table column names.
         dim_names: Grid dimension order for a griddap request (e.g.
             `["time", "latitude", "longitude"]`). Ignored for tabledap.
+        flux_variables: Subset of griddap `variables` that are
+            accumulations / fluxes rather than instantaneous state fields.
+            The backend marks these `is_flux=True` so an `aggregate=` with
+            `op="auto"` reduces them by `"sum"` (the window total) instead
+            of `"mean"`. Empty by default — ERDDAP griddap variables are
+            overwhelmingly state fields (SST anomaly, DHW, chlorophyll).
         title: Human-readable description used in log messages.
         license_note: Licence / attribution note for the dataset.
 
@@ -212,6 +218,7 @@ class Dataset(BaseModel):
     protocol: ProtocolLiteral
     variables: list[str] = Field(default_factory=list)
     dim_names: list[str] = Field(default_factory=lambda: list(_DEFAULT_DIM_NAMES))
+    flux_variables: list[str] = Field(default_factory=list)
     title: str = ""
     license_note: str = ""
 

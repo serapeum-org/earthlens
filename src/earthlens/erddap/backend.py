@@ -84,17 +84,18 @@ class _GridVarInfo:
     The aggregator only reads three fields off the catalog row it is
     handed — the in-NetCDF variable name, the output-filename seed, and
     the flux marker. ERDDAP griddap variables are named identically in
-    the request and the file, and are overwhelmingly instantaneous
-    *state* fields (SST anomaly, DHW, chlorophyll), so `is_flux` defaults
-    to `False` (→ `op="auto"` resolves to `"mean"`). Pass an explicit
-    `op="sum"` to :class:`~earthlens.aggregate.AggregationConfig` for a
-    genuine accumulation variable.
+    the request and the file. `is_flux` is set per variable from the
+    resolved dataset's `flux_variables` list: it is `True` for an
+    accumulation/flux variable (→ `op="auto"` resolves to `"sum"`) and
+    `False` for an instantaneous state field (→ `"mean"`). The shipped
+    rows declare no fluxes (SST anomaly, DHW, chlorophyll are all state),
+    so the default is `False`.
 
     Attributes:
         nc_variable: Variable name inside the downloaded NetCDF.
         cds_variable: Seeds the aggregated output filename.
-        is_flux: `False` (state) by default; the aggregator maps it to a
-            `"mean"` reducer under `op="auto"`.
+        is_flux: `True` for a flux/accumulation variable (`op="auto"` →
+            `"sum"`), `False` for a state field (`"mean"`).
     """
 
     nc_variable: str
@@ -300,8 +301,12 @@ class ERDDAP(AbstractDataSource):
             variables: Column names to request.
 
         Returns:
-            pd.DataFrame: The result, or an empty canonical frame (the
-                requested columns, no rows) when the query matched nothing.
+            pd.DataFrame: The result. A populated frame uses ERDDAP's
+                column names, which carry units (e.g. `"wtmp (degree_C)"`);
+                the empty-match fallback instead uses the **bare requested
+                names** (`"wtmp"`), since the unit-suffixed names are only
+                known from a successful response. So `df.columns` differs
+                between a matched and an empty result.
 
         Raises:
             requests.exceptions.HTTPError: For any HTTP failure other than
@@ -446,16 +451,13 @@ class ERDDAP(AbstractDataSource):
                 else empty_canonical(list(self.vars))
             )
             out_path = self._write_table(df)
-            if len(df):
-                logger.info(
-                    f"ERDDAP {self._dataset.dataset_id}: {len(df)} row(s) "
-                    f"written to {out_path}"
-                )
-            else:
-                logger.warning(
-                    f"ERDDAP {self._dataset.dataset_id}: no rows matched; "
-                    f"wrote an empty table to {out_path}"
-                )
+            # A no-match is already warned (with the extent) in `_fetch_table`;
+            # here just record where the table landed, at the matching level.
+            level = logger.info if len(df) else logger.debug
+            level(
+                f"ERDDAP {self._dataset.dataset_id}: {len(df)} row(s) written "
+                f"to {out_path}"
+            )
             return df
 
         nc_paths: list[Path] = self._api()
@@ -487,10 +489,13 @@ class ERDDAP(AbstractDataSource):
             effective = aggregate.model_copy(
                 update={"out_dir": self.root_dir / "aggregated"}
             )
+        flux = set(self._dataset.flux_variables)
         out_paths: list[Path] = []
         for nc_path in nc_paths:
             for var in self.vars:
-                var_info = _GridVarInfo(nc_variable=var, cds_variable=var)
+                var_info = _GridVarInfo(
+                    nc_variable=var, cds_variable=var, is_flux=var in flux
+                )
                 agg = aggregate_netcdf(nc_path, var_info, effective)
                 out_paths.extend(p for _, _, p in agg if p is not None)
         return out_paths

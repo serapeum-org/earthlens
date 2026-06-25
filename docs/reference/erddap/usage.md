@@ -57,8 +57,9 @@ paths = EarthLens(
 # -> [PosixPath('erddap_out/aggregated/CRW_SSTANOMALY_1MS_20230601.tif')]
 ```
 
-ERDDAP griddap variables are instantaneous *state* fields, so `op="auto"` resolves to `"mean"`. Pass an explicit
-`op="sum"` for a genuine accumulation variable.
+Under `op="auto"` the reducer is picked per variable: an instantaneous *state* field (SST anomaly, DHW,
+chlorophyll — all the shipped griddap datasets) reduces by `"mean"`, while a variable listed in its catalog row's
+`flux_variables` (an accumulation / flux) reduces by `"sum"` (the window total). Pass an explicit `op=` to override.
 
 ## tabledap → DataFrame
 

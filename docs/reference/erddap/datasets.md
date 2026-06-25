@@ -41,6 +41,7 @@ datasets:
     protocol: griddap          # or tabledap
     dim_names: [time, latitude, longitude]   # griddap only
     variables: [<default variable>, ...]
+    flux_variables: [<accumulation variable>, ...]   # optional; op="auto" -> "sum"
     title: <human-readable title>
     license_note: <licence / attribution>
 ```

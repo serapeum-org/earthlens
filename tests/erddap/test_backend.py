@@ -218,6 +218,7 @@ class TestGriddap:
         def _fake_aggregate(nc_path, var_info, config):
             seen["nc_path"] = nc_path
             seen["nc_variable"] = var_info.nc_variable
+            seen["is_flux"] = var_info.is_flux
             seen["out_dir"] = config.out_dir
             return [("2023-06-01", None, tmp_path / "agg.tif")]
 
@@ -228,7 +229,25 @@ class TestGriddap:
         assert result == [tmp_path / "agg.tif"]
         assert seen["nc_path"] == tmp_path / f"{GRIDDAP_ID}.nc"
         assert seen["nc_variable"] == "CRW_SSTANOMALY"
+        assert seen["is_flux"] is False  # a state field reduces by mean
         assert seen["out_dir"] == tmp_path / "aggregated"
+
+    def test_aggregate_marks_flux_variable(self, tmp_path, fake_nc_get, monkeypatch):
+        """A catalog flux_variables member is marked is_flux=True for the reducer."""
+        seen = {}
+
+        def _fake_aggregate(nc_path, var_info, config):
+            seen[var_info.nc_variable] = var_info.is_flux
+            return [("2023-06-01", None, tmp_path / f"{var_info.nc_variable}.tif")]
+
+        monkeypatch.setattr("earthlens.aggregate.aggregate_netcdf", _fake_aggregate)
+        backend = _grid_backend(tmp_path)
+        # Curate the resolved row so one variable is a flux (frozen → copy).
+        backend._dataset = backend._dataset.model_copy(
+            update={"flux_variables": ["CRW_SSTANOMALY"]}
+        )
+        backend.download(aggregate=AggregationConfig(freq="1D"))
+        assert seen["CRW_SSTANOMALY"] is True
 
     def test_griddap_http_error_becomes_valueerror(self, tmp_path, monkeypatch):
         """An out-of-coverage griddap response surfaces as a clear ValueError."""
