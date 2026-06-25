@@ -2,16 +2,31 @@
 
 from __future__ import annotations
 
+import re
+from pathlib import Path
 from typing import Any, Callable
 
 import pandas as pd
 import pytest
 
+import earthlens.argo
 from earthlens.argo import ARGO
 from earthlens.argo._helpers import ARGO_COLUMNS, region_box
 from tests.argo.conftest import DataNotFound, FakeArgo
 
 pytestmark = pytest.mark.argo
+
+
+def test_no_xarray_leak_in_source():
+    """No argo source module imports xarray (G1 — the headline landmine)."""
+    pattern = re.compile(r"import xarray|\bxr\.|to_xarray")
+    pkg_dir = Path(earthlens.argo.__file__).parent
+    offenders = [
+        path.name
+        for path in pkg_dir.glob("*.py")
+        if pattern.search(path.read_text(encoding="utf-8"))
+    ]
+    assert offenders == [], f"xarray reference leaked into argo source: {offenders}"
 
 
 def test_region_construction_and_dispatch(
