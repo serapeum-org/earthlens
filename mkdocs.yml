@@ -267,6 +267,10 @@ nav:
       - Usage: reference/iucn/usage.md
       - Authentication: reference/iucn/authentication.md
       - Reference: reference/iucn/iucn.md
+    - Drought indicators (USDM / EDO / GDO / SPEIbase):
+      - Introduction: reference/drought/introduction.md
+      - Usage: reference/drought/usage.md
+      - Reference: reference/drought/drought.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
