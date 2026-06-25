@@ -80,6 +80,19 @@ class TestConstructionAndOutputKind:
                 path=str(tmp_path),
             )
 
+    def test_invalid_output_format_rejected(self, tmp_path):
+        """An out-of-domain output_format fails at construction."""
+        with pytest.raises(ValueError, match="output_format must be one of"):
+            ERDDAP(
+                start="2023-01-01",
+                end="2023-01-02",
+                lat_lim=[0.0, 1.0],
+                lon_lim=[0.0, 1.0],
+                dataset=TABLEDAP_ID,
+                output_format="feather",
+                path=str(tmp_path),
+            )
+
     def test_variables_mapping_rejected(self, tmp_path):
         """Passing variables as a mapping is a TypeError."""
         with pytest.raises(TypeError, match="list of variable"):
@@ -131,6 +144,20 @@ class TestTabledap:
         fake_erddapy.frame = pd.DataFrame({"station": ["46042"], "wtmp": [12.3]})
         _table_backend(tmp_path).download()
         assert (tmp_path / f"{TABLEDAP_ID}.csv").is_file()
+
+    def test_download_writes_parquet(self, tmp_path, fake_erddapy, monkeypatch):
+        """output_format='parquet' writes a .parquet file."""
+        fake_erddapy.frame = pd.DataFrame({"station": ["46042"], "wtmp": [12.3]})
+        written: dict = {}
+        monkeypatch.setattr(
+            pd.DataFrame,
+            "to_parquet",
+            lambda self, path, index=True: written.update(path=path),
+        )
+        backend = _table_backend(tmp_path)
+        backend._output_format = "parquet"
+        backend.download()
+        assert str(written["path"]).endswith(f"{TABLEDAP_ID}.parquet")
 
     def test_aggregate_rejected_for_tabledap(self, tmp_path, fake_erddapy):
         """aggregate= on a tabledap dataset raises NotImplementedError."""
