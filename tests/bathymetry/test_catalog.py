@@ -12,11 +12,7 @@ from earthlens.bathymetry.catalog import Transport, clear_catalog_cache
 
 pytestmark = pytest.mark.bathymetry
 
-_ROW = (
-    "    endpoint: https://x/erddap\n"
-    "    dataset_id: A\n"
-    "    variable: z\n"
-)
+_ROW = "    endpoint: https://x/erddap\n" "    dataset_id: A\n" "    variable: z\n"
 
 VALID_TRANSPORTS = set(Transport.__args__)
 

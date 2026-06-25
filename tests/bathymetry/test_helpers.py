@@ -62,7 +62,11 @@ def test_griddap_url_shifts_lon_for_0360_row():
 def test_griddap_url_positive_lon_unchanged_for_0360_row():
     """A positive longitude is unchanged when wrapped onto 0..360."""
     url = griddap_subset_url(
-        "https://e.org/erddap", "d", "z", (150.0, 0.0, 151.0, 1.0), lon_convention="0..360"
+        "https://e.org/erddap",
+        "d",
+        "z",
+        (150.0, 0.0, 151.0, 1.0),
+        lon_convention="0..360",
     )
     assert "[(150.0):1:(151.0)]" in url
 

@@ -155,9 +155,7 @@ class Bathymetry(AbstractDataSource):
         self._dataset: Dataset = self._catalog.get(dataset)
         self._timeout = timeout
 
-        resolved_variables = (
-            list(variables) if variables else [self._dataset.variable]
-        )
+        resolved_variables = list(variables) if variables else [self._dataset.variable]
         self._validate_variables(resolved_variables)
 
         super().__init__(
