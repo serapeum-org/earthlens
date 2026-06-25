@@ -1,0 +1,63 @@
+# OBIS species catalog — friendly species keys for the earthlens OBIS backend.
+#
+# Each entry maps a friendly name a user can pass in `variables` to an OBIS
+# `scientificname`. OBIS keys occurrence search on the scientific name string
+# (not a numeric id), so these are convenience aliases for a handful of
+# well-known marine species. For any other taxon, pass the name explicitly with
+# the `species:` prefix (`variables=["species:Mola mola"]`).
+#
+# Validate the curated entries with: earthlens datasets validate obis
+#
+# `available_datasets:` below is the informational index of common marine
+# higher-rank taxa OBIS records cover — root life groups plus commonly-queried
+# marine families. `earthlens datasets refresh obis` diffs this list against
+# the curated `species:` keys above so a maintainer can see what is index-only
+# vs wired up as a friendly alias.
+available_datasets:
+  - kingdom:Animalia
+  - kingdom:Chromista
+  - kingdom:Plantae
+  - kingdom:Protozoa
+  - phylum:Annelida
+  - phylum:Arthropoda
+  - phylum:Bryozoa
+  - phylum:Chordata
+  - phylum:Cnidaria
+  - phylum:Echinodermata
+  - phylum:Mollusca
+  - phylum:Porifera
+  - class:Actinopterygii
+  - class:Anthozoa
+  - class:Asteroidea
+  - class:Aves
+  - class:Bivalvia
+  - class:Cephalopoda
+  - class:Chondrichthyes
+  - class:Crustacea
+  - class:Echinoidea
+  - class:Mammalia
+  - class:Reptilia
+  - class:Scyphozoa
+  - order:Carcharhiniformes
+  - order:Cetacea
+  - order:Decapoda
+  - order:Pinnipedia
+  - order:Sirenia
+  - order:Testudines
+
+species:
+  common-dolphin:
+    scientific_name: "Delphinus delphis"
+    title: "Common dolphin"
+  blue-whale:
+    scientific_name: "Balaenoptera musculus"
+    title: "Blue whale"
+  great-white-shark:
+    scientific_name: "Carcharodon carcharias"
+    title: "Great white shark"
+  loggerhead-turtle:
+    scientific_name: "Caretta caretta"
+    title: "Loggerhead sea turtle"
+  ocean-sunfish:
+    scientific_name: "Mola mola"
+    title: "Ocean sunfish"

@@ -29,14 +29,14 @@ class TestListBackends:
     def test_collapses_aliases_to_distinct_backends(self):
         """Every registry alias collapses to one BackendInfo per backend.
 
-        The facade registry exposes 35+ keys (aliases like `chirps`,
-        `google-earth-engine`); list_backends returns one entry per
-        distinct backend module.
+        The facade registry exposes 40+ keys (aliases like `chirps`,
+        `google-earth-engine`, `protected-planet`); list_backends returns
+        one entry per distinct backend module.
         """
         backends = list_backends()
         providers = [b.provider for b in backends]
         assert len(providers) == len(set(providers)), "provider ids must be unique"
-        assert len(backends) == 25, f"expected 25 backends, got {len(backends)}"
+        assert len(backends) == 29, f"expected 29 backends, got {len(backends)}"
 
     def test_sorted_by_provider(self):
         """Backends are returned sorted by canonical provider id."""

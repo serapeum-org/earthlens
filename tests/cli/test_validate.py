@@ -40,6 +40,10 @@ _CURATED_ENUM = (
     "tropycal",
     "gdacs",
     "chc",
+    "gbif",
+    "obis",
+    "wdpa",
+    "iucn",
 )
 
 

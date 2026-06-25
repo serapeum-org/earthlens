@@ -1,0 +1,100 @@
+# IUCN country catalog — curated ISO2 countries for the earthlens IUCN backend.
+#
+# Each entry is keyed by its ISO 3166-1 alpha-2 code (the value the Red List v4
+# `countries/{code}` endpoint expects) and carries a human name and region. This
+# is a curated, biodiversity-notable subset across every continent — it is NOT
+# exhaustive: the backend accepts ANY valid alpha-2 code as a `country:` selector
+# whether or not it is listed here. The catalog gives friendly-name resolution, a
+# did-you-mean hint, and the `validate` target. (Species are selected by binomial
+# via `species:<name>`, not from this catalog.)
+#
+# Validate the curated entries with: earthlens datasets validate iucn
+#
+# `available_datasets:` mirrors the curated ISO2 country keys below — the
+# universe the IUCN backend's friendly-name resolution covers. `earthlens
+# datasets refresh iucn` reports the same list (the country axis is the
+# refreshable surface; the Red List v4 country dictionary is token-gated, so
+# the curated catalog *is* the offline informational index).
+available_datasets:
+  - AR
+  - AU
+  - BR
+  - BW
+  - CA
+  - CD
+  - CL
+  - CN
+  - CO
+  - CR
+  - DE
+  - EC
+  - ES
+  - ET
+  - FJ
+  - FR
+  - GA
+  - GB
+  - ID
+  - IN
+  - IT
+  - JP
+  - KE
+  - LI
+  - MG
+  - MX
+  - MY
+  - NA
+  - NG
+  - "NO"
+  - NP
+  - NZ
+  - PE
+  - PG
+  - PH
+  - TH
+  - TZ
+  - US
+  - VN
+  - ZA
+
+countries:
+  KE: {name: Kenya, region: Africa}
+  TZ: {name: Tanzania, region: Africa}
+  ZA: {name: South Africa, region: Africa}
+  CD: {name: Democratic Republic of the Congo, region: Africa}
+  MG: {name: Madagascar, region: Africa}
+  ET: {name: Ethiopia, region: Africa}
+  NG: {name: Nigeria, region: Africa}
+  GA: {name: Gabon, region: Africa}
+  BW: {name: Botswana, region: Africa}
+  NA: {name: Namibia, region: Africa}
+  BR: {name: Brazil, region: Americas}
+  US: {name: United States, region: Americas}
+  CA: {name: Canada, region: Americas}
+  MX: {name: Mexico, region: Americas}
+  PE: {name: Peru, region: Americas}
+  CO: {name: Colombia, region: Americas}
+  EC: {name: Ecuador, region: Americas}
+  CR: {name: Costa Rica, region: Americas}
+  AR: {name: Argentina, region: Americas}
+  CL: {name: Chile, region: Americas}
+  ID: {name: Indonesia, region: Asia}
+  IN: {name: India, region: Asia}
+  CN: {name: China, region: Asia}
+  MY: {name: Malaysia, region: Asia}
+  PH: {name: Philippines, region: Asia}
+  TH: {name: Thailand, region: Asia}
+  NP: {name: Nepal, region: Asia}
+  VN: {name: Vietnam, region: Asia}
+  JP: {name: Japan, region: Asia}
+  GB: {name: United Kingdom, region: Europe}
+  FR: {name: France, region: Europe}
+  ES: {name: Spain, region: Europe}
+  DE: {name: Germany, region: Europe}
+  "NO": {name: Norway, region: Europe}  # quoted: bare NO is a YAML 1.1 boolean
+  IT: {name: Italy, region: Europe}
+  LI: {name: Liechtenstein, region: Europe}
+  AU: {name: Australia, region: Oceania}
+  NZ: {name: New Zealand, region: Oceania}
+  PG: {name: Papua New Guinea, region: Oceania}
+  FJ: {name: Fiji, region: Oceania}
