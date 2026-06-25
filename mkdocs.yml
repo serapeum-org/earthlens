@@ -175,6 +175,11 @@ nav:
       - Authentication: reference/jaxa/authentication.md
       - Available datasets: reference/jaxa/datasets.md
       - Reference: reference/jaxa/jaxa.md
+    - Bathymetry (topography / bathymetry DEMs):
+      - Introduction: reference/bathymetry/introduction.md
+      - Usage: reference/bathymetry/usage.md
+      - Available datasets: reference/bathymetry/datasets.md
+      - Reference: reference/bathymetry/bathymetry.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
