@@ -14,10 +14,13 @@ catalog-refresh tool are follow-ons.
 
 | `dataset=` | Protocol | Output | Default variables | Description |
 |---|---|---|---|---|
-| `NOAA_DHW` | griddap | raster | `CRW_SSTANOMALY`, `CRW_DHW` | NOAA Coral Reef Watch daily global 5 km SST anomaly + Degree Heating Weeks |
-| `erdMH1chla8day` | griddap | raster | `chlorophyll` | Chlorophyll-a, Aqua MODIS, global 4 km, 8-day composite |
-| `nceiPH53sstd1day` | griddap | raster | `sea_surface_temperature` | NCEI AVHRR Pathfinder v5.3 L3-collated SST, daytime, daily |
-| `cwwcNDBCMet` | tabledap | tabular | `station`, `time`, `wtmp` | NDBC standard meteorological buoy time series |
+| `NOAA_DHW` | griddap | raster | `CRW_SSTANOMALY`, `CRW_DHW` | NOAA Coral Reef Watch daily global 5 km SST anomaly + Degree Heating Weeks (current) |
+| `erdMH1chla8day` | griddap | raster | `chlorophyll` | Chlorophyll-a, Aqua MODIS, global 4 km, 8-day composite — **historical, 2003–2022 only** |
+| `nceiPH53sstd1day` | griddap | raster | `sea_surface_temperature` | NCEI AVHRR Pathfinder v5.3 L3-collated SST, daytime, daily (current) |
+| `cwwcNDBCMet` | tabledap | tabular | `station`, `time`, `wtmp` | NDBC standard meteorological buoy time series (current) |
+
+`erdMH1chla8day` is a **historical** record (the Aqua MODIS product stopped updating in mid-2022); request a
+date inside 2003–2022, or a recent-date request returns a clear out-of-coverage error.
 
 All four are U.S. Government public-domain datasets on a public, no-auth server.
 

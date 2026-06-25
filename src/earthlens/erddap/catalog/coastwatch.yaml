@@ -15,7 +15,10 @@ datasets:
     dim_names: [time, latitude, longitude]
     variables:
       - chlorophyll
-    title: Chlorophyll-a, Aqua MODIS, NPP, Global, 4km, 8-day composite
+    # Historical record: the Aqua MODIS mission product covers 2003-01 to
+    # 2022-06 only (it stopped updating). Request dates inside that window;
+    # a recent-date request returns a clear out-of-coverage ValueError.
+    title: Chlorophyll-a, Aqua MODIS, NPP, Global, 4km, 8-day composite (2003-2022, historical)
     license_note: NASA OBPG / NOAA CoastWatch, U.S. Government public domain
 
   nceiPH53sstd1day:
