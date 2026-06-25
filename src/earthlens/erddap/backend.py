@@ -175,8 +175,8 @@ class ERDDAP(AbstractDataSource):
         self._output_format: OutputFormat = output_format
         self._timeout = timeout
 
-        resolved_variables = list(variables) if variables else list(
-            self._dataset.variables
+        resolved_variables = (
+            list(variables) if variables else list(self._dataset.variables)
         )
         super().__init__(
             start=start,

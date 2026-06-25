@@ -24,7 +24,9 @@ class FakeErddapClient:
     #: Exception `to_pandas` raises instead of returning; set per test.
     error: Exception | None = None
 
-    def __init__(self, server: str, protocol: str | None = None, response: str = "html"):
+    def __init__(
+        self, server: str, protocol: str | None = None, response: str = "html"
+    ):
         self.server = server
         self.protocol = protocol
         self.dataset_id: str | None = None

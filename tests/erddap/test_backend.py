@@ -206,7 +206,9 @@ class TestGriddap:
         _grid_backend(tmp_path).download()
         assert "xarray" not in sys.modules
 
-    def test_aggregate_routes_through_pyramids(self, tmp_path, fake_nc_get, monkeypatch):
+    def test_aggregate_routes_through_pyramids(
+        self, tmp_path, fake_nc_get, monkeypatch
+    ):
         """aggregate= reduces the downloaded .nc via aggregate_netcdf."""
         seen = {}
 
@@ -216,9 +218,7 @@ class TestGriddap:
             seen["out_dir"] = config.out_dir
             return [("2023-06-01", None, tmp_path / "agg.tif")]
 
-        monkeypatch.setattr(
-            "earthlens.aggregate.aggregate_netcdf", _fake_aggregate
-        )
+        monkeypatch.setattr("earthlens.aggregate.aggregate_netcdf", _fake_aggregate)
         backend = _grid_backend(tmp_path)
         result = backend.download(aggregate=AggregationConfig(freq="1D"))
 

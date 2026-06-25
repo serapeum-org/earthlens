@@ -35,9 +35,7 @@ def _network_ok() -> bool:
         return False
 
 
-_offline_skip = pytest.mark.skipif(
-    not _network_ok(), reason=f"{_HOST} unreachable"
-)
+_offline_skip = pytest.mark.skipif(not _network_ok(), reason=f"{_HOST} unreachable")
 
 
 @_offline_skip

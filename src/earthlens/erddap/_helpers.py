@@ -74,9 +74,7 @@ def build_constraints(
             ```
     """
     if protocol not in ("tabledap", "griddap"):
-        raise ValueError(
-            f"protocol must be 'tabledap' or 'griddap', got {protocol!r}."
-        )
+        raise ValueError(f"protocol must be 'tabledap' or 'griddap', got {protocol!r}.")
     base = {
         "time>=": time.start_date.strftime(_ISO_TIME),
         "time<=": time.end_date.strftime(_ISO_TIME),
