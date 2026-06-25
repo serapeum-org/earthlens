@@ -356,6 +356,10 @@ nav:
       - Catalog explorer (no network): examples/jaxa/01_catalog_explorer.ipynb
       - AW3D30 elevation quickstart (live): examples/jaxa/02_aw3d30_quickstart.ipynb
       - G-Portal search (anonymous): examples/jaxa/03_gportal_search.ipynb
+    - ERDDAP (multi-server client):
+      - Catalog explorer (no network): examples/erddap/01_catalog_explorer.ipynb
+      - CRW SST anomaly — griddap (live): examples/erddap/02_griddap_sst_anomaly.ipynb
+      - NDBC buoys — tabledap (live): examples/erddap/03_tabledap_buoys.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
