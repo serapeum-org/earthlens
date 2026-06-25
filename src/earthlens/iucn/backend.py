@@ -90,7 +90,10 @@ class IUCN(AbstractDataSource):
             lon_lim: `[lon_min, lon_max]` bounding-box longitudes in degrees.
             temporal_resolution: The Red List is not time-chunked, so this
                 is the sentinel `"all"`.
-            path: Output directory for the assessment table.
+            path: Output directory for the assessment table. The empty
+                string (the default) opts out of writing — `download()`
+                returns the in-memory DataFrame without touching the
+                filesystem. Pass an explicit directory to write the file.
             fmt: `strptime` format for `start` / `end`.
             token: IUCN Red List v4 token; falls back to the `IUCN_TOKEN`
                 environment variable.

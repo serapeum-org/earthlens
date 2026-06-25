@@ -78,13 +78,31 @@ def _session(session: requests.Session | None) -> requests.Session:
 
 
 def _parse_retry_after(value: str | None) -> float | None:
-    """Parse a `Retry-After` header value into seconds, or `None` if absent."""
+    """Parse a `Retry-After` header value into seconds, or `None` if absent.
+
+    RFC 9110 §10.2.3 allows either an integer number of seconds or an
+    HTTP-date (e.g. `Fri, 31 Dec 2027 23:59:59 GMT`). Both forms are
+    handled; an unparseable value falls back to `None` so the caller can
+    use exponential back-off.
+    """
     if not value:
         return None
     try:
         return float(value)
     except (TypeError, ValueError):
+        pass
+    try:
+        from email.utils import parsedate_to_datetime
+
+        target = parsedate_to_datetime(value)
+    except (TypeError, ValueError):
         return None
+    if target is None:
+        return None
+    import datetime as _dt
+
+    now = _dt.datetime.now(tz=target.tzinfo)
+    return max(0.0, (target - now).total_seconds())
 
 
 def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
@@ -157,7 +175,10 @@ def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
                 "(the WDPA token has been redacted from this error)."
             )
         return response.json()
-    raise RuntimeError(
+    # Defensive: unreachable today (every iteration above returns or raises).
+    # Kept so a future edit that breaks the invariant fails loudly instead of
+    # silently exiting the loop.
+    raise RuntimeError(  # pragma: no cover
         f"Protected Planet exhausted {MAX_RETRIES} retries on /{path} "
         f"(last status {last_status}); the WDPA token has been redacted."
     )
@@ -245,7 +266,10 @@ def fetch_country(
             `EPSG:4326`.
 
     Raises:
-        AuthenticationError: On an HTTP 401.
+        AuthenticationError: On an HTTP 401 (missing/invalid token).
+        RuntimeError: On any other non-2xx response after retries are
+            exhausted, or on a non-recoverable transport error. The token
+            is never echoed.
     """
     http = _session(session)
     rows: list[dict] = []
@@ -284,7 +308,10 @@ def fetch_by_id(
             point-only) GeoDataFrame, CRS `EPSG:4326`.
 
     Raises:
-        AuthenticationError: On an HTTP 401.
+        AuthenticationError: On an HTTP 401 (missing/invalid token).
+        RuntimeError: On any other non-2xx response after retries are
+            exhausted, or on a non-recoverable transport error. The token
+            is never echoed.
     """
     http = _session(session)
     params = {"token": token, "with_geometry": "true"}

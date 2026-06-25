@@ -96,7 +96,10 @@ class WDPA(AbstractDataSource):
                 degrees, both in `[-180, 180]`.
             temporal_resolution: WDPA is not time-chunked, so this is the
                 sentinel `"all"`.
-            path: Output directory for the protected-area file.
+            path: Output directory for the protected-area file. The empty
+                string (the default) opts out of writing — `download()`
+                returns the in-memory FeatureCollection without touching
+                the filesystem. Pass an explicit directory to write the file.
             fmt: `strptime` format for `start` / `end`.
             token: Protected Planet API token; falls back to the
                 `WDPA_TOKEN` environment variable.

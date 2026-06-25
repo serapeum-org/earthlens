@@ -25,6 +25,7 @@ stubs), so the row builders read each field defensively.
 
 from __future__ import annotations
 
+import threading
 import time
 from typing import Any
 
@@ -43,9 +44,12 @@ THROTTLE_SECONDS = 2.0
 #: Module-level monotonic time of the last successful `_get` request, and a
 #: companion "has any call happened yet" flag. The flag is what gates the first
 #: call — a `0.0` value alone is ambiguous under a simulated (test) clock that
-#: starts at zero. Tests reset both via :func:`clear_throttle_state`.
+#: starts at zero. Tests reset both via :func:`clear_throttle_state`. The lock
+#: guards reads/writes so concurrent callers (e.g. a `ThreadPoolExecutor` of
+#: per-species lookups) cannot race past the inter-call window.
 _LAST_CALL_MONOTONIC: float = 0.0
 _CALLED_ONCE: bool = False
+_THROTTLE_LOCK = threading.Lock()
 
 #: Retry policy for transient upstream failures (5xx / 429 / connection errors).
 MAX_RETRIES = 5
@@ -63,13 +67,31 @@ def clear_throttle_state() -> None:
 
 
 def _parse_retry_after(value: str | None) -> float | None:
-    """Parse a `Retry-After` header value into seconds, or `None` if absent."""
+    """Parse a `Retry-After` header value into seconds, or `None` if absent.
+
+    RFC 9110 §10.2.3 allows either an integer number of seconds or an
+    HTTP-date (e.g. `Fri, 31 Dec 2027 23:59:59 GMT`). Both forms are
+    handled; an unparseable value falls back to `None` so the caller can
+    use exponential back-off.
+    """
     if not value:
         return None
     try:
         return float(value)
     except (TypeError, ValueError):
+        pass
+    try:
+        from email.utils import parsedate_to_datetime
+
+        target = parsedate_to_datetime(value)
+    except (TypeError, ValueError):
         return None
+    if target is None:
+        return None
+    import datetime as _dt
+
+    now = _dt.datetime.now(tz=target.tzinfo)
+    return max(0.0, (target - now).total_seconds())
 
 #: Ordered assessment attribute columns and their pandas dtypes.
 IUCN_COLUMNS: dict[str, str] = {
@@ -102,15 +124,18 @@ def _throttle() -> None:
 
     The first call in a session does not wait; subsequent calls sleep only the
     remaining portion of the window. Tests patch `time.sleep`, making this
-    instant under the fake clock.
+    instant under the fake clock. Thread-safe — a lock guards the shared
+    state so that concurrent callers serialize through the throttle and the
+    inter-call window is honoured against the same upstream API.
     """
     global _LAST_CALL_MONOTONIC, _CALLED_ONCE
-    if _CALLED_ONCE:
-        elapsed = time.monotonic() - _LAST_CALL_MONOTONIC
-        if elapsed < THROTTLE_SECONDS:
-            time.sleep(THROTTLE_SECONDS - elapsed)
-    _LAST_CALL_MONOTONIC = time.monotonic()
-    _CALLED_ONCE = True
+    with _THROTTLE_LOCK:
+        if _CALLED_ONCE:
+            elapsed = time.monotonic() - _LAST_CALL_MONOTONIC
+            if elapsed < THROTTLE_SECONDS:
+                time.sleep(THROTTLE_SECONDS - elapsed)
+        _LAST_CALL_MONOTONIC = time.monotonic()
+        _CALLED_ONCE = True
 
 
 def _get(
@@ -195,7 +220,10 @@ def _get(
                 f"IUCN Red List returned HTTP {status} for /{path}."
             )
         return response.json()
-    raise RuntimeError(
+    # Defensive: unreachable today (every iteration above returns or raises).
+    # Kept so a future edit that breaks the invariant fails loudly instead of
+    # silently exiting the loop.
+    raise RuntimeError(  # pragma: no cover
         f"IUCN Red List exhausted {MAX_RETRIES} retries on /{path} "
         f"(last status {last_status})."
     )
@@ -300,7 +328,10 @@ def fetch_species(
         list[dict]: One row per assessment, the latest enriched with detail.
 
     Raises:
-        AuthenticationError: On an HTTP 401.
+        AuthenticationError: On an HTTP 401 (missing/invalid token).
+        ValueError: On an HTTP 404 (unknown binomial / endpoint).
+        RuntimeError: On any other non-2xx status after retries are exhausted,
+            or on a non-recoverable transport error.
     """
     http = _session(session)
     summary = _get(
@@ -339,7 +370,10 @@ def fetch_country(
         list[dict]: One row per assessment in the country list.
 
     Raises:
-        AuthenticationError: On an HTTP 401.
+        AuthenticationError: On an HTTP 401 (missing/invalid token).
+        ValueError: On an HTTP 404 (unknown country code).
+        RuntimeError: On any other non-2xx status after retries are exhausted,
+            or on a non-recoverable transport error.
     """
     http = _session(session)
     body = _get(http, token, f"countries/{code}")

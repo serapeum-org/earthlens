@@ -241,6 +241,24 @@ class TestFetchAndDownload:
         # No usable Retry-After -> sleep = BACKOFF_FACTOR * 2**0 = 1.0
         assert fake_wdpa.sleeps == [1.0]
 
+    def test_retry_after_http_date_form(self, tmp_path, fake_wdpa):
+        """A 429 carrying an HTTP-date Retry-After parses to a positive wait.
+
+        RFC 9110 §10.2.3 allows the header in HTTP-date form. Today neither
+        upstream uses it, but we honour it if they ever do — a future
+        server-side change should not silently fall back to back-off.
+        """
+        fake_wdpa.state.set_responses([
+            fake_wdpa.response(
+                {}, status_code=429, headers={"Retry-After": "Fri, 31 Dec 2099 23:59:59 GMT"}
+            ),
+            fake_wdpa.response({"protected_areas": []}),
+        ])
+        _backend(tmp_path).download()
+        # The wait is the delta until 2099 — many years of seconds.
+        assert len(fake_wdpa.sleeps) == 1
+        assert fake_wdpa.sleeps[0] > 365 * 24 * 3600
+
     def test_download_writes_geoparquet(self, tmp_path, fake_wdpa):
         """A non-empty result is written to a GeoParquet file under path."""
         fake_wdpa.state.set_responses(

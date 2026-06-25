@@ -128,8 +128,10 @@ class OBIS(AbstractDataSource):
                 degrees, both in `[-180, 180]`.
             temporal_resolution: OBIS issues a single search spanning the
                 whole window, so this is the sentinel `"all"`.
-            path: Output directory for the occurrence file. Created by the
-                parent class if absent.
+            path: Output directory for the occurrence file. The empty string
+                (the default) opts out of writing — `download()` returns the
+                in-memory FeatureCollection without touching the filesystem.
+                Pass an explicit directory to write the file.
             fmt: `strptime` format for `start` / `end`.
             size: Maximum number of occurrence records to request.
             file_format: Output vector format — `"geoparquet"` (default),
