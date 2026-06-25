@@ -89,7 +89,9 @@ def _validate_nwp(catalog: Any) -> tuple[int, list[str]]:
     models = catalog.datasets
     for key, record in models.items():
         backend = getattr(record, "backend", None)
-        if backend in _DIRECT_URL_BACKENDS and not getattr(record, "url_template", None):
+        if backend in _DIRECT_URL_BACKENDS and not getattr(
+            record, "url_template", None
+        ):
             issues.append(f"{key}: {backend} model has no url_template")
         if backend == "herbie" and not getattr(record, "model_family", None):
             issues.append(f"{key}: herbie model has no model_family")
@@ -193,9 +195,7 @@ def _validate_asf(catalog: Any) -> tuple[int, list[str]]:
         if row.dataset is not None and not hasattr(asf.DATASET, row.dataset):
             issues.append(f"{key}: DATASET.{row.dataset} not in asf_search")
         if not hasattr(asf.PRODUCT_TYPE, row.product_type):
-            issues.append(
-                f"{key}: PRODUCT_TYPE.{row.product_type} not in asf_search"
-            )
+            issues.append(f"{key}: PRODUCT_TYPE.{row.product_type} not in asf_search")
     return len(products), issues
 
 
@@ -432,6 +432,39 @@ def _validate_jaxa(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
+def _validate_erddap(catalog: Any) -> tuple[int, list[str]]:
+    """Lint each ERDDAP row beyond the model's load-time checks.
+
+    The `Dataset` model already enforces `server_url` / `dataset_id` /
+    `protocol` at load (`extra="forbid"`, `protocol` is a `Literal`), and
+    the loader rejects a curated key absent from `available_datasets:`.
+    These cross-row lints add what the model can't see:
+
+    * a server_url that is not an `http(s)` URL (the griddap path builds a
+      URL from it and the tabledap path hands it to erddapy);
+    * a griddap row with empty `dim_names` — `build_griddap_url` would have
+      no axes to subset, producing a malformed request;
+    * a `flux_variables` entry that is not one of the row's default
+      `variables` — a likely typo, since the flux marker would then never
+      apply to the row's default request.
+    """
+    issues: list[str] = []
+    for key, row in catalog.datasets.items():
+        if not row.server_url.startswith(("http://", "https://")):
+            issues.append(f"{key}: server_url {row.server_url!r} is not an http(s) URL")
+        if row.protocol == "griddap" and not row.dim_names:
+            issues.append(
+                f"{key}: griddap row has empty `dim_names` (no axes to subset)"
+            )
+        unknown_flux = [v for v in row.flux_variables if v not in row.variables]
+        if unknown_flux:
+            issues.append(
+                f"{key}: flux_variables {unknown_flux} not in the row's default "
+                f"variables {row.variables} (likely a typo)"
+            )
+    return len(catalog.datasets), issues
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -451,6 +484,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "sentinel_hub": _validate_sentinel_hub,
     "worldpop": _validate_worldpop,
     "jaxa": _validate_jaxa,
+    "erddap": _validate_erddap,
 }
 
 
