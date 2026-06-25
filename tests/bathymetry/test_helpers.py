@@ -7,7 +7,9 @@ import pytest
 from earthlens.base import SpatialExtent
 from earthlens.bathymetry._helpers import (
     bbox_from_extent,
+    estimate_grid_pixels,
     griddap_subset_url,
+    resolution_degrees,
 )
 
 ENDPOINT = "https://coastwatch.pfeg.noaa.gov/erddap"
@@ -73,3 +75,25 @@ def test_bbox_from_extent_orders_west_south_east_north():
     """bbox_from_extent returns (west, south, east, north) in order."""
     space = SpatialExtent.from_pairs(lat_lim=[25.0, 26.0], lon_lim=[-18.0, -17.0])
     assert bbox_from_extent(space) == (-18.0, 25.0, -17.0, 26.0)
+
+
+def test_resolution_degrees_arc_units():
+    """Arc-second and arc-minute labels convert to degrees."""
+    assert resolution_degrees("15 arc-second") == pytest.approx(15 / 3600)
+    assert resolution_degrees("1 arc-minute") == pytest.approx(1 / 60)
+
+
+@pytest.mark.parametrize("label", ["native", "", "15 metres", "1 km"])
+def test_resolution_degrees_unparseable_returns_none(label: str):
+    """A non arc-second / arc-minute label yields None."""
+    assert resolution_degrees(label) is None
+
+
+def test_estimate_grid_pixels_for_arcsecond_bbox():
+    """A 2x1 degree bbox at 15 arc-second is ~480x240 pixels."""
+    assert estimate_grid_pixels((-1.0, 0.0, 1.0, 1.0), "15 arc-second") == (480, 240)
+
+
+def test_estimate_grid_pixels_unparseable_returns_none():
+    """An unparseable resolution gives no pixel estimate."""
+    assert estimate_grid_pixels((0.0, 0.0, 1.0, 1.0), "native") is None

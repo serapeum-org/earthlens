@@ -11,6 +11,7 @@ import requests
 
 from earthlens.bathymetry import backend as backend_module
 from earthlens.bathymetry.backend import Bathymetry
+from earthlens.bathymetry.catalog import Catalog, Dataset
 
 #: A minimal NetCDF-3 header (magic + padding) the magic-byte guard accepts.
 _NETCDF_BODY = b"CDF\x01" + b"\x00" * 64
@@ -219,3 +220,58 @@ def test_static_temporal_extent_has_no_dates(tmp_path: Path):
 def test_output_kind_is_raster(tmp_path: Path):
     """The backend declares raster output (so the facade gates aggregate)."""
     assert _make("gebco_2020", tmp_path).OUTPUT_KIND == "raster"
+
+
+def test_near_miss_variable_offers_did_you_mean():
+    """A near-miss band name surfaces a did-you-mean hint."""
+    with pytest.raises(ValueError, match="Did you mean 'elevation'"):
+        Bathymetry(
+            dataset="gebco_2020",
+            variables=["elevaton"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+        )
+
+
+def test_large_subset_warns(
+    tmp_path: Path,
+    captured_get: dict,
+    fake_pyramids: type[_FakeNetCDF],
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """A near-global 15-arc-second request warns about its size."""
+    seen: list[str] = []
+    monkeypatch.setattr(backend_module.logger, "warning", seen.append)
+    Bathymetry(
+        dataset="gebco_2020",
+        lat_lim=[-90.0, 90.0],
+        lon_lim=[-180.0, 180.0],
+        path=tmp_path,
+    ).download()
+    assert any("large subset" in message for message in seen)
+
+
+def test_unparseable_resolution_skips_size_log(
+    tmp_path: Path, captured_get: dict, fake_pyramids: type[_FakeNetCDF]
+):
+    """A row with no parseable resolution still downloads (no size estimate)."""
+    catalog = Catalog(
+        datasets={
+            "custom": Dataset(
+                id="custom",
+                endpoint="https://coastwatch.pfeg.noaa.gov/erddap",
+                dataset_id="CUSTOM",
+                variable="z",
+                native_resolution="",
+            )
+        },
+        available_datasets=["custom"],
+    )
+    result = Bathymetry(
+        dataset="custom",
+        catalog=catalog,
+        lat_lim=[0.0, 1.0],
+        lon_lim=[0.0, 1.0],
+        path=tmp_path,
+    ).download()
+    assert result[0].name == "custom.tif"
