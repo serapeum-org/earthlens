@@ -170,9 +170,10 @@ def griddap_subset_url(
     east_n = _normalise_lon(east, lon_convention)
     if west_n > east_n:
         raise ValueError(
-            f"bbox crosses the antimeridian in the server's "
-            f"{lon_convention!r} frame (west {west_n} > east {east_n}); "
-            "split it into two separate requests."
+            f"bbox is inverted or crosses the antimeridian in the server's "
+            f"{lon_convention!r} frame (west {west_n} > east {east_n}): pass "
+            "west < east for a contiguous box, or split an "
+            "antimeridian-crossing request into two."
         )
     base = f"{endpoint.rstrip('/')}/griddap/{dataset_id}.nc?"
     lat_range = f"[({south}):{step}:({north})]"
