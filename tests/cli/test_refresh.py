@@ -87,15 +87,17 @@ class TestSupportedProviders:
         """CHC's FTP product-tree walk is wired up."""
         assert "chc" in supported_providers()
 
-    def test_twentyone_refreshable_providers(self):
-        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm, jaxa, erddap)."""
-        assert len(supported_providers()) == 21, sorted(supported_providers())
+    def test_refreshable_providers(self):
+        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm, jaxa, erddap, cluster)."""
+        assert len(supported_providers()) == 25, sorted(supported_providers())
         assert "s3" in supported_providers(), "s3 regenerates its index from curated"
         assert "nwm" in supported_providers(), "nwm walks its operational bucket"
         assert "jaxa" in supported_providers(), "jaxa lists both SDK universes"
         assert (
             "erddap" in supported_providers()
         ), "erddap crawls each server's allDatasets"
+        for key in ("gbif", "obis", "wdpa", "iucn"):
+            assert key in supported_providers(), f"{key} cluster backend is wired up"
 
 
 class TestEcmwfRefresher:
@@ -1351,3 +1353,51 @@ class TestUsgsParameterTable:
             monkeypatch, [{"parameter_code": ""}, {"parameter_code": "1"}]
         )
         assert list(refresh_mod._usgs_parameter_rows()) == ["1"], "blank code dropped"
+
+
+class TestBiodiversityRefreshers:
+    """Tests for the gbif / obis / wdpa / iucn refreshers (no network).
+
+    The cluster catalogs follow the s3 pattern: the curated `available_datasets:`
+    plus the catalog's `datasets:` keys *are* the universe — no anonymous live
+    endpoint enumerates GBIF taxa or Protected Planet countries. Each refresher
+    returns the combined sorted set so audit reports zero drift on a clean tree.
+    """
+
+    @pytest.mark.parametrize("provider", ["gbif", "obis", "wdpa", "iucn"])
+    def test_refresh_reports_ok_with_curated_universe(self, provider):
+        """Each cluster backend reports ok and counts the curated universe."""
+        outcome = refresh_one(_info(provider))
+        assert outcome.status == "ok", f"{provider} refresh ran: {outcome.detail}"
+        assert outcome.live_count > 0, f"{provider} live universe is non-empty"
+
+    @pytest.mark.parametrize("provider", ["gbif", "obis", "wdpa", "iucn"])
+    def test_audit_reports_zero_drift_on_clean_catalog(self, provider):
+        """Audit confirms the curated rows match the curated universe."""
+        outcome = audit_one(_info(provider))
+        assert outcome.status == "ok", f"{provider} audit ran: {outcome.detail}"
+        assert outcome.broken == [], f"{provider} curated rows resolve upstream"
+        assert outcome.untracked == [], f"{provider} no untracked drift"
+
+    def test_gbif_includes_friendly_aliases_and_index(self):
+        """gbif's refresh axis is the union of friendly aliases + available index."""
+        from earthlens.gbif import Catalog as G
+
+        cat = G()
+        grouped = refresh_mod._gbif_grouped(cat)
+        ids = set(grouped["gbif"])
+        assert {"birds", "mammals", "kingdom:Animalia"} <= ids, "union returned"
+
+    def test_wdpa_iso3_codes_are_universe(self):
+        """wdpa refresher returns the curated ISO3 country codes."""
+        from earthlens.wdpa import Catalog as W
+
+        grouped = refresh_mod._wdpa_grouped(W())
+        assert "KEN" in grouped["wdpa"] and "USA" in grouped["wdpa"]
+
+    def test_iucn_iso2_codes_are_universe(self):
+        """iucn refresher returns the curated ISO2 country codes (including 'NO')."""
+        from earthlens.iucn import Catalog as I
+
+        grouped = refresh_mod._iucn_grouped(I())
+        assert "KE" in grouped["iucn"] and "NO" in grouped["iucn"], "Norway preserved"

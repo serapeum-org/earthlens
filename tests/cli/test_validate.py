@@ -42,6 +42,10 @@ _CURATED_ENUM = (
     "gdacs",
     "chc",
     "erddap",
+    "gbif",
+    "obis",
+    "wdpa",
+    "iucn",
 )
 
 

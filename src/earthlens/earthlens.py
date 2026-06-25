@@ -297,13 +297,14 @@ class EarthLens:
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'erddap', 'eumetsat',
-             'fdsn', 'firms', 'g-portal', 'gdacs', 'gee', 'ghs', 'ghsl',
+             'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gee', 'ghs', 'ghsl',
              'google-earth-engine', 'hdx', 'human-settlement', 'insar', 'ioos',
-             'jaxa', 'jaxa-earth', 'landsat', 'national-water-model', 'nexrad',
-             'nwis', 'nwm', 'nwp', 'openaq', 'openeo', 'overture',
-             'planetary-computer', 'radar', 'sentinel-hub', 'sentinelhub',
-             'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis', 'usgs-water',
-             'veda', 'world-pop', 'worldpop']
+             'iucn', 'jaxa', 'jaxa-earth', 'landsat', 'national-water-model',
+             'nexrad', 'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo',
+             'overture', 'planetary-computer', 'protected-planet', 'radar',
+             'redlist', 'sentinel-hub', 'sentinelhub', 'stac', 'tropycal',
+             'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'wdpa',
+             'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -401,6 +402,20 @@ class EarthLens:
             crop to the AOI via `pyramids` with a tidy age/sex table for
             demographic products; `mixed` output; keys `"worldpop"` /
             `"world-pop"`.
+        :class:`earthlens.gbif.GBIF`: GBIF species occurrences via
+            `pygbif` (anonymous); `vector` occurrence-point
+            FeatureCollection; key `"gbif"`.
+        :class:`earthlens.obis.OBIS`: OBIS marine occurrences via
+            `pyobis` (anonymous); `vector` occurrence-point
+            FeatureCollection; key `"obis"`.
+        :class:`earthlens.wdpa.WDPA`: Protected Planet (WDPA)
+            protected-area polygons via the direct v4 REST API
+            (`?token=`); `vector` polygon FeatureCollection; keys
+            `"wdpa"` / `"protected-planet"`.
+        :class:`earthlens.iucn.IUCN`: IUCN Red List v4 assessments via
+            the direct REST shim (Bearer token); `tabular` `DataFrame`
+            (always a CC-BY-NC `LicenseWarning`); keys `"iucn"` /
+            `"redlist"`.
 
     """
 
@@ -552,6 +567,17 @@ class EarthLens:
             # "world-pop". The default REST path needs no extra SDK.
             "worldpop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
             "world-pop": ("earthlens.worldpop", "WorldPop", "worldpop", {}),
+            # Biodiversity cluster. GBIF / OBIS are anonymous occurrence search
+            # (vector FeatureCollection of points); WDPA returns protected-area
+            # polygons (token, ?token= query param); IUCN returns Red List
+            # assessments (tabular DataFrame, Bearer token). GBIF/OBIS need the
+            # pygbif/pyobis extra; WDPA/IUCN use core requests (no extra).
+            "gbif": ("earthlens.gbif", "GBIF", "gbif", {}),
+            "obis": ("earthlens.obis", "OBIS", "obis", {}),
+            "wdpa": ("earthlens.wdpa", "WDPA", "", {}),
+            "protected-planet": ("earthlens.wdpa", "WDPA", "", {}),
+            "iucn": ("earthlens.iucn", "IUCN", "", {}),
+            "redlist": ("earthlens.iucn", "IUCN", "", {}),
             # JAXA archive over two protocols: authless `jaxa-earth` (STAC +
             # COG via the official jaxa.earth API) and credentialed
             # `gportal` (G-Portal SFTP via the community gportal SDK).
