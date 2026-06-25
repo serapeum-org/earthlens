@@ -52,6 +52,21 @@ class TestFlattenLabel:
         """An empty list yields `None`, not an empty string."""
         assert _flatten_label([]) is None
 
+    def test_unknown_type_falls_through_to_none(self):
+        """A value that is none of (None, str, list, dict) returns `None`."""
+        assert _flatten_label(42) is None
+        assert _flatten_label(3.14) is None
+
+    def test_empty_english_falls_back_to_code(self):
+        """A wrapper with `description.en = ""` falls through to the `code` field."""
+        wrapper = {"description": {"en": ""}, "code": "1"}
+        assert _flatten_label(wrapper) == "1"
+
+    def test_empty_string_description_falls_back_to_code(self):
+        """A wrapper with `description = ""` (empty string) falls through to `code`."""
+        wrapper = {"description": "", "code": "VU"}
+        assert _flatten_label(wrapper) == "VU"
+
 
 @pytest.mark.iucn
 class TestThrottleThreadSafety:

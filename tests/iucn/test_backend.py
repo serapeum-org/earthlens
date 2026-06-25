@@ -85,6 +85,49 @@ class TestConstruction:
 class TestFetchAndDownload:
     """`download` fetches assessments over the v4 API into a DataFrame."""
 
+    def test_non_latest_assessment_skips_detail_enrichment(self, tmp_path, fake_iucn):
+        """`fetch_species` only enriches the latest assessment, not older ones."""
+        fake_iucn.state.route(
+            "taxa/scientific_name",
+            {
+                "taxon": {"scientific_name": "Panthera leo"},
+                "assessments": [
+                    {
+                        "assessment_id": 1,
+                        "red_list_category_code": "VU",
+                        "year_published": "2010",
+                        "latest": False,
+                    }
+                ],
+            },
+        )
+        _backend(tmp_path).download()
+        assessment_calls = [
+            c for c in fake_iucn.state.calls if "assessment/" in c["url"]
+        ]
+        assert assessment_calls == [], (
+            "a non-latest assessment must not trigger the detail fetch; "
+            f"got calls: {assessment_calls}"
+        )
+
+    def test_latest_without_assessment_id_skips_detail_enrichment(self, tmp_path, fake_iucn):
+        """A latest assessment lacking an id is also skipped (no `assessment/None` GET)."""
+        fake_iucn.state.route(
+            "taxa/scientific_name",
+            {
+                "taxon": {"scientific_name": "Panthera leo"},
+                "assessments": [
+                    {
+                        "assessment_id": None,
+                        "red_list_category_code": "VU",
+                        "latest": True,
+                    }
+                ],
+            },
+        )
+        _backend(tmp_path).download()
+        assert not [c for c in fake_iucn.state.calls if "assessment/" in c["url"]]
+
     def test_species_two_step_and_bearer(self, tmp_path, fake_iucn):
         """A species query does the binomial split + two-step with a Bearer header."""
         fake_iucn.state.route("taxa/scientific_name", _species_summary())

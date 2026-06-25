@@ -40,6 +40,25 @@ class TestCatalogLoad:
             Catalog()
         catalog_module.clear_catalog_cache()
 
+    def test_invalid_row_raises(self, tmp_path, monkeypatch):
+        """A country row missing its required name raises a validation ValueError."""
+        bad = tmp_path / "bad.yaml"
+        bad.write_text("countries:\n  KEN:\n    region: Africa\n", encoding="utf-8")
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", bad)
+        catalog_module.clear_catalog_cache()
+        with pytest.raises(ValueError, match="failed validation"):
+            Catalog()
+        catalog_module.clear_catalog_cache()
+
+    def test_missing_file_triggers_filenotfound_branch(self, tmp_path, monkeypatch):
+        """A nonexistent catalog path exercises the `path.stat() FileNotFoundError` branch."""
+        missing = tmp_path / "definitely-missing.yaml"
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", missing)
+        catalog_module.clear_catalog_cache()
+        with pytest.raises((ValueError, FileNotFoundError)):
+            Catalog()
+        catalog_module.clear_catalog_cache()
+
 
 @pytest.mark.wdpa
 class TestResolveIso3:

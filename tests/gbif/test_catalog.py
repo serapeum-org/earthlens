@@ -51,6 +51,15 @@ class TestCatalogLoad:
             Catalog()
         catalog_module.clear_catalog_cache()
 
+    def test_missing_file_triggers_filenotfound_branch(self, tmp_path, monkeypatch):
+        """A nonexistent catalog path exercises the `path.stat() FileNotFoundError` branch."""
+        missing = tmp_path / "definitely-missing.yaml"
+        monkeypatch.setattr(catalog_module, "CATALOG_PATH", missing)
+        catalog_module.clear_catalog_cache()
+        with pytest.raises((ValueError, FileNotFoundError)):
+            Catalog()
+        catalog_module.clear_catalog_cache()
+
 
 @pytest.mark.gbif
 class TestResolveTaxonKey:

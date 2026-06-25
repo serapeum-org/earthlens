@@ -190,3 +190,17 @@ class TestParseRetryAfter:
 
         assert iucn_alias is parse_retry_after
         assert wdpa_alias is parse_retry_after
+
+    def test_parsedate_returning_none_yields_none(self, monkeypatch):
+        """The defensive `target is None` branch in `parse_retry_after` is honoured.
+
+        `email.utils.parsedate_to_datetime` raises (not returns `None`) for
+        malformed input in CPython, so this branch is dead code in practice,
+        but the explicit `None` check is kept as a future-proof safety net.
+        """
+        from earthlens.biodiversity import _helpers, parse_retry_after
+
+        monkeypatch.setattr(
+            _helpers, "parsedate_to_datetime", lambda value: None
+        )
+        assert parse_retry_after("Fri, 31 Dec 2099 23:59:59 GMT") is None

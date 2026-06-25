@@ -241,6 +241,24 @@ class TestFetchAndDownload:
         # No usable Retry-After -> sleep = BACKOFF_FACTOR * 2**0 = 1.0
         assert fake_wdpa.sleeps == [1.0]
 
+    def test_explicit_session_is_passed_through(self):
+        """`_session(session)` returns the caller's session verbatim, no new one made."""
+        from earthlens.wdpa._rest import _session
+
+        sentinel = object()
+        assert _session(sentinel) is sentinel, "the explicit session must pass through"
+
+    def test_fetch_country_max_pages_zero_short_circuits(self):
+        """`fetch_country(..., max_pages=0)` does not call the HTTP session at all."""
+        from earthlens.wdpa._rest import fetch_country
+
+        class _BoomSession:
+            def get(self, *args, **kwargs):
+                raise AssertionError("HTTP must not be called when max_pages=0")
+
+        result = fetch_country("token", "KEN", session=_BoomSession(), max_pages=0)
+        assert len(result) == 0, "no pages fetched -> empty result"
+
     def test_retry_after_http_date_form(self, tmp_path, fake_wdpa):
         """A 429 carrying an HTTP-date Retry-After parses to a positive wait.
 
