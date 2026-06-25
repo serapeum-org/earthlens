@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/erddap/usage/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/iucn/introduction/">
       
       
-        <link rel="prev" href="../introduction/">
+        <link rel="prev" href="../../wdpa/wdpa/">
       
       
-        <link rel="next" href="../datasets/">
+        <link rel="next" href="../usage/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Usage - earthlens</title>
+        <title>Introduction - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#erddap-usage" class="md-skip">
+        <a href="#iucn-red-list-introduction" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Usage
+              Introduction
             
           </span>
         </div>
@@ -2925,297 +2925,6 @@
                 
   
   
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_14" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_14" id="__nav_3_14_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ERDDAP (multi-server client)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_14_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_14">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    ERDDAP (multi-server client)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Install
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pick-a-dataset" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pick a dataset
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#griddap-raster-netcdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        griddap → raster NetCDF
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="griddap → raster NetCDF">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#aggregating-griddap-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Aggregating griddap output
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tabledap-dataframe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        tabledap → DataFrame
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-request-constraints-mapping" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The request → constraints mapping
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../erddap/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     
@@ -3230,10 +2939,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_14" >
         
           
-          <label class="md-nav__link" for="__nav_3_15" id="__nav_3_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_14" id="__nav_3_14_label" tabindex="0">
             
   
   
@@ -3251,8 +2960,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3400,10 +3109,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_16" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_15" >
         
           
-          <label class="md-nav__link" for="__nav_3_16" id="__nav_3_16_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_15" id="__nav_3_15_label" tabindex="0">
             
   
   
@@ -3421,8 +3130,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_16_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_16">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3598,10 +3307,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_16" >
         
           
-          <label class="md-nav__link" for="__nav_3_17" id="__nav_3_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_16" id="__nav_3_16_label" tabindex="0">
             
   
   
@@ -3619,8 +3328,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3824,10 +3533,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_17" >
         
           
-          <label class="md-nav__link" for="__nav_3_18" id="__nav_3_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_17" id="__nav_3_17_label" tabindex="0">
             
   
   
@@ -3845,8 +3554,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3966,10 +3675,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_18" >
         
           
-          <label class="md-nav__link" for="__nav_3_19" id="__nav_3_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_18" id="__nav_3_18_label" tabindex="0">
             
   
   
@@ -3987,8 +3696,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_19">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4136,10 +3845,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_19" >
         
           
-          <label class="md-nav__link" for="__nav_3_20" id="__nav_3_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_19" id="__nav_3_19_label" tabindex="0">
             
   
   
@@ -4157,8 +3866,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_20">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4306,10 +4015,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_20" >
         
           
-          <label class="md-nav__link" for="__nav_3_21" id="__nav_3_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_20" id="__nav_3_20_label" tabindex="0">
             
   
   
@@ -4327,8 +4036,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_21">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4476,10 +4185,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_22" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_21" >
         
           
-          <label class="md-nav__link" for="__nav_3_22" id="__nav_3_22_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_21" id="__nav_3_21_label" tabindex="0">
             
   
   
@@ -4497,8 +4206,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_22_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_22">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4674,10 +4383,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_23" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_22" >
         
           
-          <label class="md-nav__link" for="__nav_3_23" id="__nav_3_23_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_22" id="__nav_3_22_label" tabindex="0">
             
   
   
@@ -4695,8 +4404,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_23_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_23">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4844,10 +4553,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_24" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_23" >
         
           
-          <label class="md-nav__link" for="__nav_3_24" id="__nav_3_24_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_23" id="__nav_3_23_label" tabindex="0">
             
   
   
@@ -4865,8 +4574,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_24_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_24">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_23">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5014,10 +4723,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_25" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_24" >
         
           
-          <label class="md-nav__link" for="__nav_3_25" id="__nav_3_25_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_24" id="__nav_3_24_label" tabindex="0">
             
   
   
@@ -5035,8 +4744,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_25_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_25">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_24_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_24">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5212,10 +4921,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_26" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_25" >
         
           
-          <label class="md-nav__link" for="__nav_3_26" id="__nav_3_26_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_25" id="__nav_3_25_label" tabindex="0">
             
   
   
@@ -5233,8 +4942,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_26_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_26">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_25_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_25">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5438,10 +5147,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_27" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_26" >
         
           
-          <label class="md-nav__link" for="__nav_3_27" id="__nav_3_27_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_26" id="__nav_3_26_label" tabindex="0">
             
   
   
@@ -5459,8 +5168,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_27_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_27">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_26_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_26">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5590,6 +5299,809 @@
   
     <li class="md-nav__item">
       <a href="../../worldpop/worldpop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_27" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_27" id="__nav_3_27_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Biodiversity (overview)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_27_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_27">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Biodiversity (overview)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../biodiversity/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_28" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_28" id="__nav_3_28_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GBIF (species occurrences)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_28_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_28">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GBIF (species occurrences)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gbif/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gbif/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gbif/gbif/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_29" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_29" id="__nav_3_29_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OBIS (marine occurrences)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_29_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_29">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    OBIS (marine occurrences)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../obis/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../obis/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../obis/obis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_30" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_30" id="__nav_3_30_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protected Planet (WDPA)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_30_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_30">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Protected Planet (WDPA)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../wdpa/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../wdpa/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../wdpa/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../wdpa/wdpa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_31" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_31" id="__nav_3_31_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IUCN Red List (assessments)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_31_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_31">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IUCN Red List (assessments)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#a-v4-rest-shim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A v4 REST shim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it returns
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#licensing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Licensing
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iucn/" class="md-nav__link">
         
   
   
@@ -6216,6 +6728,34 @@
     
   
     Showcase — Hurricane Ian from geostationary orbit (GOES, AWS Open Data)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/species_occurrences_gbif_obis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mapping a species' occurrences — GBIF + OBIS
   
 
     
@@ -11691,6 +12231,462 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_30" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_30" id="__nav_4_30_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GBIF (species occurrences)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_30_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_30">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GBIF (species occurrences)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/gbif/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GBIF quickstart — species occurrences over a bounding box
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_31" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_31" id="__nav_4_31_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OBIS (marine occurrences)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_31_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_31">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    OBIS (marine occurrences)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/obis/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OBIS quickstart — marine occurrences over a bounding box
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_32" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_32" id="__nav_4_32_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protected Planet (WDPA)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_32_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_32">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Protected Planet (WDPA)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/wdpa/catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WDPA catalog explorer (no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/wdpa/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WDPA quickstart — protected-area polygons for a country
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/wdpa/regional_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WDPA — comparing protected areas across countries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_33" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_33" id="__nav_4_33_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IUCN Red List (assessments)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_33_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_33">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IUCN Red List (assessments)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/iucn/catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IUCN catalog explorer (no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/iucn/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IUCN Red List quickstart — species assessments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/iucn/country_redlist_breakdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IUCN — a country's Red List breakdown
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -11951,10 +12947,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#a-v4-rest-shim" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        A v4 REST shim
       
     </span>
   </a>
@@ -11962,10 +12958,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pick-a-dataset" class="md-nav__link">
+  <a href="#what-it-returns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pick a dataset
+        What it returns
       
     </span>
   </a>
@@ -11973,38 +12969,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#griddap-raster-netcdf" class="md-nav__link">
+  <a href="#authentication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        griddap → raster NetCDF
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="griddap → raster NetCDF">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#aggregating-griddap-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Aggregating griddap output
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tabledap-dataframe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        tabledap → DataFrame
+        Authentication
       
     </span>
   </a>
@@ -12012,10 +12980,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-request-constraints-mapping" class="md-nav__link">
+  <a href="#licensing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The request → constraints mapping
+        Licensing
       
     </span>
   </a>
@@ -12039,7 +13007,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/erddap/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/iucn/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -12048,79 +13016,50 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/erddap/usage.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/iucn/introduction.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="erddap-usage"><a class="toclink" href="#erddap-usage">ERDDAP — usage</a><a class="headerlink" href="#erddap-usage" title="Permanent link">#</a></h1>
-<h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<p>The backend needs the optional <code>erddapy</code> SDK:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>erddap<span class="o">]</span>
-</code></pre></div>
-<p><code>import earthlens</code> works without it — <code>erddapy</code> is imported lazily, only when a tabledap dataset is downloaded.</p>
-<h2 id="pick-a-dataset"><a class="toclink" href="#pick-a-dataset">Pick a dataset</a><a class="headerlink" href="#pick-a-dataset" title="Permanent link">#</a></h2>
-<p>Every request names one curated dataset with <code>dataset=&lt;id&gt;</code> (see <a href="../datasets/">Available datasets</a> for the
-shipped ids). The id's <code>protocol</code> decides the output shape, so you do not choose griddap vs tabledap yourself —
-the catalog does. An unknown id raises a <code>ValueError</code> naming the closest match.</p>
-<h2 id="griddap-raster-netcdf"><a class="toclink" href="#griddap-raster-netcdf">griddap → raster NetCDF</a><a class="headerlink" href="#griddap-raster-netcdf" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;erddap&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;NOAA_DHW&quot;</span><span class="p">,</span>                 <span class="c1"># NOAA Coral Reef Watch, 5 km daily</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CRW_SSTANOMALY&quot;</span><span class="p">,</span> <span class="s2">&quot;CRW_DHW&quot;</span><span class="p">],</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-06-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-06-03&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>                 <span class="c1"># [south, north]</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">150.0</span><span class="p">,</span> <span class="mf">155.0</span><span class="p">],</span>             <span class="c1"># [west, east]</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;erddap_out&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># -&gt; [PosixPath(&#39;erddap_out/NOAA_DHW.nc&#39;)]</span>
-</code></pre></div>
-<p>Omit <code>variables=</code> to fall back to the catalog row's default set.</p>
-<h3 id="aggregating-griddap-output"><a class="toclink" href="#aggregating-griddap-output">Aggregating griddap output</a><a class="headerlink" href="#aggregating-griddap-output" title="Permanent link">#</a></h3>
-<p>Because griddap output is raster, you can pass an <code>aggregate=</code> config; each NetCDF is reduced per time-window into
-GeoTIFFs through the pyramids flow (the same one the ECMWF backend uses):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;erddap&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;NOAA_DHW&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CRW_SSTANOMALY&quot;</span><span class="p">],</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-06-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-06-30&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">150.0</span><span class="p">,</span> <span class="mf">155.0</span><span class="p">],</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;erddap_out&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="c1"># -&gt; [PosixPath(&#39;erddap_out/aggregated/CRW_SSTANOMALY_1MS_20230601.tif&#39;)]</span>
-</code></pre></div>
-<p>ERDDAP griddap variables are instantaneous <em>state</em> fields, so <code>op="auto"</code> resolves to <code>"mean"</code>. Pass an explicit
-<code>op="sum"</code> for a genuine accumulation variable.</p>
-<h2 id="tabledap-dataframe"><a class="toclink" href="#tabledap-dataframe">tabledap → DataFrame</a><a class="headerlink" href="#tabledap-dataframe" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;erddap&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;cwwcNDBCMet&quot;</span><span class="p">,</span>              <span class="c1"># NDBC standard meteorological buoys</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;wtmp&quot;</span><span class="p">],</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-01-02&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">],</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">123.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.0</span><span class="p">],</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;erddap_out&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># -&gt; pandas.DataFrame, also written to erddap_out/cwwcNDBCMet.csv</span>
-</code></pre></div>
-<p>Pass <code>output_format="parquet"</code> to write Parquet instead of CSV. A query that matches no rows returns an <strong>empty</strong>
-frame with the requested columns (plus a warning), rather than raising.</p>
-<p><code>aggregate=</code> is <strong>not</strong> accepted for a tabledap dataset — the facade raises <code>NotImplementedError</code>, since a table
-has no gridded reduction. Use a griddap dataset (or the CMEMS backend) for gridded fields you want to reduce.</p>
-<h2 id="the-request-constraints-mapping"><a class="toclink" href="#the-request-constraints-mapping">The request → constraints mapping</a><a class="headerlink" href="#the-request-constraints-mapping" title="Permanent link">#</a></h2>
-<p>The bbox (<code>lat_lim</code> / <code>lon_lim</code>) and window (<code>start</code> / <code>end</code>) become ERDDAP subset constraints:
-<code>time&gt;=</code>/<code>time&lt;=</code> (ISO-8601, UTC) and <code>latitude</code>/<code>longitude</code> <code>&gt;=</code>/<code>&lt;=</code>. griddap additionally strides each axis at
-full resolution. You do not build these by hand — the backend derives them from the request.</p>
+<h1 id="iucn-red-list-introduction"><a class="toclink" href="#iucn-red-list-introduction">IUCN Red List — introduction</a><a class="headerlink" href="#iucn-red-list-introduction" title="Permanent link">#</a></h1>
+<p>The <a href="https://www.iucnredlist.org/">IUCN Red List</a> is the world's authoritative
+inventory of the conservation status of species — each assessment carries a
+category (e.g. <code>EN</code>, <code>VU</code>, <code>CR</code>), the criteria behind it, a population trend,
+threats, and a publication year. earthlens ships an <code>iucn</code> backend (alias
+<code>redlist</code>) that fetches assessment records from the IUCN Red List <strong>v4</strong> API.</p>
+<p>This page orients the backend. For the hands-on walkthrough see
+<a href="../usage/">Usage</a>; the rendered API is the <a href="../iucn/">Reference</a> page.</p>
+<h2 id="a-v4-rest-shim"><a class="toclink" href="#a-v4-rest-shim">A v4 REST shim</a><a class="headerlink" href="#a-v4-rest-shim" title="Permanent link">#</a></h2>
+<p>There is no mature Python client for the v4 API, so the backend talks to
+<code>https://api.iucnredlist.org/api/v4</code> directly with <code>requests</code> (a core
+dependency — no extra). The retired v3 API (<code>apiv3.iucnredlist.org</code>, with a
+<code>?token=</code> query param) is gone; v4 authenticates with an
+<strong><code>Authorization: Bearer &lt;token&gt;</code></strong> header.</p>
+<h2 id="what-it-returns"><a class="toclink" href="#what-it-returns">What it returns</a><a class="headerlink" href="#what-it-returns" title="Permanent link">#</a></h2>
+<p><code>iucn</code> is the cluster's only <code>tabular</code> backend
+(<code>IUCN.OUTPUT_KIND == "tabular"</code>): a query returns assessment <strong>records</strong>, not
+geometry, so <code>download()</code> returns a <code>pandas.DataFrame</code> and the facade rejects
+an <code>aggregate=</code> argument. Each entry in <code>variables</code> is a
+<code>"species:&lt;binomial&gt;"</code> or a <code>"country:&lt;ISO2&gt;"</code> selector.</p>
+<p>The species path is <strong>two-step</strong>: the binomial is split into genus + species,
+looked up via <code>taxa/scientific_name?genus_name=&amp;species_name=</code> (which returns
+the assessment list), then the latest assessment is enriched from
+<code>assessment/{id}</code> with its criteria and population trend. The country path
+lists <code>countries/{code}</code> (ISO alpha-2). IUCN advises a ~2-second delay between
+calls, which the backend honours.</p>
+<h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
+<p>v4 requires a token sent as a Bearer header. Resolve it from a <code>token=</code>
+argument or the <code>IUCN_TOKEN</code> environment variable; a missing token raises
+<code>AuthenticationError</code> naming <code>IUCN_TOKEN</code>. Sign up for a free token at
+<a href="https://api.iucnredlist.org/users/sign_up">api.iucnredlist.org/users/sign_up</a>.</p>
+<h2 id="licensing"><a class="toclink" href="#licensing">Licensing</a><a class="headerlink" href="#licensing" title="Permanent link">#</a></h2>
+<p>Red List data is <strong><code>CC-BY-NC</code></strong>, and redistribution requires a written IUCN
+waiver. <strong>Every</strong> download raises a <code>LicenseWarning</code>, and Red List data is
+<strong>never</strong> shipped as package data — the token stays user-supplied, so each
+user fetches under their own agreement. See the
+<a href="https://www.iucnredlist.org/terms/terms-of-use">IUCN Red List Terms of Use</a>.</p>
 
 
 
@@ -12156,7 +13095,7 @@ full resolution. You do not build these by hand — the backend derives them fro
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
+          <a href="../../wdpa/wdpa/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -12166,20 +13105,20 @@ full resolution. You do not build these by hand — the backend derives them fro
                 Previous
               </span>
               <div class="md-ellipsis">
-                Introduction
+                Reference
               </div>
             </div>
           </a>
         
         
           
-          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Available datasets">
+          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Available datasets
+                Usage
               </div>
             </div>
             <div class="md-footer__button md-icon">
