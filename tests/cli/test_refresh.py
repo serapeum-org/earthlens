@@ -155,6 +155,22 @@ class TestErddapRefresher:
         """erddap is a registered live refresher."""
         assert "erddap" in supported_providers()
 
+    def test_unreachable_server_aborts_without_partial_write(self, monkeypatch):
+        """A server fetch failure surfaces as `error` and writes nothing.
+
+        Pins the write-safety contract: the crawl fails fast rather than
+        persisting a partial `_index.yaml` (which would break the loader's
+        `curated ⊆ available` invariant).
+        """
+
+        def boom(url, **kw):
+            raise RuntimeError("503 server down")
+
+        monkeypatch.setattr(refresh_mod, "_get_json", boom)
+        outcome = refresh_one(_info("erddap"), write=True)
+        assert outcome.status == "error", "an unreachable server aborts the crawl"
+        assert outcome.written == "", "nothing is written on a failed crawl"
+
 
 class TestErddapCoverage:
     """Tests for the ERDDAP `audit --coverage` classifier."""
