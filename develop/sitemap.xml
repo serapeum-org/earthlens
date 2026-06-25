@@ -169,6 +169,18 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/01_catalog_explorer/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/02_griddap_sst_anomaly/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/03_tabledap_buoys/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/catalog_explorer/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
