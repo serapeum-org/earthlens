@@ -12592,11 +12592,12 @@ multi-provider verbs) a comma-separated list or the literal <code>all</code>:</p
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>stac,openeo<span class="w">         </span><span class="c1"># a comma list</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>all<span class="w">                </span><span class="c1"># every provider</span>
 </code></pre></div>
-<p>Canonical ids: <code>chc</code>, <code>s3</code>, <code>cmems</code>, <code>ecmwf</code>, <code>earthdata</code>, <code>eumetsat</code>, <code>fdsn</code>, <code>firms</code>, <code>gdacs</code>, <code>gee</code>,
-<code>ghsl</code>, <code>hdx</code>, <code>jaxa</code>, <code>nwp</code>, <code>openaq</code>, <code>openeo</code>, <code>overture</code>, <code>radar</code>, <code>sentinel_hub</code>, <code>stac</code>,
+<p>Canonical ids: <code>chc</code>, <code>s3</code>, <code>cmems</code>, <code>ecmwf</code>, <code>earthdata</code>, <code>erddap</code>, <code>eumetsat</code>, <code>fdsn</code>, <code>firms</code>, <code>gdacs</code>,
+<code>gee</code>, <code>ghsl</code>, <code>hdx</code>, <code>jaxa</code>, <code>nwp</code>, <code>openaq</code>, <code>openeo</code>, <code>overture</code>, <code>radar</code>, <code>sentinel_hub</code>, <code>stac</code>,
 <code>tropycal</code>, <code>usgs_water</code>, <code>worldpop</code>. Common aliases include <code>amazon-s3</code>, <code>chirps</code>, <code>google-earth-engine</code>,
-<code>sentinel-hub</code>/<code>sentinelhub</code>, <code>nexrad</code>, <code>nwis</code>/<code>usgs-water</code>, <code>world-pop</code>, <code>human-settlement</code>/<code>ghs</code>,
-<code>earth-search</code>/<code>planetary-computer</code>/<code>cdse</code> (STAC endpoints). An unknown selector is a <strong>usage error</strong>
+<code>ioos</code> (erddap), <code>sentinel-hub</code>/<code>sentinelhub</code>, <code>nexrad</code>, <code>nwis</code>/<code>usgs-water</code>, <code>world-pop</code>,
+<code>human-settlement</code>/<code>ghs</code>, <code>earth-search</code>/<code>planetary-computer</code>/<code>cdse</code> (STAC endpoints). An unknown selector is
+a <strong>usage error</strong>
 (exit code <code>2</code>).</p>
 <h3 id="output-modes"><a class="toclink" href="#output-modes">Output modes</a><a class="headerlink" href="#output-modes" title="Permanent link">#</a></h3>
 <p>Most read commands accept:</p>
