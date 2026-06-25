@@ -33,6 +33,7 @@ Public surface (re-exported from this package):
 
 from __future__ import annotations
 
+from earthlens.erddap.backend import ERDDAP
 from earthlens.erddap.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -44,5 +45,6 @@ __all__ = [
     "CATALOG_PATH",
     "Catalog",
     "Dataset",
+    "ERDDAP",
     "clear_catalog_cache",
 ]
