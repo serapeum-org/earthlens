@@ -293,16 +293,17 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bdc',
-             'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
+            ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bathymetry',
+             'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
-             'earth-search', 'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms',
-             'g-portal', 'gdacs', 'gee', 'ghs', 'ghsl', 'google-earth-engine',
-             'hdx', 'human-settlement', 'insar', 'jaxa', 'jaxa-earth',
-             'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
-             'openaq', 'openeo', 'overture', 'planetary-computer', 'radar',
-             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'world-pop', 'worldpop']
+             'earth-search', 'earthdata', 'ecmwf', 'etopo', 'eumetsat', 'fdsn',
+             'firms', 'g-portal', 'gdacs', 'gebco', 'gee', 'ghs', 'ghsl',
+             'google-earth-engine', 'hdx', 'human-settlement', 'insar', 'jaxa',
+             'jaxa-earth', 'landsat', 'national-water-model', 'nexrad', 'nwis',
+             'nwm', 'nwp', 'openaq', 'openeo', 'overture', 'planetary-computer',
+             'radar', 'sentinel-hub', 'sentinelhub', 'stac', 'tropycal',
+             'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'world-pop',
+             'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -559,6 +560,14 @@ class EarthLens:
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            # Global topography / bathymetry DEMs (GEBCO 2020 + ETOPO1
+            # ice/bedrock) subset via NOAA ERDDAP griddap -> pyramids ->
+            # GeoTIFF. Open data (requests + pyramids are core), so no extra
+            # to hint. Aliases "gebco" / "etopo" — pass dataset= to pick the
+            # DEM (e.g. dataset="gebco_2020" / "etopo1_ice" / "etopo1_bedrock").
+            "bathymetry": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            "gebco": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            "etopo": ("earthlens.bathymetry", "Bathymetry", "", {}),
         }
     )
 
