@@ -169,6 +169,18 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/01_catalog_explorer/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/02_griddap_sst_anomaly/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/03_tabledap_buoys/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/catalog_explorer/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -214,10 +226,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/firms/quickstart/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/gbif/quickstart/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
@@ -333,18 +341,6 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/iucn/catalog_explorer/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/iucn/country_redlist_breakdown/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/iucn/quickstart/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/jaxa/01_catalog_explorer/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -394,10 +390,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwp/nwp_polish_features/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/obis/quickstart/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
@@ -557,10 +549,6 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcase/species_occurrences_gbif_obis/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcase/strait_of_hormuz_ships/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -657,18 +645,6 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/wdpa/catalog_explorer/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/wdpa/quickstart/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/wdpa/regional_comparison/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/worldpop/01_catalog_explorer/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -745,10 +721,6 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/biodiversity/introduction/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/chc/catalog/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -817,6 +789,22 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/erddap/datasets/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/erddap/erddap/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/erddap/introduction/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/erddap/usage/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/eumetsat/authentication/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -866,18 +854,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/firms/usage/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gbif/gbif/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gbif/introduction/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/gbif/usage/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
@@ -953,22 +929,6 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/iucn/authentication/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/iucn/introduction/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/iucn/iucn/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/iucn/usage/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/jaxa/authentication/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -1018,18 +978,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/nwp/usage/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/obis/introduction/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/obis/obis/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/obis/usage/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
@@ -1198,22 +1146,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/usgs-water/usgs_water/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/wdpa/authentication/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/wdpa/introduction/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/wdpa/usage/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/wdpa/wdpa/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
