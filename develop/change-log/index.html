@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12739,8 +12739,10 @@
   SST, Aqua MODIS chlorophyll [historical 2003–2022], NDBC buoys), the <code>[erddap]</code>
   optional extra (<code>erddapy</code>), aliases <code>erddap</code> / <code>ioos</code>, intro / usage / datasets
   / reference docs, and three example notebooks (catalog explorer + griddap +
-  tabledap). Public servers only (no auth module); a catalog-refresh crawler is a
-  follow-on.</li>
+  tabledap). <code>earthlens datasets validate erddap</code> lints the rows and
+  <code>earthlens datasets refresh erddap [--write]</code> regenerates the
+  <code>available_datasets:</code> index by walking each curated server's <code>allDatasets</code>
+  table. Public servers only (no auth module).</li>
 <li><strong>asf</strong>: add <code>earthlens.asf</code> — Alaska Satellite Facility SAR backend with
   <code>asf_search</code>-backed search and the InSAR baseline <code>stack()</code>. Reuses NASA
   Earthdata Login auth from <code>earthlens.earthdata</code> (no second credential
