@@ -15,8 +15,11 @@ measured level); there are no credentials.
 
 ## Region selection (bbox + time)
 
-Name the parameters you want; the bbox + time window + depth range build
-the `argopy` region box:
+Name the family parameters you're interested in; the bbox + time window + depth
+range build the `argopy` region box. Note that for a region selection the names
+are **validated** against the chosen family but do not subset the result —
+`argopy` returns the whole family (`PRES`/`TEMP`/`PSAL` plus QC/error columns for
+`phy`), so naming a parameter asserts intent rather than filtering columns:
 
 ```python
 from earthlens import EarthLens

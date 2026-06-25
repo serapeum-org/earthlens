@@ -44,6 +44,11 @@ selection) or a single selector token:
 | `["float:6902746"]` / `["float:6902746,6902747"]` | one or more floats by WMO id | `.float([...])` |
 | `["profile:6902746/12"]` | one float's cycle | `.profile(6902746, 12)` |
 
+For a region selection the parameter names are **validated** against the chosen
+family but do not subset the returned columns — `argopy` returns the whole
+family (`PRES`/`TEMP`/`PSAL` plus QC/error columns for `phy`), so naming a
+parameter asserts intent rather than filtering columns.
+
 The dataset family is chosen with `dataset=` (`"phy"` default core
 physical, or `"bgc"` biogeochemical); the data backend with `source=`
 (`"erddap"` default / `"gdac"` / `"argovis"`); the QC mode with `mode=`

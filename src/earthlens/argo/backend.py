@@ -162,11 +162,15 @@ class ARGO(AbstractDataSource):
         Args:
             start: Inclusive start of the window, parsed with `fmt`.
             end: Inclusive end of the window.
-            variables: Either Argo parameter names (`["TEMP", "PSAL"]`,
-                validated against the chosen `dataset` family) for a
-                region selection, or a single `"float:<WMO>"` /
+            variables: Either Argo parameter names (`["TEMP", "PSAL"]`)
+                for a region selection, or a single `"float:<WMO>"` /
                 `"profile:<WMO>/<cycle>"` selector token. An empty list
-                is a region selection over all parameters.
+                is a region selection. For a region selection the names
+                are **validated** against the chosen `dataset` family but
+                do **not** subset the result: `argopy` returns the whole
+                family (for `"phy"`: `PRES`/`TEMP`/`PSAL` plus their
+                `*_ERROR`/`*_QC`), so naming a parameter asserts intent
+                rather than filtering columns.
             lat_lim: `[lat_min, lat_max]` bounding-box latitudes (used by
                 a region selection; ignored for float / profile).
             lon_lim: `[lon_min, lon_max]` bounding-box longitudes.
