@@ -12,6 +12,8 @@ from earthlens.bathymetry._helpers import (
     resolution_degrees,
 )
 
+pytestmark = pytest.mark.bathymetry
+
 ENDPOINT = "https://coastwatch.pfeg.noaa.gov/erddap"
 
 

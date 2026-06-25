@@ -13,6 +13,8 @@ from earthlens.bathymetry import backend as backend_module
 from earthlens.bathymetry.backend import Bathymetry
 from earthlens.bathymetry.catalog import Catalog, Dataset
 
+pytestmark = pytest.mark.bathymetry
+
 #: A minimal NetCDF-3 header (magic + padding) the magic-byte guard accepts.
 _NETCDF_BODY = b"CDF\x01" + b"\x00" * 64
 

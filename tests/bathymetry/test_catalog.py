@@ -10,6 +10,8 @@ from pydantic import ValidationError
 from earthlens.bathymetry import Catalog, Dataset
 from earthlens.bathymetry.catalog import Transport, clear_catalog_cache
 
+pytestmark = pytest.mark.bathymetry
+
 _ROW = (
     "    endpoint: https://x/erddap\n"
     "    dataset_id: A\n"
