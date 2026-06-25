@@ -95,6 +95,8 @@ overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
 usgs-water = ["dataretrieval >=1.1.4"]
 ghsl = []
 worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
+gbif = ["pygbif >=0.6.6"]
+obis = ["pyobis >=1.6.1"]
 # JAXA backend — two protocols, both SDKs are optional:
 #   * jaxa.earth: the official authless STAC + COG API. Pin tight on the
 #     prototype 0.x line (the SDK has no public source repo; behaviour
@@ -108,7 +110,7 @@ jaxa = [
 ]
 # Self-referential: the union of every backend extra, without re-listing deps.
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,jaxa]",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa]",
 ]
 
 [dependency-groups]
@@ -282,6 +284,11 @@ markers = [
     "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
     "worldpop: tests for the WorldPop population data hub backend (open CC-BY-4.0; default REST path needs only core requests + pyramids, optional `worldpop` extra adds worldpoppy).",
     "cli: tests for the `earthlens` console script / federated catalog-query CLI (typer and rich are core dependencies; no extra needed).",
+    "biodiversity: tests for the shared biodiversity-cluster helpers (`wkt_from_bbox`, `occurrences_to_fc`, `LicenseWarning`; no extra SDK).",
+    "gbif: tests for the GBIF species-occurrence backend (requires the `gbif` extra: pygbif; search is anonymous).",
+    "obis: tests for the OBIS marine-occurrence backend (requires the `obis` extra: pyobis; search is anonymous).",
+    "wdpa: tests for the Protected Planet (WDPA) backend (no extra SDK; direct v4 REST via core `requests`; needs a token).",
+    "iucn: tests for the IUCN Red List v4 backend (no extra SDK; direct v4 REST via core `requests`; needs a Bearer token).",
     "jaxa: tests for the JAXA backend (requires the `jaxa` extra: jaxa.earth + gportal; two protocols — authless STAC/COG via jaxa.earth, credentialed SFTP via gportal).",
 ]
 

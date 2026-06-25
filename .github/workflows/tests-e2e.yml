@@ -232,3 +232,53 @@ jobs:
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
           pixi run -e py312 pytest -m "e2e and asf" -v
+
+  e2e-iucn:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        with:
+          environments: py312
+          activate-environment: py312
+          cache: true
+
+      - name: Run live IUCN Red List e2e tests
+        # The IUCN e2e test skips itself when IUCN_TOKEN is unset, so this
+        # job is harmless if the secret is not configured yet. Sign up for a
+        # free token at https://api.iucnredlist.org/users/sign_up.
+        env:
+          IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
+        run: |
+          pixi run -e py312 pytest -m "e2e and iucn" -v
+
+  e2e-wdpa:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        with:
+          environments: py312
+          activate-environment: py312
+          cache: true
+
+      - name: Run live Protected Planet (WDPA) e2e tests
+        # The WDPA e2e test skips itself when WDPA_TOKEN is unset, so this
+        # job is harmless if the secret is not configured yet. Request a
+        # personal token at https://api.protectedplanet.net/request.
+        env:
+          WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
+        run: |
+          pixi run -e py312 pytest -m "e2e and wdpa" -v
