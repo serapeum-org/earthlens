@@ -11,6 +11,7 @@ from earthlens.cli.adapter import list_backends
 from earthlens.cli.validate import (
     ValidateResult,
     _live_ecmwf,
+    _validate_bathymetry,
     _validate_nwp,
     _validate_overture,
     _validate_radar,
@@ -44,6 +45,7 @@ _CURATED_ENUM = (
     "obis",
     "wdpa",
     "iucn",
+    "bathymetry",
 )
 
 
@@ -69,6 +71,34 @@ class TestBundledCatalogsLintClean:
         assert result.status == "ok", f"{provider} validator errored: {result.detail}"
         assert result.issues == [], f"{provider} issues: {result.issues}"
         assert result.checked > 0, f"{provider} checked nothing"
+
+
+class TestValidateBathymetry:
+    """Tests for the bathymetry structural lint."""
+
+    def test_flags_missing_endpoint_and_band(self):
+        """A row missing its endpoint and band is flagged for each."""
+        catalog = SimpleNamespace(
+            available_datasets=["bad"],
+            datasets={"bad": SimpleNamespace(endpoint="", dataset_id="X", variable="")},
+        )
+        checked, issues = _validate_bathymetry(catalog)
+        assert checked == 1
+        assert any("missing endpoint" in i for i in issues)
+        assert any("missing variable" in i for i in issues)
+
+    def test_flags_id_absent_from_index(self):
+        """A curated id missing from the available_datasets index is flagged."""
+        catalog = SimpleNamespace(
+            available_datasets=["other"],
+            datasets={
+                "row": SimpleNamespace(
+                    endpoint="https://x/erddap", dataset_id="X", variable="z"
+                )
+            },
+        )
+        _checked, issues = _validate_bathymetry(catalog)
+        assert any("available_datasets" in i for i in issues)
 
 
 class TestValidateNwp:
