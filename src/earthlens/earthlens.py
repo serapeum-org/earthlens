@@ -293,7 +293,8 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bdc',
+            ['alaska-satellite-facility', 'amazon-s3', 'argo', 'argo-floats',
+             'argopy', 'asf', 'bdc',
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms',
@@ -400,6 +401,11 @@ class EarthLens:
             crop to the AOI via `pyramids` with a tidy age/sex table for
             demographic products; `mixed` output; keys `"worldpop"` /
             `"world-pop"`.
+        :class:`earthlens.argo.ARGO`: Argo autonomous-float ocean
+            profiles (temperature / salinity / pressure, plus BGC
+            parameters) via `argopy` as a `tabular` long-format
+            `DataFrame`; region / `float:` / `profile:` selectors, open
+            data (no auth); keys `"argo"` / `"argo-floats"` / `"argopy"`.
 
     """
 
@@ -559,6 +565,13 @@ class EarthLens:
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            # Argo autonomous-float ocean profiles via the `argopy` SDK
+            # (open data, no auth). `OUTPUT_KIND="tabular"` — a long-format
+            # DataFrame of profiles. The `"argo"` key is canonical; the
+            # `"argo-floats"` / `"argopy"` aliases collapse to it.
+            "argo": ("earthlens.argo", "ARGO", "argo", {}),
+            "argo-floats": ("earthlens.argo", "ARGO", "argo", {}),
+            "argopy": ("earthlens.argo", "ARGO", "argo", {}),
         }
     )
 
@@ -599,8 +612,9 @@ class EarthLens:
                 `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
                 `"stac"` (with endpoint aliases `"planetary-computer"` /
                 `"earth-search"` / `"cdse"`), `"tropycal"`,
-                `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`), or
-                `"worldpop"` (alias `"world-pop"`). See
+                `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`),
+                `"worldpop"` (alias `"world-pop"`), or `"argo"` (aliases
+                `"argo-floats"` / `"argopy"`). See
                 `sorted(EarthLens.DataSources)` for the live list.
                 Defaults to `"chc"`.
             temporal_resolution: The download cadence — `"daily"` or
