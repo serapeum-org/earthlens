@@ -1265,3 +1265,68 @@ class TestFirmsKeyRedaction:
             curate_mod._firms_csv_lines("VIIRS_SNPP_NRT")
         assert "TOPSECRETKEY" not in str(exc.value), "map key scrubbed from the error"
         assert "***" in str(exc.value), "key replaced with a mask"
+
+
+class TestBiodiversityProbers:
+    """Tests for the gbif / obis / wdpa / iucn probers (offline)."""
+
+    def test_gbif_returns_dispatch_row(self):
+        """The light probe returns the catalog's recorded taxon_key + rank."""
+        from earthlens.gbif import Catalog as G
+
+        result = curate_mod._gbif_probe(G(), "birds")
+        assert result == {"birds": {"taxon_key": 212, "title": "Aves — birds", "rank": "class"}}
+
+    def test_gbif_raises_on_unknown_taxon(self):
+        """An unknown taxon raises with a clear message."""
+        from earthlens.gbif import Catalog as G
+
+        with pytest.raises(ValueError, match="unknown GBIF taxon"):
+            curate_mod._gbif_probe(G(), "nope")
+
+    def test_obis_returns_dispatch_row(self):
+        """The OBIS probe returns the curated scientific_name + title."""
+        from earthlens.obis import Catalog as O
+
+        result = curate_mod._obis_probe(O(), "blue-whale")
+        assert result["blue-whale"]["scientific_name"] == "Balaenoptera musculus"
+
+    def test_obis_raises_on_unknown_species(self):
+        """An unknown species raises with a clear message."""
+        from earthlens.obis import Catalog as O
+
+        with pytest.raises(ValueError, match="unknown OBIS species"):
+            curate_mod._obis_probe(O(), "nope")
+
+    def test_wdpa_returns_country_row(self):
+        """The WDPA probe returns the curated name + region."""
+        from earthlens.wdpa import Catalog as W
+
+        result = curate_mod._wdpa_probe(W(), "KEN")
+        assert result == {"KEN": {"name": "Kenya", "region": "Africa"}}
+
+    def test_wdpa_raises_on_unknown_country(self):
+        """An unknown country code raises with a clear message."""
+        from earthlens.wdpa import Catalog as W
+
+        with pytest.raises(ValueError, match="unknown WDPA country"):
+            curate_mod._wdpa_probe(W(), "XYZ")
+
+    def test_iucn_returns_country_row(self):
+        """The IUCN probe returns the curated name + region."""
+        from earthlens.iucn import Catalog as I
+
+        result = curate_mod._iucn_probe(I(), "KE")
+        assert result == {"KE": {"name": "Kenya", "region": "Africa"}}
+
+    def test_iucn_raises_on_unknown_country(self):
+        """An unknown country code raises with a clear message."""
+        from earthlens.iucn import Catalog as I
+
+        with pytest.raises(ValueError, match="unknown IUCN country"):
+            curate_mod._iucn_probe(I(), "XX")
+
+    def test_cluster_probers_registered(self):
+        """All four cluster backends appear in the probe registry."""
+        for key in ("gbif", "obis", "wdpa", "iucn"):
+            assert key in supported_providers(), f"{key} cluster prober wired"

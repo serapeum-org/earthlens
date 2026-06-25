@@ -9,6 +9,50 @@
 # `species.name_backbone`.
 #
 # Validate the curated entries with: earthlens datasets validate gbif
+#
+# `available_datasets:` below is the informational index of GBIF backbone
+# taxa earthlens recognises by friendly id — the 8 kingdom roots plus a
+# curated set of commonly-queried higher taxa (classes / orders / families).
+# `earthlens datasets refresh gbif` diffs this list against the curated
+# `taxa:` keys above so a maintainer can see what is index-only vs wired up.
+available_datasets:
+  - kingdom:Animalia
+  - kingdom:Archaea
+  - kingdom:Bacteria
+  - kingdom:Chromista
+  - kingdom:Fungi
+  - kingdom:Plantae
+  - kingdom:Protozoa
+  - kingdom:Viruses
+  - kingdom:incertae-sedis
+  - class:Amphibia
+  - class:Arachnida
+  - class:Aves
+  - class:Bivalvia
+  - class:Cephalopoda
+  - class:Chondrichthyes
+  - class:Gastropoda
+  - class:Insecta
+  - class:Liliopsida
+  - class:Magnoliopsida
+  - class:Mammalia
+  - class:Pinopsida
+  - class:Polypodiopsida
+  - class:Reptilia
+  - order:Anura
+  - order:Carnivora
+  - order:Cetacea
+  - order:Chiroptera
+  - order:Coleoptera
+  - order:Diptera
+  - order:Hymenoptera
+  - order:Lepidoptera
+  - order:Passeriformes
+  - order:Primates
+  - order:Rodentia
+  - order:Squamata
+  - order:Testudines
+
 taxa:
   animals:
     taxon_key: 1

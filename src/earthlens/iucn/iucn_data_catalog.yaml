@@ -9,6 +9,54 @@
 # via `species:<name>`, not from this catalog.)
 #
 # Validate the curated entries with: earthlens datasets validate iucn
+#
+# `available_datasets:` mirrors the curated ISO2 country keys below — the
+# universe the IUCN backend's friendly-name resolution covers. `earthlens
+# datasets refresh iucn` reports the same list (the country axis is the
+# refreshable surface; the Red List v4 country dictionary is token-gated, so
+# the curated catalog *is* the offline informational index).
+available_datasets:
+  - AR
+  - AU
+  - BR
+  - BW
+  - CA
+  - CD
+  - CL
+  - CN
+  - CO
+  - CR
+  - DE
+  - EC
+  - ES
+  - ET
+  - FJ
+  - FR
+  - GA
+  - GB
+  - ID
+  - IN
+  - IT
+  - JP
+  - KE
+  - LI
+  - MG
+  - MX
+  - MY
+  - NA
+  - NG
+  - "NO"
+  - NP
+  - NZ
+  - PE
+  - PG
+  - PH
+  - TH
+  - TZ
+  - US
+  - VN
+  - ZA
+
 countries:
   KE: {name: Kenya, region: Africa}
   TZ: {name: Tanzania, region: Africa}

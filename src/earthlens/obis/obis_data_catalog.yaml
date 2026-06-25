@@ -7,6 +7,44 @@
 # the `species:` prefix (`variables=["species:Mola mola"]`).
 #
 # Validate the curated entries with: earthlens datasets validate obis
+#
+# `available_datasets:` below is the informational index of common marine
+# higher-rank taxa OBIS records cover — root life groups plus commonly-queried
+# marine families. `earthlens datasets refresh obis` diffs this list against
+# the curated `species:` keys above so a maintainer can see what is index-only
+# vs wired up as a friendly alias.
+available_datasets:
+  - kingdom:Animalia
+  - kingdom:Chromista
+  - kingdom:Plantae
+  - kingdom:Protozoa
+  - phylum:Annelida
+  - phylum:Arthropoda
+  - phylum:Bryozoa
+  - phylum:Chordata
+  - phylum:Cnidaria
+  - phylum:Echinodermata
+  - phylum:Mollusca
+  - phylum:Porifera
+  - class:Actinopterygii
+  - class:Anthozoa
+  - class:Asteroidea
+  - class:Aves
+  - class:Bivalvia
+  - class:Cephalopoda
+  - class:Chondrichthyes
+  - class:Crustacea
+  - class:Echinoidea
+  - class:Mammalia
+  - class:Reptilia
+  - class:Scyphozoa
+  - order:Carcharhiniformes
+  - order:Cetacea
+  - order:Decapoda
+  - order:Pinnipedia
+  - order:Sirenia
+  - order:Testudines
+
 species:
   common-dolphin:
     scientific_name: "Delphinus delphis"

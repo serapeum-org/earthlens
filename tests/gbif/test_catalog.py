@@ -99,3 +99,35 @@ class TestResolveTaxonKey:
         """An unknown friendly key raises with a did-you-mean hint."""
         with pytest.raises(ValueError, match="Did you mean 'birds'"):
             Catalog().resolve_taxon_key("bird")
+
+
+class TestAvailableDatasetsIndex:
+    """Tests for the informational `available_datasets:` index."""
+
+    def test_index_loads_from_yaml(self):
+        """The bundled catalog ships a non-empty available_datasets index."""
+        cat = Catalog()
+        assert len(cat.available_datasets) >= 30, "richer GBIF taxonomic index"
+
+    def test_index_carries_kingdom_keys(self):
+        """The index includes the eight GBIF backbone kingdoms."""
+        cat = Catalog()
+        for kingdom in ("Animalia", "Plantae", "Fungi", "Bacteria"):
+            assert f"kingdom:{kingdom}" in cat.available_datasets, kingdom
+
+    def test_index_carries_class_keys(self):
+        """The index includes vertebrate animal classes."""
+        cat = Catalog()
+        for cls in ("Aves", "Mammalia", "Reptilia", "Amphibia"):
+            assert f"class:{cls}" in cat.available_datasets, cls
+
+
+class TestModelPostInitSkipsLoadWhenProvided:
+    """Tests the model_post_init inner false-branch — preset available_datasets is preserved when the YAML is loaded."""
+
+    def test_preset_available_datasets_preserved_during_yaml_load(self):
+        """With empty `datasets`, model_post_init loads the YAML but keeps preset available_datasets."""
+        cat = Catalog(available_datasets=["preset:held"])
+        assert cat.available_datasets == ["preset:held"], "preset survived YAML load"
+        assert len(cat.datasets) > 0, "YAML still loaded for datasets"
+

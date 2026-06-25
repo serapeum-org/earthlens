@@ -34,7 +34,7 @@ SPECIES_PREFIX = "species:"
 # Module-level cache of parsed catalog rows, keyed on the resolved path plus the
 # YAML's `st_mtime_ns`, so editing the file invalidates the entry. Mirrors the
 # FDSN / GBIF catalog loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Species]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Species], list[str]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -47,14 +47,16 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_catalog_data(path: Path) -> dict[str, Species]:
+def _load_catalog_data(path: Path) -> tuple[dict[str, Species], list[str]]:
     """Parse, validate, and cache the OBIS species catalog at `path`.
 
     Args:
         path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
 
     Returns:
-        Mapping from friendly species name to its :class:`Species` row.
+        A pair `(rows, available)` of the friendly-name `Species` map and the
+        informational `available_datasets:` index of common marine higher-rank
+        taxa.
 
     Raises:
         ValueError: If the file has no `species:` block, or a row fails
@@ -86,8 +88,9 @@ def _load_catalog_data(path: Path) -> dict[str, Species]:
                 f"{path} species {name!r} failed validation:\n{exc}"
             ) from exc
 
-    _CATALOG_CACHE[key] = rows
-    return rows
+    available = [str(item) for item in (data.get("available_datasets") or [])]
+    _CATALOG_CACHE[key] = (rows, available)
+    return rows, available
 
 
 class Species(BaseModel):
@@ -174,7 +177,10 @@ class Catalog(AbstractCatalog):
                 the YAML is missing, empty, or has a malformed row.
         """
         if not self.datasets:
-            self.datasets = dict(_load_catalog_data(CATALOG_PATH))
+            rows, available = _load_catalog_data(CATALOG_PATH)
+            self.datasets = dict(rows)
+            if not self.available_datasets:
+                self.available_datasets = list(available)
         super().model_post_init(__context)
 
     @classmethod
@@ -193,8 +199,8 @@ class Catalog(AbstractCatalog):
                 fails :class:`Species` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        rows = _load_catalog_data(catalog_path)
-        return cls(datasets=dict(rows))
+        rows, available = _load_catalog_data(catalog_path)
+        return cls(datasets=dict(rows), available_datasets=list(available))
 
     def get_catalog(self) -> dict[str, Species]:
         """Return the species map (satisfies the abstract contract).

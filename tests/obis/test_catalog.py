@@ -76,3 +76,29 @@ class TestResolveScientificName:
         """An unknown friendly key raises with a did-you-mean hint."""
         with pytest.raises(ValueError, match="Did you mean 'blue-whale'"):
             Catalog().resolve_scientific_name("blue-whal")
+
+
+class TestAvailableDatasetsIndex:
+    """Tests for the informational `available_datasets:` index."""
+
+    def test_index_loads_from_yaml(self):
+        """The bundled catalog ships a non-empty available_datasets index."""
+        cat = Catalog()
+        assert len(cat.available_datasets) >= 25, "richer marine-taxa index"
+
+    def test_index_carries_phylum_keys(self):
+        """The index includes major marine phyla."""
+        cat = Catalog()
+        for phylum in ("Chordata", "Mollusca", "Cnidaria", "Echinodermata"):
+            assert f"phylum:{phylum}" in cat.available_datasets, phylum
+
+
+class TestModelPostInitSkipsLoadWhenProvided:
+    """Tests the model_post_init inner false-branch — preset available_datasets is preserved when the YAML is loaded."""
+
+    def test_preset_available_datasets_preserved_during_yaml_load(self):
+        """With empty `datasets`, model_post_init loads the YAML but keeps preset available_datasets."""
+        cat = Catalog(available_datasets=["preset:held"])
+        assert cat.available_datasets == ["preset:held"], "preset survived YAML load"
+        assert len(cat.datasets) > 0, "YAML still loaded for datasets"
+

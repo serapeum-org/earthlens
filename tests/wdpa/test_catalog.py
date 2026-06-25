@@ -84,3 +84,24 @@ class TestResolveIso3:
         """An unknown country name raises with a did-you-mean hint."""
         with pytest.raises(ValueError, match="Did you mean 'Kenya'"):
             Catalog().resolve_iso3("Kenyaa")
+
+
+class TestAvailableDatasetsIndex:
+    """Tests for the informational `available_datasets:` index."""
+
+    def test_index_mirrors_curated_iso3_codes(self):
+        """The available_datasets index covers the curated ISO3 country axis."""
+        cat = Catalog()
+        assert set(cat.available_datasets) == set(cat.datasets)
+        assert len(cat.available_datasets) == 40
+
+
+class TestModelPostInitSkipsLoadWhenProvided:
+    """Tests the model_post_init inner false-branch — preset available_datasets is preserved when the YAML is loaded."""
+
+    def test_preset_available_datasets_preserved_during_yaml_load(self):
+        """With empty `datasets`, model_post_init loads the YAML but keeps preset available_datasets."""
+        cat = Catalog(available_datasets=["preset:held"])
+        assert cat.available_datasets == ["preset:held"], "preset survived YAML load"
+        assert len(cat.datasets) > 0, "YAML still loaded for datasets"
+

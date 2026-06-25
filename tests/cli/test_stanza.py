@@ -28,6 +28,10 @@ class TestSupportedProviders:
             "eumetsat",
             "gee",
             "jaxa",
+            "gbif",
+            "obis",
+            "wdpa",
+            "iucn",
         }
 
 
@@ -372,3 +376,40 @@ class TestGeeLiveBands:
         ee_type, bands = stanza_mod._gee_live_bands("projects/x/y")
         assert ee_type == "image_collection", "asset type lowercased"
         assert sorted(bands) == ["B1", "B2"], "live band names read"
+
+
+class TestBiodiversityEmitters:
+    """Tests for the gbif / obis / wdpa / iucn emitters (no network)."""
+
+    def test_gbif_seeds_taxon_row(self):
+        """`emit_stanza` for gbif seeds taxon_key + title + rank from args."""
+        result = emit_stanza(_info("gbif"), "212", key="birds", title="Aves", rank="class")
+        assert result.status == "ok", f"emit ran: {result.detail}"
+        assert result.row == {"taxon_key": 212, "title": "Aves", "rank": "class"}
+
+    def test_obis_seeds_species_row(self):
+        """`emit_stanza` for obis seeds scientific_name + title from args."""
+        result = emit_stanza(
+            _info("obis"), "Mola mola", key="ocean-sunfish", title="Ocean sunfish"
+        )
+        assert result.status == "ok", f"emit ran: {result.detail}"
+        assert result.row == {"scientific_name": "Mola mola", "title": "Ocean sunfish"}
+
+    def test_wdpa_seeds_country_row(self):
+        """`emit_stanza` for wdpa seeds name + region from args."""
+        result = emit_stanza(_info("wdpa"), "KEN", key="KEN", name="Kenya", region="Africa")
+        assert result.status == "ok", f"emit ran: {result.detail}"
+        assert result.row == {"name": "Kenya", "region": "Africa"}
+
+    def test_iucn_seeds_country_row(self):
+        """`emit_stanza` for iucn seeds name + region from args."""
+        result = emit_stanza(_info("iucn"), "KE", key="KE", name="Kenya", region="Africa")
+        assert result.status == "ok", f"emit ran: {result.detail}"
+        assert result.row == {"name": "Kenya", "region": "Africa"}
+
+    def test_cluster_blocks_register(self):
+        """Cluster catalogs land under their own top-level YAML blocks."""
+        assert stanza_mod._STANZA_BLOCK["gbif"] == "taxa"
+        assert stanza_mod._STANZA_BLOCK["obis"] == "species"
+        assert stanza_mod._STANZA_BLOCK["wdpa"] == "countries"
+        assert stanza_mod._STANZA_BLOCK["iucn"] == "countries"

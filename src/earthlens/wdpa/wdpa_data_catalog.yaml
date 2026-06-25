@@ -8,6 +8,54 @@
 # friendly-name resolution, a did-you-mean hint, and the `validate` target.
 #
 # Validate the curated entries with: earthlens datasets validate wdpa
+#
+# `available_datasets:` mirrors the curated ISO3 country keys below — the
+# universe the WDPA backend's friendly-name resolution covers. `earthlens
+# datasets refresh wdpa` reports the same list (the country axis is the
+# refreshable surface; Protected Planet has no anonymous "list everything"
+# endpoint, so the curated catalog *is* its informational index).
+available_datasets:
+  - ARG
+  - AUS
+  - BRA
+  - BWA
+  - CAN
+  - CHL
+  - CHN
+  - COD
+  - COL
+  - CRI
+  - DEU
+  - ECU
+  - ESP
+  - ETH
+  - FJI
+  - FRA
+  - GAB
+  - GBR
+  - IDN
+  - IND
+  - ITA
+  - JPN
+  - KEN
+  - LIE
+  - MDG
+  - MEX
+  - MYS
+  - NAM
+  - NGA
+  - NOR
+  - NPL
+  - NZL
+  - PER
+  - PHL
+  - PNG
+  - THA
+  - TZA
+  - USA
+  - VNM
+  - ZAF
+
 countries:
   KEN: {name: Kenya, region: Africa}
   TZA: {name: Tanzania, region: Africa}

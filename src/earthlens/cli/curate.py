@@ -1343,6 +1343,108 @@ def _jaxa_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return {k: {"value": str(v)[:80]} for k, v in flat.items()}
 
 
+def _gbif_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Report a GBIF curated taxon's dispatch metadata (offline).
+
+    GBIF's per-taxon live sample needs a `taxonKey`, but for curation a
+    maintainer only wants the catalog's recorded `taxon_key` / `rank` —
+    they paste that into the row. This reads it straight from the bundled
+    catalog row (mirrors `_ghsl_probe`'s offline shape).
+
+    Args:
+        catalog: The loaded GBIF `Catalog`.
+        dataset: A curated friendly name (e.g. `"birds"`).
+
+    Returns:
+        Single-entry mapping `{dataset: {taxon_key, title, rank}}`.
+
+    Raises:
+        ValueError: If `dataset` is not a curated GBIF taxon.
+    """
+    record = catalog.datasets.get(dataset)
+    if record is None:
+        raise ValueError(f"unknown GBIF taxon {dataset!r}")
+    return {
+        dataset: {
+            "taxon_key": record.taxon_key,
+            "title": record.title,
+            "rank": record.rank,
+        }
+    }
+
+
+def _obis_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Report an OBIS curated species' dispatch metadata (offline).
+
+    Symmetric to `_gbif_probe` — reads the curated `scientific_name` / `title`
+    straight from the bundled row.
+
+    Args:
+        catalog: The loaded OBIS `Catalog`.
+        dataset: A curated friendly name (e.g. `"blue-whale"`).
+
+    Returns:
+        Single-entry mapping `{dataset: {scientific_name, title}}`.
+
+    Raises:
+        ValueError: If `dataset` is not a curated OBIS species.
+    """
+    record = catalog.datasets.get(dataset)
+    if record is None:
+        raise ValueError(f"unknown OBIS species {dataset!r}")
+    return {
+        dataset: {
+            "scientific_name": record.scientific_name,
+            "title": record.title,
+        }
+    }
+
+
+def _wdpa_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Report a WDPA curated country's dispatch metadata (offline).
+
+    Protected Planet's per-country live sample is token-gated, so the
+    light probe reads the curated `name` / `region` from the bundled row
+    (the same pattern `_ghsl_probe` follows for an offline-only universe).
+
+    Args:
+        catalog: The loaded WDPA `Catalog`.
+        dataset: A curated ISO3 alpha-3 code (e.g. `"KEN"`).
+
+    Returns:
+        Single-entry mapping `{dataset: {name, region}}`.
+
+    Raises:
+        ValueError: If `dataset` is not a curated WDPA country.
+    """
+    record = catalog.datasets.get(dataset)
+    if record is None:
+        raise ValueError(f"unknown WDPA country {dataset!r}")
+    return {dataset: {"name": record.name, "region": record.region}}
+
+
+def _iucn_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+    """Report an IUCN curated country's dispatch metadata (offline).
+
+    Red List per-country live sample is token-gated; the light probe
+    surfaces the curated `name` / `region` from the bundled row.
+
+    Args:
+        catalog: The loaded IUCN `Catalog`.
+        dataset: A curated ISO2 alpha-2 code (e.g. `"KE"`).
+
+    Returns:
+        Single-entry mapping `{dataset: {name, region}}`.
+
+    Raises:
+        ValueError: If `dataset` is not a curated IUCN country.
+    """
+    record = catalog.datasets.get(dataset)
+    if record is None:
+        raise ValueError(f"unknown IUCN country {dataset!r}")
+    return {dataset: {"name": record.name, "region": record.region}}
+
+
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
@@ -1362,6 +1464,10 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,
     "tropycal": _tropycal_probe,
+    "gbif": _gbif_probe,
+    "obis": _obis_probe,
+    "wdpa": _wdpa_probe,
+    "iucn": _iucn_probe,
     "nwp": _nwp_probe,
     "jaxa": _jaxa_probe,
 }

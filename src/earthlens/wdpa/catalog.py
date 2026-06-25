@@ -33,7 +33,7 @@ COUNTRY_PREFIX = "country:"
 # Module-level cache of parsed catalog rows, keyed on the resolved path plus
 # the YAML's `st_mtime_ns`, so editing the file invalidates the entry. Mirrors
 # the FDSN / GBIF catalog loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Country]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Country], list[str]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -46,14 +46,15 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_catalog_data(path: Path) -> dict[str, Country]:
+def _load_catalog_data(path: Path) -> tuple[dict[str, Country], list[str]]:
     """Parse, validate, and cache the WDPA country catalog at `path`.
 
     Args:
         path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
 
     Returns:
-        Mapping from ISO3 code to its :class:`Country` row.
+        A pair `(rows, available)` of the ISO3-keyed `Country` map and the
+        informational `available_datasets:` mirror of the curated codes.
 
     Raises:
         ValueError: If the file has no `countries:` block, or a row fails
@@ -85,8 +86,9 @@ def _load_catalog_data(path: Path) -> dict[str, Country]:
                 f"{path} country {code!r} failed validation:\n{exc}"
             ) from exc
 
-    _CATALOG_CACHE[key] = rows
-    return rows
+    available = [str(item) for item in (data.get("available_datasets") or [])]
+    _CATALOG_CACHE[key] = (rows, available)
+    return rows, available
 
 
 class Country(BaseModel):
@@ -169,7 +171,10 @@ class Catalog(AbstractCatalog):
                 YAML is missing, empty, or has a malformed row.
         """
         if not self.datasets:
-            self.datasets = dict(_load_catalog_data(CATALOG_PATH))
+            rows, available = _load_catalog_data(CATALOG_PATH)
+            self.datasets = dict(rows)
+            if not self.available_datasets:
+                self.available_datasets = list(available)
         super().model_post_init(__context)
 
     @classmethod
@@ -188,8 +193,8 @@ class Catalog(AbstractCatalog):
                 fails :class:`Country` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        rows = _load_catalog_data(catalog_path)
-        return cls(datasets=dict(rows))
+        rows, available = _load_catalog_data(catalog_path)
+        return cls(datasets=dict(rows), available_datasets=list(available))
 
     def get_catalog(self) -> dict[str, Country]:
         """Return the country map (satisfies the abstract contract).

@@ -35,7 +35,7 @@ TAXON_PREFIX = "taxon:"
 # Module-level cache of parsed catalog rows, keyed on the resolved path plus
 # the YAML's `st_mtime_ns`, so editing the file invalidates the entry without
 # re-parsing on every `Catalog()`. Mirrors the FDSN / OpenAQ catalog loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Taxon]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Taxon], list[str]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -48,14 +48,16 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_catalog_data(path: Path) -> dict[str, Taxon]:
+def _load_catalog_data(path: Path) -> tuple[dict[str, Taxon], list[str]]:
     """Parse, validate, and cache the GBIF taxon catalog at `path`.
 
     Args:
         path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
 
     Returns:
-        Mapping from friendly taxon name to its :class:`Taxon` row.
+        A pair `(rows, available)` of the friendly-name `Taxon` map and the
+        informational `available_datasets:` index (the richer taxonomic
+        listing the refresher diffs against).
 
     Raises:
         ValueError: If the file has no `taxa:` block, or a row fails
@@ -85,8 +87,9 @@ def _load_catalog_data(path: Path) -> dict[str, Taxon]:
         except ValidationError as exc:
             raise ValueError(f"{path} taxon {name!r} failed validation:\n{exc}") from exc
 
-    _CATALOG_CACHE[key] = rows
-    return rows
+    available = [str(item) for item in (data.get("available_datasets") or [])]
+    _CATALOG_CACHE[key] = (rows, available)
+    return rows, available
 
 
 def _name_backbone_key(name: str) -> int:
@@ -217,7 +220,10 @@ class Catalog(AbstractCatalog):
                 the YAML is missing, empty, or has a malformed row.
         """
         if not self.datasets:
-            self.datasets = dict(_load_catalog_data(CATALOG_PATH))
+            rows, available = _load_catalog_data(CATALOG_PATH)
+            self.datasets = dict(rows)
+            if not self.available_datasets:
+                self.available_datasets = list(available)
         super().model_post_init(__context)
 
     @classmethod
@@ -236,8 +242,8 @@ class Catalog(AbstractCatalog):
                 :class:`Taxon` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        rows = _load_catalog_data(catalog_path)
-        return cls(datasets=dict(rows))
+        rows, available = _load_catalog_data(catalog_path)
+        return cls(datasets=dict(rows), available_datasets=list(available))
 
     def get_catalog(self) -> dict[str, Taxon]:
         """Return the taxon map (satisfies the abstract contract).
