@@ -57,10 +57,6 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/bathymetry/01_bathymetry_quickstart/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/chc/catalog_explorer/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -729,6 +725,18 @@
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/argo/argo/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/argo/introduction/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/argo/usage/</loc>
+         <lastmod>2026-06-25</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/asf/asf/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
@@ -746,22 +754,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/asf/usage/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/bathymetry/bathymetry/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/bathymetry/datasets/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/bathymetry/introduction/</loc>
-         <lastmod>2026-06-25</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/bathymetry/usage/</loc>
          <lastmod>2026-06-25</lastmod>
     </url>
     <url>
