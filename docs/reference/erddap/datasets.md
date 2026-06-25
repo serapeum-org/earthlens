@@ -55,3 +55,9 @@ datasets:
 
 Mirror the new key into `_index.yaml`; the loader rejects a curated key that is absent from it. Only add public
 (no-auth) servers.
+
+You don't have to hand-write the row: `earthlens datasets curate erddap <dataset_id>` seeds a complete row from
+the server's `/info` metadata (inferring `protocol` from the grid dimensions, the variable set, and the title /
+licence), printing it to vet. Add `--server <url>` to look up a dataset on a server the catalog doesn't yet
+reference, and `--write --target <slice>` to append it into a `catalog/<slice>.yaml` file. Trim the emitted
+`variables` to the headline set before committing.

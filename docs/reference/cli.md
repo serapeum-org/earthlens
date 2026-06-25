@@ -210,7 +210,7 @@ serves (the drift a CI gate fails on) and, informationally, live ids missing fro
 | Option | Meaning |
 |--------|---------|
 | `--strict` | exit non-zero if any curated dataset is no longer served live |
-| `--coverage` | switch to a **curation-coverage** report — classify the available universe into DONE / addressable / thin / table / missing, and list the highest-value ids to curate next (currently `gee`) |
+| `--coverage` | switch to a **curation-coverage** report — classify the available universe into DONE / addressable / thin / table / missing, and list the highest-value ids to curate next (`gee`, `erddap`) |
 | `-j, --json` | JSON output |
 
 ```bash
@@ -259,7 +259,7 @@ earthlens datasets probe nwp icon-global          # which band tokens are in the
 The authoring companion to `probe`: fetches one upstream id's metadata and emits a paste-ready
 `datasets:` YAML row (inferring `output_kind` / `format` / bands where it can). By default it prints the
 row to vet and paste; `--write` appends it into the catalog file. Supported providers: `earthdata`,
-`hdx`, `usgs_water`, `eumetsat`, `gee`, `jaxa`.
+`hdx`, `usgs_water`, `eumetsat`, `gee`, `jaxa`, `erddap`.
 
 | Option | Meaning |
 |--------|---------|
@@ -272,6 +272,7 @@ row to vet and paste; `--write` appends it into the catalog file. Supported prov
 | `--target` | per-family file stem under `catalog/` to write into (sharded providers; gee auto-picks, others default to `--daac` / `--group`) |
 | `--version`, `--cmr-provider`, `--daac`, `--cloud-hosted` | earthdata seed options |
 | `--name`, `--units`, `--group`, `--service` | usgs_water seed options |
+| `--server` | erddap: ERDDAP base URL to look the dataset up on (defaults to the catalog's curated servers) |
 | `-j, --json` | emit the seeded row as JSON |
 
 ```bash
@@ -281,6 +282,8 @@ earthlens datasets curate earthdata GPM_3IMERGHH --version 07 --cmr-provider GES
 earthlens datasets curate gee --fill-empty --write       # bulk-hydrate placeholders
 earthlens datasets curate jaxa JAXA.AW3D30.v3.2           # jaxa-earth STAC seed
 earthlens datasets curate jaxa 11001002                   # G-Portal numeric id seed
+earthlens datasets curate erddap erdMBsstd8day            # seed from a server's /info
+earthlens datasets curate erddap myDataset --server https://my.erddap/erddap --write --target coastwatch
 ```
 
 ---
