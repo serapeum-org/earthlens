@@ -521,6 +521,18 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/pvgis/01_pvgis_quickstart/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/pvgis/02_catalog_explorer/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/pvgis/03_pv_power_and_tmy/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/radar/catalog_explorer/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -1202,6 +1214,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/overture/usage/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/pvgis/datasets/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/pvgis/introduction/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/pvgis/pvgis/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/pvgis/usage/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
