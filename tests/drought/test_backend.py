@@ -127,13 +127,20 @@ def test_drought_non_midnight_window_keeps_trailing_day():
 
 
 def test_drought_accepts_datetime_and_date_inputs():
-    """start/end coerce through to_datetime so non-string inputs work."""
+    """start/end coerce through to_datetime so non-string inputs snap correctly.
+
+    Pin the actual snapped value (not just 'both paths agree') — a
+    regression that routes BOTH non-string inputs through a buggy coercer
+    (silently truncating, returning None / NaT, etc.) would still pass an
+    equality-only check because two identical wrong values compare equal.
+    """
     backend_dt = Drought(
         start=dt.datetime(2026, 6, 23),
         end=dt.datetime(2026, 6, 23),
         lat_lim=[30.0, 40.0],
         lon_lim=[-95.0, -85.0],
         dataset="usdm",
+        today=dt.date(2026, 6, 23),
     )
     backend_date = Drought(
         start=dt.date(2026, 6, 23),
@@ -141,8 +148,12 @@ def test_drought_accepts_datetime_and_date_inputs():
         lat_lim=[30.0, 40.0],
         lon_lim=[-95.0, -85.0],
         dataset="usdm",
+        today=dt.date(2026, 6, 23),
     )
-    assert list(backend_dt.time.dates) == list(backend_date.time.dates)
+    expected = pd.DatetimeIndex([pd.Timestamp("2026-06-16")])
+    # 2026-06-23 queried on the same Tuesday walks back to 06-16 (G5).
+    assert list(backend_dt.time.dates) == list(expected)
+    assert list(backend_date.time.dates) == list(expected)
 
 
 def test_drought_rejects_inverted_window():
