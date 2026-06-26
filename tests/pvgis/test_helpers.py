@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import numpy as np
+import pandas as pd
 import pytest
 import requests
 
@@ -127,18 +127,20 @@ class TestParsers:
     """Tests for `parse_seriescalc` / `parse_tmy` and `_records_to_frame`."""
 
     def test_parse_seriescalc(self, seriescalc_payload):
-        """seriescalc parses to one row per hourly record with a datetime time."""
+        """seriescalc parses to one row per hourly record with a UTC-aware time."""
         df = h.parse_seriescalc(seriescalc_payload)
         n = len(seriescalc_payload["outputs"]["hourly"])
         assert len(df) == n, f"expected {n} rows, got {len(df)}"
-        assert np.issubdtype(df["time"].dtype, np.datetime64), df["time"].dtype
+        assert pd.api.types.is_datetime64_any_dtype(df["time"]), df["time"].dtype
+        assert str(df["time"].dt.tz) == "UTC", df["time"].dt.tz
         assert {"G(i)", "T2m"}.issubset(df.columns), list(df.columns)
 
     def test_parse_tmy_normalizes_time_utc(self, tmy_payload):
-        """TMY's `time(UTC)` key is normalised to a `time` datetime column."""
+        """TMY's `time(UTC)` key is normalised to a UTC-aware `time` column."""
         df = h.parse_tmy(tmy_payload)
         assert "time" in df.columns and "time(UTC)" not in df.columns, list(df.columns)
-        assert np.issubdtype(df["time"].dtype, np.datetime64), df["time"].dtype
+        assert pd.api.types.is_datetime64_any_dtype(df["time"]), df["time"].dtype
+        assert str(df["time"].dt.tz) == "UTC", df["time"].dt.tz
         assert "RH" in df.columns, list(df.columns)
 
     def test_records_to_frame_missing_time_key(self):

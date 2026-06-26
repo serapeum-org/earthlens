@@ -158,22 +158,25 @@ def _records_to_frame(rows: list[dict[str, Any]], time_key: str) -> pd.DataFrame
     """Fold a list of PVGIS hourly records into a long frame (`G8`).
 
     The timestamp column is renamed from its API key (`"time"` for
-    seriescalc, `"time(UTC)"` for TMY) to a canonical `time` and parsed to
-    `datetime64`; the value columns pass through unchanged.
+    seriescalc, `"time(UTC)"` for TMY) to a canonical `time` and parsed to a
+    **UTC-aware** `datetime64` — PVGIS timestamps are UTC (TMY labels its key
+    `time(UTC)` explicitly), so the column is localised to UTC to match the
+    other tabular backends rather than left naive. The value columns pass
+    through unchanged.
 
     Args:
         rows: The `outputs.hourly` / `outputs.tmy_hourly` record list.
         time_key: The timestamp key in `rows` (`"time"` or `"time(UTC)"`).
 
     Returns:
-        pd.DataFrame: A frame with a `time` `datetime64` column plus the
-            value columns, in record order.
+        pd.DataFrame: A frame with a UTC-aware `time` (`datetime64[ns, UTC]`)
+            column plus the value columns, in record order.
     """
     df = pd.DataFrame(rows)
     if time_key != "time" and time_key in df.columns:
         df = df.rename(columns={time_key: "time"})
     if "time" in df.columns:
-        df["time"] = pd.to_datetime(df["time"], format=TIME_FORMAT)
+        df["time"] = pd.to_datetime(df["time"], format=TIME_FORMAT, utc=True)
     return df
 
 
