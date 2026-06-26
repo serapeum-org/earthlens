@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from urllib.parse import urlparse
+
 import pytest
 
 from earthlens.cli import stanza as stanza_mod
@@ -97,7 +99,7 @@ class TestErddapEmitter:
         monkeypatch.setattr(stanza_mod, "_get_json", fake)
         result = emit_stanza(_info("erddap"), "myGrid")
         assert result.status == "ok"
-        assert "coastwatch.pfeg.noaa.gov" in result.row["server_url"]
+        assert urlparse(result.row["server_url"]).hostname == "coastwatch.pfeg.noaa.gov"
         assert any("/info/myGrid/index.json" in u for u in calls)
 
     def test_not_found_reports_error(self, monkeypatch):
