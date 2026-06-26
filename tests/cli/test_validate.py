@@ -11,6 +11,8 @@ from earthlens.cli.adapter import list_backends
 from earthlens.cli.validate import (
     ValidateResult,
     _live_ecmwf,
+    _validate_bathymetry,
+    _validate_erddap,
     _validate_nwp,
     _validate_overture,
     _validate_radar,
@@ -39,11 +41,14 @@ _CURATED_ENUM = (
     "radar",
     "tropycal",
     "gdacs",
+    "argo",
     "chc",
+    "erddap",
     "gbif",
     "obis",
     "wdpa",
     "iucn",
+    "bathymetry",
 )
 
 
@@ -69,6 +74,34 @@ class TestBundledCatalogsLintClean:
         assert result.status == "ok", f"{provider} validator errored: {result.detail}"
         assert result.issues == [], f"{provider} issues: {result.issues}"
         assert result.checked > 0, f"{provider} checked nothing"
+
+
+class TestValidateBathymetry:
+    """Tests for the bathymetry structural lint."""
+
+    def test_flags_missing_endpoint_and_band(self):
+        """A row missing its endpoint and band is flagged for each."""
+        catalog = SimpleNamespace(
+            available_datasets=["bad"],
+            datasets={"bad": SimpleNamespace(endpoint="", dataset_id="X", variable="")},
+        )
+        checked, issues = _validate_bathymetry(catalog)
+        assert checked == 1
+        assert any("missing endpoint" in i for i in issues)
+        assert any("missing variable" in i for i in issues)
+
+    def test_flags_id_absent_from_index(self):
+        """A curated id missing from the available_datasets index is flagged."""
+        catalog = SimpleNamespace(
+            available_datasets=["other"],
+            datasets={
+                "row": SimpleNamespace(
+                    endpoint="https://x/erddap", dataset_id="X", variable="z"
+                )
+            },
+        )
+        _checked, issues = _validate_bathymetry(catalog)
+        assert any("available_datasets" in i for i in issues)
 
 
 class TestValidateNwp:
@@ -111,6 +144,49 @@ class TestValidateNwp:
         _checked, issues = _validate_nwp(catalog)
         assert any("empty band map" in i for i in issues), "empty bands flagged"
         assert any("out of range" in i for i in issues), "bad cycle flagged"
+
+
+class TestValidateErddap:
+    """The ERDDAP offline lint flags the cross-row problems the model can't."""
+
+    @staticmethod
+    def _catalog(**row_overrides):
+        """A one-row fake catalog whose row carries the given overrides."""
+        from earthlens.erddap.catalog import Dataset
+
+        fields = dict(
+            server_url="https://example.org/erddap",
+            dataset_id="d",
+            protocol="tabledap",
+            variables=["a"],
+        )
+        fields.update(row_overrides)
+        return SimpleNamespace(datasets={"d": Dataset(**fields)})
+
+    def test_clean_row_has_no_issues(self):
+        """A well-formed row lints clean and is counted."""
+        checked, issues = _validate_erddap(self._catalog())
+        assert checked == 1, f"expected 1 row checked, got {checked}"
+        assert issues == [], f"clean row should have no issues, got {issues}"
+
+    def test_non_http_server_url_flagged(self):
+        """A server_url that is not http(s) is flagged."""
+        _, issues = _validate_erddap(self._catalog(server_url="ftp://x/erddap"))
+        assert any("http(s)" in i for i in issues), f"server_url not flagged: {issues}"
+
+    def test_empty_griddap_dim_names_flagged(self):
+        """A griddap row with empty dim_names is flagged."""
+        _, issues = _validate_erddap(self._catalog(protocol="griddap", dim_names=[]))
+        assert any("dim_names" in i for i in issues), f"dim_names not flagged: {issues}"
+
+    def test_flux_variable_not_in_variables_flagged(self):
+        """A flux_variables entry absent from the row's variables is flagged."""
+        _, issues = _validate_erddap(
+            self._catalog(protocol="griddap", variables=["a"], flux_variables=["b"])
+        )
+        assert any(
+            "flux_variables" in i for i in issues
+        ), f"flux typo not flagged: {issues}"
 
 
 class TestStructuralLints:

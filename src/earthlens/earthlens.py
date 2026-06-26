@@ -293,18 +293,19 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bdc',
+            ['alaska-satellite-facility', 'amazon-s3', 'argo', 'argo-floats',
+             'argopy', 'asf', 'bathymetry', 'bdc',
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
-             'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo', 'eumetsat',
-             'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gdo', 'gee', 'ghs',
-             'ghsl', 'google-earth-engine', 'hdx', 'human-settlement', 'insar',
-             'iucn', 'jaxa', 'jaxa-earth', 'landsat', 'national-water-model',
-             'nexrad', 'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo',
-             'overture', 'planetary-computer', 'protected-planet', 'radar',
-             'redlist', 'sentinel-hub', 'sentinelhub', 'stac', 'tropycal',
-             'usdm', 'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'wdpa',
-             'world-pop', 'worldpop']
+             'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo', 'erddap',
+             'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs',
+             'gdo', 'gebco', 'gee', 'ghs', 'ghsl', 'google-earth-engine', 'hdx',
+             'human-settlement', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth',
+             'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
+             'obis', 'openaq', 'openeo', 'overture', 'planetary-computer',
+             'protected-planet', 'radar', 'redlist', 'sentinel-hub',
+             'sentinelhub', 'stac', 'tropycal', 'usdm', 'usgs-landsat',
+             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -424,6 +425,11 @@ class EarthLens:
             the direct REST shim (Bearer token); `tabular` `DataFrame`
             (always a CC-BY-NC `LicenseWarning`); keys `"iucn"` /
             `"redlist"`.
+        :class:`earthlens.argo.ARGO`: Argo autonomous-float ocean
+            profiles (temperature / salinity / pressure, plus BGC
+            parameters) via `argopy` as a `tabular` long-format
+            `DataFrame`; region / `float:` / `profile:` selectors, open
+            data (no auth); keys `"argo"` / `"argo-floats"` / `"argopy"`.
 
     """
 
@@ -594,6 +600,28 @@ class EarthLens:
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            # Argo autonomous-float ocean profiles via the `argopy` SDK
+            # (open data, no auth). `OUTPUT_KIND="tabular"` — a long-format
+            # DataFrame of profiles. The `"argo"` key is canonical; the
+            # `"argo-floats"` / `"argopy"` aliases collapse to it.
+            "argo": ("earthlens.argo", "ARGO", "argo", {}),
+            "argo-floats": ("earthlens.argo", "ARGO", "argo", {}),
+            "argopy": ("earthlens.argo", "ARGO", "argo", {}),
+            # Generic ERDDAP client — one backend for many public ERDDAP
+            # servers (NOAA CoastWatch / CRW, NCEI, …). `dataset=<id>`
+            # picks a curated row; its `protocol` sets the per-instance
+            # OUTPUT_KIND (griddap -> raster, tabledap -> tabular). Alias
+            # "ioos".
+            "erddap": ("earthlens.erddap", "ERDDAP", "erddap", {}),
+            "ioos": ("earthlens.erddap", "ERDDAP", "erddap", {}),
+            # Global topography / bathymetry DEMs (GEBCO 2020 + ETOPO1
+            # ice/bedrock) subset via NOAA ERDDAP griddap -> pyramids ->
+            # GeoTIFF. Open data (requests + pyramids are core), so no extra
+            # to hint. Aliases "gebco" / "etopo" — pass dataset= to pick the
+            # DEM (e.g. dataset="gebco_2020" / "etopo1_ice" / "etopo1_bedrock").
+            "bathymetry": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            "gebco": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            "etopo": ("earthlens.bathymetry", "Bathymetry", "", {}),
             # Drought-indicator backend over three live public services:
             # USDM (vector GeoJSON polygon classes), Copernicus EDO/GDO (raster
             # OGC WCS — waits on pyramids PY-A temporal `read_wcs`), and CSIC
@@ -652,8 +680,9 @@ class EarthLens:
                 `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
                 `"stac"` (with endpoint aliases `"planetary-computer"` /
                 `"earth-search"` / `"cdse"`), `"tropycal"`,
-                `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`), or
-                `"worldpop"` (alias `"world-pop"`). See
+                `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`),
+                `"worldpop"` (alias `"world-pop"`), or `"argo"` (aliases
+                `"argo-floats"` / `"argopy"`). See
                 `sorted(EarthLens.DataSources)` for the live list.
                 Defaults to `"chc"`.
             temporal_resolution: The download cadence — `"daily"` or

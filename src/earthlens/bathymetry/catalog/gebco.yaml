@@ -1,0 +1,20 @@
+# GEBCO global terrain model — served as ERDDAP griddap by NOAA CoastWatch.
+#
+# GEBCO (General Bathymetric Chart of the Oceans) is a continuous global
+# elevation grid covering both land topography and ocean bathymetry. The
+# CoastWatch ERDDAP serves the 15-arc-second GEBCO_2020 grid as a griddap
+# coverage whose single `elevation` band carries metres relative to sea
+# level (negative = below sea level). Pinned live in the A1 gate — see
+# planning/bathymetry/captures/bathymetry-sdk-facts.md.
+datasets:
+  gebco_2020:
+    title: GEBCO 2020 global terrain model (15 arc-second, topography + bathymetry)
+    transport: erddap-griddap
+    endpoint: https://coastwatch.pfeg.noaa.gov/erddap
+    dataset_id: GEBCO_2020
+    variable: elevation
+    native_resolution: 15 arc-second
+    lon_convention: "-180..180"
+    license_note: >-
+      GEBCO Compilation Group (2020) GEBCO 2020 Grid (doi:10.5285/a29c5465-b138-234d-e053-6c86abc040b9);
+      served by the NOAA CoastWatch ERDDAP, U.S. Government public domain.

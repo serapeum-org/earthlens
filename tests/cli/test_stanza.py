@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from urllib.parse import urlparse
+
 import pytest
 
 from earthlens.cli import stanza as stanza_mod
@@ -28,11 +30,88 @@ class TestSupportedProviders:
             "eumetsat",
             "gee",
             "jaxa",
+            "erddap",
             "gbif",
             "obis",
             "wdpa",
             "iucn",
         }
+
+
+class TestErddapEmitter:
+    """Tests for the ERDDAP emitter (seeds from `/info`, network mocked)."""
+
+    @staticmethod
+    def _info_table(*, dims, variables, title="T", license_="L"):
+        """A faked ERDDAP `/info` table — dimension + variable + NC_GLOBAL rows."""
+        rows = [["dimension", d, "", "double", ""] for d in dims]
+        rows += [["variable", v, "", "double", ""] for v in variables]
+        rows += [
+            ["attribute", "NC_GLOBAL", "title", "String", title],
+            ["attribute", "NC_GLOBAL", "license", "String", license_],
+        ]
+        return {"table": {"rows": rows}}
+
+    def test_seeds_griddap_row_from_info(self, monkeypatch):
+        """A dimensioned dataset seeds a full griddap row with dim_names."""
+        monkeypatch.setattr(
+            stanza_mod,
+            "_get_json",
+            lambda url, **kw: self._info_table(
+                dims=["time", "latitude", "longitude"],
+                variables=["sst", "sst_mask"],
+                title="My SST",
+            ),
+        )
+        result = emit_stanza(_info("erddap"), "myGrid", server="https://x/erddap")
+        assert result.status == "ok"
+        assert result.row == {
+            "server_url": "https://x/erddap",
+            "dataset_id": "myGrid",
+            "protocol": "griddap",
+            "dim_names": ["time", "latitude", "longitude"],
+            "variables": ["sst", "sst_mask"],
+            "title": "My SST",
+            "license_note": "L",
+        }
+
+    def test_seeds_tabledap_row_without_dim_names(self, monkeypatch):
+        """A dimensionless dataset seeds a tabledap row (no dim_names key)."""
+        monkeypatch.setattr(
+            stanza_mod,
+            "_get_json",
+            lambda url, **kw: self._info_table(dims=[], variables=["station", "wtmp"]),
+        )
+        result = emit_stanza(_info("erddap"), "myTable", server="https://x/erddap")
+        assert result.status == "ok"
+        assert result.row["protocol"] == "tabledap"
+        assert "dim_names" not in result.row
+        assert result.row["variables"] == ["station", "wtmp"]
+
+    def test_defaults_to_curated_servers(self, monkeypatch):
+        """With no --server, the id is looked up on the catalog's curated servers."""
+        calls = []
+
+        def fake(url, **kw):
+            calls.append(url)
+            return self._info_table(dims=["time"], variables=["v"])
+
+        monkeypatch.setattr(stanza_mod, "_get_json", fake)
+        result = emit_stanza(_info("erddap"), "myGrid")
+        assert result.status == "ok"
+        assert urlparse(result.row["server_url"]).hostname == "coastwatch.pfeg.noaa.gov"
+        assert any("/info/myGrid/index.json" in u for u in calls)
+
+    def test_not_found_reports_error(self, monkeypatch):
+        """An id absent from every candidate server is a clear error."""
+
+        def boom(url, **kw):
+            raise RuntimeError("404 Not Found")
+
+        monkeypatch.setattr(stanza_mod, "_get_json", boom)
+        result = emit_stanza(_info("erddap"), "ghost", server="https://x/erddap")
+        assert result.status == "error"
+        assert "not found" in result.detail.lower()
 
 
 class TestUsgsWaterEmitter:
