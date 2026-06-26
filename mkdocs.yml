@@ -185,6 +185,11 @@ nav:
       - Usage: reference/bathymetry/usage.md
       - Available datasets: reference/bathymetry/datasets.md
       - Reference: reference/bathymetry/bathymetry.md
+    - PVGIS (solar radiation / PV):
+      - Introduction: reference/pvgis/introduction.md
+      - Usage: reference/pvgis/usage.md
+      - Available products: reference/pvgis/datasets.md
+      - Reference: reference/pvgis/pvgis.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
