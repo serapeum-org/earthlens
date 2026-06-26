@@ -237,7 +237,16 @@ class Drought(AbstractDataSource):
                 "or widen the window."
             )
 
-        raw = pd.date_range(start=start_dt, end=end_dt, freq="D")
+        # Drop sub-day precision before building the range: `pd.date_range`
+        # steps by 24h FROM the start's wall time, so a non-midnight start
+        # like `datetime(2026, 6, 30, 23, 59)` paired with end
+        # `datetime(2026, 7, 1, 0, 1)` would step past the end on the
+        # second tick and yield only [Jun 30 23:59], silently dropping
+        # July 1 (and therefore the July monthly snap) from the request.
+        # Always range over calendar days.
+        raw = pd.date_range(
+            start=start_dt.date(), end=end_dt.date(), freq="D"
+        )
         # `pd.date_range(start, end)` with `end_dt >= start_dt` always yields
         # at least one element, and `snap_to_cadence` is total over non-empty
         # input, so `snapped` is guaranteed non-empty here. Resist adding a

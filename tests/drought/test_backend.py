@@ -111,6 +111,21 @@ def test_drought_rejects_unknown_dataset_with_did_you_mean():
         )
 
 
+def test_drought_non_midnight_window_keeps_trailing_day():
+    """A non-midnight start must not drop the trailing calendar day."""
+    backend = Drought(
+        start=dt.datetime(2026, 6, 1, 23, 59),
+        end=dt.datetime(2026, 7, 1, 0, 1),
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="speibase-12",
+        path="drought_out",
+    )
+    # Snap to month-start; the range must cover both June and July.
+    snapped = sorted(d.date() for d in backend.time.dates)
+    assert snapped == [dt.date(2026, 6, 1), dt.date(2026, 7, 1)]
+
+
 def test_drought_accepts_datetime_and_date_inputs():
     """start/end coerce through to_datetime so non-string inputs work."""
     backend_dt = Drought(
