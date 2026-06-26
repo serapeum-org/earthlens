@@ -350,13 +350,14 @@ class ClimateIndices(AbstractDataSource):
                 return response.text
             except requests.RequestException as exc:
                 last_exc = exc
-                if attempt == _HTTP_RETRIES or not _is_transient(exc):
+                if not _is_transient(exc):
                     break
-                logger.warning(
-                    f"climate index {index_id!r}: transient fetch error from "
-                    f"{url} ({exc}); retry {attempt + 1}/{_HTTP_RETRIES}."
-                )
-                time.sleep(_HTTP_RETRY_BACKOFF * (attempt + 1))
+                if attempt < _HTTP_RETRIES:
+                    logger.warning(
+                        f"climate index {index_id!r}: transient fetch error from "
+                        f"{url} ({exc}); retry {attempt + 1}/{_HTTP_RETRIES}."
+                    )
+                    time.sleep(_HTTP_RETRY_BACKOFF * (attempt + 1))
         raise ValueError(
             f"climate index {index_id!r}: failed to fetch {url} ({last_exc})."
         ) from last_exc

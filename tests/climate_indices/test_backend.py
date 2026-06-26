@@ -32,9 +32,11 @@ class _FakeResponse:
         self.status_code = status_code
 
     def raise_for_status(self) -> None:
-        """Raise `HTTPError` for a >=400 status, mirroring requests."""
+        """Raise `HTTPError` (carrying this response) for a >=400 status."""
         if self.status_code >= 400:
-            raise requests.HTTPError(f"HTTP {self.status_code}")
+            error = requests.HTTPError(f"HTTP {self.status_code}")
+            error.response = self
+            raise error
 
 
 def _fake_get(url: str, timeout: float | None = None) -> _FakeResponse:
@@ -50,6 +52,22 @@ def _always_404(url: str, timeout: float | None = None) -> _FakeResponse:
     return _FakeResponse("Not found", status_code=404)
 
 
+class _Flaky5xxGet:
+    """A fake `requests.get` that 503s `fails` times, then serves the body."""
+
+    def __init__(self, text: str, fails: int) -> None:
+        self.text = text
+        self.fails = fails
+        self.calls = 0
+
+    def __call__(self, url: str, timeout: float | None = None) -> _FakeResponse:
+        """Return a 503 for the first `fails` calls, then a 200 with the body."""
+        self.calls += 1
+        if self.calls <= self.fails:
+            return _FakeResponse("Service Unavailable", status_code=503)
+        return _FakeResponse(self.text)
+
+
 class _CountingGet404:
     """A fake `requests.get` that always 404s and counts its calls."""
 
@@ -60,6 +78,23 @@ class _CountingGet404:
         """Count the call and return a 404 response."""
         self.calls += 1
         return _FakeResponse("Not found", status_code=404)
+
+
+class _AlwaysConnError:
+    """A fake `requests.get` that always raises a transient `ConnectionError`."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def __call__(self, url: str, timeout: float | None = None) -> _FakeResponse:
+        """Count the call and raise a transient connection error."""
+        self.calls += 1
+        raise requests.ConnectionError("down")
+
+
+def _generic_request_error(url: str, timeout: float | None = None) -> _FakeResponse:
+    """Raise a bare (non-connection, non-HTTP) RequestException — not transient."""
+    raise requests.RequestException("weird")
 
 
 def _html_200(url: str, timeout: float | None = None) -> _FakeResponse:
@@ -199,6 +234,41 @@ def test_transient_fetch_error_is_retried(monkeypatch, tmp_path: Path) -> None:
     ).download()
     assert flaky.calls == 2, "first attempt failed, second succeeded"
     assert len(df) == 24
+
+
+def test_5xx_is_retried(monkeypatch, tmp_path: Path) -> None:
+    """A 5xx status is transient and is retried, then succeeds (L3)."""
+    flaky = _Flaky5xxGet((DATA / "psl" / "oni.data").read_text(), fails=1)
+    monkeypatch.setattr(backend.requests, "get", flaky)
+    monkeypatch.setattr(backend.time, "sleep", lambda _s: None)
+    df = ClimateIndices(
+        start="2000-01-01", end="2001-12-31", variables=["oni"], path=tmp_path
+    ).download()
+    assert flaky.calls == 2, "503 then 200"
+    assert len(df) == 24
+
+
+def test_persistent_transient_failure_exhausts_retries(monkeypatch, tmp_path) -> None:
+    """A always-failing transient error retries then raises after exhaustion (L3)."""
+    flaky = _AlwaysConnError()
+    monkeypatch.setattr(backend.requests, "get", flaky)
+    monkeypatch.setattr(backend.time, "sleep", lambda _s: None)
+    source = ClimateIndices(
+        start="2000-01-01", end="2001-12-31", variables=["oni"], path=tmp_path
+    )
+    with pytest.raises(ValueError, match="oni"):
+        source.download()
+    assert flaky.calls == backend._HTTP_RETRIES + 1, "first attempt + all retries"
+
+
+def test_non_transient_request_error_fails_fast(monkeypatch, tmp_path: Path) -> None:
+    """A bare RequestException is not transient and is not retried (L3)."""
+    monkeypatch.setattr(backend.requests, "get", _generic_request_error)
+    source = ClimateIndices(
+        start="2000-01-01", end="2001-12-31", variables=["oni"], path=tmp_path
+    )
+    with pytest.raises(ValueError, match="oni"):
+        source.download()
 
 
 def test_404_is_not_retried(monkeypatch, tmp_path: Path) -> None:
