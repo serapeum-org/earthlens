@@ -3284,7 +3284,7 @@
   <span class="md-ellipsis">
     
   
-    Climate indices (teleconnections)
+    PVGIS (solar radiation / PV)
   
 
     
@@ -3300,7 +3300,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Climate indices (teleconnections)
+    PVGIS (solar radiation / PV)
   
 
           </label>
@@ -3313,7 +3313,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/climate_indices/introduction/" class="md-nav__link">
+      <a href="../../../reference/pvgis/introduction/" class="md-nav__link">
         
   
   
@@ -3341,7 +3341,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/climate_indices/usage/" class="md-nav__link">
+      <a href="../../../reference/pvgis/usage/" class="md-nav__link">
         
   
   
@@ -3369,14 +3369,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/climate_indices/datasets/" class="md-nav__link">
+      <a href="../../../reference/pvgis/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available indices
+    Available products
   
 
     
@@ -3397,7 +3397,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/climate_indices/climate_indices/" class="md-nav__link">
+      <a href="../../../reference/pvgis/pvgis/" class="md-nav__link">
         
   
   
@@ -10472,7 +10472,7 @@
   <span class="md-ellipsis">
     
   
-    Climate indices (teleconnections)
+    PVGIS (solar radiation / PV)
   
 
     
@@ -10488,7 +10488,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Climate indices (teleconnections)
+    PVGIS (solar radiation / PV)
   
 
           </label>
@@ -10501,14 +10501,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../climate_indices/01_climate_indices_quickstart/" class="md-nav__link">
+      <a href="../../pvgis/01_pvgis_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Climate indices — quickstart (live)
+    PVGIS quickstart — hourly solar radiation (live)
   
 
     
@@ -10529,14 +10529,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../climate_indices/02_catalog_and_behavior/" class="md-nav__link">
+      <a href="../../pvgis/02_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Climate indices — catalog &amp; behaviour (offline)
+    PVGIS catalog explorer (offline)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pvgis/03_pv_power_and_tmy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PV power and the Typical Meteorological Year (live)
   
 
     
@@ -15310,7 +15338,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9ee29f3b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2d3413d1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15328,7 +15356,7 @@ retrospective subset and shows what is still deferred.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=72d46b1b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d2d8498e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15341,7 +15369,7 @@ entry point.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9469f4b9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=09b02529">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15378,7 +15406,7 @@ from earthlens import EarthLens</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=edd76bf1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63c1684b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15391,7 +15419,7 @@ no whole-store download.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=eeb18a0a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18305da1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15404,7 +15432,7 @@ write the Parquet table into.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dcaa2789">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2bc294b2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15453,7 +15481,7 @@ write the Parquet table into.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=23f29d6d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=60bc223a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15465,7 +15493,7 @@ window, and returns the list of written Parquet paths.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bfae45c2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=68376c27">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15492,7 +15520,7 @@ window, and returns the list of written Parquet paths.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c2545397">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aba0683f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15503,7 +15531,7 @@ window, and returns the list of written Parquet paths.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9f7e2f8a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=112f439c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15534,7 +15562,7 @@ df.head()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=037b06c5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c1de5efb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15546,7 +15574,7 @@ the streamflow plus the in-file <code>latitude</code>/<code>longitude</code>/<co
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=15282c04">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0f2e19ba">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15575,7 +15603,7 @@ print('columns:', list(df.columns))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21f96692">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b7caaada">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15587,7 +15615,7 @@ those to the in-file <code>gage_id</code> coordinate join instead of <code>featu
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0c6e4dea">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18a569d2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15599,7 +15627,7 @@ list so we can see how each is routed (enumerated here, not downloaded).</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a997ceb9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e48802db">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15646,7 +15674,7 @@ list so we can see how each is routed (enumerated here, not downloaded).</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=641f4075">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f04d475e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15658,7 +15686,7 @@ list so we can see how each is routed (enumerated here, not downloaded).</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=aff5ea40">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1a4b18cf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15685,7 +15713,7 @@ list so we can see how each is routed (enumerated here, not downloaded).</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b5f37db9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3eb45ca5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15699,7 +15727,7 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6454c6ec">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d617f0e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15711,7 +15739,7 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=40fef279">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8ac205ec">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15748,7 +15776,7 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=28c9bc17">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=41dd770d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15760,7 +15788,7 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=090ccf3a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=687352be">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15807,7 +15835,7 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e15db248">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4d532152">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15819,7 +15847,7 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=513b491f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=06024fb4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15846,7 +15874,7 @@ does not yet expose, so it raises a clear <code>NotImplementedError</code>. Thei
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17ac39d5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9ea825bd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15858,7 +15886,7 @@ needs a separate reader, so the temporal aggregator is unsupported.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0f05559d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6f05a029">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15870,7 +15898,7 @@ exercise the aggregator path.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d5e2a8a7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2be47089">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15915,7 +15943,7 @@ exercise the aggregator path.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=da4d1375">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=991759cd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15926,7 +15954,7 @@ exercise the aggregator path.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b70468a9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b57303a1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -3284,7 +3284,7 @@
   <span class="md-ellipsis">
     
   
-    Climate indices (teleconnections)
+    PVGIS (solar radiation / PV)
   
 
     
@@ -3300,7 +3300,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Climate indices (teleconnections)
+    PVGIS (solar radiation / PV)
   
 
           </label>
@@ -3313,7 +3313,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/climate_indices/introduction/" class="md-nav__link">
+      <a href="../../../reference/pvgis/introduction/" class="md-nav__link">
         
   
   
@@ -3341,7 +3341,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/climate_indices/usage/" class="md-nav__link">
+      <a href="../../../reference/pvgis/usage/" class="md-nav__link">
         
   
   
@@ -3369,14 +3369,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/climate_indices/datasets/" class="md-nav__link">
+      <a href="../../../reference/pvgis/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available indices
+    Available products
   
 
     
@@ -3397,7 +3397,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/climate_indices/climate_indices/" class="md-nav__link">
+      <a href="../../../reference/pvgis/pvgis/" class="md-nav__link">
         
   
   
@@ -10472,7 +10472,7 @@
   <span class="md-ellipsis">
     
   
-    Climate indices (teleconnections)
+    PVGIS (solar radiation / PV)
   
 
     
@@ -10488,7 +10488,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Climate indices (teleconnections)
+    PVGIS (solar radiation / PV)
   
 
           </label>
@@ -10501,14 +10501,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../climate_indices/01_climate_indices_quickstart/" class="md-nav__link">
+      <a href="../../pvgis/01_pvgis_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Climate indices — quickstart (live)
+    PVGIS quickstart — hourly solar radiation (live)
   
 
     
@@ -10529,14 +10529,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../climate_indices/02_catalog_and_behavior/" class="md-nav__link">
+      <a href="../../pvgis/02_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Climate indices — catalog &amp; behaviour (offline)
+    PVGIS catalog explorer (offline)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pvgis/03_pv_power_and_tmy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PV power and the Typical Meteorological Year (live)
   
 
     
@@ -15042,7 +15070,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dcb492df">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b3ecb2df">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15056,7 +15084,7 @@ sensor, not tens of thousands of raw readings.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cbccabc2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4826b5a2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15070,7 +15098,7 @@ so the notebook stays <code>--nbval-lax</code>-safe.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ebccc21b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e85290a2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15083,7 +15111,7 @@ so the notebook imports cleanly even without a display backend.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d9383c23">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=aa5393e0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15114,7 +15142,7 @@ from earthlens import EarthLens</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6bb35abf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e821a332">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15126,7 +15154,7 @@ overlay, a bounding box over the Los Angeles basin, and the one-year date window
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=62a6a842">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f6373d76">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15159,7 +15187,7 @@ start, end = "2023-01-01", "2023-12-31"</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a9ffb8cf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f56e705a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15173,7 +15201,7 @@ without credentials.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=909b0c22">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fa64ebac">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15230,7 +15258,7 @@ else:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=71d94a25">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6dbf004e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15243,7 +15271,7 @@ guideline.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3bc63eba">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7ea68732">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15288,7 +15316,7 @@ if df is not None and not df.empty:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=86348997">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d50f0b0b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15300,7 +15328,7 @@ every exceedance day in crimson so the polluted stretches stand out at a glance.
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4493adea">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f416e7f1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
