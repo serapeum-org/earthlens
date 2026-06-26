@@ -150,10 +150,10 @@ def test_drought_accepts_datetime_and_date_inputs():
         dataset="usdm",
         today=dt.date(2026, 6, 23),
     )
-    expected = pd.DatetimeIndex([pd.Timestamp("2026-06-16")])
     # 2026-06-23 queried on the same Tuesday walks back to 06-16 (G5).
-    assert list(backend_dt.time.dates) == list(expected)
-    assert list(backend_date.time.dates) == list(expected)
+    expected = [dt.date(2026, 6, 16)]
+    assert [d.date() for d in backend_dt.time.dates] == expected
+    assert [d.date() for d in backend_date.time.dates] == expected
 
 
 def test_drought_rejects_inverted_window():
