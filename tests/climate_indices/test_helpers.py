@@ -102,6 +102,31 @@ def test_parse_climexp_non_grid_body_yields_no_rows() -> None:
     assert df.empty
 
 
+def test_parse_psl_skips_non_numeric_rows_and_sentinel() -> None:
+    """A non-numeric 13-token row and a non-numeric lone footer are ignored."""
+    text = (
+        "1950 1951\n"
+        "1950 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2\n"
+        "1951 a b c d e f g h i j k l\n"  # 13 tokens but non-numeric → skipped
+        "footer\n"  # lone non-numeric line → not taken as sentinel
+    )
+    df = parse_psl(text)
+    assert len(df) == 12
+    assert df["value"].notna().all()
+
+
+def test_parse_climexp_skips_non_numeric_rows() -> None:
+    """A 13/14-token climexp row with non-numeric months is skipped."""
+    text = (
+        "# header\n"
+        "1880 a b c d e f g h i j k l\n"  # 13 tokens, non-numeric → skipped
+        "1881 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2\n"
+    )
+    df = parse_climexp(text)
+    assert len(df) == 12
+    assert df["date"].dt.year.unique().tolist() == [1881]
+
+
 def test_empty_canonical_schema() -> None:
     """empty_canonical has the canonical columns and no rows."""
     df = empty_canonical()

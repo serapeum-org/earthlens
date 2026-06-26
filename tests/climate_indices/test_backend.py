@@ -191,6 +191,65 @@ def test_citation_logged_once(fake_http, tmp_path: Path) -> None:
     assert len(citation_lines) == 2
 
 
+def test_invalid_output_format_raises() -> None:
+    """An unrecognised output_format raises ValueError."""
+    with pytest.raises(ValueError, match="output_format"):
+        ClimateIndices(
+            start="2000-01-01",
+            end="2001-12-31",
+            variables=["oni"],
+            output_format="xml",
+        )
+
+
+def test_unparseable_body_raises(monkeypatch, tmp_path: Path) -> None:
+    """A 200 response whose body has no grid rows raises a ValueError (G8)."""
+
+    def _html(url: str, timeout: float | None = None) -> _FakeResponse:
+        return _FakeResponse("<!DOCTYPE HTML><html>error</html>")
+
+    monkeypatch.setattr(backend.requests, "get", _html)
+    source = ClimateIndices(
+        start="2000-01-01", end="2001-12-31", variables=["oni"], path=tmp_path
+    )
+    with pytest.raises(ValueError, match="no monthly data parsed"):
+        source.download()
+
+
+def test_parquet_output(fake_http, tmp_path: Path) -> None:
+    """download(output_format='parquet') writes a parquet table."""
+    pytest.importorskip("pyarrow")
+    df = ClimateIndices(
+        start="2000-01-01",
+        end="2001-12-31",
+        variables=["oni"],
+        path=tmp_path,
+        output_format="parquet",
+    ).download()
+    written = list(tmp_path.glob("climate_indices_*.parquet"))
+    assert len(written) == 1
+    assert len(df) == 24
+
+
+def test_citation_deduped_for_same_source(fake_http, tmp_path: Path) -> None:
+    """Two indices from one source log that source's citation once (G6)."""
+    from loguru import logger
+
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="INFO")
+    try:
+        ClimateIndices(
+            start="2000-01-01",
+            end="2001-12-31",
+            variables=["oni", "nao"],
+            path=tmp_path,
+        ).download()
+    finally:
+        logger.remove(sink_id)
+    citation_lines = [m for m in messages if "source citation" in m]
+    assert len(citation_lines) == 1
+
+
 def test_no_xarray_in_subpackage() -> None:
     """The shipped subpackage imports no xarray (G3)."""
     src = Path(backend.__file__).parent
