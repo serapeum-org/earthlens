@@ -1,0 +1,30 @@
+# PVGIS 5.3 product catalogue (earthlens.pvgis).
+#
+# Each row maps a product id to the JRC PVGIS tool it drives, the REST
+# endpoint segment, the per-product default query params (merged under the
+# caller's backend kwargs), and the canonical value columns the parser keeps.
+# MVP ships the two `tabular` time-series tools: `seriescalc` (hourly
+# radiation / PV power) and `tmy` (typical meteorological year). The
+# non-time-series tools (PVcalc / MRcalc / DRcalc) are catalog follow-ons.
+#
+# Facts pinned from the live API in planning/pvgis/captures/pvgis-sdk-facts.md.
+products:
+  seriescalc:
+    tool: seriescalc
+    endpoint: seriescalc
+    default_params: {}
+    columns: ["time", "G(i)", "H_sun", "T2m", "WS10m", "Int"]
+    description: >-
+      Hourly solar-radiation time series (global in-plane irradiance, sun
+      height, air temperature, wind speed). Set pvcalculation=1 (+ peakpower /
+      loss / angle / aspect) to also return PV system power P (W).
+  tmy:
+    tool: tmy
+    endpoint: tmy
+    default_params: {}
+    columns:
+      ["time", "T2m", "RH", "G(h)", "Gb(n)", "Gd(h)", "IR(h)", "WS10m", "WD10m", "SP"]
+    description: >-
+      Typical Meteorological Year — an hourly multi-year synthesis of air
+      temperature, humidity, horizontal/beam/diffuse irradiance, infrared,
+      wind, and surface pressure for the location.
