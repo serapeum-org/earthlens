@@ -381,6 +381,7 @@ nav:
       - Catalog explorer (no network): examples/erddap/01_catalog_explorer.ipynb
       - CRW SST anomaly — griddap (live): examples/erddap/02_griddap_sst_anomaly.ipynb
       - NDBC buoys — tabledap (live): examples/erddap/03_tabledap_buoys.ipynb
+      - Catalog tooling — validate/coverage/curate (live): examples/erddap/04_catalog_tooling.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
