@@ -1,0 +1,43 @@
+# ERDDAP curated catalog - NOAA CoastWatch / NCEI slice.
+#
+# Public datasets served by the NOAA CoastWatch ERDDAP
+# (https://coastwatch.pfeg.noaa.gov/erddap): ocean-colour chlorophyll,
+# NCEI AVHRR Pathfinder SST (griddap rasters), and the NDBC standard
+# meteorological buoy network (a tabledap time-series). See the slice
+# header in coral-reef-watch.yaml for the row schema.
+
+datasets:
+
+  erdMH1chla8day:
+    server_url: https://coastwatch.pfeg.noaa.gov/erddap
+    dataset_id: erdMH1chla8day
+    protocol: griddap
+    dim_names: [time, latitude, longitude]
+    variables:
+      - chlorophyll
+    # Historical record: the Aqua MODIS mission product covers 2003-01 to
+    # 2022-06 only (it stopped updating). Request dates inside that window;
+    # a recent-date request returns a clear out-of-coverage ValueError.
+    title: Chlorophyll-a, Aqua MODIS, NPP, Global, 4km, 8-day composite (2003-2022, historical)
+    license_note: NASA OBPG / NOAA CoastWatch, U.S. Government public domain
+
+  nceiPH53sstd1day:
+    server_url: https://coastwatch.pfeg.noaa.gov/erddap
+    dataset_id: nceiPH53sstd1day
+    protocol: griddap
+    dim_names: [time, latitude, longitude]
+    variables:
+      - sea_surface_temperature
+    title: AVHRR Pathfinder Version 5.3 L3-Collated SST, daytime, daily
+    license_note: NOAA NCEI AVHRR Pathfinder, U.S. Government public domain
+
+  cwwcNDBCMet:
+    server_url: https://coastwatch.pfeg.noaa.gov/erddap
+    dataset_id: cwwcNDBCMet
+    protocol: tabledap
+    variables:
+      - station
+      - time
+      - wtmp
+    title: NDBC Standard Meteorological Buoy Data
+    license_note: NOAA NDBC, U.S. Government public domain

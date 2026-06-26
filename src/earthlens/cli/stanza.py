@@ -520,6 +520,97 @@ def _walk_gportal(node: Any, mission: str = "", level: str = ""):
             yield (mission, level, str(item))
 
 
+def _erddap_info_rows(server_url: str, dataset_id: str) -> list[list[Any]]:
+    """Return one ERDDAP dataset's `/info` table rows.
+
+    Each row is `[Row Type, Variable Name, Attribute Name, Data Type,
+    Value]` — the shape ERDDAP's `info/<id>/index.json` endpoint emits.
+
+    Args:
+        server_url: The ERDDAP base URL (a trailing slash is tolerated).
+        dataset_id: The dataset id on that server.
+
+    Returns:
+        The `table.rows` list from the `/info` JSON.
+    """
+    base = server_url.rstrip("/")
+    body = _get_json(f"{base}/info/{dataset_id}/index.json")
+    return body["table"]["rows"]
+
+
+def _erddap_global_attr(rows: list[list[Any]], name: str) -> str:
+    """Return one `NC_GLOBAL` attribute value from `/info` rows (`""` if absent)."""
+    for row in rows:
+        if row[1] == "NC_GLOBAL" and row[2] == name:
+            return str(row[4])
+    return ""
+
+
+def _emit_erddap(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
+    """Seed an ERDDAP `datasets:` row from a server's `/info` metadata.
+
+    Reads the dataset's `/info/<id>/index.json`: the presence of grid
+    `dimension` rows decides `protocol` (`griddap` if dimensioned, else
+    `tabledap`), the `variable` rows give the default variable set, and the
+    `NC_GLOBAL` `title` / `license` attributes fill the human metadata. The
+    server is taken from `--server` if given, else discovered by trying each
+    `server_url` the catalog already curates from.
+
+    `--minimal` is ignored: the protocol and dimension order are only
+    knowable from `/info`, and that call is a single cheap GET. The emitted
+    `variables` list is **every** data variable the dataset exposes — the
+    maintainer trims it to the headline set (e.g. drop `*_mask` / `*_qc`)
+    before committing.
+
+    Args:
+        catalog: The loaded ERDDAP `Catalog` (its curated `server_url`s seed
+            the server search).
+        upstream_id: The ERDDAP dataset id to seed from.
+        **opts: `server` (an explicit ERDDAP base URL to look the id up on).
+
+    Returns:
+        The seeded row: `server_url` / `dataset_id` / `protocol` /
+        (`dim_names` for griddap) / `variables` / `title` / `license_note`.
+
+    Raises:
+        ValueError: If the id is not found on `--server` or any curated
+            server.
+    """
+    server = opts.get("server")
+    candidates = (
+        [server]
+        if server
+        else sorted({row.server_url for row in catalog.datasets.values()})
+    )
+    rows: list[list[Any]] | None = None
+    found_server = ""
+    last_exc: Exception | None = None
+    for candidate in candidates:
+        try:
+            rows = _erddap_info_rows(candidate, upstream_id)
+            found_server = candidate
+            break
+        except Exception as exc:  # noqa: BLE001 — try the next server, report at end
+            last_exc = exc
+    if rows is None:
+        raise ValueError(
+            f"{upstream_id!r} not found on any known ERDDAP server "
+            f"{candidates} (pass --server <url> to point elsewhere): {last_exc}"
+        )
+    dim_names = [row[1] for row in rows if row[0] == "dimension"]
+    variables = [row[1] for row in rows if row[0] == "variable"]
+    protocol = "griddap" if dim_names else "tabledap"
+    row: dict[str, Any] = {
+        "server_url": found_server,
+        "dataset_id": upstream_id,
+        "protocol": protocol,
+    }
+    if protocol == "griddap":
+        row["dim_names"] = dim_names
+    row["variables"] = variables
+    row["title"] = _erddap_global_attr(rows, "title")
+    row["license_note"] = _erddap_global_attr(rows, "license")
+    return row
 # --------------------------------------------------------------------------- #
 # biodiversity cluster — gbif / obis / wdpa / iucn (no live emit).
 # --------------------------------------------------------------------------- #
@@ -608,6 +699,7 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     "eumetsat": _emit_eumetsat,
     "gee": _emit_gee,
     "jaxa": _emit_jaxa,
+    "erddap": _emit_erddap,
     "gbif": _emit_gbif,
     "obis": _emit_obis,
     "wdpa": _emit_wdpa,

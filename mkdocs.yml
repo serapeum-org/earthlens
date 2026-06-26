@@ -175,6 +175,11 @@ nav:
       - Authentication: reference/jaxa/authentication.md
       - Available datasets: reference/jaxa/datasets.md
       - Reference: reference/jaxa/jaxa.md
+    - ERDDAP (multi-server client):
+      - Introduction: reference/erddap/introduction.md
+      - Usage: reference/erddap/usage.md
+      - Available datasets: reference/erddap/datasets.md
+      - Reference: reference/erddap/erddap.md
     - Bathymetry (topography / bathymetry DEMs):
       - Introduction: reference/bathymetry/introduction.md
       - Usage: reference/bathymetry/usage.md
@@ -377,6 +382,11 @@ nav:
       - Catalog explorer (no network): examples/jaxa/01_catalog_explorer.ipynb
       - AW3D30 elevation quickstart (live): examples/jaxa/02_aw3d30_quickstart.ipynb
       - G-Portal search (anonymous): examples/jaxa/03_gportal_search.ipynb
+    - ERDDAP (multi-server client):
+      - Catalog explorer (no network): examples/erddap/01_catalog_explorer.ipynb
+      - CRW SST anomaly — griddap (live): examples/erddap/02_griddap_sst_anomaly.ipynb
+      - NDBC buoys — tabledap (live): examples/erddap/03_tabledap_buoys.ipynb
+      - Catalog tooling — validate/coverage/curate (live): examples/erddap/04_catalog_tooling.ipynb
     - Bathymetry (topography / bathymetry DEMs):
       - DEM quickstart (live): examples/bathymetry/01_bathymetry_quickstart.ipynb
       - Catalog explorer (no network): examples/bathymetry/02_catalog_explorer.ipynb
