@@ -11910,7 +11910,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.9.0
-  sha256: c3b5c49078325d9316987a605b849e2fd4a57d80a2b8af536773ba2742134213
+  sha256: 141cb4e20562b0c77f0571488d4656022b718b77eb5024f186983a451e9eb024
   requires_dist:
   - pyramids-gis>=0.35.0
   - geopandas>=1.0.0
@@ -11962,6 +11962,7 @@ packages:
   - pyobis>=1.6.1 ; extra == 'obis'
   - jaxa-earth>=0.1.6,<0.2 ; extra == 'jaxa'
   - gportal>=0.4,<0.5 ; extra == 'jaxa'
+  - argopy>=1.4 ; extra == 'argo'
   - erddapy>=3.0 ; extra == 'erddap'
   - earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap] ; extra == 'all'
   requires_python: '>=3.11,<4'

@@ -271,6 +271,11 @@ def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("name", "description")))
 
 
+def _validate_argo(catalog: Any) -> tuple[int, list[str]]:
+    """Each Argo dataset family needs a description and a non-empty parameters map."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("description", "parameters")))
+
+
 def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     """Each CHC dataset needs FTP bases, a file pattern, and variables."""
 
@@ -541,6 +546,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "radar": _validate_radar,
     "tropycal": _validate_tropycal,
     "gdacs": _validate_gdacs,
+    "argo": _validate_argo,
     "chc": _validate_chc,
     "usgs_water": _validate_usgs_water,
     "sentinel_hub": _validate_sentinel_hub,
