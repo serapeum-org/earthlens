@@ -231,12 +231,17 @@ class Drought(AbstractDataSource):
             )
 
         raw = pd.date_range(start=start_dt, end=end_dt, freq="D")
+        # `pd.date_range(start, end)` with `end_dt >= start_dt` always yields
+        # at least one element, and `snap_to_cadence` is total over non-empty
+        # input, so `snapped` is guaranteed non-empty here. Resist adding a
+        # fallback: a future filter that empties `snapped` (e.g. a SPEIbase
+        # pre-epoch drop, a USDM pre-release walk-back) is a real signal the
+        # window is unreachable; silently pushing the un-snapped start_dt
+        # into the URL would 404 with no hint at the cause.
         snapped = snap_to_cadence(
             [pd.Timestamp(ts).date() for ts in raw],
             self._dataset.cadence,
         )
-        if not snapped:
-            snapped = [start_dt.date()]
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
