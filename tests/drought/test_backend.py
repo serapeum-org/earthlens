@@ -515,22 +515,62 @@ def test_speibase_rejects_period_past_time_axis(monkeypatch, tmp_path, fake_netc
         backend.download(progress_bar=False)
 
 
+def test_owslib_xarray_guard_catches_indented_imports(tmp_path):
+    """The G7 guard above must catch indented (lazy) imports, not just col-0."""
+    import re
+
+    leak = tmp_path / "leak.py"
+    leak.write_text(
+        "def _fetch_wcs():\n"
+        "    from owslib.wcs import WebCoverageService\n"
+        "    return WebCoverageService\n",
+        encoding="utf-8",
+    )
+    leak_pattern = re.compile(r"\b(?:owslib|xarray)\b")
+    hit = False
+    for line in leak.read_text(encoding="utf-8").splitlines():
+        stripped = line.lstrip()
+        if (
+            stripped.startswith("import ") or stripped.startswith("from ")
+        ) and leak_pattern.search(line):
+            hit = True
+            break
+    assert hit, "the indented-import guard must catch a lazy `from owslib...`"
+
+
 def test_drought_src_does_not_import_owslib_or_xarray():
-    """earthlens drought src must never import owslib or xarray (`G7`)."""
+    """earthlens drought src must never import owslib or xarray (`G7`).
+
+    Catches both module-level and indented (lazy) imports — the backend
+    uses indented imports pervasively (`from pyramids.netcdf import
+    NetCDF` inside `_fetch_speibase`), so a future indented
+    `from owslib.wcs import WebCoverageService` inside `_fetch_wcs` (or
+    `import xarray as xr` inside any helper) must not slip past this
+    guard.
+    """
     import re
 
     src = Path(__file__).resolve().parents[2] / "src" / "earthlens" / "drought"
-    pattern = re.compile(r"\b(?:owslib|xarray)\b")
+    # `(?:^|\s)` allows any whitespace prefix (so indented imports match).
+    import_pattern = re.compile(
+        r"(?:^|\s)(?:import|from)\s+(?:[\w.]+\s+import\s+\S+|owslib|xarray)\b"
+    )
+    leak_pattern = re.compile(r"\b(?:owslib|xarray)\b")
     offenders = []
     for py_file in src.rglob("*.py"):
         text = py_file.read_text(encoding="utf-8")
-        if any(
-            line.startswith("import ") or line.startswith("from ")
-            for line in text.splitlines()
-            if pattern.search(line)
-        ):
-            offenders.append(py_file)
-    assert offenders == [], f"owslib/xarray import leak in: {offenders}"
+        for line in text.splitlines():
+            stripped = line.lstrip()
+            if not (
+                stripped.startswith("import ") or stripped.startswith("from ")
+            ):
+                continue
+            if leak_pattern.search(line):
+                offenders.append((py_file, line.strip()))
+                break
+    assert offenders == [], (
+        f"owslib/xarray import leak — drought has no SDK extra: {offenders}"
+    )
 
 
 class _FakeResponse:
