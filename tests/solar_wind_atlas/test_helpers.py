@@ -54,6 +54,15 @@ def test_window_crop_window_size_matches_native_grid(
     assert part["dst_height"] == 200
 
 
+def test_window_crop_squeezes_single_band_3d(
+    fake_pyramids: type[FakeDataset], tmp_path: Path
+) -> None:
+    """A (1, H, W) read_part result is squeezed to (H, W) before writing."""
+    fake_pyramids.emit_3d = True
+    _helpers.window_crop("https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif")
+    assert fake_pyramids.recorder["create"][0]["shape"] == (200, 200)
+
+
 def test_zip_cache_path_uses_url_filename(tmp_path: Path) -> None:
     """zip_cache_path maps a URL to cache_dir/<filename>."""
     url = "https://api.globalsolaratlas.info/download/World/World_GHI.zip"

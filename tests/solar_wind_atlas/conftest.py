@@ -42,6 +42,9 @@ class FakeDataset:
     #: A plausible global geotransform (origin, 0.0025 deg pixel, negative dy).
     geotransform = (-180.0, 0.0025, 0.0, 80.0, 0.0, -0.0025)
     epsg = 4326
+    #: When True, `read_part` returns a single-band `(1, H, W)` array so the
+    #: helper's squeeze branch is exercised.
+    emit_3d = False
 
     @classmethod
     def read_file(cls, path: str) -> FakeDataset:
@@ -66,6 +69,8 @@ class FakeDataset:
                 "bbox_crs": bbox_crs,
             }
         )
+        if type(self).emit_3d:
+            return np.zeros((1, dst_height, dst_width), dtype="float32")
         return np.zeros((dst_height, dst_width), dtype="float32")
 
     @classmethod
@@ -81,6 +86,7 @@ class FakeDataset:
 def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
     """Inject a fake `pyramids.dataset` module so no real GDAL is touched."""
     FakeDataset.recorder = {}
+    FakeDataset.emit_3d = False
     module = types.ModuleType("pyramids.dataset")
     module.Dataset = FakeDataset
     monkeypatch.setitem(sys.modules, "pyramids.dataset", module)
@@ -103,8 +109,8 @@ class FakeResponse:
         """No-op — the fake always succeeds."""
 
     def iter_content(self, chunk_size: int = 1) -> list[bytes]:
-        """Yield the body in one chunk."""
-        return [self._body]
+        """Yield the body, plus an empty chunk to exercise the skip guard."""
+        return [self._body, b""]
 
 
 class FakeGet:

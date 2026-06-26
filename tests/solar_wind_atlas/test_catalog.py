@@ -66,3 +66,86 @@ def test_catalog_covers_the_six_solar_layers(catalog: Catalog) -> None:
     """All six Global Solar Atlas variables are curated."""
     solar = {k for k, v in catalog.datasets.items() if v.atlas == "gsa"}
     assert solar == {"ghi", "dni", "dif", "gti", "pvout", "opta"}
+
+
+_ROW = (
+    "  x:\n"
+    "    atlas: gsa\n"
+    "    transport: download_zip\n"
+    "    url: https://example/x.zip\n"
+    "    units: kWh/m2/day\n"
+    "    long_name: example\n"
+)
+
+
+def test_load_from_single_file(tmp_path) -> None:
+    """The loader accepts a single YAML file (the test back-compat path)."""
+    from earthlens.solar_wind_atlas import catalog as catmod
+
+    catmod.clear_catalog_cache()
+    one = tmp_path / "one.yaml"
+    one.write_text(f"available_datasets: [x]\ndatasets:\n{_ROW}", encoding="utf-8")
+    cat = Catalog.load(one)
+    assert cat.get("x").atlas == "gsa"
+
+
+def test_duplicate_layer_across_files_raises(tmp_path) -> None:
+    """A layer declared in two files fails the merge."""
+    from earthlens.solar_wind_atlas import catalog as catmod
+
+    catmod.clear_catalog_cache()
+    (tmp_path / "a.yaml").write_text(f"datasets:\n{_ROW}", encoding="utf-8")
+    (tmp_path / "b.yaml").write_text(f"datasets:\n{_ROW}", encoding="utf-8")
+    with pytest.raises(ValueError, match="declared in two catalog files"):
+        Catalog.load(tmp_path)
+
+
+def test_missing_datasets_block_raises(tmp_path) -> None:
+    """A catalog with no datasets: block is rejected."""
+    from earthlens.solar_wind_atlas import catalog as catmod
+
+    catmod.clear_catalog_cache()
+    (tmp_path / "empty.yaml").write_text("available_datasets: []\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="empty 'datasets:' block"):
+        Catalog.load(tmp_path)
+
+
+def test_invalid_row_raises(tmp_path) -> None:
+    """A row missing a required field fails pydantic validation."""
+    from earthlens.solar_wind_atlas import catalog as catmod
+
+    catmod.clear_catalog_cache()
+    bad = "  y:\n    atlas: gsa\n    transport: download_zip\n"  # no url
+    (tmp_path / "bad.yaml").write_text(f"datasets:\n{bad}", encoding="utf-8")
+    with pytest.raises(ValueError, match="failed validation"):
+        Catalog.load(tmp_path)
+
+
+def test_curated_missing_from_index_raises(tmp_path) -> None:
+    """A curated id absent from available_datasets: is rejected."""
+    from earthlens.solar_wind_atlas import catalog as catmod
+
+    catmod.clear_catalog_cache()
+    (tmp_path / "c.yaml").write_text(
+        f"available_datasets: [other]\ndatasets:\n{_ROW}", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="missing from"):
+        Catalog.load(tmp_path)
+
+
+def test_missing_path_raises(tmp_path) -> None:
+    """A non-existent catalog path is rejected."""
+    from earthlens.solar_wind_atlas import catalog as catmod
+
+    catmod.clear_catalog_cache()
+    with pytest.raises(ValueError, match="does not exist"):
+        Catalog.load(tmp_path / "nope")
+
+
+def test_clear_catalog_cache_is_callable() -> None:
+    """clear_catalog_cache empties the parse cache without error."""
+    from earthlens.solar_wind_atlas import catalog as catmod
+
+    Catalog()
+    catmod.clear_catalog_cache()
+    assert catmod._CATALOG_CACHE == {}
