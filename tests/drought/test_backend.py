@@ -515,6 +515,53 @@ def test_speibase_rejects_period_before_epoch(monkeypatch, tmp_path, fake_netcdf
         backend.download(progress_bar=False)
 
 
+def test_speibase_rejects_missing_time_axis(monkeypatch, tmp_path, fake_netcdf):
+    """An empty / time-less dimension_sizes raises instead of silently bypassing."""
+    monkeypatch.setattr(
+        backend_module,
+        "_http_download",
+        lambda url, target: target.write_bytes(b"fake-nc"),
+    )
+    # `fake_netcdf` IS the `_FakeNetCDF` class object — patch the property
+    # on the class itself, and restore it in `finally` so the rest of the
+    # suite sees the fixture's default `n_time` axis again.
+    monkeypatch.setattr(
+        fake_netcdf, "dimension_sizes", property(lambda self: {})
+    )
+    backend = Drought(
+        start="2026-06-01",
+        end="2026-06-01",
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="speibase-12",
+        path=str(tmp_path),
+    )
+    with pytest.raises(ValueError, match="no discoverable time axis"):
+        backend.download(progress_bar=False)
+
+
+def test_speibase_handles_capitalised_time_dim(monkeypatch, tmp_path, fake_netcdf):
+    """`Time` / `T` / `t` axis names resolve through the case-insensitive lookup."""
+    monkeypatch.setattr(
+        backend_module,
+        "_http_download",
+        lambda url, target: target.write_bytes(b"fake-nc"),
+    )
+    monkeypatch.setattr(
+        fake_netcdf, "dimension_sizes", property(lambda self: {"Time": 2000})
+    )
+    backend = Drought(
+        start="2026-06-01",
+        end="2026-06-01",
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="speibase-12",
+        path=str(tmp_path),
+    )
+    # Should NOT raise — the case-insensitive lookup finds "Time".
+    backend.download(progress_bar=False)
+
+
 def test_speibase_rejects_period_past_time_axis(monkeypatch, tmp_path, fake_netcdf):
     """A period past the bundled NetCDF's time axis raises clearly."""
     monkeypatch.setattr(

@@ -460,7 +460,27 @@ class Drought(AbstractDataSource):
 
         nc = NetCDF.read_file(str(nc_path))
         try:
-            n_time = (nc.dimension_sizes or {}).get("time", 0)
+            # Case-insensitive lookup — pyramids reports dimension names in
+            # whatever case the source NetCDF uses; SPEIbase v2.x ships
+            # `time` lowercase today, but a future release that switches to
+            # `Time` / `t` should not silently disable the upper-bound
+            # guard. An empty `dimension_sizes` (variable-subset open with
+            # no root group) is treated as an unknown axis and rejected
+            # rather than letting an over-range idx propagate.
+            dim_sizes = nc.dimension_sizes or {}
+            time_axis = next(
+                (size for name, size in dim_sizes.items() if name.lower() == "time"),
+                None,
+            )
+            if time_axis is None:
+                raise ValueError(
+                    f"SPEIbase NetCDF {nc_path.name} has no discoverable "
+                    "time axis (dimension_sizes empty or missing 'time' "
+                    "key). Cannot safely slice — bump the pyramids floor "
+                    "or pin the catalog row to a NetCDF with a labelled "
+                    "time dimension."
+                )
+            n_time = time_axis
             written: list[Path] = []
             for product in products:
                 period: dt.date = product.metadata["period"]
@@ -470,7 +490,7 @@ class Drought(AbstractDataSource):
                         f"SPEIbase period {period} is before the dataset "
                         f"epoch ({SPEIBASE_EPOCH_YEAR}-01)."
                     )
-                if n_time and idx >= n_time:
+                if idx >= n_time:
                     last_year = SPEIBASE_EPOCH_YEAR + (n_time - 1) // 12
                     last_month = ((n_time - 1) % 12) + 1
                     raise ValueError(
