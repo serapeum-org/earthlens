@@ -105,6 +105,7 @@ class Drought(AbstractDataSource):
         temporal_resolution: str = "auto",
         path: str | Path | None = None,
         fmt: str = "%Y-%m-%d",
+        today: dt.date | None = None,
     ):
         """Configure a drought-indicator request.
 
@@ -131,6 +132,11 @@ class Drought(AbstractDataSource):
                 in-memory FeatureCollection without writing to disk).
             fmt: `strptime` format for `start` / `end`. Defaults to
                 `"%Y-%m-%d"`.
+            today: Reference "now" date used by the USDM weekly snap to
+                decide whether the same-week Tuesday's composite has been
+                released yet. Defaults to `dt.date.today()` for live
+                queries; tests and historical reruns pin this to a fixed
+                date so the snap result is deterministic.
 
         Raises:
             ValueError: When `dataset` is missing or unknown, when
@@ -155,6 +161,7 @@ class Drought(AbstractDataSource):
         self._catalog = Catalog()
         self._dataset: Dataset = self._catalog.get(dataset)
         self.OUTPUT_KIND = self._dataset.output_kind
+        self._today = today if today is not None else dt.date.today()
 
         # `bool(Path("")) is True` and `str(Path(""))` is `"."` — both would
         # bypass a `not path` check and silently route the parent class to
@@ -257,6 +264,7 @@ class Drought(AbstractDataSource):
         snapped = snap_to_cadence(
             [pd.Timestamp(ts).date() for ts in raw],
             self._dataset.cadence,
+            today=self._today,
         )
         return TemporalExtent(
             start_date=start_dt,

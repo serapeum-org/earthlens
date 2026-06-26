@@ -224,17 +224,36 @@ def test_drought_search_emits_one_product_per_snapped_period():
         lat_lim=[30.0, 40.0],
         lon_lim=[-95.0, -85.0],
         dataset="usdm",
+        # Today pinned to Tue 2026-06-23: this week's 06-23 composite has
+        # not been released yet (the Thursday release is 06-25), so the
+        # walk-back fires for 06-23 itself; 06-16's release Thursday was
+        # 06-18 and is past, so 06-16 lands on itself.
+        today=dt.date(2026, 6, 23),
     )
     products = backend._search()
-    # Window covers Wed 06-10 → Tue 06-23. The pre-release walk-back rule
-    # (Tuesday/Wednesday → previous week) gives the unique released-side
-    # composites 06-02, 06-09, 06-16.
+    # Window 06-10 (Wed) → 06-23 (Tue): 06-10 snaps to 06-09 (released).
+    # 06-23 walks back to 06-16 (06-23's release Thursday is still future).
     assert [p.id for p in products] == [
-        "usdm@2026-06-02",
         "usdm@2026-06-09",
         "usdm@2026-06-16",
     ]
     assert {p.metadata["dataset"] for p in products} == {"usdm"}
+
+
+def test_drought_search_does_not_overshoot_historical_tuesday():
+    """A historical Tuesday queried much later snaps to itself, not the prior week."""
+    backend = Drought(
+        start="2026-06-23",
+        end="2026-06-23",
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="usdm",
+        # Today is well past the 06-25 release Thursday for 2026-06-23, so
+        # the walk-back must NOT trigger (Round 2 G5 regression).
+        today=dt.date(2027, 1, 15),
+    )
+    products = backend._search()
+    assert [p.id for p in products] == ["usdm@2026-06-23"]
 
 
 def test_usdm_render_url_uses_tuesday_valid_date():
@@ -257,12 +276,14 @@ def test_usdm_fetch_builds_feature_collection_in_4326(monkeypatch, tmp_path):
         lon_lim=[-95.0, -85.0],
         dataset="usdm",
         path=str(tmp_path),
+        # Pin today to the Tuesday itself — the 06-23 composite's release
+        # Thursday (06-25) is still in the future, so the walk-back fires.
+        today=dt.date(2026, 6, 23),
     )
     fc = backend.download(progress_bar=False)
     assert fc.crs.to_epsg() == 4326
     assert len(fc) == 2
     assert set(fc["DM"]) == {1, 3}
-    # Tuesday-of-release-week walks back to the prior week's composite.
     assert fc["release_date"].iloc[0] == "2026-06-16"
 
 

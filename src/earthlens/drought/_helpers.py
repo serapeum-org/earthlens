@@ -95,7 +95,7 @@ def _to_date(value: dt.date | dt.datetime | str) -> dt.date:
     )
 
 
-def _snap_weekly(date: dt.date) -> dt.date:
+def _snap_weekly(date: dt.date, today: dt.date | None = None) -> dt.date:
     """Snap a calendar date to the most recent **already-published** Tuesday.
 
     USDM releases every Thursday UTC; each composite is **valid the prior
@@ -104,26 +104,35 @@ def _snap_weekly(date: dt.date) -> dt.date:
     date — verified live, every Thursday URL returns 404).
 
     The trap: the file `usdm_{this-week's-Tuesday}.json` is not published
-    until that week's **Thursday**. A query on Monday lands the prior week
-    (no problem); a query on Tuesday or Wednesday lands *this* week's
-    Tuesday — whose JSON does not exist yet and 404s. So in the
-    pre-release half of the week (Tuesday + Wednesday) the snap walks back
-    one more week to the *previous* Tuesday, whose composite was published
-    the prior Thursday.
+    until that week's **Thursday**. A live query on Tuesday or Wednesday
+    that snapped to *this* week's Tuesday would 404. The fix walks back
+    one more week to the prior Tuesday's composite — but **only when**
+    today's date has not yet reached the snapped Tuesday's release
+    Thursday. Without that `today` check the walk-back would also fire
+    for historical queries (e.g. `date = 2026-06-23` queried in
+    2027-01), silently delivering the prior week's composite instead of
+    the requested (and long-published) one.
 
     Args:
         date: A calendar date.
+        today: The reference "now" date the publication check is made
+            against. Defaults to `dt.date.today()` for live queries; tests
+            (and any caller wanting deterministic output) pass an explicit
+            date.
 
     Returns:
         datetime.date: The most recent Tuesday at-or-before `date` whose
-            composite has already been released (Tuesday/Wednesday queries
-            walk back one extra week).
+            composite has been published by `today`.
     """
+    if today is None:
+        today = dt.date.today()
     days_back = (date.weekday() - 1) % 7
     snapped = date - dt.timedelta(days=days_back)
-    # Thursday is weekday 3 — same-week composite is released on Thursday,
-    # so (date - snapped).days >= 2 means we are at-or-after the release.
-    if (date - snapped).days < 2:
+    # The snapped Tuesday's composite goes live on the Thursday two days
+    # after it — i.e. `snapped + 2 days`. Walk back one week only when
+    # that release Thursday is still in the future relative to `today`.
+    release_thursday = snapped + dt.timedelta(days=2)
+    if release_thursday > today:
         snapped -= dt.timedelta(days=7)
     return snapped
 
@@ -175,6 +184,7 @@ _SNAPPERS = {
 def snap_to_cadence(
     dates: list[dt.date | dt.datetime | str],
     cadence: str,
+    today: dt.date | None = None,
 ) -> list[dt.date]:
     """Clamp every requested date onto the source's release calendar.
 
@@ -188,6 +198,12 @@ def snap_to_cadence(
         cadence: The source's release cadence — `"weekly"`,
             `"10day"`, or `"monthly"`. Matches the `Dataset.cadence`
             literal.
+        today: The reference "now" date used by `weekly` to decide
+            whether the same-week Tuesday's composite has been published
+            yet. Defaults to `dt.date.today()` for live queries. Pin to
+            a specific date when calling against historical data
+            (otherwise a current-week query for a historical Tuesday
+            would silently walk back to the prior week).
 
     Returns:
         list[datetime.date]: Distinct snapped dates, sorted ascending.
@@ -196,18 +212,20 @@ def snap_to_cadence(
         ValueError: When `cadence` is not one of the three known values.
 
     Examples:
-        - USDM Friday-or-later → most recent released Tuesday composite:
+        - USDM at-or-after release Thursday → same-week Tuesday composite:
             ```python
             >>> import datetime as dt
             >>> from earthlens.drought._helpers import snap_to_cadence
-            >>> snap_to_cadence([dt.date(2026, 6, 26)], "weekly")
+            >>> snap_to_cadence([dt.date(2026, 6, 23)], "weekly",
+            ...                  today=dt.date(2026, 6, 26))
             [datetime.date(2026, 6, 23)]
 
             ```
-        - USDM pre-release Tuesday → walks back to the previous week's
-          composite (this week's hasn't been published until Thursday):
+        - USDM Tuesday queried on the same Tuesday (pre-release) walks back
+          to the previous week's composite:
             ```python
-            >>> snap_to_cadence([dt.date(2026, 6, 23)], "weekly")
+            >>> snap_to_cadence([dt.date(2026, 6, 23)], "weekly",
+            ...                  today=dt.date(2026, 6, 23))
             [datetime.date(2026, 6, 16)]
 
             ```
@@ -231,7 +249,10 @@ def snap_to_cadence(
             f"unknown cadence {cadence!r}; expected one of "
             f"{sorted(_SNAPPERS)}"
         ) from exc
-    snapped = {snapper(_to_date(d)) for d in dates}
+    if cadence == "weekly":
+        snapped = {snapper(_to_date(d), today=today) for d in dates}
+    else:
+        snapped = {snapper(_to_date(d)) for d in dates}
     return sorted(snapped)
 
 

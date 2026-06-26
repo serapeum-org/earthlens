@@ -20,22 +20,22 @@ from earthlens.drought._helpers import (
 
 def test_weekly_snap_idempotent_on_released_tuesday():
     """A query at-or-after Thursday lands the same-week Tuesday composite."""
-    # Friday — Tuesday's composite was released the prior day.
-    assert snap_to_cadence([dt.date(2026, 6, 26)], "weekly") == [
-        dt.date(2026, 6, 23)
-    ]
+    # Friday queried on the same Friday — Tuesday's composite was released the prior day.
+    assert snap_to_cadence(
+        [dt.date(2026, 6, 26)], "weekly", today=dt.date(2026, 6, 26)
+    ) == [dt.date(2026, 6, 23)]
 
 
 def test_weekly_snap_walks_back_on_pre_release_tue_wed():
     """Tuesday and Wednesday of release week → previous week's composite."""
-    # Tuesday — that day's JSON isn't published until Thursday.
-    assert snap_to_cadence([dt.date(2026, 6, 23)], "weekly") == [
-        dt.date(2026, 6, 16)
-    ]
-    # Wednesday — same story.
-    assert snap_to_cadence([dt.date(2026, 6, 24)], "weekly") == [
-        dt.date(2026, 6, 16)
-    ]
+    # Tuesday queried on the same Tuesday — that day's JSON isn't published until Thursday.
+    assert snap_to_cadence(
+        [dt.date(2026, 6, 23)], "weekly", today=dt.date(2026, 6, 23)
+    ) == [dt.date(2026, 6, 16)]
+    # Wednesday queried on the same Wednesday — same story.
+    assert snap_to_cadence(
+        [dt.date(2026, 6, 24)], "weekly", today=dt.date(2026, 6, 24)
+    ) == [dt.date(2026, 6, 16)]
 
 
 def test_weekly_snap_walks_back_from_other_weekday():
@@ -44,7 +44,24 @@ def test_weekly_snap_walks_back_from_other_weekday():
         (dt.date(2026, 6, 25), dt.date(2026, 6, 23)),  # Thu → same-week Tue
         (dt.date(2026, 6, 22), dt.date(2026, 6, 16)),  # Mon → prior Tue
     ):
-        assert snap_to_cadence([queried], "weekly") == [expected]
+        assert snap_to_cadence(
+            [queried], "weekly", today=queried
+        ) == [expected]
+
+
+def test_weekly_snap_does_not_overshoot_historical_query():
+    """A historical Tuesday queried much later stays at itself (not walked back).
+
+    Round 2's G5: F5's walk-back rule originally triggered whenever the
+    input date's weekday was Tue/Wed, regardless of `today`. A query for
+    `2026-06-23` made in 2027 would silently fetch the 06-16 composite
+    instead of the (long-released) 06-23 one.
+    """
+    assert snap_to_cadence(
+        [dt.date(2026, 6, 23)],  # a Tuesday
+        "weekly",
+        today=dt.date(2027, 1, 1),  # ~6 months later, well past release Thursday
+    ) == [dt.date(2026, 6, 23)]
 
 
 def test_weekly_snap_dedupes_same_week():
@@ -52,17 +69,19 @@ def test_weekly_snap_dedupes_same_week():
     snapped = snap_to_cadence(
         [dt.date(2026, 6, 25), dt.date(2026, 6, 26), dt.date(2026, 6, 27)],
         "weekly",
+        today=dt.date(2026, 6, 27),
     )
     assert snapped == [dt.date(2026, 6, 23)]
 
 
 def test_weekly_snap_two_weeks_emit_two_releases():
     """A two-week span emits one Tuesday per week, sorted."""
-    # Wed 2026-06-10 → walks back to 06-02 (06-09 not yet released);
-    # Fri 2026-06-26 → lands on 06-23.
+    # Both Tuesdays' release Thursdays (06-04, 06-25) are past 2026-06-26,
+    # so each Tuesday lands on itself — no walk-back.
     snapped = snap_to_cadence(
-        [dt.date(2026, 6, 10), dt.date(2026, 6, 26)],
+        [dt.date(2026, 6, 2), dt.date(2026, 6, 26)],
         "weekly",
+        today=dt.date(2026, 6, 26),
     )
     assert snapped == [dt.date(2026, 6, 2), dt.date(2026, 6, 23)]
 
