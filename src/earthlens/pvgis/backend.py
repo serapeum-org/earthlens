@@ -384,7 +384,6 @@ class PVGIS(AbstractDataSource):
         """
         from tqdm import tqdm
 
-        session = requests.Session()
         last_call = [0.0]
         single = len(products) == 1
         iterator = tqdm(
@@ -393,10 +392,11 @@ class PVGIS(AbstractDataSource):
             desc="PVGIS",
             unit="point",
         )
-        return [
-            self._fetch_point(product, session, last_call, single=single)
-            for product in iterator
-        ]
+        with requests.Session() as session:
+            return [
+                self._fetch_point(product, session, last_call, single=single)
+                for product in iterator
+            ]
 
     def _fetch_point(
         self,
