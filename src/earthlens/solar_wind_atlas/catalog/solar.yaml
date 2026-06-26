@@ -1,0 +1,66 @@
+# Global Solar Atlas — solar-resource climatology layers (download-then-localise).
+#
+# Every Global Solar Atlas world product is distributed as a DEFLATE-compressed
+# GeoTIFF ZIP archive on api.globalsolaratlas.info (there is no range-accessible
+# COG and no reachable AOI-clip endpoint — see the A1 gate,
+# planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md). A deflate ZIP
+# member cannot be range-windowed, so these rows use the `download_zip`
+# transport: the ~2.7 GB (1 km) archive is fetched once into a cache and the
+# bbox window is read from the local member. The single-file 1 km
+# (LTAy_AvgDailyTotals) product is used; the 250 m segmented product is a
+# follow-on. Values are long-term-average daily totals.
+datasets:
+
+  ghi:
+    atlas: gsa
+    transport: download_zip
+    url: https://api.globalsolaratlas.info/download/World/World_GHI_GISdata_LTAy_AvgDailyTotals_GlobalSolarAtlas-v2_GEOTIFF.zip
+    units: kWh/m2/day
+    long_name: Global horizontal irradiation (long-term average daily total)
+    license_note: >-
+      Global Solar Atlas 2.0, © 2026 The World Bank, Solar resource data: Solargis. Licensed CC-BY-4.0.
+
+  dni:
+    atlas: gsa
+    transport: download_zip
+    url: https://api.globalsolaratlas.info/download/World/World_DNI_GISdata_LTAy_AvgDailyTotals_GlobalSolarAtlas-v2_GEOTIFF.zip
+    units: kWh/m2/day
+    long_name: Direct normal irradiation (long-term average daily total)
+    license_note: >-
+      Global Solar Atlas 2.0, © 2026 The World Bank, Solar resource data: Solargis. Licensed CC-BY-4.0.
+
+  dif:
+    atlas: gsa
+    transport: download_zip
+    url: https://api.globalsolaratlas.info/download/World/World_DIF_GISdata_LTAy_AvgDailyTotals_GlobalSolarAtlas-v2_GEOTIFF.zip
+    units: kWh/m2/day
+    long_name: Diffuse horizontal irradiation (long-term average daily total)
+    license_note: >-
+      Global Solar Atlas 2.0, © 2026 The World Bank, Solar resource data: Solargis. Licensed CC-BY-4.0.
+
+  gti:
+    atlas: gsa
+    transport: download_zip
+    url: https://api.globalsolaratlas.info/download/World/World_GTI_GISdata_LTAy_AvgDailyTotals_GlobalSolarAtlas-v2_GEOTIFF.zip
+    units: kWh/m2/day
+    long_name: Global irradiation for optimally tilted surface (long-term average daily total)
+    license_note: >-
+      Global Solar Atlas 2.0, © 2026 The World Bank, Solar resource data: Solargis. Licensed CC-BY-4.0.
+
+  pvout:
+    atlas: gsa
+    transport: download_zip
+    url: https://api.globalsolaratlas.info/download/World/World_PVOUT_GISdata_LTAy_AvgDailyTotals_GlobalSolarAtlas-v2_GEOTIFF.zip
+    units: kWh/kWp/day
+    long_name: Photovoltaic power potential — specific PV output (long-term average daily total)
+    license_note: >-
+      Global Solar Atlas 2.0, © 2026 The World Bank, Solar resource data: Solargis. Licensed CC-BY-4.0.
+
+  opta:
+    atlas: gsa
+    transport: download_zip
+    url: https://api.globalsolaratlas.info/download/World/World_OPTA_GISdata_LTAy_AvgDailyTotals_GlobalSolarAtlas-v2_GEOTIFF.zip
+    units: degree
+    long_name: Optimum tilt of PV modules
+    license_note: >-
+      Global Solar Atlas 2.0, © 2026 The World Bank, Solar resource data: Solargis. Licensed CC-BY-4.0.

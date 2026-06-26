@@ -1,0 +1,24 @@
+# Solar & Wind Atlas catalog index — every curated layer id (informational).
+#
+# Each id resolves to a row in one of the per-atlas files (solar.yaml,
+# wind.yaml). The loader checks every curated row appears here, mirroring the
+# ghsl / bathymetry / cmems sharded-catalog contract.
+available_datasets:
+  # Global Solar Atlas (download_zip)
+  - ghi
+  - dni
+  - dif
+  - gti
+  - pvout
+  - opta
+  # Global Wind Atlas (vsicurl)
+  - wind_100m
+  - weibull_k_10m
+  - weibull_k_50m
+  - weibull_k_100m
+  - weibull_k_150m
+  - weibull_k_200m
+  - capacity_factor_iec1
+  - capacity_factor_iec2
+  - capacity_factor_iec3
+  - air_density_100m
