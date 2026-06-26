@@ -294,7 +294,8 @@ class EarthLens:
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['alaska-satellite-facility', 'amazon-s3', 'asf', 'bathymetry', 'bdc',
-             'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
+             'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
+             'climate_indices', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'etopo', 'eumetsat', 'fdsn',
              'firms', 'g-portal', 'gbif', 'gdacs', 'gebco', 'gee', 'ghs', 'ghsl',
@@ -302,7 +303,8 @@ class EarthLens:
              'jaxa', 'jaxa-earth', 'landsat', 'national-water-model', 'nexrad',
              'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo', 'overture',
              'planetary-computer', 'protected-planet', 'radar', 'redlist',
-             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal', 'usgs-landsat',
+             'sentinel-hub', 'sentinelhub', 'stac', 'teleconnections', 'tropycal',
+             'usgs-landsat',
              'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
@@ -593,6 +595,15 @@ class EarthLens:
             "bathymetry": ("earthlens.bathymetry", "Bathymetry", "", {}),
             "gebco": ("earthlens.bathymetry", "Bathymetry", "", {}),
             "etopo": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            # Monthly climate / teleconnection indices (ENSO/ONI, NAO, AO,
+            # PDO, AMO, SOI, PNA, ...) from NOAA PSL + KNMI Climate Explorer
+            # ASCII series -> long-format DataFrame. Open data (requests +
+            # pandas are core), so no extra to hint. Aliases "climate_indices"
+            # / "teleconnections". Global scalar series: spatial args are
+            # ignored and aggregate= is rejected.
+            "climate-indices": ("earthlens.climate_indices", "ClimateIndices", "", {}),
+            "climate_indices": ("earthlens.climate_indices", "ClimateIndices", "", {}),
+            "teleconnections": ("earthlens.climate_indices", "ClimateIndices", "", {}),
         }
     )
 
@@ -623,6 +634,8 @@ class EarthLens:
         Args:
             data_source: Backend key. One of the registered keys in
                 :attr:`DataSources` — `"chc"` (alias `"chirps"`),
+                `"climate-indices"` (aliases `"climate_indices"` /
+                `"teleconnections"`),
                 `"amazon-s3"`, `"asf"` (aliases
                 `"alaska-satellite-facility"` / `"insar"`),
                 `"cmems"`, `"earthdata"`, `"ecmwf"`,
