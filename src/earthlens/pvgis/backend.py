@@ -133,9 +133,10 @@ class PVGIS(AbstractDataSource):
             temporal_resolution: Recorded resolution label (PVGIS is hourly).
             path: Output directory for the written table.
             fmt: `strptime` format for `start` / `end`.
-            point: An explicit `(lat, lon)` to query a single location,
-                bypassing the bbox. Mutually exclusive with `lat_lim` /
-                `lon_lim`.
+            point: An explicit `(lat, lon)` to query a single location. When
+                given it wins, collapsing the request to that one coordinate
+                and overriding any `lat_lim` / `lon_lim` (including the
+                whole-Earth defaults the facade injects).
             spacing_deg: Grid step in degrees when sampling a bbox (`G3`).
             output_format: On-disk format — `"csv"` (default) or `"parquet"`.
             max_points: Hard cap on the number of sampled grid points (`G5`);
@@ -146,8 +147,7 @@ class PVGIS(AbstractDataSource):
                 PVGIS query parameter.
 
         Raises:
-            ValueError: When `output_format` is unrecognised; when both
-                `point=` and `lat_lim`/`lon_lim` are given; or when no
+            ValueError: When `output_format` is unrecognised, or when no
                 location (neither `point=` nor a bbox) is supplied.
             TypeError: When `variables` is a mapping (this backend takes a
                 single-element list naming the tool).
@@ -165,8 +165,10 @@ class PVGIS(AbstractDataSource):
                 f"got {output_format!r}."
             )
         if point is not None:
-            if lat_lim is not None or lon_lim is not None:
-                raise ValueError("pass either point=(lat, lon) or lat_lim=/lon_lim=.")
+            # `point=` wins and collapses the bbox to that single coordinate,
+            # overriding any `lat_lim`/`lon_lim` (including the whole-Earth
+            # defaults the EarthLens facade injects), so a single-point
+            # request works identically through the facade and directly.
             lat_lim = [float(point[0]), float(point[0])]
             lon_lim = [float(point[1]), float(point[1])]
         if lat_lim is None or lon_lim is None:

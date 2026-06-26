@@ -151,7 +151,7 @@ def throttled_get(
             return resp
         sleep(2**attempt)
     resp.raise_for_status()
-    return resp
+    return resp  # pragma: no cover - raise_for_status always raises on a 429
 
 
 def _records_to_frame(rows: list[dict[str, Any]], time_key: str) -> pd.DataFrame:
