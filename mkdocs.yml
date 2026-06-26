@@ -185,6 +185,11 @@ nav:
       - Usage: reference/bathymetry/usage.md
       - Available datasets: reference/bathymetry/datasets.md
       - Reference: reference/bathymetry/bathymetry.md
+    - PVGIS (solar radiation / PV):
+      - Introduction: reference/pvgis/introduction.md
+      - Usage: reference/pvgis/usage.md
+      - Available products: reference/pvgis/datasets.md
+      - Reference: reference/pvgis/pvgis.md
     - Climate indices (teleconnections):
       - Introduction: reference/climate_indices/introduction.md
       - Usage: reference/climate_indices/usage.md
@@ -403,6 +408,10 @@ nav:
       - GEBCO vs ETOPO1 resolution (live): examples/bathymetry/04_gebco_vs_etopo_resolution.ipynb
       - Shaded relief (live): examples/bathymetry/05_shaded_relief.ipynb
       - Depth distribution (live): examples/bathymetry/06_depth_histogram.ipynb
+    - PVGIS (solar radiation / PV):
+      - Quickstart — hourly radiation (live): examples/pvgis/01_pvgis_quickstart.ipynb
+      - Catalog explorer (no network): examples/pvgis/02_catalog_explorer.ipynb
+      - PV power & TMY (live): examples/pvgis/03_pv_power_and_tmy.ipynb
     - Climate indices (teleconnections):
       - Quickstart (live): examples/climate_indices/01_climate_indices_quickstart.ipynb
       - Catalog & behaviour (no network): examples/climate_indices/02_catalog_and_behavior.ipynb

@@ -49,6 +49,7 @@ _CURATED_ENUM = (
     "wdpa",
     "iucn",
     "bathymetry",
+    "pvgis",
 )
 
 
