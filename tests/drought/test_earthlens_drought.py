@@ -35,7 +35,7 @@ def test_facade_routes_usdm_through_drought(monkeypatch):
     assert facade.datasource.OUTPUT_KIND == "vector"
 
 
-def test_facade_routes_drought_with_explicit_dataset_kwarg():
+def test_facade_routes_drought_with_explicit_dataset_kwarg(tmp_path):
     """The bare `"drought"` key takes the `dataset=` kwarg verbatim."""
     facade = EarthLens(
         data_source="drought",
@@ -45,6 +45,7 @@ def test_facade_routes_drought_with_explicit_dataset_kwarg():
         lat_lim=[30.0, 40.0],
         lon_lim=[-95.0, -85.0],
         dataset="speibase-12",
+        path=str(tmp_path),
     )
     assert isinstance(facade.datasource, Drought)
     assert facade.datasource._dataset.id == "speibase-12"

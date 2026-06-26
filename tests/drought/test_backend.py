@@ -155,7 +155,7 @@ def test_drought_rejects_conflicting_variables_kwarg():
         )
 
 
-def test_drought_output_kind_is_per_instance():
+def test_drought_output_kind_is_per_instance(tmp_path):
     """OUTPUT_KIND tracks the resolved catalog row."""
     usdm = Drought(
         start="2026-06-01",
@@ -170,9 +170,22 @@ def test_drought_output_kind_is_per_instance():
         lat_lim=[30.0, 40.0],
         lon_lim=[-95.0, -85.0],
         dataset="speibase-12",
+        path=str(tmp_path),
     )
     assert usdm.OUTPUT_KIND == "vector"
     assert spei.OUTPUT_KIND == "raster"
+
+
+def test_drought_raster_requires_explicit_path():
+    """A raster dataset without path= is rejected up-front."""
+    with pytest.raises(ValueError, match="needs path="):
+        Drought(
+            start="2026-06-01",
+            end="2026-06-01",
+            lat_lim=[30.0, 40.0],
+            lon_lim=[-95.0, -85.0],
+            dataset="speibase-12",
+        )
 
 
 def test_drought_search_emits_one_product_per_snapped_period():

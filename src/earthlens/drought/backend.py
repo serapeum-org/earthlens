@@ -103,7 +103,7 @@ class Drought(AbstractDataSource):
         dataset: str,
         variables: list[str] | None = None,
         temporal_resolution: str = "auto",
-        path: str | Path = "",
+        path: str | Path | None = None,
         fmt: str = "%Y-%m-%d",
     ):
         """Configure a drought-indicator request.
@@ -122,8 +122,13 @@ class Drought(AbstractDataSource):
             temporal_resolution: Advisory label. Defaults to `"auto"` —
                 the backend snaps dates to the source's release cadence
                 (`weekly` / `10day` / `monthly`).
-            path: Output directory for the raster transports. Defaults to
-                the current directory.
+            path: Output directory for the raster transports. **Required**
+                when the resolved dataset is raster — the SPEIbase NetCDFs
+                and per-period GeoTIFFs land here, and silently writing
+                hundreds of MB into the user's CWD is hostile. Defaults to
+                `None`; raster requests without an explicit `path=` raise.
+                Optional for the USDM vector transport (which returns an
+                in-memory FeatureCollection without writing to disk).
             fmt: `strptime` format for `start` / `end`. Defaults to
                 `"%Y-%m-%d"`.
 
@@ -151,6 +156,14 @@ class Drought(AbstractDataSource):
         self._dataset: Dataset = self._catalog.get(dataset)
         self.OUTPUT_KIND = self._dataset.output_kind
 
+        if self.OUTPUT_KIND == "raster" and not path:
+            raise ValueError(
+                f"Drought needs path= for raster dataset {dataset!r} — the "
+                "per-period rasters are written to disk; silently writing "
+                "to the current working directory is not safe. Pass an "
+                "explicit output directory (e.g. path='drought_out')."
+            )
+
         super().__init__(
             start=start,
             end=end,
@@ -159,7 +172,7 @@ class Drought(AbstractDataSource):
             lat_lim=lat_lim,
             lon_lim=lon_lim,
             fmt=fmt,
-            path=str(path),
+            path=str(path) if path else "",
         )
 
     def _initialize(self) -> None:
