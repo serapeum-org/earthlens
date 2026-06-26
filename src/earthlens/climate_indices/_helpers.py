@@ -16,8 +16,8 @@ Two ASCII dialects are parsed here into one canonical long frame:
 
 Both return the canonical `(date, value)` long frame (monthly
 `Timestamp` on the first of each month, the sentinel mapped to `NaN`).
-Everything here is pure text → pandas — there is no `xarray` anywhere
-in this subpackage by design.
+Everything here is pure text → pandas — these series are scalar tabular
+data, so no gridded-array dependency is used in this subpackage by design.
 """
 
 from __future__ import annotations

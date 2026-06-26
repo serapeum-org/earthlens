@@ -21,9 +21,11 @@ from earthlens.climate_indices._helpers import (
     parse_climexp,
     parse_psl,
 )
+from earthlens.climate_indices.backend import ClimateIndices
 from earthlens.climate_indices.catalog import Catalog, Index
 
 __all__ = [
+    "ClimateIndices",
     "Catalog",
     "Index",
     "parse_psl",
