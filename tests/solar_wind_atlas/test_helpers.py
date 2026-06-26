@@ -48,7 +48,9 @@ def test_window_crop_window_size_matches_native_grid(
     fake_pyramids: type[FakeDataset], tmp_path: Path
 ) -> None:
     """A 0.5 deg bbox at the 0.0025 deg native grid reads a ~200x200 window."""
-    _helpers.window_crop("https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif")
+    _helpers.window_crop(
+        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
+    )
     part = fake_pyramids.recorder["read_part"][0]
     assert part["dst_width"] == 200
     assert part["dst_height"] == 200
@@ -59,7 +61,9 @@ def test_window_crop_squeezes_single_band_3d(
 ) -> None:
     """A (1, H, W) read_part result is squeezed to (H, W) before writing."""
     fake_pyramids.emit_3d = True
-    _helpers.window_crop("https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif")
+    _helpers.window_crop(
+        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
+    )
     assert fake_pyramids.recorder["create"][0]["shape"] == (200, 200)
 
 
@@ -87,7 +91,9 @@ def test_inner_tif_raises_without_geotiff(tmp_path: Path) -> None:
         _helpers.inner_tif(zip_path)
 
 
-def test_download_zip_streams_once_then_caches(fake_get: FakeGet, tmp_path: Path) -> None:
+def test_download_zip_streams_once_then_caches(
+    fake_get: FakeGet, tmp_path: Path
+) -> None:
     """download_zip GETs once and reuses the cached archive on a second call."""
     url = "https://api.globalsolaratlas.info/download/World/World_GHI.zip"
     first = _helpers.download_zip(url, tmp_path)

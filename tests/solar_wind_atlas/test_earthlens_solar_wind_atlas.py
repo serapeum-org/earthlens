@@ -24,9 +24,7 @@ class TestRegistry:
     @pytest.mark.parametrize("key", KEYS)
     def test_keys_resolve_to_solar_wind_atlas_class(self, key: str) -> None:
         """All keys resolve to `earthlens.solar_wind_atlas.SolarWindAtlas`."""
-        assert (
-            EarthLens.DataSources[key] is earthlens.solar_wind_atlas.SolarWindAtlas
-        )
+        assert EarthLens.DataSources[key] is earthlens.solar_wind_atlas.SolarWindAtlas
 
     @pytest.mark.parametrize("key", KEYS)
     def test_keys_hint_no_extra(self, key: str) -> None:

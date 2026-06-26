@@ -10,7 +10,6 @@ from earthlens.solar_wind_atlas import SolarWindAtlas
 
 from .conftest import FakeDataset, FakeGet
 
-
 pytestmark = pytest.mark.solar_wind_atlas
 
 #: A small Denmark AOI used across the backend tests.
@@ -70,7 +69,10 @@ def test_aggregate_is_rejected(tmp_path: Path) -> None:
 
 
 def test_solar_request_warns_about_large_download(
-    fake_pyramids: type[FakeDataset], fake_get: FakeGet, info_log: list[str], tmp_path: Path
+    fake_pyramids: type[FakeDataset],
+    fake_get: FakeGet,
+    info_log: list[str],
+    tmp_path: Path,
 ) -> None:
     """A solar request logs the one-time multi-GB download heads-up."""
     _backend(tmp_path, ["ghi"]).download()
@@ -78,7 +80,10 @@ def test_solar_request_warns_about_large_download(
 
 
 def test_attribution_logged_once_per_atlas(
-    fake_pyramids: type[FakeDataset], fake_get: FakeGet, info_log: list[str], tmp_path: Path
+    fake_pyramids: type[FakeDataset],
+    fake_get: FakeGet,
+    info_log: list[str],
+    tmp_path: Path,
 ) -> None:
     """Each fetched atlas's CC-BY attribution is logged exactly once."""
     _backend(tmp_path, ["ghi", "dni", "wind_100m"]).download()
@@ -112,7 +117,9 @@ def test_empty_variables_is_rejected(tmp_path: Path) -> None:
 def test_missing_bbox_is_rejected(tmp_path: Path) -> None:
     """A missing bounding box raises ValueError."""
     with pytest.raises(ValueError, match="bounding box"):
-        SolarWindAtlas(variables=["ghi"], lat_lim=None, lon_lim=None, path=str(tmp_path))
+        SolarWindAtlas(
+            variables=["ghi"], lat_lim=None, lon_lim=None, path=str(tmp_path)
+        )
 
 
 def test_cache_dir_defaults_under_root(tmp_path: Path) -> None:
@@ -125,6 +132,10 @@ def test_cache_dir_override_is_honoured(tmp_path: Path) -> None:
     """An explicit cache_dir= overrides the default."""
     custom = tmp_path / "custom_cache"
     backend = SolarWindAtlas(
-        variables=["ghi"], lat_lim=LAT, lon_lim=LON, path=str(tmp_path), cache_dir=custom
+        variables=["ghi"],
+        lat_lim=LAT,
+        lon_lim=LON,
+        path=str(tmp_path),
+        cache_dir=custom,
     )
     assert backend.cache_dir == custom

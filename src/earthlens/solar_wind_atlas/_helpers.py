@@ -126,7 +126,14 @@ def read_part_to_geotiff(
         )
         if getattr(array, "ndim", 2) == 3 and array.shape[0] == 1:
             array = array[0]
-        geo = (origin_x + col0 * pixel_w, pixel_w, 0.0, origin_y + row0 * pixel_h, 0.0, pixel_h)
+        geo = (
+            origin_x + col0 * pixel_w,
+            pixel_w,
+            0.0,
+            origin_y + row0 * pixel_h,
+            0.0,
+            pixel_h,
+        )
         window = Dataset.create_from_array(arr=array, geo=geo, epsg=dataset.epsg)
         window.to_file(str(out_path))
     finally:
@@ -247,4 +254,6 @@ def download_cache_crop(
     """
     zip_path = download_zip(url, cache_dir, timeout=timeout)
     member = inner_tif(zip_path)
-    return read_part_to_geotiff(f"/vsizip/{zip_path}/{member}", bbox, out_path, epsg=epsg)
+    return read_part_to_geotiff(
+        f"/vsizip/{zip_path}/{member}", bbox, out_path, epsg=epsg
+    )

@@ -253,7 +253,9 @@ class SolarWindAtlas(AbstractDataSource):
         bbox = bbox_from_extent(self.space)
         out_path = self.root_dir / f"{layer.id}.tif"
         if layer.transport == "vsicurl":
-            logger.info(f"solar_wind_atlas {layer.id}: windowed /vsicurl read {layer.url}")
+            logger.info(
+                f"solar_wind_atlas {layer.id}: windowed /vsicurl read {layer.url}"
+            )
             return window_crop(layer.url, bbox, out_path)
         logger.info(f"solar_wind_atlas {layer.id}: download + crop {layer.url}")
         return download_cache_crop(
