@@ -1,0 +1,279 @@
+"""Product catalog for the NREL backend.
+
+NREL exposes several keyed CSV download products under one host
+(`https://developer.nlr.gov`): the NSRDB GOES Aggregated PSM v4 hourly series,
+the NSRDB GOES TMY v4 typical-meteorological-year series, and the WIND Toolkit
+(WTK) hourly wind series. A request selects one via the `product=` kwarg (or an
+alias) on the backend. This module is the bridge from that product id to the
+concrete request shape: the source archive, the CSV endpoint path, the default
+attribute list, the data resolution, the CSV metadata-row count, and the
+canonical value columns the parser keeps.
+
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that loads the
+bundled `nrel_data_catalog.yaml` and exposes each row as a `Product`. Resolve
+one with `get` (a did-you-mean hint on an unknown id) and list the ids with
+`available`.
+
+`CATALOG_PATH` is the path to the bundled YAML.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+
+from earthlens.base import AbstractCatalog
+from earthlens.base.yaml_loader import load_yaml_strict
+
+CATALOG_PATH: Path = Path(__file__).parent / "nrel_data_catalog.yaml"
+
+#: Module-level cache of parsed catalog rows, keyed on the resolved path plus
+#: the YAML's `st_mtime_ns`, so editing the file invalidates the entry without
+#: re-parsing on every `Catalog()`. Mirrors the sibling loaders.
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Product]] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level catalog parse cache.
+
+    Useful in tests that rewrite the catalog on disk and want to force a
+    re-parse. Production callers do not need this — the cache key includes the
+    file's `st_mtime_ns`, so any real edit invalidates the entry.
+    """
+    _CATALOG_CACHE.clear()
+
+
+def _load_catalog_data(path: Path) -> dict[str, Product]:
+    """Parse, validate, and cache the product catalog at `path`.
+
+    Args:
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
+
+    Returns:
+        Mapping from product id to its `Product` row.
+
+    Raises:
+        ValueError: If the file has no `products:` block, or a row fails
+            `Product` validation.
+    """
+    resolved = str(path.resolve())
+    try:
+        mtime = path.stat().st_mtime_ns
+    except FileNotFoundError:
+        mtime = 0
+    key = (resolved, mtime)
+    cached = _CATALOG_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    data = load_yaml_strict(path) or {}
+    products_yaml = data.get("products") or {}
+    if not products_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'products:' block. "
+            "The NREL catalog must list at least one product."
+        )
+    rows: dict[str, Product] = {}
+    for name, body in products_yaml.items():
+        try:
+            rows[name] = Product(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} product {name!r} failed validation:\n{exc}"
+            ) from exc
+
+    _CATALOG_CACHE[key] = rows
+    return rows
+
+
+class Product(BaseModel):
+    """One NREL product's catalog row.
+
+    The product id is the parent key in `Catalog.datasets`; the row carries
+    everything the backend needs to shape a keyed CSV request for it.
+
+    Attributes:
+        source: The source archive — `"nsrdb"` (solar) or `"wtk"` (wind).
+        endpoint: The CSV download endpoint path appended to `NLR_HOST`.
+        names_kind: Whether `names=` is a calendar `"year"` or the literal
+            `"tmy"`.
+        default_attributes: The default attribute list requested when the
+            caller passes no `variables=`.
+        interval: Data resolution in minutes (`30` or `60`).
+        meta_rows: The number of CSV metadata header rows before the data table
+            (NSRDB = 2, WTK = 1); the parser auto-detects but this documents it.
+        columns: The canonical value columns the parser keeps, including the
+            assembled `time` column.
+        description: Human-readable summary of the product.
+
+    Examples:
+        - Build a row directly:
+            ```python
+            >>> from earthlens.nrel import Product
+            >>> p = Product(source="nsrdb", endpoint="/api/x.csv",
+            ...             names_kind="year", columns=["time", "GHI"])
+            >>> p.source
+            'nsrdb'
+            >>> p.interval
+            60
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    source: str
+    endpoint: str
+    names_kind: Literal["year", "tmy"] = "year"
+    default_attributes: list[str] = Field(default_factory=list)
+    interval: int = 60
+    meta_rows: int = 2
+    columns: list[str] = Field(default_factory=list)
+    description: str = ""
+
+
+class Catalog(AbstractCatalog):
+    """Product catalog for the NREL backend.
+
+    Reads the bundled `nrel_data_catalog.yaml` (shipped as package data) and
+    exposes its `products:` block as a map of `Product` rows keyed by product
+    id. Instantiate with no arguments (`Catalog()`); resolve a row with `get`,
+    or list the ids with `available`.
+
+    Attributes:
+        datasets: Map from product id to its `Product` row.
+
+    Examples:
+        - Resolve a product and read its source:
+            ```python
+            >>> from earthlens.nrel import Catalog
+            >>> Catalog().get("nsrdb-psm3").source
+            'nsrdb'
+
+            ```
+        - An unknown but close id raises with a did-you-mean hint:
+            ```python
+            >>> from earthlens.nrel import Catalog
+            >>> Catalog().get("wkt")
+            Traceback (most recent call last):
+                ...
+            ValueError: 'wkt' is not in the NREL product catalog. Known products: ['nsrdb-psm3', 'nsrdb-tmy', 'wtk']. Did you mean 'wtk'?
+
+            ```
+    """
+
+    _catalog_kind: str = "NREL product catalog"
+    _entry_noun: str = "products"
+
+    #: The product rows live in the base `datasets` field so the inherited dict
+    #: surface (`len`, `in`, `[]`, iteration) and `get_dataset`'s did-you-mean
+    #: hint work unchanged; narrowed here to `Product` values.
+    datasets: dict[str, Product] = Field(default_factory=dict)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _accept_products_alias(cls, data: object) -> object:
+        """Accept the `products=` kwarg as an alias for `datasets`.
+
+        Lets callers (and tests) construct `Catalog(products={...})` while the
+        rows live in the base `datasets` field. An explicit `datasets=` always
+        wins.
+
+        Args:
+            data: The raw model input (a mapping for keyword construction).
+
+        Returns:
+            The input with `products` renamed to `datasets`, untouched
+            otherwise.
+        """
+        if isinstance(data, dict) and "products" in data and "datasets" not in data:
+            data = dict(data)
+            data["datasets"] = data.pop("products")
+        return data
+
+    @property
+    def products(self) -> dict[str, Product]:
+        """The product map — alias for the base `datasets` field.
+
+        Returns:
+            dict[str, Product]: The same mapping stored in `datasets`.
+        """
+        return self.datasets
+
+    def model_post_init(self, __context: object) -> None:
+        """Auto-load the bundled catalog when no products were supplied.
+
+        `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`
+        (or `datasets=...`) skips the disk read.
+
+        Raises:
+            ValueError: Propagated from `load` when the YAML is missing, empty,
+                or has a malformed row.
+        """
+        if not self.datasets:
+            self.datasets = Catalog.load().datasets
+        super().model_post_init(__context)
+
+    @classmethod
+    def load(cls, catalog_path: Path | None = None) -> Catalog:
+        """Read the NREL product catalog from disk.
+
+        Args:
+            catalog_path: Path to the catalog YAML. Defaults to the
+                module-level `CATALOG_PATH`.
+
+        Returns:
+            A fully-populated `Catalog`.
+
+        Raises:
+            ValueError: If the file has no `products:` block, or a row fails
+                `Product` validation.
+        """
+        catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
+        return cls(datasets=dict(_load_catalog_data(catalog_path)))
+
+    def get_catalog(self) -> dict[str, Product]:
+        """Return the product map (satisfies the abstract contract).
+
+        Returns:
+            dict[str, Product]: Same object as `datasets` / `products`.
+        """
+        return self.datasets
+
+    def available(self) -> list[str]:
+        """The sorted list of curated product ids.
+
+        Returns:
+            list[str]: Every curated catalog key, sorted.
+
+        Examples:
+            - List the shipped products:
+                ```python
+                >>> from earthlens.nrel import Catalog
+                >>> Catalog().available()
+                ['nsrdb-psm3', 'nsrdb-tmy', 'wtk']
+
+                ```
+        """
+        return sorted(self.datasets)
+
+    def get(self, product: str) -> Product:
+        """Resolve a product id to its `Product` row.
+
+        Thin wrapper over the inherited `get_dataset`, which raises a
+        `ValueError` with a did-you-mean hint on an unknown id.
+
+        Args:
+            product: A product id (`"nsrdb-psm3"`, `"nsrdb-tmy"`, `"wtk"`).
+
+        Returns:
+            Product: The matching catalog row.
+
+        Raises:
+            ValueError: If `product` is not a known id; the message names the
+                catalog kind and, when a close match exists, a did-you-mean
+                hint.
+        """
+        return self.get_dataset(product)
