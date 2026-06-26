@@ -52,6 +52,14 @@ class FakeSession:
         self._responses = responses
         self.calls: list[str] = []
 
+    def __enter__(self) -> FakeSession:
+        """Enter the context manager (mirrors `requests.Session`)."""
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        """Exit the context manager (no-op; nothing to release)."""
+        return None
+
     def get(self, url: str, timeout: int = 60) -> FakeResponse:
         """Record the URL and return the next (or only) configured response."""
         self.calls.append(url)
