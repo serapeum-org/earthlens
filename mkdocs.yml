@@ -190,6 +190,11 @@ nav:
       - Usage: reference/pvgis/usage.md
       - Available products: reference/pvgis/datasets.md
       - Reference: reference/pvgis/pvgis.md
+    - Climate indices (teleconnections):
+      - Introduction: reference/climate_indices/introduction.md
+      - Usage: reference/climate_indices/usage.md
+      - Available indices: reference/climate_indices/datasets.md
+      - Reference: reference/climate_indices/climate_indices.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
@@ -407,6 +412,9 @@ nav:
       - Quickstart — hourly radiation (live): examples/pvgis/01_pvgis_quickstart.ipynb
       - Catalog explorer (no network): examples/pvgis/02_catalog_explorer.ipynb
       - PV power & TMY (live): examples/pvgis/03_pv_power_and_tmy.ipynb
+    - Climate indices (teleconnections):
+      - Quickstart (live): examples/climate_indices/01_climate_indices_quickstart.ipynb
+      - Catalog & behaviour (no network): examples/climate_indices/02_catalog_and_behavior.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
