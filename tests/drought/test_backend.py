@@ -618,10 +618,46 @@ def test_speibase_rejects_period_past_time_axis(monkeypatch, tmp_path, fake_netc
         backend.download(progress_bar=False)
 
 
-def test_owslib_xarray_guard_catches_indented_imports(tmp_path):
-    """The G7 guard above must catch indented (lazy) imports, not just col-0."""
-    import re
+import re as _re
 
+_LEAK_PATTERN = _re.compile(r"\b(?:owslib|xarray)\b")
+
+
+def _scan_for_leaky_imports(src_dir: Path) -> list[tuple[Path, str]]:
+    """Walk every `.py` under `src_dir` and return any owslib/xarray import.
+
+    Matches both module-level (`import owslib`) and indented / lazy
+    (`    from owslib.wcs import ...`) imports by `lstrip`-ing each line
+    before the `import `/`from ` prefix check — the drought backend uses
+    indented lazy imports throughout (every pyramids import lives at
+    column ≥4 inside a `_fetch_*` helper), so a future indented
+    `from owslib...` must not slip past.
+    """
+    offenders: list[tuple[Path, str]] = []
+    for py_file in src_dir.rglob("*.py"):
+        text = py_file.read_text(encoding="utf-8")
+        for line in text.splitlines():
+            stripped = line.lstrip()
+            if not (
+                stripped.startswith("import ")
+                or stripped.startswith("from ")
+            ):
+                continue
+            if _LEAK_PATTERN.search(line):
+                offenders.append((py_file, line.strip()))
+                break
+    return offenders
+
+
+def test_owslib_xarray_guard_catches_indented_imports(tmp_path):
+    """The shared scanner must catch indented (lazy) imports, not just col-0.
+
+    Exercise the SAME helper the production guard uses, so any future
+    weakening of `_scan_for_leaky_imports` (e.g. dropping the lstrip)
+    breaks this meta-test loud and clear — rather than the production
+    guard quietly accepting a leak while a private copy of its logic
+    continues to claim it does not.
+    """
     leak = tmp_path / "leak.py"
     leak.write_text(
         "def _fetch_wcs():\n"
@@ -629,16 +665,8 @@ def test_owslib_xarray_guard_catches_indented_imports(tmp_path):
         "    return WebCoverageService\n",
         encoding="utf-8",
     )
-    leak_pattern = re.compile(r"\b(?:owslib|xarray)\b")
-    hit = False
-    for line in leak.read_text(encoding="utf-8").splitlines():
-        stripped = line.lstrip()
-        if (
-            stripped.startswith("import ") or stripped.startswith("from ")
-        ) and leak_pattern.search(line):
-            hit = True
-            break
-    assert hit, "the indented-import guard must catch a lazy `from owslib...`"
+    offenders = _scan_for_leaky_imports(tmp_path)
+    assert offenders, "the indented-import guard must catch a lazy `from owslib...`"
 
 
 def test_drought_src_does_not_import_owslib_or_xarray():
@@ -651,26 +679,8 @@ def test_drought_src_does_not_import_owslib_or_xarray():
     `import xarray as xr` inside any helper) must not slip past this
     guard.
     """
-    import re
-
     src = Path(__file__).resolve().parents[2] / "src" / "earthlens" / "drought"
-    # `(?:^|\s)` allows any whitespace prefix (so indented imports match).
-    import_pattern = re.compile(
-        r"(?:^|\s)(?:import|from)\s+(?:[\w.]+\s+import\s+\S+|owslib|xarray)\b"
-    )
-    leak_pattern = re.compile(r"\b(?:owslib|xarray)\b")
-    offenders = []
-    for py_file in src.rglob("*.py"):
-        text = py_file.read_text(encoding="utf-8")
-        for line in text.splitlines():
-            stripped = line.lstrip()
-            if not (
-                stripped.startswith("import ") or stripped.startswith("from ")
-            ):
-                continue
-            if leak_pattern.search(line):
-                offenders.append((py_file, line.strip()))
-                break
+    offenders = _scan_for_leaky_imports(src)
     assert offenders == [], (
         f"owslib/xarray import leak — drought has no SDK extra: {offenders}"
     )
