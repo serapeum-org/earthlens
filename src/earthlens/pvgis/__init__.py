@@ -12,7 +12,7 @@ This is a `tabular` backend: the result is a per-coordinate hourly table, not
 a gridded array, so `PVGIS.OUTPUT_KIND` is `"tabular"` and the
 `earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument for it
 (PVGIS already returns the resolved hourly / TMY series). There is no SDK, no
-authentication, and no `pyramids` / `xarray` dependency — pure `requests` +
+authentication, and no `pyramids` array dependency — pure `requests` +
 `pandas`.
 
 Public surface (re-exported from this package):
@@ -29,6 +29,7 @@ Public surface (re-exported from this package):
 
 from __future__ import annotations
 
+from earthlens.pvgis.backend import PVGIS
 from earthlens.pvgis.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -39,6 +40,7 @@ from earthlens.pvgis.catalog import (
 __all__ = [
     "CATALOG_PATH",
     "Catalog",
+    "PVGIS",
     "Product",
     "clear_catalog_cache",
 ]

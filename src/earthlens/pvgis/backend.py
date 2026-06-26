@@ -1,0 +1,491 @@
+"""Backend that fetches solar-radiation / PV time series from JRC PVGIS.
+
+`PVGIS(AbstractDataSource)` hits the keyless JRC PVGIS 5.3 non-interactive
+REST service (`https://re.jrc.ec.europa.eu/api/v5_3/<tool>`) directly with
+`requests` — no SDK, no authentication, no `pyramids` array layer. A request
+selects a tool with `variables=["seriescalc"]` (hourly radiation / PV power
+time series) or `["tmy"]` (typical meteorological year), samples the request
+location(s) — a single `point=(lat, lon)` (or a degenerate bbox), or a bbox
+expanded to a point grid at `spacing_deg` — issues one keyless `GET` per point
+throttled to the 30 req/s rate limit, parses each JSON response into a
+long-format `pandas.DataFrame` tagged with `lat`/`lon`/`product`, and
+concatenates them.
+
+This is a `tabular` backend: the result is a per-coordinate hourly table, so
+`OUTPUT_KIND = "tabular"` and the `earthlens.earthlens.EarthLens` facade
+rejects an `aggregate=` argument for it — PVGIS already returns the resolved
+hourly / TMY series.
+
+Per-tool knobs (PV `pvcalculation` / `peakpower` / `loss` / `angle` /
+`aspect` / `components`, and `raddatabase`) are passed as keyword arguments
+and merged over the catalog defaults; for `seriescalc` the `start`/`end`
+window supplies `startyear`/`endyear`.
+
+PVGIS is **not global** (high latitudes / open sea are excluded): an
+out-of-coverage point returns an HTTP 4xx with a JSON `message`. For a
+multi-point bbox the point is skipped with a warning; for a single explicit
+point a `ValueError` naming the coordinate is raised.
+"""
+
+from __future__ import annotations
+
+import datetime as dt
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Literal
+
+import pandas as pd
+import requests
+from loguru import logger
+
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    RemoteProduct,
+    SpatialExtent,
+    TemporalExtent,
+)
+from earthlens.pvgis import _helpers
+from earthlens.pvgis.catalog import Catalog, Product
+
+if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
+
+OutputFormat = Literal["csv", "parquet"]
+
+#: Accepted on-disk output formats.
+OUTPUT_FORMATS: tuple[str, ...] = ("csv", "parquet")
+
+#: Default bbox sampling step in degrees (`G3`).
+DEFAULT_SPACING_DEG = 0.1
+
+#: Soft / hard request-count guards (`G5`). A grid larger than the soft
+#: threshold warns; larger than the hard cap raises, so a country-scale bbox
+#: never silently fires thousands of keyless GETs.
+WARN_POINTS = 50
+DEFAULT_MAX_POINTS = 400
+
+#: PV / radiation knobs forwarded verbatim to the PVGIS query when set. Each
+#: maps a constructor keyword to its PVGIS query-param name (here identical).
+_KNOBS: tuple[str, ...] = (
+    "raddatabase",
+    "pvcalculation",
+    "peakpower",
+    "loss",
+    "angle",
+    "aspect",
+    "components",
+)
+
+#: The JRC attribution logged once on a successful download (`G7`).
+_CITATION = (
+    "PVGIS (c) European Union, 2001-2024 — data from the JRC Photovoltaic "
+    "Geographical Information System (PVGIS), "
+    "https://re.jrc.ec.europa.eu/pvg_tools/. Free reuse with attribution."
+)
+
+
+class PVGIS(AbstractDataSource):
+    """JRC PVGIS solar-radiation / PV backend (long-format tabular output).
+
+    Fetches per-coordinate hourly time series for a point (or a bbox sampled
+    to a point grid) / date window / tool through the same `download()` shape
+    every other earthlens backend uses, and returns a long-format
+    `pandas.DataFrame` (one block of rows per sampled point). The query is a
+    search/fetch split: `_search` enumerates the `(lat, lon)` points to pull,
+    and `_fetch` issues one throttled keyless GET per point and parses it.
+
+    Attributes:
+        OUTPUT_KIND: `"tabular"` — the result is per-row hourly observations,
+            so the facade rejects `aggregate=` with `NotImplementedError`.
+    """
+
+    OUTPUT_KIND: OutputKind = "tabular"
+
+    def __init__(
+        self,
+        start: str,
+        end: str,
+        variables: list[str],
+        lat_lim: list[float] | None = None,
+        lon_lim: list[float] | None = None,
+        temporal_resolution: str = "hourly",
+        path: Path | str = "",
+        fmt: str = "%Y-%m-%d",
+        point: tuple[float, float] | None = None,
+        spacing_deg: float = DEFAULT_SPACING_DEG,
+        output_format: OutputFormat = "csv",
+        max_points: int = DEFAULT_MAX_POINTS,
+        **knobs: Any,
+    ):
+        """Initialise a PVGIS backend instance.
+
+        Args:
+            start: Inclusive start of the window, parsed with `fmt`. For
+                `seriescalc` its year becomes `startyear`; `tmy` ignores it.
+            end: Inclusive end of the window (its year becomes `endyear`).
+            variables: Single-element list naming the product / tool —
+                `["seriescalc"]` or `["tmy"]`. An empty list defaults to
+                `["seriescalc"]`.
+            lat_lim: `[lat_min, lat_max]` bounding-box latitudes. Optional
+                when `point=` is given.
+            lon_lim: `[lon_min, lon_max]` bounding-box longitudes. Optional
+                when `point=` is given.
+            temporal_resolution: Recorded resolution label (PVGIS is hourly).
+            path: Output directory for the written table.
+            fmt: `strptime` format for `start` / `end`.
+            point: An explicit `(lat, lon)` to query a single location,
+                bypassing the bbox. Mutually exclusive with `lat_lim` /
+                `lon_lim`.
+            spacing_deg: Grid step in degrees when sampling a bbox (`G3`).
+            output_format: On-disk format — `"csv"` (default) or `"parquet"`.
+            max_points: Hard cap on the number of sampled grid points (`G5`);
+                a request that would exceed it raises `ValueError`.
+            **knobs: PV / radiation query knobs merged over the catalog
+                defaults — `raddatabase`, `pvcalculation`, `peakpower`,
+                `loss`, `angle`, `aspect`, `components`, plus any other raw
+                PVGIS query parameter.
+
+        Raises:
+            ValueError: When `output_format` is unrecognised; when both
+                `point=` and `lat_lim`/`lon_lim` are given; or when no
+                location (neither `point=` nor a bbox) is supplied.
+            TypeError: When `variables` is a mapping (this backend takes a
+                single-element list naming the tool).
+        """
+        if isinstance(variables, dict):
+            raise TypeError(
+                "PVGIS `variables` must be a single-element list naming the "
+                "tool (e.g. ['seriescalc'] or ['tmy']), not a mapping. PV "
+                "knobs are explicit PVGIS(...) keyword arguments "
+                "(peakpower=, angle=, raddatabase=, ...)."
+            )
+        if output_format not in OUTPUT_FORMATS:
+            raise ValueError(
+                f"output_format must be one of {list(OUTPUT_FORMATS)}, "
+                f"got {output_format!r}."
+            )
+        if point is not None:
+            if lat_lim is not None or lon_lim is not None:
+                raise ValueError("pass either point=(lat, lon) or lat_lim=/lon_lim=.")
+            lat_lim = [float(point[0]), float(point[0])]
+            lon_lim = [float(point[1]), float(point[1])]
+        if lat_lim is None or lon_lim is None:
+            raise ValueError(
+                "PVGIS needs a location: pass point=(lat, lon) for a single "
+                "site, or lat_lim=/lon_lim= (or aoi=) for a bbox."
+            )
+
+        self._catalog = Catalog()
+        self._spacing_deg = spacing_deg
+        self._output_format: OutputFormat = output_format
+        self._max_points = max_points
+        self._knobs = dict(knobs)
+        self._product_id = (list(variables) or ["seriescalc"])[0]
+        self._product: Product | None = None
+        self._show_progress = True
+        super().__init__(
+            start=start,
+            end=end,
+            variables=list(variables) or ["seriescalc"],
+            temporal_resolution=temporal_resolution,
+            lat_lim=lat_lim,
+            lon_lim=lon_lim,
+            fmt=fmt,
+            path=path,
+        )
+
+    def _initialize(self):
+        """Resolve the requested product from the catalog (`G4`).
+
+        Returns `None` — PVGIS is keyless, so there is no client object.
+
+        Raises:
+            ValueError: If the first `variables` entry is not a known product
+                id (with a did-you-mean hint).
+        """
+        self._product = self._catalog.get(self._product_id)
+        return None
+
+    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
+        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
+
+        Args:
+            lat_lim: `[lat_min, lat_max]` in degrees.
+            lon_lim: `[lon_min, lon_max]` in degrees.
+
+        Returns:
+            SpatialExtent: Validated, frozen bbox.
+        """
+        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
+
+    def _check_input_dates(
+        self,
+        start: str,
+        end: str,
+        temporal_resolution: str,
+        fmt: str,
+    ) -> TemporalExtent:
+        """Parse the `[start, end]` window into a `TemporalExtent`.
+
+        Args:
+            start: Inclusive start date string.
+            end: Inclusive end date string.
+            temporal_resolution: Recorded as the resolution label.
+            fmt: `strptime` format applied to `start` and `end`.
+
+        Returns:
+            TemporalExtent: Frozen model with the parsed endpoints.
+
+        Raises:
+            ValueError: If `start` parses to a date later than `end`.
+        """
+        start_dt = dt.datetime.strptime(start, fmt)
+        end_dt = dt.datetime.strptime(end, fmt)
+        return TemporalExtent(
+            start_date=start_dt,
+            end_date=end_dt,
+            resolution=temporal_resolution,
+            dates=pd.DatetimeIndex([start_dt, end_dt]),
+        )
+
+    def _resolved_params(self) -> dict[str, Any]:
+        """Build the per-request query params (catalog defaults + knobs).
+
+        Starts from the product's `default_params`, adds the
+        `startyear`/`endyear` window for `seriescalc`, then merges the PV
+        knobs and any extra raw params so a caller value always wins.
+
+        Returns:
+            dict[str, Any]: The query params (excluding `lat`/`lon`/
+                `outputformat`, which `build_url` supplies).
+        """
+        params: dict[str, Any] = dict(self._product.default_params)
+        if self._product.tool == "seriescalc":
+            params["startyear"] = self.time.start_date.year
+            params["endyear"] = self.time.end_date.year
+        params.update({k: v for k, v in self._knobs.items() if v is not None})
+        return params
+
+    def _points(self) -> list[tuple[float, float]]:
+        """Enumerate and guard the `(lat, lon)` sample points (`G3`, `G5`).
+
+        Returns:
+            list[tuple[float, float]]: The sampled coordinates.
+
+        Raises:
+            ValueError: If the grid exceeds `max_points` — the message tells
+                the user to shrink the bbox or coarsen `spacing_deg`.
+        """
+        points = _helpers.point_grid(self.space, self._spacing_deg)
+        if len(points) > self._max_points:
+            raise ValueError(
+                f"PVGIS request would sample {len(points)} points (> the "
+                f"max_points={self._max_points} cap): one keyless GET each. "
+                f"Shrink the bbox, coarsen spacing_deg (now {self._spacing_deg}"
+                f"), or raise max_points= deliberately."
+            )
+        if len(points) > WARN_POINTS:
+            logger.warning(
+                f"PVGIS will issue {len(points)} keyless GETs (one per grid "
+                f"point); throttled to <=30 req/s. Coarsen spacing_deg to "
+                f"reduce the count."
+            )
+        return points
+
+    def download(
+        self,
+        progress_bar: bool = True,
+        aggregate: AggregationConfig | None = None,
+    ) -> pd.DataFrame:
+        """Fetch every sampled point, write the table, and return it.
+
+        Args:
+            progress_bar: Show a per-point `tqdm` bar while fetching.
+            aggregate: Must be `None`. PVGIS output is tabular (the resolved
+                hourly / TMY series), so there is no gridded reduction; the
+                facade already rejects a non-`None` `aggregate=` for a
+                `tabular` backend, and this is the belt-and-suspenders guard
+                for direct callers.
+
+        Returns:
+            pd.DataFrame: The concatenated long-format frame — one block of
+                hourly rows per in-coverage sampled point, tagged with
+                `lat`/`lon`/`product`.
+
+        Raises:
+            NotImplementedError: If `aggregate` is not `None`.
+            ValueError: If a single explicit point is out of PVGIS coverage,
+                or the grid exceeds `max_points`.
+        """
+        if aggregate is not None:
+            raise NotImplementedError(
+                "PVGIS.download(aggregate=...) is not supported: PVGIS output "
+                "is a per-coordinate hourly time series (tabular), not a "
+                "gridded raster, so there is no meaningful gridded reduction. "
+                "PVGIS already returns the resolved hourly / TMY series."
+            )
+        self._show_progress = progress_bar
+        frames = [frame for frame in self._api() if frame is not None]
+        if frames:
+            df = pd.concat(frames, ignore_index=True)
+        else:
+            df = _helpers.empty_canonical(
+                [*self._product.columns, "lat", "lon", "product"]
+            )
+        out_path = self._write_table(df)
+        if len(df):
+            logger.info(f"PVGIS {self._product.tool}: {len(df)} row(s) -> {out_path}")
+            logger.info(_CITATION)
+        else:
+            logger.warning(
+                f"PVGIS {self._product.tool}: no rows returned; wrote an empty "
+                f"(schema-only) table to {out_path}"
+            )
+        return df
+
+    def _api(self) -> list[pd.DataFrame | None]:
+        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
+        return self._api_via_search_fetch()
+
+    def _search(self) -> list[RemoteProduct]:
+        """Enumerate one product per sampled `(lat, lon)` point (`G3`).
+
+        Returns:
+            list[RemoteProduct]: One product per grid point, each carrying
+                the `lat`/`lon` and the resolved query params in `metadata`.
+
+        Raises:
+            ValueError: If the grid exceeds `max_points` (`G5`).
+        """
+        params = self._resolved_params()
+        return [
+            RemoteProduct(
+                id=f"{self._product.tool}:{lat},{lon}",
+                metadata={"lat": lat, "lon": lon, "params": params},
+            )
+            for lat, lon in self._points()
+        ]
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[pd.DataFrame | None]:
+        """Fetch each point's series, throttled and coverage-aware.
+
+        Widens the inherited `-> list[Path]` contract: a tabular backend
+        returns in-memory long-format frames (or `None` for a skipped
+        out-of-coverage point), not file paths.
+
+        Args:
+            products: The list returned by `_search`.
+
+        Returns:
+            list[pd.DataFrame | None]: One frame per in-coverage point (same
+                order); `None` where a multi-point bbox skipped a point.
+        """
+        from tqdm import tqdm
+
+        session = requests.Session()
+        last_call = [0.0]
+        single = len(products) == 1
+        iterator = tqdm(
+            products,
+            disable=not self._show_progress,
+            desc="PVGIS",
+            unit="point",
+        )
+        return [
+            self._fetch_point(product, session, last_call, single=single)
+            for product in iterator
+        ]
+
+    def _fetch_point(
+        self,
+        product: RemoteProduct,
+        session: Any,
+        last_call: list[float],
+        *,
+        single: bool,
+    ) -> pd.DataFrame | None:
+        """Fetch and parse one point, applying the coverage policy (`G6`).
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+            session: The shared `requests.Session`.
+            last_call: The shared throttle timestamp (one-element list).
+            single: Whether this is the only point (an explicit single site).
+
+        Returns:
+            pd.DataFrame | None: The parsed frame tagged with
+                `lat`/`lon`/`product`, or `None` when an out-of-coverage
+                point is skipped (multi-point bbox only).
+
+        Raises:
+            ValueError: When a single explicit point is out of coverage; the
+                message names the coordinate and the PVGIS error.
+        """
+        lat = product.metadata["lat"]
+        lon = product.metadata["lon"]
+        params = product.metadata["params"]
+        url = _helpers.build_url(self._product.endpoint, lat, lon, params)
+        resp = _helpers.throttled_get(session, url, last_call=last_call)
+        if resp.status_code >= 400:
+            message = self._error_message(resp)
+            if single:
+                raise ValueError(
+                    f"PVGIS returned no data for point (lat={lat}, lon={lon}): "
+                    f"{message} (the location may be outside PVGIS coverage)."
+                )
+            logger.warning(
+                f"PVGIS skipped point (lat={lat}, lon={lon}): {message}"
+            )
+            return None
+        payload = resp.json()
+        if self._product.tool == "tmy":
+            df = _helpers.parse_tmy(payload)
+        else:
+            df = _helpers.parse_seriescalc(payload)
+        df["lat"] = lat
+        df["lon"] = lon
+        df["product"] = self._product.tool
+        return df
+
+    @staticmethod
+    def _error_message(resp: Any) -> str:
+        """Extract a readable error message from a PVGIS error response.
+
+        Args:
+            resp: The HTTP response with a 4xx/5xx status.
+
+        Returns:
+            str: The JSON `message` field when present, else the raw body
+                (truncated).
+        """
+        try:
+            return _helpers.error_message(resp.json()) or resp.text[:200]
+        except ValueError:
+            return resp.text[:200]
+
+    def _write_table(self, df: pd.DataFrame) -> Path:
+        """Write the long-format table to `root_dir` and return the path.
+
+        Args:
+            df: The canonical long-format frame.
+
+        Returns:
+            Path: The written CSV / Parquet file path.
+
+        Raises:
+            ImportError: When `output_format="parquet"` but `pyarrow` is
+                missing.
+        """
+        ext = "parquet" if self._output_format == "parquet" else "csv"
+        out_path = self.root_dir / f"pvgis_{self._product.tool}.{ext}"
+        if self._output_format == "parquet":
+            try:
+                df.to_parquet(out_path, index=False)
+            except ImportError as exc:  # pragma: no cover - depends on env
+                raise ImportError(
+                    "Writing Parquet requires 'pyarrow'. Install it (pip "
+                    "install pyarrow) or use output_format='csv'."
+                ) from exc
+        else:
+            df.to_csv(out_path, index=False)
+        return out_path

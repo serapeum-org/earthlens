@@ -6,8 +6,8 @@ turns a bbox into `(lat, lon)` pairs (`point_grid`), the keyless REST URL
 builder (`build_url`), the rate-limited GET with `429` backoff
 (`throttled_get`), and the two JSON parsers that fold a `seriescalc` /
 `tmy` response into a long-format `pandas.DataFrame` (`parse_seriescalc` /
-`parse_tmy`). The parse is pure `pandas` — there is deliberately no
-`xarray` here.
+`parse_tmy`). The parse is pure `pandas` — deliberately no array / NetCDF
+layer.
 """
 
 from __future__ import annotations
