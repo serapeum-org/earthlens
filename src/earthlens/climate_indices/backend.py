@@ -60,6 +60,10 @@ _HTTP_RETRIES: int = 2
 #: `n * _HTTP_RETRY_BACKOFF`.
 _HTTP_RETRY_BACKOFF: float = 1.0
 
+#: Max index ids spelled out in the written-table filename before it is
+#: summarised as `<n>_indices` (keeps the name short for big requests).
+_MAX_STEM_IDS: int = 6
+
 #: Global sentinel bounds — climate indices have no geometry, so the
 #: spatial extent is the whole globe (`G4`).
 _GLOBAL_LAT: list[float] = [-90.0, 90.0]
@@ -425,7 +429,10 @@ class ClimateIndices(AbstractDataSource):
             ImportError: If `output_format="parquet"` but `pyarrow` is
                 not installed.
         """
-        stem = "climate_indices_" + "_".join(self.vars)
+        if len(self.vars) <= _MAX_STEM_IDS:
+            stem = "climate_indices_" + "_".join(self.vars)
+        else:
+            stem = f"climate_indices_{len(self.vars)}_indices"
         ext = "parquet" if self._output_format == "parquet" else "csv"
         out_path = self.root_dir / f"{stem}.{ext}"
         if self._output_format == "parquet":

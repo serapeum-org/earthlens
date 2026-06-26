@@ -67,6 +67,11 @@ def _html_200(url: str, timeout: float | None = None) -> _FakeResponse:
     return _FakeResponse("<!DOCTYPE HTML><html>error</html>")
 
 
+def _any_psl_get(url: str, timeout: float | None = None) -> _FakeResponse:
+    """Serve the ONI (psl-dialect) fixture for any URL (for multi-PSL-index tests)."""
+    return _FakeResponse((DATA / "psl" / "oni.data").read_text())
+
+
 class _FlakyGet:
     """A fake `requests.get` that raises `ConnectionError` `fails` times, then succeeds."""
 
@@ -313,6 +318,17 @@ def test_citation_deduped_for_same_source(fake_http, tmp_path: Path) -> None:
         logger.remove(sink_id)
     citation_lines = [m for m in messages if "source citation" in m]
     assert len(citation_lines) == 1
+
+
+def test_many_indices_summarised_filename(monkeypatch, tmp_path: Path) -> None:
+    """A request beyond the stem cap writes a summarised `<n>_indices` file (N1)."""
+    monkeypatch.setattr(backend.requests, "get", _any_psl_get)
+    psl_ids = ["oni", "nina34", "soi", "nao", "ao", "pna", "pdo"]  # 7 > cap of 6
+    ClimateIndices(
+        start="2000-01-01", end="2001-12-31", variables=psl_ids, path=tmp_path
+    ).download()
+    written = [p.name for p in tmp_path.glob("climate_indices_*.csv")]
+    assert written == ["climate_indices_7_indices.csv"], written
 
 
 def test_no_xarray_in_subpackage() -> None:
