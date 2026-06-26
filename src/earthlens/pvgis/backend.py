@@ -217,14 +217,21 @@ class PVGIS(AbstractDataSource):
     ) -> TemporalExtent:
         """Parse the `[start, end]` window into a `TemporalExtent`.
 
+        The resolution label is always `"hourly"` — PVGIS only serves hourly
+        series — so the value the caller (or the `EarthLens` facade, whose
+        default is `"daily"`) passes for `temporal_resolution` is ignored
+        here; recording it verbatim would mislabel the cadence.
+
         Args:
             start: Inclusive start date string.
             end: Inclusive end date string.
-            temporal_resolution: Recorded as the resolution label.
+            temporal_resolution: Accepted for the shared constructor shape but
+                not recorded — the label is fixed to `"hourly"`.
             fmt: `strptime` format applied to `start` and `end`.
 
         Returns:
-            TemporalExtent: Frozen model with the parsed endpoints.
+            TemporalExtent: Frozen model with the parsed endpoints and an
+                `"hourly"` resolution label.
 
         Raises:
             ValueError: If `start` parses to a date later than `end`.
@@ -234,7 +241,7 @@ class PVGIS(AbstractDataSource):
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
-            resolution=temporal_resolution,
+            resolution="hourly",
             dates=pd.DatetimeIndex([start_dt, end_dt]),
         )
 

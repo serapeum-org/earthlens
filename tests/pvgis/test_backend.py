@@ -60,6 +60,11 @@ class TestConstruction:
         """An empty variables list defaults to the seriescalc product."""
         assert _backend(tmp_path, variables=[])._product.tool == "seriescalc"
 
+    def test_resolution_label_is_always_hourly(self, tmp_path):
+        """The cadence label is fixed to hourly, ignoring a passed value."""
+        backend = _backend(tmp_path, temporal_resolution="daily")
+        assert backend.time.resolution == "hourly", backend.time.resolution
+
 
 class TestDownloadSinglePoint:
     """Tests for a single-point `download`."""
