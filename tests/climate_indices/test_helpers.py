@@ -10,6 +10,8 @@ import pytest
 
 from earthlens.climate_indices import empty_canonical, parse_climexp, parse_psl
 
+pytestmark = pytest.mark.climate_indices
+
 DATA = Path(__file__).parent / "data"
 
 

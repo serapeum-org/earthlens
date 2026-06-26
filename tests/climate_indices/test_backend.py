@@ -10,6 +10,8 @@ import requests
 
 from earthlens.climate_indices import ClimateIndices, backend
 
+pytestmark = pytest.mark.climate_indices
+
 DATA = Path(__file__).parent / "data"
 
 #: Map an index file's basename to its captured fixture.

@@ -6,6 +6,8 @@ import pytest
 
 from earthlens.climate_indices import Catalog, Index
 
+pytestmark = pytest.mark.climate_indices
+
 
 def test_catalog_loads_and_lists_indices() -> None:
     """The bundled catalog loads and lists the shipped index ids."""
