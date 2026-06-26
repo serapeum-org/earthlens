@@ -6,6 +6,8 @@ import pytest
 
 from earthlens.solar_wind_atlas import Catalog, Layer
 
+pytestmark = pytest.mark.solar_wind_atlas
+
 
 @pytest.fixture(scope="module")
 def catalog() -> Catalog:

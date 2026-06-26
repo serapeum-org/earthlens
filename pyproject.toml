@@ -310,6 +310,7 @@ markers = [
     "argo: tests for the Argo float-profile backend (requires the `argo` extra: argopy; open data, no auth).",
     "erddap: tests for the generic ERDDAP backend (requires the `erddap` extra: erddapy; griddap raster via direct .nc download + pyramids, tabledap tabular via to_pandas; public servers only).",
     "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; no extra SDK — core requests + pyramids).",
+    "solar_wind_atlas: tests for the Solar & Wind Atlas backend (Global Solar Atlas + Global Wind Atlas climatology layers; no extra SDK — core requests + pyramids; GWA windowed /vsicurl COG read, GSA download-then-localise).",
 ]
 
 [tool.pixi.workspace]

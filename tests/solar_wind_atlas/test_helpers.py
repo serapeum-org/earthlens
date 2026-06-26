@@ -13,6 +13,8 @@ from earthlens.solar_wind_atlas import _helpers
 
 from .conftest import FakeDataset, FakeGet, zip_bytes
 
+pytestmark = pytest.mark.solar_wind_atlas
+
 
 def test_vsicurl_prefixes_the_url() -> None:
     """vsicurl wraps an http URL as a /vsicurl/ path verbatim."""

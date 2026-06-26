@@ -10,6 +10,9 @@ from earthlens.solar_wind_atlas import SolarWindAtlas
 
 from .conftest import FakeDataset, FakeGet
 
+
+pytestmark = pytest.mark.solar_wind_atlas
+
 #: A small Denmark AOI used across the backend tests.
 LAT = [55.0, 55.5]
 LON = [12.0, 12.5]
