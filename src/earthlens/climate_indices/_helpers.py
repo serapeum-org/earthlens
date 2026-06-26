@@ -95,7 +95,9 @@ def parse_psl(text: str) -> pd.DataFrame:
     missing-value sentinel from the first lone single-numeric-token line
     that follows the data block (it varies per file). The
     `<first_year> <last_year>` header (2 tokens) and the free-text
-    provenance footer (multi-token lines) are ignored.
+    provenance footer (multi-token lines) are ignored. When data rows are
+    found but no sentinel line follows, a warning is logged and any
+    in-data missing markers are kept as raw values.
 
     Args:
         text: The full file body as text.

@@ -131,7 +131,8 @@ class ClimateIndices(AbstractDataSource):
             variables: Index ids to fetch (`["oni", "nao"]`). Resolved
                 against the catalogue with a did-you-mean hint on a miss.
                 Must be a non-empty list — there is no implicit
-                "fetch everything".
+                "fetch everything". Repeated ids are de-duplicated
+                order-stably (first-wins), so each series is fetched once.
             lat_lim: Accepted for signature parity and **ignored** —
                 climate indices are global scalars (`G4`).
             lon_lim: Accepted for signature parity and **ignored**.
@@ -419,6 +420,11 @@ class ClimateIndices(AbstractDataSource):
 
     def _write_table(self, df: pd.DataFrame) -> Path:
         """Write the long-format table to `root_dir` and return the path.
+
+        The filename spells out the requested ids
+        (`climate_indices_oni_nao.csv`) up to :data:`_MAX_STEM_IDS`; beyond
+        that it is summarised as `climate_indices_<n>_indices.csv` to keep
+        the name short.
 
         Args:
             df: The canonical long-format frame.
