@@ -1,0 +1,38 @@
+# Argo float parameter catalog (curated).
+#
+# Argo is not a curated dataset catalogue — it is one global float array
+# served through the `argopy` SDK — so this "catalog" is a small, curated
+# vocabulary of the measured **parameter** names, grouped by the two
+# `argopy` dataset families selected with `dataset=` ("phy" / "bgc").
+# It mirrors `fdsn_data_catalog.yaml` / `gdacs_data_catalog.yaml`: a
+# single small enumeration with no `available_*` index and no
+# refresh/probe/audit tooling.
+#
+# The parameter names are the canonical Argo identifiers (Argo
+# reference table R03). The phy family is verified live against an
+# `argopy` 1.4.0 ERDDAP region fetch (TEMP / PSAL / PRES columns); the
+# bgc family is curated from the Argo BGC core-parameter list (a live
+# BGC fetch is blocked by an argopy/xarray data-mode-merge skew in the
+# pinned env — see planning/argo/captures/argo-sdk-facts.md).
+families:
+  phy:
+    description: "Core physical profile: temperature, salinity, pressure."
+    parameters:
+      PRES: dbar
+      TEMP: degC
+      PSAL: psu
+  bgc:
+    description: "Biogeochemical parameters (BGC-Argo floats)."
+    parameters:
+      DOXY: micromole/kg
+      CHLA: mg/m3
+      BBP700: 1/m
+      BBP532: 1/m
+      PH_IN_SITU_TOTAL: dimensionless
+      NITRATE: micromole/kg
+      DOWN_IRRADIANCE380: W/m^2/nm
+      DOWN_IRRADIANCE412: W/m^2/nm
+      DOWN_IRRADIANCE490: W/m^2/nm
+      DOWNWELLING_PAR: microMoleQuanta/m^2/sec
+      CDOM: ppb
+      TURBIDITY: ntu
