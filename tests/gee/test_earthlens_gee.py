@@ -68,6 +68,9 @@ class TestRegistry:
         assert sorted(EarthLens.DataSources) == [
             "alaska-satellite-facility",
             "amazon-s3",
+            "argo",
+            "argo-floats",
+            "argopy",
             "asf",
             "bdc",
             "brazil-data-cube",
