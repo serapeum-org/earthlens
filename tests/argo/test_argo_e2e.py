@@ -36,10 +36,13 @@ _END = "2020-01-31"
 #: A known long-running Argo float (WMO id) for the float-selector case.
 _FLOAT_WMO = "6902746"
 
-#: argopy realise failures that are environment / SDK-version artefacts
-#: (an xarray skew or a transient transport error), not earthlens bugs —
-#: surfaced as a skip so the suite stays green where the SDK is flaky.
-_SDK_SKIP = (OSError, RecursionError, AttributeError, KeyError)
+#: argopy realise failures that are environment / SDK-version artefacts —
+#: surfaced as a skip so the suite stays green where the SDK is flaky:
+#: `OSError` (network / transport), `RecursionError` (the `argovis` backend),
+#: and `AttributeError` (the documented `ScipyArrayWrapper.oindex` xarray
+#: skew). Deliberately excludes `KeyError` / `ValueError`, which our own
+#: backend could raise — those must fail the e2e, not be skipped.
+_SDK_SKIP = (OSError, RecursionError, AttributeError)
 
 
 def _network_ok() -> bool:
