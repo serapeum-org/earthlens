@@ -39,7 +39,7 @@ requested date onto the source's release calendar before fetching:
 
 | Cadence | Where | Snap rule |
 |---------|-------|-----------|
-| `weekly` | USDM | Most recent **Tuesday** at or before the requested date (USDM releases Thursday UTC, valid the prior Tuesday — the JSON URL is keyed on the Tuesday valid date, not the Thursday release date). |
+| `weekly` | USDM | Most recent **Tuesday** at or before the requested date, **then walk back one more week if that Tuesday's composite has not yet been released** (its release Thursday is still in the future relative to `today`). USDM releases on Thursday for the prior Tuesday's valid date, and the JSON URL is keyed on the Tuesday valid date. |
 | `10day`  | Most EDO/GDO indicators | Start of the **dekad** containing the date (the 1st, 11th, or 21st of the month). |
 | `monthly` | SPEIbase + some EDO/GDO indicators (`spgTS`, `twsan`, `rdria`) | The **first** of the month. |
 

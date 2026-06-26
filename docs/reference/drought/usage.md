@@ -31,7 +31,9 @@ ValueError: 'usdmm' is not in the drought catalog. Known datasets: [...]. Did yo
 ## USDM — weekly polygon classes (vector)
 
 The most common request: the latest weekly USDM polygons over a US bbox.
-The `"usdm"` facade alias pre-binds `dataset="usdm"`:
+The four drought-facade keys (`drought` / `usdm` / `edo` / `gdo`) are
+discoverability aliases — all resolve to the same backend and all
+require an explicit `dataset=`:
 
 ```python
 from earthlens import EarthLens
@@ -42,18 +44,23 @@ facade = EarthLens(
     variables=[],
     lat_lim=[30.0, 40.0],
     lon_lim=[-95.0, -85.0],
+    dataset="usdm",
 )
 fc = facade.download()
 fc.crs.to_epsg()        # 4326
 sorted(fc["DM"].unique())  # [0, 1, 2, 3, 4]
-fc["release_date"].iloc[0] # '2026-06-23'  (the Tuesday valid date)
+fc["release_date"].iloc[0] # '2026-06-16' if queried on/before Thu 2026-06-25;
+                           # '2026-06-23' once that Thursday release rolls out.
 ```
 
 The result is a
 `pyramids.feature.collection.FeatureCollection` (a `GeoDataFrame`) in
 EPSG:4326. A multi-week range snaps to one Tuesday per week and merges
 into one `FeatureCollection` with a `release_date` column so you can
-trace each polygon back to its weekly valid date.
+trace each polygon back to its weekly valid date. The walk-back rule
+fires when the snapped Tuesday's composite has not yet been released
+(its release Thursday is still in the future) — historical queries
+always land on the requested Tuesday.
 
 Asking for `aggregate=` on USDM is rejected — drought-class polygons
 have no gridded reduction:
@@ -118,13 +125,13 @@ mirror the WCS coverage ids on the same MapServer.
 
 ## Aliases
 
-Four facade keys point at the drought backend:
+Four facade keys point at the drought backend, all of which require an
+explicit `dataset=` kwarg:
 
-* `"drought"` — the canonical key; takes `dataset=` verbatim.
-* `"usdm"` — pre-binds `dataset="usdm"` so the most common request needs
-  no `dataset=` kwarg.
+* `"drought"` — the canonical key.
+* `"usdm"` — discoverability alias; still requires `dataset="usdm"`.
 * `"edo"` / `"gdo"` — namespace aliases for the European / Global
-  indicator families; the caller still names the indicator via
+  indicator families; the caller names the specific indicator via
   `dataset="edo-spaST"` / `dataset="gdo-twsan"`.
 
 ## Date snapping at a glance
@@ -133,13 +140,22 @@ Four facade keys point at the drought backend:
 from datetime import date
 from earthlens.drought._helpers import snap_to_cadence
 
-snap_to_cadence([date(2026, 6, 23)], "weekly")   # [date(2026, 6, 23)] — Tuesday valid date
+# Historical Tuesday (today is well past the release Thursday) → itself
+snap_to_cadence([date(2026, 6, 23)], "weekly",
+                today=date(2027, 1, 1))   # [date(2026, 6, 23)]
+# Same Tuesday queried on the same Tuesday (release Thursday is future) → walks back
+snap_to_cadence([date(2026, 6, 23)], "weekly",
+                today=date(2026, 6, 23))  # [date(2026, 6, 16)]
 snap_to_cadence([date(2026, 6, 15)], "10day")    # [date(2026, 6, 11)] — middle dekad
 snap_to_cadence([date(2026, 6, 25)], "monthly")  # [date(2026, 6, 1)]
 ```
 
 A range of dates collapses to one snapped period per release — so a
 week-long USDM range yields one FeatureCollection per Tuesday valid date.
+The weekly snap walks back one extra week when the same-week Tuesday's
+composite has not yet been released (its release Thursday is still in
+the future relative to `today`); historical queries always land on the
+requested Tuesday.
 
 ## Attributions logged on success
 
