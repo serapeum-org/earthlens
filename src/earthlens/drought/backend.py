@@ -349,15 +349,28 @@ class Drought(AbstractDataSource):
         # silently strands a non-4326 payload at the wrong epsg).
         gdf = gpd.GeoDataFrame(merged, geometry="geometry")
         if gdf.crs is None:
-            gdf = gdf.set_crs("EPSG:4326")
-        elif gdf.crs.to_epsg() != 4326:
+            # _geojson_to_gdf always stamps the source CRS (RFC 7946 default
+            # 4326 when the payload omits it), so reaching here means an
+            # upstream contract was broken. Raise loudly rather than
+            # silently re-labelling unknown coordinates.
+            raise RuntimeError(
+                "USDM frame reached _fetch_usdm with no CRS; "
+                "_geojson_to_gdf is expected to stamp one."
+            )
+        if gdf.crs.to_epsg() != 4326:
             gdf = gdf.to_crs("EPSG:4326")
         bbox = bbox_from_extent(self.space)
         within = gdf.cx[bbox[0] : bbox[2], bbox[1] : bbox[3]]
         if not len(within):
             return self._empty_vector()
+        # `within` inherits `gdf`'s CRS (already 4326 after the to_crs
+        # above); do NOT pass `crs="EPSG:4326"` here — that is the
+        # relabel-without-transform footgun the comment above warns
+        # against. A future maintainer who edits the block between line
+        # `gdf = gdf.to_crs(...)` and this wrap must keep `within.crs`
+        # consistent rather than relying on a re-stamp.
         return FeatureCollection(
-            gpd.GeoDataFrame(within, geometry="geometry", crs="EPSG:4326")
+            gpd.GeoDataFrame(within, geometry="geometry")
         )
 
     @staticmethod
