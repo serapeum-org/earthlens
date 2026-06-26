@@ -64,18 +64,6 @@ DEFAULT_SPACING_DEG = 0.1
 WARN_POINTS = 50
 DEFAULT_MAX_POINTS = 400
 
-#: PV / radiation knobs forwarded verbatim to the PVGIS query when set. Each
-#: maps a constructor keyword to its PVGIS query-param name (here identical).
-_KNOBS: tuple[str, ...] = (
-    "raddatabase",
-    "pvcalculation",
-    "peakpower",
-    "loss",
-    "angle",
-    "aspect",
-    "components",
-)
-
 #: The JRC attribution logged once on a successful download (`G7`).
 _CITATION = (
     "PVGIS (c) European Union, 2001-2024 — data from the JRC Photovoltaic "
