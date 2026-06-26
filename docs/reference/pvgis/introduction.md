@@ -65,7 +65,9 @@ df = EarthLens(
   Americas, but excludes high latitudes and open sea. An out-of-coverage point
   returns an HTTP 4xx with a JSON `message`: for a multi-point bbox the point is
   **skipped with a warning** (the in-coverage points are kept); for a single
-  explicit point a clear `ValueError` naming the coordinate is raised.
+  explicit point a clear `ValueError` naming the coordinate is raised. A skipped
+  point reflects whatever error PVGIS returned for it (most often
+  out-of-coverage, but the warning quotes the actual `message`).
 
 ## Attribution
 
