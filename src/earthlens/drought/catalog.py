@@ -184,10 +184,12 @@ class Dataset(BaseModel):
         transport: The transport the backend's `_fetch` dispatches on.
             One of `"usdm-geojson"`, `"edo-wcs"`, `"netcdf-url"`.
         endpoint: URL or URL template. USDM has a `{ymd}` placeholder
-            substituted with the Thursday release date; EDO/GDO is the
-            WCS map endpoint (the coverage and time-subset go in the
-            request, not the URL); SPEIbase is the literal per-scale
-            NetCDF URL.
+            substituted with the **Tuesday valid date** (USDM releases on
+            Thursday for the prior Tuesday, and the JSON URL stem is
+            keyed on that Tuesday — verified live; every Thursday URL
+            returns 404); EDO/GDO is the WCS map endpoint (the coverage
+            and time-subset go in the request, not the URL); SPEIbase
+            is the literal per-scale NetCDF URL.
         coverage: WCS `CoverageId` for `"edo-wcs"` rows; `None` for the
             other transports.
         output_kind: Per-row output shape — `"vector"` for USDM,
