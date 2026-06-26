@@ -23,6 +23,7 @@ scalar series use no gridded-array dependency.
 from __future__ import annotations
 
 import datetime as dt
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -51,10 +52,38 @@ OUTPUT_FORMATS: tuple[str, ...] = ("csv", "parquet")
 #: HTTP timeout (seconds) for a single index-file GET.
 _HTTP_TIMEOUT: float = 60.0
 
+#: Number of extra attempts after the first on a transient fetch failure
+#: (connection error / timeout / 5xx). A 4xx (e.g. 404) fails fast.
+_HTTP_RETRIES: int = 2
+
+#: Base back-off (seconds) between retry attempts; the nth retry waits
+#: `n * _HTTP_RETRY_BACKOFF`.
+_HTTP_RETRY_BACKOFF: float = 1.0
+
 #: Global sentinel bounds — climate indices have no geometry, so the
 #: spatial extent is the whole globe (`G4`).
 _GLOBAL_LAT: list[float] = [-90.0, 90.0]
 _GLOBAL_LON: list[float] = [-180.0, 180.0]
+
+
+def _is_transient(exc: requests.RequestException) -> bool:
+    """Return whether a fetch error is worth retrying.
+
+    Connection errors and timeouts are transient; an HTTP error is
+    transient only for a 5xx status (a 4xx such as 404 is a real miss
+    and fails fast). Anything else is treated as non-transient.
+
+    Args:
+        exc: The exception raised by `requests.get` / `raise_for_status`.
+
+    Returns:
+        bool: `True` to retry, `False` to fail fast.
+    """
+    if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
+        return True
+    if isinstance(exc, requests.HTTPError) and exc.response is not None:
+        return exc.response.status_code >= 500
+    return False
 
 
 class ClimateIndices(AbstractDataSource):
@@ -291,7 +320,12 @@ class ClimateIndices(AbstractDataSource):
 
     @staticmethod
     def _get_text(url: str | None, index_id: str) -> str:
-        """GET an index file's body, or raise a clear error.
+        """GET an index file's body, retrying transient failures.
+
+        A transient failure (connection error, timeout, or a 5xx status)
+        is retried up to :data:`_HTTP_RETRIES` times with a linear
+        back-off; a 4xx (e.g. 404) fails fast since retrying a real miss
+        is pointless.
 
         Args:
             url: The index file URL.
@@ -301,17 +335,27 @@ class ClimateIndices(AbstractDataSource):
             str: The response body text.
 
         Raises:
-            ValueError: On any HTTP / network failure, naming the index
-                and URL (`G8`).
+            ValueError: When the GET still fails after the retries, naming
+                the index and URL (`G8`).
         """
-        try:
-            response = requests.get(url, timeout=_HTTP_TIMEOUT)
-            response.raise_for_status()
-        except requests.RequestException as exc:
-            raise ValueError(
-                f"climate index {index_id!r}: failed to fetch {url} ({exc})."
-            ) from exc
-        return response.text
+        last_exc: Exception | None = None
+        for attempt in range(_HTTP_RETRIES + 1):
+            try:
+                response = requests.get(url, timeout=_HTTP_TIMEOUT)
+                response.raise_for_status()
+                return response.text
+            except requests.RequestException as exc:
+                last_exc = exc
+                if attempt == _HTTP_RETRIES or not _is_transient(exc):
+                    break
+                logger.warning(
+                    f"climate index {index_id!r}: transient fetch error from "
+                    f"{url} ({exc}); retry {attempt + 1}/{_HTTP_RETRIES}."
+                )
+                time.sleep(_HTTP_RETRY_BACKOFF * (attempt + 1))
+        raise ValueError(
+            f"climate index {index_id!r}: failed to fetch {url} ({last_exc})."
+        ) from last_exc
 
     def download(
         self,

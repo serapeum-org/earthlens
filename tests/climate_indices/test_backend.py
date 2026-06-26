@@ -50,9 +50,37 @@ def _always_404(url: str, timeout: float | None = None) -> _FakeResponse:
     return _FakeResponse("Not found", status_code=404)
 
 
+class _CountingGet404:
+    """A fake `requests.get` that always 404s and counts its calls."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def __call__(self, url: str, timeout: float | None = None) -> _FakeResponse:
+        """Count the call and return a 404 response."""
+        self.calls += 1
+        return _FakeResponse("Not found", status_code=404)
+
+
 def _html_200(url: str, timeout: float | None = None) -> _FakeResponse:
     """Return a 200 response whose body is an HTML error page."""
     return _FakeResponse("<!DOCTYPE HTML><html>error</html>")
+
+
+class _FlakyGet:
+    """A fake `requests.get` that raises `ConnectionError` `fails` times, then succeeds."""
+
+    def __init__(self, text: str, fails: int) -> None:
+        self.text = text
+        self.fails = fails
+        self.calls = 0
+
+    def __call__(self, url: str, timeout: float | None = None) -> _FakeResponse:
+        """Fail transiently for the first `fails` calls, then return the body."""
+        self.calls += 1
+        if self.calls <= self.fails:
+            raise requests.ConnectionError("transient")
+        return _FakeResponse(self.text)
 
 
 @pytest.fixture()
@@ -154,6 +182,30 @@ def test_fetch_failure_names_index_and_url(monkeypatch, tmp_path: Path) -> None:
     )
     with pytest.raises(ValueError, match="oni"):
         source.download()
+
+
+def test_transient_fetch_error_is_retried(monkeypatch, tmp_path: Path) -> None:
+    """A transient connection error is retried, then succeeds (L3)."""
+    flaky = _FlakyGet((DATA / "psl" / "oni.data").read_text(), fails=1)
+    monkeypatch.setattr(backend.requests, "get", flaky)
+    monkeypatch.setattr(backend.time, "sleep", lambda _s: None)
+    df = ClimateIndices(
+        start="2000-01-01", end="2001-12-31", variables=["oni"], path=tmp_path
+    ).download()
+    assert flaky.calls == 2, "first attempt failed, second succeeded"
+    assert len(df) == 24
+
+
+def test_404_is_not_retried(monkeypatch, tmp_path: Path) -> None:
+    """A 4xx fails fast — no retry attempts (L3)."""
+    flaky = _CountingGet404()
+    monkeypatch.setattr(backend.requests, "get", flaky)
+    source = ClimateIndices(
+        start="2000-01-01", end="2001-12-31", variables=["oni"], path=tmp_path
+    )
+    with pytest.raises(ValueError, match="oni"):
+        source.download()
+    assert flaky.calls == 1, "404 must not be retried"
 
 
 def test_window_with_no_data_returns_empty_canonical(fake_http, tmp_path: Path) -> None:
