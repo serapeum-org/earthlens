@@ -40,6 +40,13 @@ Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core inst
 | USGS Water — NWIS / Water Data | `usgs-water`, `usgs-nwis`, `nwis` | tabular | none | `usgs-water` | [USGS Water](usgs-water/introduction.md) |
 | JRC Global Human Settlement Layer | `ghsl`, `ghs`, `human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
 | WorldPop population data hub | `worldpop`, `world-pop` | mixed (rasters + age/sex tables) | none (CC-BY-4.0) | `worldpop` (optional) | [WorldPop](worldpop/introduction.md) |
+| Alaska Satellite Facility (SAR search + InSAR baselines) | `asf`, `alaska-satellite-facility`, `insar` | vector | NASA Earthdata Login (reuses `earthdata`) | `asf` | [ASF](asf/introduction.md) |
+| JAXA Earth-observation archive (jaxa-earth STAC/COG + G-Portal SFTP) | `jaxa`, `jaxa-earth`, `g-portal` | raster | none (jaxa-earth) / G-Portal SFTP credentials | `jaxa` | [JAXA](jaxa/introduction.md) |
+| GBIF species occurrences | `gbif` | vector | none (anonymous) | `gbif` | [GBIF](gbif/introduction.md) |
+| OBIS marine occurrences | `obis` | vector | none (anonymous) | `obis` | [OBIS](obis/introduction.md) |
+| Protected Planet (WDPA) protected areas | `wdpa`, `protected-planet` | vector | API token (`?token=`) | — | [WDPA](wdpa/introduction.md) |
+| IUCN Red List assessments | `iucn`, `redlist` | tabular | Bearer token | — | [IUCN](iucn/introduction.md) |
+| Argo float ocean profiles | `argo`, `argo-floats`, `argopy` | tabular | none (open data) | `argo` | [Argo](argo/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)

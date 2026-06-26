@@ -9,9 +9,9 @@
 [![codecov](https://codecov.io/gh/serapeum-org/earthlens/branch/main/graph/badge.svg)](https://codecov.io/gh/serapeum-org/earthlens)
 
 **earthlens** is a Python package providing a single, unified API for downloading
-satellite, climate, and geospatial data from **23 providers** — climate
+satellite, climate, and geospatial data from **30 providers** — climate
 reanalysis, satellite imagery, ocean models, weather forecasts, natural-hazard
-feeds, air quality, population, and more. Pick a `data_source`, describe the area
+feeds, air quality, biodiversity, population, and more. Pick a `data_source`, describe the area
 and dates you want, and call `download()`; the matching backend handles auth,
 catalog lookup, request shaping, and writing the output.
 
