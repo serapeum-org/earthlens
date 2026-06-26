@@ -410,10 +410,14 @@ class ARGO(AbstractDataSource):
         try:
             access = self._apply_selection(fetcher, selection)
             df = access.to_dataframe()
-        except _no_data_errors():
+        except _no_data_errors() as exc:
+            # `FileNotFoundError` is in the no-data tuple because an empty
+            # erddap region surfaces as one, but argopy/fsspec can also raise
+            # it for a genuinely missing artefact — log the caught exception so
+            # a mis-classified failure is diagnosable rather than invisible.
             logger.warning(
-                "ARGO: argopy returned no data for the request; "
-                "returning an empty frame."
+                f"ARGO: argopy returned no data for the request "
+                f"({type(exc).__name__}: {exc}); returning an empty frame."
             )
             return empty_canonical(ARGO_COLUMNS)
         if df is None or df.empty:
