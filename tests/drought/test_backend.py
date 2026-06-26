@@ -252,6 +252,72 @@ def test_usdm_fetch_clips_to_bbox(monkeypatch, tmp_path):
     assert {"OBJECTID", "DM", "release_date"}.issubset(set(fc.columns))
 
 
+def test_usdm_honours_payload_crs_member(monkeypatch, tmp_path):
+    """A GeoJSON `crs` member is respected (defensive reproject reachable)."""
+    # Build a payload with USA Contiguous Albers Equal-Area metre coords +
+    # the corresponding RFC 7946-style crs member (USDM historical shape).
+    albers_payload = {
+        "type": "FeatureCollection",
+        "crs": {
+            "type": "name",
+            "properties": {"name": "EPSG:5070"},
+        },
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [-500_000.0, 1_700_000.0],
+                                [500_000.0, 1_700_000.0],
+                                [500_000.0, 2_300_000.0],
+                                [-500_000.0, 2_300_000.0],
+                                [-500_000.0, 1_700_000.0],
+                            ]
+                        ]
+                    ],
+                },
+                "properties": {
+                    "OBJECTID": 1,
+                    "DM": 2,
+                    "Shape_Length": 4.0,
+                    "Shape_Area": 1.2,
+                },
+            }
+        ],
+    }
+    monkeypatch.setattr(
+        backend_module, "_http_get_json", lambda url: albers_payload
+    )
+    backend = Drought(
+        start="2026-06-23",
+        end="2026-06-23",
+        lat_lim=[-90.0, 90.0],
+        lon_lim=[-180.0, 180.0],
+        dataset="usdm",
+    )
+    fc = backend.download(progress_bar=False)
+    assert fc.crs.to_epsg() == 4326
+    assert len(fc) == 1
+    # The Albers metre coords map to ~ Texas/Oklahoma — well inside the
+    # CONUS bbox, so the polygon survives the clip (proves the reproject ran).
+
+
+def test_crs_from_geojson_handles_variants():
+    """Each accepted `crs` member shape returns an EPSG:NNNN string."""
+    f = backend_module._crs_from_geojson
+    assert f({"crs": {"type": "name", "properties": {"name": "EPSG:5070"}}}) == "EPSG:5070"
+    assert f({"crs": {"type": "EPSG", "properties": {"code": 4326}}}) == "EPSG:4326"
+    assert (
+        f({"crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:EPSG::5070"}}})
+        == "EPSG:5070"
+    )
+    # Missing crs member → RFC 7946 default.
+    assert f({"type": "FeatureCollection", "features": []}) == "EPSG:4326"
+
+
 def test_usdm_aggregate_rejected(tmp_path):
     """`aggregate=` is a NotImplementedError on the vector USDM route."""
     backend = Drought(

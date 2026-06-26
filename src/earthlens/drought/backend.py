@@ -381,23 +381,32 @@ class Drought(AbstractDataSource):
         per-period attribution; preserves USDM's `OBJECTID` / `DM` /
         `Shape_Length` / `Shape_Area` schema verbatim.
 
+        The source CRS is read from the payload's top-level `crs` member
+        (RFC 7946 deprecated but still emitted by USDM and most ArcGIS
+        endpoints); when absent the GeoJSON spec mandates EPSG:4326. The
+        downstream `_fetch_usdm` step is the one that drives a real
+        `to_crs` transform — this helper only labels the frame
+        accurately.
+
         Args:
             payload: The decoded GeoJSON `FeatureCollection` dict.
-            period: The snapped release date for this fetch.
+            period: The snapped Tuesday valid date for this fetch.
 
         Returns:
-            gpd.GeoDataFrame: Polygons in EPSG:4326 with a `release_date`
-                column.
+            gpd.GeoDataFrame: Polygons labelled with whatever CRS the
+                payload declared (RFC 7946 default `EPSG:4326` when
+                absent) and a `release_date` column.
         """
         import geopandas as gpd
 
+        source_crs = _crs_from_geojson(payload)
         features = payload.get("features") or []
         if not features:
             return gpd.GeoDataFrame(
-                {"geometry": gpd.GeoSeries([], crs="EPSG:4326")},
-                crs="EPSG:4326",
+                {"geometry": gpd.GeoSeries([], crs=source_crs)},
+                crs=source_crs,
             )
-        gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
+        gdf = gpd.GeoDataFrame.from_features(features, crs=source_crs)
         gdf["release_date"] = period.isoformat()
         return gdf
 
@@ -531,6 +540,40 @@ class Drought(AbstractDataSource):
         result = self._api()
         logger.info(attribution_for(self._dataset.transport))
         return result
+
+
+def _crs_from_geojson(payload: dict[str, Any]) -> str:
+    """Read the CRS a GeoJSON payload declares, defaulting to EPSG:4326.
+
+    The RFC 7946 `crs` member is deprecated, but every USDM JSON we
+    sample carries an ArcGIS-flavoured one
+    (`{"crs": {"type": "name", "properties": {"name": "EPSG:4326"}}}`
+    or `{"type": "EPSG", "properties": {"code": 4326}}`). Accept both
+    shapes plus the older `urn:ogc:def:crs:EPSG::4326` URN. When the
+    payload omits the `crs` member entirely, RFC 7946 §4 mandates
+    EPSG:4326.
+
+    Args:
+        payload: A decoded GeoJSON `FeatureCollection` dict.
+
+    Returns:
+        str: A `"EPSG:NNNN"` CRS string ready to feed to geopandas.
+    """
+    crs = payload.get("crs")
+    if not isinstance(crs, dict):
+        return "EPSG:4326"
+    props = crs.get("properties") or {}
+    name = props.get("name") or props.get("code")
+    if name is None:
+        return "EPSG:4326"
+    text = str(name)
+    if text.upper().startswith("EPSG:"):
+        return text
+    if "EPSG::" in text:
+        return f"EPSG:{text.rsplit('::', 1)[-1]}"
+    if text.isdigit():
+        return f"EPSG:{text}"
+    return text
 
 
 def _http_get_json(url: str) -> dict[str, Any]:
