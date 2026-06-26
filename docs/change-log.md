@@ -4,6 +4,29 @@
 
 ### Feat
 
+- **erddap**: add `earthlens.erddap` — a generic ERDDAP client that reaches many
+  public ERDDAP servers (NOAA CoastWatch / Coral Reef Watch, NCEI, …) from one
+  backend. A curated sharded catalog pins each dataset to a concrete
+  `(server_url, dataset_id, protocol)`; the `protocol` sets a **per-instance**
+  `OUTPUT_KIND` — `griddap` → raster NetCDF (accepts `aggregate=`, routed through
+  the pyramids `aggregate_netcdf` flow), `tabledap` → tabular `pandas.DataFrame`.
+  Built on IOOS `erddapy` (the tabledap `to_pandas()` path only); the griddap
+  path builds the OPeNDAP `.nc` URL directly and downloads it (erddapy's instance
+  `dataset_id` setter eagerly fetches the full coordinate axis and hangs), reading
+  it back via pyramids — earthlens never imports `xarray`. Validates NetCDF magic
+  bytes before writing (an ERDDAP HTML error page can arrive with a 200), and
+  flux variables are catalog-driven (`flux_variables` → `op="auto"` sums). Ships
+  four verified-public CoastWatch datasets (CRW SST anomaly + DHW, NCEI Pathfinder
+  SST, Aqua MODIS chlorophyll [historical 2003–2022], NDBC buoys), the `[erddap]`
+  optional extra (`erddapy`), aliases `erddap` / `ioos`, intro / usage / datasets
+  / reference docs, and three example notebooks (catalog explorer + griddap +
+  tabledap). Full `earthlens datasets` CLI integration: `validate erddap` lints
+  the rows, `refresh erddap [--write]` regenerates the `available_datasets:`
+  index by walking each curated server's `allDatasets` table, `audit erddap`
+  diffs curated-vs-live, `audit erddap --coverage` classifies the universe
+  into DONE / addressable (griddap) / table (tabledap) / thin (test datasets) /
+  missing, and `curate erddap <id> [--server …]` seeds a catalog row from a
+  dataset's `/info` metadata. Public servers only (no auth module).
 - **asf**: add `earthlens.asf` — Alaska Satellite Facility SAR backend with
   `asf_search`-backed search and the InSAR baseline `stack()`. Reuses NASA
   Earthdata Login auth from `earthlens.earthdata` (no second credential

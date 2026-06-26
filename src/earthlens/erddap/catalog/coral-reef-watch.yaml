@@ -1,0 +1,32 @@
+# ERDDAP curated catalog - NOAA Coral Reef Watch slice.
+#
+# One shard of the sharded ERDDAP server catalog. The loader
+# (earthlens.erddap.catalog.Catalog) merges every *.yaml in this
+# directory into one Catalog at construction time; dataset keys must be
+# unique across files. Each row pins a concrete dataset on a concrete
+# ERDDAP server: server_url + dataset_id + protocol decide the request
+# shape and output kind (griddap -> raster NetCDF, tabledap -> tabular
+# DataFrame). Only public (no-auth) servers ship here.
+#
+# Schema (per dataset):
+#   <dataset_id>:
+#     server_url: <https ERDDAP base url, no trailing slash>
+#     dataset_id: <ERDDAP dataset id on that server>
+#     protocol:   <griddap|tabledap>
+#     dim_names:  [<grid dimension order>]   # griddap only
+#     variables:  [<default variable set>]
+#     title:        <human-readable title>
+#     license_note: <licence / attribution note>
+
+datasets:
+
+  NOAA_DHW:
+    server_url: https://coastwatch.pfeg.noaa.gov/erddap
+    dataset_id: NOAA_DHW
+    protocol: griddap
+    dim_names: [time, latitude, longitude]
+    variables:
+      - CRW_SSTANOMALY
+      - CRW_DHW
+    title: NOAA Coral Reef Watch Daily Global 5km SST anomaly and Degree Heating Weeks
+    license_note: NOAA Coral Reef Watch (CoralTemp), U.S. Government public domain

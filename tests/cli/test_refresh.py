@@ -87,12 +87,15 @@ class TestSupportedProviders:
         """CHC's FTP product-tree walk is wired up."""
         assert "chc" in supported_providers()
 
-    def test_twenty_refreshable_providers(self):
-        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm, jaxa, cluster)."""
-        assert len(supported_providers()) == 24, sorted(supported_providers())
+    def test_refreshable_providers(self):
+        """Every provider with a refreshable index has refresh/audit (incl. s3, nwm, jaxa, erddap, cluster)."""
+        assert len(supported_providers()) == 25, sorted(supported_providers())
         assert "s3" in supported_providers(), "s3 regenerates its index from curated"
         assert "nwm" in supported_providers(), "nwm walks its operational bucket"
         assert "jaxa" in supported_providers(), "jaxa lists both SDK universes"
+        assert (
+            "erddap" in supported_providers()
+        ), "erddap crawls each server's allDatasets"
         for key in ("gbif", "obis", "wdpa", "iucn"):
             assert key in supported_providers(), f"{key} cluster backend is wired up"
 
@@ -110,6 +113,129 @@ class TestEcmwfRefresher:
         outcome = refresh_one(_info("ecmwf"))
         assert outcome.status == "ok", "ecmwf refresh ran"
         assert outcome.live_count == 1, "one CDS dataset id listed"
+
+
+class TestErddapRefresher:
+    """Tests for the ERDDAP `allDatasets` crawler."""
+
+    @staticmethod
+    def _all_datasets(*ids):
+        """A faked ERDDAP allDatasets.json body (with the meta-row first)."""
+        rows = [["allDatasets"]] + [[i] for i in ids]
+        return {"table": {"columnNames": ["datasetID"], "rows": rows}}
+
+    def test_dataset_ids_drops_meta_row_and_dedupes(self, monkeypatch):
+        """The synthetic `allDatasets` row is excluded; ids are sorted + unique."""
+        from earthlens.cli.refresh import _erddap_dataset_ids
+
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: self._all_datasets("b", "a", "a"),
+        )
+        assert _erddap_dataset_ids("https://x/erddap/") == ["a", "b"]
+
+    def test_grouped_queries_each_curated_server_once(self, monkeypatch):
+        """Each distinct curated server_url is hit once at its allDatasets table."""
+        from earthlens.cli.refresh import _erddap_grouped
+
+        calls = []
+
+        def fake(url, **kw):
+            calls.append(url)
+            return self._all_datasets("NOAA_DHW", "cwwcNDBCMet")
+
+        monkeypatch.setattr(refresh_mod, "_get_json", fake)
+        grouped = _erddap_grouped(load_catalog(_info("erddap")))
+        assert len(grouped) == 1, "the shipped catalog references one server"
+        assert all(
+            u.endswith("/tabledap/allDatasets.json?datasetID") for u in calls
+        ), f"unexpected endpoint(s): {calls}"
+        assert _flatten(grouped) == ["NOAA_DHW", "cwwcNDBCMet"]
+
+    def test_erddap_is_supported(self):
+        """erddap is a registered live refresher."""
+        assert "erddap" in supported_providers()
+
+    def test_unreachable_server_aborts_without_partial_write(self, monkeypatch):
+        """A server fetch failure surfaces as `error` and writes nothing.
+
+        Pins the write-safety contract: the crawl fails fast rather than
+        persisting a partial `_index.yaml` (which would break the loader's
+        `curated ⊆ available` invariant).
+        """
+
+        def boom(url, **kw):
+            raise RuntimeError("503 server down")
+
+        monkeypatch.setattr(refresh_mod, "_get_json", boom)
+        outcome = refresh_one(_info("erddap"), write=True)
+        assert outcome.status == "error", "an unreachable server aborts the crawl"
+        assert outcome.written == "", "nothing is written on a failed crawl"
+
+
+class TestErddapCoverage:
+    """Tests for the ERDDAP `audit --coverage` classifier."""
+
+    def test_classify_each_bucket(self):
+        """Each (structure, curation) combination maps to the right bucket."""
+        from earthlens.cli.refresh import _erddap_classify
+
+        curated = {"NOAA_DHW"}
+        assert _erddap_classify("NOAA_DHW", "grid", curated) == "DONE"
+        assert _erddap_classify("testGridWav", "grid", curated) == "thin"
+        assert _erddap_classify("someGrid", "grid", curated) == "addressable"
+        assert _erddap_classify("someTable", "table", curated) == "table"
+        assert _erddap_classify("vanished", None, curated) == "missing"
+
+    def test_coverage_counts_and_todo(self, monkeypatch):
+        """Coverage buckets the available index and lists addressable griddap."""
+        from earthlens.cli.refresh import _erddap_coverage
+        from earthlens.erddap.catalog import Dataset
+
+        row = Dataset(
+            server_url="https://x/erddap",
+            dataset_id="NOAA_DHW",
+            protocol="griddap",
+            variables=["v"],
+        )
+        catalog = SimpleNamespace(
+            available_datasets=["NOAA_DHW", "g1", "t1", "testX"],
+            datasets={"NOAA_DHW": row},
+        )
+        monkeypatch.setattr(
+            refresh_mod,
+            "_get_json",
+            lambda url, **kw: {
+                "table": {
+                    "columnNames": ["datasetID", "dataStructure"],
+                    "rows": [
+                        ["allDatasets", "table"],
+                        ["NOAA_DHW", "grid"],
+                        ["g1", "grid"],
+                        ["t1", "table"],
+                        ["testX", "grid"],
+                    ],
+                }
+            },
+        )
+        counts, todo = _erddap_coverage(catalog)
+        assert counts == {
+            "DONE": 1,
+            "addressable": 1,
+            "thin": 1,
+            "table": 1,
+            "missing": 0,
+        }
+        assert todo == ["g1"]
+
+    def test_coverage_empty_index_raises(self):
+        """An empty available index asks the user to refresh first."""
+        from earthlens.cli.refresh import _erddap_coverage
+
+        catalog = SimpleNamespace(available_datasets=[], datasets={})
+        with pytest.raises(ValueError, match="refresh erddap"):
+            _erddap_coverage(catalog)
 
 
 class TestOpeneoRefresher:
