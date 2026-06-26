@@ -85,6 +85,26 @@ def bbox_from_extent(space: object) -> list[float]:
     return [space.west, space.south, space.east, space.north]
 
 
+def _source_no_data(dataset: object) -> object:
+    """Return the source raster's first-band no-data value, or `-9999` default.
+
+    `pyramids` exposes `no_data_value` as a per-band tuple (e.g. `(-9999.0,)` or
+    `(None,)`). The windowed crop carries the source value through to the written
+    GeoTIFF so genuinely-empty cells stay flagged; a missing value falls back to
+    the pyramids default.
+
+    Args:
+        dataset: An opened `pyramids.Dataset`.
+
+    Returns:
+        The first-band no-data value when the source declares one, else `-9999`.
+    """
+    nodata = getattr(dataset, "no_data_value", None)
+    if isinstance(nodata, (list, tuple)) and nodata and nodata[0] is not None:
+        return nodata[0]
+    return -9999
+
+
 def read_part_to_geotiff(
     path: str, bbox: list[float], out_path: Path, *, epsg: int = 4326
 ) -> Path:
@@ -134,7 +154,12 @@ def read_part_to_geotiff(
             0.0,
             pixel_h,
         )
-        window = Dataset.create_from_array(arr=array, geo=geo, epsg=dataset.epsg)
+        window = Dataset.create_from_array(
+            arr=array,
+            geo=geo,
+            epsg=dataset.epsg,
+            no_data_value=_source_no_data(dataset),
+        )
         window.to_file(str(out_path))
     finally:
         # Drop the /vsicurl handle — an open remote dataset can hang the
@@ -196,12 +221,17 @@ def download_zip(url: str, cache_dir: Path, *, timeout: float = 600.0) -> Path:
     if target.exists() and target.stat().st_size > 0:
         return target
     partial = target.with_suffix(target.suffix + ".part")
-    with requests.get(url, stream=True, timeout=timeout) as response:
-        response.raise_for_status()
-        with partial.open("wb") as handle:
-            for chunk in response.iter_content(chunk_size=_DOWNLOAD_CHUNK):
-                if chunk:
-                    handle.write(chunk)
+    try:
+        with requests.get(url, stream=True, timeout=timeout) as response:
+            response.raise_for_status()
+            with partial.open("wb") as handle:
+                for chunk in response.iter_content(chunk_size=_DOWNLOAD_CHUNK):
+                    if chunk:
+                        handle.write(chunk)
+    except BaseException:
+        # Don't leave a truncated .part behind for a failed / interrupted fetch.
+        partial.unlink(missing_ok=True)
+        raise
     partial.replace(target)
     return target
 

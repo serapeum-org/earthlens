@@ -11,7 +11,7 @@ import pytest
 from earthlens.base import SpatialExtent
 from earthlens.solar_wind_atlas import _helpers
 
-from .conftest import FakeDataset, FakeGet, zip_bytes
+from .conftest import FailingGet, FakeDataset, FakeGet, zip_bytes
 
 pytestmark = pytest.mark.solar_wind_atlas
 
@@ -65,6 +65,28 @@ def test_window_crop_squeezes_single_band_3d(
         "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
     )
     assert fake_pyramids.recorder["create"][0]["shape"] == (200, 200)
+
+
+def test_window_crop_propagates_source_no_data(
+    fake_pyramids: type[FakeDataset], tmp_path: Path
+) -> None:
+    """The written GeoTIFF carries the source raster's no-data value, not -9999."""
+    _helpers.window_crop(
+        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
+    )
+    assert fake_pyramids.recorder["create"][0]["no_data_value"] == -32768.0
+
+
+def test_download_zip_cleans_partial_on_failure(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A failed download removes its .part file instead of leaving a stub."""
+    monkeypatch.setattr(_helpers.requests, "get", FailingGet())
+    url = "https://api.globalsolaratlas.info/download/World/World_GHI.zip"
+    with pytest.raises(OSError, match="connection dropped"):
+        _helpers.download_zip(url, tmp_path)
+    assert not (tmp_path / "World_GHI.zip.part").exists()
+    assert not (tmp_path / "World_GHI.zip").exists()
 
 
 def test_zip_cache_path_uses_url_filename(tmp_path: Path) -> None:

@@ -42,6 +42,8 @@ class FakeDataset:
     #: A plausible global geotransform (origin, 0.0025 deg pixel, negative dy).
     geotransform = (-180.0, 0.0025, 0.0, 80.0, 0.0, -0.0025)
     epsg = 4326
+    #: Per-band no-data tuple, mirroring pyramids' `Dataset.no_data_value`.
+    no_data_value = (-32768.0,)
     #: When True, `read_part` returns a single-band `(1, H, W)` array so the
     #: helper's squeeze branch is exercised.
     emit_3d = False
@@ -74,10 +76,17 @@ class FakeDataset:
         return np.zeros((dst_height, dst_width), dtype="float32")
 
     @classmethod
-    def create_from_array(cls, *, arr: np.ndarray, geo: tuple, epsg: int) -> FakeWindow:
-        """Record the geo-wrap and return a writable fake window."""
+    def create_from_array(
+        cls, *, arr: np.ndarray, geo: tuple, epsg: int, no_data_value: object = -9999
+    ) -> FakeWindow:
+        """Record the geo-wrap (incl. no-data) and return a writable fake window."""
         cls.recorder.setdefault("create", []).append(
-            {"shape": arr.shape, "geo": geo, "epsg": epsg}
+            {
+                "shape": arr.shape,
+                "geo": geo,
+                "epsg": epsg,
+                "no_data_value": no_data_value,
+            }
         )
         return FakeWindow(cls.recorder)
 
@@ -111,6 +120,32 @@ class FakeResponse:
     def iter_content(self, chunk_size: int = 1) -> list[bytes]:
         """Yield the body, plus an empty chunk to exercise the skip guard."""
         return [self._body, b""]
+
+
+class FailingResponse:
+    """A streaming response whose body iteration raises mid-download."""
+
+    def __enter__(self) -> FailingResponse:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        return None
+
+    def raise_for_status(self) -> None:
+        """No-op — the failure happens during streaming, not at the status."""
+
+    def iter_content(self, chunk_size: int = 1) -> list[bytes]:
+        """Raise to simulate a dropped connection mid-stream."""
+        raise OSError("connection dropped mid-stream")
+
+
+class FailingGet:
+    """Callable `requests.get` stand-in that fails partway through the body."""
+
+    def __call__(
+        self, url: str, *, stream: bool = False, timeout: float = 0.0
+    ) -> FailingResponse:
+        return FailingResponse()
 
 
 class FakeGet:
