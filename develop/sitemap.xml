@@ -89,14 +89,6 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/climate_indices/01_climate_indices_quickstart/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/climate_indices/02_catalog_and_behavior/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/cmems/altimetry_sla_coastal_signal/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -198,6 +190,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/ecmwf/wind_energy_resource/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/01_catalog_explorer/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/02_griddap_sst_anomaly/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/03_tabledap_buoys/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/04_catalog_tooling/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
@@ -813,22 +821,6 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/climate_indices/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/datasets/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/introduction/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/usage/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/cmems/authentication/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -878,6 +870,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/usage/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/erddap/datasets/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/erddap/erddap/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/erddap/introduction/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/erddap/usage/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
