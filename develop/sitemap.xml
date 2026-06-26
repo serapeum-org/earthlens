@@ -129,6 +129,14 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/catalog_explorer/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/quickstart/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/earthdata/catalog_explorer/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -854,6 +862,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/cmems/usage/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/drought/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/introduction/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/usage/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
