@@ -50,6 +50,11 @@ def _always_404(url: str, timeout: float | None = None) -> _FakeResponse:
     return _FakeResponse("Not found", status_code=404)
 
 
+def _html_200(url: str, timeout: float | None = None) -> _FakeResponse:
+    """Return a 200 response whose body is an HTML error page."""
+    return _FakeResponse("<!DOCTYPE HTML><html>error</html>")
+
+
 @pytest.fixture()
 def fake_http(monkeypatch: pytest.MonkeyPatch) -> None:
     """Route the backend's `requests.get` to the captured fixtures."""
@@ -204,11 +209,7 @@ def test_invalid_output_format_raises() -> None:
 
 def test_unparseable_body_raises(monkeypatch, tmp_path: Path) -> None:
     """A 200 response whose body has no grid rows raises a ValueError (G8)."""
-
-    def _html(url: str, timeout: float | None = None) -> _FakeResponse:
-        return _FakeResponse("<!DOCTYPE HTML><html>error</html>")
-
-    monkeypatch.setattr(backend.requests, "get", _html)
+    monkeypatch.setattr(backend.requests, "get", _html_200)
     source = ClimateIndices(
         start="2000-01-01", end="2001-12-31", variables=["oni"], path=tmp_path
     )
