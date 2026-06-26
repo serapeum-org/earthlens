@@ -196,6 +196,18 @@ def test_citation_logged_once(fake_http, tmp_path: Path) -> None:
     assert len(citation_lines) == 2
 
 
+def test_duplicate_index_ids_are_deduped(fake_http, tmp_path: Path) -> None:
+    """A repeated id is fetched once — no duplicate rows (L2)."""
+    df = ClimateIndices(
+        start="2000-01-01",
+        end="2001-12-31",
+        variables=["oni", "oni"],
+        path=tmp_path,
+    ).download()
+    assert not df.duplicated(["date", "index"]).any()
+    assert len(df) == 24
+
+
 def test_invalid_output_format_raises() -> None:
     """An unrecognised output_format raises ValueError."""
     with pytest.raises(ValueError, match="output_format"):

@@ -120,7 +120,10 @@ class ClimateIndices(AbstractDataSource):
                 "ClimateIndices `variables` must be a list of index ids "
                 "(e.g. ['oni', 'nao']), not a mapping."
             )
-        index_ids = list(variables) if variables else []
+        # De-dupe the requested ids order-stably (first-wins) so a repeated
+        # id does not fetch and emit the same series twice (mirrors the
+        # usgs_water parameter-code de-dupe).
+        index_ids = list(dict.fromkeys(variables)) if variables else []
         if not index_ids:
             raise ValueError(
                 "ClimateIndices needs variables=[index id, ...]; available "
