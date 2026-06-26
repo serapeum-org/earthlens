@@ -96,22 +96,36 @@ def _to_date(value: dt.date | dt.datetime | str) -> dt.date:
 
 
 def _snap_weekly(date: dt.date) -> dt.date:
-    """Snap a calendar date to the **Tuesday at or before** it.
+    """Snap a calendar date to the most recent **already-published** Tuesday.
 
     USDM releases every Thursday UTC; each composite is **valid the prior
     Tuesday**, and the on-disk JSON / shapefile stem is `usdm_{YYYYMMDD}`
     where the date is the **Tuesday valid date** (not the Thursday release
-    date — verified live, every Thursday URL returns 404). The backend
-    therefore snaps each requested date to that Tuesday.
+    date — verified live, every Thursday URL returns 404).
+
+    The trap: the file `usdm_{this-week's-Tuesday}.json` is not published
+    until that week's **Thursday**. A query on Monday lands the prior week
+    (no problem); a query on Tuesday or Wednesday lands *this* week's
+    Tuesday — whose JSON does not exist yet and 404s. So in the
+    pre-release half of the week (Tuesday + Wednesday) the snap walks back
+    one more week to the *previous* Tuesday, whose composite was published
+    the prior Thursday.
 
     Args:
         date: A calendar date.
 
     Returns:
-        datetime.date: The most recent Tuesday at-or-before `date`.
+        datetime.date: The most recent Tuesday at-or-before `date` whose
+            composite has already been released (Tuesday/Wednesday queries
+            walk back one extra week).
     """
     days_back = (date.weekday() - 1) % 7
-    return date - dt.timedelta(days=days_back)
+    snapped = date - dt.timedelta(days=days_back)
+    # Thursday is weekday 3 — same-week composite is released on Thursday,
+    # so (date - snapped).days >= 2 means we are at-or-after the release.
+    if (date - snapped).days < 2:
+        snapped -= dt.timedelta(days=7)
+    return snapped
 
 
 def _snap_10day(date: dt.date) -> dt.date:
@@ -182,18 +196,19 @@ def snap_to_cadence(
         ValueError: When `cadence` is not one of the three known values.
 
     Examples:
-        - USDM Tuesday → snaps to itself (Tuesday is the valid date):
+        - USDM Friday-or-later → most recent released Tuesday composite:
             ```python
             >>> import datetime as dt
             >>> from earthlens.drought._helpers import snap_to_cadence
-            >>> snap_to_cadence([dt.date(2026, 6, 23)], "weekly")
+            >>> snap_to_cadence([dt.date(2026, 6, 26)], "weekly")
             [datetime.date(2026, 6, 23)]
 
             ```
-        - A two-day span snaps to one Tuesday per week (de-duplicated):
+        - USDM pre-release Tuesday → walks back to the previous week's
+          composite (this week's hasn't been published until Thursday):
             ```python
-            >>> snap_to_cadence([dt.date(2026, 6, 23), dt.date(2026, 6, 24)], "weekly")
-            [datetime.date(2026, 6, 23)]
+            >>> snap_to_cadence([dt.date(2026, 6, 23)], "weekly")
+            [datetime.date(2026, 6, 16)]
 
             ```
         - A dekad date snaps to the first of its 10-day period:

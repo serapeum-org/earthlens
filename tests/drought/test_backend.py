@@ -198,10 +198,13 @@ def test_drought_search_emits_one_product_per_snapped_period():
         dataset="usdm",
     )
     products = backend._search()
+    # Window covers Wed 06-10 → Tue 06-23. The pre-release walk-back rule
+    # (Tuesday/Wednesday → previous week) gives the unique released-side
+    # composites 06-02, 06-09, 06-16.
     assert [p.id for p in products] == [
+        "usdm@2026-06-02",
         "usdm@2026-06-09",
         "usdm@2026-06-16",
-        "usdm@2026-06-23",
     ]
     assert {p.metadata["dataset"] for p in products} == {"usdm"}
 
@@ -231,7 +234,8 @@ def test_usdm_fetch_builds_feature_collection_in_4326(monkeypatch, tmp_path):
     assert fc.crs.to_epsg() == 4326
     assert len(fc) == 2
     assert set(fc["DM"]) == {1, 3}
-    assert fc["release_date"].iloc[0] == "2026-06-23"
+    # Tuesday-of-release-week walks back to the prior week's composite.
+    assert fc["release_date"].iloc[0] == "2026-06-16"
 
 
 def test_usdm_fetch_clips_to_bbox(monkeypatch, tmp_path):

@@ -18,27 +18,39 @@ from earthlens.drought._helpers import (
 )
 
 
-def test_weekly_snap_is_idempotent_on_tuesday():
-    """USDM URLs use the Tuesday valid date, so Tuesday snaps to itself."""
-    assert snap_to_cadence([dt.date(2026, 6, 23)], "weekly") == [
+def test_weekly_snap_idempotent_on_released_tuesday():
+    """A query at-or-after Thursday lands the same-week Tuesday composite."""
+    # Friday — Tuesday's composite was released the prior day.
+    assert snap_to_cadence([dt.date(2026, 6, 26)], "weekly") == [
         dt.date(2026, 6, 23)
     ]
 
 
+def test_weekly_snap_walks_back_on_pre_release_tue_wed():
+    """Tuesday and Wednesday of release week → previous week's composite."""
+    # Tuesday — that day's JSON isn't published until Thursday.
+    assert snap_to_cadence([dt.date(2026, 6, 23)], "weekly") == [
+        dt.date(2026, 6, 16)
+    ]
+    # Wednesday — same story.
+    assert snap_to_cadence([dt.date(2026, 6, 24)], "weekly") == [
+        dt.date(2026, 6, 16)
+    ]
+
+
 def test_weekly_snap_walks_back_from_other_weekday():
-    """Wed/Thu/Fri/Mon all snap to the most recent Tuesday."""
-    for non_tuesday, expected in (
-        (dt.date(2026, 6, 24), dt.date(2026, 6, 23)),  # Wed → Tue
-        (dt.date(2026, 6, 25), dt.date(2026, 6, 23)),  # Thu → Tue
+    """Thu/Mon → most recent released Tuesday composite."""
+    for queried, expected in (
+        (dt.date(2026, 6, 25), dt.date(2026, 6, 23)),  # Thu → same-week Tue
         (dt.date(2026, 6, 22), dt.date(2026, 6, 16)),  # Mon → prior Tue
     ):
-        assert snap_to_cadence([non_tuesday], "weekly") == [expected]
+        assert snap_to_cadence([queried], "weekly") == [expected]
 
 
 def test_weekly_snap_dedupes_same_week():
-    """Two dates inside one release window collapse to one fetch."""
+    """Multiple released-side dates inside one window collapse to one fetch."""
     snapped = snap_to_cadence(
-        [dt.date(2026, 6, 23), dt.date(2026, 6, 24), dt.date(2026, 6, 25)],
+        [dt.date(2026, 6, 25), dt.date(2026, 6, 26), dt.date(2026, 6, 27)],
         "weekly",
     )
     assert snapped == [dt.date(2026, 6, 23)]
@@ -46,11 +58,13 @@ def test_weekly_snap_dedupes_same_week():
 
 def test_weekly_snap_two_weeks_emit_two_releases():
     """A two-week span emits one Tuesday per week, sorted."""
+    # Wed 2026-06-10 → walks back to 06-02 (06-09 not yet released);
+    # Fri 2026-06-26 → lands on 06-23.
     snapped = snap_to_cadence(
-        [dt.date(2026, 6, 10), dt.date(2026, 6, 23)],
+        [dt.date(2026, 6, 10), dt.date(2026, 6, 26)],
         "weekly",
     )
-    assert snapped == [dt.date(2026, 6, 9), dt.date(2026, 6, 23)]
+    assert snapped == [dt.date(2026, 6, 2), dt.date(2026, 6, 23)]
 
 
 @pytest.mark.parametrize(
