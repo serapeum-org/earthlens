@@ -111,6 +111,25 @@ def test_drought_rejects_unknown_dataset_with_did_you_mean():
         )
 
 
+def test_drought_accepts_datetime_and_date_inputs():
+    """start/end coerce through to_datetime so non-string inputs work."""
+    backend_dt = Drought(
+        start=dt.datetime(2026, 6, 23),
+        end=dt.datetime(2026, 6, 23),
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="usdm",
+    )
+    backend_date = Drought(
+        start=dt.date(2026, 6, 23),
+        end=dt.date(2026, 6, 23),
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="usdm",
+    )
+    assert list(backend_dt.time.dates) == list(backend_date.time.dates)
+
+
 def test_drought_rejects_inverted_window():
     """end < start surfaces a clear ValueError."""
     with pytest.raises(ValueError, match="before start"):

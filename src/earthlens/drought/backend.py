@@ -36,6 +36,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base._dates import to_datetime
 from earthlens.drought._helpers import (
     attribution_for,
     bbox_from_extent,
@@ -208,8 +209,8 @@ class Drought(AbstractDataSource):
         Returns:
             TemporalExtent: The window plus the per-period snapped dates.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         if end_dt < start_dt:
             raise ValueError(
                 f"end ({end!r}) is before start ({start!r}); flip the order "
