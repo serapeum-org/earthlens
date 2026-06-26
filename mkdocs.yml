@@ -185,6 +185,11 @@ nav:
       - Usage: reference/bathymetry/usage.md
       - Available datasets: reference/bathymetry/datasets.md
       - Reference: reference/bathymetry/bathymetry.md
+    - Solar & Wind Atlas (solar / wind climatology):
+      - Introduction: reference/solar_wind_atlas/introduction.md
+      - Usage: reference/solar_wind_atlas/usage.md
+      - Available layers: reference/solar_wind_atlas/datasets.md
+      - Reference: reference/solar_wind_atlas/solar_wind_atlas.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
