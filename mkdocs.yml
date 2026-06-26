@@ -180,6 +180,11 @@ nav:
       - Usage: reference/bathymetry/usage.md
       - Available datasets: reference/bathymetry/datasets.md
       - Reference: reference/bathymetry/bathymetry.md
+    - Climate indices (teleconnections):
+      - Introduction: reference/climate_indices/introduction.md
+      - Usage: reference/climate_indices/usage.md
+      - Available indices: reference/climate_indices/datasets.md
+      - Reference: reference/climate_indices/climate_indices.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
