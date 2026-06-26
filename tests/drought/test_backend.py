@@ -374,9 +374,14 @@ class _FakeNetCDF:
     """Stand-in for `pyramids.netcdf.NetCDF` — records `subset()` calls."""
 
     calls: list[dict[str, Any]] = []
+    n_time: int = 1500  # SPEIbase v2.10 is ~1488 months (Jan 1901 → Dec 2024).
 
     def __init__(self, path: str):
         self.path = path
+
+    @property
+    def dimension_sizes(self) -> dict[str, int]:
+        return {"time": _FakeNetCDF.n_time}
 
     def subset(
         self,
@@ -479,6 +484,26 @@ def test_speibase_rejects_period_before_epoch(monkeypatch, tmp_path, fake_netcdf
         path=str(tmp_path),
     )
     with pytest.raises(ValueError, match="before the dataset epoch"):
+        backend.download(progress_bar=False)
+
+
+def test_speibase_rejects_period_past_time_axis(monkeypatch, tmp_path, fake_netcdf):
+    """A period past the bundled NetCDF's time axis raises clearly."""
+    monkeypatch.setattr(
+        backend_module,
+        "_http_download",
+        lambda url, target: target.write_bytes(b"fake-nc"),
+    )
+    # 1500 months from 1901-01 → up to 2025-12; ask for 2099-06 to overshoot.
+    backend = Drought(
+        start="2099-06-01",
+        end="2099-06-01",
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="speibase-12",
+        path=str(tmp_path),
+    )
+    with pytest.raises(ValueError, match="past the bundled time axis"):
         backend.download(progress_bar=False)
 
 

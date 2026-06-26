@@ -435,6 +435,7 @@ class Drought(AbstractDataSource):
 
         nc = NetCDF.read_file(str(nc_path))
         try:
+            n_time = (nc.dimension_sizes or {}).get("time", 0)
             written: list[Path] = []
             for product in products:
                 period: dt.date = product.metadata["period"]
@@ -443,6 +444,15 @@ class Drought(AbstractDataSource):
                     raise ValueError(
                         f"SPEIbase period {period} is before the dataset "
                         f"epoch ({SPEIBASE_EPOCH_YEAR}-01)."
+                    )
+                if n_time and idx >= n_time:
+                    last_year = SPEIBASE_EPOCH_YEAR + (n_time - 1) // 12
+                    last_month = ((n_time - 1) % 12) + 1
+                    raise ValueError(
+                        f"SPEIbase period {period} is past the bundled "
+                        f"time axis (length {n_time}, last month "
+                        f"{last_year}-{last_month:02d}). Bump the catalog "
+                        "row's `endpoint` to a newer SPEIbase release."
                     )
                 subset = nc.subset(
                     "spei",
