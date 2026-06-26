@@ -54,6 +54,19 @@ def test_region_construction_and_dispatch(
     assert len(acks) == 1
 
 
+def test_acknowledgement_logged_once_per_instance(
+    fake_argopy: FakeArgo,
+    argo_kwargs: Callable[..., dict[str, Any]],
+    info_log: list[str],
+):
+    """The Argo acknowledgement is logged once per instance, not per download."""
+    backend = ARGO(**argo_kwargs())
+    backend.download()
+    backend.download()
+    acks = [m for m in info_log if "International Argo Program" in m]
+    assert len(acks) == 1
+
+
 def test_region_writes_table(
     fake_argopy: FakeArgo, argo_kwargs: Callable[..., dict[str, Any]], tmp_path
 ):

@@ -233,6 +233,7 @@ class ARGO(AbstractDataSource):
         self._mode = mode
         self._depth = (float(depth[0]), float(depth[1]))
         self._output_format: OutputFormat = output_format
+        self._acknowledged = False
         super().__init__(
             start=start,
             end=end,
@@ -335,7 +336,11 @@ class ARGO(AbstractDataSource):
         out_path = self._write_table(df)
         if len(df):
             logger.info(f"ARGO: {len(df)} row(s) written to {out_path}")
-            logger.info(ARGO_ACKNOWLEDGEMENT)
+            # Argo asks users to cite the program; log the acknowledgement
+            # once per backend instance rather than on every download() call.
+            if not self._acknowledged:
+                logger.info(ARGO_ACKNOWLEDGEMENT)
+                self._acknowledged = True
         else:
             logger.warning(
                 f"ARGO: no profiles matched the request; wrote an empty "
