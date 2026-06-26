@@ -97,6 +97,14 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/climate_indices/01_climate_indices_quickstart/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/climate_indices/02_catalog_and_behavior/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/cmems/altimetry_sla_coastal_signal/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -126,6 +134,14 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/cmems/seaice_arctic_thickness/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/catalog_explorer/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/quickstart/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
@@ -513,18 +529,6 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/pvgis/01_pvgis_quickstart/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/pvgis/02_catalog_explorer/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/pvgis/03_pv_power_and_tmy/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/radar/catalog_explorer/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -853,6 +857,22 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/climate_indices/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/datasets/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/introduction/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/usage/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/cmems/authentication/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -866,6 +886,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/cmems/usage/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/drought/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/introduction/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/usage/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
@@ -1190,22 +1222,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/overture/usage/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/pvgis/datasets/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/pvgis/introduction/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/pvgis/pvgis/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/pvgis/usage/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>

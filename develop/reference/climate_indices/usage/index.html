@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/pvgis/introduction/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/usage/">
       
       
-        <link rel="prev" href="../../bathymetry/bathymetry/">
+        <link rel="prev" href="../introduction/">
       
       
-        <link rel="next" href="../usage/">
+        <link rel="next" href="../datasets/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Introduction - earthlens</title>
+        <title>Usage - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pvgis-introduction" class="md-skip">
+        <a href="#climate-indices-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Usage
             
           </span>
         </div>
@@ -3291,7 +3291,7 @@
   <span class="md-ellipsis">
     
   
-    PVGIS (solar radiation / PV)
+    Climate indices (teleconnections)
   
 
     
@@ -3307,11 +3307,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    PVGIS (solar radiation / PV)
+    Climate indices (teleconnections)
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3336,7 +3364,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Usage
   
 
     
@@ -3354,7 +3382,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Usage
   
 
     
@@ -3380,10 +3408,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
+  <a href="#a-single-index" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works
+        A single index
       
     </span>
   </a>
@@ -3391,10 +3419,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#three-things-that-shape-the-backend" class="md-nav__link">
+  <a href="#several-indices-at-once" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Three things that shape the backend
+        Several indices at once
       
     </span>
   </a>
@@ -3402,10 +3430,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#attribution" class="md-nav__link">
+  <a href="#pivoting-to-wide-form" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Attribution
+        Pivoting to wide form
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-backend-does-not-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this backend does not do
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output format
       
     </span>
   </a>
@@ -3428,34 +3478,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../datasets/" class="md-nav__link">
         
   
@@ -3463,7 +3485,7 @@
   <span class="md-ellipsis">
     
   
-    Available products
+    Available indices
   
 
     
@@ -3484,7 +3506,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../pvgis/" class="md-nav__link">
+      <a href="../climate_indices/" class="md-nav__link">
         
   
   
@@ -6743,6 +6765,148 @@
   
     <li class="md-nav__item">
       <a href="../../argo/argo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_36" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_36" id="__nav_3_36_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drought indicators (USDM / EDO / GDO / SPEIbase)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_36_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_36">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Drought indicators (USDM / EDO / GDO / SPEIbase)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../drought/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../drought/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../drought/drought/" class="md-nav__link">
         
   
   
@@ -10554,7 +10718,7 @@
   <span class="md-ellipsis">
     
   
-    PVGIS (solar radiation / PV)
+    Climate indices (teleconnections)
   
 
     
@@ -10570,7 +10734,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    PVGIS (solar radiation / PV)
+    Climate indices (teleconnections)
   
 
           </label>
@@ -10583,14 +10747,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/pvgis/01_pvgis_quickstart/" class="md-nav__link">
+      <a href="../../../examples/climate_indices/01_climate_indices_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    PVGIS quickstart — hourly solar radiation (live)
+    Climate indices — quickstart (live)
   
 
     
@@ -10611,42 +10775,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/pvgis/02_catalog_explorer/" class="md-nav__link">
+      <a href="../../../examples/climate_indices/02_catalog_and_behavior/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    PVGIS catalog explorer (offline)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/pvgis/03_pv_power_and_tmy/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    PV power and the Typical Meteorological Year (live)
+    Climate indices — catalog &amp; behaviour (offline)
   
 
     
@@ -14240,10 +14376,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
+  <a href="#a-single-index" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works
+        A single index
       
     </span>
   </a>
@@ -14251,10 +14387,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#three-things-that-shape-the-backend" class="md-nav__link">
+  <a href="#several-indices-at-once" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Three things that shape the backend
+        Several indices at once
       
     </span>
   </a>
@@ -14262,10 +14398,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#attribution" class="md-nav__link">
+  <a href="#pivoting-to-wide-form" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Attribution
+        Pivoting to wide form
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-backend-does-not-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this backend does not do
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output format
       
     </span>
   </a>
@@ -14289,7 +14447,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/pvgis/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/climate_indices/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -14298,89 +14456,98 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/pvgis/introduction.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/climate_indices/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="pvgis-introduction"><a class="toclink" href="#pvgis-introduction">PVGIS — introduction</a><a class="headerlink" href="#pvgis-introduction" title="Permanent link">#</a></h1>
-<p>earthlens ships a single <code>pvgis</code> backend that fetches <strong>solar-radiation and
-photovoltaic (PV) time series</strong> from the European Commission JRC
-<a href="https://re.jrc.ec.europa.eu/pvg_tools/">Photovoltaic Geographical Information System (PVGIS)</a>
-5.3 non-interactive REST API. A request resolves to a <strong>per-coordinate hourly
-<code>pandas.DataFrame</code></strong>, so this is a <code>tabular</code> backend — not a raster, not a grid
-of pixels.</p>
-<p>Two tools ship in the MVP:</p>
-<ul>
-<li><strong><code>seriescalc</code></strong> — hourly solar-radiation / PV-power time series over a
-  chosen year window (global in-plane irradiance, sun height, air temperature,
-  wind; PV system power when the PV knobs are set).</li>
-<li><strong><code>tmy</code></strong> — a Typical Meteorological Year: an hourly multi-year synthesis of
-  temperature, humidity, horizontal / beam / diffuse irradiance, infrared,
-  wind, and surface pressure.</li>
-</ul>
-<p>This page orients the backend. For the hands-on download walkthrough see
-<a href="../usage/">Usage</a> and the product ids on the
-<a href="../datasets/">Available datasets</a> page; the rendered API is the
-<a href="../pvgis/">Reference</a> page.</p>
-<h2 id="how-it-works"><a class="toclink" href="#how-it-works">How it works</a><a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
-<p>PVGIS 5.3 is a <strong>keyless</strong> REST API (<code>https://re.jrc.ec.europa.eu/api/v5_3/&lt;tool&gt;</code>,
-<code>GET</code>, <code>outputformat=json</code>). The backend hits it <strong>directly with <code>requests</code></strong> —
-there is no SDK, no authentication, and no <code>pyramids</code> / array dependency (pure
-<code>requests</code> + <code>pandas</code>). A request samples the location(s) — a single
-<code>point=(lat, lon)</code>, or a bounding box expanded to a point grid at <code>spacing_deg</code>
-— issues one keyless <code>GET</code> per point, parses each JSON response into a
-long-format frame tagged with <code>lat</code> / <code>lon</code> / <code>product</code>, and concatenates them.</p>
+<h1 id="climate-indices-usage"><a class="toclink" href="#climate-indices-usage">Climate indices — usage</a><a class="headerlink" href="#climate-indices-usage" title="Permanent link">#</a></h1>
+<p>The <code>climate-indices</code> backend downloads one or more monthly index series
+and returns them as a long-format <code>pandas.DataFrame</code>. It needs no
+credentials (both NOAA PSL and KNMI Climate Explorer are open). See
+<a href="../datasets/">Available indices</a> for the <code>variables=</code> ids and
+<a href="../introduction/">Introduction</a> for how the two ASCII dialects are parsed.</p>
+<h2 id="a-single-index"><a class="toclink" href="#a-single-index">A single index</a><a class="headerlink" href="#a-single-index" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;pvgis&quot;</span><span class="p">,</span>            <span class="c1"># alias: &quot;solar-pv&quot;</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;seriescalc&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;climate-indices&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;oni&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;1990-01-01&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-12-31&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">point</span><span class="o">=</span><span class="p">(</span><span class="mf">45.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">),</span>              <span class="c1"># northern Italy</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;indices_out&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># -&gt; a per-coordinate hourly pandas.DataFrame</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">#         date index  value    source</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># 0 1990-01-01   oni   0.12  noaa-psl</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># ...</span>
 </code></pre></div>
-<h2 id="three-things-that-shape-the-backend"><a class="toclink" href="#three-things-that-shape-the-backend">Three things that shape the backend</a><a class="headerlink" href="#three-things-that-shape-the-backend" title="Permanent link">#</a></h2>
+<p><code>download()</code> returns the long-format frame (<code>date</code>, <code>index</code>, <code>value</code>,
+<code>source</code>) and also writes it to a CSV under <code>path</code>
+(<code>climate_indices_oni.csv</code>). The monthly <code>date</code> is the first of each
+month; the missing-value sentinel becomes <code>NaN</code> (kept, not dropped).</p>
+<h2 id="several-indices-at-once"><a class="toclink" href="#several-indices-at-once">Several indices at once</a><a class="headerlink" href="#several-indices-at-once" title="Permanent link">#</a></h2>
+<p>Pass more than one id; the result concatenates them, distinguished by the
+<code>index</code> column (and <code>source</code>, since indices may come from different
+sources):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;climate-indices&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;oni&quot;</span><span class="p">,</span> <span class="s2">&quot;nao&quot;</span><span class="p">,</span> <span class="s2">&quot;amo&quot;</span><span class="p">],</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;1980-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>     <span class="c1"># [&#39;amo&#39;, &#39;nao&#39;, &#39;oni&#39;]</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">)[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># index</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># amo    knmi-climexp</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="c1"># nao        noaa-psl</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># oni        noaa-psl</span>
+</code></pre></div>
+<p>The <code>"climate_indices"</code> and <code>"teleconnections"</code> aliases route to the same
+backend.</p>
+<h2 id="pivoting-to-wide-form"><a class="toclink" href="#pivoting-to-wide-form">Pivoting to wide form</a><a class="headerlink" href="#pivoting-to-wide-form" title="Permanent link">#</a></h2>
+<p>The long frame pivots to a month × index table in one call:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">wide</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">wide</span><span class="p">[[</span><span class="s2">&quot;oni&quot;</span><span class="p">,</span> <span class="s2">&quot;nao&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="what-this-backend-does-not-do"><a class="toclink" href="#what-this-backend-does-not-do">What this backend does <em>not</em> do</a><a class="headerlink" href="#what-this-backend-does-not-do" title="Permanent link">#</a></h2>
 <ul>
 <li>
-<p><strong>Output is a per-point time series, not a grid.</strong> PVGIS already returns the
-  resolved hourly / TMY series, so there is no gridded reduction to apply. The
-  <code>EarthLens</code> facade rejects a non-<code>None</code> <code>aggregate=</code> for this <code>tabular</code>
-  backend with <code>NotImplementedError</code>. (Resample the returned <code>DataFrame</code> in
-  pandas if you want a coarser cadence.)</p>
+<p><strong>No bounding box.</strong> Climate indices are global scalars, so
+  <code>lat_lim</code> / <code>lon_lim</code> / <code>aoi</code> are accepted but ignored — the same result
+  comes back with or without them.</p>
 </li>
 <li>
-<p><strong>A bbox becomes many keyless GETs — throttled and capped.</strong> A bounding box
-  is sampled to a <code>(lat, lon)</code> grid at <code>spacing_deg</code> (default <code>0.1°</code>) and each
-  point is one request. The backend throttles to the documented <strong>30 requests
-  per second</strong> limit and retries an HTTP <code>429</code> with exponential backoff. Before
-  fetching it warns once the grid passes a soft threshold and raises a
-  <code>ValueError</code> past a hard cap (<code>max_points</code>, default 400) — so a country-scale
-  box never silently fires thousands of calls. Shrink the box or coarsen
-  <code>spacing_deg</code>.</p>
+<p><strong>No <code>aggregate=</code>.</strong> The values are already monthly scalars, so a
+  non-<code>None</code> <code>aggregate=</code> raises <code>NotImplementedError</code>. Do any rollup on
+  the returned DataFrame instead:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">annual</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">)</span>
+</code></pre></div>
 </li>
 <li>
-<p><strong>PVGIS is not global.</strong> Coverage spans Europe, Africa, most of Asia, and the
-  Americas, but excludes high latitudes and open sea. An out-of-coverage point
-  returns an HTTP 4xx with a JSON <code>message</code>: for a multi-point bbox the point is
-  <strong>skipped with a warning</strong> (the in-coverage points are kept); for a single
-  explicit point a clear <code>ValueError</code> naming the coordinate is raised. A skipped
-  point reflects whatever error PVGIS returned for it (most often
-  out-of-coverage, but the warning quotes the actual <code>message</code>).</p>
+<p><strong>No deriving indices from gridded fields.</strong> This backend fetches the
+  <strong>published</strong> index series; it does not compute ONI from SST grids.</p>
 </li>
 </ul>
-<h2 id="attribution"><a class="toclink" href="#attribution">Attribution</a><a class="headerlink" href="#attribution" title="Permanent link">#</a></h2>
-<p>PVGIS data is free to reuse with attribution:</p>
-<blockquote>
-<p>PVGIS © European Union, 2001–2024 — data from the JRC Photovoltaic
-Geographical Information System (PVGIS),
-<a href="https://re.jrc.ec.europa.eu/pvg_tools/">https://re.jrc.ec.europa.eu/pvg_tools/</a>.</p>
-</blockquote>
-<p>The backend logs this citation once on a successful <code>download()</code>.</p>
+<h2 id="output-format"><a class="toclink" href="#output-format">Output format</a><a class="headerlink" href="#output-format" title="Permanent link">#</a></h2>
+<p>Pass <code>output_format="parquet"</code> to write Parquet instead of CSV (needs
+<code>pyarrow</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;climate-indices&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;oni&quot;</span><span class="p">],</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;parquet&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
 
 
 
@@ -14416,7 +14583,7 @@ Geographical Information System (PVGIS),
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../bathymetry/bathymetry/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
+          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -14426,20 +14593,20 @@ Geographical Information System (PVGIS),
                 Previous
               </span>
               <div class="md-ellipsis">
-                Reference
+                Introduction
               </div>
             </div>
           </a>
         
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
+          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Available indices">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Usage
+                Available indices
               </div>
             </div>
             <div class="md-footer__button md-icon">
