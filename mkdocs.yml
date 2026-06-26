@@ -282,6 +282,10 @@ nav:
       - Usage: reference/iucn/usage.md
       - Authentication: reference/iucn/authentication.md
       - Reference: reference/iucn/iucn.md
+    - Argo (float profiles):
+      - Introduction: reference/argo/introduction.md
+      - Usage: reference/argo/usage.md
+      - Reference: reference/argo/argo.md
   - Examples:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
@@ -499,6 +503,9 @@ nav:
       - Catalog explorer (no network): examples/iucn/catalog_explorer.ipynb
       - Quickstart — species assessments: examples/iucn/quickstart.ipynb
       - Country Red List breakdown (live): examples/iucn/country_redlist_breakdown.ipynb
+    - Argo (float profiles):
+      - Quickstart — float profiles: examples/argo/quickstart.ipynb
+      - Catalog, selectors & T–S diagram: examples/argo/catalog_and_selectors.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
