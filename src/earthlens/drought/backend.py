@@ -156,7 +156,14 @@ class Drought(AbstractDataSource):
         self._dataset: Dataset = self._catalog.get(dataset)
         self.OUTPUT_KIND = self._dataset.output_kind
 
-        if self.OUTPUT_KIND == "raster" and not path:
+        # `bool(Path("")) is True` and `str(Path(""))` is `"."` — both would
+        # bypass a `not path` check and silently route the parent class to
+        # `Path(".").absolute()` (the user's CWD). Normalise to a string
+        # first so the empty-path detection covers `None`, `""`, `Path("")`,
+        # `Path(".")`, and `Path()` uniformly.
+        path_str = "" if path is None else str(path)
+        is_empty_path = path_str in ("", ".")
+        if self.OUTPUT_KIND == "raster" and is_empty_path:
             raise ValueError(
                 f"Drought needs path= for raster dataset {dataset!r} — the "
                 "per-period rasters are written to disk; silently writing "
@@ -172,7 +179,7 @@ class Drought(AbstractDataSource):
             lat_lim=lat_lim,
             lon_lim=lon_lim,
             fmt=fmt,
-            path=str(path) if path else "",
+            path=path_str,
         )
 
     def _initialize(self) -> None:

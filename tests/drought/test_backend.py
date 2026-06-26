@@ -176,16 +176,29 @@ def test_drought_output_kind_is_per_instance(tmp_path):
     assert spei.OUTPUT_KIND == "raster"
 
 
-def test_drought_raster_requires_explicit_path():
-    """A raster dataset without path= is rejected up-front."""
+@pytest.mark.parametrize(
+    "empty_path",
+    [None, "", Path(""), Path("."), Path()],
+    ids=["None", "empty-str", "Path-empty-str", "Path-dot", "Path-default"],
+)
+def test_drought_raster_rejects_every_empty_path_form(empty_path):
+    """Every empty-path form (None, '', Path(''), Path('.'), Path()) raises.
+
+    `bool(Path(''))` and `bool(Path())` are both True (pathlib defines no
+    __bool__/__len__), so a `not path` check would silently route the
+    parent class to `Path('.').absolute()` — the user's CWD.
+    """
+    kwargs = dict(
+        start="2026-06-01",
+        end="2026-06-01",
+        lat_lim=[30.0, 40.0],
+        lon_lim=[-95.0, -85.0],
+        dataset="speibase-12",
+    )
+    if empty_path is not None:
+        kwargs["path"] = empty_path
     with pytest.raises(ValueError, match="needs path="):
-        Drought(
-            start="2026-06-01",
-            end="2026-06-01",
-            lat_lim=[30.0, 40.0],
-            lon_lim=[-95.0, -85.0],
-            dataset="speibase-12",
-        )
+        Drought(**kwargs)
 
 
 def test_drought_search_emits_one_product_per_snapped_period():
