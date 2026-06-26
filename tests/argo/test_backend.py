@@ -63,6 +63,15 @@ def test_region_writes_table(
     assert (tmp_path / "argo_phy_region.csv").exists()
 
 
+def test_empty_variables_is_region(
+    fake_argopy: FakeArgo, argo_kwargs: Callable[..., dict[str, Any]]
+):
+    """An empty variables list is a region selection with no param validation."""
+    backend = ARGO(**argo_kwargs(variables=[]))
+    backend.download()
+    assert fake_argopy.method() == "region"
+
+
 def test_float_selector_dispatch(
     fake_argopy: FakeArgo, argo_kwargs: Callable[..., dict[str, Any]]
 ):
@@ -149,3 +158,37 @@ def test_bad_source_rejected(argo_kwargs: Callable[..., dict[str, Any]]):
     """An unknown source= is rejected at construction."""
     with pytest.raises(ValueError, match="source must be one of"):
         ARGO(**argo_kwargs(source="nope"))
+
+
+def test_bad_dataset_rejected(argo_kwargs: Callable[..., dict[str, Any]]):
+    """An unknown dataset= is rejected at construction."""
+    with pytest.raises(ValueError, match="dataset must be one of"):
+        ARGO(**argo_kwargs(dataset="nope"))
+
+
+def test_bad_mode_rejected(argo_kwargs: Callable[..., dict[str, Any]]):
+    """An unknown mode= is rejected at construction."""
+    with pytest.raises(ValueError, match="mode must be one of"):
+        ARGO(**argo_kwargs(mode="nope"))
+
+
+def test_bad_output_format_rejected(argo_kwargs: Callable[..., dict[str, Any]]):
+    """An unknown output_format= is rejected at construction."""
+    with pytest.raises(ValueError, match="output_format must be one of"):
+        ARGO(**argo_kwargs(output_format="tsv"))
+
+
+def test_variables_mapping_rejected(argo_kwargs: Callable[..., dict[str, Any]]):
+    """A mapping variables= is rejected (this backend takes a flat list)."""
+    with pytest.raises(TypeError, match="must be a list"):
+        ARGO(**argo_kwargs(variables={"phy": ["TEMP"]}))
+
+
+def test_parquet_output(
+    fake_argopy: FakeArgo, argo_kwargs: Callable[..., dict[str, Any]], tmp_path
+):
+    """output_format='parquet' writes a .parquet file."""
+    pytest.importorskip("pyarrow")
+    backend = ARGO(**argo_kwargs(path=str(tmp_path), output_format="parquet"))
+    backend.download()
+    assert (tmp_path / "argo_phy_region.parquet").exists()

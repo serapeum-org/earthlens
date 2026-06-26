@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from earthlens.argo import Catalog, Family
+from earthlens.argo import Catalog, Family, clear_catalog_cache
 
 pytestmark = pytest.mark.argo
 
@@ -44,3 +44,30 @@ def test_unknown_family_raises():
     """An unknown family name raises with a did-you-mean hint."""
     with pytest.raises(ValueError, match="Did you mean 'phy'"):
         Catalog().parameters_for("phys")
+
+
+def test_load_uses_then_clears_cache():
+    """A second load hits the parse cache; clearing it forces a re-parse."""
+    clear_catalog_cache()
+    first = Catalog.load()
+    cached = Catalog.load()
+    assert sorted(first.datasets) == sorted(cached.datasets)
+    clear_catalog_cache()
+    reloaded = Catalog.load()
+    assert sorted(reloaded.datasets) == sorted(first.datasets)
+
+
+def test_missing_families_block_raises(tmp_path):
+    """A YAML without a `families:` block raises a clear error."""
+    bad = tmp_path / "argo_data_catalog.yaml"
+    bad.write_text("regions: {}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="families"):
+        Catalog.load(bad)
+
+
+def test_malformed_family_row_raises(tmp_path):
+    """A family row with an unexpected key fails validation with a clear error."""
+    bad = tmp_path / "argo_data_catalog.yaml"
+    bad.write_text("families:\n  phy:\n    bogus: 1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="failed validation"):
+        Catalog.load(bad)

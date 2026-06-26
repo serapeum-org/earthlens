@@ -80,6 +80,12 @@ def test_parse_selection_rejects_non_numeric_cycle():
         parse_selection(["profile:6902746/xx"])
 
 
+def test_parse_selection_rejects_empty_float():
+    """A bare float: token with no WMO id is rejected."""
+    with pytest.raises(ValueError, match="no WMO id"):
+        parse_selection(["float:"])
+
+
 def test_region_box_order():
     """region_box emits the A1-pinned [W, E, S, N, dmin, dmax, start, end] order."""
     box = region_box(_space(), _time(), (0.0, 2000.0))
