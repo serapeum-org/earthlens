@@ -39,6 +39,7 @@ _CURATED_ENUM = (
     "radar",
     "tropycal",
     "gdacs",
+    "argo",
     "chc",
     "gbif",
     "obis",
