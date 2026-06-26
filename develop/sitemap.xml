@@ -37,6 +37,14 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/argo/catalog_and_selectors/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/argo/quickstart/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/asf/catalog_explorer/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -86,14 +94,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/chc/quickstart/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/climate_indices/01_climate_indices_quickstart/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/climate_indices/02_catalog_and_behavior/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
@@ -773,6 +773,18 @@
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/argo/argo/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/argo/introduction/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/argo/usage/</loc>
+         <lastmod>2026-06-26</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/asf/asf/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
@@ -826,22 +838,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/chc/usage/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/climate_indices/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/datasets/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/introduction/</loc>
-         <lastmod>2026-06-26</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/climate_indices/usage/</loc>
          <lastmod>2026-06-26</lastmod>
     </url>
     <url>
