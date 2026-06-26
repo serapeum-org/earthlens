@@ -88,7 +88,8 @@ def parse_selection(variables: list[str]) -> Selection:
 
     Raises:
         ValueError: If a `float:` / `profile:` selector is mixed with
-            other entries, or a `profile:` token omits its `/<cycle>`.
+            other entries, a `profile:` token omits its `/<cycle>`, or a
+            WMO id / cycle is not an integer.
     """
     selectors = [v for v in variables if v.startswith(_SELECTOR_PREFIXES)]
     if not selectors:
@@ -102,7 +103,7 @@ def parse_selection(variables: list[str]) -> Selection:
     token = selectors[0]
     if token.startswith("float:"):
         body = token[len("float:") :]
-        wmos = tuple(int(part) for part in body.split(",") if part)
+        wmos = tuple(_selector_int(part, token, "WMO id") for part in body.split(",") if part)
         if not wmos:
             raise ValueError(f"float: selector has no WMO id: {token!r}.")
         return Selection("float", wmos)
@@ -112,7 +113,36 @@ def parse_selection(variables: list[str]) -> Selection:
         raise ValueError(
             f"profile: selector must be 'profile:<WMO>/<cycle>', got {token!r}."
         )
-    return Selection("profile", (int(wmo_part),), int(cycle_part))
+    return Selection(
+        "profile",
+        (_selector_int(wmo_part, token, "WMO id"),),
+        _selector_int(cycle_part, token, "cycle"),
+    )
+
+
+def _selector_int(value: str, token: str, what: str) -> int:
+    """Convert a selector field to `int`, with a token-aware error message.
+
+    Args:
+        value: The substring to parse (a WMO id or cycle number).
+        token: The full selector token, for the error message.
+        what: A short label for `value` (`"WMO id"` / `"cycle"`).
+
+    Returns:
+        int: The parsed integer.
+
+    Raises:
+        ValueError: If `value` is not an integer; the message names the
+            offending token and the expected selector shape.
+    """
+    try:
+        return int(value)
+    except ValueError:
+        raise ValueError(
+            f"Argo {token!r} selector has a non-numeric {what} {value!r}; "
+            f"expected an integer (e.g. 'float:6902746' / "
+            f"'profile:6902746/12')."
+        ) from None
 
 
 def region_box(

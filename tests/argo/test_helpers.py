@@ -68,6 +68,18 @@ def test_parse_selection_rejects_bad_profile():
         parse_selection(["profile:6902746"])
 
 
+def test_parse_selection_rejects_non_numeric_float():
+    """A non-numeric WMO id raises a friendly error, not a raw int() error."""
+    with pytest.raises(ValueError, match="non-numeric WMO id"):
+        parse_selection(["float:abc"])
+
+
+def test_parse_selection_rejects_non_numeric_cycle():
+    """A non-numeric cycle raises a friendly error naming the token."""
+    with pytest.raises(ValueError, match="non-numeric cycle"):
+        parse_selection(["profile:6902746/xx"])
+
+
 def test_region_box_order():
     """region_box emits the A1-pinned [W, E, S, N, dmin, dmax, start, end] order."""
     box = region_box(_space(), _time(), (0.0, 2000.0))
