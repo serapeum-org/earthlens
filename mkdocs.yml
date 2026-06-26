@@ -180,6 +180,11 @@ nav:
       - Usage: reference/erddap/usage.md
       - Available datasets: reference/erddap/datasets.md
       - Reference: reference/erddap/erddap.md
+    - Bathymetry (topography / bathymetry DEMs):
+      - Introduction: reference/bathymetry/introduction.md
+      - Usage: reference/bathymetry/usage.md
+      - Available datasets: reference/bathymetry/datasets.md
+      - Reference: reference/bathymetry/bathymetry.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
@@ -382,6 +387,13 @@ nav:
       - CRW SST anomaly — griddap (live): examples/erddap/02_griddap_sst_anomaly.ipynb
       - NDBC buoys — tabledap (live): examples/erddap/03_tabledap_buoys.ipynb
       - Catalog tooling — validate/coverage/curate (live): examples/erddap/04_catalog_tooling.ipynb
+    - Bathymetry (topography / bathymetry DEMs):
+      - DEM quickstart (live): examples/bathymetry/01_bathymetry_quickstart.ipynb
+      - Catalog explorer (no network): examples/bathymetry/02_catalog_explorer.ipynb
+      - Coastal depth profile (live): examples/bathymetry/03_coastal_depth_profile.ipynb
+      - GEBCO vs ETOPO1 resolution (live): examples/bathymetry/04_gebco_vs_etopo_resolution.ipynb
+      - Shaded relief (live): examples/bathymetry/05_shaded_relief.ipynb
+      - Depth distribution (live): examples/bathymetry/06_depth_histogram.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
