@@ -466,7 +466,16 @@ class _FakeNetCDF:
 
 @pytest.fixture
 def fake_netcdf(monkeypatch):
-    """Replace `pyramids.netcdf.NetCDF.read_file` with a `_FakeNetCDF`."""
+    """Replace `pyramids.netcdf.NetCDF.read_file` with a `_FakeNetCDF`.
+
+    Snapshots and restores `_FakeNetCDF.n_time` alongside `.calls` so a
+    test that monkeys with the time axis length (the G3 missing-axis +
+    capitalised-axis tests do this through `monkeypatch.setattr`) cannot
+    leak its mutation into the rest of the file — `_FakeNetCDF.n_time` is
+    a class-level int and `dimension_sizes` reads `_FakeNetCDF.n_time`,
+    not `self.n_time`, so a stale value would silently break every
+    subsequent SPEIbase test.
+    """
     import pyramids.netcdf as netcdf_module
 
     monkeypatch.setattr(
@@ -474,9 +483,11 @@ def fake_netcdf(monkeypatch):
         "read_file",
         classmethod(lambda cls, path: _FakeNetCDF(str(path))),
     )
+    saved_n_time = _FakeNetCDF.n_time
     _FakeNetCDF.calls.clear()
     yield _FakeNetCDF
     _FakeNetCDF.calls.clear()
+    _FakeNetCDF.n_time = saved_n_time
 
 
 def test_speibase_fetch_writes_one_tif_per_month(monkeypatch, tmp_path, fake_netcdf):
