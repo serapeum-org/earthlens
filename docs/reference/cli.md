@@ -45,10 +45,10 @@ earthlens datasets validate all                # every provider
 ```
 
 Canonical ids: `bathymetry`, `chc`, `s3`, `cmems`, `ecmwf`, `earthdata`, `erddap`, `eumetsat`, `fdsn`,
-`firms`, `gdacs`, `gee`, `ghsl`, `hdx`, `jaxa`, `nwp`, `openaq`, `openeo`, `overture`, `radar`,
+`firms`, `gdacs`, `gee`, `ghsl`, `hdx`, `jaxa`, `nwp`, `openaq`, `openeo`, `overture`, `pvgis`, `radar`,
 `sentinel_hub`, `stac`, `tropycal`, `usgs_water`, `worldpop`. Common aliases include `amazon-s3`, `chirps`,
 `google-earth-engine`, `ioos` (erddap), `sentinel-hub`/`sentinelhub`, `nexrad`, `nwis`/`usgs-water`,
-`world-pop`, `human-settlement`/`ghs`, `gebco`/`etopo` (bathymetry),
+`world-pop`, `human-settlement`/`ghs`, `gebco`/`etopo` (bathymetry), `solar-pv` (pvgis),
 `earth-search`/`planetary-computer`/`cdse` (STAC endpoints). An unknown selector is a **usage error**
 (exit code `2`).
 
