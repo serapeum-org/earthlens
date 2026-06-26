@@ -299,12 +299,14 @@ class EarthLens:
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'erddap', 'etopo',
              'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gebco',
-             'gee', 'ghs', 'ghsl', 'google-earth-engine', 'hdx',
+             'gee', 'ghs', 'ghsl', 'global-solar-atlas', 'global-wind-atlas',
+             'google-earth-engine', 'gsa', 'gwa', 'hdx',
              'human-settlement', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth',
              'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
              'obis', 'openaq', 'openeo', 'overture', 'planetary-computer',
              'protected-planet', 'radar', 'redlist', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
+             'sentinelhub', 'solar-wind-atlas', 'stac', 'tropycal',
+             'usgs-landsat', 'usgs-nwis',
              'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
@@ -614,6 +616,18 @@ class EarthLens:
             "bathymetry": ("earthlens.bathymetry", "Bathymetry", "", {}),
             "gebco": ("earthlens.bathymetry", "Bathymetry", "", {}),
             "etopo": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            # Global Solar Atlas + Global Wind Atlas climatology layers,
+            # bbox-subset to GeoTIFF. Open data / CC-BY-4.0 (requests +
+            # pyramids are core), so no extra to hint. The wind layers are
+            # read windowed over /vsicurl; the solar layers download once and
+            # crop locally. Aliases "global-solar-atlas" / "global-wind-atlas"
+            # / "gsa" / "gwa" — pass variables=[...] to pick layers (e.g.
+            # variables=["ghi", "wind_100m"]).
+            "solar-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "global-solar-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "global-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "gsa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "gwa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
         }
     )
 
