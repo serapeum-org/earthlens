@@ -333,6 +333,13 @@ def test_crs_from_geojson_handles_variants():
     )
     # Missing crs member → RFC 7946 default.
     assert f({"type": "FeatureCollection", "features": []}) == "EPSG:4326"
+    # Malformed crs blocks (non-dict properties / non-dict crs / missing
+    # name+code) must all degrade to the RFC 7946 default, not raise.
+    assert f({"crs": "EPSG:4326"}) == "EPSG:4326"  # crs is a str
+    assert f({"crs": {"type": "name", "properties": "EPSG:4326"}}) == "EPSG:4326"
+    assert f({"crs": {"type": "name", "properties": ["EPSG:4326"]}}) == "EPSG:4326"
+    assert f({"crs": {"type": "name", "properties": {}}}) == "EPSG:4326"
+    assert f({"crs": {"type": "name", "properties": {"name": None}}}) == "EPSG:4326"
 
 
 def test_usdm_aggregate_rejected(tmp_path):

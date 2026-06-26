@@ -597,7 +597,14 @@ def _crs_from_geojson(payload: dict[str, Any]) -> str:
     crs = payload.get("crs")
     if not isinstance(crs, dict):
         return "EPSG:4326"
-    props = crs.get("properties") or {}
+    props = crs.get("properties")
+    # `or {}` only catches None/empty; a truthy non-dict (a `str`, `list`,
+    # or `int` from a malformed upstream) would slip past and the next
+    # `.get(...)` would AttributeError. Default to the RFC 7946 value
+    # instead, which is the only safe interpretation when we cannot
+    # parse the properties block.
+    if not isinstance(props, dict):
+        return "EPSG:4326"
     name = props.get("name") or props.get("code")
     if name is None:
         return "EPSG:4326"
