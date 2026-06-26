@@ -374,7 +374,11 @@ class _FakeNetCDF:
     """Stand-in for `pyramids.netcdf.NetCDF` — records `subset()` calls."""
 
     calls: list[dict[str, Any]] = []
-    n_time: int = 1500  # SPEIbase v2.10 is ~1488 months (Jan 1901 → Dec 2024).
+    # Sized so the happy-path SPEIbase tests at 2026 dates (idx ≈ 1505)
+    # land inside the axis, but the overflow-guard test at 2099-06
+    # (idx 2381) does not. Any value in (1506, 2381) works; 2000 is a
+    # round number comfortably past 2026 without reaching 2099.
+    n_time: int = 2000
 
     def __init__(self, path: str):
         self.path = path
