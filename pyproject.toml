@@ -297,6 +297,7 @@ markers = [
     "jaxa: tests for the JAXA backend (requires the `jaxa` extra: jaxa.earth + gportal; two protocols — authless STAC/COG via jaxa.earth, credentialed SFTP via gportal).",
     "erddap: tests for the generic ERDDAP backend (requires the `erddap` extra: erddapy; griddap raster via direct .nc download + pyramids, tabledap tabular via to_pandas; public servers only).",
     "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; no extra SDK — core requests + pyramids).",
+    "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
 ]
 
 [tool.pixi.workspace]
