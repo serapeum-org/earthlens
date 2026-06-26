@@ -389,6 +389,9 @@ nav:
       - GEBCO vs ETOPO1 resolution (live): examples/bathymetry/04_gebco_vs_etopo_resolution.ipynb
       - Shaded relief (live): examples/bathymetry/05_shaded_relief.ipynb
       - Depth distribution (live): examples/bathymetry/06_depth_histogram.ipynb
+    - Climate indices (teleconnections):
+      - Quickstart (live): examples/climate_indices/01_climate_indices_quickstart.ipynb
+      - Catalog & behaviour (no network): examples/climate_indices/02_catalog_and_behavior.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
