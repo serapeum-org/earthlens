@@ -1,0 +1,32 @@
+# NOAA ETOPO1 global relief — served as ERDDAP griddap by NOAA upwell.
+#
+# ETOPO1 is a 1-arc-minute global relief model of Earth's surface. Two
+# variants are shipped as separate rows (the variant is the dataset id,
+# not a `variables` knob): the `etopo1_ice` Ice-Surface model (top of the
+# Antarctic / Greenland ice sheets) and the `etopo1_bedrock` Bedrock model
+# (base of the ice sheets). Both expose a single `z` band of metres
+# relative to sea level. Pinned live in the A1 gate — see
+# planning/bathymetry/captures/bathymetry-sdk-facts.md.
+datasets:
+  etopo1_ice:
+    title: "ETOPO1 global relief, Ice Surface (1 arc-minute)"
+    transport: erddap-griddap
+    endpoint: https://upwell.pfeg.noaa.gov/erddap
+    dataset_id: etopo1_ice
+    variable: z
+    native_resolution: 1 arc-minute
+    lon_convention: "-180..180"
+    license_note: >-
+      Amante, C. and B.W. Eakins, 2009. ETOPO1 1 Arc-Minute Global Relief Model (doi:10.7289/V5C8276M);
+      served by the NOAA upwell ERDDAP, U.S. Government public domain.
+  etopo1_bedrock:
+    title: "ETOPO1 global relief, Bedrock (1 arc-minute)"
+    transport: erddap-griddap
+    endpoint: https://upwell.pfeg.noaa.gov/erddap
+    dataset_id: etopo1_bedrock
+    variable: z
+    native_resolution: 1 arc-minute
+    lon_convention: "-180..180"
+    license_note: >-
+      Amante, C. and B.W. Eakins, 2009. ETOPO1 1 Arc-Minute Global Relief Model (doi:10.7289/V5C8276M);
+      served by the NOAA upwell ERDDAP, U.S. Government public domain.

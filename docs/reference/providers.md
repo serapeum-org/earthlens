@@ -46,6 +46,8 @@ Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core inst
 | OBIS marine occurrences | `obis` | vector | none (anonymous) | `obis` | [OBIS](obis/introduction.md) |
 | Protected Planet (WDPA) protected areas | `wdpa`, `protected-planet` | vector | API token (`?token=`) | — | [WDPA](wdpa/introduction.md) |
 | IUCN Red List assessments | `iucn`, `redlist` | tabular | Bearer token | — | [IUCN](iucn/introduction.md) |
+| Generic ERDDAP servers (NOAA CoastWatch / Coral Reef Watch / NCEI / …) | `erddap`, `ioos` | per-dataset (raster griddap / tabular tabledap) | none (public servers) | `erddap` | [ERDDAP](erddap/introduction.md) |
+| Bathymetry DEMs (GEBCO 2020 / NOAA ETOPO1 ice + bedrock) | `bathymetry`, `gebco`, `etopo` | raster | none (open ERDDAP) | — | [Bathymetry](bathymetry/introduction.md) |
 | Argo float ocean profiles | `argo`, `argo-floats`, `argopy` | tabular | none (open data) | `argo` | [Argo](argo/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables

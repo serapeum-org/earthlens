@@ -294,17 +294,18 @@ class EarthLens:
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['alaska-satellite-facility', 'amazon-s3', 'argo', 'argo-floats',
-             'argopy', 'asf', 'bdc',
+             'argopy', 'asf', 'bathymetry', 'bdc',
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
-             'earth-search', 'earthdata', 'ecmwf', 'eumetsat', 'fdsn', 'firms',
-             'g-portal', 'gbif', 'gdacs', 'gee', 'ghs', 'ghsl',
-             'google-earth-engine', 'hdx', 'human-settlement', 'insar', 'iucn',
-             'jaxa', 'jaxa-earth', 'landsat', 'national-water-model', 'nexrad',
-             'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo', 'overture',
-             'planetary-computer', 'protected-planet', 'radar', 'redlist',
-             'sentinel-hub', 'sentinelhub', 'stac', 'tropycal', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
+             'earth-search', 'earthdata', 'ecmwf', 'erddap', 'etopo',
+             'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gebco',
+             'gee', 'ghs', 'ghsl', 'google-earth-engine', 'hdx',
+             'human-settlement', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth',
+             'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
+             'obis', 'openaq', 'openeo', 'overture', 'planetary-computer',
+             'protected-planet', 'radar', 'redlist', 'sentinel-hub',
+             'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
+             'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -598,6 +599,21 @@ class EarthLens:
             "argo": ("earthlens.argo", "ARGO", "argo", {}),
             "argo-floats": ("earthlens.argo", "ARGO", "argo", {}),
             "argopy": ("earthlens.argo", "ARGO", "argo", {}),
+            # Generic ERDDAP client — one backend for many public ERDDAP
+            # servers (NOAA CoastWatch / CRW, NCEI, …). `dataset=<id>`
+            # picks a curated row; its `protocol` sets the per-instance
+            # OUTPUT_KIND (griddap -> raster, tabledap -> tabular). Alias
+            # "ioos".
+            "erddap": ("earthlens.erddap", "ERDDAP", "erddap", {}),
+            "ioos": ("earthlens.erddap", "ERDDAP", "erddap", {}),
+            # Global topography / bathymetry DEMs (GEBCO 2020 + ETOPO1
+            # ice/bedrock) subset via NOAA ERDDAP griddap -> pyramids ->
+            # GeoTIFF. Open data (requests + pyramids are core), so no extra
+            # to hint. Aliases "gebco" / "etopo" — pass dataset= to pick the
+            # DEM (e.g. dataset="gebco_2020" / "etopo1_ice" / "etopo1_bedrock").
+            "bathymetry": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            "gebco": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            "etopo": ("earthlens.bathymetry", "Bathymetry", "", {}),
         }
     )
 

@@ -630,6 +630,12 @@ def curate(
     service: list[str] = typer.Option(
         None, "--service", help="usgs_water: repeatable service the code serves."
     ),
+    server: str = typer.Option(
+        "",
+        "--server",
+        help="erddap: ERDDAP base URL to look the dataset up on (defaults to "
+        "the servers the catalog already curates from).",
+    ),
     write: bool = typer.Option(
         False,
         "--write",
@@ -654,7 +660,7 @@ def curate(
     (single-file providers like usgs_water write in place; sharded providers
     need `--target <file-stem>`, defaulting to `--daac` / `--group`). Only
     providers with a stanza emitter are supported (earthdata, hdx,
-    usgs_water, eumetsat, gee); others report `unsupported`.
+    usgs_water, eumetsat, gee, jaxa, erddap); others report `unsupported`.
     """
     backends = _select_refresh_backends(provider)
     if len(backends) != 1:
@@ -682,6 +688,7 @@ def curate(
         units=units,
         group=group,
         services=service or None,
+        server=server or None,
     )
 
     if result.status != "ok":

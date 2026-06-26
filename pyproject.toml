@@ -119,10 +119,15 @@ jaxa = [
 # dev/test env without argopy; the gated live e2e needs `pip install
 # earthlens[argo]` in an argopy-capable (openeo-free) environment.
 argo = ["argopy >=1.4"]
+# Generic ERDDAP client (IOOS erddapy, BSD-3). Used only on the tabledap
+# to_pandas() path; the griddap path builds the OPeNDAP .nc URL directly and
+# downloads it with core `requests`, then reads it back via pyramids — earthlens
+# never imports xarray. Floor pinned from the A1 gate (erddapy 3.2.1 verified).
+erddap = ["erddapy >=3.0"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 # (argo is intentionally excluded — see the note above its extra.)
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa]",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
 ]
 
 [dependency-groups]
@@ -303,6 +308,8 @@ markers = [
     "iucn: tests for the IUCN Red List v4 backend (no extra SDK; direct v4 REST via core `requests`; needs a Bearer token).",
     "jaxa: tests for the JAXA backend (requires the `jaxa` extra: jaxa.earth + gportal; two protocols — authless STAC/COG via jaxa.earth, credentialed SFTP via gportal).",
     "argo: tests for the Argo float-profile backend (requires the `argo` extra: argopy; open data, no auth).",
+    "erddap: tests for the generic ERDDAP backend (requires the `erddap` extra: erddapy; griddap raster via direct .nc download + pyramids, tabledap tabular via to_pandas; public servers only).",
+    "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; no extra SDK — core requests + pyramids).",
 ]
 
 [tool.pixi.workspace]
