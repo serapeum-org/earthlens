@@ -23,6 +23,7 @@ data, so no gridded-array dependency is used in this subpackage by design.
 from __future__ import annotations
 
 import pandas as pd
+from loguru import logger
 
 #: The canonical long-format schema every parsed / concatenated frame
 #: carries (the backend stamps `index` / `source` onto the `(date,
@@ -120,6 +121,11 @@ def parse_psl(text: str) -> pd.DataFrame:
                 sentinel = float(parts[0])
             except ValueError:
                 continue
+    if rows and sentinel is None:
+        logger.warning(
+            "parse_psl: no missing-value sentinel line found after the data "
+            "block; any in-data missing markers are kept as raw values."
+        )
     return _melt_year_months(rows, sentinel)
 
 

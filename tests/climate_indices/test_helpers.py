@@ -115,6 +115,25 @@ def test_parse_psl_skips_non_numeric_rows_and_sentinel() -> None:
     assert df["value"].notna().all()
 
 
+def test_parse_psl_without_sentinel_line_warns_and_keeps_values() -> None:
+    """A PSL body with no lone sentinel line warns and keeps raw values (L1)."""
+    from loguru import logger
+
+    text = (
+        "2000 2000\n"
+        "2000 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2\n"
+    )
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING")
+    try:
+        df = parse_psl(text)
+    finally:
+        logger.remove(sink_id)
+    assert len(df) == 12
+    assert df["value"].notna().all()
+    assert any("no missing-value sentinel" in m for m in messages)
+
+
 def test_parse_climexp_skips_non_numeric_rows() -> None:
     """A 13/14-token climexp row with non-numeric months is skipped."""
     text = (
