@@ -39,11 +39,11 @@ requested date onto the source's release calendar before fetching:
 
 | Cadence | Where | Snap rule |
 |---------|-------|-----------|
-| `weekly` | USDM | Most recent **Thursday** at or before the requested date (USDM releases Thursday UTC, valid the prior Tuesday). |
+| `weekly` | USDM | Most recent **Tuesday** at or before the requested date (USDM releases Thursday UTC, valid the prior Tuesday — the JSON URL is keyed on the Tuesday valid date, not the Thursday release date). |
 | `10day`  | Most EDO/GDO indicators | Start of the **dekad** containing the date (the 1st, 11th, or 21st of the month). |
 | `monthly` | SPEIbase + some EDO/GDO indicators (`spgTS`, `twsan`, `rdria`) | The **first** of the month. |
 
-Two dates that snap to the same period yield one fetch — so a two-week
+Two dates that snap to the same Tuesday yield one fetch — so a two-week
 window over USDM returns at most two `FeatureCollection`s merged into one.
 
 ## Output shape

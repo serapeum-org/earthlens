@@ -46,14 +46,14 @@ facade = EarthLens(
 fc = facade.download()
 fc.crs.to_epsg()        # 4326
 sorted(fc["DM"].unique())  # [0, 1, 2, 3, 4]
-fc["release_date"].iloc[0] # '2026-06-18'  (the Thursday release)
+fc["release_date"].iloc[0] # '2026-06-23'  (the Tuesday valid date)
 ```
 
 The result is a
 `pyramids.feature.collection.FeatureCollection` (a `GeoDataFrame`) in
-EPSG:4326. A multi-week range snaps to one Thursday per week and merges
+EPSG:4326. A multi-week range snaps to one Tuesday per week and merges
 into one `FeatureCollection` with a `release_date` column so you can
-trace each polygon back to its weekly release.
+trace each polygon back to its weekly valid date.
 
 Asking for `aggregate=` on USDM is rejected — drought-class polygons
 have no gridded reduction:
@@ -133,13 +133,13 @@ Four facade keys point at the drought backend:
 from datetime import date
 from earthlens.drought._helpers import snap_to_cadence
 
-snap_to_cadence([date(2026, 6, 23)], "weekly")   # [date(2026, 6, 18)] — Thursday
+snap_to_cadence([date(2026, 6, 23)], "weekly")   # [date(2026, 6, 23)] — Tuesday valid date
 snap_to_cadence([date(2026, 6, 15)], "10day")    # [date(2026, 6, 11)] — middle dekad
 snap_to_cadence([date(2026, 6, 25)], "monthly")  # [date(2026, 6, 1)]
 ```
 
 A range of dates collapses to one snapped period per release — so a
-week-long USDM range yields one FeatureCollection per Thursday release.
+week-long USDM range yields one FeatureCollection per Tuesday valid date.
 
 ## Attributions logged on success
 

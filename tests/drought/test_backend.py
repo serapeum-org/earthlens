@@ -157,7 +157,7 @@ def test_drought_output_kind_is_per_instance():
 
 
 def test_drought_search_emits_one_product_per_snapped_period():
-    """A two-week window collapses to two Thursday releases for USDM."""
+    """A two-week window collapses to one Tuesday release per week for USDM."""
     backend = Drought(
         start="2026-06-10",
         end="2026-06-23",
@@ -167,19 +167,19 @@ def test_drought_search_emits_one_product_per_snapped_period():
     )
     products = backend._search()
     assert [p.id for p in products] == [
-        "usdm@2026-06-04",
-        "usdm@2026-06-11",
-        "usdm@2026-06-18",
+        "usdm@2026-06-09",
+        "usdm@2026-06-16",
+        "usdm@2026-06-23",
     ]
     assert {p.metadata["dataset"] for p in products} == {"usdm"}
 
 
-def test_usdm_render_url_uses_release_date():
-    """The `{ymd}` placeholder takes the Thursday release date verbatim."""
+def test_usdm_render_url_uses_tuesday_valid_date():
+    """The `{ymd}` placeholder takes the Tuesday valid date verbatim."""
     rendered = Drought._render_usdm_url(
-        "https://example.com/usdm_{ymd}.json", dt.date(2026, 6, 18)
+        "https://example.com/usdm_{ymd}.json", dt.date(2026, 6, 23)
     )
-    assert rendered == "https://example.com/usdm_20260618.json"
+    assert rendered == "https://example.com/usdm_20260623.json"
 
 
 def test_usdm_fetch_builds_feature_collection_in_4326(monkeypatch, tmp_path):
@@ -199,7 +199,7 @@ def test_usdm_fetch_builds_feature_collection_in_4326(monkeypatch, tmp_path):
     assert fc.crs.to_epsg() == 4326
     assert len(fc) == 2
     assert set(fc["DM"]) == {1, 3}
-    assert fc["release_date"].iloc[0] == "2026-06-18"
+    assert fc["release_date"].iloc[0] == "2026-06-23"
 
 
 def test_usdm_fetch_clips_to_bbox(monkeypatch, tmp_path):

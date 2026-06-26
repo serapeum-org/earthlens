@@ -96,20 +96,21 @@ def _to_date(value: dt.date | dt.datetime | str) -> dt.date:
 
 
 def _snap_weekly(date: dt.date) -> dt.date:
-    """Snap a calendar date to the **Thursday at or before** it.
+    """Snap a calendar date to the **Tuesday at or before** it.
 
-    USDM releases every Thursday UTC; the release covers the previous
-    Tuesday. The dataset row stores the **release date** (Thursday) in its
-    `{ymd}` URL placeholder, so the backend snaps the user's request to
-    that Thursday.
+    USDM releases every Thursday UTC; each composite is **valid the prior
+    Tuesday**, and the on-disk JSON / shapefile stem is `usdm_{YYYYMMDD}`
+    where the date is the **Tuesday valid date** (not the Thursday release
+    date — verified live, every Thursday URL returns 404). The backend
+    therefore snaps each requested date to that Tuesday.
 
     Args:
         date: A calendar date.
 
     Returns:
-        datetime.date: The most recent Thursday at-or-before `date`.
+        datetime.date: The most recent Tuesday at-or-before `date`.
     """
-    days_back = (date.weekday() - 3) % 7
+    days_back = (date.weekday() - 1) % 7
     return date - dt.timedelta(days=days_back)
 
 
@@ -181,18 +182,18 @@ def snap_to_cadence(
         ValueError: When `cadence` is not one of the three known values.
 
     Examples:
-        - USDM Tuesday → snaps back to the previous Thursday release:
+        - USDM Tuesday → snaps to itself (Tuesday is the valid date):
             ```python
             >>> import datetime as dt
             >>> from earthlens.drought._helpers import snap_to_cadence
             >>> snap_to_cadence([dt.date(2026, 6, 23)], "weekly")
-            [datetime.date(2026, 6, 18)]
+            [datetime.date(2026, 6, 23)]
 
             ```
-        - A two-week span snaps to one Thursday per week (de-duplicated):
+        - A two-day span snaps to one Tuesday per week (de-duplicated):
             ```python
             >>> snap_to_cadence([dt.date(2026, 6, 23), dt.date(2026, 6, 24)], "weekly")
-            [datetime.date(2026, 6, 18)]
+            [datetime.date(2026, 6, 23)]
 
             ```
         - A dekad date snaps to the first of its 10-day period:

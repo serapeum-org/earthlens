@@ -309,7 +309,7 @@ class Drought(AbstractDataSource):
         a future release switches CRS) and clipped to the requested bbox.
 
         Args:
-            products: One product per snapped Thursday release date.
+            products: One product per snapped Tuesday valid date.
 
         Returns:
             FeatureCollection: The drought-class polygons, CRS `EPSG:4326`,
@@ -348,11 +348,11 @@ class Drought(AbstractDataSource):
 
     @staticmethod
     def _render_usdm_url(template: str, period: dt.date) -> str:
-        """Substitute `{ymd}` in a USDM endpoint with the release date.
+        """Substitute `{ymd}` in a USDM endpoint with the Tuesday valid date.
 
         Args:
             template: The catalog row's endpoint (carries `{ymd}`).
-            period: The snapped Thursday release date.
+            period: The snapped Tuesday valid date.
 
         Returns:
             str: The fully-rendered USDM JSON URL.
