@@ -100,6 +100,12 @@ def test_unknown_bgc_param_rejected(argo_kwargs: Callable[..., dict[str, Any]]):
         ARGO(**argo_kwargs(variables=["DOXyy"], dataset="bgc"))
 
 
+def test_unknown_phy_param_rejected(argo_kwargs: Callable[..., dict[str, Any]]):
+    """A region request validates phy parameter names through the constructor."""
+    with pytest.raises(ValueError, match="Did you mean 'TEMP'"):
+        ARGO(**argo_kwargs(variables=["TEMPP"], dataset="phy"))
+
+
 def test_aggregate_rejected(argo_kwargs: Callable[..., dict[str, Any]]):
     """A non-None aggregate= is rejected, pointing at CMEMS."""
     backend = ARGO(**argo_kwargs())
