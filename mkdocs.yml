@@ -399,6 +399,10 @@ nav:
       - GEBCO vs ETOPO1 resolution (live): examples/bathymetry/04_gebco_vs_etopo_resolution.ipynb
       - Shaded relief (live): examples/bathymetry/05_shaded_relief.ipynb
       - Depth distribution (live): examples/bathymetry/06_depth_histogram.ipynb
+    - PVGIS (solar radiation / PV):
+      - Quickstart — hourly radiation (live): examples/pvgis/01_pvgis_quickstart.ipynb
+      - Catalog explorer (no network): examples/pvgis/02_catalog_explorer.ipynb
+      - PV power & TMY (live): examples/pvgis/03_pv_power_and_tmy.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
