@@ -1,0 +1,84 @@
+# Climate / teleconnection index catalogue for earthlens.climate_indices.
+#
+# Two open ASCII sources (no auth). Each `sources:` entry pins a base URL
+# and the citation to log on use; each `datasets:` row names its source,
+# the per-file name appended to that base URL, the ASCII `dialect` parser
+# to use, and light metadata. The loader joins `base_url + file` into the
+# row's `url` and attaches the source citation. Sentinels are detected
+# per file at parse time (PSL) or fixed (`-999.9`, climexp), so they are
+# not stored here. Verified live 2026-06-26 (see
+# planning/climate_indices/captures/climate-indices-sdk-facts.md).
+
+sources:
+  noaa-psl:
+    base_url: https://psl.noaa.gov/data/correlation/
+    citation: >-
+      NOAA Physical Sciences Laboratory (PSL), Boulder, Colorado, USA,
+      from their website at https://psl.noaa.gov/data/climateindices/
+  knmi-climexp:
+    base_url: https://climexp.knmi.nl/data/
+    citation: >-
+      KNMI Climate Explorer (https://climexp.knmi.nl), Royal Netherlands
+      Meteorological Institute.
+
+datasets:
+  oni:
+    source: noaa-psl
+    dialect: psl
+    file: oni.data
+    long_name: Oceanic Niño Index (3-month running mean of Niño 3.4 ERSSTv5 SST anomaly)
+    units: degC
+  nina34:
+    source: noaa-psl
+    dialect: psl
+    file: nina34.data
+    long_name: Niño 3.4 sea-surface-temperature anomaly
+    units: degC
+  soi:
+    source: noaa-psl
+    dialect: psl
+    file: soi.data
+    long_name: Southern Oscillation Index
+    units: std
+  nao:
+    source: noaa-psl
+    dialect: psl
+    file: nao.data
+    long_name: North Atlantic Oscillation (CPC)
+    units: std
+  ao:
+    source: noaa-psl
+    dialect: psl
+    file: ao.data
+    long_name: Arctic Oscillation
+    units: std
+  pna:
+    source: noaa-psl
+    dialect: psl
+    file: pna.data
+    long_name: Pacific/North American teleconnection pattern
+    units: std
+  pdo:
+    source: noaa-psl
+    dialect: psl
+    file: pdo.data
+    long_name: Pacific Decadal Oscillation
+    units: std
+  tni:
+    source: noaa-psl
+    dialect: psl
+    file: tni.data
+    long_name: Trans-Niño Index
+    units: degC
+  censo:
+    source: noaa-psl
+    dialect: psl
+    file: censo.data
+    long_name: Bivariate ENSO index (CENSO)
+    units: std
+  amo:
+    source: knmi-climexp
+    dialect: climexp
+    file: iamo_ersst.dat
+    long_name: Atlantic Multidecadal Oscillation (detrended, ERSSTv5)
+    units: degC
