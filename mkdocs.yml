@@ -474,6 +474,7 @@ nav:
       - Country Red List breakdown (live): examples/iucn/country_redlist_breakdown.ipynb
     - Argo (float profiles):
       - Quickstart — float profiles: examples/argo/quickstart.ipynb
+      - Catalog, selectors & T–S diagram: examples/argo/catalog_and_selectors.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
