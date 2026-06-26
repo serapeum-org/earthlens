@@ -100,7 +100,7 @@ class Drought(AbstractDataSource):
         end: str,
         lat_lim: list[float],
         lon_lim: list[float],
-        dataset: str,
+        dataset: str | None = None,
         variables: list[str] | None = None,
         temporal_resolution: str = "auto",
         path: str | Path | None = None,

@@ -20,8 +20,8 @@ def test_drought_key_listed_in_registered_sources():
     assert {"drought", "usdm", "edo", "gdo"}.issubset(keys)
 
 
-def test_facade_routes_usdm_through_drought(monkeypatch):
-    """`EarthLens("usdm", ...)` resolves to a Drought instance, dataset bound."""
+def test_facade_routes_usdm_through_drought_with_explicit_dataset():
+    """`EarthLens("usdm", dataset="usdm", ...)` resolves to Drought."""
     facade = EarthLens(
         data_source="usdm",
         start="2026-06-23",
@@ -29,10 +29,25 @@ def test_facade_routes_usdm_through_drought(monkeypatch):
         variables=[],
         lat_lim=[30.0, 40.0],
         lon_lim=[-95.0, -85.0],
+        dataset="usdm",
     )
     assert isinstance(facade.datasource, Drought)
     assert facade.datasource._dataset.id == "usdm"
     assert facade.datasource.OUTPUT_KIND == "vector"
+
+
+@pytest.mark.parametrize("key", ["drought", "usdm", "edo", "gdo"])
+def test_facade_aliases_require_explicit_dataset(key):
+    """Every drought alias requires an explicit dataset= kwarg (no pre-bind)."""
+    with pytest.raises(ValueError, match="needs dataset="):
+        EarthLens(
+            data_source=key,
+            start="2026-06-23",
+            end="2026-06-23",
+            variables=[],
+            lat_lim=[30.0, 40.0],
+            lon_lim=[-95.0, -85.0],
+        )
 
 
 def test_facade_routes_drought_with_explicit_dataset_kwarg(tmp_path):

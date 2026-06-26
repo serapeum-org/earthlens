@@ -413,8 +413,9 @@ class EarthLens:
             GeoJSON), Copernicus EDO/GDO (raster via OGC WCS — pending the
             pyramids temporal `read_wcs` extension), and CSIC SPEIbase
             (raster via NetCDF). Per-instance `OUTPUT_KIND`. No SDK extra.
-            Keys `"drought"` / `"usdm"` (pre-binds `dataset="usdm"`) /
-            `"edo"` / `"gdo"`.
+            Four discoverability keys (`"drought"` / `"usdm"` / `"edo"` /
+            `"gdo"`) all resolve to the same backend; all require an
+            explicit `dataset=` kwarg.
         :class:`earthlens.wdpa.WDPA`: Protected Planet (WDPA)
             protected-area polygons via the direct v4 REST API
             (`?token=`); `vector` polygon FeatureCollection; keys
@@ -598,12 +599,17 @@ class EarthLens:
             # OGC WCS — waits on pyramids PY-A temporal `read_wcs`), and CSIC
             # SPEIbase (raster NetCDF). Per-instance OUTPUT_KIND from the
             # resolved `dataset=` row. No SDK extra (requests + pyramids are
-            # core). The `usdm` / `edo` / `gdo` aliases pre-bind the
-            # `dataset=` keyword so a user can write
-            # `EarthLens("usdm", ...)` for the most common request without
-            # repeating `dataset="usdm"`.
+            # core). The four keys (`drought` / `usdm` / `edo` / `gdo`) are
+            # discoverability aliases — all four resolve to the same backend
+            # and all four require an explicit `dataset=` kwarg (e.g.
+            # `EarthLens("usdm", dataset="usdm", ...)`,
+            # `EarthLens("edo", dataset="edo-spaST", ...)`). No alias pre-binds
+            # the dataset: pre-bound aliases collide with the facade's own
+            # `dataset=` plumbing (TypeError: multiple values) and only work for
+            # exactly one of the 32 catalog rows, so they trade a tiny ergonomic
+            # win for two foot-guns.
             "drought": ("earthlens.drought", "Drought", "", {}),
-            "usdm": ("earthlens.drought", "Drought", "", {"dataset": "usdm"}),
+            "usdm": ("earthlens.drought", "Drought", "", {}),
             "edo": ("earthlens.drought", "Drought", "", {}),
             "gdo": ("earthlens.drought", "Drought", "", {}),
         }
