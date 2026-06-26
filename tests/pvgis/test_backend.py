@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
 import pytest
 
 from earthlens.pvgis import PVGIS
@@ -106,9 +105,7 @@ class TestDownloadSinglePoint:
         _backend(tmp_path, output_format="parquet").download(progress_bar=False)
         assert (tmp_path / "pvgis_seriescalc.parquet").exists(), "Parquet not written"
 
-    def test_logs_citation_on_success(
-        self, tmp_path, bind_session, seriescalc_payload
-    ):
+    def test_logs_citation_on_success(self, tmp_path, bind_session, seriescalc_payload):
         """A successful download logs the JRC citation once."""
         from loguru import logger
 
@@ -163,9 +160,7 @@ class TestDownloadBbox:
         with pytest.raises(ValueError, match="max_points"):
             backend.download(progress_bar=False)
 
-    def test_warn_past_soft_threshold(
-        self, tmp_path, bind_session, seriescalc_payload
-    ):
+    def test_warn_past_soft_threshold(self, tmp_path, bind_session, seriescalc_payload):
         """A grid above the soft threshold logs a warning but still fetches."""
         from loguru import logger
 

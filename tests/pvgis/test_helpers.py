@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import numpy as np
-import pandas as pd
 import pytest
 import requests
 
@@ -77,7 +76,9 @@ class TestThrottledGet:
             monotonic=lambda: 0.0,
         )
         assert resp.status_code == 200, "expected the 200 response back"
-        assert slept and slept[0] > 0, f"expected a positive throttle sleep, got {slept}"
+        assert (
+            slept and slept[0] > 0
+        ), f"expected a positive throttle sleep, got {slept}"
 
     def test_no_sleep_when_interval_elapsed(self):
         """A clock far past the last call skips the throttle sleep."""

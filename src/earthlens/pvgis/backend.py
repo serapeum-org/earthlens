@@ -435,9 +435,7 @@ class PVGIS(AbstractDataSource):
                     f"PVGIS returned no data for point (lat={lat}, lon={lon}): "
                     f"{message} (the location may be outside PVGIS coverage)."
                 )
-            logger.warning(
-                f"PVGIS skipped point (lat={lat}, lon={lon}): {message}"
-            )
+            logger.warning(f"PVGIS skipped point (lat={lat}, lon={lon}): {message}")
             return None
         payload = resp.json()
         if self._product.tool == "tmy":
