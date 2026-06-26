@@ -302,9 +302,9 @@ class EarthLens:
              'human-settlement', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth',
              'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
              'obis', 'openaq', 'openeo', 'overture', 'planetary-computer',
-             'protected-planet', 'radar', 'redlist', 'sentinel-hub',
-             'sentinelhub', 'stac', 'tropycal', 'usgs-landsat', 'usgs-nwis',
-             'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
+             'protected-planet', 'pvgis', 'radar', 'redlist', 'sentinel-hub',
+             'sentinelhub', 'solar-pv', 'stac', 'tropycal', 'usgs-landsat',
+             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -601,6 +601,13 @@ class EarthLens:
             "bathymetry": ("earthlens.bathymetry", "Bathymetry", "", {}),
             "gebco": ("earthlens.bathymetry", "Bathymetry", "", {}),
             "etopo": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            # JRC PVGIS solar-radiation / PV time series over the keyless
+            # REST API. Per-coordinate hourly DataFrame (tabular); a point
+            # or a bbox sampled to a point grid. variables=["seriescalc"]
+            # (hourly radiation / PV power) or ["tmy"]. No extra SDK (core
+            # requests + pandas). Alias "solar-pv".
+            "pvgis": ("earthlens.pvgis", "PVGIS", "", {}),
+            "solar-pv": ("earthlens.pvgis", "PVGIS", "", {}),
         }
     )
 
@@ -639,6 +646,7 @@ class EarthLens:
                 `"ghs"` / `"human-settlement"`), `"hdx"`, `"nwp"`,
                 `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
                 `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
+                `"pvgis"` (alias `"solar-pv"`),
                 `"stac"` (with endpoint aliases `"planetary-computer"` /
                 `"earth-search"` / `"cdse"`), `"tropycal"`,
                 `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`), or
