@@ -44,9 +44,10 @@ earthlens datasets refresh stac,openeo         # a comma list
 earthlens datasets validate all                # every provider
 ```
 
-Canonical ids: `chc`, `s3`, `cmems`, `ecmwf`, `earthdata`, `eumetsat`, `fdsn`, `firms`, `gdacs`, `gee`,
-`ghsl`, `hdx`, `jaxa`, `nwp`, `openaq`, `openeo`, `overture`, `radar`, `sentinel_hub`, `stac`,
-`tropycal`, `usgs_water`, `worldpop`. Common aliases include `amazon-s3`, `chirps`, `google-earth-engine`,
+Canonical ids: `argo`, `asf`, `chc`, `cmems`, `earthdata`, `ecmwf`, `eumetsat`, `fdsn`, `firms`, `gbif`,
+`gdacs`, `gee`, `ghsl`, `hdx`, `iucn`, `jaxa`, `nwm`, `nwp`, `obis`, `openaq`, `openeo`, `overture`,
+`radar`, `s3`, `sentinel_hub`, `stac`, `tropycal`, `usgs_water`, `wdpa`, `worldpop`. Common aliases
+include `amazon-s3`, `chirps`, `google-earth-engine`, `argo-floats`/`argopy`,
 `sentinel-hub`/`sentinelhub`, `nexrad`, `nwis`/`usgs-water`, `world-pop`, `human-settlement`/`ghs`,
 `earth-search`/`planetary-computer`/`cdse` (STAC endpoints). An unknown selector is a **usage error**
 (exit code `2`).
