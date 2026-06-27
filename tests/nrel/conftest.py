@@ -99,6 +99,17 @@ def wtk_csv() -> str:
 
 
 @pytest.fixture
+def loguru_messages():
+    """Capture loguru WARNING+ messages into a list for the duration of a test."""
+    from loguru import logger
+
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING")
+    yield messages
+    logger.remove(sink_id)
+
+
+@pytest.fixture
 def bind_session(monkeypatch: pytest.MonkeyPatch):
     """Return a binder that patches `requests.Session` to a `FakeSession`."""
 
