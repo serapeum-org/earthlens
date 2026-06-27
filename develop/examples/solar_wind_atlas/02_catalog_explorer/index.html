@@ -15953,13 +15953,20 @@ by_transport
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9690b300">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell celltag_raises-exception">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell celltag_raises-exception" id="cell-id=9690b300">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="celltoolbar">
+<div class="button_container tags_button_container">
+<span class="tag-container">
+<span class="cell-tag">raises-exception</span>
+</span>
+</div>
+</div>
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -15972,15 +15979,9 @@ by_transport
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gho"</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gho"</span><span class="p">)</span>  <span class="c1"># unknown id -&gt; ValueError with a did-you-mean hint</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">try:
-    catalog.get("gho")
-except ValueError as exc:
-    print(exc)
+<div class="clipboard-copy-txt" id="cell-4">catalog.get("gho")  # unknown id -&gt; ValueError with a did-you-mean hint
 </div>
 </div>
 </div>
@@ -15992,9 +15993,31 @@ except ValueError as exc:
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>'gho' is not in the Solar &amp; Wind Atlas catalog. Known layers: ['air_density_100m', 'capacity_factor_iec1', 'capacity_factor_iec2', 'capacity_factor_iec3', 'dif', 'dni', 'ghi', 'gti', 'opta', 'pvout', 'weibull_k_100m', 'weibull_k_10m', 'weibull_k_150m', 'weibull_k_200m', 'weibull_k_50m', 'wind_100m']. Did you mean 'ghi'?
-</pre>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[4]</span><span class="ansi-green-fg">, line 1</span>
+<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">1</span> catalog.get(<span class="ansi-yellow-fg">"gho"</span>)  <span style="color: rgb(95,135,135)"># unknown id -&gt; ValueError with a did-you-mean hint</span>
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\solar-wind-atlas\src\earthlens\solar_wind_atlas\catalog.py:277</span>, in <span class="ansi-cyan-fg">Catalog.get</span><span class="ansi-blue-fg">(self, layer_id)</span>
+<span class="ansi-green-fg">    253</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-blue-fg">get</span>(<span style="color: rgb(0,135,0)">self</span>, layer_id: <span style="color: rgb(0,135,0)">str</span>) -&gt; Layer:
+<span class="ansi-green-fg">    254</span> <span style="color: rgb(188,188,188)">    </span><span class="ansi-yellow-fg">"""Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<span class="ansi-green-fg">    255</span> 
+<span class="ansi-green-fg">    256</span> <span class="ansi-yellow-fg">    Args:</span>
+<span class="ansi-green-fg">   (...)</span><span class="ansi-green-fg">    275</span> <span class="ansi-yellow-fg">            ```</span>
+<span class="ansi-green-fg">    276</span> <span class="ansi-yellow-fg">    """</span>
+<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">277</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-black-fg ansi-yellow-bg">self</span><span class="ansi-black-fg ansi-yellow-bg">.</span><span class="ansi-black-fg ansi-yellow-bg">get_dataset</span><span class="ansi-black-fg ansi-yellow-bg">(</span><span class="ansi-black-fg ansi-yellow-bg">layer_id</span><span class="ansi-black-fg ansi-yellow-bg">)</span>
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\solar-wind-atlas\src\earthlens\base\abstractdatasource.py:1072</span>, in <span class="ansi-cyan-fg">AbstractCatalog.get_dataset</span><span class="ansi-blue-fg">(self, name)</span>
+<span class="ansi-green-fg">   1070</span> close = difflib.get_close_matches(name, <span style="color: rgb(0,135,0)">self</span>.datasets, n=<span class="ansi-green-fg">1</span>)
+<span class="ansi-green-fg">   1071</span> hint = <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg"> Did you mean </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>close[<span class="ansi-green-fg">0</span>]<span class="ansi-bold" style="color: rgb(175,95,135)">!r}</span><span class="ansi-yellow-fg">?</span><span class="ansi-yellow-fg">"</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> close <span class="ansi-bold" style="color: rgb(0,135,0)">else</span> <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">"</span>
+<span class="ansi-green-fg">-&gt; </span><span class="ansi-green-fg">1072</span> <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">ValueError</span>(
+<span class="ansi-green-fg">   1073</span>     <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>name<span class="ansi-bold" style="color: rgb(175,95,135)">!r}</span><span class="ansi-yellow-fg"> is not in the </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span><span style="color: rgb(0,135,0)">self</span>._catalog_kind<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">. </span><span class="ansi-yellow-fg">"</span>
+<span class="ansi-green-fg">   1074</span>     <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Known </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span><span style="color: rgb(0,135,0)">self</span>._entry_noun<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">: </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span><span style="color: rgb(0,135,0)">sorted</span>(<span style="color: rgb(0,135,0)">self</span>.datasets)<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">.</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>hint<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">"</span>
+<span class="ansi-green-fg">   1075</span> ) <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>
+
+<span class="ansi-red-fg">ValueError</span>: 'gho' is not in the Solar &amp; Wind Atlas catalog. Known layers: ['air_density_100m', 'capacity_factor_iec1', 'capacity_factor_iec2', 'capacity_factor_iec3', 'dif', 'dni', 'ghi', 'gti', 'opta', 'pvout', 'weibull_k_100m', 'weibull_k_10m', 'weibull_k_150m', 'weibull_k_200m', 'weibull_k_50m', 'wind_100m']. Did you mean 'ghi'?</pre>
 </div>
 </div>
 </div>
