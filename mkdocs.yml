@@ -417,6 +417,8 @@ nav:
       - Quickstart — hourly radiation (live): examples/pvgis/01_pvgis_quickstart.ipynb
       - Catalog explorer (no network): examples/pvgis/02_catalog_explorer.ipynb
       - PV power & TMY (live): examples/pvgis/03_pv_power_and_tmy.ipynb
+    - NREL (solar / wind resource):
+      - Quickstart — NSRDB + WIND Toolkit (live): examples/nrel/01_nrel_quickstart.ipynb
     - Climate indices (teleconnections):
       - Quickstart (live): examples/climate_indices/01_climate_indices_quickstart.ipynb
       - Catalog & behaviour (no network): examples/climate_indices/02_catalog_and_behavior.ipynb
