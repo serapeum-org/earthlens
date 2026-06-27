@@ -11910,7 +11910,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.9.0
-  sha256: dcda6724ac1fb3a40deef180446b57c9b3613fc8a50a0d4de1b0ea997bf62da1
+  sha256: 22015e148e3d084d308d3b2768460d52bcedccdc4684ea7933fc015c1a6bd8c6
   requires_dist:
   - pyramids-gis>=0.35.0
   - geopandas>=1.0.0

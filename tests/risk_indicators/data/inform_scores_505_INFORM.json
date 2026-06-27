@@ -1,0 +1,42 @@
+[
+ {
+  "Iso3": "AFG",
+  "IndicatorId": "INFORM",
+  "IndicatorScore": 7.8,
+  "IndicatorName": "",
+  "nodelevel": 0,
+  "ValidityYear": 0,
+  "Unit": "",
+  "Note": ""
+ },
+ {
+  "Iso3": "ETH",
+  "IndicatorId": "INFORM",
+  "IndicatorScore": 7.0,
+  "IndicatorName": "",
+  "nodelevel": 0,
+  "ValidityYear": 0,
+  "Unit": "",
+  "Note": ""
+ },
+ {
+  "Iso3": "FRA",
+  "IndicatorId": "INFORM",
+  "IndicatorScore": 2.6,
+  "IndicatorName": "",
+  "nodelevel": 0,
+  "ValidityYear": 0,
+  "Unit": "",
+  "Note": ""
+ },
+ {
+  "Iso3": "KEN",
+  "IndicatorId": "INFORM",
+  "IndicatorScore": 6.2,
+  "IndicatorName": "",
+  "nodelevel": 0,
+  "ValidityYear": 0,
+  "Unit": "",
+  "Note": ""
+ }
+]
