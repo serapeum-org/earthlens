@@ -192,11 +192,14 @@ class RiskIndicators(AbstractDataSource):
                 f"dataset {self._dataset.id!r} (ThinkHazard) needs country= "
                 "(ISO3, e.g. country='KEN') or a raw admin_code=."
             )
-        if provider == "gfw" and not self._country:
-            raise ValueError(
-                f"dataset {self._dataset.id!r} (GFW) needs country= (ISO3, "
-                "e.g. country='KEN')."
-            )
+        if provider == "gfw":
+            iso = (self._country or "").strip()
+            if not (len(iso) == 3 and iso.isalpha()):
+                raise ValueError(
+                    f"dataset {self._dataset.id!r} (GFW) needs country= as a "
+                    f"3-letter ISO3 code (e.g. country='KEN'); got "
+                    f"{self._country!r}."
+                )
 
     def _initialize(self):
         """No global client — auth (GFW only) is built in :meth:`__init__`.

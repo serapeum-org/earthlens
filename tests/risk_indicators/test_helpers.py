@@ -98,11 +98,13 @@ class TestIsTransient:
         [
             (_helpers.requests.ConnectionError("reset"), True),
             (_helpers.requests.Timeout("slow"), True),
+            (_helpers.requests.exceptions.ChunkedEncodingError("mid-body"), True),
+            (_helpers.requests.exceptions.ContentDecodingError("gzip"), True),
             (_helpers.requests.RequestException("other"), False),
         ],
     )
     def test_connection_and_timeout(self, exc, expected):
-        """Connection resets and timeouts are transient; a bare error is not."""
+        """Connection resets (handshake or mid-body) and timeouts are transient."""
         assert _helpers._is_transient(exc) is expected
 
     def test_5xx_transient_4xx_not(self):

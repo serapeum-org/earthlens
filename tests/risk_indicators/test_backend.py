@@ -125,6 +125,17 @@ class TestConstruction:
                 path=tmp_path,
             )
 
+    def test_gfw_non_iso3_country_rejected(self, monkeypatch, tmp_path):
+        """A GFW request whose country is not a 3-letter ISO3 is rejected."""
+        with pytest.raises(ValueError, match="ISO3"):
+            _build(
+                monkeypatch,
+                variables=["gfw:tree_cover_loss"],
+                country="Kenya",
+                api_key="k",
+                path=tmp_path,
+            )
+
 
 class TestGridAndDates:
     """The sentinel extent and tolerant date handling."""

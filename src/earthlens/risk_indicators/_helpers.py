@@ -63,12 +63,25 @@ _HTTP_RETRIES: int = 2
 _HTTP_RETRY_BACKOFF: float = 1.0
 
 
+#: Exception types treated as transient (worth a retry). Covers a reset during
+#: the handshake (`ConnectionError`), a timeout, and — the common GFW case — a
+#: reset *mid-body* while streaming the response, which `requests` raises as a
+#: `ChunkedEncodingError` (a sibling of `ConnectionError`, not a subclass).
+_TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
+    requests.ConnectionError,
+    requests.Timeout,
+    requests.exceptions.ChunkedEncodingError,
+    requests.exceptions.ContentDecodingError,
+)
+
+
 def _is_transient(exc: requests.RequestException) -> bool:
     """Return whether a request error is worth retrying.
 
-    Connection errors (including the GFW host's intermittent resets) and
-    timeouts are transient; an HTTP error is transient only for a 5xx status
-    (a 4xx such as 404 is a real miss and fails fast).
+    Connection errors (including the GFW host's intermittent resets, whether
+    they land during the handshake or mid-body) and timeouts are transient; an
+    HTTP error is transient only for a 5xx status (a 4xx such as 404 is a real
+    miss and fails fast).
 
     Args:
         exc: The exception raised by `requests.get` / `raise_for_status`.
@@ -76,7 +89,7 @@ def _is_transient(exc: requests.RequestException) -> bool:
     Returns:
         bool: `True` to retry, `False` to fail fast.
     """
-    if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
+    if isinstance(exc, _TRANSIENT_ERRORS):
         return True
     if isinstance(exc, requests.HTTPError) and exc.response is not None:
         return exc.response.status_code >= 500

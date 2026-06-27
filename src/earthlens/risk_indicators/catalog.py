@@ -186,6 +186,10 @@ class Dataset(BaseModel):
                 without `gfw_dataset`/`gfw_version`/`sql_template`, or a vector
                 GFW row without `gfw_geostore`).
         """
+        if self.provider in ("thinkhazard", "inform") and self.output_kind != "tabular":
+            raise ValueError(
+                f"{self.provider} dataset {self.id!r} must be output_kind 'tabular'"
+            )
         if self.provider == "inform":
             if self.workflow_id is None or not self.indicator_id:
                 raise ValueError(

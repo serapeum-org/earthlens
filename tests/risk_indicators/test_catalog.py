@@ -118,6 +118,19 @@ class TestDatasetValidator:
         row = Dataset(id="thinkhazard:x", provider="thinkhazard", output_kind="tabular")
         assert row.hazard is None
 
+    @pytest.mark.parametrize("provider", ["thinkhazard", "inform"])
+    def test_non_gfw_provider_must_be_tabular(self, provider):
+        """A thinkhazard / inform row declared as vector is rejected."""
+        kwargs = (
+            {"workflow_id": 505, "indicator_id": "INFORM"}
+            if provider == "inform"
+            else {}
+        )
+        with pytest.raises(ValueError, match="must be output_kind 'tabular'"):
+            Dataset(
+                id=f"{provider}:x", provider=provider, output_kind="vector", **kwargs
+            )
+
 
 class TestResolveAdmin:
     """resolve_admin maps an ISO3 to a ThinkHazard ADM0 code."""
