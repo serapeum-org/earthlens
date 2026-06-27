@@ -419,6 +419,7 @@ nav:
       - PV power & TMY (live): examples/pvgis/03_pv_power_and_tmy.ipynb
     - NREL (solar / wind resource):
       - Quickstart — NSRDB + WIND Toolkit (live): examples/nrel/01_nrel_quickstart.ipynb
+      - Products & behaviour — TMY + bbox grid (live): examples/nrel/02_nrel_products_and_behavior.ipynb
     - Climate indices (teleconnections):
       - Quickstart (live): examples/climate_indices/01_climate_indices_quickstart.ipynb
       - Catalog & behaviour (no network): examples/climate_indices/02_catalog_and_behavior.ipynb
