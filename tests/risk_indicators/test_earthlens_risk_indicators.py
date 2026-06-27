@@ -28,10 +28,7 @@ class TestRegistry:
     @pytest.mark.parametrize("key", KEYS)
     def test_keys_resolve_to_risk_indicators_class(self, key: str) -> None:
         """All keys resolve to `earthlens.risk_indicators.RiskIndicators`."""
-        assert (
-            EarthLens.DataSources[key]
-            is earthlens.risk_indicators.RiskIndicators
-        )
+        assert EarthLens.DataSources[key] is earthlens.risk_indicators.RiskIndicators
 
     @pytest.mark.parametrize("key", KEYS)
     def test_keys_hint_no_extra(self, key: str) -> None:
@@ -53,9 +50,7 @@ class TestFacadeConstruction:
             country="KEN",
             path=tmp_path,
         )
-        assert isinstance(
-            el.datasource, earthlens.risk_indicators.RiskIndicators
-        )
+        assert isinstance(el.datasource, earthlens.risk_indicators.RiskIndicators)
         assert el.datasource.OUTPUT_KIND == "tabular"
 
     def test_facade_forwards_country(self, tmp_path: Path) -> None:

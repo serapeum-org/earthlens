@@ -293,7 +293,9 @@ class TestToFeatureCollection:
 
     def test_empty_features(self):
         """An empty features list yields an empty collection."""
-        fc = _helpers.to_feature_collection({"type": "FeatureCollection", "features": []})
+        fc = _helpers.to_feature_collection(
+            {"type": "FeatureCollection", "features": []}
+        )
         assert len(fc) == 0 and fc.crs.to_epsg() == 4326
 
     def test_missing_features_key_raises(self):

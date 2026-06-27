@@ -73,7 +73,9 @@ class FakeHttp:
         Raises:
             AssertionError: If no fixture matches the URL.
         """
-        self.calls.append({"url": url, "params": params or {}, "headers": headers or {}})
+        self.calls.append(
+            {"url": url, "params": params or {}, "headers": headers or {}}
+        )
         if "/geostore/admin/" in url:
             geojson = load_json("gfw_geostore_admin_KEN.json")
             payload: Any = {"data": {"attributes": {"geojson": geojson}}}

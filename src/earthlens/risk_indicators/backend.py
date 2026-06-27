@@ -32,7 +32,6 @@ from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 from loguru import logger
-from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base import (
     AbstractDataSource,

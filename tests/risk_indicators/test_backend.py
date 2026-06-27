@@ -49,9 +49,14 @@ class TestConstruction:
     def test_non_gfw_builds_no_auth(self, monkeypatch, tmp_path):
         """A ThinkHazard / INFORM request never constructs GfwAuth."""
         th = _build(
-            monkeypatch, variables=["thinkhazard:flood_river"], country="KEN", path=tmp_path
+            monkeypatch,
+            variables=["thinkhazard:flood_river"],
+            country="KEN",
+            path=tmp_path,
         )
-        inf = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        inf = _build(
+            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+        )
         assert th._auth is None and inf._auth is None
 
     def test_gfw_builds_auth(self, monkeypatch, tmp_path):
@@ -68,7 +73,12 @@ class TestConstruction:
     def test_gfw_without_key_raises(self, monkeypatch, tmp_path):
         """A GFW request with no key raises AuthenticationError naming GFW_API_KEY."""
         with pytest.raises(AuthenticationError, match="GFW_API_KEY"):
-            _build(monkeypatch, variables=["gfw:tree_cover_loss"], country="KEN", path=tmp_path)
+            _build(
+                monkeypatch,
+                variables=["gfw:tree_cover_loss"],
+                country="KEN",
+                path=tmp_path,
+            )
 
     def test_variables_must_be_one_id(self, monkeypatch, tmp_path):
         """Zero or many dataset ids are rejected."""
@@ -85,7 +95,9 @@ class TestConstruction:
     def test_variables_mapping_rejected(self, monkeypatch, tmp_path):
         """A mapping variables= is a TypeError."""
         with pytest.raises(TypeError, match="not a mapping"):
-            _build(monkeypatch, variables={"inform:risk": []}, country="KEN", path=tmp_path)
+            _build(
+                monkeypatch, variables={"inform:risk": []}, country="KEN", path=tmp_path
+            )
 
     def test_bad_output_format_rejected(self, monkeypatch, tmp_path):
         """An unknown output_format is rejected."""
@@ -106,7 +118,12 @@ class TestConstruction:
     def test_gfw_missing_country_rejected(self, monkeypatch, tmp_path):
         """A GFW request without country is rejected."""
         with pytest.raises(ValueError, match="country="):
-            _build(monkeypatch, variables=["gfw:tree_cover_loss"], api_key="k", path=tmp_path)
+            _build(
+                monkeypatch,
+                variables=["gfw:tree_cover_loss"],
+                api_key="k",
+                path=tmp_path,
+            )
 
 
 class TestGridAndDates:
@@ -141,7 +158,10 @@ class TestRouting:
     def test_thinkhazard_resolves_admin(self, fake_http, monkeypatch, tmp_path):
         """A ThinkHazard country request resolves KEN to admin code 133."""
         df = _build(
-            monkeypatch, variables=["thinkhazard:flood_river"], country="KEN", path=tmp_path
+            monkeypatch,
+            variables=["thinkhazard:flood_river"],
+            country="KEN",
+            path=tmp_path,
         ).download()
         assert isinstance(df, pd.DataFrame) and df.iloc[0]["hazard"] == "FL"
         assert fake_http.calls[0]["url"].endswith("/report/133/FL.json")
@@ -190,7 +210,9 @@ class TestRouting:
         assert call["headers"]["x-api-key"] == "secret"
         assert "KEN" in call["params"]["sql"]
 
-    def test_gfw_vector_returns_feature_collection(self, fake_http, monkeypatch, tmp_path):
+    def test_gfw_vector_returns_feature_collection(
+        self, fake_http, monkeypatch, tmp_path
+    ):
         """A GFW geometry request returns a FeatureCollection."""
         fc = _build(
             monkeypatch,
@@ -264,7 +286,9 @@ class TestSubpackageHygiene:
         """No fixture JSON carries a GFW-key-shaped UUID."""
         import re
 
-        uuid = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+        uuid = re.compile(
+            r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+        )
         for path in (Path(__file__).parent / "data").glob("*.json"):
             text = path.read_text(encoding="utf-8")
             payload = json.loads(text)

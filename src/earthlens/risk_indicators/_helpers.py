@@ -124,6 +124,7 @@ def _request_json(
             time.sleep(_HTTP_RETRY_BACKOFF * (attempt + 1))
     raise last_exc  # pragma: no cover - loop always returns or raises above
 
+
 #: Canonical column order for a ThinkHazard hazard-level table.
 THINKHAZARD_COLUMNS: list[str] = [
     "country",
