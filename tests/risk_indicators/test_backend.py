@@ -223,6 +223,18 @@ class TestRouting:
         ).download()
         assert isinstance(fc, FeatureCollection)
 
+    def test_gfw_upper_cases_country(self, fake_http, monkeypatch, tmp_path):
+        """A lower-case country is upper-cased before the GFW SQL / geostore."""
+        _build(
+            monkeypatch,
+            variables=["gfw:tree_cover_loss"],
+            country="ken",
+            api_key="secret",
+            path=tmp_path,
+        ).download()
+        assert "'KEN'" in fake_http.calls[0]["params"]["sql"]
+        assert "ken" not in fake_http.calls[0]["params"]["sql"]
+
 
 class TestDownloadSemantics:
     """Output writing, aggregate rejection, and empty results."""

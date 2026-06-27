@@ -312,13 +312,16 @@ class RiskIndicators(AbstractDataSource):
         if dataset.provider == "inform":
             payload = _helpers.inform_query(dataset.workflow_id, dataset.indicator_id)
             return _helpers.inform_to_frame(payload, country=country)
-        # provider == "gfw"
+        # provider == "gfw" — GFW keys on upper-case ISO3, so normalise the
+        # country before interpolating it (the other two providers already
+        # resolve / filter case-insensitively).
         api_key = self._auth.api_key
+        iso = country.strip().upper()
         if dataset.output_kind == "vector":
-            payload = _helpers.gfw_geostore(country, api_key=api_key)
+            payload = _helpers.gfw_geostore(iso, api_key=api_key)
             geojson = payload["data"]["attributes"]["geojson"]
             return _helpers.to_feature_collection(geojson)
-        sql = dataset.sql_template.format(iso=country)
+        sql = dataset.sql_template.format(iso=iso)
         payload = _helpers.gfw_query(
             dataset.gfw_dataset, dataset.gfw_version, sql, api_key=api_key
         )
