@@ -235,7 +235,11 @@ def parse_psm3_csv(text: str, *, meta_rows: int | None = None) -> pd.DataFrame:
     for NSRDB, a single `SiteID,…` row for WTK) then the data table
     (`Year,Month,Day,Hour,Minute,GHI,DNI,…`). The metadata header is skipped
     and a canonical `time` column is assembled from the five date-part columns.
-    Pure `pandas` (`read_csv` / `io.StringIO`); no array-library detour.
+    The `time` column is **timezone-naive wall-clock**: it carries whatever the
+    request's `utc=` flag asked for (local site time for `utc="false"`, the NREL
+    default; UTC for `utc="true"`) without attaching a tzinfo, matching the
+    naive timestamps the CSV ships. Pure `pandas` (`read_csv` / `io.StringIO`);
+    no array-library detour.
 
     Args:
         text: The raw CSV body.
