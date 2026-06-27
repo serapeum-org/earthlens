@@ -1,0 +1,36 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "iso": "KEN"
+   },
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        40.14097214,
+        -3.16589499
+       ],
+       [
+        40.11347198,
+        -3.29902697
+       ],
+       [
+        39.97652817,
+        -3.39013791
+       ],
+       [
+        39.96374893,
+        -3.33180594
+       ]
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
