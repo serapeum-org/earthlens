@@ -179,6 +179,11 @@ class NREL(AbstractDataSource):
             # overriding any lat_lim/lon_lim (including the whole-Earth defaults
             # the EarthLens facade injects), so a single-point request behaves
             # identically through the facade and directly.
+            if not isinstance(point, (tuple, list)) or len(point) != 2:
+                raise ValueError(
+                    "NREL `point` must be a 2-tuple (lat, lon); got "
+                    f"{point!r}."
+                )
             lat_lim = [float(point[0]), float(point[0])]
             lon_lim = [float(point[1]), float(point[1])]
         if lat_lim is None or lon_lim is None:

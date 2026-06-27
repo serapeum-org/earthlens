@@ -264,6 +264,16 @@ class TestConstructorValidation:
                 point=(1.0, 2.0),
             )
 
+    def test_malformed_point_raises_value_error(self, nrel_env):
+        """A point that is not a 2-tuple raises a clear ValueError."""
+        with pytest.raises(ValueError, match="must be a 2-tuple"):
+            NREL(
+                start="2020-01-01",
+                end="2020-01-01",
+                variables=["ghi"],
+                point=(1.0,),
+            )
+
     def test_invalid_output_format_raises(self, nrel_env):
         """An unrecognised output_format raises ValueError."""
         with pytest.raises(ValueError, match="output_format"):
