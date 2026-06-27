@@ -195,6 +195,11 @@ nav:
       - Usage: reference/climate_indices/usage.md
       - Available indices: reference/climate_indices/datasets.md
       - Reference: reference/climate_indices/climate_indices.md
+    - Risk indicators (ThinkHazard / INFORM / GFW):
+      - Introduction: reference/risk_indicators/introduction.md
+      - Usage: reference/risk_indicators/usage.md
+      - Available datasets: reference/risk_indicators/datasets.md
+      - Reference: reference/risk_indicators/risk_indicators.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
