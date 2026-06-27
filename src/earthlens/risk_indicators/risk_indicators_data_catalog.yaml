@@ -1,0 +1,406 @@
+# risk_indicators_data_catalog.yaml
+#
+# Curated catalog for the earthlens.risk_indicators backend (M29): three
+# country/admin-indexed risk sources — GFDRR ThinkHazard!, INFORM Risk (JRC),
+# and the Global Forest Watch Data API. Each dataset row pins its provider, its
+# output_kind (tabular -> DataFrame, vector -> FeatureCollection), and the
+# provider-specific request detail. Endpoints/shapes live-verified 2026-06-27
+# (see planning/risk_indicators/captures/risk-sdk-facts.md).
+#
+# admin_codes: ISO3 -> ThinkHazard ADM0 division code (== FAO GAUL 2015 ADM0
+# code), used by resolve_admin() to turn a country= ISO3 into a ThinkHazard code.
+
+datasets:
+  thinkhazard:flood_river:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: FL
+    long_name: River flood hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:flood_urban:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: UF
+    long_name: Urban flood hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:flood_coastal:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: CF
+    long_name: Coastal flood hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:earthquake:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: EQ
+    long_name: Earthquake hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:landslide:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: LS
+    long_name: Landslide hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:tsunami:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: TS
+    long_name: Tsunami hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:cyclone:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: CY
+    long_name: Cyclone hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:water_scarcity:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: DG
+    long_name: Water scarcity hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:extreme_heat:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: EH
+    long_name: Extreme heat hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:wildfire:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: WF
+    long_name: Wildfire hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:volcano:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    hazard: VA
+    long_name: Volcano hazard level (ThinkHazard!)
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  thinkhazard:all:
+    provider: thinkhazard
+    output_kind: tabular
+    selector: country
+    long_name: All ThinkHazard! hazard levels for a division
+    citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  inform:risk:
+    provider: inform
+    output_kind: tabular
+    selector: country
+    workflow_id: 505
+    indicator_id: INFORM
+    long_name: INFORM Risk composite index
+    citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
+  inform:hazard_exposure:
+    provider: inform
+    output_kind: tabular
+    selector: country
+    workflow_id: 505
+    indicator_id: HA
+    long_name: INFORM Hazard & Exposure dimension
+    citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
+  inform:vulnerability:
+    provider: inform
+    output_kind: tabular
+    selector: country
+    workflow_id: 505
+    indicator_id: VU
+    long_name: INFORM Vulnerability dimension
+    citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
+  inform:coping_capacity:
+    provider: inform
+    output_kind: tabular
+    selector: country
+    workflow_id: 505
+    indicator_id: CC
+    long_name: INFORM Lack of Coping Capacity dimension
+    citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
+  inform:climate_risk:
+    provider: inform
+    output_kind: tabular
+    selector: country
+    workflow_id: 435
+    indicator_id: INFORM
+    long_name: INFORM Climate Change Risk (SSP5 2050)
+    citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
+  gfw:tree_cover_loss:
+    provider: gfw
+    output_kind: tabular
+    selector: country
+    gfw_dataset: gadm__tcl__iso_change
+    gfw_version: v20260424
+    sql_template: "SELECT iso, umd_tree_cover_loss__year, SUM(umd_tree_cover_loss__ha) AS umd_tree_cover_loss__ha FROM data WHERE iso='{iso}' AND umd_tree_cover_density_2000__threshold=30 GROUP BY iso, umd_tree_cover_loss__year ORDER BY umd_tree_cover_loss__year"
+    long_name: Annual tree-cover loss (ha) by country (UMD/Hansen, canopy>=30%)
+    citation: "Global Forest Watch / Hansen-UMD tree cover loss; GADM boundaries — https://www.globalforestwatch.org (CC BY 4.0)."
+  gfw:tree_cover_loss_summary:
+    provider: gfw
+    output_kind: tabular
+    selector: country
+    gfw_dataset: gadm__tcl__iso_summary
+    gfw_version: v20260424
+    sql_template: "SELECT iso, SUM(umd_tree_cover_loss__ha) AS umd_tree_cover_loss__ha FROM data WHERE iso='{iso}' AND umd_tree_cover_density_2000__threshold=30 GROUP BY iso"
+    long_name: Total tree-cover loss (ha) by country (UMD/Hansen, canopy>=30%)
+    citation: "Global Forest Watch / Hansen-UMD tree cover loss; GADM boundaries — https://www.globalforestwatch.org (CC BY 4.0)."
+  gfw:admin_boundary:
+    provider: gfw
+    output_kind: vector
+    selector: country
+    gfw_geostore: admin
+    long_name: GADM admin boundary geometry the GFW indicators are computed over
+    citation: "Global Forest Watch / Hansen-UMD tree cover loss; GADM boundaries — https://www.globalforestwatch.org (CC BY 4.0)."
+
+admin_codes:
+  ABW: 14
+  AFG: 1
+  AGO: 8
+  AIA: 9
+  ALA: 1242
+  ALB: 3
+  AND: 7
+  ARE: 255
+  ARG: 12
+  ARM: 13
+  ASM: 5
+  ATA: 10
+  ATF: 88
+  ATG: 11
+  AUS: 17
+  AUT: 18
+  AZE: 19
+  BDI: 43
+  BEL: 27
+  BEN: 29
+  BES: 176
+  BFA: 42
+  BGD: 23
+  BGR: 41
+  BHR: 21
+  BHS: 20
+  BIH: 34
+  BLR: 26
+  BLZ: 28
+  BMU: 30
+  BOL: 33
+  BRA: 37
+  BRB: 24
+  BRN: 40
+  BTN: 31
+  BVT: 36
+  BWA: 35
+  CAF: 49
+  CAN: 46
+  CCK: 56
+  CHE: 237
+  CHL: 51
+  CHN: 53
+  CIV: 66
+  CMR: 45
+  COD: 68
+  COG: 59
+  COK: 60
+  COL: 57
+  COM: 58
+  CPV: 47
+  CRI: 61
+  CUB: 63
+  CXR: 54
+  CYM: 48
+  CYP: 64
+  CZE: 65
+  DEU: 93
+  DJI: 70
+  DMA: 71
+  DNK: 69
+  DOM: 72
+  DZA: 4
+  ECU: 73
+  EGY: 40765
+  ERI: 77
+  ESH: 268
+  ESP: 229
+  EST: 78
+  ETH: 79
+  FIN: 84
+  FJI: 83
+  FLK: 81
+  FRA: 85
+  FRO: 82
+  FSM: 163
+  GAB: 89
+  GBR: 256
+  GEO: 92
+  GGY: 104
+  GHA: 94
+  GIB: 95
+  GIN: 106
+  GLP: 100
+  GMB: 90
+  GNB: 105
+  GNQ: 76
+  GRC: 97
+  GRD: 99
+  GRL: 98
+  GTM: 103
+  GUF: 86
+  GUM: 101
+  GUY: 107
+  HKG: 33364
+  HMD: 109
+  HND: 111
+  HRV: 62
+  HTI: 108
+  HUN: 113
+  IDN: 116
+  IMN: 120
+  IND: 115
+  IOT: 38
+  IRL: 119
+  IRN: 117
+  IRQ: 118
+  ISL: 114
+  ISR: 121
+  ITA: 122
+  JAM: 123
+  JEY: 128
+  JOR: 130
+  JPN: 126
+  KAZ: 132
+  KEN: 133
+  KGZ: 138
+  KHM: 44
+  KIR: 135
+  KNA: 208
+  KOR: 202
+  KWT: 137
+  LAO: 139
+  LBN: 141
+  LBR: 144
+  LBY: 145
+  LCA: 209
+  LIE: 146
+  LKA: 231
+  LSO: 142
+  LTU: 147
+  LUX: 148
+  LVA: 140
+  MAC: 149
+  MAR: 169
+  MCO: 166
+  MDA: 165
+  MDG: 150
+  MDV: 154
+  MEX: 162
+  MHL: 157
+  MKD: 241
+  MLI: 155
+  MLT: 156
+  MMR: 171
+  MNE: 2647
+  MNG: 167
+  MNP: 185
+  MOZ: 170
+  MRT: 159
+  MSR: 168
+  MTQ: 158
+  MUS: 160
+  MWI: 152
+  MYS: 153
+  MYT: 161
+  NAM: 172
+  NCL: 178
+  NER: 181
+  NFK: 184
+  NGA: 182
+  NIC: 180
+  NIU: 183
+  NLD: 177
+  NOR: 186
+  NPL: 175
+  NRU: 173
+  NZL: 179
+  OMN: 187
+  PAK: 188
+  PAN: 191
+  PCN: 197
+  PER: 195
+  PHL: 196
+  PLW: 189
+  PNG: 192
+  POL: 198
+  PRI: 200
+  PRK: 67
+  PRT: 199
+  PRY: 194
+  PSE: 91267
+  PYF: 87
+  QAT: 201
+  REU: 206
+  ROU: 203
+  RUS: 204
+  RWA: 205
+  SAU: 215
+  SDN: 40764
+  SEN: 217
+  SGP: 222
+  SGS: 228
+  SHN: 207
+  SJM: 234
+  SLB: 225
+  SLE: 221
+  SLV: 75
+  SMR: 213
+  SOM: 226
+  SPM: 210
+  SRB: 2648
+  STP: 214
+  SUR: 233
+  SVK: 223
+  SVN: 224
+  SWE: 236
+  SWZ: 235
+  SYC: 220
+  SYR: 238
+  TCA: 251
+  TCD: 50
+  TGO: 243
+  THA: 240
+  TJK: 239
+  TKL: 244
+  TKM: 250
+  TLS: 242
+  TON: 245
+  TTO: 246
+  TUN: 248
+  TUR: 249
+  TUV: 252
+  TWN: 925
+  TZA: 257
+  UGA: 253
+  UKR: 254
+  URY: 260
+  USA: 259
+  UZB: 261
+  VAT: 110
+  VCT: 211
+  VEN: 263
+  VGB: 39
+  VIR: 258
+  VNM: 264
+  VUT: 262
+  WLF: 266
+  WSM: 212
+  YEM: 269
+  ZAF: 227
+  ZMB: 270
+  ZWE: 271

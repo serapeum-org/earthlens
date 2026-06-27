@@ -300,14 +300,14 @@ class EarthLens:
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo', 'erddap',
              'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs',
-             'gdo', 'gebco', 'gee', 'ghs', 'ghsl', 'google-earth-engine', 'hdx',
-             'human-settlement', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth',
-             'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
-             'obis', 'openaq', 'openeo', 'overture', 'planetary-computer',
-             'protected-planet', 'pvgis', 'radar', 'redlist', 'sentinel-hub',
-             'sentinelhub', 'solar-pv', 'stac', 'teleconnections', 'tropycal',
-             'usdm',
-             'usgs-landsat',
+             'gdo', 'gebco', 'gee', 'gfw', 'ghs', 'ghsl', 'global-forest-watch',
+             'google-earth-engine', 'hdx', 'human-settlement', 'inform', 'insar',
+             'ioos', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
+             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'obis',
+             'openaq', 'openeo', 'overture', 'planetary-computer',
+             'protected-planet', 'pvgis', 'radar', 'redlist', 'risk-indicators',
+             'sentinel-hub', 'sentinelhub', 'solar-pv', 'stac', 'teleconnections',
+             'thinkhazard', 'tropycal', 'usdm', 'usgs-landsat',
              'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
@@ -641,6 +641,28 @@ class EarthLens:
             "climate-indices": ("earthlens.climate_indices", "ClimateIndices", "", {}),
             "climate_indices": ("earthlens.climate_indices", "ClimateIndices", "", {}),
             "teleconnections": ("earthlens.climate_indices", "ClimateIndices", "", {}),
+            # Country/admin-indexed risk indicators over three sources — GFDRR
+            # ThinkHazard! + INFORM Risk (JRC) (both public) + the Global Forest
+            # Watch Data API (needs GFW_API_KEY). Per-instance OUTPUT_KIND
+            # (tabular -> DataFrame, vector -> FeatureCollection); pass
+            # country=<ISO3> (or admin_code=) and, for gfw, api_key=. No extra
+            # SDK (core requests + pandas + pyramids). Aliases "thinkhazard" /
+            # "inform" / "gfw" / "global-forest-watch".
+            "risk-indicators": (
+                "earthlens.risk_indicators",
+                "RiskIndicators",
+                "",
+                {},
+            ),
+            "thinkhazard": ("earthlens.risk_indicators", "RiskIndicators", "", {}),
+            "inform": ("earthlens.risk_indicators", "RiskIndicators", "", {}),
+            "gfw": ("earthlens.risk_indicators", "RiskIndicators", "", {}),
+            "global-forest-watch": (
+                "earthlens.risk_indicators",
+                "RiskIndicators",
+                "",
+                {},
+            ),
             # Drought-indicator backend over three live public services:
             # USDM (vector GeoJSON polygon classes), Copernicus EDO/GDO (raster
             # OGC WCS — waits on pyramids PY-A temporal `read_wcs`), and CSIC
