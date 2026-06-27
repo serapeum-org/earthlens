@@ -302,12 +302,14 @@ class EarthLens:
              'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gebco',
              'gee', 'ghs', 'ghsl', 'google-earth-engine', 'hdx',
              'human-settlement', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth',
-             'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
+             'landsat', 'national-water-model', 'nexrad', 'nrel', 'nsrdb',
+             'nwis', 'nwm', 'nwp',
              'obis', 'openaq', 'openeo', 'overture', 'planetary-computer',
              'protected-planet', 'pvgis', 'radar', 'redlist', 'sentinel-hub',
              'sentinelhub', 'solar-pv', 'stac', 'teleconnections', 'tropycal',
              'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
+             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wind-toolkit',
+             'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -632,6 +634,16 @@ class EarthLens:
             "climate-indices": ("earthlens.climate_indices", "ClimateIndices", "", {}),
             "climate_indices": ("earthlens.climate_indices", "ClimateIndices", "", {}),
             "teleconnections": ("earthlens.climate_indices", "ClimateIndices", "", {}),
+            # NREL NSRDB (solar) + WIND Toolkit (wind) resource time series over
+            # the keyed REST CSV download API. Per-coordinate hourly DataFrame
+            # (tabular); a point or a bbox sampled to a point grid. Requires a
+            # free NREL api_key + email (NREL_API_KEY / NREL_EMAIL), forwarded
+            # via **backend_kwargs. No extra SDK (core requests + pandas). The
+            # "nsrdb" / "wind-toolkit" aliases pre-bind product=; pick a product
+            # directly with product="nsrdb-psm3" / "nsrdb-tmy" / "wtk".
+            "nrel": ("earthlens.nrel", "NREL", "", {}),
+            "nsrdb": ("earthlens.nrel", "NREL", "", {"product": "nsrdb-psm3"}),
+            "wind-toolkit": ("earthlens.nrel", "NREL", "", {"product": "wtk"}),
         }
     )
 
@@ -669,7 +681,8 @@ class EarthLens:
                 `"cmems"`, `"earthdata"`, `"ecmwf"`,
                 `"eumetsat"`, `"fdsn"`, `"firms"`, `"gdacs"`, `"gee"`
                 (alias `"google-earth-engine"`), `"ghsl"` (aliases
-                `"ghs"` / `"human-settlement"`), `"hdx"`, `"nwp"`,
+                `"ghs"` / `"human-settlement"`), `"hdx"`,
+                `"nrel"` (aliases `"nsrdb"` / `"wind-toolkit"`), `"nwp"`,
                 `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
                 `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
                 `"pvgis"` (alias `"solar-pv"`),
