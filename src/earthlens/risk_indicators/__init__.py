@@ -44,9 +44,11 @@ from earthlens.risk_indicators.auth import (
     GfwAuth,
     GfwCredentials,
 )
+from earthlens.risk_indicators.backend import RiskIndicators
 from earthlens.risk_indicators.catalog import Catalog, Dataset
 
 __all__ = [
+    "RiskIndicators",
     "Catalog",
     "Dataset",
     "GfwAuth",
