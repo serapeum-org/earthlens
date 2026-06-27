@@ -485,7 +485,12 @@ class NREL(AbstractDataSource):
                 f"{message}"
             )
             return None
-        df = _helpers.parse_psm3_csv(resp.text, meta_rows=self._product.meta_rows)
+        # Auto-detect the data-table header offset (the `Year,Month,Day,...`
+        # line) rather than pinning the catalog's `meta_rows`: it handles the
+        # NSRDB (2-row) and WTK (1-row) layouts identically and stays correct if
+        # a future PSM revision changes the metadata-header height. The catalog
+        # `meta_rows` field documents the expected layout.
+        df = _helpers.parse_psm3_csv(resp.text)
         df["lat"] = lat
         df["lon"] = lon
         df["year"] = name

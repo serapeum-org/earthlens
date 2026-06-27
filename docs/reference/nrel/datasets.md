@@ -38,8 +38,10 @@ vocabulary as `nsrdb-psm3`; one call regardless of the requested year window.
 
 ## `wtk` — WIND Toolkit (hourly wind)
 
-Hourly modelled wind resource for one point and one year, CONUS + offshore.
-Attributes are per-height (`windspeed_<H>m`, `winddirection_<H>m`,
+Hourly modelled wind resource for one point and one year, CONUS + offshore
+(the CONUS WTK archive covers roughly **2007–2014** — a year outside the
+archive's range returns the generic coverage error). Attributes are per-height
+(`windspeed_<H>m`, `winddirection_<H>m`,
 `temperature_<H>m`, `pressure_<H>m`, for hub heights such as 10 / 40 / 80 / 100 /
 120 / 160 m); the default set is `windspeed_100m, winddirection_100m,
 temperature_100m`. The WTK CSV uses a **single** metadata header row (NSRDB uses
