@@ -24,9 +24,12 @@ Endpoints / response shapes were live-verified 2026-06-27 (see
 
 from __future__ import annotations
 
+import time
+
 import geopandas as gpd
 import pandas as pd
 import requests
+from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 #: ThinkHazard! public REST base (no auth). Hazard reports live under
@@ -52,6 +55,75 @@ _USER_AGENT = "earthlens-risk-indicators"
 #: Default per-request HTTP timeout (seconds).
 _HTTP_TIMEOUT: float = 120.0
 
+#: Extra attempts after the first on a transient failure (connection reset /
+#: timeout / 5xx). The GFW host in particular resets connections intermittently.
+_HTTP_RETRIES: int = 2
+
+#: Base back-off (seconds) between retries; the nth retry waits n * this.
+_HTTP_RETRY_BACKOFF: float = 1.0
+
+
+def _is_transient(exc: requests.RequestException) -> bool:
+    """Return whether a request error is worth retrying.
+
+    Connection errors (including the GFW host's intermittent resets) and
+    timeouts are transient; an HTTP error is transient only for a 5xx status
+    (a 4xx such as 404 is a real miss and fails fast).
+
+    Args:
+        exc: The exception raised by `requests.get` / `raise_for_status`.
+
+    Returns:
+        bool: `True` to retry, `False` to fail fast.
+    """
+    if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
+        return True
+    if isinstance(exc, requests.HTTPError) and exc.response is not None:
+        return exc.response.status_code >= 500
+    return False
+
+
+def _request_json(
+    url: str,
+    *,
+    params: dict | None,
+    headers: dict[str, str],
+    timeout: float,
+) -> dict | list:
+    """GET `url` and return parsed JSON, retrying transient failures.
+
+    Args:
+        url: The request URL.
+        params: Query parameters, or `None`.
+        headers: Request headers (carries the `User-Agent` and any key).
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        The parsed JSON body.
+
+    Raises:
+        requests.RequestException: When the GET still fails after the retries
+            (the last error is re-raised; a 4xx fails fast without retrying).
+    """
+    last_exc: requests.RequestException | None = None
+    for attempt in range(_HTTP_RETRIES + 1):
+        try:
+            response = requests.get(
+                url, params=params, headers=headers, timeout=timeout
+            )
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as exc:
+            last_exc = exc
+            if not _is_transient(exc) or attempt == _HTTP_RETRIES:
+                raise
+            logger.warning(
+                f"risk-indicators: transient fetch error from {url} ({exc}); "
+                f"retry {attempt + 1}/{_HTTP_RETRIES}."
+            )
+            time.sleep(_HTTP_RETRY_BACKOFF * (attempt + 1))
+    raise last_exc  # pragma: no cover - loop always returns or raises above
+
 #: Canonical column order for a ThinkHazard hazard-level table.
 THINKHAZARD_COLUMNS: list[str] = [
     "country",
@@ -64,6 +136,16 @@ THINKHAZARD_COLUMNS: list[str] = [
 
 #: Canonical column order for an INFORM country-score table.
 INFORM_COLUMNS: list[str] = ["iso3", "indicator_id", "indicator_score", "validity_year"]
+
+#: ThinkHazard hazard-level title -> mnemonic. The all-hazards list returns the
+#: mnemonic (`"HIG"`) while the single-hazard report returns the title word
+#: (`"High"`); the parser normalises both reports to carry both forms.
+_LEVEL_TITLE_TO_MNEMONIC: dict[str, str] = {
+    "Very low": "VLO",
+    "Low": "LOW",
+    "Medium": "MED",
+    "High": "HIG",
+}
 
 
 def _headers(api_key: str | None = None) -> dict[str, str]:
@@ -108,9 +190,7 @@ def thinkhazard_query(
     """
     suffix = f"/{hazard}" if hazard else ""
     url = f"{base}/report/{admin_code}{suffix}.json"
-    response = requests.get(url, headers=_headers(), timeout=timeout)
-    response.raise_for_status()
-    return response.json()
+    return _request_json(url, params=None, headers=_headers(), timeout=timeout)
 
 
 def inform_query(
@@ -138,9 +218,7 @@ def inform_query(
     """
     url = f"{base}/countries/Scores/"
     params = {"WorkflowId": workflow_id, "IndicatorId": indicator_id}
-    response = requests.get(url, params=params, headers=_headers(), timeout=timeout)
-    response.raise_for_status()
-    return response.json()
+    return _request_json(url, params=params, headers=_headers(), timeout=timeout)
 
 
 def gfw_query(
@@ -170,11 +248,9 @@ def gfw_query(
             403 from GFW).
     """
     url = f"{base}/dataset/{dataset}/{version}/query/json"
-    response = requests.get(
+    return _request_json(
         url, params={"sql": sql}, headers=_headers(api_key), timeout=timeout
     )
-    response.raise_for_status()
-    return response.json()
 
 
 def gfw_geostore(
@@ -204,9 +280,7 @@ def gfw_geostore(
     """
     parts = "/".join((iso, *admin))
     url = f"{base}/geostore/admin/{parts}"
-    response = requests.get(url, headers=_headers(api_key), timeout=timeout)
-    response.raise_for_status()
-    return response.json()
+    return _request_json(url, params=None, headers=_headers(api_key), timeout=timeout)
 
 
 def to_frame(payload: dict | list, columns: list[str] | None = None) -> pd.DataFrame:
@@ -274,12 +348,13 @@ def thinkhazard_to_frame(
             )
     else:
         category = payload.get("hazard_category", {}) if payload else {}
+        title = category.get("hazard_level")
         records.append(
             {
                 "hazard": hazard,
                 "hazard_type": category.get("hazard_type"),
-                "level": category.get("hazard_level"),
-                "level_title": category.get("hazard_level"),
+                "level": _LEVEL_TITLE_TO_MNEMONIC.get(title, title),
+                "level_title": title,
             }
         )
     frame = pd.DataFrame(records)

@@ -49,6 +49,101 @@ def _load(name):
     return json.loads((DATA / name).read_text(encoding="utf-8"))
 
 
+class _FlakyGet:
+    """A requests.get stand-in that raises a sequence of errors, then returns."""
+
+    def __init__(self, errors, payload=None):
+        self.errors = list(errors)
+        self.payload = payload if payload is not None else {"data": []}
+        self.attempts = 0
+
+    def __call__(self, url, params=None, headers=None, timeout=None):
+        self.attempts += 1
+        if self.errors:
+            raise self.errors.pop(0)
+        return _Resp(self.payload)
+
+
+class _ReturnsResponse:
+    """A requests.get stand-in that returns a fixed response and counts calls."""
+
+    def __init__(self, response):
+        self.response = response
+        self.calls = 0
+
+    def __call__(self, url, params=None, headers=None, timeout=None):
+        self.calls += 1
+        return self.response
+
+
+class _HttpError(_Resp):
+    """A response whose raise_for_status raises an HTTPError with a status."""
+
+    def __init__(self, status_code):
+        super().__init__({})
+        self.status_code = status_code
+
+    def raise_for_status(self):
+        """Raise an HTTPError carrying this response (for status checks)."""
+        err = _helpers.requests.HTTPError(f"HTTP {self.status_code}")
+        err.response = self
+        raise err
+
+
+class TestIsTransient:
+    """_is_transient classifies which request errors are retryable."""
+
+    @pytest.mark.parametrize(
+        "exc, expected",
+        [
+            (_helpers.requests.ConnectionError("reset"), True),
+            (_helpers.requests.Timeout("slow"), True),
+            (_helpers.requests.RequestException("other"), False),
+        ],
+    )
+    def test_connection_and_timeout(self, exc, expected):
+        """Connection resets and timeouts are transient; a bare error is not."""
+        assert _helpers._is_transient(exc) is expected
+
+    def test_5xx_transient_4xx_not(self):
+        """A 5xx HTTPError is transient; a 4xx is not."""
+        err5 = _helpers.requests.HTTPError("boom")
+        err5.response = _HttpError(503)
+        err4 = _helpers.requests.HTTPError("nope")
+        err4.response = _HttpError(404)
+        assert _helpers._is_transient(err5) is True
+        assert _helpers._is_transient(err4) is False
+
+
+class TestRequestJsonRetry:
+    """_request_json retries transient failures and fails fast on 4xx."""
+
+    def test_retries_then_succeeds(self, monkeypatch):
+        """A connection reset is retried and the next attempt's body returned."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet([_helpers.requests.ConnectionError("reset")], {"data": [1]})
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        out = _helpers.gfw_query("d", "v", "SELECT 1", api_key="k")
+        assert out == {"data": [1]} and flaky.attempts == 2
+
+    def test_gives_up_after_retries(self, monkeypatch):
+        """A persistent reset raises after exhausting the retries."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        errs = [_helpers.requests.ConnectionError("reset")] * 5
+        monkeypatch.setattr(_helpers.requests, "get", _FlakyGet(errs))
+        with pytest.raises(_helpers.requests.ConnectionError):
+            _helpers.thinkhazard_query("133")
+
+    def test_4xx_fails_fast(self, monkeypatch):
+        """A 404 is not retried — it raises on the first attempt."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        returns_404 = _ReturnsResponse(_HttpError(404))
+        monkeypatch.setattr(_helpers.requests, "get", returns_404)
+        with pytest.raises(_helpers.requests.HTTPError):
+            _helpers.inform_query(505, "INFORM")
+        assert returns_404.calls == 1
+
+
 class TestThinkhazardQuery:
     """thinkhazard_query builds the public report URL, no key header."""
 
@@ -160,6 +255,8 @@ class TestThinkhazardToFrame:
         assert len(df) == 1
         assert df.iloc[0]["hazard"] == "FL"
         assert df.iloc[0]["hazard_type"] == "River flood"
+        assert df.iloc[0]["level"] == "HIG"
+        assert df.iloc[0]["level_title"] == "High"
 
 
 class TestInformToFrame:
