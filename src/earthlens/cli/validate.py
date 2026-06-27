@@ -532,6 +532,11 @@ def _validate_bathymetry(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
+def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
+    """Each PVGIS product needs a tool, an endpoint, and non-empty columns."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -558,6 +563,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "jaxa": _validate_jaxa,
     "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
+    "pvgis": _validate_pvgis,
 }
 
 

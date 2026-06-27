@@ -295,7 +295,8 @@ class EarthLens:
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['alaska-satellite-facility', 'amazon-s3', 'argo', 'argo-floats',
              'argopy', 'asf', 'bathymetry', 'bdc',
-             'brazil-data-cube', 'cdse', 'chc', 'chirps', 'cmems', 'dea',
+             'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
+             'climate_indices', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'erddap', 'etopo',
              'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gebco',
@@ -304,9 +305,9 @@ class EarthLens:
              'human-settlement', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth',
              'landsat', 'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp',
              'obis', 'openaq', 'openeo', 'overture', 'planetary-computer',
-             'protected-planet', 'radar', 'redlist', 'sentinel-hub',
-             'sentinelhub', 'solar-wind-atlas', 'stac', 'tropycal',
-             'usgs-landsat', 'usgs-nwis',
+             'protected-planet', 'pvgis', 'radar', 'redlist', 'sentinel-hub',
+             'sentinelhub', 'solar-pv', 'solar-wind-atlas', 'stac',
+             'teleconnections', 'tropycal', 'usgs-landsat', 'usgs-nwis',
              'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
@@ -628,6 +629,22 @@ class EarthLens:
             "global-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
             "gsa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
             "gwa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            # JRC PVGIS solar-radiation / PV time series over the keyless
+            # REST API. Per-coordinate hourly DataFrame (tabular); a point
+            # or a bbox sampled to a point grid. variables=["seriescalc"]
+            # (hourly radiation / PV power) or ["tmy"]. No extra SDK (core
+            # requests + pandas). Alias "solar-pv".
+            "pvgis": ("earthlens.pvgis", "PVGIS", "", {}),
+            "solar-pv": ("earthlens.pvgis", "PVGIS", "", {}),
+            # Monthly climate / teleconnection indices (ENSO/ONI, NAO, AO,
+            # PDO, AMO, SOI, PNA, ...) from NOAA PSL + KNMI Climate Explorer
+            # ASCII series -> long-format DataFrame. Open data (requests +
+            # pandas are core), so no extra to hint. Aliases "climate_indices"
+            # / "teleconnections". Global scalar series: spatial args are
+            # ignored and aggregate= is rejected.
+            "climate-indices": ("earthlens.climate_indices", "ClimateIndices", "", {}),
+            "climate_indices": ("earthlens.climate_indices", "ClimateIndices", "", {}),
+            "teleconnections": ("earthlens.climate_indices", "ClimateIndices", "", {}),
         }
     )
 
@@ -658,6 +675,8 @@ class EarthLens:
         Args:
             data_source: Backend key. One of the registered keys in
                 :attr:`DataSources` — `"chc"` (alias `"chirps"`),
+                `"climate-indices"` (aliases `"climate_indices"` /
+                `"teleconnections"`),
                 `"amazon-s3"`, `"asf"` (aliases
                 `"alaska-satellite-facility"` / `"insar"`),
                 `"cmems"`, `"earthdata"`, `"ecmwf"`,
@@ -666,6 +685,7 @@ class EarthLens:
                 `"ghs"` / `"human-settlement"`), `"hdx"`, `"nwp"`,
                 `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
                 `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
+                `"pvgis"` (alias `"solar-pv"`),
                 `"stac"` (with endpoint aliases `"planetary-computer"` /
                 `"earth-search"` / `"cdse"`), `"tropycal"`,
                 `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`),
