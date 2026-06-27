@@ -190,6 +190,11 @@ nav:
       - Usage: reference/pvgis/usage.md
       - Available products: reference/pvgis/datasets.md
       - Reference: reference/pvgis/pvgis.md
+    - NREL (solar / wind resource):
+      - Introduction: reference/nrel/introduction.md
+      - Usage: reference/nrel/usage.md
+      - Available products: reference/nrel/datasets.md
+      - Reference: reference/nrel/nrel.md
     - Climate indices (teleconnections):
       - Introduction: reference/climate_indices/introduction.md
       - Usage: reference/climate_indices/usage.md
