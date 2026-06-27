@@ -254,6 +254,16 @@ class TestConstructorValidation:
                 point=(1.0, 2.0),
             )
 
+    def test_variables_bare_string_raises_type_error(self, nrel_env):
+        """A bare-string variables raises instead of splitting into characters."""
+        with pytest.raises(TypeError, match="single-character"):
+            NREL(
+                start="2020-01-01",
+                end="2020-01-01",
+                variables="ghi",
+                point=(1.0, 2.0),
+            )
+
     def test_invalid_output_format_raises(self, nrel_env):
         """An unrecognised output_format raises ValueError."""
         with pytest.raises(ValueError, match="output_format"):

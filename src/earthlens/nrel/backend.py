@@ -155,16 +155,19 @@ class NREL(AbstractDataSource):
         Raises:
             ValueError: When `output_format` is unrecognised, or when no
                 location (neither `point=` nor a bbox) is supplied.
-            TypeError: When `variables` is a mapping (this backend takes a list
-                of attribute names).
+            TypeError: When `variables` is a mapping or a bare string (this
+                backend takes a list of attribute names; a string would split
+                into single-character attributes).
             AuthenticationError: When neither an explicit nor an environment
                 API key + email pair can be resolved.
         """
-        if isinstance(variables, dict):
+        if isinstance(variables, (dict, str)):
             raise TypeError(
                 "NREL `variables` must be a list of attribute names "
-                "(e.g. ['ghi', 'dni']), not a mapping. Pick the product with "
-                "product='nsrdb-psm3' / 'nsrdb-tmy' / 'wtk'."
+                "(e.g. ['ghi', 'dni']), not a "
+                f"{type(variables).__name__}. A bare string would split into "
+                "single-character attributes; wrap it in a list (['ghi']). "
+                "Pick the product with product='nsrdb-psm3' / 'nsrdb-tmy' / 'wtk'."
             )
         if output_format not in OUTPUT_FORMATS:
             raise ValueError(
