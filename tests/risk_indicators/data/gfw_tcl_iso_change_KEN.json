@@ -1,0 +1,35 @@
+{
+ "data": [
+  {
+   "iso": "KEN",
+   "umd_tree_cover_loss__year": 2001,
+   "umd_tree_cover_loss__ha": 19027.364860583224
+  },
+  {
+   "iso": "KEN",
+   "umd_tree_cover_loss__year": 2002,
+   "umd_tree_cover_loss__ha": 20286.987738779757
+  },
+  {
+   "iso": "KEN",
+   "umd_tree_cover_loss__year": 2003,
+   "umd_tree_cover_loss__ha": 13553.195405517616
+  },
+  {
+   "iso": "KEN",
+   "umd_tree_cover_loss__year": 2004,
+   "umd_tree_cover_loss__ha": 16988.097530644336
+  },
+  {
+   "iso": "KEN",
+   "umd_tree_cover_loss__year": 2005,
+   "umd_tree_cover_loss__ha": 12745.355934903297
+  },
+  {
+   "iso": "KEN",
+   "umd_tree_cover_loss__year": 2006,
+   "umd_tree_cover_loss__ha": 20656.131084886983
+  }
+ ],
+ "status": "success"
+}

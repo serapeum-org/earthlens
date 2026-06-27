@@ -300,13 +300,17 @@ class EarthLens:
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'erddap', 'etopo',
              'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gebco',
-             'gee', 'ghs', 'ghsl', 'google-earth-engine', 'hdx',
-             'human-settlement', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth',
+             'gee', 'gfw', 'ghs', 'ghsl', 'global-forest-watch',
+             'google-earth-engine', 'hdx',
+             'human-settlement', 'inform', 'insar', 'ioos', 'iucn', 'jaxa',
+             'jaxa-earth',
              'landsat', 'national-water-model', 'nexrad', 'nrel', 'nsrdb',
              'nwis', 'nwm', 'nwp',
              'obis', 'openaq', 'openeo', 'overture', 'planetary-computer',
-             'protected-planet', 'pvgis', 'radar', 'redlist', 'sentinel-hub',
-             'sentinelhub', 'solar-pv', 'stac', 'teleconnections', 'tropycal',
+             'protected-planet', 'pvgis', 'radar', 'redlist', 'risk-indicators',
+             'sentinel-hub',
+             'sentinelhub', 'solar-pv', 'stac', 'teleconnections', 'thinkhazard',
+             'tropycal',
              'usgs-landsat',
              'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wind-toolkit',
              'world-pop', 'worldpop']
@@ -644,6 +648,28 @@ class EarthLens:
             "nrel": ("earthlens.nrel", "NREL", "", {}),
             "nsrdb": ("earthlens.nrel", "NREL", "", {"product": "nsrdb-psm3"}),
             "wind-toolkit": ("earthlens.nrel", "NREL", "", {"product": "wtk"}),
+            # Country/admin-indexed risk indicators over three sources — GFDRR
+            # ThinkHazard! + INFORM Risk (JRC) (both public) + the Global Forest
+            # Watch Data API (needs GFW_API_KEY). Per-instance OUTPUT_KIND
+            # (tabular -> DataFrame, vector -> FeatureCollection); pass
+            # country=<ISO3> (or admin_code=) and, for gfw, api_key=. No extra
+            # SDK (core requests + pandas + pyramids). Aliases "thinkhazard" /
+            # "inform" / "gfw" / "global-forest-watch".
+            "risk-indicators": (
+                "earthlens.risk_indicators",
+                "RiskIndicators",
+                "",
+                {},
+            ),
+            "thinkhazard": ("earthlens.risk_indicators", "RiskIndicators", "", {}),
+            "inform": ("earthlens.risk_indicators", "RiskIndicators", "", {}),
+            "gfw": ("earthlens.risk_indicators", "RiskIndicators", "", {}),
+            "global-forest-watch": (
+                "earthlens.risk_indicators",
+                "RiskIndicators",
+                "",
+                {},
+            ),
         }
     )
 
