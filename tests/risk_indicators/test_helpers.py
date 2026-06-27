@@ -306,6 +306,26 @@ class TestToFeatureCollection:
             _helpers.to_feature_collection({"type": "x"})
 
 
+class TestGfwGeostoreToFeatureCollection:
+    """gfw_geostore_to_feature_collection digs the geostore payload safely."""
+
+    def test_extracts_geojson(self):
+        """A well-formed geostore payload yields the boundary collection."""
+        payload = {
+            "data": {"attributes": {"geojson": _load("gfw_geostore_admin_KEN.json")}}
+        }
+        fc = _helpers.gfw_geostore_to_feature_collection(payload)
+        assert isinstance(fc, FeatureCollection) and len(fc) == 1
+
+    @pytest.mark.parametrize(
+        "payload", [{}, {"data": {}}, {"data": {"attributes": {}}}]
+    )
+    def test_malformed_payload_raises_clear_error(self, payload):
+        """A payload missing data.attributes.geojson raises a descriptive error."""
+        with pytest.raises(ValueError, match="data.attributes.geojson"):
+            _helpers.gfw_geostore_to_feature_collection(payload)
+
+
 class TestResolveAdminAndEmpty:
     """The module-level resolve_admin and empty_canonical helpers."""
 

@@ -30,6 +30,7 @@ from __future__ import annotations
 from earthlens.risk_indicators._helpers import (
     empty_canonical,
     gfw_geostore,
+    gfw_geostore_to_feature_collection,
     gfw_query,
     inform_query,
     inform_to_frame,
@@ -56,6 +57,7 @@ __all__ = [
     "AuthenticationError",
     "gfw_query",
     "gfw_geostore",
+    "gfw_geostore_to_feature_collection",
     "thinkhazard_query",
     "thinkhazard_to_frame",
     "inform_query",

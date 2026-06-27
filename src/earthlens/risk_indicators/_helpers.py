@@ -404,6 +404,34 @@ def inform_to_frame(payload: list, *, country: str | None = None) -> pd.DataFram
     return frame.reset_index(drop=True)
 
 
+def gfw_geostore_to_feature_collection(payload: dict) -> FeatureCollection:
+    """Extract the GeoJSON from a GFW geostore payload and wrap it.
+
+    The geostore response nests the boundary at `data.attributes.geojson`; this
+    digs it out with a descriptive error (rather than a bare `KeyError`) when an
+    unexpected payload shape comes back, then delegates to
+    :func:`to_feature_collection`.
+
+    Args:
+        payload: The parsed JSON from :func:`gfw_geostore`.
+
+    Returns:
+        FeatureCollection: The admin-boundary features tagged `EPSG:4326`.
+
+    Raises:
+        ValueError: If the payload carries no `data.attributes.geojson` mapping.
+    """
+    geojson = (((payload or {}).get("data") or {}).get("attributes") or {}).get(
+        "geojson"
+    )
+    if not isinstance(geojson, dict):
+        raise ValueError(
+            "GFW geostore payload is missing a data.attributes.geojson mapping; "
+            f"got top-level keys {sorted(payload or {})}."
+        )
+    return to_feature_collection(geojson)
+
+
 def to_feature_collection(geojson: dict) -> FeatureCollection:
     """Wrap a GeoJSON `FeatureCollection` mapping into a pyramids collection.
 

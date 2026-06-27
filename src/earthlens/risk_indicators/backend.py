@@ -322,8 +322,7 @@ class RiskIndicators(AbstractDataSource):
         iso = country.strip().upper()
         if dataset.output_kind == "vector":
             payload = _helpers.gfw_geostore(iso, api_key=api_key)
-            geojson = payload["data"]["attributes"]["geojson"]
-            return _helpers.to_feature_collection(geojson)
+            return _helpers.gfw_geostore_to_feature_collection(payload)
         sql = dataset.sql_template.format(iso=iso)
         payload = _helpers.gfw_query(
             dataset.gfw_dataset, dataset.gfw_version, sql, api_key=api_key
