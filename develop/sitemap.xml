@@ -137,6 +137,14 @@
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/catalog_explorer/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/quickstart/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/earthdata/catalog_explorer/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
@@ -410,14 +418,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/jaxa/03_gportal_search/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nrel/01_nrel_quickstart/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nrel/02_nrel_products_and_behavior/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
@@ -913,6 +913,18 @@
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/drought/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/introduction/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/usage/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/earthdata/authentication/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
@@ -1134,22 +1146,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/jaxa/usage/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nrel/datasets/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nrel/introduction/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nrel/nrel/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nrel/usage/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
