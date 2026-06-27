@@ -423,6 +423,7 @@ nav:
     - Solar & Wind Atlas (solar / wind climatology):
       - Wind quickstart — windowed read (live): examples/solar_wind_atlas/01_wind_quickstart.ipynb
       - Catalog explorer (no network): examples/solar_wind_atlas/02_catalog_explorer.ipynb
+      - Wind resource layers — multi-variable (live): examples/solar_wind_atlas/03_wind_resource_layers.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
