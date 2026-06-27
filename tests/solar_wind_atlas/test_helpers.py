@@ -56,6 +56,18 @@ def test_window_crop_window_size_matches_native_grid(
     assert part["dst_height"] == 200
 
 
+def test_window_crop_clamps_degenerate_bbox_to_one_pixel(
+    fake_pyramids: type[FakeDataset], tmp_path: Path
+) -> None:
+    """A zero-extent point bbox still reads a 1x1 window instead of failing."""
+    _helpers.window_crop(
+        "https://x/w.tif", [12.0, 55.0, 12.0, 55.0], tmp_path / "p.tif"
+    )
+    part = fake_pyramids.recorder["read_part"][0]
+    assert part["dst_width"] == 1
+    assert part["dst_height"] == 1
+
+
 def test_window_crop_squeezes_single_band_3d(
     fake_pyramids: type[FakeDataset], tmp_path: Path
 ) -> None:

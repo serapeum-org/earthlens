@@ -138,10 +138,15 @@ def read_part_to_geotiff(
         col1 = math.ceil((east - origin_x) / pixel_w)
         row0 = math.floor((north - origin_y) / pixel_h)
         row1 = math.ceil((south - origin_y) / pixel_h)
+        # A point / sub-pixel bbox (e.g. lat_min == lat_max landing on a cell
+        # edge) snaps to a zero-width window; read at least one pixel so the
+        # request still yields a 1x1 cell instead of failing.
+        ncols = max(1, col1 - col0)
+        nrows = max(1, row1 - row0)
         array = dataset.read_part(
             (west, south, east, north),
-            dst_width=col1 - col0,
-            dst_height=row1 - row0,
+            dst_width=ncols,
+            dst_height=nrows,
             bbox_crs=epsg,
         )
         if getattr(array, "ndim", 2) == 3 and array.shape[0] == 1:
