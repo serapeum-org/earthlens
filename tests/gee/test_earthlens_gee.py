@@ -111,6 +111,8 @@ class TestRegistry:
             "landsat",
             "national-water-model",
             "nexrad",
+            "nrel",
+            "nsrdb",
             "nwis",
             "nwm",
             "nwp",
@@ -134,6 +136,7 @@ class TestRegistry:
             "usgs-water",
             "veda",
             "wdpa",
+            "wind-toolkit",
             "world-pop",
             "worldpop",
         ]
