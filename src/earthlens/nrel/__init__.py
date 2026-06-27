@@ -40,6 +40,7 @@ from earthlens.nrel.auth import (
     NrelAuth,
     NrelCredentials,
 )
+from earthlens.nrel.backend import NREL
 from earthlens.nrel.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -51,6 +52,7 @@ __all__ = [
     "AuthenticationError",
     "CATALOG_PATH",
     "Catalog",
+    "NREL",
     "NrelAuth",
     "NrelCredentials",
     "Product",
