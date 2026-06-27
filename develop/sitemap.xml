@@ -417,6 +417,10 @@
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nrel/02_nrel_products_and_behavior/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwm/catalog_explorer/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
@@ -538,6 +542,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/radar/catalog_explorer/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/risk_indicators/01_risk_indicators_quickstart/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/risk_indicators/02_catalog_and_behavior/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/risk_indicators/03_global_forest_watch/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
@@ -1266,6 +1282,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/radar/usage/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/risk_indicators/datasets/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/risk_indicators/introduction/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/risk_indicators/risk_indicators/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/risk_indicators/usage/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
