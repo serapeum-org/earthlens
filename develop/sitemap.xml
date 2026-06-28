@@ -137,14 +137,6 @@
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/catalog_explorer/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/quickstart/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/earthdata/catalog_explorer/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
@@ -669,6 +661,18 @@
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/solar_wind_atlas/01_wind_quickstart/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/solar_wind_atlas/02_catalog_explorer/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/solar_wind_atlas/03_wind_resource_layers/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/stac/bdc_cbers_amazonia/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
@@ -910,18 +914,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/cmems/usage/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/drought/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/introduction/</loc>
-         <lastmod>2026-06-27</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/usage/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
@@ -1338,6 +1330,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/usage/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/solar_wind_atlas/datasets/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/solar_wind_atlas/introduction/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/solar_wind_atlas/solar_wind_atlas/</loc>
+         <lastmod>2026-06-27</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/solar_wind_atlas/usage/</loc>
          <lastmod>2026-06-27</lastmod>
     </url>
     <url>
