@@ -16401,21 +16401,21 @@ solar.head()</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-28 15:48:00.857</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.nrel.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">382</span> - <span class="ansi-bold">NREL nsrdb-psm3: 8760 row(s) -&gt; C:\Users\main\AppData\Local\Temp\tmpnqt97rg2\nrel_nsrdb-psm3.csv</span>
+<pre><span class="ansi-green-fg">2026-06-28 16:04:55.933</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.nrel.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">384</span> - <span class="ansi-bold">NREL nsrdb-psm3: 8760 row(s) -&gt; C:\Users\main\AppData\Local\Temp\tmpk2m6hyv3\nrel_nsrdb-psm3.csv</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-28 15:48:00.859</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.nrel.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">383</span> - <span class="ansi-bold">Data from the NREL National Solar Radiation Database (NSRDB) / WIND Toolkit via the NREL Developer Network (developer.nlr.gov). Please cite NREL per https://nsrdb.nrel.gov/ and the WIND Toolkit references.</span>
+<pre><span class="ansi-green-fg">2026-06-28 16:04:55.934</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.nrel.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">385</span> - <span class="ansi-bold">Data from the NREL National Solar Radiation Database (NSRDB) / WIND Toolkit via the NREL Developer Network (developer.nlr.gov). Please cite NREL per https://nsrdb.nrel.gov/ and the WIND Toolkit references.</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>(8760, 14)
+<pre>(8760, 9)
 </pre>
 </div>
 </div>
@@ -16440,16 +16440,11 @@ solar.head()</div>
 <thead>
 <tr style="text-align: right;">
 <th></th>
-<th>Year</th>
-<th>Month</th>
-<th>Day</th>
-<th>Hour</th>
-<th>Minute</th>
+<th>time</th>
 <th>GHI</th>
 <th>DNI</th>
 <th>DHI</th>
 <th>Temperature</th>
-<th>time</th>
 <th>lat</th>
 <th>lon</th>
 <th>year</th>
@@ -16459,16 +16454,11 @@ solar.head()</div>
 <tbody>
 <tr>
 <th>0</th>
-<td>2020</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>30</td>
+<td>2020-01-01 00:30:00</td>
 <td>0</td>
 <td>0</td>
 <td>0</td>
 <td>-3.2</td>
-<td>2020-01-01 00:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2020</td>
@@ -16476,16 +16466,11 @@ solar.head()</div>
 </tr>
 <tr>
 <th>1</th>
-<td>2020</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-<td>30</td>
+<td>2020-01-01 01:30:00</td>
 <td>0</td>
 <td>0</td>
 <td>0</td>
 <td>-2.9</td>
-<td>2020-01-01 01:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2020</td>
@@ -16493,16 +16478,11 @@ solar.head()</div>
 </tr>
 <tr>
 <th>2</th>
-<td>2020</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
-<td>30</td>
+<td>2020-01-01 02:30:00</td>
 <td>0</td>
 <td>0</td>
 <td>0</td>
 <td>-2.7</td>
-<td>2020-01-01 02:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2020</td>
@@ -16510,16 +16490,11 @@ solar.head()</div>
 </tr>
 <tr>
 <th>3</th>
-<td>2020</td>
-<td>1</td>
-<td>1</td>
-<td>3</td>
-<td>30</td>
+<td>2020-01-01 03:30:00</td>
 <td>0</td>
 <td>0</td>
 <td>0</td>
 <td>-2.5</td>
-<td>2020-01-01 03:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2020</td>
@@ -16527,16 +16502,11 @@ solar.head()</div>
 </tr>
 <tr>
 <th>4</th>
-<td>2020</td>
-<td>1</td>
-<td>1</td>
-<td>4</td>
-<td>30</td>
+<td>2020-01-01 04:30:00</td>
 <td>0</td>
 <td>0</td>
 <td>0</td>
 <td>-2.3</td>
-<td>2020-01-01 04:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2020</td>
@@ -16597,16 +16567,11 @@ column is assembled from the CSV's Year/Month/Day/Hour/Minute fields.</p>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>Year                    int64
-Month                   int64
-Day                     int64
-Hour                    int64
-Minute                  int64
+<pre>time           datetime64[us]
 GHI                     int64
 DNI                     int64
 DHI                     int64
 Temperature           float64
-time           datetime64[us]
 lat                   float64
 lon                   float64
 year                    int64
@@ -16751,21 +16716,21 @@ wind.head()</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-28 15:48:04.770</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.nrel.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">382</span> - <span class="ansi-bold">NREL wtk: 8760 row(s) -&gt; C:\Users\main\AppData\Local\Temp\tmpnqt97rg2\nrel_wtk.csv</span>
+<pre><span class="ansi-green-fg">2026-06-28 16:04:59.651</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.nrel.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">384</span> - <span class="ansi-bold">NREL wtk: 8760 row(s) -&gt; C:\Users\main\AppData\Local\Temp\tmpk2m6hyv3\nrel_wtk.csv</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-28 15:48:04.771</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.nrel.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">383</span> - <span class="ansi-bold">Data from the NREL National Solar Radiation Database (NSRDB) / WIND Toolkit via the NREL Developer Network (developer.nlr.gov). Please cite NREL per https://nsrdb.nrel.gov/ and the WIND Toolkit references.</span>
+<pre><span class="ansi-green-fg">2026-06-28 16:04:59.652</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.nrel.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">385</span> - <span class="ansi-bold">Data from the NREL National Solar Radiation Database (NSRDB) / WIND Toolkit via the NREL Developer Network (developer.nlr.gov). Please cite NREL per https://nsrdb.nrel.gov/ and the WIND Toolkit references.</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>(8760, 13)
+<pre>(8760, 8)
 </pre>
 </div>
 </div>
@@ -16790,15 +16755,10 @@ wind.head()</div>
 <thead>
 <tr style="text-align: right;">
 <th></th>
-<th>Year</th>
-<th>Month</th>
-<th>Day</th>
-<th>Hour</th>
-<th>Minute</th>
+<th>time</th>
 <th>wind speed at 100m (m/s)</th>
 <th>wind direction at 100m (deg)</th>
 <th>air temperature at 100m (C)</th>
-<th>time</th>
 <th>lat</th>
 <th>lon</th>
 <th>year</th>
@@ -16808,15 +16768,10 @@ wind.head()</div>
 <tbody>
 <tr>
 <th>0</th>
-<td>2012</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>30</td>
+<td>2012-01-01 00:30:00</td>
 <td>8.44</td>
 <td>173.99</td>
 <td>-3.43</td>
-<td>2012-01-01 00:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2012</td>
@@ -16824,15 +16779,10 @@ wind.head()</div>
 </tr>
 <tr>
 <th>1</th>
-<td>2012</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-<td>30</td>
+<td>2012-01-01 01:30:00</td>
 <td>8.33</td>
 <td>170.17</td>
 <td>-3.35</td>
-<td>2012-01-01 01:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2012</td>
@@ -16840,15 +16790,10 @@ wind.head()</div>
 </tr>
 <tr>
 <th>2</th>
-<td>2012</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
-<td>30</td>
+<td>2012-01-01 02:30:00</td>
 <td>6.77</td>
 <td>181.08</td>
 <td>-2.71</td>
-<td>2012-01-01 02:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2012</td>
@@ -16856,15 +16801,10 @@ wind.head()</div>
 </tr>
 <tr>
 <th>3</th>
-<td>2012</td>
-<td>1</td>
-<td>1</td>
-<td>3</td>
-<td>30</td>
+<td>2012-01-01 03:30:00</td>
 <td>2.89</td>
 <td>165.41</td>
 <td>-0.86</td>
-<td>2012-01-01 03:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2012</td>
@@ -16872,15 +16812,10 @@ wind.head()</div>
 </tr>
 <tr>
 <th>4</th>
-<td>2012</td>
-<td>1</td>
-<td>1</td>
-<td>4</td>
-<td>30</td>
+<td>2012-01-01 04:30:00</td>
 <td>1.57</td>
 <td>122.59</td>
 <td>-1.93</td>
-<td>2012-01-01 04:30:00</td>
 <td>39.74</td>
 <td>-105.18</td>
 <td>2012</td>
