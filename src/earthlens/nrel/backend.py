@@ -181,8 +181,7 @@ class NREL(AbstractDataSource):
             # identically through the facade and directly.
             if not isinstance(point, (tuple, list)) or len(point) != 2:
                 raise ValueError(
-                    "NREL `point` must be a 2-tuple (lat, lon); got "
-                    f"{point!r}."
+                    "NREL `point` must be a 2-tuple (lat, lon); got " f"{point!r}."
                 )
             lat_lim = [float(point[0]), float(point[0])]
             lon_lim = [float(point[1]), float(point[1])]
@@ -274,7 +273,10 @@ class NREL(AbstractDataSource):
                 `"hourly"` resolution label.
 
         Raises:
-            ValueError: If `start` parses to a date later than `end`.
+            pydantic.ValidationError: If `start` parses to a date later than
+                `end` — `TemporalExtent` rejects inverted bounds (note this is
+                not a `ValueError` subclass).
+            ValueError: If `start` / `end` do not match `fmt` (from `strptime`).
         """
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
