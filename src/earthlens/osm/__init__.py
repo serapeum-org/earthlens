@@ -59,6 +59,7 @@ from earthlens.osm._helpers import (
     shapely_bbox,
     to_fc,
 )
+from earthlens.osm.backend import OSM
 from earthlens.osm.catalog import CATALOG_PATH, Catalog, Dataset
 
 __all__ = [
@@ -66,6 +67,7 @@ __all__ = [
     "Catalog",
     "Dataset",
     "LicenseWarning",
+    "OSM",
     "bbox_swne",
     "bbox_wsen",
     "empty_fc",
