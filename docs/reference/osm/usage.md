@@ -132,6 +132,14 @@ bbox in the QL yourself).
 | `user_agent` | `User-Agent` sent on the Overpass POST (a real one is required) | `earthlens (+…)` |
 | `timeout` | Overpass HTTP timeout (s); also the QL `[timeout:N]` budget | `180.0` |
 | `file_format` | `"geojson"` or `"gpkg"` | `"geojson"` |
+| `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun | `100.0` |
+
+!!! warning "Keep the bbox small"
+    OSM is for small/targeted queries. A box larger than `max_bbox_deg2` (the
+    default `100` square degrees comfortably covers a large country) is rejected
+    before any request — in particular the whole-Earth default you get if you
+    omit `lat_lim` / `lon_lim` through the facade, which would hammer the shared
+    public services. Raise `max_bbox_deg2=` for a genuinely larger area.
 
 ## The returned FeatureCollection
 

@@ -89,6 +89,15 @@ _DRIVERS: dict[str, tuple[str, str]] = {
     "gpkg": ("GPKG", "gpkg"),
 }
 
+#: Default bbox-area cap, in square degrees, for the live-query footgun guard.
+#: OSM is for small/targeted queries; a box larger than this (a continent, or
+#: the whole-Earth `[-90, 90]` x `[-180, 180]` default a facade caller gets when
+#: they omit `lat_lim` / `lon_lim`, ~64 800 square degrees) would hammer the
+#: shared public services planet-wide. ~100 square degrees comfortably covers a
+#: large country (France is ~64); raise it with `max_bbox_deg2=` for a genuinely
+#: larger area.
+_DEFAULT_MAX_BBOX_DEG2 = 100.0
+
 
 class OSM(AbstractDataSource):
     """OpenStreetMap feature backend (vector FeatureCollection output).
@@ -127,6 +136,7 @@ class OSM(AbstractDataSource):
         user_agent: str = USER_AGENT,
         timeout: float = 180.0,
         file_format: FileFormat = "geojson",
+        max_bbox_deg2: float | None = None,
     ):
         """Initialise an OSM backend instance.
 
@@ -166,6 +176,12 @@ class OSM(AbstractDataSource):
                 fills the QL `[timeout:N]` server budget.
             file_format: Output vector format — `"geojson"` (default, robust
                 for mixed geometry types) or `"gpkg"`.
+            max_bbox_deg2: Optional override of the bbox-area cap (square
+                degrees) that guards against a planet-wide live query (the
+                whole-Earth default a facade caller gets when they omit
+                `lat_lim` / `lon_lim`). `None` uses the built-in
+                `100.0`-square-degree default; pass a larger value for a
+                genuinely larger area.
 
         Raises:
             TypeError: If `variables` is a mapping rather than a list / string
@@ -198,6 +214,7 @@ class OSM(AbstractDataSource):
         self._user_agent = user_agent
         self._timeout = timeout
         self._file_format: FileFormat = file_format
+        self._max_bbox_deg2 = max_bbox_deg2
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -284,8 +301,9 @@ class OSM(AbstractDataSource):
 
         Raises:
             ValueError: If an id in `self.vars` is not a registered named
-                query.
+                query, or the requested bbox exceeds the area cap.
         """
+        self._guard_bbox()
         return [
             RemoteProduct(
                 id=query_id,
@@ -293,6 +311,34 @@ class OSM(AbstractDataSource):
             )
             for query_id in self.vars
         ]
+
+    def _guard_bbox(self) -> None:
+        """Reject a bbox large enough to be a planet-wide live-query footgun.
+
+        OSM is for small/targeted queries; an oversized box (a continent, or the
+        whole-Earth default a facade caller gets when they omit `lat_lim` /
+        `lon_lim`) would hammer the shared public services. Raises when the bbox
+        area exceeds the cap (`max_bbox_deg2`, else `100.0` square degrees).
+
+        Raises:
+            ValueError: If the requested bbox area exceeds the cap.
+        """
+        cap = (
+            self._max_bbox_deg2
+            if self._max_bbox_deg2 is not None
+            else _DEFAULT_MAX_BBOX_DEG2
+        )
+        area = (self.space.east - self.space.west) * (
+            self.space.north - self.space.south
+        )
+        if area > cap:
+            raise ValueError(
+                f"The requested bbox covers {area:.1f} square degrees, which "
+                f"exceeds the {cap:.1f} square-degree cap for live OSM queries "
+                "(an oversized box hammers the shared public services). Shrink "
+                "the bbox (lat_lim / lon_lim or aoi=), or raise the cap with "
+                "max_bbox_deg2=."
+            )
 
     def _fetch(self, products: list[RemoteProduct]) -> list[FeatureCollection]:
         """Run each planned query live and map the result to a FeatureCollection.

@@ -237,6 +237,27 @@ class TestDownloadContract:
         with pytest.raises(ValueError, match="not in the OSM query catalog"):
             OSM(**{**osm_kwargs(), "variables": ["overpass:nope"]}).download()
 
+    def test_whole_earth_bbox_rejected(self, osm_kwargs):
+        """A whole-Earth bbox exceeds the area cap and is rejected before fetch."""
+        with pytest.raises(ValueError, match="square-degree cap"):
+            OSM(
+                **{**osm_kwargs(), "lat_lim": [-90, 90], "lon_lim": [-180, 180]}
+            ).download()
+
+    def test_max_bbox_override_allows_large_box(
+        self, osm_kwargs, fake_overpy, fake_overpass_post
+    ):
+        """A raised max_bbox_deg2 lets a larger box through."""
+        fc = OSM(
+            **{
+                **osm_kwargs(),
+                "lat_lim": [40.0, 50.0],
+                "lon_lim": [0.0, 20.0],  # 200 deg2, over the 100 default
+                "max_bbox_deg2": 1000.0,
+            }
+        ).download()
+        assert len(fc) == 3
+
 
 class TestLazyImports:
     """The SDKs are imported lazily; a missing one is a friendly ImportError."""
