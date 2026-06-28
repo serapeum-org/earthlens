@@ -31,7 +31,9 @@ from earthlens.glaciers._helpers import (
     concat_outlines,
     download_zip,
     empty_canonical,
+    empty_feature_collection,
     fetch_glims,
+    filter_wgms,
     glims_wfs_url,
     parse_wgms_csv,
     read_outlines,
@@ -39,9 +41,11 @@ from earthlens.glaciers._helpers import (
     shapely_bbox,
     wgms_glacier_table,
 )
+from earthlens.glaciers.backend import Glaciers
 from earthlens.glaciers.catalog import Catalog, Dataset, Region
 
 __all__ = [
+    "Glaciers",
     "Catalog",
     "Dataset",
     "Region",
@@ -52,6 +56,8 @@ __all__ = [
     "fetch_glims",
     "glims_wfs_url",
     "concat_outlines",
+    "empty_feature_collection",
+    "filter_wgms",
     "parse_wgms_csv",
     "wgms_glacier_table",
     "empty_canonical",

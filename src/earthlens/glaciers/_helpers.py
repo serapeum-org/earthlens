@@ -322,6 +322,20 @@ def fetch_glims(
     return _clip_to_bbox(fc, bbox)
 
 
+def empty_feature_collection() -> FeatureCollection:
+    """Build an empty EPSG:4326 :class:`FeatureCollection` (no features).
+
+    Returned by the vector path when a request's bbox overlaps no glacier
+    region / matches no outline, so `download()` always yields a collection.
+
+    Returns:
+        FeatureCollection: A zero-feature collection in EPSG:4326.
+    """
+    import geopandas as gpd
+
+    return FeatureCollection(gpd.GeoDataFrame(geometry=[], crs="EPSG:4326"))
+
+
 def concat_outlines(fragments: list[FeatureCollection]) -> FeatureCollection:
     """Merge per-region outline fragments into one collection.
 
@@ -398,6 +412,73 @@ def wgms_glacier_table(zip_path: Path) -> pd.DataFrame:
         KeyError: If the zip has no `data/glacier.csv` member.
     """
     return parse_wgms_csv(zip_path, "glacier")
+
+
+def _as_list(value: Any) -> list[Any]:
+    """Normalise a scalar / iterable selector into a list.
+
+    Args:
+        value: A scalar, list, tuple, or set.
+
+    Returns:
+        list: `value` as a list (a scalar becomes a one-element list).
+    """
+    if isinstance(value, (list, tuple, set)):
+        return list(value)
+    return [value]
+
+
+def filter_wgms(
+    df: pd.DataFrame,
+    glaciers: pd.DataFrame | None = None,
+    *,
+    glacier_id: Any = None,
+    glacier_name: str | None = None,
+    region: Any = None,
+    bbox: list[float] | None = None,
+) -> pd.DataFrame:
+    """Filter a WGMS fluctuations table by glacier / region / bbox.
+
+    `glacier_id` and `glacier_name` match the table directly; `region` and
+    `bbox` need the `glacier` join table (its `id` == the table's `glacier_id`,
+    its `gtng_region` is id-prefixed like `"11_central_europe"`, and it carries
+    `latitude` / `longitude`).
+
+    Args:
+        df: A fluctuations table with a `glacier_id` (and `glacier_name`) column.
+        glaciers: The `glacier` join table; required for `region` / `bbox`.
+        glacier_id: One id or a list of ids (matched against `glacier_id`).
+        glacier_name: A case-insensitive substring matched against
+            `glacier_name`.
+        region: One GTN-G region id (`"11"`) or a list, matched against the
+            `glacier` table's `gtng_region` prefix.
+        bbox: `[west, south, east, north]` filtering glaciers by their point
+            coordinates in the `glacier` table.
+
+    Returns:
+        pandas.DataFrame: The filtered rows, with a reset index.
+    """
+    out = df
+    if glacier_id is not None:
+        ids = {int(i) for i in _as_list(glacier_id)}
+        out = out[out["glacier_id"].isin(ids)]
+    if glacier_name is not None:
+        names = out["glacier_name"].astype(str)
+        out = out[names.str.contains(glacier_name, case=False, na=False)]
+    if (region is not None or bbox is not None) and glaciers is not None:
+        sel = glaciers
+        if region is not None:
+            wanted = {str(r) for r in _as_list(region)}
+            prefix = sel["gtng_region"].astype(str).str.split("_").str[0]
+            sel = sel[prefix.isin(wanted)]
+        if bbox is not None:
+            west, south, east, north = bbox
+            sel = sel[
+                sel["longitude"].between(west, east)
+                & sel["latitude"].between(south, north)
+            ]
+        out = out[out["glacier_id"].isin(set(sel["id"]))]
+    return out.reset_index(drop=True)
 
 
 def empty_canonical(columns: list[str]) -> pd.DataFrame:
