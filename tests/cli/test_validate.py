@@ -13,7 +13,9 @@ from earthlens.cli.validate import (
     _live_ecmwf,
     _validate_bathymetry,
     _validate_erddap,
+    _validate_nrel,
     _validate_nwp,
+    _validate_osm,
     _validate_overture,
     _validate_radar,
     _validate_tropycal,
@@ -35,6 +37,7 @@ _CURATED_ENUM = (
     "s3",
     "ghsl",
     "overture",
+    "osm",
     "fdsn",
     "firms",
     "asf",
@@ -77,6 +80,35 @@ class TestBundledCatalogsLintClean:
         assert result.checked > 0, f"{provider} checked nothing"
 
 
+class TestValidateOsm:
+    """Tests for the OSM structural lint."""
+
+    def test_flags_overpass_row_missing_query_template(self):
+        """An overpass row without a query_template is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "overpass:x": SimpleNamespace(
+                    protocol="overpass", query_template="", geometry_types=["Point"]
+                )
+            }
+        )
+        checked, issues = _validate_osm(catalog)
+        assert checked == 1
+        assert any("missing query_template" in i for i in issues)
+
+    def test_flags_ohsome_row_missing_filter(self):
+        """An ohsome row without an ohsome_filter is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "ohsome:x": SimpleNamespace(
+                    protocol="ohsome", ohsome_filter="", geometry_types=["Polygon"]
+                )
+            }
+        )
+        checked, issues = _validate_osm(catalog)
+        assert any("missing ohsome_filter" in i for i in issues)
+
+
 class TestValidateBathymetry:
     """Tests for the bathymetry structural lint."""
 
@@ -103,6 +135,32 @@ class TestValidateBathymetry:
         )
         _checked, issues = _validate_bathymetry(catalog)
         assert any("available_datasets" in i for i in issues)
+
+
+class TestValidateNrel:
+    """Tests for the nrel structural lint."""
+
+    def test_good_rows_pass(self):
+        """A row with source, endpoint, and columns reports no issues."""
+        catalog = SimpleNamespace(
+            datasets={
+                "nsrdb-psm3": SimpleNamespace(
+                    source="nsrdb", endpoint="/api/x.csv", columns=["time", "GHI"]
+                )
+            }
+        )
+        checked, issues = _validate_nrel(catalog)
+        assert checked == 1
+        assert issues == []
+
+    def test_flags_missing_source_and_columns(self):
+        """A row missing its source and columns is flagged for each."""
+        catalog = SimpleNamespace(
+            datasets={"bad": SimpleNamespace(source="", endpoint="/x.csv", columns=[])}
+        )
+        _checked, issues = _validate_nrel(catalog)
+        assert any("missing source" in i for i in issues)
+        assert any("missing columns" in i for i in issues)
 
 
 class TestValidateNwp:

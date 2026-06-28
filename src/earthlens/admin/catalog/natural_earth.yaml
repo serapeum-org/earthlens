@@ -1,0 +1,32 @@
+# Natural Earth — global cultural admin layers (countries / states) at 10m/50m/110m.
+#
+# Natural Earth ships zipped shapefiles on the NACIS CDN
+# (`https://naciscdn.org/naturalearth/<scale>/cultural/<file>.zip`); the backend
+# reads the zip directly through pyramids `FeatureCollection.read_file` via
+# `/vsizip//vsicurl/` (pointing at the zip root works — no need to name the inner
+# `.shp`). Pinned live in the A1 gate. Native CRS EPSG:4326. The scale is an
+# optional `scale=` selector (defaulting to `default_scale`); the layer comes
+# from the dataset id. Public domain.
+datasets:
+  natural_earth:countries:
+    title: Natural Earth cultural admin-0 countries (default scale 110m)
+    provider: natural_earth
+    layer: admin_0_countries
+    default_scale: 110m
+    required_selectors: []
+    native_crs: EPSG:4326
+    url_template: https://naciscdn.org/naturalearth/{scale}/cultural/ne_{scale}_{layer}.zip
+    license_note: >-
+      Natural Earth, public domain (made with Natural Earth; free vector and
+      raster map data at naturalearthdata.com).
+  natural_earth:states:
+    title: Natural Earth cultural admin-1 states / provinces (default scale 50m)
+    provider: natural_earth
+    layer: admin_1_states_provinces
+    default_scale: 50m
+    required_selectors: []
+    native_crs: EPSG:4326
+    url_template: https://naciscdn.org/naturalearth/{scale}/cultural/ne_{scale}_{layer}.zip
+    license_note: >-
+      Natural Earth, public domain (made with Natural Earth; free vector and
+      raster map data at naturalearthdata.com).

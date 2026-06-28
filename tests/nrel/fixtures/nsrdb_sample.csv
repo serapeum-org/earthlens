@@ -1,0 +1,6 @@
+Source,Location ID,City,State,Country,Latitude,Longitude,Time Zone,Elevation,Local Time Zone,Version
+NSRDB,479494,-,-,-,39.73,-105.18,-7,1876,-7,4.0.0
+Year,Month,Day,Hour,Minute,GHI,DNI,DHI,Temperature,Wind Speed
+2020,1,1,0,30,0,0,0,-3.2,5.9
+2020,1,1,1,30,0,0,0,-2.9,6.2
+2020,1,1,12,30,512,750,88,3.1,4.0

@@ -1,0 +1,70 @@
+# geoBoundaries (gbOpen) — per-country administrative boundaries, ADM0–ADM5.
+#
+# geoBoundaries is a two-step source (G5): the request hits the API
+# `https://www.geoboundaries.org/api/current/gbOpen/<ISO3>/<ADM>/`, reads the
+# `gjDownloadURL` from the JSON metadata, and reads that GeoJSON through pyramids
+# `FeatureCollection.read_file` (via `/vsicurl/`). Pinned live in the A1 gate —
+# see planning/admin/captures/admin-sdk-facts.md. Native CRS EPSG:4326. The
+# request supplies the country as `country=<ISO3>`; the ADM level comes from the
+# dataset id. License CC-BY-4.0.
+datasets:
+  geoboundaries:adm0:
+    title: geoBoundaries gbOpen ADM0 (national boundary) for one country
+    provider: geoboundaries
+    adm_level: ADM0
+    required_selectors: [country]
+    native_crs: EPSG:4326
+    url_template: https://www.geoboundaries.org/api/current/gbOpen/{iso}/{adm}/
+    license_note: >-
+      geoBoundaries (gbOpen), CC-BY-4.0; cite Runfola, D. et al. (2020)
+      geoBoundaries: A global database of political administrative boundaries.
+  geoboundaries:adm1:
+    title: geoBoundaries gbOpen ADM1 (first sub-national level) for one country
+    provider: geoboundaries
+    adm_level: ADM1
+    required_selectors: [country]
+    native_crs: EPSG:4326
+    url_template: https://www.geoboundaries.org/api/current/gbOpen/{iso}/{adm}/
+    license_note: >-
+      geoBoundaries (gbOpen), CC-BY-4.0; cite Runfola, D. et al. (2020)
+      geoBoundaries: A global database of political administrative boundaries.
+  geoboundaries:adm2:
+    title: geoBoundaries gbOpen ADM2 (second sub-national level) for one country
+    provider: geoboundaries
+    adm_level: ADM2
+    required_selectors: [country]
+    native_crs: EPSG:4326
+    url_template: https://www.geoboundaries.org/api/current/gbOpen/{iso}/{adm}/
+    license_note: >-
+      geoBoundaries (gbOpen), CC-BY-4.0; cite Runfola, D. et al. (2020)
+      geoBoundaries: A global database of political administrative boundaries.
+  geoboundaries:adm3:
+    title: geoBoundaries gbOpen ADM3 (third sub-national level) for one country
+    provider: geoboundaries
+    adm_level: ADM3
+    required_selectors: [country]
+    native_crs: EPSG:4326
+    url_template: https://www.geoboundaries.org/api/current/gbOpen/{iso}/{adm}/
+    license_note: >-
+      geoBoundaries (gbOpen), CC-BY-4.0; cite Runfola, D. et al. (2020)
+      geoBoundaries: A global database of political administrative boundaries.
+  geoboundaries:adm4:
+    title: geoBoundaries gbOpen ADM4 (fourth sub-national level) for one country
+    provider: geoboundaries
+    adm_level: ADM4
+    required_selectors: [country]
+    native_crs: EPSG:4326
+    url_template: https://www.geoboundaries.org/api/current/gbOpen/{iso}/{adm}/
+    license_note: >-
+      geoBoundaries (gbOpen), CC-BY-4.0; cite Runfola, D. et al. (2020)
+      geoBoundaries: A global database of political administrative boundaries.
+  geoboundaries:adm5:
+    title: geoBoundaries gbOpen ADM5 (fifth sub-national level) for one country
+    provider: geoboundaries
+    adm_level: ADM5
+    required_selectors: [country]
+    native_crs: EPSG:4326
+    url_template: https://www.geoboundaries.org/api/current/gbOpen/{iso}/{adm}/
+    license_note: >-
+      geoBoundaries (gbOpen), CC-BY-4.0; cite Runfola, D. et al. (2020)
+      geoBoundaries: A global database of political administrative boundaries.

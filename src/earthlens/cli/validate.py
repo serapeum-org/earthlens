@@ -151,6 +151,22 @@ def _validate_overture(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, check)
 
 
+def _validate_osm(catalog: Any) -> tuple[int, list[str]]:
+    """Each OSM named query needs a protocol and that protocol's query field."""
+
+    def check(key: str, record: Any) -> list[str]:
+        """Flag a query missing protocol/geometry, or its protocol's query field."""
+        issues = _require(key, record, ("protocol", "geometry_types"))
+        protocol = getattr(record, "protocol", None)
+        if protocol == "overpass" and not getattr(record, "query_template", None):
+            issues.append(f"{key}: overpass row missing query_template")
+        if protocol == "ohsome" and not getattr(record, "ohsome_filter", None):
+            issues.append(f"{key}: ohsome row missing ohsome_filter")
+        return issues
+
+    return _lint(catalog, check)
+
+
 def _validate_fdsn(catalog: Any) -> tuple[int, list[str]]:
     """Each FDSN network needs an fdsn_id."""
     return _lint(catalog, lambda k, r: _require(k, r, ("fdsn_id",)))
@@ -537,6 +553,13 @@ def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
 
 
+def _validate_nrel(catalog: Any) -> tuple[int, list[str]]:
+    """Each NREL product needs a source, a CSV endpoint, and non-empty columns."""
+    return _lint(
+        catalog, lambda k, r: _require(k, r, ("source", "endpoint", "columns"))
+    )
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -545,6 +568,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "s3": _validate_s3,
     "ghsl": _validate_ghsl,
     "overture": _validate_overture,
+    "osm": _validate_osm,
     "fdsn": _validate_fdsn,
     "firms": _validate_firms,
     "asf": _validate_asf,
@@ -564,6 +588,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
     "pvgis": _validate_pvgis,
+    "nrel": _validate_nrel,
 }
 
 

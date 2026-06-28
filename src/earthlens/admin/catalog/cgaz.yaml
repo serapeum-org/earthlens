@@ -1,0 +1,40 @@
+# CGAZ — geoBoundaries Comprehensive Global Admin Zones (seamless global layers).
+#
+# CGAZ ships a single seamless layer per ADM level (one file, all countries),
+# fetched in one step (G5) from the geoBoundaries GitHub release tree. The
+# GeoPackage variant is used (the GeoJSON variants are 360–550 MB); read through
+# pyramids `FeatureCollection.read_file` (via `/vsicurl/`). Pinned live in the A1
+# gate. The native CRS is an "Undefined geographic SRS" (geographic degrees,
+# WGS84-equivalent), which the backend declares EPSG:4326 without transforming
+# (G8). No per-country selector — the layer is global. License CC-BY-4.0.
+datasets:
+  cgaz:adm0:
+    title: CGAZ seamless global ADM0 (national boundaries, all countries)
+    provider: cgaz
+    adm_level: ADM0
+    required_selectors: []
+    native_crs: undefined
+    url_template: https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/CGAZ/geoBoundariesCGAZ_{level}.gpkg
+    license_note: >-
+      geoBoundaries CGAZ (Comprehensive Global Admin Zones), CC-BY-4.0; cite
+      Runfola, D. et al. (2020) geoBoundaries.
+  cgaz:adm1:
+    title: CGAZ seamless global ADM1 (first sub-national level, all countries)
+    provider: cgaz
+    adm_level: ADM1
+    required_selectors: []
+    native_crs: undefined
+    url_template: https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/CGAZ/geoBoundariesCGAZ_{level}.gpkg
+    license_note: >-
+      geoBoundaries CGAZ (Comprehensive Global Admin Zones), CC-BY-4.0; cite
+      Runfola, D. et al. (2020) geoBoundaries.
+  cgaz:adm2:
+    title: CGAZ seamless global ADM2 (second sub-national level, all countries)
+    provider: cgaz
+    adm_level: ADM2
+    required_selectors: []
+    native_crs: undefined
+    url_template: https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/CGAZ/geoBoundariesCGAZ_{level}.gpkg
+    license_note: >-
+      geoBoundaries CGAZ (Comprehensive Global Admin Zones), CC-BY-4.0; cite
+      Runfola, D. et al. (2020) geoBoundaries.
