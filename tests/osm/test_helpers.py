@@ -89,6 +89,16 @@ class TestOverpyToGdf:
         result = FakeResult([], [FakeWay(9, {"x": "y"}, [(0.0, 0.0)])], [])
         assert len(overpy_to_gdf(result)) == 0
 
+    def test_reserved_columns_not_clobbered_by_tags(self):
+        """A tag named like a reserved column cannot overwrite identity/geometry."""
+        from tests.osm.conftest import FakeNode
+
+        node = FakeNode(7, 49.41, 8.69, {"osm_id": "junk", "osm_type": "x", "name": "ok"})
+        gdf = overpy_to_gdf(FakeResult([node], [], []))
+        row = gdf.iloc[0]
+        assert row.osm_id == 7 and row.osm_type == "node"
+        assert row.geometry.geom_type == "Point" and row["name"] == "ok"
+
 
 class TestToFc:
     """Wrapping a GeoDataFrame into a FeatureCollection, normalising CRS."""

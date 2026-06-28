@@ -146,6 +146,25 @@ def _way_geometry(way) -> Polygon | LineString | None:
     return None
 
 
+def _row(osm_id: int, osm_type: str, geometry, tags: dict) -> dict:
+    """Build one element row with the reserved identity/geometry keys winning.
+
+    The element's free-form OSM `tags` are spread first so a tag whose key
+    collides with a reserved column (`osm_id`, `osm_type`, `geometry`) cannot
+    clobber the identity or geometry value — the reserved keys are written last.
+
+    Args:
+        osm_id: The OSM element id.
+        osm_type: `"node"` or `"way"`.
+        geometry: The shapely geometry built for the element.
+        tags: The element's OSM tags.
+
+    Returns:
+        dict: The row mapping, reserved keys last.
+    """
+    return {**dict(tags), "osm_id": osm_id, "osm_type": osm_type, "geometry": geometry}
+
+
 def overpy_to_gdf(result) -> gpd.GeoDataFrame:
     """Build a WGS84 `GeoDataFrame` from a parsed overpy result.
 
@@ -191,25 +210,18 @@ def overpy_to_gdf(result) -> gpd.GeoDataFrame:
     rows: list[dict] = []
     for node in result.nodes:
         rows.append(
-            {
-                "osm_id": node.id,
-                "osm_type": "node",
-                "geometry": Point(float(node.lon), float(node.lat)),
-                **dict(node.tags),
-            }
+            _row(
+                node.id,
+                "node",
+                Point(float(node.lon), float(node.lat)),
+                node.tags,
+            )
         )
     for way in result.ways:
         geometry = _way_geometry(way)
         if geometry is None:
             continue
-        rows.append(
-            {
-                "osm_id": way.id,
-                "osm_type": "way",
-                "geometry": geometry,
-                **dict(way.tags),
-            }
-        )
+        rows.append(_row(way.id, "way", geometry, way.tags))
     if not rows:
         return _empty_gdf()
     return gpd.GeoDataFrame(rows, geometry="geometry", crs=OSM_CRS)
