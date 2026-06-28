@@ -4,10 +4,9 @@ Three concerns are factored here so `osm/backend.py` only routes:
 
 * the bbox-order helpers `bbox_swne` / `bbox_wsen` / `shapely_bbox` —
   `SpatialExtent` exposes the bbox as `.south/.west/.north/.east` but has no
-  `bbox_swne` / `shapely_bbox` of its own (the roadmap's `self.space.*` calls
-  were fabricated; verified), and the two protocols want the corners in
-  *different* orders (`G3`): Overpass QL is `S,W,N,E`, the ohsome `bboxes`
-  parameter is `W,S,E,N`.
+  `bbox_swne` / `shapely_bbox` of its own, and the two protocols want the
+  corners in *different* orders (`G3`): Overpass QL is `S,W,N,E`, the ohsome
+  `bboxes` parameter is `W,S,E,N`.
 * `overpy_to_gdf` — overpy returns parsed elements, not a `GeoDataFrame`, so
   geometry is built here (`G4`). Under the `out geom;` QL the backend uses,
   way coordinates ride on `way.attributes["geometry"]` (a list of `{lat, lon}`
@@ -34,9 +33,10 @@ from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import LineString, Point, Polygon, box
 
 # `LicenseWarning` is shared across the ODbL / restrictive-license backends; it
-# lives in the biodiversity cluster's helper module and is re-exported here
-# (the same class object) so the backend imports it from its own subpackage.
-from earthlens.overture._helpers import LicenseWarning  # noqa: F401
+# lives in the biodiversity cluster's helper module (overture re-exports the same
+# class object) and is re-exported here so the backend imports it from its own
+# subpackage.
+from earthlens.biodiversity._helpers import LicenseWarning  # noqa: F401
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
