@@ -658,6 +658,20 @@ class EarthLens:
                 "",
                 {},
             ),
+            # Administrative-boundary polygons from four public sources —
+            # geoBoundaries (per-country ADM0-5), CGAZ (seamless global ADM0/1/2),
+            # Natural Earth (cultural admin), US Census TIGER/Line (states /
+            # counties / tracts / nation); GADM omitted for license. Vector
+            # FeatureCollection output (EPSG:4326); no extra SDK (core requests +
+            # pyramids), all four public. Pass the dataset via variables=
+            # ["geoboundaries:adm1"] plus its selector (country=<ISO3> /
+            # scale= / year= / state=). Aliases "admin-boundaries" /
+            # "geoboundaries" / "natural-earth" / "tiger".
+            "admin": ("earthlens.admin", "AdminBoundaries", "", {}),
+            "admin-boundaries": ("earthlens.admin", "AdminBoundaries", "", {}),
+            "geoboundaries": ("earthlens.admin", "AdminBoundaries", "", {}),
+            "natural-earth": ("earthlens.admin", "AdminBoundaries", "", {}),
+            "tiger": ("earthlens.admin", "AdminBoundaries", "", {}),
         }
     )
 
@@ -702,8 +716,10 @@ class EarthLens:
                 `"stac"` (with endpoint aliases `"planetary-computer"` /
                 `"earth-search"` / `"cdse"`), `"tropycal"`,
                 `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`),
-                `"worldpop"` (alias `"world-pop"`), or `"argo"` (aliases
-                `"argo-floats"` / `"argopy"`). See
+                `"worldpop"` (alias `"world-pop"`), `"argo"` (aliases
+                `"argo-floats"` / `"argopy"`), or `"admin"` (aliases
+                `"admin-boundaries"` / `"geoboundaries"` /
+                `"natural-earth"` / `"tiger"`). See
                 `sorted(EarthLens.DataSources)` for the live list.
                 Defaults to `"chc"`.
             temporal_resolution: The download cadence — `"daily"` or
