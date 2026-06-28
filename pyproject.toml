@@ -124,8 +124,21 @@ argo = ["argopy >=1.4"]
 # downloads it with core `requests`, then reads it back via pyramids — earthlens
 # never imports xarray. Floor pinned from the A1 gate (erddapy 3.2.1 verified).
 erddap = ["erddapy >=3.0"]
+# OpenStreetMap features over two public, keyless protocols: overpy (Overpass,
+# current-state) + ohsome (OSM history/analytics). Both imported lazily — the
+# package imports without [osm]. Floors pinned from the A1 gate (overpy 0.7 /
+# ohsome 0.4.0 verified).
+#
+# Deliberately NOT in `all`: ohsome 0.4.0 pins `pandas<3.0.0` (and
+# `geopandas<2.0.0`), while the locked `all` env runs `pandas 3.0.3` — adding
+# ohsome would force a pandas downgrade across the whole dev/test/CI solve. The
+# non-e2e osm tests fake both SDKs (monkeypatched `sys.modules`), so they run in
+# the `all` dev/test env without overpy/ohsome installed; the gated live e2e
+# needs `pip install earthlens[osm]` in a (pandas<3) osm-capable environment.
+# (Same policy as the `argo` extra above.)
+osm = ["overpy >=0.7", "ohsome >=0.4.0"]
 # Self-referential: the union of every backend extra, without re-listing deps.
-# (argo is intentionally excluded — see the note above its extra.)
+# (argo and osm are intentionally excluded — see the notes above their extras.)
 all = [
     "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
 ]
@@ -314,6 +327,7 @@ markers = [
     "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
     "climate_indices: tests for the climate / teleconnection index backend (NOAA PSL + KNMI Climate Explorer monthly ASCII series; no extra SDK — core requests + pandas).",
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
+    "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
 ]
 
 [tool.pixi.workspace]
