@@ -13,6 +13,7 @@ from earthlens.cli.validate import (
     _live_ecmwf,
     _validate_bathymetry,
     _validate_erddap,
+    _validate_nrel,
     _validate_nwp,
     _validate_overture,
     _validate_radar,
@@ -103,6 +104,32 @@ class TestValidateBathymetry:
         )
         _checked, issues = _validate_bathymetry(catalog)
         assert any("available_datasets" in i for i in issues)
+
+
+class TestValidateNrel:
+    """Tests for the nrel structural lint."""
+
+    def test_good_rows_pass(self):
+        """A row with source, endpoint, and columns reports no issues."""
+        catalog = SimpleNamespace(
+            datasets={
+                "nsrdb-psm3": SimpleNamespace(
+                    source="nsrdb", endpoint="/api/x.csv", columns=["time", "GHI"]
+                )
+            }
+        )
+        checked, issues = _validate_nrel(catalog)
+        assert checked == 1
+        assert issues == []
+
+    def test_flags_missing_source_and_columns(self):
+        """A row missing its source and columns is flagged for each."""
+        catalog = SimpleNamespace(
+            datasets={"bad": SimpleNamespace(source="", endpoint="/x.csv", columns=[])}
+        )
+        _checked, issues = _validate_nrel(catalog)
+        assert any("missing source" in i for i in issues)
+        assert any("missing columns" in i for i in issues)
 
 
 class TestValidateNwp:

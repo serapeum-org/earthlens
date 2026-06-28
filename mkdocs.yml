@@ -195,6 +195,11 @@ nav:
       - Usage: reference/pvgis/usage.md
       - Available products: reference/pvgis/datasets.md
       - Reference: reference/pvgis/pvgis.md
+    - NREL (solar / wind resource):
+      - Introduction: reference/nrel/introduction.md
+      - Usage: reference/nrel/usage.md
+      - Available products: reference/nrel/datasets.md
+      - Reference: reference/nrel/nrel.md
     - Climate indices (teleconnections):
       - Introduction: reference/climate_indices/introduction.md
       - Usage: reference/climate_indices/usage.md
@@ -427,6 +432,9 @@ nav:
       - Quickstart — hourly radiation (live): examples/pvgis/01_pvgis_quickstart.ipynb
       - Catalog explorer (no network): examples/pvgis/02_catalog_explorer.ipynb
       - PV power & TMY (live): examples/pvgis/03_pv_power_and_tmy.ipynb
+    - NREL (solar / wind resource):
+      - Quickstart — NSRDB + WIND Toolkit (live): examples/nrel/01_nrel_quickstart.ipynb
+      - Products & behaviour — TMY + bbox grid (live): examples/nrel/02_nrel_products_and_behavior.ipynb
     - Climate indices (teleconnections):
       - Quickstart (live): examples/climate_indices/01_climate_indices_quickstart.ipynb
       - Catalog & behaviour (no network): examples/climate_indices/02_catalog_and_behavior.ipynb
