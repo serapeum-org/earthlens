@@ -404,6 +404,14 @@ class EarthLens:
             to the AOI via `pyramids` as `raster` GeoTIFFs (one per
             product × epoch; `aggregate=` reduces across epochs); no
             credentials; keys `"ghsl"` / `"ghs"` / `"human-settlement"`.
+        :class:`earthlens.glaciers.Glaciers`: glacier outlines / fluctuations
+            over three open sources — RGI 7.0 per-region outlines (UNESCO
+            IHP-WINS) and GLIMS WFS time-series outlines as `vector`
+            `FeatureCollection`s clipped to the AOI, and the WGMS Fluctuations
+            of Glaciers (mass balance / front variation / state) as a
+            `tabular` `DataFrame`; per-instance `OUTPUT_KIND`, `aggregate=`
+            rejected; no credentials; keys `"glaciers"` / `"rgi"` / `"glims"`
+            / `"wgms"`.
         :class:`earthlens.worldpop.WorldPop`: WorldPop open population data
             hub (CC-BY-4.0, no credentials) — per-country / global gridded
             population, density, age/sex, births, projections; mosaic +
@@ -745,7 +753,8 @@ class EarthLens:
                 `"cmems"`, `"earthdata"`, `"ecmwf"`,
                 `"eumetsat"`, `"fdsn"`, `"firms"`, `"gdacs"`, `"gee"`
                 (alias `"google-earth-engine"`), `"ghsl"` (aliases
-                `"ghs"` / `"human-settlement"`), `"hdx"`,
+                `"ghs"` / `"human-settlement"`), `"glaciers"` (aliases
+                `"rgi"` / `"glims"` / `"wgms"`), `"hdx"`,
                 `"nrel"` (aliases `"nsrdb"` / `"wind-toolkit"`), `"nwp"`,
                 `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
                 `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),

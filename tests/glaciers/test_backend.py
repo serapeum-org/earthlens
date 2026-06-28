@@ -119,9 +119,16 @@ def test_wgms_glacier_id_filter(tmp_path: Path, patch_download):
     assert 0 < len(filtered) <= len(full)
 
 
-def test_download_rejects_aggregate(tmp_path: Path, patch_download):
-    """`aggregate=` is rejected for both output kinds (G8)."""
+def test_download_rejects_aggregate_vector(tmp_path: Path, patch_download):
+    """`aggregate=` is rejected for a vector dataset (G8)."""
     backend = Glaciers(variables=["rgi:outlines"], region="11", path=tmp_path)
+    with pytest.raises(NotImplementedError, match="aggregate"):
+        backend.download(aggregate=object())
+
+
+def test_download_rejects_aggregate_tabular(tmp_path: Path, patch_download):
+    """`aggregate=` is rejected for a tabular (WGMS) dataset too (G8)."""
+    backend = Glaciers(variables=["wgms:mass_balance"], path=tmp_path)
     with pytest.raises(NotImplementedError, match="aggregate"):
         backend.download(aggregate=object())
 

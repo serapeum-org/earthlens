@@ -318,7 +318,7 @@ def fetch_glims(
     dest_path.write_text(resp.text, encoding="utf-8")
     fc = FeatureCollection.read_file(str(Path(dest_path).resolve()))
     if len(fc) == 0:
-        return FeatureCollection(fc)
+        return fc
     return _clip_to_bbox(fc, bbox)
 
 
