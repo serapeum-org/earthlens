@@ -210,6 +210,11 @@ nav:
       - Usage: reference/risk_indicators/usage.md
       - Available datasets: reference/risk_indicators/datasets.md
       - Reference: reference/risk_indicators/risk_indicators.md
+    - Glaciers (RGI / GLIMS / WGMS):
+      - Introduction: reference/glaciers/introduction.md
+      - Usage: reference/glaciers/usage.md
+      - Available datasets: reference/glaciers/datasets.md
+      - Reference: reference/glaciers/glaciers.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
