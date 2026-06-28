@@ -37,6 +37,18 @@
          <lastmod>2026-06-28</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/admin/01_admin_quickstart/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/admin/02_catalog_explorer/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/admin/03_natural_earth_and_tiger/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/argo/catalog_and_selectors/</loc>
          <lastmod>2026-06-28</lastmod>
     </url>
@@ -822,6 +834,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/providers/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/admin/admin/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/admin/datasets/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/admin/introduction/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/admin/usage/</loc>
          <lastmod>2026-06-28</lastmod>
     </url>
     <url>
