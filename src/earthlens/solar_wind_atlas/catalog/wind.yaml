@@ -1,0 +1,102 @@
+# Global Wind Atlas v3 — wind climatology layers (windowed /vsicurl COG read).
+#
+# The Global Wind Atlas v3 layers are range-accessible Cloud-Optimized GeoTIFFs
+# (tiled + overview pyramids) on public figshare (article 9420803,
+# data.dtu.dk), served via ndownloader.figshare.com -> presigned DTU S3 that
+# honours HTTP range requests (verified live — see the A1/A1b gate,
+# planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md). They use the
+# `vsicurl` transport: only the bbox window's byte ranges transfer, never the
+# whole multi-GB file. Catalogued here is the publicly windowable layer set;
+# per-height mean wind-speed at 10/50/150/200 m is not public on figshare
+# (blocked behind a private_link) and is out of scope for now.
+datasets:
+
+  wind_100m:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17247017
+    units: m/s
+    long_name: Mean wind speed at 100 m above ground level
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  weibull_k_10m:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17602796
+    units: dimensionless
+    long_name: Weibull shape parameter k at 10 m above ground level
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  weibull_k_50m:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17602832
+    units: dimensionless
+    long_name: Weibull shape parameter k at 50 m above ground level
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  weibull_k_100m:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17602748
+    units: dimensionless
+    long_name: Weibull shape parameter k at 100 m above ground level
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  weibull_k_150m:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17603240
+    units: dimensionless
+    long_name: Weibull shape parameter k at 150 m above ground level
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  weibull_k_200m:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17603435
+    units: dimensionless
+    long_name: Weibull shape parameter k at 200 m above ground level
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  capacity_factor_iec1:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17281760
+    units: fraction
+    long_name: Wind turbine capacity factor, IEC Class 1
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  capacity_factor_iec2:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17281778
+    units: fraction
+    long_name: Wind turbine capacity factor, IEC Class 2
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  capacity_factor_iec3:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17281805
+    units: fraction
+    long_name: Wind turbine capacity factor, IEC Class 3
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
+
+  air_density_100m:
+    atlas: gwa
+    transport: vsicurl
+    url: https://ndownloader.figshare.com/files/17281898
+    units: kg/m3
+    long_name: Mean air density at 100 m above ground level
+    license_note: >-
+      Global Wind Atlas 3.0, © Technical University of Denmark (DTU) / World Bank (ESMAP). Licensed CC-BY-4.0.
