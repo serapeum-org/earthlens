@@ -41,6 +41,16 @@ class _StreamResp:
         yield self._payload
 
 
+class _TextResp:
+    """A non-streaming response stand-in over a text payload."""
+
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+    def raise_for_status(self):
+        return None
+
+
 class _FlakySession:
     """A session whose `get` raises `fails` times before streaming bytes."""
 
@@ -104,14 +114,7 @@ def test_clip_to_bbox_reprojects_non_4326():
 def test_fetch_glims_empty_result(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """An empty WFS response yields an empty FeatureCollection."""
     empty = json.dumps({"type": "FeatureCollection", "features": [], "crs": None})
-
-    class _Resp:
-        text = empty
-
-        def raise_for_status(self):
-            return None
-
-    monkeypatch.setattr(_helpers.requests, "get", lambda *a, **k: _Resp())
+    monkeypatch.setattr(_helpers.requests, "get", lambda *a, **k: _TextResp(empty))
     fc = _helpers.fetch_glims(
         "https://wfs", "T", [0.0, 0.0, 1.0, 1.0], tmp_path / "e.geojson"
     )
