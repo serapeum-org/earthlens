@@ -232,6 +232,21 @@ class TestDownloadContract:
         # each query returns the same fixture result (3 features) -> 6 combined.
         assert len(fc) == 6
 
+    def test_overpass_and_ohsome_combined(
+        self, osm_kwargs, fake_overpy, fake_overpass_post, fake_ohsome
+    ):
+        """An overpass + an ohsome query combine, unioning their disjoint columns."""
+        fc = OSM(
+            **{
+                **osm_kwargs(),
+                "variables": ["overpass:hospitals", "ohsome:buildings"],
+                "start": "2020-01-01",
+            }
+        ).download()
+        assert len(fc) == 5  # 3 overpass + 2 ohsome fixture rows
+        assert {"osm_id", "osm_type", "@osmId"} <= set(fc.columns)
+        assert fc.crs.to_epsg() == 4326
+
     def test_unknown_query_id_raises(self, osm_kwargs):
         """An unknown named-query id raises ValueError before any fetch."""
         with pytest.raises(ValueError, match="not in the OSM query catalog"):
