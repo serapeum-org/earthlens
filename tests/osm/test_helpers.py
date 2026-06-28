@@ -93,7 +93,9 @@ class TestOverpyToGdf:
         """A tag named like a reserved column cannot overwrite identity/geometry."""
         from tests.osm.conftest import FakeNode
 
-        node = FakeNode(7, 49.41, 8.69, {"osm_id": "junk", "osm_type": "x", "name": "ok"})
+        node = FakeNode(
+            7, 49.41, 8.69, {"osm_id": "junk", "osm_type": "x", "name": "ok"}
+        )
         gdf = overpy_to_gdf(FakeResult([node], [], []))
         row = gdf.iloc[0]
         assert row.osm_id == 7 and row.osm_type == "node"
