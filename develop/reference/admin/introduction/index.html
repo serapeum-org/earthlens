@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/glaciers/introduction/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/admin/introduction/">
       
       
         <link rel="prev" href="../../risk_indicators/risk_indicators/">
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#glaciers-introduction" class="md-skip">
+        <a href="#administrative-boundaries-introduction" class="md-skip">
           Skip to content
         </a>
       
@@ -4141,7 +4141,7 @@
   <span class="md-ellipsis">
     
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER)
   
 
     
@@ -4157,7 +4157,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER)
   
 
           </label>
@@ -4230,10 +4230,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#two-design-points" class="md-nav__link">
+  <a href="#why-gadm-is-not-here" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Two design points
+        Why GADM is not here
       
     </span>
   </a>
@@ -4241,10 +4241,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#three-design-points" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        Three design points
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Three design points">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vector-output-aggregate-rejected" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector output; aggregate= rejected
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uniform-epsg4326-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uniform EPSG:4326 output
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
       
     </span>
   </a>
@@ -4252,10 +4302,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#licenses-citations" class="md-nav__link">
+  <a href="#what-is-not-here-yet" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Licenses / citations
+        What is not here (yet)
       
     </span>
   </a>
@@ -4334,7 +4384,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../glaciers/" class="md-nav__link">
+      <a href="../admin/" class="md-nav__link">
         
   
   
@@ -12058,7 +12108,7 @@
   <span class="md-ellipsis">
     
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Administrative boundaries (geoBoundaries / Natural Earth / TIGER)
   
 
     
@@ -12074,7 +12124,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Administrative boundaries (geoBoundaries / Natural Earth / TIGER)
   
 
           </label>
@@ -12087,14 +12137,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/glaciers/01_glaciers_quickstart/" class="md-nav__link">
+      <a href="../../../examples/admin/01_admin_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Glaciers — quickstart (live)
+    Administrative boundaries — quickstart (geoBoundaries)
   
 
     
@@ -12115,14 +12165,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/glaciers/02_catalog_and_behavior/" class="md-nav__link">
+      <a href="../../../examples/admin/02_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Glaciers — catalog &amp; behaviour (no network)
+    Administrative boundaries — catalog explorer (offline)
   
 
     
@@ -12143,14 +12193,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/glaciers/03_glims_and_wgms/" class="md-nav__link">
+      <a href="../../../examples/admin/03_natural_earth_and_tiger/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Glaciers — GLIMS outlines &amp; WGMS mass balance (live)
+    Administrative boundaries — Natural Earth &amp; US Census TIGER
   
 
     
@@ -15744,10 +15794,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#two-design-points" class="md-nav__link">
+  <a href="#why-gadm-is-not-here" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Two design points
+        Why GADM is not here
       
     </span>
   </a>
@@ -15755,10 +15805,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#three-design-points" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        Three design points
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Three design points">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vector-output-aggregate-rejected" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector output; aggregate= rejected
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uniform-epsg4326-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uniform EPSG:4326 output
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
       
     </span>
   </a>
@@ -15766,10 +15866,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#licenses-citations" class="md-nav__link">
+  <a href="#what-is-not-here-yet" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Licenses / citations
+        What is not here (yet)
       
     </span>
   </a>
@@ -15793,7 +15893,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/glaciers/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/admin/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -15802,65 +15902,84 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/glaciers/introduction.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/admin/introduction.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="glaciers-introduction"><a class="toclink" href="#glaciers-introduction">Glaciers — introduction</a><a class="headerlink" href="#glaciers-introduction" title="Permanent link">#</a></h1>
-<p>earthlens ships a single <code>glaciers</code> backend that fetches <strong>glacier outlines and
-fluctuations</strong> from three open sources and returns them either as a pyramids
-<code>FeatureCollection</code> (outlines) or a tidy <code>pandas.DataFrame</code> (fluctuations). The
-output shape is <strong>per instance</strong> — it follows the dataset you pick — and
-<code>aggregate=</code> is rejected for both shapes (these are pre-computed inventories /
-measurements, not gridded fields).</p>
-<p>Three sources are covered:</p>
+<h1 id="administrative-boundaries-introduction"><a class="toclink" href="#administrative-boundaries-introduction">Administrative boundaries — introduction</a><a class="headerlink" href="#administrative-boundaries-introduction" title="Permanent link">#</a></h1>
+<p>earthlens ships a single <code>admin</code> backend that fetches <strong>administrative-boundary
+polygons</strong> from four <strong>public</strong> sources and returns them as a pyramids
+<code>FeatureCollection</code> of polygons in <strong>EPSG:4326</strong>. These are vector boundary
+layers, not gridded rasters — so there is no meaningful grid reduction and
+<code>aggregate=</code> is rejected.</p>
+<p>Four sources are covered:</p>
 <ul>
-<li><strong><a href="https://nsidc.org/data/nsidc-0770/versions/7">RGI 7.0</a></strong> (Randolph Glacier
-  Inventory) — global glacier <strong>outlines</strong>, one shapefile per GTN-G first-order
-  region (regions 01–19). Served openly — no login — by the
-  <strong><a href="https://ihp-wins.unesco.org/dataset/randolph-glacier-inventory-rgi-7-0-glacier-product">UNESCO IHP-WINS</a></strong>
-  mirror (the NSIDC host is Earthdata-gated, and the backend never touches it).
-  Vector.</li>
-<li><strong><a href="https://www.glims.org/">GLIMS</a></strong> (Global Land Ice Measurements from Space) —
-  <strong>time-series</strong> glacier outlines (a glacier can have several outlines with
-  different acquisition dates), queried by bounding box through the open GLIMS
-  GeoServer <strong>WFS</strong>. Vector.</li>
-<li><strong><a href="https://wgms.ch/">WGMS</a></strong> — the <strong>Fluctuations of Glaciers</strong> (FoG) database:
-  mass balance, front variation (length change), and glacier state, as tabular
-  CSV tables. Open download. Tabular.</li>
+<li><strong><a href="https://www.geoboundaries.org/">geoBoundaries</a></strong> (gbOpen) — per-country
+  administrative boundaries from <strong>ADM0 to ADM5</strong>, fetched by ISO3 country code.
+  CC-BY-4.0. Two-step: the API returns metadata whose <code>gjDownloadURL</code> points at
+  the GeoJSON.</li>
+<li><strong><a href="https://www.geoboundaries.org/globalDownloads.html">CGAZ</a></strong> (Comprehensive
+  Global Admin Zones) — <strong>single seamless global</strong> layers at ADM0 / ADM1 / ADM2
+  (one file, every country). CC-BY-4.0.</li>
+<li><strong><a href="https://www.naturalearthdata.com/">Natural Earth</a></strong> — global cultural admin
+  layers (countries, states / provinces) at 10m / 50m / 110m scales. Public
+  domain.</li>
+<li><strong><a href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html">US Census TIGER/Line</a></strong>
+  — US states, counties, census tracts, and the nation outline, from the
+  generalized cartographic-boundary (<code>cb_</code>) shapefiles. Public domain.</li>
 </ul>
 <p>This page orients the backend. For the hands-on walkthrough see <a href="../usage/">Usage</a>
 and the shipped dataset ids on the <a href="../datasets/">Available datasets</a> page; the
-rendered API is the <a href="../glaciers/">Reference</a> page.</p>
-<h2 id="two-design-points"><a class="toclink" href="#two-design-points">Two design points</a><a class="headerlink" href="#two-design-points" title="Permanent link">#</a></h2>
-<p><strong>Per-instance <code>OUTPUT_KIND</code>.</strong> RGI and GLIMS outlines are <code>vector</code>; WGMS
-fluctuations are <code>tabular</code>. The resolved dataset's <code>output_kind</code> is copied onto
-the backend's <code>OUTPUT_KIND</code> at construction, so <code>download()</code> returns a
-<code>FeatureCollection</code> for <code>rgi:outlines</code> / <code>glims:outlines</code> and a <code>DataFrame</code> for
-the <code>wgms:*</code> datasets. The <code>EarthLens</code> facade reads it to know the return shape
-and to reject <code>aggregate=</code>.</p>
-<p><strong>Region-download-then-clip (RGI).</strong> RGI ships per GTN-G region (each region is a
-multi-MB shapefile zip), so the backend maps your request bounding box to the
-overlapping region(s), downloads and caches each region zip once, reads the
-shapefile inside it via pyramids <code>FeatureCollection.read_file</code>, reprojects to
-EPSG:4326 if needed, and clips to the bbox. A <code>region=</code> override (a GTN-G region
-id such as <code>"11"</code>) skips the bbox→region step.</p>
-<h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
-<p><strong>None.</strong> All three sources are open — IHP-WINS (RGI), the GLIMS WFS, and the
-WGMS FoG download — so the backend ships no auth module and needs no
-credentials.</p>
-<h2 id="licenses-citations"><a class="toclink" href="#licenses-citations">Licenses / citations</a><a class="headerlink" href="#licenses-citations" title="Permanent link">#</a></h2>
-<p>On a successful download the resolved dataset's citation is logged once:</p>
-<ul>
-<li><strong>RGI 7.0</strong> — RGI 7.0 Consortium (2023), DOI <code>10.5067/F6JMOVY5NAVZ</code>, CC-BY-4.0.</li>
-<li><strong>GLIMS</strong> — GLIMS and NSIDC (<code>nsidc-0272</code>), CC-BY-4.0; cite the contributing
-  analysts.</li>
-<li><strong>WGMS</strong> — WGMS (2026), Fluctuations of Glaciers Database, DOI
-  <code>10.5904/wgms-fog-2026-02-10</code>.</li>
-</ul>
+rendered API is the <a href="../admin/">Reference</a> page.</p>
+<h2 id="why-gadm-is-not-here"><a class="toclink" href="#why-gadm-is-not-here">Why GADM is <strong>not</strong> here</a><a class="headerlink" href="#why-gadm-is-not-here" title="Permanent link">#</a></h2>
+<p><a href="https://gadm.org/">GADM</a> is deliberately omitted. Its license forbids
+commercial use and redistribution, which is incompatible with shipping the data
+through an open tool. The four shipped sources are all CC-BY-4.0 or public
+domain, so they can be fetched and redistributed freely (with attribution where
+required). There is no plan to add GADM.</p>
+<h2 id="three-design-points"><a class="toclink" href="#three-design-points">Three design points</a><a class="headerlink" href="#three-design-points" title="Permanent link">#</a></h2>
+<h3 id="vector-output-aggregate-rejected"><a class="toclink" href="#vector-output-aggregate-rejected">Vector output; <code>aggregate=</code> rejected</a><a class="headerlink" href="#vector-output-aggregate-rejected" title="Permanent link">#</a></h3>
+<p><code>admin</code> declares <code>OUTPUT_KIND = "vector"</code>. <code>download()</code> returns a
+<code>pyramids.feature.collection.FeatureCollection</code> of boundary polygons (and writes
+it to one vector file when a <code>path</code> is set). The <code>EarthLens</code> facade reads
+<code>OUTPUT_KIND</code> and rejects a non-<code>None</code> <code>aggregate=</code> with <code>NotImplementedError</code> —
+boundaries are not a gridded field.</p>
+<h3 id="no-authentication"><a class="toclink" href="#no-authentication">No authentication</a><a class="headerlink" href="#no-authentication" title="Permanent link">#</a></h3>
+<p>All four sources are public, so there is <strong>no auth module</strong> and <strong>no extra
+SDK</strong>: the only dependencies are core <code>requests</code> and <code>pyramids</code>. On a successful
+fetch the backend logs the per-source license (geoBoundaries / CGAZ CC-BY-4.0;
+Natural Earth and TIGER public domain) so attribution is never lost.</p>
+<h3 id="uniform-epsg4326-output"><a class="toclink" href="#uniform-epsg4326-output">Uniform EPSG:4326 output</a><a class="headerlink" href="#uniform-epsg4326-output" title="Permanent link">#</a></h3>
+<p>Sources arrive in different CRSs — TIGER in NAD83 (EPSG:4269), CGAZ in an
+unlabelled geographic-degree CRS, the rest in EPSG:4326. The backend normalises
+every result to <strong>EPSG:4326</strong>: a known non-4326 EPSG is reprojected, an
+unlabelled-but-geographic CRS (CGAZ) is declared 4326 without a transform, and a
+missing CRS is assumed WGS84. Every vector read goes through pyramids
+<code>FeatureCollection.read_file</code> — earthlens never reads a vector file with a bare
+<code>geopandas.read_file</code>.</p>
+<h2 id="how-it-works"><a class="toclink" href="#how-it-works">How it works</a><a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
+<p>Each request names <strong>one (or more) dataset id(s)</strong> (via <code>variables=</code>) plus the
+selector that dataset needs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># geoBoundaries ADM1 for Kenya -&gt; a FeatureCollection of 47 county polygons</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">fc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;geoboundaries:adm1&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p>The selector is per provider: <code>country=</code> (ISO3) for geoBoundaries, an optional
+<code>scale=</code> for Natural Earth, an optional <code>year=</code> (and a <code>state=</code> FIPS code for the
+per-state <code>tiger:tract</code>) for TIGER; CGAZ is seamless and needs none. A missing
+required selector raises a clear <code>ValueError</code>.</p>
+<h2 id="what-is-not-here-yet"><a class="toclink" href="#what-is-not-here-yet">What is <em>not</em> here (yet)</a><a class="headerlink" href="#what-is-not-here-yet" title="Permanent link">#</a></h2>
+<p>An <code>bbox=</code> area-of-interest clip is a follow-on — the MVP returns the whole admin
+layer for the selector. Point sampling and raster output are out of scope; this
+is a pure vector backend.</p>
 
 
 

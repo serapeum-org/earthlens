@@ -4435,7 +4435,7 @@
   <span class="md-ellipsis">
     
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER)
   
 
     
@@ -4451,7 +4451,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER)
   
 
           </label>
@@ -4464,7 +4464,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../glaciers/introduction/" class="md-nav__link">
+      <a href="../admin/introduction/" class="md-nav__link">
         
   
   
@@ -4492,7 +4492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../glaciers/usage/" class="md-nav__link">
+      <a href="../admin/usage/" class="md-nav__link">
         
   
   
@@ -4520,7 +4520,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../glaciers/datasets/" class="md-nav__link">
+      <a href="../admin/datasets/" class="md-nav__link">
         
   
   
@@ -4548,7 +4548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../glaciers/glaciers/" class="md-nav__link">
+      <a href="../admin/admin/" class="md-nav__link">
         
   
   
@@ -12272,7 +12272,7 @@
   <span class="md-ellipsis">
     
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Administrative boundaries (geoBoundaries / Natural Earth / TIGER)
   
 
     
@@ -12288,7 +12288,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Administrative boundaries (geoBoundaries / Natural Earth / TIGER)
   
 
           </label>
@@ -12301,14 +12301,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/glaciers/01_glaciers_quickstart/" class="md-nav__link">
+      <a href="../../examples/admin/01_admin_quickstart/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Glaciers — quickstart (live)
+    Administrative boundaries — quickstart (geoBoundaries)
   
 
     
@@ -12329,14 +12329,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/glaciers/02_catalog_and_behavior/" class="md-nav__link">
+      <a href="../../examples/admin/02_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Glaciers — catalog &amp; behaviour (no network)
+    Administrative boundaries — catalog explorer (offline)
   
 
     
@@ -12357,14 +12357,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/glaciers/03_glims_and_wgms/" class="md-nav__link">
+      <a href="../../examples/admin/03_natural_earth_and_tiger/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Glaciers — GLIMS outlines &amp; WGMS mass balance (live)
+    Administrative boundaries — Natural Earth &amp; US Census TIGER
   
 
     
@@ -16283,14 +16283,13 @@ multi-provider verbs) a comma-separated list or the literal <code>all</code>:</p
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>all<span class="w">                </span><span class="c1"># every provider</span>
 </code></pre></div>
 <p>Canonical ids: <code>argo</code>, <code>asf</code>, <code>bathymetry</code>, <code>chc</code>, <code>climate-indices</code>, <code>cmems</code>, <code>earthdata</code>, <code>ecmwf</code>,
-<code>erddap</code>, <code>eumetsat</code>, <code>fdsn</code>, <code>firms</code>, <code>gbif</code>, <code>gdacs</code>, <code>gee</code>, <code>ghsl</code>, <code>glaciers</code>, <code>hdx</code>, <code>iucn</code>, <code>jaxa</code>, <code>nwm</code>, <code>nwp</code>,
+<code>erddap</code>, <code>eumetsat</code>, <code>fdsn</code>, <code>firms</code>, <code>gbif</code>, <code>gdacs</code>, <code>gee</code>, <code>ghsl</code>, <code>hdx</code>, <code>iucn</code>, <code>jaxa</code>, <code>nwm</code>, <code>nwp</code>,
 <code>obis</code>, <code>openaq</code>, <code>openeo</code>, <code>overture</code>, <code>pvgis</code>, <code>radar</code>, <code>risk-indicators</code>, <code>s3</code>, <code>sentinel_hub</code>, <code>stac</code>,
 <code>tropycal</code>, <code>usgs_water</code>, <code>wdpa</code>, <code>worldpop</code>. Common aliases include <code>amazon-s3</code>, <code>chirps</code>,
 <code>google-earth-engine</code>, <code>argo-floats</code>/<code>argopy</code>, <code>ioos</code> (erddap), <code>gebco</code>/<code>etopo</code> (bathymetry),
 <code>climate_indices</code>/<code>teleconnections</code> (climate indices), <code>sentinel-hub</code>/<code>sentinelhub</code>, <code>nexrad</code>,
 <code>nwis</code>/<code>usgs-water</code>, <code>world-pop</code>, <code>human-settlement</code>/<code>ghs</code>, <code>solar-pv</code> (pvgis),
 <code>thinkhazard</code>/<code>inform</code>/<code>gfw</code>/<code>global-forest-watch</code> (risk indicators),
-<code>rgi</code>/<code>glims</code>/<code>wgms</code> (glaciers),
 <code>earth-search</code>/<code>planetary-computer</code>/<code>cdse</code> (STAC endpoints). An unknown selector is a <strong>usage error</strong>
 (exit code <code>2</code>).</p>
 <h3 id="output-modes"><a class="toclink" href="#output-modes">Output modes</a><a class="headerlink" href="#output-modes" title="Permanent link">#</a></h3>
