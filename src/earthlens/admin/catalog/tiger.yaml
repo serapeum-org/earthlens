@@ -1,0 +1,56 @@
+# US Census TIGER/Line cartographic boundaries — states / counties / tracts / nation.
+#
+# The generalized cartographic-boundary (`cb_`) shapefiles live under
+# `https://www2.census.gov/geo/tiger/GENZ<YEAR>/shp/cb_<YEAR>_<scope>_<entity>_<res>.zip`,
+# read directly through pyramids `FeatureCollection.read_file` via
+# `/vsizip//vsicurl/`. `pygris` is deliberately NOT used (G4): the direct URLs
+# need no extra dependency. Pinned live in the A1 gate. Native CRS EPSG:4269
+# (NAD83) → the backend reprojects to EPSG:4326 (G8). The year is an optional
+# `year=` selector (defaulting to `default_year`); the entity / resolution come
+# from the dataset id. Per-state entities (`tract`) need a `state=` FIPS code.
+# Public domain (U.S. Government work).
+datasets:
+  tiger:nation:
+    title: TIGER cartographic-boundary US nation outline (5m)
+    provider: tiger
+    layer: nation
+    resolution: 5m
+    default_year: 2023
+    per_state: false
+    required_selectors: []
+    native_crs: EPSG:4269
+    url_template: https://www2.census.gov/geo/tiger/GENZ{year}/shp/cb_{year}_{scope}_{entity}_{res}.zip
+    license_note: U.S. Census Bureau TIGER/Line cartographic boundaries, public domain.
+  tiger:state:
+    title: TIGER cartographic-boundary US states (500k)
+    provider: tiger
+    layer: state
+    resolution: 500k
+    default_year: 2023
+    per_state: false
+    required_selectors: []
+    native_crs: EPSG:4269
+    url_template: https://www2.census.gov/geo/tiger/GENZ{year}/shp/cb_{year}_{scope}_{entity}_{res}.zip
+    license_note: U.S. Census Bureau TIGER/Line cartographic boundaries, public domain.
+  tiger:county:
+    title: TIGER cartographic-boundary US counties (500k)
+    provider: tiger
+    layer: county
+    resolution: 500k
+    default_year: 2023
+    per_state: false
+    required_selectors: []
+    native_crs: EPSG:4269
+    url_template: https://www2.census.gov/geo/tiger/GENZ{year}/shp/cb_{year}_{scope}_{entity}_{res}.zip
+    license_note: U.S. Census Bureau TIGER/Line cartographic boundaries, public domain.
+  tiger:tract:
+    title: TIGER cartographic-boundary census tracts for one state (500k, per-state)
+    provider: tiger
+    layer: tract
+    resolution: 500k
+    default_year: 2023
+    per_state: true
+    required_selectors: [state]
+    native_crs: EPSG:4269
+    url_template: https://www2.census.gov/geo/tiger/GENZ{year}/shp/cb_{year}_{scope}_{entity}_{res}.zip
+    license_note: U.S. Census Bureau TIGER/Line cartographic boundaries, public domain.

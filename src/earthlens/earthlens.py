@@ -293,24 +293,26 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['alaska-satellite-facility', 'amazon-s3', 'argo', 'argo-floats',
+            ['admin', 'admin-boundaries', 'alaska-satellite-facility',
+             'amazon-s3', 'argo', 'argo-floats',
              'argopy', 'asf', 'bathymetry', 'bdc',
              'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
              'climate_indices', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'erddap', 'etopo',
              'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gebco',
-             'gee', 'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
+             'gee', 'geoboundaries', 'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
              'global-forest-watch',
              'global-solar-atlas', 'global-wind-atlas', 'google-earth-engine',
              'gsa', 'gwa', 'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
              'iucn', 'jaxa', 'jaxa-earth', 'landsat', 'national-water-model',
+             'natural-earth',
              'nexrad', 'nrel', 'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'openaq',
              'openeo', 'overture', 'planetary-computer', 'protected-planet',
              'pvgis', 'radar', 'redlist', 'rgi', 'risk-indicators',
              'sentinel-hub',
              'sentinelhub', 'solar-pv', 'solar-wind-atlas', 'stac',
-             'teleconnections', 'thinkhazard', 'tropycal', 'usgs-landsat',
+             'teleconnections', 'thinkhazard', 'tiger', 'tropycal', 'usgs-landsat',
              'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wgms', 'wind-toolkit',
              'world-pop', 'worldpop']
 
@@ -716,6 +718,20 @@ class EarthLens:
             "rgi": ("earthlens.glaciers", "Glaciers", "", {}),
             "glims": ("earthlens.glaciers", "Glaciers", "", {}),
             "wgms": ("earthlens.glaciers", "Glaciers", "", {}),
+            # Administrative-boundary polygons from four public sources —
+            # geoBoundaries (per-country ADM0-5), CGAZ (seamless global ADM0/1/2),
+            # Natural Earth (cultural admin), US Census TIGER/Line (states /
+            # counties / tracts / nation); GADM omitted for license. Vector
+            # FeatureCollection output (EPSG:4326); no extra SDK (core requests +
+            # pyramids), all four public. Pass the dataset via variables=
+            # ["geoboundaries:adm1"] plus its selector (country=<ISO3> /
+            # scale= / year= / state=). Aliases "admin-boundaries" /
+            # "geoboundaries" / "natural-earth" / "tiger".
+            "admin": ("earthlens.admin", "AdminBoundaries", "", {}),
+            "admin-boundaries": ("earthlens.admin", "AdminBoundaries", "", {}),
+            "geoboundaries": ("earthlens.admin", "AdminBoundaries", "", {}),
+            "natural-earth": ("earthlens.admin", "AdminBoundaries", "", {}),
+            "tiger": ("earthlens.admin", "AdminBoundaries", "", {}),
         }
     )
 
@@ -762,8 +778,10 @@ class EarthLens:
                 `"stac"` (with endpoint aliases `"planetary-computer"` /
                 `"earth-search"` / `"cdse"`), `"tropycal"`,
                 `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`),
-                `"worldpop"` (alias `"world-pop"`), or `"argo"` (aliases
-                `"argo-floats"` / `"argopy"`). See
+                `"worldpop"` (alias `"world-pop"`), `"argo"` (aliases
+                `"argo-floats"` / `"argopy"`), or `"admin"` (aliases
+                `"admin-boundaries"` / `"geoboundaries"` /
+                `"natural-earth"` / `"tiger"`). See
                 `sorted(EarthLens.DataSources)` for the live list.
                 Defaults to `"chc"`.
             temporal_resolution: The download cadence — `"daily"` or
