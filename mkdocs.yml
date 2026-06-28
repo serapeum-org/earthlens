@@ -446,6 +446,10 @@ nav:
       - Quickstart — ThinkHazard + INFORM (live): examples/risk_indicators/01_risk_indicators_quickstart.ipynb
       - Catalog & behaviour (no network): examples/risk_indicators/02_catalog_and_behavior.ipynb
       - Global Forest Watch (live, needs key): examples/risk_indicators/03_global_forest_watch.ipynb
+    - Glaciers (RGI / GLIMS / WGMS):
+      - Quickstart — RGI outlines (live): examples/glaciers/01_glaciers_quickstart.ipynb
+      - Catalog & behaviour (no network): examples/glaciers/02_catalog_and_behavior.ipynb
+      - GLIMS outlines & WGMS mass balance (live): examples/glaciers/03_glims_and_wgms.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
