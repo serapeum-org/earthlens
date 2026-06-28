@@ -14,6 +14,7 @@ from earthlens.cli.validate import (
     _validate_bathymetry,
     _validate_erddap,
     _validate_nwp,
+    _validate_osm,
     _validate_overture,
     _validate_radar,
     _validate_tropycal,
@@ -35,6 +36,7 @@ _CURATED_ENUM = (
     "s3",
     "ghsl",
     "overture",
+    "osm",
     "fdsn",
     "firms",
     "asf",
@@ -75,6 +77,35 @@ class TestBundledCatalogsLintClean:
         assert result.status == "ok", f"{provider} validator errored: {result.detail}"
         assert result.issues == [], f"{provider} issues: {result.issues}"
         assert result.checked > 0, f"{provider} checked nothing"
+
+
+class TestValidateOsm:
+    """Tests for the OSM structural lint."""
+
+    def test_flags_overpass_row_missing_query_template(self):
+        """An overpass row without a query_template is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "overpass:x": SimpleNamespace(
+                    protocol="overpass", query_template="", geometry_types=["Point"]
+                )
+            }
+        )
+        checked, issues = _validate_osm(catalog)
+        assert checked == 1
+        assert any("missing query_template" in i for i in issues)
+
+    def test_flags_ohsome_row_missing_filter(self):
+        """An ohsome row without an ohsome_filter is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "ohsome:x": SimpleNamespace(
+                    protocol="ohsome", ohsome_filter="", geometry_types=["Polygon"]
+                )
+            }
+        )
+        checked, issues = _validate_osm(catalog)
+        assert any("missing ohsome_filter" in i for i in issues)
 
 
 class TestValidateBathymetry:
