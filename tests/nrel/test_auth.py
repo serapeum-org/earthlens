@@ -38,6 +38,17 @@ class TestConfigureResolution:
         assert auth.api_key.get_secret_value() == "env-key"
         assert auth.email == "env@example.com"
 
+    def test_empty_explicit_key_falls_back_to_env(
+        self, monkeypatch: pytest.MonkeyPatch
+    ):
+        """An explicit empty api_key falls back to the env var, like email does."""
+        monkeypatch.setenv("NREL_API_KEY", "env-key")
+        monkeypatch.setenv("NREL_EMAIL", "env@example.com")
+        auth = _auth("", "")
+        auth.configure()
+        assert auth.api_key.get_secret_value() == "env-key"
+        assert auth.email == "env@example.com"
+
     def test_explicit_key_wins_over_env(self, monkeypatch: pytest.MonkeyPatch):
         """An explicit api_key takes priority over the environment variable."""
         monkeypatch.setenv("NREL_API_KEY", "env-key")

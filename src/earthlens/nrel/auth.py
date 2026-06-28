@@ -152,7 +152,11 @@ class NrelAuth(AbstractAuth[NrelCredentials]):
         if self.is_authenticated():
             return
         key = self._creds.api_key
-        if key is None and "NREL_API_KEY" in os.environ:
+        # Treat an absent OR empty explicit key the same as a missing one and
+        # fall back to the environment — symmetric with the `email` resolution
+        # below, so `api_key=""` (e.g. an unset config value) does not error
+        # while `NREL_API_KEY` is set.
+        if (key is None or not key.get_secret_value()) and "NREL_API_KEY" in os.environ:
             key = SecretStr(os.environ["NREL_API_KEY"])
         email = self._creds.email or os.environ.get("NREL_EMAIL")
         if key is None or not key.get_secret_value():
