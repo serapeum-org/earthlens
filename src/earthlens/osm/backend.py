@@ -354,9 +354,12 @@ class OSM(AbstractDataSource):
         template = self._query or dataset.query_template
         south, west, north, east = bbox_swne(self.space)
         bbox_str = f"{south},{west},{north},{east}"
-        ql = template
-        if "{bbox}" in ql:
-            ql = ql.format(bbox=bbox_str, timeout=int(self._timeout))
+        # Substitute only the known placeholders — never `str.format` the whole
+        # QL, which would choke on Overpass regex brace-quantifiers (e.g.
+        # `~"^A.{2,5}$"`) in a raw `query=` override (`{2,5}` -> KeyError).
+        ql = template.replace("{bbox}", bbox_str).replace(
+            "{timeout}", str(int(self._timeout))
+        )
         logger.info(f"Querying Overpass for {query_id!r} over bbox ({bbox_str})")
         response = requests.post(
             self._endpoint,

@@ -96,6 +96,16 @@ class TestOverpassRoute:
         OSM(**{**osm_kwargs(), "query": raw}).download()
         assert fake_overpass_post.calls[0]["data"]["data"] == raw
 
+    def test_raw_query_with_regex_brace_quantifier(
+        self, osm_kwargs, fake_overpy, fake_overpass_post
+    ):
+        """A raw query mixing {bbox} with a regex brace-quantifier does not crash."""
+        raw = '[out:json];(node["name"~"^A.{2,5}$"]({bbox}););out geom;'
+        OSM(**{**osm_kwargs(), "query": raw}).download()
+        sent = fake_overpass_post.calls[0]["data"]["data"]
+        assert "{2,5}" in sent  # the quantifier survives untouched
+        assert "(49.4,8.67,49.42,8.71)" in sent  # the bbox was substituted
+
 
 class TestOhsomeRoute:
     """The ohsome branch: post(bboxes, time, filter) -> as_dataframe."""
