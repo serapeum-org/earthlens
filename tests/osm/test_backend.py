@@ -213,6 +213,18 @@ class TestDownloadContract:
         written = list(Path(tmp_path).glob("osm_*.geojson"))
         assert len(written) == 1
 
+    def test_writes_gpkg_with_mixed_geometry(
+        self, osm_kwargs, fake_overpy, fake_overpass_post, tmp_path
+    ):
+        """file_format='gpkg' writes a GeoPackage even with mixed geometry types."""
+        import geopandas as gpd
+
+        OSM(**{**osm_kwargs(), "file_format": "gpkg"}).download()
+        written = list(Path(tmp_path).glob("osm_*.gpkg"))
+        assert len(written) == 1
+        reloaded = gpd.read_file(written[0])
+        assert len(reloaded) == 3  # Point + LineString + Polygon round-tripped
+
     def test_no_file_when_empty(
         self, osm_kwargs, fake_overpy, fake_overpass_post, tmp_path
     ):
@@ -254,9 +266,16 @@ class TestDownloadContract:
 
     def test_whole_earth_bbox_rejected(self, osm_kwargs):
         """A whole-Earth bbox exceeds the area cap and is rejected before fetch."""
-        with pytest.raises(ValueError, match="square-degree cap"):
+        with pytest.raises(ValueError, match="too large for a live OSM query"):
             OSM(
                 **{**osm_kwargs(), "lat_lim": [-90, 90], "lon_lim": [-180, 180]}
+            ).download()
+
+    def test_thin_globe_spanning_bbox_rejected(self, osm_kwargs):
+        """A thin box under the area cap but globe-spanning on one axis is rejected."""
+        with pytest.raises(ValueError, match="too large"):
+            OSM(
+                **{**osm_kwargs(), "lat_lim": [0.0, 0.1], "lon_lim": [-180, 180]}
             ).download()
 
     def test_max_bbox_override_allows_large_box(

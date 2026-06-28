@@ -122,7 +122,9 @@ EarthLens(
 ```
 
 A raw `query=` with no `{bbox}` placeholder is sent verbatim (you supply the
-bbox in the QL yourself).
+bbox in the QL yourself). A raw Overpass `query=` **must request JSON output**
+(`[out:json]`) — the response is parsed with `overpy.Overpass().parse_json`, so
+an `[out:xml]` / `[out:csv]` override will not parse.
 
 ## Other knobs
 

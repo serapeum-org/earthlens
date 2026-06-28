@@ -98,6 +98,11 @@ _DRIVERS: dict[str, tuple[str, str]] = {
 #: larger area.
 _DEFAULT_MAX_BBOX_DEG2 = 100.0
 
+#: Single-axis span cap, in degrees, applied under the default area cap so a
+#: degenerate thin-but-globe-spanning box (e.g. `0.1° x 360°`, ~36 square
+#: degrees) is still rejected — the area cap alone would let it through.
+_MAX_BBOX_SPAN_DEG = 90.0
+
 
 class OSM(AbstractDataSource):
     """OpenStreetMap feature backend (vector FeatureCollection output).
@@ -163,8 +168,10 @@ class OSM(AbstractDataSource):
             fmt: `strptime` format for `start` / `end`.
             query: Optional raw Overpass QL override applied to every
                 requested `overpass` query (a `{bbox}` placeholder, if
-                present, is filled with the request bbox). Power-user escape
-                hatch (`G6`).
+                present, is filled with the request bbox). It must request
+                JSON output (`[out:json]`) — the response is parsed with
+                `overpy.Overpass().parse_json`, so an `[out:xml]` / `[out:csv]`
+                override would fail to parse. Power-user escape hatch (`G6`).
             filter: Optional raw ohsome filter override applied to every
                 requested `ohsome` query. Power-user escape hatch (`G6`).
             endpoint: Overpass API endpoint URL. Defaults to the canonical
@@ -318,23 +325,31 @@ class OSM(AbstractDataSource):
         OSM is for small/targeted queries; an oversized box (a continent, or the
         whole-Earth default a facade caller gets when they omit `lat_lim` /
         `lon_lim`) would hammer the shared public services. Raises when the bbox
-        area exceeds the cap (`max_bbox_deg2`, else `100.0` square degrees).
+        area exceeds the cap (`max_bbox_deg2`, else `100.0` square degrees). With
+        the default cap it *also* rejects a degenerate box that slips under the
+        area cap yet still spans (near) the whole globe on one axis (e.g. a thin
+        `0.1° x 360°` strip); an explicit `max_bbox_deg2` is taken as "I know
+        what I'm doing" and relaxes the single-axis guard too.
 
         Raises:
-            ValueError: If the requested bbox area exceeds the cap.
+            ValueError: If the requested bbox area (or, under the default cap, a
+                single-axis span) is too large.
         """
         cap = (
             self._max_bbox_deg2
             if self._max_bbox_deg2 is not None
             else _DEFAULT_MAX_BBOX_DEG2
         )
-        area = (self.space.east - self.space.west) * (
-            self.space.north - self.space.south
+        width = self.space.east - self.space.west
+        height = self.space.north - self.space.south
+        area = width * height
+        over_span = self._max_bbox_deg2 is None and (
+            width > _MAX_BBOX_SPAN_DEG or height > _MAX_BBOX_SPAN_DEG
         )
-        if area > cap:
+        if area > cap or over_span:
             raise ValueError(
-                f"The requested bbox covers {area:.1f} square degrees, which "
-                f"exceeds the {cap:.1f} square-degree cap for live OSM queries "
+                f"The requested bbox ({width:.1f}deg x {height:.1f}deg, "
+                f"{area:.1f} square degrees) is too large for a live OSM query "
                 "(an oversized box hammers the shared public services). Shrink "
                 "the bbox (lat_lim / lon_lim or aoi=), or raise the cap with "
                 "max_bbox_deg2=."
@@ -574,8 +589,10 @@ class OSM(AbstractDataSource):
     def _write(self, collection: FeatureCollection) -> Path:
         """Write the features to one vector file under `root_dir`.
 
-        The filename embeds the requested query ids
-        (`osm_<ids>.<ext>`), so distinct requests land in distinct files.
+        The filename embeds the requested query ids (`osm_<ids>.<ext>`), so
+        requests for different named queries land in distinct files. The bbox
+        and time window are *not* part of the name, so two requests for the same
+        query ids over different areas/times overwrite the same file.
 
         Args:
             collection: The features to write.

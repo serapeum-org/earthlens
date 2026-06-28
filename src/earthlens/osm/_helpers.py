@@ -256,7 +256,10 @@ def to_fc(gdf: gpd.GeoDataFrame) -> FeatureCollection:
     """
     if gdf.crs is None:
         gdf = gdf.set_crs(OSM_CRS)
-    elif str(gdf.crs).upper() not in ("EPSG:4326", "WGS84"):
+    elif gdf.crs.to_epsg() != 4326:
+        # Compare by EPSG code, not string: a 4326-equivalent CRS expressed
+        # differently (OGC:CRS84, a WKT-built CRS) should not trigger a
+        # redundant reprojection.
         gdf = gdf.to_crs(OSM_CRS)
     return FeatureCollection(gdf)
 
