@@ -129,6 +129,15 @@ def test_geoboundaries_resolve_builds_api_url(monkeypatch):
     assert seen["timeout"] == 12.0
 
 
+def test_geoboundaries_resolve_empty_list_raises(monkeypatch):
+    """An empty-list API response raises a clear ValueError, not IndexError."""
+    monkeypatch.setattr(
+        _helpers.requests, "get", lambda url, timeout=60: _FakeResponse([])
+    )
+    with pytest.raises(ValueError, match="no boundary for KEN/ADM1"):
+        geoboundaries_resolve("KEN", "ADM1")
+
+
 def test_geoboundaries_resolve_http_error_propagates(monkeypatch):
     """A non-2xx metadata status propagates rather than being swallowed."""
     import requests

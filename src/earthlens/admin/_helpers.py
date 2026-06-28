@@ -69,12 +69,19 @@ def geoboundaries_resolve(iso: str, adm: str, timeout: float = 60.0) -> str:
 
     Raises:
         requests.HTTPError: If the metadata endpoint returns a non-2xx status.
+        ValueError: If the API returns an empty list (no boundary for the
+            `(ISO, ADM)` pair).
         KeyError: If the metadata carries no `gjDownloadURL`.
     """
     response = requests.get(f"{GEOBOUNDARIES_API}/{iso}/{adm}/", timeout=timeout)
     response.raise_for_status()
     meta = response.json()
     if isinstance(meta, list):
+        if not meta:
+            raise ValueError(
+                f"geoBoundaries returned no boundary for {iso}/{adm}; the "
+                "country may not publish that ADM level."
+            )
         meta = meta[0]
     return meta["gjDownloadURL"]
 
