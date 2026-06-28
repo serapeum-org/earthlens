@@ -1,0 +1,51 @@
+# NREL solar / wind resource catalogue (earthlens.nrel).
+#
+# Each row maps a product id to an NREL/NLR Developer Network keyed CSV
+# download endpoint, the source archive, the per-product default attribute
+# list, the data resolution, the number of CSV metadata header rows, and the
+# canonical value columns the parser keeps. The CSV download endpoints serve a
+# single POINT for a single `names=` (year, or `tmy`) per request.
+#
+# Facts pinned from the live API in planning/nrel/captures/nrel-sdk-facts.md
+# (verified 2026-06-27). The legacy PSM v3.2.2 endpoints were superseded by the
+# GOES Aggregated PSM v4 product; `developer.nrel.gov` was retired 2026-05-29
+# in favour of `developer.nlr.gov` (the host lives in nrel/_helpers.NLR_HOST).
+products:
+  nsrdb-psm3:
+    source: nsrdb
+    endpoint: /api/nsrdb/v2/solar/nsrdb-GOES-aggregated-v4-0-0-download.csv
+    names_kind: year
+    default_attributes: ["ghi", "dni", "dhi", "air_temperature", "wind_speed"]
+    interval: 60
+    meta_rows: 2
+    columns: ["time", "GHI", "DNI", "DHI", "Temperature", "Wind Speed"]
+    description: >-
+      NSRDB GOES Aggregated PSM v4 — hourly satellite-derived solar resource
+      (global/direct/diffuse horizontal irradiance) plus meteorology, for one
+      point and one year (valid years 1998-2024). The current replacement for
+      the retired PSM v3.2.2 hourly product.
+  nsrdb-tmy:
+    source: nsrdb
+    endpoint: /api/nsrdb/v2/solar/nsrdb-GOES-tmy-v4-0-0-download.csv
+    names_kind: tmy
+    default_attributes: ["ghi", "dni", "dhi", "air_temperature"]
+    interval: 60
+    meta_rows: 2
+    columns: ["time", "GHI", "DNI", "DHI", "Temperature"]
+    description: >-
+      NSRDB GOES TMY v4 — a Typical Meteorological Year: an hourly multi-year
+      synthesis of solar irradiance and temperature for the location
+      (names=tmy). One point per request.
+  wtk:
+    source: wtk
+    endpoint: /api/wind-toolkit/v2/wind/wtk-download.csv
+    names_kind: year
+    default_attributes:
+      ["windspeed_100m", "winddirection_100m", "temperature_100m"]
+    interval: 60
+    meta_rows: 1
+    columns: ["time", "wind speed at 100m (m/s)", "wind direction at 100m (deg)", "air temperature at 100m (C)"]
+    description: >-
+      WIND Toolkit (WTK) v2 — hourly modelled wind resource (speed, direction,
+      temperature, pressure at selectable hub heights) for one point and one
+      year. CONUS and offshore coverage. Its CSV has a single metadata row.

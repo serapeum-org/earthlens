@@ -1,0 +1,21 @@
+# Administrative-boundary catalog index — every curated dataset id (informational).
+#
+# Each id resolves to a row in one of the per-provider files (geoboundaries.yaml,
+# cgaz.yaml, natural_earth.yaml, tiger.yaml). The loader checks every curated row
+# appears here, mirroring the ghsl / cmems / bathymetry sharded-catalog contract.
+available_datasets:
+  - geoboundaries:adm0
+  - geoboundaries:adm1
+  - geoboundaries:adm2
+  - geoboundaries:adm3
+  - geoboundaries:adm4
+  - geoboundaries:adm5
+  - cgaz:adm0
+  - cgaz:adm1
+  - cgaz:adm2
+  - natural_earth:countries
+  - natural_earth:states
+  - tiger:nation
+  - tiger:state
+  - tiger:county
+  - tiger:tract

@@ -66,6 +66,8 @@ class TestRegistry:
         assert "gee" in EarthLens.DataSources
         assert "google-earth-engine" in EarthLens.DataSources
         assert sorted(EarthLens.DataSources) == [
+            "admin",
+            "admin-boundaries",
             "alaska-satellite-facility",
             "amazon-s3",
             "argo",
@@ -98,6 +100,7 @@ class TestRegistry:
             "gdacs",
             "gebco",
             "gee",
+            "geoboundaries",
             "gfw",
             "ghs",
             "ghsl",
@@ -117,7 +120,10 @@ class TestRegistry:
             "jaxa-earth",
             "landsat",
             "national-water-model",
+            "natural-earth",
             "nexrad",
+            "nrel",
+            "nsrdb",
             "nwis",
             "nwm",
             "nwp",
@@ -142,12 +148,14 @@ class TestRegistry:
             "stac",
             "teleconnections",
             "thinkhazard",
+            "tiger",
             "tropycal",
             "usgs-landsat",
             "usgs-nwis",
             "usgs-water",
             "veda",
             "wdpa",
+            "wind-toolkit",
             "world-pop",
             "worldpop",
         ]

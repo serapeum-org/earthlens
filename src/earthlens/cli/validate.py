@@ -553,6 +553,13 @@ def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
 
 
+def _validate_nrel(catalog: Any) -> tuple[int, list[str]]:
+    """Each NREL product needs a source, a CSV endpoint, and non-empty columns."""
+    return _lint(
+        catalog, lambda k, r: _require(k, r, ("source", "endpoint", "columns"))
+    )
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -581,6 +588,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
     "pvgis": _validate_pvgis,
+    "nrel": _validate_nrel,
 }
 
 
