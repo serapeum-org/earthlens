@@ -300,16 +300,18 @@ class EarthLens:
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'erddap', 'etopo',
              'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gebco',
-             'gee', 'gfw', 'ghs', 'ghsl', 'global-forest-watch',
+             'gee', 'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
+             'global-forest-watch',
              'global-solar-atlas', 'global-wind-atlas', 'google-earth-engine',
              'gsa', 'gwa', 'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
              'iucn', 'jaxa', 'jaxa-earth', 'landsat', 'national-water-model',
              'nexrad', 'nrel', 'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'openaq',
              'openeo', 'overture', 'planetary-computer', 'protected-planet',
-             'pvgis', 'radar', 'redlist', 'risk-indicators', 'sentinel-hub',
+             'pvgis', 'radar', 'redlist', 'rgi', 'risk-indicators',
+             'sentinel-hub',
              'sentinelhub', 'solar-pv', 'solar-wind-atlas', 'stac',
              'teleconnections', 'thinkhazard', 'tropycal', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wind-toolkit',
+             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wgms', 'wind-toolkit',
              'world-pop', 'worldpop']
 
             ```
@@ -626,9 +628,24 @@ class EarthLens:
             # crop locally. Aliases "global-solar-atlas" / "global-wind-atlas"
             # / "gsa" / "gwa" — pass variables=[...] to pick layers (e.g.
             # variables=["ghi", "wind_100m"]).
-            "solar-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
-            "global-solar-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
-            "global-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "solar-wind-atlas": (
+                "earthlens.solar_wind_atlas",
+                "SolarWindAtlas",
+                "",
+                {},
+            ),
+            "global-solar-atlas": (
+                "earthlens.solar_wind_atlas",
+                "SolarWindAtlas",
+                "",
+                {},
+            ),
+            "global-wind-atlas": (
+                "earthlens.solar_wind_atlas",
+                "SolarWindAtlas",
+                "",
+                {},
+            ),
             "gsa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
             "gwa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
             # JRC PVGIS solar-radiation / PV time series over the keyless
@@ -679,6 +696,18 @@ class EarthLens:
                 "",
                 {},
             ),
+            # Glacier outlines / fluctuations over three open sources — RGI 7.0
+            # per-region outlines (UNESCO IHP-WINS) + GLIMS WFS time-series
+            # outlines + WGMS Fluctuations of Glaciers (tabular). Per-instance
+            # OUTPUT_KIND (vector -> FeatureCollection for rgi/glims, tabular ->
+            # DataFrame for wgms); pass a bbox (lat_lim/lon_lim or aoi=) for
+            # rgi/glims, or region= / glacier_id= / glacier_name= for wgms. No
+            # extra SDK (core requests + pandas + pyramids); no auth. Aliases
+            # "rgi" / "glims" / "wgms".
+            "glaciers": ("earthlens.glaciers", "Glaciers", "", {}),
+            "rgi": ("earthlens.glaciers", "Glaciers", "", {}),
+            "glims": ("earthlens.glaciers", "Glaciers", "", {}),
+            "wgms": ("earthlens.glaciers", "Glaciers", "", {}),
         }
     )
 
