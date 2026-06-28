@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -16864,10 +16864,7 @@ or list the ids with <code>available</code>.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-137">137</a></span>
-<span class="normal"><a href="#__codelineno-0-138">138</a></span>
-<span class="normal"><a href="#__codelineno-0-139">139</a></span>
-<span class="normal"><a href="#__codelineno-0-140">140</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-140">140</a></span>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
@@ -17006,149 +17003,152 @@ or list the ids with <code>available</code>.</p>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product catalog for the NREL backend.</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    Reads the bundled `nrel_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    exposes its `products:` block as a map of `Product` rows keyed by product</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    id. Instantiate with no arguments (`Catalog()`); resolve a row with `get`,</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    or list the ids with `available`.</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">        datasets: Map from product id to its `Product` row.</span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product catalog for the NREL backend.</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    Reads the bundled `nrel_data_catalog.yaml` (shipped as package data) and</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">    exposes its `products:` block as a map of `Product` rows keyed by product</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    id. Instantiate with no arguments (`Catalog()`); resolve a row with `get`,</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    or list the ids with `available`.</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        - Resolve a product and read its source:</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;nsrdb-psm3&quot;).source</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">            &#39;nsrdb&#39;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        - An unknown but close id raises with a did-you-mean hint:</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wkt&quot;)</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            ValueError: &#39;wkt&#39; is not in the NREL product catalog. Known products: [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]. Did you mean &#39;wtk&#39;?</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        datasets: Map from product id to its `Product` row.</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">        - Resolve a product and read its source:</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;nsrdb-psm3&quot;).source</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">            &#39;nsrdb&#39;</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        - An unknown but close id raises with a did-you-mean hint:</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wkt&quot;)</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            ValueError: &#39;wkt&#39; is not in the NREL product catalog. Known products: [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]. Did you mean &#39;wtk&#39;?</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NREL product catalog&quot;</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;products&quot;</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="c1">#: The product rows live in the base `datasets` field so the inherited dict</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="c1">#: surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s did-you-mean</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="c1">#: hint work unchanged; narrowed here to `Product` values.</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_accept_products_alias</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Accept the `products=` kwarg as an alias for `datasets`.</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        Lets callers (and tests) construct `Catalog(products={...})` while the</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        rows live in the base `datasets` field. An explicit `datasets=` always</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">        wins.</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            data: The raw model input (a mapping for keyword construction).</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NREL product catalog&quot;</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;products&quot;</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="c1">#: The product rows live in the base `datasets` field so the inherited dict</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="c1">#: surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s did-you-mean</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="c1">#: hint work unchanged; narrowed here to `Product` values.</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_accept_products_alias</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Accept the `products=` kwarg as an alias for `datasets`.</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        Lets callers (and tests) construct `Catalog(products={...})` while the</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        rows live in the base `datasets` field. An explicit `datasets=` always</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        wins.</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            The input with `products` renamed to `datasets`, untouched</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            otherwise.</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;products&quot;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="s2">&quot;datasets&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>            <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;datasets&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;products&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="k">return</span> <span class="n">data</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The product map — alias for the base `datasets` field.</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            dict[str, Product]: The same mapping stored in `datasets`.</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            data: The raw model input (a mapping for keyword construction).</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            The input with `products` renamed to `datasets`, untouched</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            otherwise.</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;products&quot;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="s2">&quot;datasets&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>            <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;datasets&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;products&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="k">return</span> <span class="n">data</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The product map — alias for the base `datasets` field.</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            dict[str, Product]: The same mapping stored in `datasets`.</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        (or `datasets=...`) skips the disk read.</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing, empty,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                or has a malformed row.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the NREL product catalog from disk.</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        (or `datasets=...`) skips the disk read.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing, empty,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">                or has a malformed row.</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the NREL product catalog from disk.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            ValueError: If the file has no `products:` block, or a row fails</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">                `Product` validation.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            ValueError: If the file has no `products:` block, or a row fails</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">                `Product` validation.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            dict[str, Product]: Same object as `datasets` / `products`.</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The sorted list of curated product ids.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            dict[str, Product]: Same object as `datasets` / `products`.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            list[str]: Every curated catalog key, sorted.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The sorted list of curated product ids.</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            - List the shipped products:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">                &gt;&gt;&gt; Catalog().available()</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">                [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a product id to its `Product` row.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            list[str]: Every curated catalog key, sorted.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            - List the shipped products:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                &gt;&gt;&gt; Catalog().available()</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">                [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a product id to its `Product` row.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            product: A product id (`&quot;nsrdb-psm3&quot;`, `&quot;nsrdb-tmy&quot;`, `&quot;wtk&quot;`).</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            Product: The matching catalog row.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            product: A product id (`&quot;nsrdb-psm3&quot;`, `&quot;nsrdb-tmy&quot;`, `&quot;wtk&quot;`).</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ValueError: If `product` is not a known id; the message names the</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">                catalog kind and, when a close match exists, a did-you-mean</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                hint.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            Product: The matching catalog row.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            ValueError: If `product` is not a known id; the message names the</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">                catalog kind and, when a close match exists, a did-you-mean</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                hint.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -17259,10 +17259,7 @@ or list the ids with <code>available</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
-<span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
@@ -17274,22 +17271,25 @@ or list the ids with <code>available</code>.</p>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The sorted list of curated product ids.</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        list[str]: Every curated catalog key, sorted.</span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span>
+<span class="normal"><a href="#__codelineno-0-262">262</a></span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The sorted list of curated product ids.</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        - List the shipped products:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            &gt;&gt;&gt; Catalog().available()</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        list[str]: Every curated catalog key, sorted.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        - List the shipped products:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            &gt;&gt;&gt; Catalog().available()</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17393,10 +17393,7 @@ hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
@@ -17410,24 +17407,27 @@ hint.</p>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a product id to its `Product` row.</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a product id to its `Product` row.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        product: A product id (`&quot;nsrdb-psm3&quot;`, `&quot;nsrdb-tmy&quot;`, `&quot;wtk&quot;`).</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        Product: The matching catalog row.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        product: A product id (`&quot;nsrdb-psm3&quot;`, `&quot;nsrdb-tmy&quot;`, `&quot;wtk&quot;`).</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        ValueError: If `product` is not a known id; the message names the</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            catalog kind and, when a close match exists, a did-you-mean</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            hint.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Product: The matching catalog row.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        ValueError: If `product` is not a known id; the message names the</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            catalog kind and, when a close match exists, a did-you-mean</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            hint.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17473,19 +17473,19 @@ hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-237">237</a></span>
-<span class="normal"><a href="#__codelineno-0-238">238</a></span>
-<span class="normal"><a href="#__codelineno-0-239">239</a></span>
-<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-240">240</a></span>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
 <span class="normal"><a href="#__codelineno-0-242">242</a></span>
-<span class="normal"><a href="#__codelineno-0-243">243</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        dict[str, Product]: Same object as `datasets` / `products`.</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        dict[str, Product]: Same object as `datasets` / `products`.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17591,10 +17591,7 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span>
-<span class="normal"><a href="#__codelineno-0-221">221</a></span>
-<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
 <span class="normal"><a href="#__codelineno-0-225">225</a></span>
@@ -17607,23 +17604,26 @@ module-level <code>CATALOG_PATH</code>.</p>
 <span class="normal"><a href="#__codelineno-0-232">232</a></span>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
-<span class="normal"><a href="#__codelineno-0-235">235</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the NREL product catalog from disk.</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the NREL product catalog from disk.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        ValueError: If the file has no `products:` block, or a row fails</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            `Product` validation.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        ValueError: If the file has no `products:` block, or a row fails</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            `Product` validation.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -17672,10 +17672,7 @@ or has a malformed row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-205">205</a></span>
-<span class="normal"><a href="#__codelineno-0-206">206</a></span>
-<span class="normal"><a href="#__codelineno-0-207">207</a></span>
-<span class="normal"><a href="#__codelineno-0-208">208</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-208">208</a></span>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
 <span class="normal"><a href="#__codelineno-0-210">210</a></span>
 <span class="normal"><a href="#__codelineno-0-211">211</a></span>
@@ -17684,19 +17681,22 @@ or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-214">214</a></span>
 <span class="normal"><a href="#__codelineno-0-215">215</a></span>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
-<span class="normal"><a href="#__codelineno-0-217">217</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    (or `datasets=...`) skips the disk read.</span>
+<span class="normal"><a href="#__codelineno-0-217">217</a></span>
+<span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing, empty,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            or has a malformed row.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    (or `datasets=...`) skips the disk read.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing, empty,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            or has a malformed row.</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20646,8 +20646,11 @@ caller passes no <code>variables=</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The canonical value columns the parser keeps, including the
-assembled <code>time</code> column.</p>
+                <p>The canonical column schema for the product — the leading
+<code>time</code> column plus the product's value columns. Used as the
+empty-result fallback schema (<code>empty_canonical</code>); a populated frame
+carries <code>time</code> plus whichever of these value columns the requested
+<code>variables</code> returned.</p>
               </div>
             </td>
           </tr>
@@ -20731,7 +20734,10 @@ assembled <code>time</code> column.</p>
 <span class="normal"><a href="#__codelineno-0-131">131</a></span>
 <span class="normal"><a href="#__codelineno-0-132">132</a></span>
 <span class="normal"><a href="#__codelineno-0-133">133</a></span>
-<span class="normal"><a href="#__codelineno-0-134">134</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-134">134</a></span>
+<span class="normal"><a href="#__codelineno-0-135">135</a></span>
+<span class="normal"><a href="#__codelineno-0-136">136</a></span>
+<span class="normal"><a href="#__codelineno-0-137">137</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One NREL product&#39;s catalog row.</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    The product id is the parent key in `Catalog.datasets`; the row carries</span>
@@ -20747,34 +20753,37 @@ assembled <code>time</code> column.</p>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">        interval: Data resolution in minutes (`30` or `60`).</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">        meta_rows: The number of CSV metadata header rows before the data table</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">            (NSRDB = 2, WTK = 1); the parser auto-detects but this documents it.</span>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        columns: The canonical value columns the parser keeps, including the</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            assembled `time` column.</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        description: Human-readable summary of the product.</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">        - Build a row directly:</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Product</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">            &gt;&gt;&gt; p = Product(source=&quot;nsrdb&quot;, endpoint=&quot;/api/x.csv&quot;,</span>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">            ...             names_kind=&quot;year&quot;, columns=[&quot;time&quot;, &quot;GHI&quot;])</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">            &gt;&gt;&gt; p.source</span>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">            &#39;nsrdb&#39;</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">            &gt;&gt;&gt; p.interval</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">            60</span>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        columns: The canonical column schema for the product — the leading</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            `time` column plus the product&#39;s value columns. Used as the</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            empty-result fallback schema (`empty_canonical`); a populated frame</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            carries `time` plus whichever of these value columns the requested</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            `variables` returned.</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">        description: Human-readable summary of the product.</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">        - Build a row directly:</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Product</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">            &gt;&gt;&gt; p = Product(source=&quot;nsrdb&quot;, endpoint=&quot;/api/x.csv&quot;,</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">            ...             names_kind=&quot;year&quot;, columns=[&quot;time&quot;, &quot;GHI&quot;])</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">            &gt;&gt;&gt; p.source</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">            &#39;nsrdb&#39;</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">            &gt;&gt;&gt; p.interval</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">            60</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">names_kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;tmy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;year&quot;</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="n">default_attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>    <span class="n">meta_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>    <span class="n">names_kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;tmy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;year&quot;</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">default_attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="n">meta_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22921,10 +22930,7 @@ or list the ids with <code>available</code>.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-137">137</a></span>
-<span class="normal"><a href="#__codelineno-0-138">138</a></span>
-<span class="normal"><a href="#__codelineno-0-139">139</a></span>
-<span class="normal"><a href="#__codelineno-0-140">140</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-140">140</a></span>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
@@ -23063,149 +23069,152 @@ or list the ids with <code>available</code>.</p>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product catalog for the NREL backend.</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    Reads the bundled `nrel_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    exposes its `products:` block as a map of `Product` rows keyed by product</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    id. Instantiate with no arguments (`Catalog()`); resolve a row with `get`,</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    or list the ids with `available`.</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">        datasets: Map from product id to its `Product` row.</span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product catalog for the NREL backend.</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    Reads the bundled `nrel_data_catalog.yaml` (shipped as package data) and</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">    exposes its `products:` block as a map of `Product` rows keyed by product</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    id. Instantiate with no arguments (`Catalog()`); resolve a row with `get`,</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    or list the ids with `available`.</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        - Resolve a product and read its source:</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;nsrdb-psm3&quot;).source</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">            &#39;nsrdb&#39;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        - An unknown but close id raises with a did-you-mean hint:</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wkt&quot;)</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            ValueError: &#39;wkt&#39; is not in the NREL product catalog. Known products: [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]. Did you mean &#39;wtk&#39;?</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        datasets: Map from product id to its `Product` row.</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">        - Resolve a product and read its source:</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;nsrdb-psm3&quot;).source</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">            &#39;nsrdb&#39;</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        - An unknown but close id raises with a did-you-mean hint:</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wkt&quot;)</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            ValueError: &#39;wkt&#39; is not in the NREL product catalog. Known products: [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]. Did you mean &#39;wtk&#39;?</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NREL product catalog&quot;</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;products&quot;</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="c1">#: The product rows live in the base `datasets` field so the inherited dict</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="c1">#: surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s did-you-mean</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="c1">#: hint work unchanged; narrowed here to `Product` values.</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_accept_products_alias</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Accept the `products=` kwarg as an alias for `datasets`.</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        Lets callers (and tests) construct `Catalog(products={...})` while the</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        rows live in the base `datasets` field. An explicit `datasets=` always</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">        wins.</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            data: The raw model input (a mapping for keyword construction).</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NREL product catalog&quot;</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;products&quot;</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="c1">#: The product rows live in the base `datasets` field so the inherited dict</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="c1">#: surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s did-you-mean</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="c1">#: hint work unchanged; narrowed here to `Product` values.</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_accept_products_alias</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Accept the `products=` kwarg as an alias for `datasets`.</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        Lets callers (and tests) construct `Catalog(products={...})` while the</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        rows live in the base `datasets` field. An explicit `datasets=` always</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        wins.</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            The input with `products` renamed to `datasets`, untouched</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            otherwise.</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;products&quot;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="s2">&quot;datasets&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>            <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;datasets&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;products&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="k">return</span> <span class="n">data</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The product map — alias for the base `datasets` field.</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            dict[str, Product]: The same mapping stored in `datasets`.</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            data: The raw model input (a mapping for keyword construction).</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            The input with `products` renamed to `datasets`, untouched</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            otherwise.</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;products&quot;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="s2">&quot;datasets&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>            <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;datasets&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;products&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="k">return</span> <span class="n">data</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The product map — alias for the base `datasets` field.</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            dict[str, Product]: The same mapping stored in `datasets`.</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        (or `datasets=...`) skips the disk read.</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing, empty,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                or has a malformed row.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the NREL product catalog from disk.</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        (or `datasets=...`) skips the disk read.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing, empty,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">                or has a malformed row.</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the NREL product catalog from disk.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            ValueError: If the file has no `products:` block, or a row fails</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">                `Product` validation.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            ValueError: If the file has no `products:` block, or a row fails</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">                `Product` validation.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            dict[str, Product]: Same object as `datasets` / `products`.</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The sorted list of curated product ids.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            dict[str, Product]: Same object as `datasets` / `products`.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            list[str]: Every curated catalog key, sorted.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The sorted list of curated product ids.</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            - List the shipped products:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">                &gt;&gt;&gt; Catalog().available()</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">                [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a product id to its `Product` row.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            list[str]: Every curated catalog key, sorted.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            - List the shipped products:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                &gt;&gt;&gt; Catalog().available()</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">                [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a product id to its `Product` row.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            product: A product id (`&quot;nsrdb-psm3&quot;`, `&quot;nsrdb-tmy&quot;`, `&quot;wtk&quot;`).</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            Product: The matching catalog row.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            product: A product id (`&quot;nsrdb-psm3&quot;`, `&quot;nsrdb-tmy&quot;`, `&quot;wtk&quot;`).</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ValueError: If `product` is not a known id; the message names the</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">                catalog kind and, when a close match exists, a did-you-mean</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                hint.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            Product: The matching catalog row.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            ValueError: If `product` is not a known id; the message names the</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">                catalog kind and, when a close match exists, a did-you-mean</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                hint.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23316,10 +23325,7 @@ or list the ids with <code>available</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
-<span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
@@ -23331,22 +23337,25 @@ or list the ids with <code>available</code>.</p>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The sorted list of curated product ids.</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        list[str]: Every curated catalog key, sorted.</span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span>
+<span class="normal"><a href="#__codelineno-0-262">262</a></span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;The sorted list of curated product ids.</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        - List the shipped products:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            &gt;&gt;&gt; Catalog().available()</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        list[str]: Every curated catalog key, sorted.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        - List the shipped products:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Catalog</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            &gt;&gt;&gt; Catalog().available()</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            [&#39;nsrdb-psm3&#39;, &#39;nsrdb-tmy&#39;, &#39;wtk&#39;]</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23450,10 +23459,7 @@ hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
@@ -23467,24 +23473,27 @@ hint.</p>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a product id to its `Product` row.</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Product</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a product id to its `Product` row.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        product: A product id (`&quot;nsrdb-psm3&quot;`, `&quot;nsrdb-tmy&quot;`, `&quot;wtk&quot;`).</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        Product: The matching catalog row.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        product: A product id (`&quot;nsrdb-psm3&quot;`, `&quot;nsrdb-tmy&quot;`, `&quot;wtk&quot;`).</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        ValueError: If `product` is not a known id; the message names the</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            catalog kind and, when a close match exists, a did-you-mean</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            hint.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Product: The matching catalog row.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        ValueError: If `product` is not a known id; the message names the</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            catalog kind and, when a close match exists, a did-you-mean</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            hint.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23530,19 +23539,19 @@ hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-237">237</a></span>
-<span class="normal"><a href="#__codelineno-0-238">238</a></span>
-<span class="normal"><a href="#__codelineno-0-239">239</a></span>
-<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-240">240</a></span>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
 <span class="normal"><a href="#__codelineno-0-242">242</a></span>
-<span class="normal"><a href="#__codelineno-0-243">243</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        dict[str, Product]: Same object as `datasets` / `products`.</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Product</span><span class="p">]:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        dict[str, Product]: Same object as `datasets` / `products`.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23648,10 +23657,7 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span>
-<span class="normal"><a href="#__codelineno-0-221">221</a></span>
-<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
 <span class="normal"><a href="#__codelineno-0-225">225</a></span>
@@ -23664,23 +23670,26 @@ module-level <code>CATALOG_PATH</code>.</p>
 <span class="normal"><a href="#__codelineno-0-232">232</a></span>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
-<span class="normal"><a href="#__codelineno-0-235">235</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the NREL product catalog from disk.</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the NREL product catalog from disk.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        ValueError: If the file has no `products:` block, or a row fails</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            `Product` validation.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        ValueError: If the file has no `products:` block, or a row fails</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            `Product` validation.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23729,10 +23738,7 @@ or has a malformed row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-205">205</a></span>
-<span class="normal"><a href="#__codelineno-0-206">206</a></span>
-<span class="normal"><a href="#__codelineno-0-207">207</a></span>
-<span class="normal"><a href="#__codelineno-0-208">208</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-208">208</a></span>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
 <span class="normal"><a href="#__codelineno-0-210">210</a></span>
 <span class="normal"><a href="#__codelineno-0-211">211</a></span>
@@ -23741,19 +23747,22 @@ or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-214">214</a></span>
 <span class="normal"><a href="#__codelineno-0-215">215</a></span>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
-<span class="normal"><a href="#__codelineno-0-217">217</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    (or `datasets=...`) skips the disk read.</span>
+<span class="normal"><a href="#__codelineno-0-217">217</a></span>
+<span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing, empty,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            or has a malformed row.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH`; passing `products=...`</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    (or `datasets=...`) skips the disk read.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing, empty,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            or has a malformed row.</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23876,8 +23885,11 @@ caller passes no <code>variables=</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The canonical value columns the parser keeps, including the
-assembled <code>time</code> column.</p>
+                <p>The canonical column schema for the product — the leading
+<code>time</code> column plus the product's value columns. Used as the
+empty-result fallback schema (<code>empty_canonical</code>); a populated frame
+carries <code>time</code> plus whichever of these value columns the requested
+<code>variables</code> returned.</p>
               </div>
             </td>
           </tr>
@@ -23961,7 +23973,10 @@ assembled <code>time</code> column.</p>
 <span class="normal"><a href="#__codelineno-0-131">131</a></span>
 <span class="normal"><a href="#__codelineno-0-132">132</a></span>
 <span class="normal"><a href="#__codelineno-0-133">133</a></span>
-<span class="normal"><a href="#__codelineno-0-134">134</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-134">134</a></span>
+<span class="normal"><a href="#__codelineno-0-135">135</a></span>
+<span class="normal"><a href="#__codelineno-0-136">136</a></span>
+<span class="normal"><a href="#__codelineno-0-137">137</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One NREL product&#39;s catalog row.</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    The product id is the parent key in `Catalog.datasets`; the row carries</span>
@@ -23977,34 +23992,37 @@ assembled <code>time</code> column.</p>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">        interval: Data resolution in minutes (`30` or `60`).</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">        meta_rows: The number of CSV metadata header rows before the data table</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">            (NSRDB = 2, WTK = 1); the parser auto-detects but this documents it.</span>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        columns: The canonical value columns the parser keeps, including the</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            assembled `time` column.</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        description: Human-readable summary of the product.</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">        - Build a row directly:</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Product</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">            &gt;&gt;&gt; p = Product(source=&quot;nsrdb&quot;, endpoint=&quot;/api/x.csv&quot;,</span>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">            ...             names_kind=&quot;year&quot;, columns=[&quot;time&quot;, &quot;GHI&quot;])</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">            &gt;&gt;&gt; p.source</span>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">            &#39;nsrdb&#39;</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">            &gt;&gt;&gt; p.interval</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">            60</span>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        columns: The canonical column schema for the product — the leading</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            `time` column plus the product&#39;s value columns. Used as the</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            empty-result fallback schema (`empty_canonical`); a populated frame</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            carries `time` plus whichever of these value columns the requested</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            `variables` returned.</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">        description: Human-readable summary of the product.</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">        - Build a row directly:</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel import Product</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">            &gt;&gt;&gt; p = Product(source=&quot;nsrdb&quot;, endpoint=&quot;/api/x.csv&quot;,</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">            ...             names_kind=&quot;year&quot;, columns=[&quot;time&quot;, &quot;GHI&quot;])</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">            &gt;&gt;&gt; p.source</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">            &#39;nsrdb&#39;</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">            &gt;&gt;&gt; p.interval</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">            60</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">names_kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;tmy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;year&quot;</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="n">default_attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>    <span class="n">meta_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>    <span class="n">names_kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;tmy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;year&quot;</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">default_attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="n">meta_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25605,25 +25623,25 @@ object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-283">283</a></span>
-<span class="normal"><a href="#__codelineno-0-284">284</a></span>
-<span class="normal"><a href="#__codelineno-0-285">285</a></span>
-<span class="normal"><a href="#__codelineno-0-286">286</a></span>
-<span class="normal"><a href="#__codelineno-0-287">287</a></span>
-<span class="normal"><a href="#__codelineno-0-288">288</a></span>
-<span class="normal"><a href="#__codelineno-0-289">289</a></span>
-<span class="normal"><a href="#__codelineno-0-290">290</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
 <span class="normal"><a href="#__codelineno-0-291">291</a></span>
-<span class="normal"><a href="#__codelineno-0-292">292</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_canonical</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a zero-row frame with the given columns (the no-data fallback).</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        columns: The canonical column names for the product.</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        pd.DataFrame: An empty frame carrying exactly `columns`.</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_canonical</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a zero-row frame with the given columns (the no-data fallback).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        columns: The canonical column names for the product.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        pd.DataFrame: An empty frame carrying exactly `columns`.</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25717,8 +25735,9 @@ call handles NSRDB (2 rows) and WTK (1 row).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>pd.DataFrame: One row per record — a <code>time</code> <code>datetime64</code> column built
-from <code>Year/Month/Day/Hour/Minute</code>, plus the data value columns.</p>
+                <p>pd.DataFrame: One row per record — a leading <code>time</code> <code>datetime64</code> column
+(assembled from <code>Year/Month/Day/Hour/Minute</code>, which are then dropped
+as redundant) followed by the data value columns.</p>
               </div>
             </td>
           </tr>
@@ -25751,7 +25770,8 @@ from <code>Year/Month/Day/Hour/Minute</code>, plus the data value columns.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <ul>
-<li>A tiny two-metadata-row NSRDB-shaped CSV parses to one row:
+<li>A tiny two-metadata-row NSRDB-shaped CSV parses to one row, <code>time</code>
+  first and the raw date parts dropped:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nrel._helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_psm3_csv</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">csv</span> <span class="o">=</span> <span class="p">(</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">...</span>     <span class="s2">&quot;Source,Location ID,Latitude,Longitude</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -25764,8 +25784,8 @@ from <code>Year/Month/Day/Hour/Minute</code>, plus the data value columns.</p>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="mi">1</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="s1">&#39;M&#39;</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">[</span><span class="s1">&#39;DNI&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">]</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;GHI&#39;</span><span class="p">,</span> <span class="s1">&#39;DNI&#39;</span><span class="p">]</span>
 </code></pre></div></li>
 </ul>
 
@@ -25821,7 +25841,14 @@ from <code>Year/Month/Day/Hour/Minute</code>, plus the data value columns.</p>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
 <span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_psm3_csv</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">meta_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span>
+<span class="normal"><a href="#__codelineno-0-283">283</a></span>
+<span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span>
+<span class="normal"><a href="#__codelineno-0-287">287</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_psm3_csv</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">meta_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse an NSRDB PSM v4 / TMY / WTK CSV into a long DataFrame.</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    The CSV opens with metadata rows (Source / Location / Lat / Lon / Elevation</span>
@@ -25841,36 +25868,43 @@ from <code>Year/Month/Day/Hour/Minute</code>, plus the data value columns.</p>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            call handles NSRDB (2 rows) and WTK (1 row).</span>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        pd.DataFrame: One row per record — a `time` `datetime64` column built</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            from `Year/Month/Day/Hour/Minute`, plus the data value columns.</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        ValueError: If `meta_rows` is `None` and no data-table header is found.</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        - A tiny two-metadata-row NSRDB-shaped CSV parses to one row:</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel._helpers import parse_psm3_csv</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            &gt;&gt;&gt; csv = (</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            ...     &quot;Source,Location ID,Latitude,Longitude\\n&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            ...     &quot;NSRDB,1,39.73,-105.18\\n&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            ...     &quot;Year,Month,Day,Hour,Minute,GHI,DNI\\n&quot;</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            ...     &quot;2020,1,1,0,30,0,0\\n&quot;</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            &gt;&gt;&gt; df = parse_psm3_csv(csv)</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            &gt;&gt;&gt; len(df)</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            1</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            &gt;&gt;&gt; df[&quot;time&quot;].dtype.kind</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            &#39;M&#39;</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            &gt;&gt;&gt; list(df.columns)[-2:]</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            [&#39;DNI&#39;, &#39;time&#39;]</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="n">skip</span> <span class="o">=</span> <span class="n">meta_rows</span> <span class="k">if</span> <span class="n">meta_rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_data_header_offset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">_TIME_PARTS</span><span class="p">])</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="k">return</span> <span class="n">data</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        pd.DataFrame: One row per record — a leading `time` `datetime64` column</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            (assembled from `Year/Month/Day/Hour/Minute`, which are then dropped</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            as redundant) followed by the data value columns.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        ValueError: If `meta_rows` is `None` and no data-table header is found.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        - A tiny two-metadata-row NSRDB-shaped CSV parses to one row, `time`</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">          first and the raw date parts dropped:</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel._helpers import parse_psm3_csv</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            &gt;&gt;&gt; csv = (</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            ...     &quot;Source,Location ID,Latitude,Longitude\\n&quot;</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            ...     &quot;NSRDB,1,39.73,-105.18\\n&quot;</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            ...     &quot;Year,Month,Day,Hour,Minute,GHI,DNI\\n&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            ...     &quot;2020,1,1,0,30,0,0\\n&quot;</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            &gt;&gt;&gt; df = parse_psm3_csv(csv)</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            &gt;&gt;&gt; len(df)</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            1</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            &gt;&gt;&gt; df[&quot;time&quot;].dtype.kind</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            &#39;M&#39;</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">            &gt;&gt;&gt; list(df.columns)</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            [&#39;time&#39;, &#39;GHI&#39;, &#39;DNI&#39;]</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="n">skip</span> <span class="o">=</span> <span class="n">meta_rows</span> <span class="k">if</span> <span class="n">meta_rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_data_header_offset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="n">time</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">_TIME_PARTS</span><span class="p">])</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="c1"># The five raw date-part columns are now redundant with `time`; drop them</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="c1"># and lead with `time` so the frame is `[time, &lt;value columns&gt;]` — matching</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="c1"># the catalog&#39;s documented `columns` and the empty_canonical fallback schema.</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">_TIME_PARTS</span><span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="n">data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">return</span> <span class="n">data</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
