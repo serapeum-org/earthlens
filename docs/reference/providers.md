@@ -49,6 +49,7 @@ Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core inst
 | Generic ERDDAP servers (NOAA CoastWatch / Coral Reef Watch / NCEI / …) | `erddap`, `ioos` | per-dataset (raster griddap / tabular tabledap) | none (public servers) | `erddap` | [ERDDAP](erddap/introduction.md) |
 | Bathymetry DEMs (GEBCO 2020 / NOAA ETOPO1 ice + bedrock) | `bathymetry`, `gebco`, `etopo` | raster | none (open ERDDAP) | — | [Bathymetry](bathymetry/introduction.md) |
 | Argo float ocean profiles | `argo`, `argo-floats`, `argopy` | tabular | none (open data) | `argo` | [Argo](argo/introduction.md) |
+| Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER) | `admin`, `admin-boundaries`, `geoboundaries`, `natural-earth`, `tiger` | vector | none (public) | — | [Administrative boundaries](admin/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)

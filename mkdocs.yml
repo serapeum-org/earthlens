@@ -200,6 +200,11 @@ nav:
       - Usage: reference/risk_indicators/usage.md
       - Available datasets: reference/risk_indicators/datasets.md
       - Reference: reference/risk_indicators/risk_indicators.md
+    - Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER):
+      - Introduction: reference/admin/introduction.md
+      - Usage: reference/admin/usage.md
+      - Available datasets: reference/admin/datasets.md
+      - Reference: reference/admin/admin.md
     - OpenAQ (air quality):
       - Introduction: reference/openaq/introduction.md
       - Usage: reference/openaq/usage.md
