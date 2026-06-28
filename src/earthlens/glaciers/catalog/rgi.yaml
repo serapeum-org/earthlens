@@ -1,0 +1,103 @@
+# RGI 7.0 — Randolph Glacier Inventory, glacier outlines (vector).
+#
+# The "G" (glacier) product, one shapefile ZIP per GTN-G first-order region
+# (01-19; region 20 "Antarctic Mainland" is the ice sheet, not in the G
+# product). Served openly — no login — by the UNESCO IHP-WINS CKAN portal
+# (the NSIDC host is Earthdata-gated). The backend maps a request bbox to the
+# overlapping region(s) via the `regions:` table below, downloads + caches each
+# region ZIP once, reads the inner shapefile via
+# `pyramids FeatureCollection.read_file("/vsizip/<zip>/<shp>")`, and clips to
+# the bbox. CRS is already EPSG:4326. Verified live 2026-06-28.
+
+datasets:
+  rgi:outlines:
+    source: rgi
+    output_kind: vector
+    long_name: RGI 7.0 glacier outlines (per GTN-G region)
+    citation: >-
+      RGI 7.0 Consortium (2023), Randolph Glacier Inventory 7.0, DOI
+      10.5067/F6JMOVY5NAVZ (CC-BY-4.0); open mirror UNESCO IHP-WINS.
+
+# GTN-G first-order region table. `bboxes` are [west, south, east, north] in
+# EPSG:4326, derived from the official RGI2000-v7.0-o1regions polygons. Region
+# 10 (North Asia) crosses the antimeridian, so it carries two sub-boxes. `url`
+# is the full IHP-WINS resource download (random resource UUID per region — no
+# derivable template). Zip member names are lowercase; the inner `.shp` is
+# uppercase and is resolved from the zip namelist at read time.
+regions:
+  "01":
+    name: Alaska
+    bboxes: [[-180.0, 50.0, -126.7917, 72.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/87ed4714-cdcf-45bd-9d1e-827082861656/download/rgi2000-v7.0-g-01_alaska.zip
+  "02":
+    name: Western Canada and USA
+    bboxes: [[-134.0017, 35.0, -104.0, 74.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/15817bba-5671-454f-a384-bb4260adb721/download/rgi2000-v7.0-g-02_western_canada_usa.zip
+  "03":
+    name: Arctic Canada North
+    bboxes: [[-125.0, 74.0, -60.0, 85.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/2d116253-4bb4-4b2b-b422-5e5488a16bac/download/rgi2000-v7.0-g-03_arctic_canada_north.zip
+  "04":
+    name: Arctic Canada South
+    bboxes: [[-90.0, 57.0, -58.0, 74.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/05c5f6e0-e10e-4254-a4a6-05525078000b/download/rgi2000-v7.0-g-04_arctic_canada_south.zip
+  "05":
+    name: Greenland Periphery
+    bboxes: [[-75.0, 59.0, -10.0, 85.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/7d2e3317-41e6-481c-8036-acfcf56ea12c/download/rgi2000-v7.0-g-05_greenland_periphery.zip
+  "06":
+    name: Iceland
+    bboxes: [[-26.0, 59.0, -10.0, 67.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/1604143a-6a7b-478d-b95b-eb3893d8f697/download/rgi2000-v7.0-g-06_iceland.zip
+  "07":
+    name: Svalbard and Jan Mayen
+    bboxes: [[-10.0, 70.0, 35.0, 83.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/54953639-86a9-449e-a832-de2c0e1f3021/download/rgi2000-v7.0-g-07_svalbard_jan_mayen.zip
+  "08":
+    name: Scandinavia
+    bboxes: [[4.0, 58.0, 35.0, 74.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/57f67a9b-2d3b-49e1-8a21-ce95cbe0adfb/download/rgi2000-v7.0-g-08_scandinavia.zip
+  "09":
+    name: Russian Arctic
+    bboxes: [[35.0, 70.0, 110.0, 83.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/1deb6da4-ac02-469a-98ec-caeba5aedd7a/download/rgi2000-v7.0-g-09_russian_arctic.zip
+  "10":
+    name: North Asia
+    bboxes: [[-180.0, 57.0, -169.0, 78.0], [57.0, 31.0, 180.0, 78.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/02a6d56a-876e-456c-ab7b-565a1fe11acb/download/rgi2000-v7.0-g-10_north_asia.zip
+  "11":
+    name: Central Europe
+    bboxes: [[-6.0, 40.0, 26.0, 50.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/69f184d1-0e10-47b6-9543-2ca7384e1341/download/rgi2000-v7.0-g-11_central_europe.zip
+  "12":
+    name: Caucasus and Middle East
+    bboxes: [[32.0, 30.0, 54.0, 45.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/5e401cf3-63e1-4c4e-b183-620fd2e67f2a/download/rgi2000-v7.0-g-12_caucasus_middle_east.zip
+  "13":
+    name: Central Asia
+    bboxes: [[65.0, 27.998, 105.0, 46.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/15e6f091-8bee-4c8f-8696-1d1de62e33a4/download/rgi2000-v7.0-g-13_central_asia.zip
+  "14":
+    name: South Asia West
+    bboxes: [[65.0, 26.0, 82.4462, 37.4704]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/d4adeac9-e01b-4554-8ec8-6b1d3936b537/download/rgi2000-v7.0-g-14_south_asia_west.zip
+  "15":
+    name: South Asia East
+    bboxes: [[75.4, 26.0, 105.0, 32.0399]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/070f3115-9792-4173-926c-600af1cf97f6/download/rgi2000-v7.0-g-15_south_asia_east.zip
+  "16":
+    name: Low Latitudes
+    bboxes: [[-100.0, -25.0, 142.0, 20.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/d054a7f9-55b4-4e20-98c5-1f39a3a67ec0/download/rgi2000-v7.0-g-16_low_latitudes.zip
+  "17":
+    name: Southern Andes
+    bboxes: [[-82.0, -57.0, -62.0, -25.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/5d98469c-e845-4f9f-a2a3-84064ca1551e/download/rgi2000-v7.0-g-17_southern_andes.zip
+  "18":
+    name: New Zealand
+    bboxes: [[164.0, -49.0, 179.0, -34.0]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/2a2044d1-2fd8-497e-b9b7-cd23a431bb66/download/rgi2000-v7.0-g-18_new_zealand.zip
+  "19":
+    name: Subantarctic and Antarctic Islands
+    bboxes: [[-180.0, -85.4877, 180.0, -45.5]]
+    url: https://ihp-wins.unesco.org/dataset/33a5017a-e6e9-43cc-82d6-62da7fbb74d8/resource/4325326e-4581-4fc6-820c-07c19f0645e5/download/rgi2000-v7.0-g-19_subantarctic_antarctic_islands.zip
