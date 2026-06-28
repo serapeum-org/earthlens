@@ -151,6 +151,22 @@ def _validate_overture(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, check)
 
 
+def _validate_osm(catalog: Any) -> tuple[int, list[str]]:
+    """Each OSM named query needs a protocol and that protocol's query field."""
+
+    def check(key: str, record: Any) -> list[str]:
+        """Flag a query missing protocol/geometry, or its protocol's query field."""
+        issues = _require(key, record, ("protocol", "geometry_types"))
+        protocol = getattr(record, "protocol", None)
+        if protocol == "overpass" and not getattr(record, "query_template", None):
+            issues.append(f"{key}: overpass row missing query_template")
+        if protocol == "ohsome" and not getattr(record, "ohsome_filter", None):
+            issues.append(f"{key}: ohsome row missing ohsome_filter")
+        return issues
+
+    return _lint(catalog, check)
+
+
 def _validate_fdsn(catalog: Any) -> tuple[int, list[str]]:
     """Each FDSN network needs an fdsn_id."""
     return _lint(catalog, lambda k, r: _require(k, r, ("fdsn_id",)))
@@ -578,6 +594,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "s3": _validate_s3,
     "ghsl": _validate_ghsl,
     "overture": _validate_overture,
+    "osm": _validate_osm,
     "fdsn": _validate_fdsn,
     "firms": _validate_firms,
     "asf": _validate_asf,

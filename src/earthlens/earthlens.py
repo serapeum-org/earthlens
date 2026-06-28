@@ -294,9 +294,8 @@ class EarthLens:
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['admin', 'admin-boundaries', 'alaska-satellite-facility',
-             'amazon-s3', 'argo', 'argo-floats',
-             'argopy', 'asf', 'bathymetry', 'bdc',
-             'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
+             'amazon-s3', 'argo', 'argo-floats', 'argopy', 'asf', 'bathymetry',
+             'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
              'climate_indices', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'earth-search', 'earthdata', 'ecmwf', 'erddap', 'etopo',
@@ -306,15 +305,15 @@ class EarthLens:
              'global-solar-atlas', 'global-wind-atlas', 'google-earth-engine',
              'gsa', 'gwa', 'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
              'iucn', 'jaxa', 'jaxa-earth', 'landsat', 'national-water-model',
-             'natural-earth',
-             'nexrad', 'nrel', 'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'openaq',
-             'openeo', 'overture', 'planetary-computer', 'protected-planet',
+             'natural-earth', 'nexrad', 'nrel', 'nsrdb', 'nwis', 'nwm', 'nwp',
+             'obis', 'ohsome', 'openaq', 'openeo', 'openstreetmap', 'osm',
+             'overpass', 'overture', 'planetary-computer', 'protected-planet',
              'pvgis', 'radar', 'redlist', 'rgi', 'risk-indicators',
              'sentinel-hub',
              'sentinelhub', 'solar-pv', 'solar-wind-atlas', 'stac',
-             'teleconnections', 'thinkhazard', 'tiger', 'tropycal', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wgms', 'wind-toolkit',
-             'world-pop', 'worldpop']
+             'teleconnections', 'thinkhazard', 'tiger', 'tropycal',
+             'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wgms',
+             'wind-toolkit', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -439,6 +438,13 @@ class EarthLens:
             parameters) via `argopy` as a `tabular` long-format
             `DataFrame`; region / `float:` / `profile:` selectors, open
             data (no auth); keys `"argo"` / `"argo-floats"` / `"argopy"`.
+        :class:`earthlens.osm.OSM`: OpenStreetMap features over two public,
+            keyless protocols — `overpy` (Overpass, current-state) +
+            `ohsome` (OSM history / analytics) — as a `vector`
+            FeatureCollection with an ODbL `LicenseWarning`; named-query
+            catalog (`overpass:hospitals`, `ohsome:buildings`) + raw
+            `query=` / `filter=` override; keys `"osm"` /
+            `"openstreetmap"` / `"overpass"` / `"ohsome"`.
 
     """
 
@@ -718,6 +724,15 @@ class EarthLens:
             "rgi": ("earthlens.glaciers", "Glaciers", "", {}),
             "glims": ("earthlens.glaciers", "Glaciers", "", {}),
             "wgms": ("earthlens.glaciers", "Glaciers", "", {}),
+            # OpenStreetMap features over two public, keyless protocols — overpy
+            # (Overpass, current-state) + ohsome (OSM history/analytics). Vector
+            # FeatureCollection output with an ODbL LicenseWarning. The [osm]
+            # extra pulls overpy + ohsome (imported lazily). Aliases
+            # "openstreetmap" / "overpass" / "ohsome".
+            "osm": ("earthlens.osm", "OSM", "osm", {}),
+            "openstreetmap": ("earthlens.osm", "OSM", "osm", {}),
+            "overpass": ("earthlens.osm", "OSM", "osm", {}),
+            "ohsome": ("earthlens.osm", "OSM", "osm", {}),
             # Administrative-boundary polygons from four public sources —
             # geoBoundaries (per-country ADM0-5), CGAZ (seamless global ADM0/1/2),
             # Natural Earth (cultural admin), US Census TIGER/Line (states /

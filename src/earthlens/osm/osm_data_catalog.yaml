@@ -1,0 +1,65 @@
+# OpenStreetMap named-query dispatch table.
+#
+# Like the GDACS / FDSN backends, `earthlens.osm` has no large remote
+# dataset index to curate — OSM is queried live by tag filter. This file
+# is the entire "catalog": one row per named query, keyed by the
+# `<protocol>:<name>` id passed in `variables=[...]`. Two protocols share
+# the one table (`G2`):
+#
+#   * overpass — small/targeted current-state features via the Overpass
+#     API. Each row carries a `query_template`: an Overpass QL string with
+#     a single `{bbox}` placeholder the backend fills with the request's
+#     bounding box in Overpass order `S,W,N,E` (`bbox_swne`). Use
+#     `out geom;` so way coordinates ride inline (the backend reads them
+#     from `way.attributes["geometry"]`; see the A1 capture).
+#   * ohsome — OSM history + analytics via the ohsome API
+#     (`elements/geometry`). Each row carries an `ohsome_filter`: an ohsome
+#     filter string. The backend fills `bboxes` in ohsome order `W,S,E,N`
+#     (`bbox_wsen`) and a `time` from the request window.
+#
+# A power user can bypass the catalogue entirely with a raw `query=`
+# (Overpass QL) / `filter=` (ohsome) override on the backend.
+#
+# Seeded + verified in A1 (overpy 0.7 / ohsome 0.4.0) — see
+# planning/osm/captures/osm-sdk-facts.md.
+datasets:
+  overpass:hospitals:
+    protocol: overpass
+    query_template: '[out:json][timeout:{timeout}];(node["amenity"="hospital"]({bbox});way["amenity"="hospital"]({bbox}););out geom;'
+    geometry_types: [Point, Polygon]
+    description: "Hospitals (current state) as points and building footprints."
+  overpass:roads:
+    protocol: overpass
+    query_template: '[out:json][timeout:{timeout}];(way["highway"]({bbox}););out geom;'
+    geometry_types: [LineString]
+    description: "Road / path centrelines (any `highway` value) as lines."
+  overpass:buildings:
+    protocol: overpass
+    query_template: '[out:json][timeout:{timeout}];(way["building"]({bbox}););out geom;'
+    geometry_types: [Polygon]
+    description: "Building footprints (any `building` value) as polygons."
+  overpass:cafes:
+    protocol: overpass
+    query_template: '[out:json][timeout:{timeout}];(node["amenity"="cafe"]({bbox}););out geom;'
+    geometry_types: [Point]
+    description: "Cafes (current state) as points."
+  overpass:schools:
+    protocol: overpass
+    query_template: '[out:json][timeout:{timeout}];(node["amenity"="school"]({bbox});way["amenity"="school"]({bbox}););out geom;'
+    geometry_types: [Point, Polygon]
+    description: "Schools (current state) as points and building footprints."
+  ohsome:buildings:
+    protocol: ohsome
+    ohsome_filter: "building=* and geometry:polygon"
+    geometry_types: [Polygon]
+    description: "Building footprints (history-aware snapshot) as polygons."
+  ohsome:highways:
+    protocol: ohsome
+    ohsome_filter: "highway=* and geometry:line"
+    geometry_types: [LineString]
+    description: "Road / path centrelines (history-aware snapshot) as lines."
+  ohsome:amenities:
+    protocol: ohsome
+    ohsome_filter: "amenity=*"
+    geometry_types: [Point, Polygon]
+    description: "Tagged amenities (history-aware snapshot) as points and polygons."
