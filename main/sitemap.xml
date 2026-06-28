@@ -513,6 +513,14 @@
          <lastmod>2026-06-28</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/osm/ohsome_history/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/osm/quickstart/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/overture/01_catalog_explorer/</loc>
          <lastmod>2026-06-28</lastmod>
     </url>
@@ -1270,6 +1278,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/openeo/usage/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/osm/introduction/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/osm/osm/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/osm/usage/</loc>
          <lastmod>2026-06-28</lastmod>
     </url>
     <url>
