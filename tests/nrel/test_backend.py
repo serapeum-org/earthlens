@@ -52,6 +52,41 @@ class TestSinglePoint:
         assert "email=me%40example.com" in url
         assert "POINT%28-105.18+39.74%29" in url
 
+    def test_empty_and_populated_share_a_schema(
+        self, nsrdb_csv, bind_session, tmp_path
+    ):
+        """An all-skipped (empty) result has the same columns as a populated one."""
+        bind_session(FakeResponse(text=nsrdb_csv))
+        populated = NREL(
+            start="2020-01-01",
+            end="2020-01-01",
+            variables=[],
+            point=(39.74, -105.18),
+            api_key="DUMMYKEY",
+            email="me@example.com",
+            path=tmp_path,
+        ).download(progress_bar=False)
+        bind_session(
+            FakeResponse(text="x", status_code=400, payload={"errors": ["nope"]})
+        )
+        empty = NREL(
+            start="2020-01-01",
+            end="2020-01-01",
+            variables=[],
+            lat_lim=[10.0, 11.0],
+            lon_lim=[10.0, 11.0],
+            spacing_deg=1.0,
+            api_key="DUMMYKEY",
+            email="me@example.com",
+            path=tmp_path,
+        ).download(progress_bar=False)
+        assert len(empty) == 0
+        assert list(populated.columns) == list(empty.columns), (
+            f"schema drift: populated={list(populated.columns)} "
+            f"empty={list(empty.columns)}"
+        )
+        assert list(populated.columns)[0] == "time"
+
     def test_writes_csv_table(self, nsrdb_csv, bind_session, tmp_path):
         """download() writes a CSV table under the output directory."""
         backend, _ = _nrel(nsrdb_csv, bind_session, path=tmp_path)

@@ -162,6 +162,12 @@ class TestParseCsv:
         df = h.parse_psm3_csv(nsrdb_csv)
         assert str(df["time"].iloc[0]) == "2020-01-01 00:30:00"
 
+    def test_leads_with_time_and_drops_raw_date_parts(self, nsrdb_csv: str):
+        """time is the first column and the redundant date-part columns are gone."""
+        df = h.parse_psm3_csv(nsrdb_csv)
+        assert list(df.columns)[0] == "time"
+        assert not ({"Year", "Month", "Day", "Hour", "Minute"} & set(df.columns))
+
     def test_missing_data_header_raises(self):
         """A body with no data-table header raises ValueError."""
         with pytest.raises(ValueError, match="no 'Year,Month,Day"):

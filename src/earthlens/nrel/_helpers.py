@@ -248,14 +248,16 @@ def parse_psm3_csv(text: str, *, meta_rows: int | None = None) -> pd.DataFrame:
             call handles NSRDB (2 rows) and WTK (1 row).
 
     Returns:
-        pd.DataFrame: One row per record — a `time` `datetime64` column built
-            from `Year/Month/Day/Hour/Minute`, plus the data value columns.
+        pd.DataFrame: One row per record — a leading `time` `datetime64` column
+            (assembled from `Year/Month/Day/Hour/Minute`, which are then dropped
+            as redundant) followed by the data value columns.
 
     Raises:
         ValueError: If `meta_rows` is `None` and no data-table header is found.
 
     Examples:
-        - A tiny two-metadata-row NSRDB-shaped CSV parses to one row:
+        - A tiny two-metadata-row NSRDB-shaped CSV parses to one row, `time`
+          first and the raw date parts dropped:
             ```python
             >>> from earthlens.nrel._helpers import parse_psm3_csv
             >>> csv = (
@@ -269,14 +271,19 @@ def parse_psm3_csv(text: str, *, meta_rows: int | None = None) -> pd.DataFrame:
             1
             >>> df["time"].dtype.kind
             'M'
-            >>> list(df.columns)[-2:]
-            ['DNI', 'time']
+            >>> list(df.columns)
+            ['time', 'GHI', 'DNI']
 
             ```
     """
     skip = meta_rows if meta_rows is not None else _data_header_offset(text)
     data = pd.read_csv(io.StringIO(text), skiprows=skip)
-    data["time"] = pd.to_datetime(data[_TIME_PARTS])
+    time = pd.to_datetime(data[_TIME_PARTS])
+    # The five raw date-part columns are now redundant with `time`; drop them
+    # and lead with `time` so the frame is `[time, <value columns>]` — matching
+    # the catalog's documented `columns` and the empty_canonical fallback schema.
+    data = data.drop(columns=_TIME_PARTS)
+    data.insert(0, "time", time)
     return data
 
 

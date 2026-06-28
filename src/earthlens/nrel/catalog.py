@@ -104,8 +104,11 @@ class Product(BaseModel):
         interval: Data resolution in minutes (`30` or `60`).
         meta_rows: The number of CSV metadata header rows before the data table
             (NSRDB = 2, WTK = 1); the parser auto-detects but this documents it.
-        columns: The canonical value columns the parser keeps, including the
-            assembled `time` column.
+        columns: The canonical column schema for the product — the leading
+            `time` column plus the product's value columns. Used as the
+            empty-result fallback schema (`empty_canonical`); a populated frame
+            carries `time` plus whichever of these value columns the requested
+            `variables` returned.
         description: Human-readable summary of the product.
 
     Examples:
