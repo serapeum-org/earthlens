@@ -301,14 +301,15 @@ class EarthLens:
              'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo', 'erddap',
              'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs',
              'gdo', 'gebco', 'gee', 'gfw', 'ghs', 'ghsl', 'global-forest-watch',
-             'google-earth-engine', 'hdx', 'human-settlement', 'inform', 'insar',
-             'ioos', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
-             'national-water-model', 'nexrad', 'nwis', 'nwm', 'nwp', 'obis',
-             'openaq', 'openeo', 'overture', 'planetary-computer',
-             'protected-planet', 'pvgis', 'radar', 'redlist', 'risk-indicators',
-             'sentinel-hub', 'sentinelhub', 'solar-pv', 'stac', 'teleconnections',
-             'thinkhazard', 'tropycal', 'usdm', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
+             'global-solar-atlas', 'global-wind-atlas', 'google-earth-engine',
+             'gsa', 'gwa', 'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
+             'iucn', 'jaxa', 'jaxa-earth', 'landsat', 'national-water-model',
+             'nexrad', 'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo',
+             'overture', 'planetary-computer', 'protected-planet', 'pvgis',
+             'radar', 'redlist', 'risk-indicators', 'sentinel-hub', 'sentinelhub',
+             'solar-pv', 'solar-wind-atlas', 'stac', 'teleconnections',
+             'thinkhazard', 'tropycal', 'usdm', 'usgs-landsat', 'usgs-nwis',
+             'usgs-water', 'veda', 'wdpa', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -625,6 +626,18 @@ class EarthLens:
             "bathymetry": ("earthlens.bathymetry", "Bathymetry", "", {}),
             "gebco": ("earthlens.bathymetry", "Bathymetry", "", {}),
             "etopo": ("earthlens.bathymetry", "Bathymetry", "", {}),
+            # Global Solar Atlas + Global Wind Atlas climatology layers,
+            # bbox-subset to GeoTIFF. Open data / CC-BY-4.0 (requests +
+            # pyramids are core), so no extra to hint. The wind layers are
+            # read windowed over /vsicurl; the solar layers download once and
+            # crop locally. Aliases "global-solar-atlas" / "global-wind-atlas"
+            # / "gsa" / "gwa" — pass variables=[...] to pick layers (e.g.
+            # variables=["ghi", "wind_100m"]).
+            "solar-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "global-solar-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "global-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "gsa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "gwa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
             # JRC PVGIS solar-radiation / PV time series over the keyless
             # REST API. Per-coordinate hourly DataFrame (tabular); a point
             # or a bbox sampled to a point grid. variables=["seriescalc"]
