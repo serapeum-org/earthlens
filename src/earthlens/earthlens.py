@@ -304,8 +304,9 @@ class EarthLens:
              'global-solar-atlas', 'global-wind-atlas', 'google-earth-engine',
              'gsa', 'gwa', 'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
              'iucn', 'jaxa', 'jaxa-earth', 'landsat', 'national-water-model',
-             'nexrad', 'nwis', 'nwm', 'nwp', 'obis', 'openaq', 'openeo',
-             'overture', 'planetary-computer', 'protected-planet', 'pvgis',
+             'nexrad', 'nwis', 'nwm', 'nwp', 'obis', 'ohsome', 'openaq',
+             'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
+             'planetary-computer', 'protected-planet', 'pvgis',
              'radar', 'redlist', 'risk-indicators', 'sentinel-hub', 'sentinelhub',
              'solar-pv', 'solar-wind-atlas', 'stac', 'teleconnections',
              'thinkhazard', 'tropycal', 'usgs-landsat', 'usgs-nwis', 'usgs-water',
@@ -426,6 +427,13 @@ class EarthLens:
             parameters) via `argopy` as a `tabular` long-format
             `DataFrame`; region / `float:` / `profile:` selectors, open
             data (no auth); keys `"argo"` / `"argo-floats"` / `"argopy"`.
+        :class:`earthlens.osm.OSM`: OpenStreetMap features over two public,
+            keyless protocols — `overpy` (Overpass, current-state) +
+            `ohsome` (OSM history / analytics) — as a `vector`
+            FeatureCollection with an ODbL `LicenseWarning`; named-query
+            catalog (`overpass:hospitals`, `ohsome:buildings`) + raw
+            `query=` / `filter=` override; keys `"osm"` /
+            `"openstreetmap"` / `"overpass"` / `"ohsome"`.
 
     """
 
@@ -668,6 +676,15 @@ class EarthLens:
                 "",
                 {},
             ),
+            # OpenStreetMap features over two public, keyless protocols — overpy
+            # (Overpass, current-state) + ohsome (OSM history/analytics). Vector
+            # FeatureCollection output with an ODbL LicenseWarning. The [osm]
+            # extra pulls overpy + ohsome (imported lazily). Aliases
+            # "openstreetmap" / "overpass" / "ohsome".
+            "osm": ("earthlens.osm", "OSM", "osm", {}),
+            "openstreetmap": ("earthlens.osm", "OSM", "osm", {}),
+            "overpass": ("earthlens.osm", "OSM", "osm", {}),
+            "ohsome": ("earthlens.osm", "OSM", "osm", {}),
         }
     )
 
