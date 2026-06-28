@@ -427,6 +427,8 @@ class OSM(AbstractDataSource):
 
         Raises:
             ValueError: If no `start` was supplied — ohsome requires a time.
+                (An inverted `end < start` window is already rejected upstream
+                by the `TemporalExtent` validator, at construction.)
         """
         start = self.time.start_date
         end = self.time.end_date
