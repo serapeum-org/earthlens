@@ -313,6 +313,7 @@ markers = [
     "solar_wind_atlas: tests for the Solar & Wind Atlas backend (Global Solar Atlas + Global Wind Atlas climatology layers; no extra SDK — core requests + pyramids; GWA windowed /vsicurl COG read, GSA download-then-localise).",
     "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
     "climate_indices: tests for the climate / teleconnection index backend (NOAA PSL + KNMI Climate Explorer monthly ASCII series; no extra SDK — core requests + pandas).",
+    "nrel: tests for the NREL NSRDB / WIND Toolkit solar-wind time-series backend (keyed REST CSV via core `requests` + `pandas`; no extra SDK; required api_key + email auth).",
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
 ]
 
