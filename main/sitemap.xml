@@ -413,6 +413,14 @@
          <lastmod>2026-06-28</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/nrel/01_nrel_quickstart/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/nrel/02_nrel_products_and_behavior/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/nwm/catalog_explorer/</loc>
          <lastmod>2026-06-28</lastmod>
     </url>
@@ -1138,6 +1146,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/jaxa/usage/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/nrel/datasets/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/nrel/introduction/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/nrel/nrel/</loc>
+         <lastmod>2026-06-28</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/nrel/usage/</loc>
          <lastmod>2026-06-28</lastmod>
     </url>
     <url>
