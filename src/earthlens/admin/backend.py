@@ -50,10 +50,9 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from pyramids.feature.collection import FeatureCollection
 
 if TYPE_CHECKING:
-    from pyramids.feature.collection import FeatureCollection
-
     from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["gpkg", "geojson"]
@@ -433,8 +432,6 @@ class AdminBoundaries(AbstractDataSource):
         Returns:
             FeatureCollection: The combined boundaries (EPSG:4326).
         """
-        from pyramids.feature.collection import FeatureCollection
-
         if not collections:
             return empty_fc()
         if len(collections) == 1:
@@ -445,9 +442,11 @@ class AdminBoundaries(AbstractDataSource):
     def _write(self, collection: FeatureCollection) -> Path:
         """Write the boundaries to one vector file under `root_dir`.
 
-        The filename embeds the requested dataset ids
-        (`admin_<ids>.<ext>`, `:` replaced by `_`), so distinct requests land
-        in distinct files.
+        The filename embeds the requested dataset ids **and the active selectors**
+        (`admin_<ids>[_<country>][_<scale>][_<year>][_<state>].<ext>`, `:`
+        replaced by `_`), so two requests that differ only by selector — e.g.
+        the same dataset for two countries — land in distinct files instead of
+        silently overwriting one another.
 
         Args:
             collection: The boundaries to write.
@@ -456,7 +455,13 @@ class AdminBoundaries(AbstractDataSource):
             Path: Absolute path of the file written.
         """
         driver, ext = _DRIVERS[self._file_format]
-        stem = "admin_" + "_".join(v.replace(":", "_") for v in self.vars)
+        parts = ["admin"] + [v.replace(":", "_") for v in self.vars]
+        parts += [
+            str(selector)
+            for selector in (self._country, self._scale, self._year, self._state)
+            if selector
+        ]
+        stem = "_".join(parts)
         out_path = self.root_dir / f"{stem}.{ext}"
         collection.to_file(str(out_path), driver=driver)
         return out_path

@@ -234,6 +234,19 @@ class TestDownload:
         backend.download(progress_bar=False)
         assert (tmp_path / "admin_cgaz_adm0.geojson").is_file()
 
+    def test_filename_embeds_selector_no_clobber(
+        self, fake_read, fake_geoboundaries, tmp_path: Path
+    ):
+        """Two countries for one dataset write to distinct selector-stamped files."""
+        AdminBoundaries(
+            variables=["geoboundaries:adm1"], country="KEN", path=str(tmp_path)
+        ).download(progress_bar=False)
+        AdminBoundaries(
+            variables=["geoboundaries:adm1"], country="UGA", path=str(tmp_path)
+        ).download(progress_bar=False)
+        assert (tmp_path / "admin_geoboundaries_adm1_KEN.gpkg").is_file()
+        assert (tmp_path / "admin_geoboundaries_adm1_UGA.gpkg").is_file()
+
     def test_no_write_without_path(self, fake_read):
         """With no path, the collection is returned but nothing is written."""
         backend = _make_backend(variables=["cgaz:adm0"])
