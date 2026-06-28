@@ -96,6 +96,16 @@ class TestConstruction:
         backend = AdminBoundaries(variables=["tiger:tract"], state=6)
         assert backend._state == "06"
 
+    def test_non_numeric_state_rejected(self):
+        """A state name / abbreviation gives a clear FIPS error, not int() noise."""
+        with pytest.raises(ValueError, match="numeric US state FIPS code"):
+            AdminBoundaries(variables=["tiger:tract"], state="CA")
+
+    def test_invalid_scale_rejected(self):
+        """An out-of-set Natural Earth scale is rejected at construction."""
+        with pytest.raises(ValueError, match="scale= must be one of"):
+            _make_backend(variables=["natural_earth:countries"], scale="100m")
+
     def test_unknown_dataset_id_raises(self):
         """An unknown dataset id raises with a did-you-mean hint."""
         with pytest.raises(ValueError, match="geoboundaries:adm1"):
@@ -238,6 +248,7 @@ class TestDownload:
         )
         fc = backend.download(progress_bar=False)
         assert len(fc) == 4
+        assert fc.crs.to_epsg() == 4326
 
     def test_empty_result_writes_nothing(self, monkeypatch, tmp_path: Path):
         """An empty fetch returns an empty FC and writes no file."""

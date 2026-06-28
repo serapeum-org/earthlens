@@ -69,6 +69,36 @@ _DRIVERS: dict[str, tuple[str, str]] = {
 _WHOLE_EARTH_LAT = [-90.0, 90.0]
 _WHOLE_EARTH_LON = [-180.0, 180.0]
 
+#: The Natural Earth scales the catalog serves; an explicit `scale=` is checked
+#: against this set so a typo fails clearly instead of as an opaque read error.
+_NE_SCALES = ("10m", "50m", "110m")
+
+
+def _coerce_state(state: str | int | None) -> str | None:
+    """Normalise a US state FIPS selector to a zero-padded two-digit string.
+
+    Args:
+        state: A numeric FIPS code as a string or int (`6`, `"6"`, `"06"`), or
+            `None` when the request needs no state selector.
+
+    Returns:
+        str | None: The zero-padded two-digit FIPS code, or `None`.
+
+    Raises:
+        ValueError: If `state` is not a numeric FIPS code (e.g. a state name or
+            postal abbreviation), with a message naming the expected form.
+    """
+    if state is None:
+        return None
+    try:
+        return f"{int(state):02d}"
+    except (TypeError, ValueError):
+        raise ValueError(
+            f"state= must be a numeric US state FIPS code (e.g. '06' for "
+            f"California), got {state!r}. State names / postal abbreviations "
+            "are not accepted."
+        ) from None
+
 
 class AdminBoundaries(AbstractDataSource):
     """Administrative-boundary backend (vector polygon output, four public sources).
@@ -141,8 +171,9 @@ class AdminBoundaries(AbstractDataSource):
 
         Raises:
             ValueError: If `variables` is empty, `file_format` is unsupported,
-                a dataset id is unknown, or a dataset's required selector
-                (`country` / `state`) is missing.
+                `scale` is not a Natural Earth scale (`10m` / `50m` / `110m`),
+                `state` is not a numeric FIPS code, a dataset id is unknown, or
+                a dataset's required selector (`country` / `state`) is missing.
         """
         if file_format not in _DRIVERS:
             raise ValueError(
@@ -155,11 +186,16 @@ class AdminBoundaries(AbstractDataSource):
                 "admin `variables` is empty; supply at least one dataset id, "
                 "e.g. variables=['geoboundaries:adm1']."
             )
+        if scale is not None and scale not in _NE_SCALES:
+            raise ValueError(
+                f"scale= must be one of {_NE_SCALES} (Natural Earth scales), "
+                f"got {scale!r}."
+            )
         self._ids = ids
         self._country = country.upper() if country else None
         self._scale = scale
         self._year = year
-        self._state = f"{int(state):02d}" if state is not None else None
+        self._state = _coerce_state(state)
         self._file_format: FileFormat = file_format
         self._timeout = timeout
         self._catalog = Catalog()
@@ -277,8 +313,8 @@ class AdminBoundaries(AbstractDataSource):
 
         Routes on the dataset's `provider`, builds the source URL (the
         geoBoundaries two-step resolve happens here), reads it through
-        `read_vector` (pyramids, normalised to EPSG:4326), and logs the
-        per-source license once per dataset.
+        `read_vector` (pyramids, normalised to EPSG:4326), and logs each
+        source's license once per provider (`G7`).
 
         Args:
             products: The products returned by `_search`.
@@ -287,13 +323,14 @@ class AdminBoundaries(AbstractDataSource):
             list[FeatureCollection]: One collection per product, in order.
         """
         collections: list[FeatureCollection] = []
+        logged_licenses: set[str] = set()
         for product in products:
             dataset: Dataset = product.metadata["dataset"]
             url = self._resolve_url(dataset)
-            logger.info(
-                f"Fetching {dataset.id} from {dataset.provider} ({url}); "
-                f"license: {dataset.license_note}"
-            )
+            logger.info(f"Fetching {dataset.id} from {dataset.provider} ({url})")
+            if dataset.provider not in logged_licenses:
+                logger.info(f"{dataset.provider} license: {dataset.license_note}")
+                logged_licenses.add(dataset.provider)
             collection = read_vector(url)
             logger.info(f"{dataset.id}: read {len(collection)} feature(s)")
             collections.append(collection)
