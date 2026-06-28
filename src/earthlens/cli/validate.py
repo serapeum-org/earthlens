@@ -544,6 +544,32 @@ def _validate_nrel(catalog: Any) -> tuple[int, list[str]]:
     )
 
 
+def _glaciers_row_issues(key: str, record: Any) -> list[str]:
+    """Lint one glaciers row: common fields + per-source request detail.
+
+    Args:
+        key: The dataset id.
+        record: The `earthlens.glaciers.Dataset` row.
+
+    Returns:
+        One issue string per missing field — the common `source` /
+        `output_kind` / `long_name` / `citation`, plus `table` / `archive_url`
+        for a `wgms` row and `wfs_url` / `wfs_typename` for a `glims` row.
+    """
+    issues = _require(key, record, ("source", "output_kind", "long_name", "citation"))
+    source = getattr(record, "source", None)
+    if source == "wgms":
+        issues += _require(key, record, ("table", "archive_url"))
+    elif source == "glims":
+        issues += _require(key, record, ("wfs_url", "wfs_typename"))
+    return issues
+
+
+def _validate_glaciers(catalog: Any) -> tuple[int, list[str]]:
+    """Each glaciers row needs a source + output kind + the per-source detail."""
+    return _lint(catalog, _glaciers_row_issues)
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -572,6 +598,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "bathymetry": _validate_bathymetry,
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,
+    "glaciers": _validate_glaciers,
 }
 
 

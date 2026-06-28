@@ -51,6 +51,7 @@ _CURATED_ENUM = (
     "iucn",
     "bathymetry",
     "pvgis",
+    "glaciers",
 )
 
 
