@@ -149,14 +149,6 @@
          <lastmod>2026-06-29</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/catalog_explorer/</loc>
-         <lastmod>2026-06-29</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/drought/quickstart/</loc>
-         <lastmod>2026-06-29</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/earthdata/catalog_explorer/</loc>
          <lastmod>2026-06-29</lastmod>
     </url>
@@ -386,6 +378,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/ghsl/07_wup_projection/</loc>
+         <lastmod>2026-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/glaciers/01_glaciers_quickstart/</loc>
+         <lastmod>2026-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/glaciers/02_catalog_and_behavior/</loc>
+         <lastmod>2026-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/glaciers/03_glims_and_wgms/</loc>
          <lastmod>2026-06-29</lastmod>
     </url>
     <url>
@@ -969,18 +973,6 @@
          <lastmod>2026-06-29</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/drought/</loc>
-         <lastmod>2026-06-29</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/introduction/</loc>
-         <lastmod>2026-06-29</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/drought/usage/</loc>
-         <lastmod>2026-06-29</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/earthdata/authentication/</loc>
          <lastmod>2026-06-29</lastmod>
     </url>
@@ -1150,6 +1142,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/ghsl/usage/</loc>
+         <lastmod>2026-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/glaciers/datasets/</loc>
+         <lastmod>2026-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/glaciers/glaciers/</loc>
+         <lastmod>2026-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/glaciers/introduction/</loc>
+         <lastmod>2026-06-29</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/glaciers/usage/</loc>
          <lastmod>2026-06-29</lastmod>
     </url>
     <url>
