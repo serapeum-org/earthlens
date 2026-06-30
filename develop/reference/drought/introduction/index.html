@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -8003,10 +8003,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#edogdo-status-pending-the-pyramids-temporal-wcs-reader" class="md-nav__link">
+  <a href="#how-the-edogdo-route-works" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EDO/GDO status — pending the pyramids temporal WCS reader
+        How the EDO/GDO route works
       
     </span>
   </a>
@@ -16498,10 +16498,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#edogdo-status-pending-the-pyramids-temporal-wcs-reader" class="md-nav__link">
+  <a href="#how-the-edogdo-route-works" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EDO/GDO status — pending the pyramids temporal WCS reader
+        How the EDO/GDO route works
       
     </span>
   </a>
@@ -16634,16 +16634,35 @@ the USDM vector route <strong>rejects</strong> <code>aggregate=</code> with <cod
 (drought-class polygons have no gridded reduction); the raster routes
 forward it (currently behind a <code>NotImplementedError</code> placeholder until the
 stack reducer ships).</p>
-<h2 id="edogdo-status-pending-the-pyramids-temporal-wcs-reader"><a class="toclink" href="#edogdo-status-pending-the-pyramids-temporal-wcs-reader">EDO/GDO status — pending the pyramids temporal WCS reader</a><a class="headerlink" href="#edogdo-status-pending-the-pyramids-temporal-wcs-reader" title="Permanent link">#</a></h2>
-<p>The EDO/GDO indicators are served over OGC WCS with a <strong>time-axis subset</strong>
-(<code>subset=time(...)</code> in WCS 2.0.0). The base <code>pyramids.wcs.read_wcs</code> is the
-cross-repo <code>PY-A</code> task introduced by the soilgrids plan and unblocks the
-EDO/GDO half once it ships with the temporal <code>time=</code> parameter. Until
-then, EDO/GDO catalog rows resolve and validate, the facade routes a
-request, and <code>download()</code> raises a clear <code>NotImplementedError</code> pointing
-at the pending dependency.</p>
-<p>The USDM (vector) and SPEIbase (NetCDF) routes are fully wired and have
-no pyramids dependency beyond what already ships.</p>
+<h2 id="how-the-edogdo-route-works"><a class="toclink" href="#how-the-edogdo-route-works">How the EDO/GDO route works</a><a class="headerlink" href="#how-the-edogdo-route-works" title="Permanent link">#</a></h2>
+<p>The Copernicus EMS drought endpoint is <strong>not a conformant OGC WCS server</strong> —
+it is a REST shim. Only its <code>GetCoverage</code> operation is reliable; the
+standard <code>GetCapabilities</code> / <code>DescribeCoverage</code> discovery operations answer
+<code>502</code> / <code>400</code> (they require a non-standard <code>SELECTED_TIMESCALE</code> parameter),
+so pyramids' <code>Dataset.from_wcs</code> (which wraps GDAL's WCS driver and needs
+that discovery handshake) cannot read it.</p>
+<p>Instead the backend builds the documented <code>GetCoverage</code> URL by hand with
+core <code>requests</code> and two Copernicus-custom parameters:</p>
+<ul>
+<li><code>TIME=&lt;YYYY-MM-DD&gt;</code> — the snapped period (10-day dekad or month).</li>
+<li><code>SELECTED_TIMESCALE=&lt;NN&gt;</code> — the SPI / SPEI integration window in months
+  (<code>01</code>, <code>03</code>, <code>06</code>, <code>12</code>, …). The SPI coverages require it; the other
+  indicators accept and ignore it. Each <code>edo-*</code> / <code>gdo-*</code> catalog row
+  carries a <code>timescale</code> (default <code>"01"</code>, a config-as-code tunable).</li>
+</ul>
+<p>plus a <code>SUBSET=Long(west,east)</code> / <code>SUBSET=Lat(south,north)</code> bbox and
+<code>CRS=EPSG:4326&amp;format=GEOTIFF</code>. The response is streamed to disk and opened
+through <code>pyramids.dataset.Dataset.read_file</code> to validate it is a real
+raster — no <code>owslib</code>, no GDAL WCS driver, no <code>xarray</code>. When the server
+rejects a request (e.g. a date outside an indicator's available coverage
+range, an HTTP 422), the Copernicus error message is surfaced verbatim.</p>
+<p><strong>One map, not two.</strong> The Copernicus WCS exposes a single <code>map=DO_WCS</code>;
+there is no separate <code>GDO_WCS</code> map. The European-vs-global split is a
+data-extent distinction, so every <code>gdo-*</code> row uses the same <code>map=DO_WCS</code>
+endpoint as the EDO rows (the two Low-Flow Index codes
+<code>lfinx_300_sms</code> / <code>lfinx_300_mds</code> are genuinely GDO-specific).</p>
+<p>All three transports are fully wired against the shipped pyramids reader
+stack — no extra pyramids work is needed.</p>
 
 
 
