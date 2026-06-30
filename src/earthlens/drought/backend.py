@@ -10,8 +10,11 @@ SPEIbase return a `list[Path]` of written GeoTIFFs / NetCDFs.
 The constructor's `dataset=` selects one curated row (`"usdm"`,
 `"edo-spaST"`, `"speibase-12"`, …); the row's `transport` field drives the
 `_fetch` route (`usdm-geojson` / `netcdf-url` / `edo-wcs`). The EDO/GDO
-route is wired but raises `NotImplementedError` until the pyramids
-temporal `read_wcs` extension (the cross-repo `PY-A` task) ships.
+route builds the Copernicus `GetCoverage` URL by hand (`TIME` +
+`SELECTED_TIMESCALE` + a `SUBSET=Long/Lat` bbox), streams the GeoTIFF, and
+opens it via `pyramids.dataset.Dataset.read_file` — Copernicus EDO/GDO is a
+REST shim whose WCS discovery handshake is unreliable, so the standard
+`Dataset.from_wcs` / GDAL WCS driver path does not apply.
 
 Authentication: none — all three sources are open. Each successful
 `download()` logs the per-source attribution once (`G6`); no
@@ -676,8 +679,9 @@ class Drought(AbstractDataSource):
 
         Raises:
             NotImplementedError: When `aggregate is not None` on the
-                vector USDM transport, or when the bound dataset uses
-                the `edo-wcs` transport (waits on `PY-A`).
+                vector USDM transport (drought-class polygons have no
+                gridded reduction), or on any raster transport (the
+                cross-period stack reducer is not wired yet).
         """
         if self.OUTPUT_KIND == "vector" and aggregate is not None:
             raise NotImplementedError(

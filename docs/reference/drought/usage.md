@@ -100,28 +100,45 @@ The downloaded NetCDF stays under `path/` between runs, so a second
 re-hitting `digital.csic.es`. Bump the catalog row's `endpoint` to point
 at a newer SPEIbase release when one ships — no code change.
 
-## EDO / GDO — Copernicus drought indicators (raster, pending)
+## EDO / GDO — Copernicus drought indicators (raster)
 
 EDO/GDO catalog rows resolve through the same facade — `dataset="edo-spaST"`
-for SPI ERA5 short-term over Europe, `dataset="gdo-twsan"` for the GRACE
-TWS anomaly over the globe, etc. The backend routes them via OGC WCS 2.0.0
-with a `subset=time(...)` axis, which lands in pyramids as the temporal
-extension of `pyramids.wcs.read_wcs` (the cross-repo `PY-A` task). Until
-the pyramids release ships:
+for SPI ERA5 short-term, `dataset="gdo-smand"` for the ensemble soil-moisture
+anomaly, etc. The backend builds the Copernicus `GetCoverage` URL by hand
+(`TIME` + the row's `SELECTED_TIMESCALE` + a `SUBSET=Long/Lat` bbox),
+streams the GeoTIFF, and opens it through `pyramids.dataset.Dataset.read_file`:
+
+```python
+from earthlens import EarthLens
+
+paths = EarthLens(
+    data_source="drought",
+    dataset="edo-spaST",
+    start="2025-12-21", end="2025-12-21",
+    variables=[],
+    lat_lim=[40.0, 50.0], lon_lim=[5.0, 15.0],
+    path="edo_out",
+).download()
+# [Path('edo_out/edo-spaST_20251221.tif')]
+```
+
+Each indicator only carries data for a limited date range; a request
+outside that range surfaces the Copernicus message verbatim:
 
 ```python
 >>> EarthLens(  # doctest: +SKIP
-...     data_source="drought", dataset="edo-spaST",
+...     data_source="drought", dataset="edo-cdinx",
 ...     start="2026-06-21", end="2026-06-21",
-...     variables=[], lat_lim=[40.0, 50.0], lon_lim=[5.0, 15.0],
+...     variables=[], lat_lim=[40.0, 50.0], lon_lim=[5.0, 15.0], path="out",
 ... ).download()
-NotImplementedError: Drought.edo-wcs transport waits on the pyramids temporal `read_wcs` extension (PY-A). ...
+ValueError: Copernicus EDO/GDO rejected 'edo-cdinx' (HTTP 422): Requested date ... is outside the available coverage range ...
 ```
 
 The list of curated EDO/GDO ids lives in `src/earthlens/drought/catalog/edo.yaml`
-and `gdo.yaml`. The indicator codes were scraped from the live Copernicus
-WMS GetCapabilities on 2026-06-26 (see `planning/drought/captures/`) and
-mirror the WCS coverage ids on the same MapServer.
+and `gdo.yaml`. The indicator codes + the `TIME` / `SELECTED_TIMESCALE`
+param shape were verified live (see `planning/drought/captures/`). Every
+`gdo-*` row uses the same `map=DO_WCS` endpoint as the EDO rows — there is
+no separate `GDO_WCS` map.
 
 ## Aliases
 

@@ -8,9 +8,14 @@ services with three different transports:
   `pyramids.feature.collection.FeatureCollection` in EPSG:4326.
 * **Copernicus EDO / GDO** — Standardised Precipitation Index, soil moisture
   anomaly, fAPAR anomaly, Combined Drought Indicator, GRACE TWS anomaly,
-  and friends, served over **OGC WCS 2.0.0** (raster output). Each indicator
-  is one catalog row routed through the temporal `pyramids.wcs.read_wcs`
-  reader (the cross-repo `PY-A` task — pending pyramids release).
+  and friends, served by the Copernicus EMS drought WCS (raster output).
+  EDO/GDO is a REST shim, not a conformant WCS server — only its
+  `GetCoverage` operation is reliable (the standard `GetCapabilities` /
+  `DescribeCoverage` discovery handshake is 502 / 400). So the backend
+  builds the documented `GetCoverage` URL by hand with core `requests`
+  (`TIME=<date>` + `SELECTED_TIMESCALE=<NN>` + a `SUBSET=Long/Lat` bbox),
+  streams the GeoTIFF, and opens it via `pyramids.dataset.Dataset.read_file`
+  — no `owslib`, no GDAL WCS driver, no `xarray`.
 * **CSIC SPEIbase** — global 0.5° monthly NetCDF of the Standardised
   Precipitation Evapotranspiration Index at scales 1–48 months (raster
   output), read through the already-shipped `pyramids.netcdf.NetCDF`.
@@ -33,14 +38,14 @@ Public surface (re-exported from this package):
   start=..., end=...)`).
 * `Catalog` — the sharded catalog loader (USDM, EDO, GDO, SPEIbase).
 * `Dataset` — one curated row (transport, endpoint, coverage,
-  output_kind, cadence, native_crs, license_note).
+  output_kind, cadence, native_crs, timescale, license_note).
 * `CATALOG_PATH` — absolute path to the bundled `catalog/` directory.
 * `clear_catalog_cache` — drop the parse cache (tests).
 
-The backend pulls no new SDK extra: USDM uses core `requests`, SPEIbase
-reads through pyramids' shipped NetCDF stack, and the WCS reader lives in
-pyramids (`PY-A`). The `[drought]` extra is therefore intentionally absent
-from `pyproject.toml`.
+The backend pulls no new SDK extra: all three transports use core
+`requests` plus the already-shipped `pyramids` reader stack (`Dataset` /
+`NetCDF` / `FeatureCollection`). The `[drought]` extra is therefore
+intentionally absent from `pyproject.toml`.
 """
 
 from __future__ import annotations

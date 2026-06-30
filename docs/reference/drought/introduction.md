@@ -60,15 +60,36 @@ the USDM vector route **rejects** `aggregate=` with `NotImplementedError`
 forward it (currently behind a `NotImplementedError` placeholder until the
 stack reducer ships).
 
-## EDO/GDO status — pending the pyramids temporal WCS reader
+## How the EDO/GDO route works
 
-The EDO/GDO indicators are served over OGC WCS with a **time-axis subset**
-(`subset=time(...)` in WCS 2.0.0). The base `pyramids.wcs.read_wcs` is the
-cross-repo `PY-A` task introduced by the soilgrids plan and unblocks the
-EDO/GDO half once it ships with the temporal `time=` parameter. Until
-then, EDO/GDO catalog rows resolve and validate, the facade routes a
-request, and `download()` raises a clear `NotImplementedError` pointing
-at the pending dependency.
+The Copernicus EMS drought endpoint is **not a conformant OGC WCS server** —
+it is a REST shim. Only its `GetCoverage` operation is reliable; the
+standard `GetCapabilities` / `DescribeCoverage` discovery operations answer
+`502` / `400` (they require a non-standard `SELECTED_TIMESCALE` parameter),
+so pyramids' `Dataset.from_wcs` (which wraps GDAL's WCS driver and needs
+that discovery handshake) cannot read it.
 
-The USDM (vector) and SPEIbase (NetCDF) routes are fully wired and have
-no pyramids dependency beyond what already ships.
+Instead the backend builds the documented `GetCoverage` URL by hand with
+core `requests` and two Copernicus-custom parameters:
+
+* `TIME=<YYYY-MM-DD>` — the snapped period (10-day dekad or month).
+* `SELECTED_TIMESCALE=<NN>` — the SPI / SPEI integration window in months
+  (`01`, `03`, `06`, `12`, …). The SPI coverages require it; the other
+  indicators accept and ignore it. Each `edo-*` / `gdo-*` catalog row
+  carries a `timescale` (default `"01"`, a config-as-code tunable).
+
+plus a `SUBSET=Long(west,east)` / `SUBSET=Lat(south,north)` bbox and
+`CRS=EPSG:4326&format=GEOTIFF`. The response is streamed to disk and opened
+through `pyramids.dataset.Dataset.read_file` to validate it is a real
+raster — no `owslib`, no GDAL WCS driver, no `xarray`. When the server
+rejects a request (e.g. a date outside an indicator's available coverage
+range, an HTTP 422), the Copernicus error message is surfaced verbatim.
+
+**One map, not two.** The Copernicus WCS exposes a single `map=DO_WCS`;
+there is no separate `GDO_WCS` map. The European-vs-global split is a
+data-extent distinction, so every `gdo-*` row uses the same `map=DO_WCS`
+endpoint as the EDO rows (the two Low-Flow Index codes
+`lfinx_300_sms` / `lfinx_300_mds` are genuinely GDO-specific).
+
+All three transports are fully wired against the shipped pyramids reader
+stack — no extra pyramids work is needed.

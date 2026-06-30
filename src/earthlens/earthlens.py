@@ -426,10 +426,10 @@ class EarthLens:
             FeatureCollection; key `"obis"`.
         :class:`earthlens.drought.Drought`: Drought-indicator backend over
             three live services — US Drought Monitor (vector polygons via
-            GeoJSON), Copernicus EDO/GDO (raster via OGC WCS — pending the
-            pyramids temporal `read_wcs` extension), and CSIC SPEIbase
-            (raster via NetCDF). Per-instance `OUTPUT_KIND`. No SDK extra.
-            Four discoverability keys (`"drought"` / `"usdm"` / `"edo"` /
+            GeoJSON), Copernicus EDO/GDO (raster via the Copernicus drought
+            `GetCoverage` REST endpoint), and CSIC SPEIbase (raster via
+            NetCDF). Per-instance `OUTPUT_KIND`. No SDK extra. Four
+            discoverability keys (`"drought"` / `"usdm"` / `"edo"` /
             `"gdo"`) all resolve to the same backend; all require an
             explicit `dataset=` kwarg.
         :class:`earthlens.wdpa.WDPA`: Protected Planet (WDPA)
@@ -756,9 +756,10 @@ class EarthLens:
             "tiger": ("earthlens.admin", "AdminBoundaries", "", {}),
             # Drought-indicator backend over three live public services:
             # USDM (vector GeoJSON polygon classes), Copernicus EDO/GDO (raster
-            # OGC WCS — waits on pyramids PY-A temporal `read_wcs`), and CSIC
-            # SPEIbase (raster NetCDF). Per-instance OUTPUT_KIND from the
-            # resolved `dataset=` row. No SDK extra (requests + pyramids are
+            # via the Copernicus drought GetCoverage REST endpoint —
+            # TIME + SELECTED_TIMESCALE custom params, not a conformant WCS),
+            # and CSIC SPEIbase (raster NetCDF). Per-instance OUTPUT_KIND from
+            # the resolved `dataset=` row. No SDK extra (requests + pyramids are
             # core). The four keys (`drought` / `usdm` / `edo` / `gdo`) are
             # discoverability aliases — all four resolve to the same backend
             # and all four require an explicit `dataset=` kwarg (e.g.
