@@ -101,7 +101,7 @@ temporal reduce needs a separate gridded reader. So
 ## Subsetting and the retrospective archive
 
 Operational files are whole-CONUS, so a subset is *read* rather than
-downloaded whole, through pyramids (≥ 0.30.0) — earthlens never imports
+downloaded whole, through pyramids (≥ 0.38.0) — earthlens never imports
 `xarray`/`zarr` itself.
 
 **Tabular** products (`chrtout`, `lakeout`, `coastal`) — a `sites=` list,

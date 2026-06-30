@@ -59,7 +59,7 @@ no `sites=`) **downloads those whole files**.
 A **subset** or the **retrospective** archive is *read* rather than
 downloaded whole, through
 [pyramids](https://github.com/serapeum-org/pyramids)'s
-`pyramids.netcdf.LabeledDataset` (pyramids ≥ 0.29.0) — earthlens never
+`pyramids.netcdf.LabeledDataset` (pyramids ≥ 0.38.0) — earthlens never
 imports `xarray` / `zarr` itself; pyramids owns the read. For the
 **tabular** products (`chrtout`, `lakeout`, `coastal`):
 
