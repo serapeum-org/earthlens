@@ -1,0 +1,38 @@
+# WGMS — Fluctuations of Glaciers (FoG) database, tabular glacier fluctuations.
+# Served openly as one zipped set of CSV tables (compressed ~37 MB). The backend
+# downloads + caches the FoG ZIP once, reads the chosen table CSV with pandas,
+# and optionally filters by glacier id / name / region / bbox (joining the
+# `glacier` table for coordinates + region). Tables are already long-format
+# (`glacier_id` / year-or-date / value). Pure pandas. Verified live 2026-06-28.
+#
+# `archive_url` is the current FoG snapshot; `table` is the CSV inside `data/`.
+# The huge `change` table (~815 MB uncompressed) is deliberately not exposed.
+
+datasets:
+  wgms:mass_balance:
+    source: wgms
+    output_kind: tabular
+    table: mass_balance
+    long_name: WGMS glacier mass balance (winter / summer / annual)
+    citation: >-
+      WGMS (2026), Fluctuations of Glaciers Database, DOI
+      10.5904/wgms-fog-2026-02-10.
+    archive_url: https://wgms.ch/downloads/DOI-WGMS-FoG-2026-02-10.zip
+  wgms:front_variation:
+    source: wgms
+    output_kind: tabular
+    table: front_variation
+    long_name: WGMS glacier front variation (length change)
+    citation: >-
+      WGMS (2026), Fluctuations of Glaciers Database, DOI
+      10.5904/wgms-fog-2026-02-10.
+    archive_url: https://wgms.ch/downloads/DOI-WGMS-FoG-2026-02-10.zip
+  wgms:state:
+    source: wgms
+    output_kind: tabular
+    table: state
+    long_name: WGMS glacier state (elevation / area / length snapshots)
+    citation: >-
+      WGMS (2026), Fluctuations of Glaciers Database, DOI
+      10.5904/wgms-fog-2026-02-10.
+    archive_url: https://wgms.ch/downloads/DOI-WGMS-FoG-2026-02-10.zip

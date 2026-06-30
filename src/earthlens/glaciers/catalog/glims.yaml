@@ -1,0 +1,21 @@
+# GLIMS — Global Land Ice Measurements from Space, time-series glacier outlines
+# (vector). Served openly via the GLIMS GeoServer WFS; the backend issues a
+# bbox GetFeature returning GeoJSON, saves it, and reads it via pyramids
+# `FeatureCollection.read_file`. GLIMS is multi-temporal: a glacier can have
+# several outlines with different `src_date`s. Verified live 2026-06-28.
+#
+# Axis-order note: with the URN CRS `urn:ogc:def:crs:EPSG::4326` the WFS bbox is
+# `south,west,north,east` (lat,lon); a plain `EPSG:4326` srs returns nothing.
+# The helper builds the URN form. Returned GeoJSON geometry is lon,lat.
+
+datasets:
+  glims:outlines:
+    source: glims
+    output_kind: vector
+    long_name: GLIMS time-series glacier outlines (WFS, bbox query)
+    citation: >-
+      GLIMS and NSIDC (2005, updated current year), Global Land Ice Measurements
+      from Space glacier database, NSIDC-0272 (CC-BY-4.0); cite the contributing
+      analysts.
+    wfs_url: https://www.glims.org/geoserver/ows
+    wfs_typename: GLIMS:GLIMS_Glacier_Outlines
