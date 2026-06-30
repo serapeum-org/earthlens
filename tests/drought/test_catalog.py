@@ -35,6 +35,27 @@ def test_edo_row_is_raster_wcs():
     assert ds.transport == "edo-wcs"
     assert ds.coverage == "spaST"
     assert ds.endpoint.endswith("map=DO_WCS")
+    # Every edo-wcs row carries a SELECTED_TIMESCALE value (SPI requires it,
+    # the rest accept and ignore it).
+    assert ds.timescale == "01"
+
+
+def test_every_edo_wcs_row_has_a_timescale():
+    """No edo-wcs row may omit the SELECTED_TIMESCALE the SPI coverages need."""
+    cat = Catalog()
+    missing = [
+        ds.id
+        for ds in cat.datasets.values()
+        if ds.transport == "edo-wcs" and not ds.timescale
+    ]
+    assert missing == [], f"edo-wcs rows missing a timescale: {missing}"
+
+
+def test_non_wcs_rows_have_no_timescale():
+    """USDM and SPEIbase rows leave timescale unset (it is WCS-only)."""
+    cat = Catalog()
+    assert cat.get("usdm").timescale is None
+    assert cat.get("speibase-12").timescale is None
 
 
 def test_gdo_row_uses_global_map_switcher():

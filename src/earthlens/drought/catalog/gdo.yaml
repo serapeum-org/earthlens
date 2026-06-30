@@ -13,6 +13,7 @@ datasets:
     output_kind: raster
     cadence: 10day
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
   gdo-spaLT:
     source: "Copernicus Global Drought Observatory (GDO)"
@@ -22,6 +23,7 @@ datasets:
     output_kind: raster
     cadence: 10day
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
   gdo-spgTS:
     source: "Copernicus Global Drought Observatory (GDO)"
@@ -31,6 +33,7 @@ datasets:
     output_kind: raster
     cadence: monthly
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
   gdo-smand:
     source: "Copernicus Global Drought Observatory (GDO)"
@@ -40,6 +43,7 @@ datasets:
     output_kind: raster
     cadence: 10day
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
   gdo-fpanv:
     source: "Copernicus Global Drought Observatory (GDO)"
@@ -49,6 +53,7 @@ datasets:
     output_kind: raster
     cadence: 10day
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
   gdo-cdinx:
     source: "Copernicus Global Drought Observatory (GDO)"
@@ -58,6 +63,7 @@ datasets:
     output_kind: raster
     cadence: 10day
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
   gdo-twsan:
     source: "Copernicus Global Drought Observatory (GDO)"
@@ -67,6 +73,7 @@ datasets:
     output_kind: raster
     cadence: monthly
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
   gdo-lfinx-sms:
     source: "Copernicus Global Drought Observatory (GDO)"
@@ -76,6 +83,7 @@ datasets:
     output_kind: raster
     cadence: 10day
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
   gdo-lfinx-mds:
     source: "Copernicus Global Drought Observatory (GDO)"
@@ -85,4 +93,5 @@ datasets:
     output_kind: raster
     cadence: 10day
     native_crs: "EPSG:4326"
+    timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"

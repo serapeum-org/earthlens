@@ -317,10 +317,8 @@ class Drought(AbstractDataSource):
                 vector transport returns the merged `FeatureCollection`.
 
         Raises:
-            NotImplementedError: For the `edo-wcs` transport — the
-                pyramids temporal `read_wcs` extension (`PY-A`) is not
-                yet released. Tracked at the planning document under
-                `PY-A`.
+            ValueError: When the resolved row's `transport` is not one of
+                the three known values (catalog out of sync with backend).
         """
         transport = self._dataset.transport
         if transport == "usdm-geojson":
@@ -328,15 +326,7 @@ class Drought(AbstractDataSource):
         if transport == "netcdf-url":
             return self._fetch_speibase(products)
         if transport == "edo-wcs":
-            raise NotImplementedError(
-                "Drought.edo-wcs transport waits on the pyramids temporal "
-                "`read_wcs` extension (PY-A). When pyramids releases the "
-                "`time=` parameter on `pyramids.wcs.read_wcs`, this branch "
-                "calls `read_wcs(endpoint=row.endpoint, coverage=row.coverage, "
-                "bbox=bbox_from_extent(self.space), crs='EPSG:4326', "
-                "time=<period>, output=<tif>)` and returns the written "
-                "paths."
-            )
+            return self._fetch_wcs(products)
         raise ValueError(
             f"unknown drought transport {transport!r} on dataset "
             f"{self._dataset.id!r} (catalog out of sync with backend?)"
@@ -532,6 +522,105 @@ class Drought(AbstractDataSource):
             nc.close()
         return written
 
+    def _fetch_wcs(self, products: list[RemoteProduct]) -> list[Path]:
+        """Fetch one Copernicus EDO/GDO GeoTIFF per period via WCS GetCoverage.
+
+        EDO/GDO is a Copernicus REST shim: only its `GetCoverage` operation
+        is reliable (the standard `GetCapabilities` / `DescribeCoverage`
+        discovery handshake is 502 / 400), so we build the documented
+        GetCoverage URL by hand — `coverageID` + `CRS=EPSG:4326` +
+        `format=GEOTIFF` + the custom `TIME=<date>` /
+        `SELECTED_TIMESCALE=<NN>` params + the `SUBSET=Long/Lat` bbox — fetch
+        it with core `requests`, and open the bytes through pyramids
+        `Dataset.read_file`. No `owslib`, no GDAL WCS driver, no `xarray`
+        (`G7`).
+
+        Args:
+            products: One product per snapped period (10-day dekad or
+                month, per the row's cadence).
+
+        Returns:
+            list[Path]: The written GeoTIFFs in `products` order.
+
+        Raises:
+            ValueError: When the server rejects a period (e.g. a date
+                outside the indicator's available coverage range); the
+                Copernicus error message is surfaced verbatim.
+        """
+        from pyramids.dataset import Dataset
+
+        bbox = bbox_from_extent(self.space)
+        written: list[Path] = []
+        for product in products:
+            period: dt.date = product.metadata["period"]
+            url = self._render_wcs_url(
+                self._dataset.endpoint,
+                coverage=self._dataset.coverage,
+                timescale=self._dataset.timescale,
+                period=period,
+                bbox=bbox,
+            )
+            out_path = (
+                self.root_dir
+                / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
+            )
+            _http_download_raster(url, out_path, label=self._dataset.id)
+            # Open to validate it is a real raster (guards against a 200
+            # response carrying a non-raster body), then leave it on disk.
+            ds = Dataset.read_file(str(out_path))
+            ds.close()
+            written.append(out_path)
+        return written
+
+    @staticmethod
+    def _render_wcs_url(
+        endpoint: str,
+        *,
+        coverage: str | None,
+        timescale: str | None,
+        period: dt.date,
+        bbox: tuple[float, float, float, float],
+    ) -> str:
+        """Build a Copernicus EDO/GDO `GetCoverage` URL for one period.
+
+        Args:
+            endpoint: The row's WCS map endpoint (carries `?map=DO_WCS`
+                or `?map=GDO_WCS`).
+            coverage: The WCS `coverageID` (e.g. `"spaST"`).
+            timescale: The `SELECTED_TIMESCALE` value (`"01"`, `"03"`,
+                …); omitted from the URL when `None`.
+            period: The snapped date for this fetch (`TIME=`).
+            bbox: `(west, south, east, north)` in EPSG:4326 degrees.
+
+        Returns:
+            str: The fully-rendered GetCoverage URL.
+
+        Raises:
+            ValueError: When `coverage` is `None` (an `edo-wcs` row must
+                carry a coverage id).
+        """
+        if not coverage:
+            raise ValueError(
+                "an edo-wcs drought row must carry a `coverage` id; "
+                "got None."
+            )
+        west, south, east, north = bbox
+        params = [
+            "SERVICE=WCS",
+            "VERSION=2.0.0",
+            "REQUEST=GetCoverage",
+            f"coverageID={coverage}",
+            "CRS=EPSG:4326",
+            "format=GEOTIFF",
+            f"TIME={period.isoformat()}",
+            f"SUBSET=Long({west},{east})",
+            f"SUBSET=Lat({south},{north})",
+        ]
+        if timescale:
+            params.append(f"SELECTED_TIMESCALE={timescale}")
+        sep = "&" if "?" in endpoint else "?"
+        return endpoint + sep + "&".join(params)
+
     @staticmethod
     def _empty_vector() -> FeatureCollection:
         """Return an empty `FeatureCollection` with the USDM schema.
@@ -693,6 +782,49 @@ def _http_download(url: str, target: Path) -> None:
         headers={"User-Agent": _USER_AGENT},
     ) as response:
         response.raise_for_status()
+        with tmp.open("wb") as fh:
+            for chunk in response.iter_content(chunk_size=1 << 16):
+                if chunk:
+                    fh.write(chunk)
+    tmp.replace(target)
+
+
+def _http_download_raster(url: str, target: Path, *, label: str) -> None:
+    """Stream a raster GeoTIFF to `target`, surfacing Copernicus JSON errors.
+
+    Like `_http_download`, but on a non-2xx response it reads the body and
+    re-raises a `ValueError` carrying the Copernicus error message (EDO/GDO
+    answer an out-of-range date or a bad coverage with an informative JSON
+    `{"message": ...}` body — far more useful than a bare HTTP status). A
+    2xx response is streamed to disk unchanged.
+
+    Args:
+        url: The fully-rendered GetCoverage URL.
+        target: The destination `.tif` path.
+        label: The dataset id, for the error message.
+
+    Raises:
+        ValueError: On a non-2xx response; the Copernicus message (or the
+            raw body) is included.
+    """
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = target.with_suffix(target.suffix + ".partial")
+    with requests.get(
+        url,
+        timeout=_HTTP_TIMEOUT,
+        stream=True,
+        headers={"User-Agent": _USER_AGENT},
+    ) as response:
+        if response.status_code >= 400:
+            body = response.text
+            try:
+                message = response.json().get("message", body)
+            except ValueError:
+                message = body
+            raise ValueError(
+                f"Copernicus EDO/GDO rejected {label!r} "
+                f"(HTTP {response.status_code}): {message.strip()[:300]}"
+            )
         with tmp.open("wb") as fh:
             for chunk in response.iter_content(chunk_size=1 << 16):
                 if chunk:

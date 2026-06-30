@@ -203,6 +203,15 @@ class Dataset(BaseModel):
             (`"EPSG:4326"`). USDM was documented Albers but ships
             `GCS_WGS_1984` today (`G4` — kept as a `to_crs("EPSG:4326")`
             defensive no-op in the backend).
+        timescale: The Copernicus `SELECTED_TIMESCALE` value for
+            `edo-wcs` rows — a one-or-two-digit string naming the SPI /
+            SPEI integration window in months (`"01"`, `"03"`, `"06"`,
+            `"12"`, …). The SPI coverages (`spaST`, `spcLT`, `spgTS`)
+            **require** it; the other EDO/GDO indicators accept and ignore
+            it, so every `edo-wcs` row carries one (default `"01"`). It is
+            config-as-code: change a row's `timescale` in the YAML to pick
+            a different window without touching the backend. `None` for
+            the non-WCS transports.
         license_note: Short attribution string logged once on success
             (`"Copernicus EMS — free reuse with attribution"`,
             `"USDM public domain — cite NDMC / UNL"`, `"CC-BY 4.0 — cite
@@ -229,6 +238,7 @@ class Dataset(BaseModel):
     output_kind: OutputKindLiteral
     cadence: CadenceLiteral
     native_crs: str = "EPSG:4326"
+    timescale: str | None = None
     license_note: str = ""
 
 

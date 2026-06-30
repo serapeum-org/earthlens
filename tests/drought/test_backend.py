@@ -403,17 +403,157 @@ def test_usdm_aggregate_rejected(tmp_path):
         backend.download(aggregate=object())
 
 
-def test_edo_route_raises_pending_pyramids(tmp_path):
-    """EDO/GDO is wired but raises pending PY-A."""
+def test_edo_render_wcs_url_carries_custom_params():
+    """The EDO/GDO GetCoverage URL carries TIME + SELECTED_TIMESCALE + bbox."""
+    url = Drought._render_wcs_url(
+        "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS",
+        coverage="spaST",
+        timescale="03",
+        period=dt.date(2025, 12, 21),
+        bbox=(5.0, 40.0, 15.0, 50.0),
+    )
+    assert "coverageID=spaST" in url
+    assert "TIME=2025-12-21" in url
+    assert "SELECTED_TIMESCALE=03" in url
+    assert "SUBSET=Long(5.0,15.0)" in url
+    assert "SUBSET=Lat(40.0,50.0)" in url
+    assert "format=GEOTIFF" in url
+    # The endpoint already has a query string, so the join uses `&`.
+    assert "map=DO_WCS&SERVICE=WCS" in url
+
+
+def test_edo_render_wcs_url_omits_timescale_when_none():
+    """A None timescale leaves SELECTED_TIMESCALE off the URL entirely."""
+    url = Drought._render_wcs_url(
+        "https://example.com/wcs?map=DO_WCS",
+        coverage="twsan",
+        timescale=None,
+        period=dt.date(2024, 6, 21),
+        bbox=(0.0, 0.0, 1.0, 1.0),
+    )
+    assert "SELECTED_TIMESCALE" not in url
+
+
+def test_edo_render_wcs_url_rejects_missing_coverage():
+    """An edo-wcs row without a coverage id is a clear ValueError."""
+    with pytest.raises(ValueError, match="must carry a `coverage`"):
+        Drought._render_wcs_url(
+            "https://example.com/wcs",
+            coverage=None,
+            timescale="01",
+            period=dt.date(2024, 6, 21),
+            bbox=(0.0, 0.0, 1.0, 1.0),
+        )
+
+
+def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
+    """The EDO route streams a GeoTIFF per period and validates via read_file."""
+    fetched: list[tuple[str, str]] = []
+
+    def _fake_download(url, target, *, label):
+        fetched.append((url, label))
+        Path(target).write_bytes(b"MM\x00*FAKE-GEOTIFF")
+
+    read_calls: list[str] = []
+
+    class _FakeDataset:
+        @classmethod
+        def read_file(cls, path):
+            read_calls.append(path)
+            return _FakeDataset()
+
+        def close(self):
+            pass
+
+    import pyramids.dataset as dataset_mod
+
+    monkeypatch.setattr(backend_module, "_http_download_raster", _fake_download)
+    monkeypatch.setattr(dataset_mod.Dataset, "read_file", _FakeDataset.read_file)
+
     backend = Drought(
-        start="2026-06-21",
-        end="2026-06-21",
+        start="2025-12-01",
+        end="2025-12-31",
         lat_lim=[40.0, 50.0],
         lon_lim=[5.0, 15.0],
         dataset="edo-spaST",
         path=str(tmp_path),
     )
-    with pytest.raises(NotImplementedError, match="PY-A"):
+    paths = backend.download(progress_bar=False)
+    assert backend.OUTPUT_KIND == "raster"
+    assert all(p.suffix == ".tif" for p in paths)
+    assert all(p.name.startswith("edo-spaST_") for p in paths)
+    # Every fetched URL is the EDO map endpoint with the SPI timescale.
+    assert fetched, "at least one period fetched"
+    for url, label in fetched:
+        assert label == "edo-spaST"
+        assert "map=DO_WCS" in url and "SELECTED_TIMESCALE=01" in url
+    # read_file was called once per written tif (the raster validation).
+    assert len(read_calls) == len(paths)
+
+
+def test_gdo_fetch_uses_global_map_switcher(monkeypatch, tmp_path):
+    """A GDO row routes through the same code with the GDO_WCS endpoint."""
+    seen: list[str] = []
+
+    def _fake_download(url, target, *, label):
+        seen.append(url)
+        Path(target).write_bytes(b"MM\x00*FAKE")
+
+    class _FakeDataset:
+        @classmethod
+        def read_file(cls, path):
+            return _FakeDataset()
+
+        def close(self):
+            pass
+
+    import pyramids.dataset as dataset_mod
+
+    monkeypatch.setattr(backend_module, "_http_download_raster", _fake_download)
+    monkeypatch.setattr(dataset_mod.Dataset, "read_file", _FakeDataset.read_file)
+
+    backend = Drought(
+        start="2024-06-21",
+        end="2024-06-21",
+        lat_lim=[40.0, 50.0],
+        lon_lim=[5.0, 15.0],
+        dataset="gdo-smand",
+        path=str(tmp_path),
+    )
+    backend.download(progress_bar=False)
+    assert seen and all("map=GDO_WCS" in u for u in seen)
+
+
+def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
+    """A server rejection (out-of-range date) surfaces the Copernicus message."""
+    import requests
+
+    class _FakeResp:
+        status_code = 422
+
+        def json(self):
+            return {"message": "Requested date is outside the available range."}
+
+        @property
+        def text(self):
+            return "{...}"
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return None
+
+    monkeypatch.setattr(requests, "get", lambda *a, **k: _FakeResp())
+    backend = Drought(
+        start="2026-06-21",
+        end="2026-06-21",
+        lat_lim=[40.0, 50.0],
+        lon_lim=[5.0, 15.0],
+        dataset="edo-cdinx",
+        path=str(tmp_path),
+    )
+    with pytest.raises(ValueError, match="outside the available range"):
         backend.download(progress_bar=False)
 
 
@@ -730,7 +870,13 @@ class _FakeResponse:
             raise requests.HTTPError(f"HTTP {self.status_code}")
 
     def json(self) -> Any:
+        if self._json is None:
+            raise ValueError("no JSON body")
         return self._json
+
+    @property
+    def text(self) -> str:
+        return self._body.decode("utf-8", errors="replace")
 
     def iter_content(self, chunk_size: int = 1024):
         view = memoryview(self._body)
@@ -787,6 +933,54 @@ def test_http_download_streams_to_target(monkeypatch, tmp_path):
     assert target.exists()
     assert target.read_bytes() == body
     assert not (target.with_suffix(target.suffix + ".partial").exists())
+
+
+def test_http_download_raster_streams_on_success(monkeypatch, tmp_path):
+    """`_http_download_raster` writes a 2xx body atomically to the target."""
+    import requests
+
+    body = b"MM\x00*" + b"y" * (1 << 17)
+    monkeypatch.setattr(
+        requests, "get", lambda *a, **k: _FakeResponse(status=200, body=body)
+    )
+    target = tmp_path / "edo.tif"
+    backend_module._http_download_raster(
+        "https://example.com/wcs", target, label="edo-spaST"
+    )
+    assert target.read_bytes() == body
+    assert not target.with_suffix(target.suffix + ".partial").exists()
+
+
+def test_http_download_raster_surfaces_json_message(monkeypatch, tmp_path):
+    """A 4xx with a JSON `message` is re-raised as a clear ValueError."""
+    import requests
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **k: _FakeResponse(
+            status=422, json_body={"message": "date outside coverage range"}
+        ),
+    )
+    with pytest.raises(ValueError, match="date outside coverage range"):
+        backend_module._http_download_raster(
+            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdinx"
+        )
+
+
+def test_http_download_raster_falls_back_to_raw_body(monkeypatch, tmp_path):
+    """A 5xx with a non-JSON body still surfaces the raw text (no crash)."""
+    import requests
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **k: _FakeResponse(status=500, body=b"upstream mapserver error"),
+    )
+    with pytest.raises(ValueError, match="upstream mapserver error"):
+        backend_module._http_download_raster(
+            "https://example.com/wcs", tmp_path / "x.tif", label="edo-fpanv"
+        )
 
 
 def test_usdm_reprojects_non_4326_payload(monkeypatch, tmp_path):
