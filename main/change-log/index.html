@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -16229,6 +16229,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -16286,7 +16297,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fix" class="md-nav__link">
+  <a href="#fix_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Fix
@@ -16325,7 +16336,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fix_1" class="md-nav__link">
+  <a href="#fix_2" class="md-nav__link">
     <span class="md-ellipsis">
       
         Fix
@@ -16459,7 +16470,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fix_2" class="md-nav__link">
+  <a href="#fix_3" class="md-nav__link">
     <span class="md-ellipsis">
       
         Fix
@@ -16633,6 +16644,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -16690,7 +16712,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fix" class="md-nav__link">
+  <a href="#fix_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Fix
@@ -16729,7 +16751,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fix_1" class="md-nav__link">
+  <a href="#fix_2" class="md-nav__link">
     <span class="md-ellipsis">
       
         Fix
@@ -16863,7 +16885,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fix_2" class="md-nav__link">
+  <a href="#fix_3" class="md-nav__link">
     <span class="md-ellipsis">
       
         Fix
@@ -17025,6 +17047,19 @@
   backscatter demo that downloads, opens with pyramids, and plots a 6 MB
   OPERA RTC tile in decibels), and an <code>e2e-asf</code> weekly-cron CI lane.</li>
 </ul>
+<h3 id="fix"><a class="toclink" href="#fix">Fix</a><a class="headerlink" href="#fix" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>pyproject</strong>: require <code>pyramids-gis &gt;=0.38.0</code> (core dependency plus the
+  <code>parquet</code> / <code>stac</code> / <code>viz</code> extras) and refresh <code>pixi.lock</code>. pyramids 0.38.0
+  ships the NetCDF <code>Container</code> / <code>Variable</code> type split (pyramids #625);
+  earthlens already consumes the typed <code>NetCDF</code> / <code>LabeledDataset</code> / <code>Dataset</code>
+  entry points and the <code>variable_names</code> property, so no source change is
+  needed. The lockfile refresh (via the repo-mandated <code>pixi update</code>, which
+  re-resolves the whole graph) also carries incidental minor/patch bumps of
+  unrelated transitives — <code>geopandas</code>, <code>pandas</code>, <code>pyogrio</code>, <code>typer</code>,
+  <code>google-auth</code>, <code>greenlet</code>, <code>httplib2</code>, <code>regex</code> (plus dev/docs <code>cleopatra</code>,
+  <code>ipython</code>) — none crossing a major-version boundary.</li>
+</ul>
 <h2 id="090-2026-06-17"><a class="toclink" href="#090-2026-06-17">0.9.0 (2026-06-17)</a><a class="headerlink" href="#090-2026-06-17" title="Permanent link">#</a></h2>
 <h3 id="feat_1"><a class="toclink" href="#feat_1">Feat</a><a class="headerlink" href="#feat_1" title="Permanent link">#</a></h3>
 <ul>
@@ -17039,7 +17074,7 @@
 <li><strong>grids,stac</strong>: adopt the specialized grid adapters and EO-agency signers from pyramids (#386)</li>
 <li><strong>cli</strong>: add the earthlens catalog-query CLI and retire tools/ (#383)</li>
 </ul>
-<h3 id="fix"><a class="toclink" href="#fix">Fix</a><a class="headerlink" href="#fix" title="Permanent link">#</a></h3>
+<h3 id="fix_1"><a class="toclink" href="#fix_1">Fix</a><a class="headerlink" href="#fix_1" title="Permanent link">#</a></h3>
 <ul>
 <li><strong>cli</strong>: keep datasets --write paths off the Rich wrap boundary (#408)</li>
 </ul>
@@ -17059,7 +17094,7 @@
 <li><strong>eumetsat</strong>: add EUMETSAT Data Store backend (earthlens.eumetsat) (#204)</li>
 <li><strong>firms</strong>: add NASA FIRMS active-fire backend (#192)</li>
 </ul>
-<h3 id="fix_1"><a class="toclink" href="#fix_1">Fix</a><a class="headerlink" href="#fix_1" title="Permanent link">#</a></h3>
+<h3 id="fix_2"><a class="toclink" href="#fix_2">Fix</a><a class="headerlink" href="#fix_2" title="Permanent link">#</a></h3>
 <ul>
 <li><strong>tropycal</strong>: shim pkg_resources so tropycal imports under setuptools&gt;=81 (#307)</li>
 <li><strong>ci</strong>: add py7zr to the [all] extra so the wheel suite installs it (#338)</li>
@@ -17095,7 +17130,7 @@
 <ul>
 <li><strong>ecmwf</strong>: migrate from legacy MARS API to cdsapi and rebuild backend, catalog, and tooling (#30)</li>
 </ul>
-<h3 id="fix_2"><a class="toclink" href="#fix_2">Fix</a><a class="headerlink" href="#fix_2" title="Permanent link">#</a></h3>
+<h3 id="fix_3"><a class="toclink" href="#fix_3">Fix</a><a class="headerlink" href="#fix_3" title="Permanent link">#</a></h3>
 <ul>
 <li><strong>pyproject</strong>: update pyramids-gis dependency and add commitizen configuration</li>
 </ul>

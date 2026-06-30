@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -16587,7 +16587,7 @@ temporal reduce needs a separate gridded reader. So
 <code>download(aggregate=...)</code> raises <code>NotImplementedError</code>.</p>
 <h2 id="subsetting-and-the-retrospective-archive"><a class="toclink" href="#subsetting-and-the-retrospective-archive">Subsetting and the retrospective archive</a><a class="headerlink" href="#subsetting-and-the-retrospective-archive" title="Permanent link">#</a></h2>
 <p>Operational files are whole-CONUS, so a subset is <em>read</em> rather than
-downloaded whole, through pyramids (≥ 0.30.0) — earthlens never imports
+downloaded whole, through pyramids (≥ 0.38.0) — earthlens never imports
 <code>xarray</code>/<code>zarr</code> itself.</p>
 <p><strong>Tabular</strong> products (<code>chrtout</code>, <code>lakeout</code>, <code>coastal</code>) — a <code>sites=</code> list,
 a bbox, or the retrospective Zarr opens anonymously + lazily through
