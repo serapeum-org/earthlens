@@ -301,16 +301,17 @@ class EarthLens:
              'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo', 'erddap',
              'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs',
              'gdo', 'gebco', 'gee', 'geoboundaries', 'gfw', 'ghs', 'ghsl',
-             'global-forest-watch', 'global-solar-atlas', 'global-wind-atlas',
-             'google-earth-engine', 'gsa', 'gwa', 'hdx', 'human-settlement',
-             'inform', 'insar', 'ioos', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
-             'national-water-model', 'natural-earth', 'nexrad', 'nrel', 'nsrdb',
-             'nwis', 'nwm', 'nwp', 'obis', 'ohsome', 'openaq', 'openeo',
-             'openstreetmap', 'osm', 'overpass', 'overture', 'planetary-computer',
-             'protected-planet', 'pvgis', 'radar', 'redlist', 'risk-indicators',
-             'sentinel-hub', 'sentinelhub', 'solar-pv', 'solar-wind-atlas',
-             'stac', 'teleconnections', 'thinkhazard', 'tiger', 'tropycal',
-             'usdm', 'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'wdpa',
+             'glaciers', 'glims', 'global-forest-watch', 'global-solar-atlas',
+             'global-wind-atlas', 'google-earth-engine', 'gsa', 'gwa', 'hdx',
+             'human-settlement', 'inform', 'insar', 'ioos', 'iucn', 'jaxa',
+             'jaxa-earth', 'landsat', 'national-water-model', 'natural-earth',
+             'nexrad', 'nrel', 'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'ohsome',
+             'openaq', 'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
+             'planetary-computer', 'protected-planet', 'pvgis', 'radar',
+             'redlist', 'rgi', 'risk-indicators', 'sentinel-hub', 'sentinelhub',
+             'solar-pv', 'solar-wind-atlas', 'stac', 'teleconnections',
+             'thinkhazard', 'tiger', 'tropycal', 'usdm', 'usgs-landsat',
+             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wgms',
              'wind-toolkit', 'world-pop', 'worldpop']
 
             ```
@@ -403,6 +404,14 @@ class EarthLens:
             to the AOI via `pyramids` as `raster` GeoTIFFs (one per
             product × epoch; `aggregate=` reduces across epochs); no
             credentials; keys `"ghsl"` / `"ghs"` / `"human-settlement"`.
+        :class:`earthlens.glaciers.Glaciers`: glacier outlines / fluctuations
+            over three open sources — RGI 7.0 per-region outlines (UNESCO
+            IHP-WINS) and GLIMS WFS time-series outlines as `vector`
+            `FeatureCollection`s clipped to the AOI, and the WGMS Fluctuations
+            of Glaciers (mass balance / front variation / state) as a
+            `tabular` `DataFrame`; per-instance `OUTPUT_KIND`, `aggregate=`
+            rejected; no credentials; keys `"glaciers"` / `"rgi"` / `"glims"`
+            / `"wgms"`.
         :class:`earthlens.worldpop.WorldPop`: WorldPop open population data
             hub (CC-BY-4.0, no credentials) — per-country / global gridded
             population, density, age/sex, births, projections; mosaic +
@@ -642,9 +651,24 @@ class EarthLens:
             # crop locally. Aliases "global-solar-atlas" / "global-wind-atlas"
             # / "gsa" / "gwa" — pass variables=[...] to pick layers (e.g.
             # variables=["ghi", "wind_100m"]).
-            "solar-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
-            "global-solar-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
-            "global-wind-atlas": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
+            "solar-wind-atlas": (
+                "earthlens.solar_wind_atlas",
+                "SolarWindAtlas",
+                "",
+                {},
+            ),
+            "global-solar-atlas": (
+                "earthlens.solar_wind_atlas",
+                "SolarWindAtlas",
+                "",
+                {},
+            ),
+            "global-wind-atlas": (
+                "earthlens.solar_wind_atlas",
+                "SolarWindAtlas",
+                "",
+                {},
+            ),
             "gsa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
             "gwa": ("earthlens.solar_wind_atlas", "SolarWindAtlas", "", {}),
             # JRC PVGIS solar-radiation / PV time series over the keyless
@@ -695,6 +719,18 @@ class EarthLens:
                 "",
                 {},
             ),
+            # Glacier outlines / fluctuations over three open sources — RGI 7.0
+            # per-region outlines (UNESCO IHP-WINS) + GLIMS WFS time-series
+            # outlines + WGMS Fluctuations of Glaciers (tabular). Per-instance
+            # OUTPUT_KIND (vector -> FeatureCollection for rgi/glims, tabular ->
+            # DataFrame for wgms); pass a bbox (lat_lim/lon_lim or aoi=) for
+            # rgi/glims, or region= / glacier_id= / glacier_name= for wgms. No
+            # extra SDK (core requests + pandas + pyramids); no auth. Aliases
+            # "rgi" / "glims" / "wgms".
+            "glaciers": ("earthlens.glaciers", "Glaciers", "", {}),
+            "rgi": ("earthlens.glaciers", "Glaciers", "", {}),
+            "glims": ("earthlens.glaciers", "Glaciers", "", {}),
+            "wgms": ("earthlens.glaciers", "Glaciers", "", {}),
             # OpenStreetMap features over two public, keyless protocols — overpy
             # (Overpass, current-state) + ohsome (OSM history/analytics). Vector
             # FeatureCollection output with an ODbL LicenseWarning. The [osm]
@@ -773,7 +809,8 @@ class EarthLens:
                 `"cmems"`, `"earthdata"`, `"ecmwf"`,
                 `"eumetsat"`, `"fdsn"`, `"firms"`, `"gdacs"`, `"gee"`
                 (alias `"google-earth-engine"`), `"ghsl"` (aliases
-                `"ghs"` / `"human-settlement"`), `"hdx"`,
+                `"ghs"` / `"human-settlement"`), `"glaciers"` (aliases
+                `"rgi"` / `"glims"` / `"wgms"`), `"hdx"`,
                 `"nrel"` (aliases `"nsrdb"` / `"wind-toolkit"`), `"nwp"`,
                 `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
                 `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),

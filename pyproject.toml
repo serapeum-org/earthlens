@@ -26,7 +26,7 @@ classifiers = [
 requires-python = ">=3.11,<4"
 
 dependencies = [
-    "pyramids-gis >=0.35.0",
+    "pyramids-gis >=0.38.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -65,7 +65,7 @@ fdsn = ["obspy >=1.5.0"]
 # read). Only `[parquet]` is needed, and only for LabeledDataset.to_parquet.
 nwm = [
     "earthlens[s3]",
-    "pyramids-gis[parquet] >=0.35.0",
+    "pyramids-gis[parquet] >=0.38.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 # ASF InSAR backend reuses the EDL token already minted by `[earthdata]`, so
@@ -84,7 +84,7 @@ nwp = [
     "ecmwflibs; sys_platform == 'win32'",
 ]
 radar = ["earthlens[s3]"]
-stac = ["pyramids-gis[stac] >=0.35.0"]
+stac = ["pyramids-gis[stac] >=0.38.0"]
 openeo = ["openeo >=0.47,<0.48"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
@@ -151,7 +151,7 @@ dev = [
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.35.0",
+    "pyramids-gis[viz] >=0.38.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); >=0.18.0 for that
     # RGB-frame animation embed/save API.
@@ -184,7 +184,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.35.0",
+    "pyramids-gis[viz] >=0.38.0",
     # cleopatra: notebooks import it directly; >=0.18.0 for the RGB-frame
     # animation embed_gif / save_animation API used by the showcase GIFs.
     "cleopatra >=0.18.0",
@@ -328,6 +328,7 @@ markers = [
     "climate_indices: tests for the climate / teleconnection index backend (NOAA PSL + KNMI Climate Explorer monthly ASCII series; no extra SDK — core requests + pandas).",
     "nrel: tests for the NREL NSRDB / WIND Toolkit solar-wind time-series backend (keyed REST CSV via core `requests` + `pandas`; no extra SDK; required api_key + email auth).",
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
+    "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
     "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
     "drought: tests for the drought backend (US Drought Monitor / Copernicus EDO+GDO / CSIC SPEIbase; no extra SDK — core `requests` + pyramids; EDO/GDO WCS route pending the pyramids temporal `read_wcs`).",

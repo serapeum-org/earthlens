@@ -210,6 +210,11 @@ nav:
       - Usage: reference/risk_indicators/usage.md
       - Available datasets: reference/risk_indicators/datasets.md
       - Reference: reference/risk_indicators/risk_indicators.md
+    - Glaciers (RGI / GLIMS / WGMS):
+      - Introduction: reference/glaciers/introduction.md
+      - Usage: reference/glaciers/usage.md
+      - Available datasets: reference/glaciers/datasets.md
+      - Reference: reference/glaciers/glaciers.md
     - OpenStreetMap (Overpass / ohsome):
       - Introduction: reference/osm/introduction.md
       - Usage: reference/osm/usage.md
@@ -457,6 +462,10 @@ nav:
       - Quickstart — ThinkHazard + INFORM (live): examples/risk_indicators/01_risk_indicators_quickstart.ipynb
       - Catalog & behaviour (no network): examples/risk_indicators/02_catalog_and_behavior.ipynb
       - Global Forest Watch (live, needs key): examples/risk_indicators/03_global_forest_watch.ipynb
+    - Glaciers (RGI / GLIMS / WGMS):
+      - Quickstart — RGI outlines (live): examples/glaciers/01_glaciers_quickstart.ipynb
+      - Catalog & behaviour (no network): examples/glaciers/02_catalog_and_behavior.ipynb
+      - GLIMS outlines & WGMS mass balance (live): examples/glaciers/03_glims_and_wgms.ipynb
     - Administrative boundaries (geoBoundaries / Natural Earth / TIGER):
       - Quickstart — geoBoundaries ADM1 (live): examples/admin/01_admin_quickstart.ipynb
       - Catalog explorer (no network): examples/admin/02_catalog_explorer.ipynb

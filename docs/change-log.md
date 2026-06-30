@@ -48,6 +48,19 @@
   backscatter demo that downloads, opens with pyramids, and plots a 6 MB
   OPERA RTC tile in decibels), and an `e2e-asf` weekly-cron CI lane.
 
+### Fix
+
+- **pyproject**: require `pyramids-gis >=0.38.0` (core dependency plus the
+  `parquet` / `stac` / `viz` extras) and refresh `pixi.lock`. pyramids 0.38.0
+  ships the NetCDF `Container` / `Variable` type split (pyramids #625);
+  earthlens already consumes the typed `NetCDF` / `LabeledDataset` / `Dataset`
+  entry points and the `variable_names` property, so no source change is
+  needed. The lockfile refresh (via the repo-mandated `pixi update`, which
+  re-resolves the whole graph) also carries incidental minor/patch bumps of
+  unrelated transitives — `geopandas`, `pandas`, `pyogrio`, `typer`,
+  `google-auth`, `greenlet`, `httplib2`, `regex` (plus dev/docs `cleopatra`,
+  `ipython`) — none crossing a major-version boundary.
+
 ## 0.9.0 (2026-06-17)
 
 ### Feat
