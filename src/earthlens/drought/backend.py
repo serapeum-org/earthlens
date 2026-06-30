@@ -825,8 +825,22 @@ def _http_download_raster(url: str, target: Path, *, label: str) -> None:
                 f"Copernicus EDO/GDO rejected {label!r} "
                 f"(HTTP {response.status_code}): {message.strip()[:300]}"
             )
+        chunks = response.iter_content(chunk_size=1 << 16)
+        first = next(chunks, b"")
+        # A 2xx is NOT a guarantee of a raster: this Copernicus MapServer
+        # answers an invalid `map=`/coverage with a plain-text or HTML body
+        # under HTTP 200 (e.g. `ERROR: invalid map parameter`). Reject any
+        # body that does not start with the GeoTIFF magic so a non-raster
+        # error never reaches `Dataset.read_file` as an opaque GDAL failure.
+        if first[:4] not in (b"MM\x00*", b"II*\x00"):
+            detail = first.decode("utf-8", errors="replace").strip()[:300]
+            raise ValueError(
+                f"Copernicus EDO/GDO returned a non-raster body for "
+                f"{label!r} (HTTP {response.status_code}): {detail}"
+            )
         with tmp.open("wb") as fh:
-            for chunk in response.iter_content(chunk_size=1 << 16):
+            fh.write(first)
+            for chunk in chunks:
                 if chunk:
                     fh.write(chunk)
     tmp.replace(target)

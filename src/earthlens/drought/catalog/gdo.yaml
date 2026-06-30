@@ -1,14 +1,19 @@
 # Global Drought Observatory (GDO) — Copernicus EMS, the global counterpart of
-# EDO. Same WCS endpoint family with a distinct `map=GDO_WCS` switcher and
-# global coverage extents. Indicator codes mirror EDO with global-scope
-# variants on Low-Flow Index (`lfinx_300_sms`, `lfinx_300_mds`); the rest of
-# the indicator codes coincide with EDO and the catalog rows here record the
-# GDO endpoint so the backend routes them through the global service.
+# EDO. The Copernicus drought WCS exposes a SINGLE map (`map=DO_WCS`); there is
+# no separate `GDO_WCS` map (verified live 2026-07-01 — `map=GDO_WCS` answers
+# `ERROR: invalid map parameter` under HTTP 200). The European-vs-global split
+# is a data-extent distinction, not a separate endpoint, so every GDO row uses
+# the same `map=DO_WCS` endpoint as EDO. The two Low-Flow Index codes
+# (`lfinx_300_sms`, `lfinx_300_mds`) are genuinely GDO-specific coverages; the
+# rest share their coverage id with the EDO rows (a request for `gdo-smand`
+# hits `coverageID=smand` exactly like `edo-smand`, differing only in the bbox
+# the caller passes). Collapsing the duplicate rows is a catalog-curation
+# follow-on — see planning/drought.
 datasets:
   gdo-spaST:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: spaST
     output_kind: raster
     cadence: 10day
@@ -18,7 +23,7 @@ datasets:
   gdo-spaLT:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: spaLT
     output_kind: raster
     cadence: 10day
@@ -28,7 +33,7 @@ datasets:
   gdo-spgTS:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: spgTS
     output_kind: raster
     cadence: monthly
@@ -38,7 +43,7 @@ datasets:
   gdo-smand:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: smand
     output_kind: raster
     cadence: 10day
@@ -48,7 +53,7 @@ datasets:
   gdo-fpanv:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: fpanv
     output_kind: raster
     cadence: 10day
@@ -58,7 +63,7 @@ datasets:
   gdo-cdinx:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: cdinx
     output_kind: raster
     cadence: 10day
@@ -68,7 +73,7 @@ datasets:
   gdo-twsan:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: twsan
     output_kind: raster
     cadence: monthly
@@ -78,7 +83,7 @@ datasets:
   gdo-lfinx-sms:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: lfinx_300_sms
     output_kind: raster
     cadence: 10day
@@ -88,7 +93,7 @@ datasets:
   gdo-lfinx-mds:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=GDO_WCS"
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
     coverage: lfinx_300_mds
     output_kind: raster
     cadence: 10day

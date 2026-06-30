@@ -58,12 +58,20 @@ def test_non_wcs_rows_have_no_timescale():
     assert cat.get("speibase-12").timescale is None
 
 
-def test_gdo_row_uses_global_map_switcher():
-    """GDO rows hit the same MapServer with the global map switcher."""
-    ds = Catalog().get("gdo-spaST")
-    assert ds.output_kind == "raster"
-    assert ds.transport == "edo-wcs"
-    assert ds.endpoint.endswith("map=GDO_WCS")
+def test_gdo_rows_use_the_single_do_wcs_map():
+    """GDO rows hit the same `map=DO_WCS` map as EDO (no separate GDO_WCS map)."""
+    cat = Catalog()
+    gdo = cat.get("gdo-spaST")
+    assert gdo.output_kind == "raster"
+    assert gdo.transport == "edo-wcs"
+    assert gdo.endpoint.endswith("map=DO_WCS")
+    # Every GDO row points at the single working map, not the invalid GDO_WCS.
+    bad = [
+        ds.id
+        for ds in cat.datasets.values()
+        if ds.id.startswith("gdo-") and "GDO_WCS" in ds.endpoint
+    ]
+    assert bad == [], f"GDO rows still pointing at the invalid GDO_WCS map: {bad}"
 
 
 def test_speibase_row_is_raster_netcdf():

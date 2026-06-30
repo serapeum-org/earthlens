@@ -491,8 +491,8 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
     assert len(read_calls) == len(paths)
 
 
-def test_gdo_fetch_uses_global_map_switcher(monkeypatch, tmp_path):
-    """A GDO row routes through the same code with the GDO_WCS endpoint."""
+def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
+    """A GDO row routes through the same `map=DO_WCS` map as EDO."""
     seen: list[str] = []
 
     def _fake_download(url, target, *, label):
@@ -521,7 +521,8 @@ def test_gdo_fetch_uses_global_map_switcher(monkeypatch, tmp_path):
         path=str(tmp_path),
     )
     backend.download(progress_bar=False)
-    assert seen and all("map=GDO_WCS" in u for u in seen)
+    assert seen and all("map=DO_WCS" in u for u in seen)
+    assert all("GDO_WCS" not in u for u in seen)
 
 
 def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
@@ -981,6 +982,29 @@ def test_http_download_raster_falls_back_to_raw_body(monkeypatch, tmp_path):
         backend_module._http_download_raster(
             "https://example.com/wcs", tmp_path / "x.tif", label="edo-fpanv"
         )
+
+
+def test_http_download_raster_rejects_non_raster_200(monkeypatch, tmp_path):
+    """A 200 carrying a non-TIFF body (MapServer error) is rejected, not written.
+
+    The Copernicus WCS answers an invalid `map=`/coverage with a plain-text
+    `ERROR: invalid map parameter` body under HTTP 200; without the magic-byte
+    guard it would slip through and reach `Dataset.read_file` as an opaque
+    GDAL failure.
+    """
+    import requests
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *a, **k: _FakeResponse(status=200, body=b"ERROR: invalid map parameter"),
+    )
+    target = tmp_path / "x.tif"
+    with pytest.raises(ValueError, match="non-raster body"):
+        backend_module._http_download_raster(
+            "https://example.com/wcs", target, label="gdo-smand"
+        )
+    assert not target.exists(), "no file written for a non-raster response"
 
 
 def test_usdm_reprojects_non_4326_payload(monkeypatch, tmp_path):
