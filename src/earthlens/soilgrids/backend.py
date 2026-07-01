@@ -54,8 +54,8 @@ class SoilGrids(AbstractDataSource):
     Resolves each requested property id against the bundled catalog, expands the
     request into `(property, depth, quantile)` coverage triples, and fetches each
     one through `pyramids.dataset.Dataset.from_wcs` — writing one cropped GeoTIFF
-    per triple. The request is a search/fetch split: :meth:`_search` names one
-    product per triple and :meth:`_fetch` realises each (WCS subset → GeoTIFF).
+    per triple. The request is a search/fetch split: `_search` names one product
+    per triple and `_fetch_one` realises each (WCS subset → GeoTIFF).
 
     Attributes:
         OUTPUT_KIND: Fixed `"raster"`; every coverage yields a gridded GeoTIFF.
@@ -137,8 +137,9 @@ class SoilGrids(AbstractDataSource):
 
         Raises:
             ValueError: If `variables` is empty / unknown (did-you-mean
-                surfaced), the bounding box is missing, or `depths` / `quantiles`
-                is an explicitly-empty list (which would select no coverages).
+                surfaced) / has duplicate ids, the bounding box is missing, or
+                `depths` / `quantiles` is an explicitly-empty list (which would
+                select no coverages).
             TypeError: If `variables` is a mapping (properties are named by id,
                 not a per-dataset map).
         """
@@ -152,6 +153,12 @@ class SoilGrids(AbstractDataSource):
                 "SoilGrids requires variables=[<property id>, ...] naming "
                 "curated properties (e.g. variables=['clay', 'phh2o']). List "
                 "ids with earthlens.soilgrids.Catalog().parameters()."
+            )
+        duplicates = sorted({v for v in variables if list(variables).count(v) > 1})
+        if duplicates:
+            raise ValueError(
+                f"SoilGrids variables has duplicate property ids {duplicates}; "
+                "list each property once."
             )
         if lat_lim is None or lon_lim is None:
             raise ValueError(
@@ -353,10 +360,14 @@ class SoilGrids(AbstractDataSource):
         # untouched and never leaves a partial behind — the temp file is the only
         # thing cleaned up.
         has_mask = getattr(self.space, "geometry", None) is not None
-        # Keep the `.tif` suffix on the temp file — pyramids picks the GDAL
-        # driver from the extension, so a `.part` suffix would raise
-        # DriverNotExistError.
-        tmp_path = out_path.with_name(f"{out_path.stem}.part{out_path.suffix}")
+        # Write to a hidden scratch subdir, then atomically rename onto out_path.
+        # The temp keeps the `.tif` suffix — pyramids picks the GDAL driver from
+        # the extension, so a driver-less suffix like `.part` would raise
+        # DriverNotExistError — but lives under `.soilgrids-tmp/` so a leftover
+        # from a crash never collides with a `root_dir/*.tif` scan.
+        tmp_dir = self.root_dir / ".soilgrids-tmp"
+        tmp_dir.mkdir(exist_ok=True)
+        tmp_path = tmp_dir / out_path.name
         dataset = None
         result = None
         try:
@@ -373,10 +384,16 @@ class SoilGrids(AbstractDataSource):
             )
             result = mask_to_geometry(dataset, self.space) if has_mask else dataset
             result.to_file(str(tmp_path))
+            # Release the GDAL write handles before the rename (Windows file
+            # lock), then promote the temp atomically. `_close_dataset` is
+            # best-effort and never raises, so it is safe here inside the try;
+            # keeping `os.replace` in the try means a rename failure is cleaned
+            # up rather than orphaning a fully-written temp in the output tree.
+            if result is not dataset:
+                _close_dataset(result)
+            _close_dataset(dataset)
+            os.replace(tmp_path, out_path)
         except Exception:
-            # Release the GDAL handles first (Windows file lock), then remove only
-            # the temp file — never out_path — and never let a cleanup error mask
-            # the original fetch failure.
             if result is not None and result is not dataset:
                 _close_dataset(result)
             _close_dataset(dataset)
@@ -385,13 +402,6 @@ class SoilGrids(AbstractDataSource):
             except OSError:
                 pass
             raise
-        # Success: close the handles (outside the try, so a best-effort close can
-        # never alter control flow) to release the temp file's lock, then swap it
-        # onto out_path atomically.
-        if result is not dataset:
-            _close_dataset(result)
-        _close_dataset(dataset)
-        os.replace(tmp_path, out_path)
         return out_path
 
     def download(

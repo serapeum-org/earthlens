@@ -130,7 +130,7 @@ def test_polygon_aoi_masks_the_result(
     assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == [_GEOMETRY]
     assert (tmp_path / "clay_0-5cm_mean.tif").exists()
-    assert not (tmp_path / "clay_0-5cm_mean.part.tif").exists()
+    assert not (tmp_path / ".soilgrids-tmp" / "clay_0-5cm_mean.tif").exists()
 
 
 def test_bbox_only_path_skips_the_mask(
@@ -141,7 +141,7 @@ def test_bbox_only_path_skips_the_mask(
     assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == []
     assert (tmp_path / "clay_0-5cm_mean.tif").exists()
-    assert not (tmp_path / "clay_0-5cm_mean.part.tif").exists()
+    assert not (tmp_path / ".soilgrids-tmp" / "clay_0-5cm_mean.tif").exists()
     # The temp write target must keep a raster extension — pyramids picks the
     # GDAL driver from it, so a driver-less suffix (e.g. `.part`) would fail.
     assert fake_from_wcs.written[0].endswith(".tif")
@@ -189,6 +189,32 @@ def test_partial_write_is_cleaned_up(
 def _locked_unlink(self, *args, **kwargs) -> None:
     """Stand-in for Path.unlink that fails as if the file were locked."""
     raise OSError("file is locked")
+
+
+def _raise_replace(src, dst, *args, **kwargs) -> None:
+    """Stand-in for os.replace that fails as if the rename were blocked."""
+    raise OSError("rename blocked")
+
+
+def test_duplicate_variables_rejected(tmp_path: Path) -> None:
+    """Repeated property ids in variables= are rejected at construction."""
+    with pytest.raises(ValueError, match="duplicate property ids"):
+        _backend(tmp_path, ["clay", "clay"])
+
+
+def test_rename_failure_cleans_up_and_reports_failed(
+    fake_from_wcs: type[FakeDataset],
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """An os.replace failure removes the temp file and reports the coverage failed."""
+    from earthlens.soilgrids import backend as backend_mod
+
+    monkeypatch.setattr(backend_mod.os, "replace", _raise_replace)
+    with pytest.raises(RuntimeError, match="all 1 requested coverage"):
+        _backend(tmp_path, ["clay"], depths=["0-5cm"]).download()
+    assert not (tmp_path / "clay_0-5cm_mean.tif").exists()
+    assert not (tmp_path / ".soilgrids-tmp" / "clay_0-5cm_mean.tif").exists()
 
 
 def test_cleanup_error_does_not_mask_the_fetch_error(
