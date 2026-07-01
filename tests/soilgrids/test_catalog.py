@@ -16,8 +16,17 @@ from earthlens.soilgrids.catalog import (
 pytestmark = pytest.mark.soilgrids
 
 EXPECTED_PROPERTIES = {
-    "clay", "sand", "silt", "cfvo", "phh2o", "cec",
-    "nitrogen", "soc", "ocd", "ocs", "bdod",
+    "clay",
+    "sand",
+    "silt",
+    "cfvo",
+    "phh2o",
+    "cec",
+    "nitrogen",
+    "soc",
+    "ocd",
+    "ocs",
+    "bdod",
 }
 
 
@@ -143,7 +152,9 @@ def test_curated_id_missing_from_index_raises(tmp_path: Path) -> None:
 
 def test_empty_datasets_block_raises(tmp_path: Path) -> None:
     """A catalog with no datasets block raises ValueError."""
-    yaml_file = _write_single_catalog(tmp_path / "empty.yaml", "available_datasets: []\n")
+    yaml_file = _write_single_catalog(
+        tmp_path / "empty.yaml", "available_datasets: []\n"
+    )
     clear_catalog_cache()
     with pytest.raises(ValueError, match="empty 'datasets:' block"):
         Catalog.load(catalog_path=yaml_file)
