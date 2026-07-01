@@ -48,16 +48,20 @@ def test_tailorconfig_defaults_and_no_bbox():
 
 def test_tailorconfig_is_frozen_and_forbids_extra():
     """TailorConfig is immutable and rejects unknown fields."""
+    from pydantic import ValidationError
+
     cfg = TailorConfig()
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         cfg.format = "netcdf4"
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         TailorConfig(bogus=1)
 
 
 def test_tailorconfig_rejects_blank_format():
     """A blank format / crs is rejected."""
-    with pytest.raises(Exception):
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
         TailorConfig(format="  ")
 
 
