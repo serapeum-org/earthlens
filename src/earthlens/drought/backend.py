@@ -25,6 +25,7 @@ restricted-redistribution clause.
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -465,7 +466,14 @@ class Drought(AbstractDataSource):
         from pyramids.netcdf import NetCDF
 
         endpoint = self._dataset.endpoint
-        nc_path = self.root_dir / f"{self._dataset.id}.nc"
+        # Key the on-disk cache on the endpoint URL, not just the dataset id:
+        # a catalog version bump (e.g. SPEIbase v2.11 -> v2.12) changes the
+        # `endpoint`, so a leftover file from the old release is ignored and
+        # the new bytes are fetched — the version bump stays a pure YAML edit.
+        endpoint_tag = hashlib.sha1(
+            endpoint.encode("utf-8"), usedforsecurity=False
+        ).hexdigest()[:8]
+        nc_path = self.root_dir / f"{self._dataset.id}-{endpoint_tag}.nc"
         if not nc_path.exists():
             _http_download(endpoint, nc_path)
         bbox = bbox_from_extent(self.space)
@@ -824,46 +832,53 @@ def _http_download_raster(url: str, target: Path, *, label: str) -> None:
     """
     target.parent.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(target.suffix + ".partial")
-    with requests.get(
-        url,
-        timeout=_HTTP_TIMEOUT,
-        stream=True,
-        headers={"User-Agent": _USER_AGENT},
-    ) as response:
-        if response.status_code >= 400:
-            body = response.text
-            try:
-                message = response.json().get("message", body)
-            except ValueError:
-                message = body
-            raise ValueError(
-                f"Copernicus EDO/GDO rejected {label!r} "
-                f"(HTTP {response.status_code}): {message.strip()[:300]}"
-            )
-        chunks = response.iter_content(chunk_size=1 << 16)
-        first = next(chunks, b"")
-        # A 2xx is NOT a guarantee of a raster: this Copernicus MapServer
-        # answers an invalid `map=`/coverage with a plain-text or HTML body
-        # under HTTP 200 (e.g. `ERROR: invalid map parameter`). Reject any
-        # body that does not start with the (Big)TIFF magic so a non-raster
-        # error never reaches `Dataset.read_file` as an opaque GDAL failure.
-        # 42 = classic TIFF, 43 = BigTIFF, in both byte orders.
-        if first[:4] not in (
-            b"MM\x00*",
-            b"II*\x00",
-            b"MM\x00+",
-            b"II+\x00",
-        ):
-            detail = first.decode("utf-8", errors="replace").strip()[:300]
-            raise ValueError(
-                f"Copernicus EDO/GDO returned a non-raster body for "
-                f"{label!r} (HTTP {response.status_code}): {detail}"
-            )
-        with tmp.open("wb") as fh:
-            fh.write(first)
-            for chunk in chunks:
-                if chunk:
-                    fh.write(chunk)
-    tmp.replace(target)
+    try:
+        with requests.get(
+            url,
+            timeout=_HTTP_TIMEOUT,
+            stream=True,
+            headers={"User-Agent": _USER_AGENT},
+        ) as response:
+            if response.status_code >= 400:
+                body = response.text
+                try:
+                    message = response.json().get("message", body)
+                except ValueError:
+                    message = body
+                raise ValueError(
+                    f"Copernicus EDO/GDO rejected {label!r} "
+                    f"(HTTP {response.status_code}): {message.strip()[:300]}"
+                )
+            chunks = response.iter_content(chunk_size=1 << 16)
+            first = next(chunks, b"")
+            # A 2xx is NOT a guarantee of a raster: this Copernicus MapServer
+            # answers an invalid `map=`/coverage with a plain-text or HTML
+            # body under HTTP 200 (e.g. `ERROR: invalid map parameter`).
+            # Reject any body that does not start with the (Big)TIFF magic so
+            # a non-raster error never reaches `Dataset.read_file` as an
+            # opaque GDAL failure. 42 = classic TIFF, 43 = BigTIFF, in both
+            # byte orders.
+            if first[:4] not in (
+                b"MM\x00*",
+                b"II*\x00",
+                b"MM\x00+",
+                b"II+\x00",
+            ):
+                detail = first.decode("utf-8", errors="replace").strip()[:300]
+                raise ValueError(
+                    f"Copernicus EDO/GDO returned a non-raster body for "
+                    f"{label!r} (HTTP {response.status_code}): {detail}"
+                )
+            with tmp.open("wb") as fh:
+                fh.write(first)
+                for chunk in chunks:
+                    if chunk:
+                        fh.write(chunk)
+        tmp.replace(target)
+    except BaseException:
+        # Mirror `_http_download`: a rejected body or a dropped connection
+        # mid-stream must not orphan a stale `.partial` on disk.
+        tmp.unlink(missing_ok=True)
+        raise
 
 

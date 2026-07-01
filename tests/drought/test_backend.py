@@ -1049,6 +1049,27 @@ def test_http_download_removes_partial_on_stream_failure(monkeypatch, tmp_path):
     assert not target.with_suffix(target.suffix + ".partial").exists()
 
 
+def test_http_download_raster_removes_partial_on_stream_failure(monkeypatch, tmp_path):
+    """A mid-stream drop after the magic check leaves no stale `.partial`."""
+    import requests
+
+    class _BrokenRasterResponse(_FakeResponse):
+        def iter_content(self, chunk_size: int = 1024):
+            yield b"MM\x00*" + b"a" * 16  # valid TIFF magic, passes the guard
+            raise requests.ConnectionError("connection dropped mid-stream")
+
+    monkeypatch.setattr(
+        requests, "get", lambda *a, **k: _BrokenRasterResponse(status=200, body=b"")
+    )
+    target = tmp_path / "edo.tif"
+    with pytest.raises(requests.ConnectionError):
+        backend_module._http_download_raster(
+            "https://example.com/wcs", target, label="edo-spaST"
+        )
+    assert not target.exists()
+    assert not target.with_suffix(target.suffix + ".partial").exists()
+
+
 def test_usdm_reprojects_non_4326_payload(monkeypatch, tmp_path):
     """A payload arriving in EPSG:3857 is reprojected to 4326."""
     # Inject a payload through a custom `_geojson_to_gdf` shim that hands

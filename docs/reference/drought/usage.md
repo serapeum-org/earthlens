@@ -102,8 +102,10 @@ out-of-range month.
 
 The downloaded NetCDF stays under `path/` between runs, so a second
 `download()` for the same dataset reuses the cached `.nc` without
-re-hitting `digital.csic.es`. Bump the catalog row's `endpoint` to point
-at a newer SPEIbase release when one ships — no code change.
+re-hitting `digital.csic.es`. The cache file name embeds a hash of the
+row's `endpoint`, so bumping the catalog row to a newer SPEIbase release
+when one ships fetches the new file fresh (the stale cache is ignored) — a
+pure YAML edit, no code change and no manual cache cleanup.
 
 ## EDO / GDO — Copernicus drought indicators (raster)
 
