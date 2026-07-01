@@ -353,7 +353,10 @@ class SoilGrids(AbstractDataSource):
         # untouched and never leaves a partial behind — the temp file is the only
         # thing cleaned up.
         has_mask = getattr(self.space, "geometry", None) is not None
-        tmp_path = out_path.with_name(out_path.name + ".part")
+        # Keep the `.tif` suffix on the temp file — pyramids picks the GDAL
+        # driver from the extension, so a `.part` suffix would raise
+        # DriverNotExistError.
+        tmp_path = out_path.with_name(f"{out_path.stem}.part{out_path.suffix}")
         dataset = None
         result = None
         try:

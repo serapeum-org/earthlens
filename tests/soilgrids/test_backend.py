@@ -130,7 +130,7 @@ def test_polygon_aoi_masks_the_result(
     assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == [_GEOMETRY]
     assert (tmp_path / "clay_0-5cm_mean.tif").exists()
-    assert not (tmp_path / "clay_0-5cm_mean.tif.part").exists()
+    assert not (tmp_path / "clay_0-5cm_mean.part.tif").exists()
 
 
 def test_bbox_only_path_skips_the_mask(
@@ -141,7 +141,10 @@ def test_bbox_only_path_skips_the_mask(
     assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == []
     assert (tmp_path / "clay_0-5cm_mean.tif").exists()
-    assert not (tmp_path / "clay_0-5cm_mean.tif.part").exists()
+    assert not (tmp_path / "clay_0-5cm_mean.part.tif").exists()
+    # The temp write target must keep a raster extension — pyramids picks the
+    # GDAL driver from it, so a driver-less suffix (e.g. `.part`) would fail.
+    assert fake_from_wcs.written[0].endswith(".tif")
 
 
 def test_progress_flag_is_wired(
