@@ -66,6 +66,23 @@ def test_nswe_from_extent_orders_bounds():
     assert TailorConfig.nswe_from_extent(52, 48, 4, 8) == [52, 48, 4, 8]
 
 
+@pytest.mark.parametrize(
+    "bbox",
+    [
+        (8, 48, 4, 52),  # west > east
+        (4, 52, 8, 48),  # south > north
+        (-200, 48, 8, 52),  # lon out of range
+        (4, -100, 8, 52),  # lat out of range
+    ],
+)
+def test_tailorconfig_rejects_bad_bbox(bbox):
+    """An inverted or out-of-range bbox is rejected at construction."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        TailorConfig(bbox=bbox)
+
+
 # --- happy path -------------------------------------------------------------
 
 

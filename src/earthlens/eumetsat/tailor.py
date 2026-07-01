@@ -96,6 +96,37 @@ class TailorConfig(BaseModel):
             raise ValueError("must be a non-empty string")
         return stripped
 
+    @field_validator("bbox")
+    @classmethod
+    def _valid_bbox(
+        cls, value: tuple[float, float, float, float] | None
+    ) -> tuple[float, float, float, float] | None:
+        """Validate a `bbox` is a well-ordered, in-range `(w, s, e, n)`.
+
+        Args:
+            value: The candidate `(west, south, east, north)` box, or
+                `None`.
+
+        Returns:
+            The validated box, or `None`.
+
+        Raises:
+            ValueError: When the box is inverted (`west > east` or
+                `south > north`) or out of the WGS84 range.
+        """
+        if value is None:
+            return None
+        west, south, east, north = value
+        if west > east:
+            raise ValueError(f"bbox west ({west}) must be <= east ({east})")
+        if south > north:
+            raise ValueError(f"bbox south ({south}) must be <= north ({north})")
+        if not (-180.0 <= west <= 180.0 and -180.0 <= east <= 180.0):
+            raise ValueError(f"bbox longitudes must be in [-180, 180]: {value}")
+        if not (-90.0 <= south <= 90.0 and -90.0 <= north <= 90.0):
+            raise ValueError(f"bbox latitudes must be in [-90, 90]: {value}")
+        return value
+
     @property
     def nswe(self) -> list[float] | None:
         """Return the Data Tailor ROI as an `[N, S, W, E]` list, or `None`.
