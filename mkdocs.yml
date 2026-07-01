@@ -345,6 +345,9 @@ nav:
       - Hurricane Harvey rainfall (NASA GPM/Earthdata): examples/showcase/hurricane_harvey_rainfall.ipynb
       - Hurricane Ian from GOES (geostationary, S3): examples/showcase/goes_hurricane_ian.ipynb
       - Sea-turtle occurrences (GBIF + OBIS): examples/showcase/species_occurrences_gbif_obis.ipynb
+    - Drought indicators (USDM / EDO / GDO / SPEIbase):
+      - Catalog explorer (no network): examples/drought/catalog_explorer.ipynb
+      - Quickstart — USDM week (live): examples/drought/quickstart.ipynb
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
       - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
