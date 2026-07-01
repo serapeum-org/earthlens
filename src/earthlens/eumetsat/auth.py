@@ -336,8 +336,9 @@ class EumetsatAuth(AbstractAuth[EumetsatCredentials]):
     def datatailor(self):
         """Return an `eumdac.DataTailor` bound to the live token.
 
-        Used by the deferred Data Tailor (server-side subset / reproject)
-        path; the MVP fetches native products and does not call this.
+        Used by the Data Tailor (server-side subset / reproject / reformat)
+        path — `EUMETSAT.download(tailor=...)`. The native whole-product
+        fetch does not call this.
 
         Returns:
             eumdac.DataTailor: The Data Tailor client.

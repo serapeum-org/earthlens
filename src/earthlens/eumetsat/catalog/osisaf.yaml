@@ -36,7 +36,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [GLB-SST-NC]
-    tailor_product_type: OSISAFSST
+    tailor_product_type: GLBSST
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2016-01-01, end: null }
   osi-saf-sea-ice-conc:
@@ -47,6 +47,6 @@ datasets:
     format: netcdf
     cadence: daily
     selectors: [OSI-401-b]
-    tailor_product_type: OSISAFSIC
+    tailor_product_type: null
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2015-06-01, end: null }

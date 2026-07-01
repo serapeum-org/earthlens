@@ -14,7 +14,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [FIR]
-    tailor_product_type: null
+    tailor_product_type: FCIL2FIR
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-07-03, end: null }
   mtg-active-fire-cap:
@@ -36,7 +36,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [AMV]
-    tailor_product_type: null
+    tailor_product_type: FCIL2AMV_IR105
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-01-27, end: null }
   mtg-amv-bufr:
@@ -58,7 +58,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [ASR]
-    tailor_product_type: null
+    tailor_product_type: FCIL2ASR
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-01-27, end: null }
   mtg-asr-bufr:
@@ -80,7 +80,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [CRM]
-    tailor_product_type: null
+    tailor_product_type: FCIL2CRM
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-07-03, end: null }
   mtg-cloud-mask:
@@ -91,7 +91,7 @@ datasets:
     format: netcdf
     cadence: 10min
     selectors: [CLM]
-    tailor_product_type: null
+    tailor_product_type: FCIL2CLM
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-01-27, end: null }
   mtg-cloud-mask-grib:
@@ -113,7 +113,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [CT]
-    tailor_product_type: null
+    tailor_product_type: FCIL2CT
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-12-10, end: null }
   mtg-ctth:
@@ -124,7 +124,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [CTTH]
-    tailor_product_type: null
+    tailor_product_type: FCIL2CTTH
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-12-10, end: null }
   mtg-fci-l1c:
@@ -135,7 +135,7 @@ datasets:
     format: native
     cadence: 10min
     selectors: [FCI-L1C-NR]
-    tailor_product_type: FCIL1C
+    tailor_product_type: FCIL1FDHSI
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2024-09-24, end: null }
   mtg-fci-l1c-hr:
@@ -146,7 +146,7 @@ datasets:
     format: native
     cadence: 10min
     selectors: [FCI-L1C-HR]
-    tailor_product_type: null
+    tailor_product_type: FCIL1HRFI
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2024-09-24, end: null }
   mtg-fci-sst:
@@ -168,7 +168,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [GII]
-    tailor_product_type: null
+    tailor_product_type: FCIL2GII
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-01-27, end: null }
   mtg-li-accumulated-flash-area:
@@ -179,7 +179,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [LI-AFA]
-    tailor_product_type: null
+    tailor_product_type: LIL2AFA
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2024-07-04, end: null }
   mtg-li-accumulated-flash-radiance:
@@ -190,7 +190,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [LI-AFR]
-    tailor_product_type: null
+    tailor_product_type: LIL2AFR
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2024-07-04, end: null }
   mtg-li-accumulated-flashes:
@@ -201,7 +201,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [LI-AF]
-    tailor_product_type: null
+    tailor_product_type: LIL2AF
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2024-07-04, end: null }
   mtg-li-events-filtered:
@@ -223,7 +223,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [LI-LFL]
-    tailor_product_type: null
+    tailor_product_type: LIL2LFL
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2024-07-04, end: null }
   mtg-li-groups:
@@ -234,7 +234,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [LI-LGR]
-    tailor_product_type: null
+    tailor_product_type: LIL2LGR
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2024-07-04, end: null }
   mtg-lst:
@@ -256,7 +256,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [OCA]
-    tailor_product_type: null
+    tailor_product_type: FCIL2OCA
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-01-27, end: null }
   mtg-olr:
@@ -267,7 +267,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [OLR]
-    tailor_product_type: null
+    tailor_product_type: FCIL2OLR
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2025-01-27, end: null }
   mtg-precip-accumulated:

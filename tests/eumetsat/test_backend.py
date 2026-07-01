@@ -141,10 +141,10 @@ def test_multiple_datasets_searched(fake_eumdac, tmp_path):
     assert len(fake_eumdac.store.search_calls) == 2
 
 
-def test_aggregate_raises_pointing_at_data_tailor(fake_eumdac, tmp_path):
-    """download(aggregate=...) raises NotImplementedError naming Data Tailor."""
+def test_aggregate_raises_not_implemented(fake_eumdac, tmp_path):
+    """download(aggregate=...) still raises NotImplementedError (temporal reducer)."""
     backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
-    with pytest.raises(NotImplementedError, match="Data Tailor"):
+    with pytest.raises(NotImplementedError, match="aggregate="):
         backend.download(aggregate=object())
 
 

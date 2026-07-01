@@ -196,3 +196,43 @@ def test_duplicate_key_across_files_rejected(tmp_path):
     clear_catalog_cache()
     with pytest.raises(ValueError, match="declared in two catalog files"):
         Catalog.load(catalog_path=tmp_path)
+
+
+def test_tailor_product_types_are_valid_registry_ids(catalog):
+    """Every non-null tailor_product_type is a real EUMETSAT Data Tailor id.
+
+    Guards the ~80-row catalog rewrite against typos: each value must be a
+    member of the /epcs/products registry snapshot (captured 2026-07-01).
+    This checks membership only, not semantic correctness — a valid id
+    assigned to the wrong collection would still pass (see review L4).
+    """
+    import json
+    from pathlib import Path
+
+    snapshot = Path(__file__).parent / "data" / "epcs_product_ids.json"
+    valid = set(json.loads(snapshot.read_text(encoding="utf-8"))["product_ids"])
+    offenders = {
+        key: ds.tailor_product_type
+        for key, ds in catalog.datasets.items()
+        if ds.tailor_product_type is not None and ds.tailor_product_type not in valid
+    }
+    assert not offenders, f"unknown tailor_product_type values: {offenders}"
+
+
+def test_expected_collections_are_data_tailor_eligible(catalog):
+    """A few known-tailorable collections carry the right product type."""
+    expected = {
+        "s3-olci-l1-efr": "OLL1EFR",
+        "s3-slstr-l2-wst": "SLL2WST",
+        "msg-hrseviri": "HRSEVIRI",
+        "mtg-fci-l1c": "FCIL1FDHSI",
+        "metop-iasi-l1c": "IASIL1",
+    }
+    for key, product_type in expected.items():
+        assert catalog.get_dataset(key).tailor_product_type == product_type
+
+
+def test_s5p_and_sea_ice_are_not_tailorable(catalog):
+    """Sentinel-5P TROPOMI and OSI-SAF sea ice are not Data-Tailor-eligible."""
+    for key in ("s5p-l2-no2", "s5p-l2-o3", "osi-saf-sea-ice-conc"):
+        assert catalog.get_dataset(key).tailor_product_type is None

@@ -14,7 +14,7 @@ datasets:
     format: grib
     cadence: 15min
     selectors: [CLM]
-    tailor_product_type: CLM
+    tailor_product_type: MSGCLMK
     extent: { lat: [-79.0, 79.0], lon: [-79.0, 79.0] }
     temporal: { start: 2004-01-19, end: null }
   msg-cloud-mask-iodc:
@@ -25,7 +25,7 @@ datasets:
     format: grib
     cadence: 15min
     selectors: [CLM]
-    tailor_product_type: CLM
+    tailor_product_type: MSGCLMK
     extent: { lat: [-79.0, 79.0], lon: [-34.0, 124.0] }
     temporal: { start: 2017-02-01, end: null }
   msg-cloud-top-height:
@@ -36,7 +36,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: MSGCLTH
     extent: { lat: [-79, 79], lon: [-79, 79] }
     temporal: { start: 2005-06-21, end: null }
   msg-cloud-top-height-2:
@@ -47,7 +47,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: MSGCLTH
     extent: { lat: [-79, 79], lon: [-79, 79] }
     temporal: { start: 2017-02-01, end: null }
   msg-fire-risk-map:
@@ -91,7 +91,7 @@ datasets:
     format: netcdf
     cadence: irregular
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: MLST
     extent: { lat: [-79, 79], lon: [-79, 79] }
     temporal: { start: 2004-01-21, end: 2015-12-31 }
   msg-land-surface-temperature-with-directional-effects:
@@ -124,7 +124,7 @@ datasets:
     format: netcdf
     cadence: 5min
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: MSGCLMK
     extent: { lat: [-79, 79], lon: [-79, 79] }
     temporal: { start: 2008-10-16, end: null }
   msg-rss:
@@ -135,7 +135,7 @@ datasets:
     format: native
     cadence: 5min
     selectors: [HRSEVIRI]
-    tailor_product_type: HRSEVIRI
+    tailor_product_type: HRSEVIRI_RSS
     extent: { lat: [15.0, 70.0], lon: [-79.0, 79.0] }
     temporal: { start: 2008-05-13, end: null }
   msg-seviri-rapid-scan-atmospheric-motion-vectors:

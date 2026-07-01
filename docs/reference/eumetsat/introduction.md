@@ -66,17 +66,19 @@ authenticate or download.
 pip install earthlens[eumetsat]
 ```
 
-## What's in the MVP — and what's deferred
+## Capabilities
 
-The MVP **fetches native products**. Two capabilities are deferred
-follow-ons:
+The backend **fetches native products** by default, and supports EUMETSAT
+**Data Tailor** for server-side customisation:
 
-* **Data Tailor** (server-side subset / reproject / format-convert) — the
-  `aggregate=` / bbox-crop path. `download(aggregate=...)` raises
-  `NotImplementedError` naming it. See [Data Tailor](data-tailor.md).
+* **Data Tailor** (server-side subset / reproject / reformat) — the
+  `tailor=TailorConfig(...)` knob. Returns the customised GeoTIFF / NetCDF.
+  See [Data Tailor](data-tailor.md). (`aggregate=` is the separate,
+  unimplemented *temporal* reducer and raises `NotImplementedError`.)
 * **Native SEVIRI / FCI client-side reading** — needs a satpy reader
-  bridge in `pyramids`. NetCDF mirror products (Sentinel-3 / -5P / -6,
-  OSI SAF) are readable with `pyramids` today.
+  bridge in `pyramids` (a deferred follow-on); tailoring to GeoTIFF
+  sidesteps it. NetCDF mirror products (Sentinel-3 / -5P / -6, OSI SAF)
+  are readable with `pyramids` today.
 
 See [Authentication](authentication.md), [Usage](usage.md), and the
 [Catalog & tooling](catalog.md) reference for the full picture.

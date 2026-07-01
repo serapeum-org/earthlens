@@ -20,23 +20,36 @@ A single request may name several collections, but they must all share
 one `output_kind` — a mixed raster+vector request is rejected at
 construction.
 
-The MVP fetches **whole native products** to disk (`G4`): `eumdac`'s
-`Product.open()` stream copied to a file. Server-side bbox / band
-subsetting and reprojection are the deferred Data Tailor path (`H4`); the
-selectors in `variables` are informational for a whole-product fetch
-(`G2`), and `bbox` is a search filter (which products intersect), not a
-pixel crop. `download(aggregate=...)` therefore raises
-`NotImplementedError` pointing at Data Tailor.
+By default the backend fetches **whole native products** to disk (`G4`):
+`eumdac`'s `Product.open()` stream copied to a file. The selectors in
+`variables` are informational for a whole-product fetch (`G2`), and `bbox`
+is a search filter (which products intersect), not a pixel crop.
+
+Server-side subset / reproject / reformat is EUMETSAT's **Data Tailor**
+service, reached with `download(tailor=TailorConfig(...))` (`H4`). That
+routes each matching product through Data Tailor (submit → poll → stream →
+delete) and returns the customised GeoTIFF / NetCDF paths instead of the
+native product; every customisation is deleted afterwards for quota
+hygiene (`G7`). Only catalog rows carrying a `tailor_product_type` are
+Data-Tailor-eligible (`G5`).
+
+`tailor=` is **spatial**; the temporal reducer is a separate `aggregate=`
+knob (`G1`). `download(aggregate=...)` still raises `NotImplementedError`
+— EUMETSAT native NetCDF products can be reduced client-side with pyramids
+after download, and the two knobs compose (tailor server-side, then reduce
+client-side).
 """
 
 from __future__ import annotations
 
 import datetime as dt
 import shutil
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
@@ -48,9 +61,40 @@ from earthlens.base import (
 from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
 from earthlens.eumetsat.catalog import Catalog, DataStoreGroup, EumetsatDataset
+from earthlens.eumetsat.tailor import TailorConfig
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
+
+#: Total wall-clock budget for polling one Data Tailor customisation to a
+#: terminal state before giving up (`G8`). A stuck job must not hang forever.
+TAILOR_POLL_TIMEOUT_S = 1800.0
+#: First poll delay; grows by `TAILOR_POLL_BACKOFF` up to `TAILOR_POLL_MAX_S`.
+TAILOR_POLL_INITIAL_S = 5.0
+#: Ceiling on the poll delay.
+TAILOR_POLL_MAX_S = 30.0
+#: Multiplicative backoff applied to the poll delay after each check.
+TAILOR_POLL_BACKOFF = 1.5
+#: How many times to retry a *transient* customisation submit (`G8`).
+TAILOR_SUBMIT_RETRIES = 3
+#: Base backoff between submit retries (scaled by the attempt number).
+TAILOR_SUBMIT_BACKOFF_S = 2.0
+#: Non-terminal ("still working") Data Tailor `Customisation.status` values
+#: (`A1`). Polling continues only while the status is one of these; any other
+#: status (`DONE`, `FAILED`, `KILLED`, or an unexpected one like `INACTIVE`)
+#: is treated as terminal so an unknown stuck state fails fast instead of
+#: polling until the timeout.
+_TAILOR_ACTIVE = frozenset({"QUEUED", "RUNNING"})
+#: Substrings that mark a submit error as transient (worth retrying) — the
+#: EUMETSAT EPCS endpoint intermittently 502s (`A1`/`G8`).
+_TRANSIENT_MARKERS = (
+    "502",
+    "bad gateway",
+    "server-side",
+    "timed out",
+    "timeout",
+    "connection",
+)
 
 
 class EUMETSAT(AbstractDataSource):
@@ -359,38 +403,338 @@ class EUMETSAT(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        tailor: TailorConfig | None = None,
     ) -> list[Path]:
-        """Search the Data Store, fetch native products, return their paths.
+        """Search the Data Store and return product paths (native or tailored).
 
-        Composes `_search` and `_fetch` to pull every product matching
-        the request bbox + window to `self.root_dir`.
+        With no `tailor=`, composes `_search` and `_fetch` to pull every
+        product matching the request bbox + window to `self.root_dir` as
+        whole native products (unchanged behaviour).
 
-        `aggregate=` is the server-side subset / reproject path, which on
-        the EUMETSAT Data Store is **Data Tailor** (`H4`) — not part of
-        the MVP. A non-`None` `aggregate` therefore raises
-        `NotImplementedError` naming Data Tailor; native NetCDF products
-        can be read / reduced client-side with pyramids after download.
+        With `tailor=TailorConfig(...)`, each matching product is routed
+        through EUMETSAT **Data Tailor** (server-side subset / reproject /
+        reformat, `H4`): submit a customisation, poll it to `DONE`, stream
+        the customised output(s) to `self.root_dir`, and delete the
+        customisation (`G7`). The returned paths are then the customised
+        GeoTIFF / NetCDF files, not the native products (`G6`).
+
+        `aggregate=` is the **temporal** reducer (`G1`) and is a separate
+        operation from the spatial `tailor=`; it is not implemented for
+        EUMETSAT, so a non-`None` `aggregate` raises `NotImplementedError`.
+        The two knobs compose — tailor server-side here, then reduce the
+        result client-side with pyramids.
+
+        The tailor branch is **fail-fast per batch**: if one product's
+        customisation fails, the error propagates and paths already streamed
+        for earlier products are not returned (their files remain on disk).
+        This mirrors the native fetch; keep batches small when a partial
+        result would be costly to recompute.
 
         Args:
             progress_bar: Reserved for parity with the other backends;
                 `eumdac`'s streaming download has no built-in bar.
-            aggregate: Optional
+            aggregate: Optional temporal
                 `earthlens.aggregate.AggregationConfig`. Rejected — see
                 above.
+            tailor: Optional `TailorConfig` routing the request through
+                Data Tailor. `None` (the default) keeps the native fetch.
 
         Returns:
-            list[Path]: The fetched product paths.
+            list[Path]: The native product paths, or — when `tailor=` is
+                given — the customised output paths.
 
         Raises:
-            NotImplementedError: When `aggregate` is not `None` (the Data
-                Tailor path, `H4`, is deferred).
+            NotImplementedError: When `aggregate` is not `None` (the
+                temporal reducer is not implemented for EUMETSAT, `G1`).
+            ValueError: When `tailor=` names a dataset that is not
+                Data-Tailor-eligible (`G5`).
         """
         if aggregate is not None:
             raise NotImplementedError(
-                "EUMETSAT aggregate=/subset is the Data Tailor path (H4); "
-                "it is not part of the MVP. Download native products "
-                "without aggregate= and reduce NetCDF products client-side "
-                "with pyramids."
+                "EUMETSAT aggregate= is the temporal reducer (G1); it is "
+                "not implemented for this backend. Download products "
+                "(optionally with tailor= for server-side subset/reproject) "
+                "and reduce NetCDF products client-side with pyramids."
             )
         self._show_progress = progress_bar
+        if tailor is not None:
+            return self._tailor(tailor)
         return self._api_via_search_fetch()
+
+    def _tailor(self, tailor: TailorConfig) -> list[Path]:
+        """Run the Data Tailor branch for every matching product (`G2`).
+
+        Rejects a non-eligible request up front (`G5`), then searches the
+        Data Store and customises each product in turn, returning the
+        flattened list of customised output paths.
+
+        Args:
+            tailor: The `TailorConfig` describing the customisation.
+
+        Returns:
+            list[Path]: Every customised output path, in search order.
+
+        Raises:
+            ValueError: When any requested dataset lacks a
+                `tailor_product_type` (not Data-Tailor-eligible).
+        """
+        ineligible = [ds for ds in self._datasets if ds.tailor_product_type is None]
+        if ineligible:
+            names = ", ".join(ds.collection_id for ds in ineligible)
+            raise ValueError(
+                f"{names} not Data-Tailor-eligible; download native (no "
+                "tailor=) and reduce client-side with pyramids."
+            )
+        assert self._auth is not None  # set by _initialize
+        self._auth.configure()
+        datatailor = self._auth.datatailor()
+        products = self._search()
+        out_paths: list[Path] = []
+        used_dirs: set[str] = set()
+        for rp in products:
+            out_paths.extend(self._tailor_one(rp, tailor, datatailor, used_dirs))
+        return out_paths
+
+    @staticmethod
+    def _dedupe_name(name: str, used: set[str]) -> str:
+        """Return `name`, suffixed if needed so it is unique within `used`.
+
+        Guarantees a distinct on-disk name even when two products share an
+        id (`L3`) or two customisation outputs sanitise to one basename
+        (`L2`). Adds the chosen name to `used`.
+
+        Args:
+            name: The candidate (already path-safe) name.
+            used: The set of names already taken; mutated in place.
+
+        Returns:
+            str: A name not already in `used`.
+        """
+        candidate = name
+        counter = 1
+        while candidate in used:
+            candidate = f"{name}_{counter}"
+            counter += 1
+        used.add(candidate)
+        return candidate
+
+    def _tailor_one(
+        self,
+        product: RemoteProduct,
+        tailor: TailorConfig,
+        datatailor,
+        used_dirs: set[str],
+    ) -> list[Path]:
+        """Customise one product via Data Tailor; always clean up (`G7`).
+
+        Builds the `eumdac` `Chain` from `tailor`, the product's catalog
+        row (`tailor_product_type`), and the request ROI (`tailor.bbox`
+        else `self.space`), submits it, polls to a terminal state, streams
+        every output to `self.root_dir`, and deletes the customisation in
+        a `finally` — even on failure — so quota is always freed.
+
+        Args:
+            product: One `RemoteProduct` from `_search` (its `metadata`
+                carries the raw `eumdac` product handle and catalog row).
+            tailor: The customisation request.
+            datatailor: The live `eumdac.DataTailor` client.
+            used_dirs: Shared per-batch set of subdirectory names already
+                taken, mutated here to keep each product's output directory
+                unique across the request (`L3`).
+
+        Returns:
+            list[Path]: The customised output paths for this product.
+
+        Raises:
+            ValueError: When the product's dataset is not eligible (`G5`).
+            RuntimeError: When the customisation ends `FAILED` / `KILLED`
+                (with the server log), or a transient submit keeps failing.
+            TimeoutError: When polling exceeds `TAILOR_POLL_TIMEOUT_S`.
+        """
+        import eumdac  # lazy — the [eumetsat] extra
+
+        dataset: EumetsatDataset = product.metadata["dataset"]
+        if dataset.tailor_product_type is None:
+            raise ValueError(
+                f"{dataset.collection_id!r} is not Data-Tailor-eligible; "
+                "download native (no tailor=) and reduce client-side."
+            )
+        nswe = tailor.nswe or TailorConfig.nswe_from_extent(
+            self.space.north, self.space.south, self.space.west, self.space.east
+        )
+        chain = eumdac.tailor_models.Chain(
+            product=dataset.tailor_product_type,
+            format=tailor.format,
+            projection=tailor.crs,
+            roi=eumdac.tailor_models.RegionOfInterest(NSWE=nswe),
+            filter=(
+                eumdac.tailor_models.Filter(bands=list(tailor.filter))
+                if tailor.filter
+                else None
+            ),
+            quicklook=tailor.quicklook or None,
+        )
+        product_handle = product.metadata["product"]
+        # Choose the per-product output subdir *before* submitting, so nothing
+        # between the submit and the `try/finally` can raise and orphan the
+        # customisation (quota hygiene, G7). Namespacing avoids cross-granule
+        # basename collisions (H1); the name is de-duped against this batch and
+        # against any pre-existing native file of the same basename (L3).
+        subdir = self._dedupe_name(
+            safe_product_filename(str(product_handle)), used_dirs
+        )
+        while (self.root_dir / subdir).exists() and not (
+            self.root_dir / subdir
+        ).is_dir():
+            subdir = self._dedupe_name(subdir, used_dirs)
+        product_dir = self.root_dir / subdir
+        cust = self._submit_customisation(datatailor, product_handle, chain)
+        try:
+            status = self._poll_customisation(cust)
+            if status != "DONE":
+                raise RuntimeError(
+                    f"Data Tailor customisation {cust} ended {status}: "
+                    f"{self._logfile_tail(cust)}"
+                )
+            product_dir.mkdir(parents=True, exist_ok=True)
+            written: list[Path] = []
+            used_names: set[str] = set()
+            for name in cust.outputs:
+                # De-dupe within a customisation so two outputs sharing a
+                # basename do not overwrite each other (L2).
+                out_name = self._dedupe_name(
+                    safe_product_filename(str(name)), used_names
+                )
+                target = product_dir / out_name
+                with cust.stream_output(name) as src, open(target, "wb") as fh:
+                    shutil.copyfileobj(src, fh)
+                written.append(target)
+            return written
+        finally:
+            self._safe_delete(cust)  # ALWAYS free quota — even on failure (G7)
+
+    @staticmethod
+    def _safe_delete(cust) -> None:
+        """Delete a customisation, never letting cleanup mask the real error.
+
+        Called from the `_tailor_one` `finally` (`G7`). A `delete()` that
+        itself raises must not replace the original `RuntimeError` /
+        `TimeoutError`, nor abort the remaining products in the batch — so
+        the failure is logged and swallowed.
+
+        Args:
+            cust: The `eumdac` `Customisation` handle to delete.
+        """
+        try:
+            cust.delete()
+        except Exception as exc:  # noqa: BLE001 - cleanup must never mask the cause
+            logger.warning(f"Data Tailor customisation {cust} delete failed: {exc}")
+
+    @staticmethod
+    def _submit_customisation(datatailor, product, chain):
+        """Submit a customisation, retrying transient EPCS failures (`G8`).
+
+        The EUMETSAT EPCS endpoint intermittently returns `502 Bad
+        Gateway`; a submit that fails with a transient marker is retried
+        up to `TAILOR_SUBMIT_RETRIES` times with a linear backoff. A
+        non-transient error (e.g. an invalid product id) is re-raised
+        immediately.
+
+        Note:
+            If a create actually succeeds server-side but its response is
+            lost (a dropped connection / timeout — the classified-transient
+            cases), the retry submits a **second** customisation and the
+            first is orphaned: the client never gets its handle, so it is
+            not polled or deleted and lingers against the quota. The EPCS
+            API offers no idempotency key to prevent this; recover by
+            sweeping stale jobs (`eumdac.DataTailor(token).customisations`).
+
+        Args:
+            datatailor: The live `eumdac.DataTailor` client.
+            product: The `eumdac` product handle to customise.
+            chain: The `eumdac.tailor_models.Chain` describing the job.
+
+        Returns:
+            The `eumdac` `Customisation` handle for the submitted job.
+
+        Raises:
+            RuntimeError: When a transient submit keeps failing after
+                `TAILOR_SUBMIT_RETRIES` attempts.
+            Exception: Any non-transient submit error, re-raised as-is.
+        """
+        last_exc: Exception | None = None
+        for attempt in range(1, TAILOR_SUBMIT_RETRIES + 1):
+            try:
+                return datatailor.new_customisation(product, chain)
+            except Exception as exc:  # noqa: BLE001 - classified below
+                message = str(exc).lower()
+                if not any(mark in message for mark in _TRANSIENT_MARKERS):
+                    raise
+                last_exc = exc
+                if attempt < TAILOR_SUBMIT_RETRIES:
+                    time.sleep(TAILOR_SUBMIT_BACKOFF_S * attempt)
+        raise RuntimeError(
+            f"Data Tailor submit failed after {TAILOR_SUBMIT_RETRIES} "
+            f"transient attempts: {last_exc}"
+        ) from last_exc
+
+    @staticmethod
+    def _poll_customisation(cust) -> str:
+        """Poll a customisation until it stops being active; return its status.
+
+        Polls `cust.status` while it is `_TAILOR_ACTIVE` (`QUEUED` /
+        `RUNNING`), sleeping `TAILOR_POLL_INITIAL_S` and growing the delay
+        by `TAILOR_POLL_BACKOFF` up to `TAILOR_POLL_MAX_S`. Any other status
+        is terminal and is returned immediately — so `DONE` succeeds and
+        `FAILED` / `KILLED` / an unexpected stuck state (e.g. `INACTIVE`)
+        fail fast rather than polling to the timeout. Gives up after
+        `TAILOR_POLL_TIMEOUT_S` so a job stuck *active* cannot hang forever
+        (`G8`); the final sleep is clamped to the remaining budget so the
+        wall-clock never overshoots the timeout.
+
+        Args:
+            cust: The `eumdac` `Customisation` handle to poll.
+
+        Returns:
+            str: The terminal status (`"DONE"`, `"FAILED"`, `"KILLED"`, or
+                any non-active value the service reports).
+
+        Raises:
+            TimeoutError: When the job is still active after
+                `TAILOR_POLL_TIMEOUT_S`.
+        """
+        deadline = time.monotonic() + TAILOR_POLL_TIMEOUT_S
+        delay = TAILOR_POLL_INITIAL_S
+        while True:
+            status = str(cust.status).upper()
+            if status not in _TAILOR_ACTIVE:
+                return status
+            now = time.monotonic()
+            if now >= deadline:
+                raise TimeoutError(
+                    f"Data Tailor customisation {cust} did not finish "
+                    f"within {TAILOR_POLL_TIMEOUT_S:.0f}s (last status "
+                    f"{status!r})."
+                )
+            time.sleep(min(delay, deadline - now))
+            delay = min(delay * TAILOR_POLL_BACKOFF, TAILOR_POLL_MAX_S)
+
+    @staticmethod
+    def _logfile_tail(cust, limit: int = 1500) -> str:
+        """Return the tail of a customisation's server log, if any.
+
+        Args:
+            cust: The `eumdac` `Customisation` handle.
+            limit: Maximum number of trailing characters to return.
+
+        Returns:
+            str: The last `limit` characters of `cust.logfile`, or a
+                placeholder when no log is available.
+        """
+        try:
+            log = cust.logfile
+        except Exception:  # noqa: BLE001 - a missing log must not mask the failure
+            log = None
+        if not log:
+            return "(no customisation log available)"
+        return str(log)[-limit:]

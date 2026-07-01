@@ -81,27 +81,123 @@ class _FakeDataStore:
         return _FakeCollection(collection_id, self)
 
 
+class _FakeChain:
+    """Stand-in for `eumdac.tailor_models.Chain` — records its kwargs."""
+
+    def __init__(self, **kwargs: Any) -> None:
+        self.product = kwargs.get("product")
+        self.format = kwargs.get("format")
+        self.projection = kwargs.get("projection")
+        self.roi = kwargs.get("roi")
+        self.filter = kwargs.get("filter")
+        self.quicklook = kwargs.get("quicklook")
+
+
+class _FakeRegionOfInterest:
+    """Stand-in for `eumdac.tailor_models.RegionOfInterest`."""
+
+    def __init__(self, NSWE: Any = None, **kwargs: Any) -> None:
+        self.NSWE = NSWE
+
+
+class _FakeFilter:
+    """Stand-in for `eumdac.tailor_models.Filter`."""
+
+    def __init__(self, bands: Any = None, **kwargs: Any) -> None:
+        self.bands = bands
+
+
+class _FakeCustomisation:
+    """Stand-in for an `eumdac` Customisation with a scripted status sequence.
+
+    The `statuses` list is consumed one value per `status` read until one
+    remains, which then sticks — so `["QUEUED", "RUNNING", "DONE"]` drives
+    a full poll loop. Records how many times `delete()` was called.
+    """
+
+    def __init__(
+        self,
+        statuses: list[str] | None = None,
+        outputs: list[str] | None = None,
+        logfile: str = "server log tail",
+        payload: bytes = b"TAILORED",
+    ) -> None:
+        self._statuses = list(statuses or ["DONE"])
+        self.outputs = list(outputs if outputs is not None else ["customised.tif"])
+        self._logfile = logfile
+        self._payload = payload
+        self.deleted = 0
+        self.delete_error: BaseException | None = None
+
+    @property
+    def status(self) -> str:
+        if len(self._statuses) > 1:
+            return self._statuses.pop(0)
+        return self._statuses[0]
+
+    @property
+    def logfile(self) -> str:
+        return self._logfile
+
+    def stream_output(self, output: str) -> _FakeStream:
+        """Yield an in-memory byte stream for `output` (name-tagged payload)."""
+        return _FakeStream(BytesIO(self._payload + output.encode()))
+
+    def delete(self) -> None:
+        self.deleted += 1
+        if self.delete_error is not None:
+            raise self.delete_error
+        return None
+
+    def __str__(self) -> str:
+        return "fake-customisation"
+
+
 class _FakeDataTailor:
-    """Stand-in for `eumdac.DataTailor` (only needed for the deferred H4)."""
+    """Stand-in for `eumdac.DataTailor` — records submits, returns a scripted job.
+
+    A test sets `.customisation` to the `_FakeCustomisation` to return and,
+    optionally, seeds `.submit_errors` with exceptions (or `None`) consumed
+    one per `new_customisation` call to exercise the transient-retry path.
+    """
 
     def __init__(self, token: Any) -> None:
         self.token = token
+        self.submitted: list[tuple[Any, Any]] = []
+        self.customisation: _FakeCustomisation | None = None
+        self.submit_errors: list[BaseException | None] = []
+
+    def new_customisation(self, product: Any, chain: Any):
+        self.submitted.append((product, chain))
+        if self.submit_errors:
+            error = self.submit_errors.pop(0)
+            if error is not None:
+                raise error
+        return self.customisation
 
 
 class _FakeEumdac(types.ModuleType):
     """Fake `eumdac` module wiring the stand-ins together.
 
-    A single `_FakeDataStore` is shared across `DataStore(...)` calls so a
-    test can pre-load `products_for` and later read `search_calls`.
+    A single `_FakeDataStore` is shared across `DataStore(...)` calls and a
+    single `_FakeDataTailor` across `DataTailor(...)` calls, so a test can
+    pre-load `products_for` / `tailor.customisation` and later read
+    `search_calls` / `tailor.submitted`.
     """
 
     def __init__(self) -> None:
         super().__init__("eumdac")
         self.store = _FakeDataStore(token=None)
+        self.tailor = _FakeDataTailor(token=None)
         self.tokens: list[_FakeAccessToken] = []
         self.AccessToken = self._make_token
         self.DataStore = self._make_store
-        self.DataTailor = _FakeDataTailor
+        self.DataTailor = self._make_tailor
+        self.tailor_models = types.SimpleNamespace(
+            Chain=_FakeChain,
+            RegionOfInterest=_FakeRegionOfInterest,
+            Filter=_FakeFilter,
+        )
 
     def _make_token(self, credentials, validity: int = 86400, cache: bool = True):
         token = _FakeAccessToken(credentials, validity, cache)
@@ -111,6 +207,10 @@ class _FakeEumdac(types.ModuleType):
     def _make_store(self, token):
         self.store.token = token
         return self.store
+
+    def _make_tailor(self, token):
+        self.tailor.token = token
+        return self.tailor
 
 
 @pytest.fixture
