@@ -333,6 +333,27 @@ def test_tailor_submit_transient_exhausted_raises_runtime(
 # --- native regression ------------------------------------------------------
 
 
+def test_facade_forwards_tailor_to_backend(fake_eumdac, tmp_path):
+    """EarthLens(...).download(tailor=...) reaches the backend Data Tailor branch."""
+    from earthlens.earthlens import EarthLens
+
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(outputs=["o.tif"])
+    el = EarthLens(
+        data_source="eumetsat",
+        start="2024-01-01",
+        end="2024-01-02",
+        variables={"s3-olci-l1-efr": ["OLL1EFR"]},
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+    )
+    paths = el.download(progress_bar=False, tailor=TailorConfig())
+    assert [p.name for p in paths] == ["o.tif"]
+    assert len(fake_eumdac.tailor.submitted) == 1
+
+
 def test_native_download_unchanged_without_tailor(fake_eumdac, tmp_path):
     """Without tailor=, download fetches the native product and never tailors."""
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("native.nc", b"NATIVE")]
