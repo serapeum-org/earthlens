@@ -21,6 +21,9 @@ transport and GeoTIFF I/O are pyramids' job, via `Dataset.from_wcs`).
 from __future__ import annotations
 
 import os
+import shutil
+import tempfile
+from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -154,7 +157,7 @@ class SoilGrids(AbstractDataSource):
                 "curated properties (e.g. variables=['clay', 'phh2o']). List "
                 "ids with earthlens.soilgrids.Catalog().parameters()."
             )
-        duplicates = sorted({v for v in variables if list(variables).count(v) > 1})
+        duplicates = sorted(v for v, n in Counter(variables).items() if n > 1)
         if duplicates:
             raise ValueError(
                 f"SoilGrids variables has duplicate property ids {duplicates}; "
@@ -259,22 +262,32 @@ class SoilGrids(AbstractDataSource):
             return []
         from tqdm import tqdm
 
+        # One unique scratch dir per download, cleaned up at the end: each
+        # coverage is written here then atomically renamed onto its final path.
+        # A unique dir (not a fixed `.soilgrids-tmp`) keeps concurrent downloads
+        # to the same output dir from colliding and never trips over a
+        # pre-existing file of that name.
+        self.root_dir.mkdir(parents=True, exist_ok=True)
+        tmp_dir = Path(tempfile.mkdtemp(dir=self.root_dir, prefix=".soilgrids-tmp-"))
         written: list[Path] = []
         failed: list[str] = []
-        for product in tqdm(
-            products,
-            disable=not self._show_progress,
-            desc="soilgrids",
-            unit="coverage",
-        ):
-            try:
-                written.append(self._fetch_one(product))
-            except Exception as exc:  # noqa: BLE001 - isolate one flaky coverage
-                failed.append(product.id)
-                logger.warning(
-                    f"soilgrids: coverage {product.id} failed "
-                    f"({type(exc).__name__}: {exc}); skipping."
-                )
+        try:
+            for product in tqdm(
+                products,
+                disable=not self._show_progress,
+                desc="soilgrids",
+                unit="coverage",
+            ):
+                try:
+                    written.append(self._fetch_one(product, tmp_dir))
+                except Exception as exc:  # noqa: BLE001 - isolate one flaky coverage
+                    failed.append(product.id)
+                    logger.warning(
+                        f"soilgrids: coverage {product.id} failed "
+                        f"({type(exc).__name__}: {exc}); skipping."
+                    )
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
         if failed and not written:
             raise RuntimeError(
                 f"soilgrids: all {len(failed)} requested coverage(s) failed to "
@@ -322,7 +335,7 @@ class SoilGrids(AbstractDataSource):
             )
         return plan
 
-    def _fetch_one(self, product: RemoteProduct) -> Path:
+    def _fetch_one(self, product: RemoteProduct, tmp_dir: Path) -> Path:
         """Fetch one coverage's bbox window as a GeoTIFF over WCS.
 
         Uses `pyramids.dataset.Dataset.from_wcs` — GDAL's WCS driver inside
@@ -334,9 +347,18 @@ class SoilGrids(AbstractDataSource):
         scaled-integer unit metadata is logged (never applied — the pixels stay
         as stored integers, `G2`).
 
+        The coverage is fetched in-memory (`from_wcs(output=None)`), written into
+        `tmp_dir` (the per-download scratch dir owned by `_api`), then atomically
+        renamed onto its final path only after a fully successful write. Because
+        the final path is touched only by that rename, any failure leaves a
+        pre-existing GeoTIFF from a prior run untouched and never leaves a partial
+        behind — only the temp file is cleaned up.
+
         Args:
             product: The `RemoteProduct` whose `metadata` carries the resolved
                 property row + the `(depth, quantile)` cell.
+            tmp_dir: The scratch directory to stage the write in before the
+                atomic rename (created + removed by :meth:`_api`).
 
         Returns:
             Path: The written GeoTIFF at
@@ -351,22 +373,10 @@ class SoilGrids(AbstractDataSource):
             f"(values are scaled integers in {row.mapped_units or 'native units'}"
             f"; divide by {row.scale_factor:g} for {row.unit or 'the unit'})"
         )
-        # Always fetch in-memory (`output=None`) and write to a temporary sibling
-        # file, then atomically rename onto out_path only after a fully successful
-        # write. `from_wcs` never touches a file itself (it builds the coverage in
-        # memory and only writes when handed an `output=`); a polygon aoi= is
-        # masked to shape before the write. Because out_path is touched only by the
-        # final rename, any failure leaves a pre-existing GeoTIFF from a prior run
-        # untouched and never leaves a partial behind — the temp file is the only
-        # thing cleaned up.
         has_mask = getattr(self.space, "geometry", None) is not None
-        # Write to a hidden scratch subdir, then atomically rename onto out_path.
         # The temp keeps the `.tif` suffix — pyramids picks the GDAL driver from
         # the extension, so a driver-less suffix like `.part` would raise
-        # DriverNotExistError — but lives under `.soilgrids-tmp/` so a leftover
-        # from a crash never collides with a `root_dir/*.tif` scan.
-        tmp_dir = self.root_dir / ".soilgrids-tmp"
-        tmp_dir.mkdir(exist_ok=True)
+        # DriverNotExistError.
         tmp_path = tmp_dir / out_path.name
         dataset = None
         result = None

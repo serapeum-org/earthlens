@@ -130,7 +130,7 @@ def test_polygon_aoi_masks_the_result(
     assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == [_GEOMETRY]
     assert (tmp_path / "clay_0-5cm_mean.tif").exists()
-    assert not (tmp_path / ".soilgrids-tmp" / "clay_0-5cm_mean.tif").exists()
+    assert not list(tmp_path.glob(".soilgrids-tmp*"))  # scratch dir removed
 
 
 def test_bbox_only_path_skips_the_mask(
@@ -141,7 +141,7 @@ def test_bbox_only_path_skips_the_mask(
     assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == []
     assert (tmp_path / "clay_0-5cm_mean.tif").exists()
-    assert not (tmp_path / ".soilgrids-tmp" / "clay_0-5cm_mean.tif").exists()
+    assert not list(tmp_path.glob(".soilgrids-tmp*"))  # scratch dir removed
     # The temp write target must keep a raster extension — pyramids picks the
     # GDAL driver from it, so a driver-less suffix (e.g. `.part`) would fail.
     assert fake_from_wcs.written[0].endswith(".tif")
@@ -214,7 +214,7 @@ def test_rename_failure_cleans_up_and_reports_failed(
     with pytest.raises(RuntimeError, match="all 1 requested coverage"):
         _backend(tmp_path, ["clay"], depths=["0-5cm"]).download()
     assert not (tmp_path / "clay_0-5cm_mean.tif").exists()
-    assert not (tmp_path / ".soilgrids-tmp" / "clay_0-5cm_mean.tif").exists()
+    assert not list(tmp_path.glob(".soilgrids-tmp*"))  # scratch dir removed
 
 
 def test_cleanup_error_does_not_mask_the_fetch_error(
