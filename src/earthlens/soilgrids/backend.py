@@ -1,0 +1,354 @@
+"""SoilGrids backend — `SoilGrids(AbstractDataSource)` over OGC WCS.
+
+`SoilGrids` is a bbox-subset raster backend (`OUTPUT_KIND="raster"`) over the
+ISRIC SoilGrids 2.0 global 250 m soil-property maps. A request is a bbox plus a
+list of property ids (`variables=["clay", "phh2o"]`) and optional `depths=` /
+`quantiles=`; `download()` expands it into `(property, depth, quantile)`
+coverage triples, fetches each one server-side over WCS, and writes one GeoTIFF
+per triple under `root_dir`, returning their paths.
+
+The WCS transport lives in `pyramids` (`Dataset.from_wcs`): SoilGrids publishes
+each property as an independent MapServer WCS service whose native grid is a
+custom Interrupted Goode Homolosine (`EPSG:152160`) that PROJ cannot resolve, so
+the reader is handed `IGH_PROJ4` as its `coverage_crs` shim and reprojects the
+result to `output_crs` (default `EPSG:4326`, pinned in the `A1` gate). Every
+layer is a single static prediction with no time axis, so the facade-forwarded
+`aggregate=` is rejected. There is no auth module — SoilGrids is open, CC-BY 4.0;
+this backend imports no OGC-WCS SDK and no array library directly (the WCS
+transport and GeoTIFF I/O are pyramids' job, via `Dataset.from_wcs`).
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+import pandas as pd
+from loguru import logger
+
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    RemoteProduct,
+    SpatialExtent,
+    TemporalExtent,
+)
+from earthlens.soilgrids._helpers import (
+    IGH_PROJ4,
+    SOILGRIDS_ATTRIBUTION,
+    bbox_from_extent,
+    coverage_id,
+    expand_request,
+)
+from earthlens.soilgrids.catalog import Catalog, Property
+
+if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
+
+
+class SoilGrids(AbstractDataSource):
+    """ISRIC SoilGrids 2.0 soil properties, bbox-subset to GeoTIFF over WCS.
+
+    Resolves each requested property id against the bundled catalog, expands the
+    request into `(property, depth, quantile)` coverage triples, and fetches each
+    one through `pyramids.dataset.Dataset.from_wcs` — writing one cropped GeoTIFF
+    per triple. The request is a search/fetch split: :meth:`_search` names one
+    product per triple and :meth:`_fetch` realises each (WCS subset → GeoTIFF).
+
+    Attributes:
+        OUTPUT_KIND: Fixed `"raster"`; every coverage yields a gridded GeoTIFF.
+            The facade reads it to gate `aggregate=` (rejected here — SoilGrids
+            is a static soil-property map with no temporal axis).
+
+    Examples:
+        - Two properties at their default depths / the `mean` layer write one
+          GeoTIFF per `(property, depth, quantile)` (marked `+SKIP` — it hits
+          the live SoilGrids WCS):
+
+            ```python
+            >>> from earthlens.earthlens import EarthLens
+            >>> paths = EarthLens(  # doctest: +SKIP
+            ...     data_source="soilgrids",
+            ...     variables=["clay", "phh2o"],
+            ...     lat_lim=[51.0, 52.0],
+            ...     lon_lim=[5.0, 6.0],
+            ...     path="soil_out",
+            ... ).download()  # -> 12 GeoTIFFs (2 properties x 6 depths x mean)
+
+            ```
+    """
+
+    OUTPUT_KIND: OutputKind = "raster"
+
+    def __init__(
+        self,
+        start: str = "",
+        end: str = "",
+        lat_lim: list[float] | None = None,
+        lon_lim: list[float] | None = None,
+        variables: list[str] | None = None,
+        temporal_resolution: str = "static",
+        path: Path | str = "",
+        fmt: str = "%Y-%m-%d",
+        *,
+        depths: list[str] | None = None,
+        quantiles: list[str] | None = None,
+        output_crs: str | None = "EPSG:4326",
+        resolution: float | tuple[float, float] | None = None,
+        coverage_crs: str = IGH_PROJ4,
+        timeout: float = 120.0,
+        catalog: Catalog | None = None,
+    ):
+        """Initialise a SoilGrids backend instance.
+
+        Resolves every requested property id against the catalog (did-you-mean
+        on a miss) **before** the parent constructor runs.
+
+        Args:
+            start: Accepted for facade parity; ignored (SoilGrids is static).
+            end: Accepted for facade parity; ignored.
+            lat_lim: `[lat_min, lat_max]` bounding-box latitudes. Required.
+            lon_lim: `[lon_min, lon_max]` bounding-box longitudes. Required.
+            variables: SoilGrids property ids (`["clay", "phh2o"]`). Required.
+                List ids with `earthlens.soilgrids.Catalog().parameters()`.
+            temporal_resolution: Advisory label only (the maps are static).
+            path: Output directory for the written GeoTIFF(s).
+            fmt: Accepted for facade parity; unused.
+            depths: Depth intervals to fetch (`["0-5cm", "5-15cm"]`), or `None`
+                for every depth each property publishes (all six standard
+                depths, or the single `0-30cm` for `ocs`).
+            quantiles: Quantile / layer tokens to fetch (`["mean", "Q0.05"]`),
+                or `None` for the `mean` layer only.
+            output_crs: CRS to reproject the coverage into. Defaults to
+                `"EPSG:4326"` (lon/lat output); pass `None` to keep the native
+                Interrupted Goode Homolosine grid.
+            resolution: Output pixel size in `output_crs` units. `None`
+                (default) keeps the native 250 m resolution (≈0.0025° in
+                EPSG:4326).
+            coverage_crs: The coverage's real CRS, handed to the WCS reader so
+                the SoilGrids IGH grid resolves. Defaults to `IGH_PROJ4`;
+                override only if ISRIC changes its native projection.
+            timeout: Per-request HTTP timeout (seconds) for the WCS calls.
+            catalog: Optional pre-built `Catalog` (tests inject a faked one);
+                defaults to the bundled catalog.
+
+        Raises:
+            ValueError: If `variables` is empty / unknown (did-you-mean
+                surfaced) or the bounding box is missing.
+            TypeError: If `variables` is a mapping (properties are named by id,
+                not a per-dataset map).
+        """
+        if isinstance(variables, dict):
+            raise TypeError(
+                "SoilGrids `variables` must be a list of property ids (e.g. "
+                "['clay', 'phh2o']), not a mapping."
+            )
+        if not variables:
+            raise ValueError(
+                "SoilGrids requires variables=[<property id>, ...] naming "
+                "curated properties (e.g. variables=['clay', 'phh2o']). List "
+                "ids with earthlens.soilgrids.Catalog().parameters()."
+            )
+        if lat_lim is None or lon_lim is None:
+            raise ValueError(
+                "SoilGrids requires a bounding box (lat_lim=[s, n], "
+                "lon_lim=[w, e]) — a property subset has no default global "
+                "extent."
+            )
+
+        self._catalog = catalog if catalog is not None else Catalog()
+        # Resolve every property up front so an unknown id fails at construction
+        # (did-you-mean), before any network call.
+        self._properties: list[Property] = [self._catalog.get(v) for v in variables]
+        self._depths_arg = depths
+        self._quantiles_arg = quantiles
+        self._output_crs = output_crs
+        self._resolution = resolution
+        self._coverage_crs = coverage_crs
+        self._timeout = timeout
+
+        super().__init__(
+            start=start,
+            end=end,
+            variables=list(variables),
+            temporal_resolution=temporal_resolution,
+            lat_lim=lat_lim,
+            lon_lim=lon_lim,
+            fmt=fmt,
+            path=path,
+        )
+
+    def _initialize(self):
+        """No client / auth — SoilGrids is public (returns `None`)."""
+        return None
+
+    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
+        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
+
+        Args:
+            lat_lim: `[lat_min, lat_max]` in degrees.
+            lon_lim: `[lon_min, lon_max]` in degrees.
+
+        Returns:
+            SpatialExtent: Validated, frozen bbox.
+        """
+        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
+
+    def _check_input_dates(
+        self, start: str, end: str, temporal_resolution: str, fmt: str
+    ) -> TemporalExtent:
+        """Return a degenerate (timeless) extent — the maps are static.
+
+        Args:
+            start: Ignored.
+            end: Ignored.
+            temporal_resolution: Recorded as the resolution label.
+            fmt: Ignored.
+
+        Returns:
+            TemporalExtent: A frozen model with `None` bounds and an empty date
+                index (a static soil-property map has no time axis).
+        """
+        return TemporalExtent(
+            start_date=None,
+            end_date=None,
+            resolution=temporal_resolution or "static",
+            dates=pd.DatetimeIndex([]),
+        )
+
+    def _api(self) -> list[Path]:
+        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
+        return self._api_via_search_fetch()
+
+    def _search(self) -> list[RemoteProduct]:
+        """Expand the request into one `RemoteProduct` per coverage triple.
+
+        No network: each product carries its `(property, depth, quantile)` and
+        the resolved property row in `metadata`, so a dry-run inspection is
+        cheap.
+
+        Returns:
+            list[RemoteProduct]: The download plan, one item per
+                `(property, depth, quantile)` coverage to fetch.
+        """
+        triples = expand_request(
+            [p.id for p in self._properties],
+            self._depths_arg,
+            self._quantiles_arg,
+            self._catalog,
+        )
+        plan: list[RemoteProduct] = []
+        for property_id, depth, quantile in triples:
+            row = self._catalog.get(property_id)
+            plan.append(
+                RemoteProduct(
+                    id=coverage_id(property_id, depth, quantile),
+                    href=row.endpoint,
+                    metadata={
+                        "property": property_id,
+                        "depth": depth,
+                        "quantile": quantile,
+                        "row": row,
+                    },
+                )
+            )
+        return plan
+
+    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+        """Fetch every coverage via `Dataset.from_wcs`, writing one GeoTIFF each.
+
+        Args:
+            products: The plan from :meth:`_search`.
+
+        Returns:
+            list[Path]: The written GeoTIFF path(s), in `products` order.
+        """
+        return [self._fetch_one(product) for product in products]
+
+    def _fetch_one(self, product: RemoteProduct) -> Path:
+        """Fetch one coverage's bbox window as a GeoTIFF over WCS.
+
+        Uses `pyramids.dataset.Dataset.from_wcs` — GDAL's WCS driver inside
+        pyramids does the transport, handed `coverage_crs` so SoilGrids' custom
+        IGH grid resolves and `output_crs` for the lon/lat reprojection. The
+        scaled-integer unit metadata is logged (never applied — the pixels stay
+        as stored integers, `G2`).
+
+        Args:
+            product: The `RemoteProduct` whose `metadata` carries the resolved
+                property row + the `(depth, quantile)` cell.
+
+        Returns:
+            Path: The written GeoTIFF at
+                `<root_dir>/<property>_<depth>_<quantile>.tif`.
+        """
+        from pyramids.dataset import Dataset
+
+        row: Property = product.metadata["row"]
+        out_path = self.root_dir / f"{product.id}.tif"
+        logger.info(
+            f"soilgrids {product.id}: WCS subset {row.endpoint} "
+            f"(values are scaled integers in {row.mapped_units or 'native units'}"
+            f"; divide by {row.scale_factor:g} for {row.unit or 'the unit'})"
+        )
+        dataset = Dataset.from_wcs(
+            row.endpoint,
+            coverage=product.id,
+            bbox=bbox_from_extent(self.space),
+            crs="EPSG:4326",
+            coverage_crs=self._coverage_crs,
+            output_crs=self._output_crs,
+            resolution=self._resolution,
+            output=str(out_path),
+            timeout=self._timeout,
+        )
+        _close_dataset(dataset)
+        return out_path
+
+    def download(
+        self,
+        progress_bar: bool = True,
+        aggregate: AggregationConfig | None = None,
+    ) -> list[Path]:
+        """Fetch every requested coverage's bbox subset as a written GeoTIFF.
+
+        Args:
+            progress_bar: Accepted for signature parity; one fetch per coverage.
+            aggregate: Must be `None`. SoilGrids is a single static prediction
+                with no temporal axis, so a non-`None` value raises
+                `NotImplementedError` (the facade already gates this; this is the
+                belt-and-suspenders guard for direct callers).
+
+        Returns:
+            list[Path]: The written GeoTIFF path(s), one per
+                `(property, depth, quantile)` coverage requested.
+
+        Raises:
+            NotImplementedError: If `aggregate` is not `None`.
+        """
+        if aggregate is not None:
+            raise NotImplementedError(
+                "SoilGrids.download(aggregate=...) is not supported: SoilGrids "
+                "is a static soil-property map with no temporal axis, so there "
+                "is nothing to reduce. Call download() without aggregate=."
+            )
+        paths = self._api()
+        logger.info(f"soilgrids attribution: {SOILGRIDS_ATTRIBUTION}")
+        return paths
+
+
+def _close_dataset(dataset: object) -> None:
+    """Release a pyramids `Dataset`'s underlying GDAL handle if it exposes one.
+
+    Closing the dataset lets the OS release the file lock (notably on Windows)
+    once the GeoTIFF is written. A no-op when the object has no `close`.
+
+    Args:
+        dataset: A pyramids `Dataset` (or anything with an optional `close`).
+    """
+    closer = getattr(dataset, "close", None)
+    if callable(closer):
+        try:
+            closer()
+        except Exception:  # noqa: BLE001 - best-effort handle release
+            pass

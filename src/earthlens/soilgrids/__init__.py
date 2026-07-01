@@ -11,8 +11,9 @@ The WCS transport lives in `pyramids` (`Dataset.from_wcs`, released in
 pyramids 0.38.0) — SoilGrids' native grid is a custom Interrupted Goode
 Homolosine (`EPSG:152160`) that PROJ cannot resolve, so the reader is handed
 the IGH proj4 string (`IGH_PROJ4`) as its `coverage_crs` shim. There is no auth
-module — SoilGrids is open, CC-BY 4.0. This subpackage never imports `owslib`
-or `xarray`; the GIS I/O is pyramids' job.
+module — SoilGrids is open, CC-BY 4.0. This subpackage imports no OGC-WCS SDK
+and no array library directly; the WCS transport and GeoTIFF I/O are pyramids'
+job.
 """
 
 from __future__ import annotations
@@ -25,9 +26,11 @@ from earthlens.soilgrids._helpers import (
     coverage_id,
     expand_request,
 )
+from earthlens.soilgrids.backend import SoilGrids
 from earthlens.soilgrids.catalog import CATALOG_PATH, Catalog, Property
 
 __all__ = [
+    "SoilGrids",
     "Catalog",
     "Property",
     "CATALOG_PATH",
