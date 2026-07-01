@@ -174,6 +174,36 @@ class TestNWPModel:
         assert NWPModel(provider="noaa-nodd", license="PD-US-GOV").license == "PD-US-GOV"
 
 
+class TestBundledTitles:
+    """Tests that every shipped row carries a human-readable title + description."""
+
+    def test_every_row_has_a_title(self):
+        """No bundled NWP model row is missing its `title`."""
+        from earthlens.nwp import Catalog
+
+        missing = [k for k, m in Catalog().datasets.items() if not m.title]
+        assert missing == [], f"rows without title: {missing}"
+
+    def test_every_row_has_a_description(self):
+        """No bundled NWP model row is missing its `description`."""
+        from earthlens.nwp import Catalog
+
+        missing = [k for k, m in Catalog().datasets.items() if not m.description]
+        assert missing == [], f"rows without description: {missing}"
+
+    def test_title_and_description_default_to_none(self):
+        """An ad-hoc row leaves title / description as None (never inferred)."""
+        model = NWPModel(provider="noaa-nodd")
+        assert model.title is None and model.description is None
+
+    def test_cli_title_resolves_from_the_row(self):
+        """The federated CLI title column reads the row's `title`."""
+        from earthlens.cli.adapter import record_title
+        from earthlens.nwp import Catalog
+
+        assert record_title(Catalog().datasets["gfs"]) == "NOAA GFS (Global Forecast System)"
+
+
 class TestBundledLicenses:
     """Tests for C2: every shipped row carries its provider's license."""
 

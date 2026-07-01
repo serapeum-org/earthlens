@@ -193,6 +193,16 @@ class NWPModel(BaseModel):
             `NWP._aggregate` checks this field — not the URL — to refuse
             aggregation on a grid `pyramids.dataset.DatasetCollection`
             cannot co-register.
+        title: Short human-readable label (e.g. `"NOAA GFS (Global
+            Forecast System)"`). Surfaced as the `title` column in the
+            federated `earthlens datasets where / search / list` CLI
+            output, so an `nwp` row reads the same as its `gee` / `s3` /
+            `radar` siblings instead of a blank cell. `None` for an
+            ad-hoc row.
+        description: One-sentence summary of the model — provider,
+            domain, resolution, and forecast horizon. Backs the CLI's
+            title fallback and gives `datasets search` free-text a
+            richer field to match against. `None` for an ad-hoc row.
 
     Examples:
         - Build a minimal Herbie-backed row and read its selector:
@@ -241,6 +251,8 @@ class NWPModel(BaseModel):
     license: str | None = None
     retention_days: int | None = None
     grid_kind: Literal["regular-latlon", "icosahedral"] = "regular-latlon"
+    title: str | None = None
+    description: str | None = None
 
 
 class Catalog(AbstractCatalog):
