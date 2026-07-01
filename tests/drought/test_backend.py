@@ -319,13 +319,18 @@ def test_usdm_fetch_clips_to_bbox(monkeypatch, tmp_path):
 
 def test_usdm_honours_payload_crs_member(monkeypatch, tmp_path):
     """A GeoJSON `crs` member is respected (defensive reproject reachable)."""
-    # Build a payload with USA Contiguous Albers Equal-Area metre coords +
-    # the corresponding RFC 7946-style crs member (USDM historical shape).
-    albers_payload = {
+    # Build a payload with projected metre coords + a matching RFC 7946-style
+    # crs member (the non-4326 shape USDM historical files carry). Web Mercator
+    # (EPSG:3857) is used deliberately: its transform to EPSG:4326 is a closed
+    # form needing no PROJ datum grids, so the reproject behaves identically on
+    # minimal PROJ builds (e.g. the conda-forge GDAL the wheel-test job installs)
+    # as on the source env — a datum-shift CRS like EPSG:5070 drops the feature
+    # when the grid is absent.
+    mercator_payload = {
         "type": "FeatureCollection",
         "crs": {
             "type": "name",
-            "properties": {"name": "EPSG:5070"},
+            "properties": {"name": "EPSG:3857"},
         },
         "features": [
             {
@@ -335,11 +340,11 @@ def test_usdm_honours_payload_crs_member(monkeypatch, tmp_path):
                     "coordinates": [
                         [
                             [
-                                [-500_000.0, 1_700_000.0],
-                                [500_000.0, 1_700_000.0],
-                                [500_000.0, 2_300_000.0],
-                                [-500_000.0, 2_300_000.0],
-                                [-500_000.0, 1_700_000.0],
+                                [-10_000_000.0, 4_000_000.0],
+                                [-9_000_000.0, 4_000_000.0],
+                                [-9_000_000.0, 5_000_000.0],
+                                [-10_000_000.0, 5_000_000.0],
+                                [-10_000_000.0, 4_000_000.0],
                             ]
                         ]
                     ],
@@ -354,7 +359,7 @@ def test_usdm_honours_payload_crs_member(monkeypatch, tmp_path):
         ],
     }
     monkeypatch.setattr(
-        backend_module, "_http_get_json", lambda url: albers_payload
+        backend_module, "_http_get_json", lambda url: mercator_payload
     )
     backend = Drought(
         start="2026-06-23",
@@ -366,8 +371,9 @@ def test_usdm_honours_payload_crs_member(monkeypatch, tmp_path):
     fc = backend.download(progress_bar=False)
     assert fc.crs.to_epsg() == 4326
     assert len(fc) == 1
-    # The Albers metre coords map to ~ Texas/Oklahoma — well inside the
-    # CONUS bbox, so the polygon survives the clip (proves the reproject ran).
+    # The Web Mercator metre coords map to ~ the south-eastern US (lon -90..-81,
+    # lat 34..41) — well inside the world bbox, so the polygon survives the clip
+    # (proves the reproject ran).
 
 
 def test_crs_from_geojson_handles_variants():
