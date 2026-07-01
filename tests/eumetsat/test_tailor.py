@@ -1,0 +1,259 @@
+"""Unit + integration tests for the EUMETSAT Data Tailor branch (mocked `eumdac`)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from earthlens.eumetsat import EUMETSAT, TailorConfig
+from tests.eumetsat.conftest import _FakeCustomisation, _FakeProduct
+
+pytestmark = pytest.mark.eumetsat
+
+_CREDS = {"consumer_key": "k", "consumer_secret": "s"}
+_OLCI = "EO:EUM:DAT:0409"  # s3-olci-l1-efr, tailor_product_type OLL1EFR
+
+
+def _backend(fake_eumdac, tmp_path, variables, **kwargs):
+    """Build an EUMETSAT backend wired to the fake `eumdac`."""
+    return EUMETSAT(
+        start="2024-01-01",
+        end="2024-01-02",
+        variables=variables,
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+        **kwargs,
+    )
+
+
+# --- TailorConfig -----------------------------------------------------------
+
+
+def test_tailorconfig_nswe_from_bbox():
+    """bbox (west, south, east, north) maps to the [N, S, W, E] ROI list."""
+    cfg = TailorConfig(format="geotiff", crs="geographic", bbox=(4, 48, 8, 52))
+    assert cfg.nswe == [52.0, 48.0, 4.0, 8.0]
+
+
+def test_tailorconfig_defaults_and_no_bbox():
+    """Defaults are geotiff/geographic and no bbox yields no ROI list."""
+    cfg = TailorConfig()
+    assert cfg.format == "geotiff"
+    assert cfg.crs == "geographic"
+    assert cfg.nswe is None
+
+
+def test_tailorconfig_is_frozen_and_forbids_extra():
+    """TailorConfig is immutable and rejects unknown fields."""
+    cfg = TailorConfig()
+    with pytest.raises(Exception):
+        cfg.format = "netcdf4"
+    with pytest.raises(Exception):
+        TailorConfig(bogus=1)
+
+
+def test_tailorconfig_rejects_blank_format():
+    """A blank format / crs is rejected."""
+    with pytest.raises(Exception):
+        TailorConfig(format="  ")
+
+
+def test_nswe_from_extent_orders_bounds():
+    """nswe_from_extent returns bounds in [N, S, W, E] order."""
+    assert TailorConfig.nswe_from_extent(52, 48, 4, 8) == [52, 48, 4, 8]
+
+
+# --- happy path -------------------------------------------------------------
+
+
+def test_tailor_happy_path_builds_chain_streams_and_deletes(fake_eumdac, tmp_path):
+    """A tailorable request builds the Chain, polls to DONE, streams, deletes."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    cust = _FakeCustomisation(
+        statuses=["QUEUED", "RUNNING", "DONE"], outputs=["a.tif", "b.tif"]
+    )
+    fake_eumdac.tailor.customisation = cust
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    paths = backend.download(
+        progress_bar=False,
+        tailor=TailorConfig(format="geotiff", crs="geographic", bbox=(4, 48, 8, 52)),
+    )
+    assert {p.name for p in paths} == {"a.tif", "b.tif"}
+    _product, chain = fake_eumdac.tailor.submitted[0]
+    assert chain.product == "OLL1EFR"
+    assert chain.format == "geotiff"
+    assert chain.projection == "geographic"
+    assert chain.roi.NSWE == [52.0, 48.0, 4.0, 8.0]
+    assert chain.filter is None
+    assert cust.deleted == 1
+    assert (tmp_path / "a.tif").read_bytes().startswith(b"TAILORED")
+
+
+def test_tailor_roi_falls_back_to_request_extent(fake_eumdac, tmp_path):
+    """With no bbox, the ROI comes from the request lat_lim / lon_lim."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(outputs=["o.tif"])
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    backend.download(progress_bar=False, tailor=TailorConfig())
+    _product, chain = fake_eumdac.tailor.submitted[0]
+    assert chain.roi.NSWE == [52.0, 50.0, -1.0, 1.0]
+
+
+def test_tailor_filter_and_quicklook_forwarded(fake_eumdac, tmp_path):
+    """filter maps to a Filter(bands=...) and quicklook=True is forwarded."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(outputs=["o.tif"])
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    backend.download(
+        progress_bar=False,
+        tailor=TailorConfig(filter=["B1", "B2"], quicklook=True),
+    )
+    _product, chain = fake_eumdac.tailor.submitted[0]
+    assert chain.filter.bands == ["B1", "B2"]
+    assert chain.quicklook is True
+
+
+# --- failure + lifecycle ----------------------------------------------------
+
+
+@pytest.mark.parametrize("terminal", ["FAILED", "KILLED"])
+def test_tailor_non_done_terminal_raises_and_deletes(fake_eumdac, tmp_path, terminal):
+    """A FAILED / KILLED customisation raises with the log and still deletes."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    cust = _FakeCustomisation(statuses=[terminal], logfile="boom-in-log")
+    fake_eumdac.tailor.customisation = cust
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    with pytest.raises(RuntimeError, match=terminal):
+        backend.download(progress_bar=False, tailor=TailorConfig())
+    assert cust.deleted == 1
+    assert "boom-in-log" in str(cust.logfile)
+
+
+def test_tailor_timeout_raises_and_deletes(fake_eumdac, tmp_path, monkeypatch):
+    """A job that never reaches a terminal state times out and is deleted."""
+    monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_POLL_TIMEOUT_S", 0.0)
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    cust = _FakeCustomisation(statuses=["RUNNING"])
+    fake_eumdac.tailor.customisation = cust
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    with pytest.raises(TimeoutError, match="did not finish"):
+        backend.download(progress_bar=False, tailor=TailorConfig())
+    assert cust.deleted == 1
+
+
+def test_tailor_missing_logfile_uses_placeholder(fake_eumdac, tmp_path):
+    """A FAILED job whose logfile read fails still raises with a placeholder."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+
+    class _NoLog(_FakeCustomisation):
+        @property
+        def logfile(self):
+            raise RuntimeError("log endpoint down")
+
+    cust = _NoLog(statuses=["FAILED"])
+    fake_eumdac.tailor.customisation = cust
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    with pytest.raises(RuntimeError, match="no customisation log"):
+        backend.download(progress_bar=False, tailor=TailorConfig())
+    assert cust.deleted == 1
+
+
+# --- eligibility ------------------------------------------------------------
+
+
+def test_tailor_non_eligible_dataset_raises_before_submit(fake_eumdac, tmp_path):
+    """A dataset without tailor_product_type is rejected before any search."""
+    backend = _backend(fake_eumdac, tmp_path, {"s5p-l2-no2": ["x"]})
+    with pytest.raises(ValueError, match="not Data-Tailor-eligible"):
+        backend.download(progress_bar=False, tailor=TailorConfig())
+    assert fake_eumdac.tailor.submitted == []
+    assert fake_eumdac.store.search_calls == []
+
+
+def test_tailor_one_defensive_eligibility_guard(fake_eumdac, tmp_path):
+    """_tailor_one re-checks eligibility per product (defensive guard)."""
+    import types
+
+    from earthlens.eumetsat.catalog import EumetsatDataset
+
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    ineligible = EumetsatDataset(collection_id="X", group="MSG", tailor_product_type=None)
+    product = types.SimpleNamespace(metadata={"product": object(), "dataset": ineligible})
+    with pytest.raises(ValueError, match="not Data-Tailor-eligible"):
+        backend._tailor_one(product, TailorConfig(), fake_eumdac.tailor)
+
+
+# --- submit retry (G8) ------------------------------------------------------
+
+
+def test_tailor_submit_retries_transient_then_succeeds(fake_eumdac, tmp_path, monkeypatch):
+    """A transient 502 on submit is retried and the second attempt succeeds."""
+    monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_SUBMIT_BACKOFF_S", 0.0)
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(outputs=["o.tif"])
+    fake_eumdac.tailor.submit_errors = [RuntimeError("502 Bad Gateway"), None]
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    paths = backend.download(progress_bar=False, tailor=TailorConfig())
+    assert [p.name for p in paths] == ["o.tif"]
+    assert len(fake_eumdac.tailor.submitted) == 2
+
+
+def test_tailor_submit_non_transient_raised_immediately(fake_eumdac, tmp_path):
+    """A non-transient submit error (bad product id) is not retried."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.submit_errors = [ValueError("Invalid product-ID 'X'")]
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    with pytest.raises(ValueError, match="Invalid product-ID"):
+        backend.download(progress_bar=False, tailor=TailorConfig())
+    assert len(fake_eumdac.tailor.submitted) == 1
+
+
+def test_tailor_submit_transient_exhausted_raises_runtime(fake_eumdac, tmp_path, monkeypatch):
+    """Repeated transient submit failures exhaust the retries and raise."""
+    monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_SUBMIT_BACKOFF_S", 0.0)
+    monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_SUBMIT_RETRIES", 3)
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.submit_errors = [RuntimeError("502 Bad Gateway")] * 3
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    with pytest.raises(RuntimeError, match="transient attempts"):
+        backend.download(progress_bar=False, tailor=TailorConfig())
+    assert len(fake_eumdac.tailor.submitted) == 3
+
+
+# --- native regression ------------------------------------------------------
+
+
+def test_native_download_unchanged_without_tailor(fake_eumdac, tmp_path):
+    """Without tailor=, download fetches the native product and never tailors."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("native.nc", b"NATIVE")]
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    paths = backend.download(progress_bar=False)
+    assert [p.name for p in paths] == ["native.nc"]
+    assert (tmp_path / "native.nc").read_bytes() == b"NATIVE"
+    assert fake_eumdac.tailor.submitted == []
+
+
+# --- static conformance guards (A2) ----------------------------------------
+
+
+def _eumetsat_py_files() -> list[Path]:
+    src = Path(__file__).resolve().parents[2] / "src" / "earthlens" / "eumetsat"
+    return list(src.rglob("*.py"))
+
+
+def test_no_xarray_import_in_eumetsat():
+    """The customised file reads via pyramids — the backend never imports xarray."""
+    offenders = [p for p in _eumetsat_py_files() if "xarray" in p.read_text(encoding="utf-8")]
+    assert not offenders, f"xarray referenced in {offenders}"
+
+
+def test_no_hardcoded_credentials_in_eumetsat():
+    """No long consumer key/secret literal is committed in the backend source."""
+    import re
+
+    pattern = re.compile(r"consumer_(?:key|secret)\s*=\s*[\"'][A-Za-z0-9]{20,}[\"']")
+    offenders = [p for p in _eumetsat_py_files() if pattern.search(p.read_text(encoding="utf-8"))]
+    assert not offenders, f"hardcoded credential literal in {offenders}"
