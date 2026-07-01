@@ -33,6 +33,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.spatial import mask_to_geometry
 from earthlens.soilgrids._helpers import (
     IGH_PROJ4,
     SOILGRIDS_ATTRIBUTION,
@@ -57,8 +58,9 @@ class SoilGrids(AbstractDataSource):
 
     Attributes:
         OUTPUT_KIND: Fixed `"raster"`; every coverage yields a gridded GeoTIFF.
-            The facade reads it to gate `aggregate=` (rejected here — SoilGrids
-            is a static soil-property map with no temporal axis).
+            The facade forwards `aggregate=` to raster backends, so `download`
+            rejects it here (SoilGrids is a static soil-property map with no
+            temporal axis).
 
     Examples:
         - Two properties at their default depths / the `mean` layer write one
@@ -166,6 +168,7 @@ class SoilGrids(AbstractDataSource):
         self._resolution = resolution
         self._coverage_crs = coverage_crs
         self._timeout = timeout
+        self._show_progress = True
 
         super().__init__(
             start=start,
@@ -217,8 +220,12 @@ class SoilGrids(AbstractDataSource):
         )
 
     def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
+        """Map `_fetch_one` over the plan under an optional per-coverage bar."""
+        return self._search_fetch_each(
+            progress_bar=self._show_progress,
+            desc="soilgrids",
+            unit="coverage",
+        )
 
     def _search(self) -> list[RemoteProduct]:
         """Expand the request into one `RemoteProduct` per coverage triple.
@@ -231,15 +238,16 @@ class SoilGrids(AbstractDataSource):
             list[RemoteProduct]: The download plan, one item per
                 `(property, depth, quantile)` coverage to fetch.
         """
+        rows_by_id = {row.id: row for row in self._properties}
         triples = expand_request(
-            [p.id for p in self._properties],
+            list(rows_by_id),
             self._depths_arg,
             self._quantiles_arg,
             self._catalog,
         )
         plan: list[RemoteProduct] = []
         for property_id, depth, quantile in triples:
-            row = self._catalog.get(property_id)
+            row = rows_by_id[property_id]
             plan.append(
                 RemoteProduct(
                     id=coverage_id(property_id, depth, quantile),
@@ -254,23 +262,15 @@ class SoilGrids(AbstractDataSource):
             )
         return plan
 
-    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Fetch every coverage via `Dataset.from_wcs`, writing one GeoTIFF each.
-
-        Args:
-            products: The plan from :meth:`_search`.
-
-        Returns:
-            list[Path]: The written GeoTIFF path(s), in `products` order.
-        """
-        return [self._fetch_one(product) for product in products]
-
     def _fetch_one(self, product: RemoteProduct) -> Path:
         """Fetch one coverage's bbox window as a GeoTIFF over WCS.
 
         Uses `pyramids.dataset.Dataset.from_wcs` — GDAL's WCS driver inside
         pyramids does the transport, handed `coverage_crs` so SoilGrids' custom
-        IGH grid resolves and `output_crs` for the lon/lat reprojection. The
+        IGH grid resolves and `output_crs` for the lon/lat reprojection. The WCS
+        subset is rectangular; when the request carried a polygon `aoi=` (stored
+        on `self.space.geometry`), the fetched coverage is masked to that exact
+        shape before writing, matching the peer raster backends. The
         scaled-integer unit metadata is logged (never applied — the pixels stay
         as stored integers, `G2`).
 
@@ -291,6 +291,10 @@ class SoilGrids(AbstractDataSource):
             f"(values are scaled integers in {row.mapped_units or 'native units'}"
             f"; divide by {row.scale_factor:g} for {row.unit or 'the unit'})"
         )
+        # A polygon aoi= needs a client-side mask; the server only honours a
+        # rectangular bbox. Fetch in-memory then mask + write; with no polygon,
+        # let from_wcs write the bbox subset straight to disk.
+        has_mask = getattr(self.space, "geometry", None) is not None
         dataset = Dataset.from_wcs(
             row.endpoint,
             coverage=product.id,
@@ -299,9 +303,13 @@ class SoilGrids(AbstractDataSource):
             coverage_crs=self._coverage_crs,
             output_crs=self._output_crs,
             resolution=self._resolution,
-            output=str(out_path),
+            output=None if has_mask else str(out_path),
             timeout=self._timeout,
         )
+        if has_mask:
+            masked = mask_to_geometry(dataset, self.space)
+            masked.to_file(str(out_path))
+            _close_dataset(masked)
         _close_dataset(dataset)
         return out_path
 
@@ -313,11 +321,13 @@ class SoilGrids(AbstractDataSource):
         """Fetch every requested coverage's bbox subset as a written GeoTIFF.
 
         Args:
-            progress_bar: Accepted for signature parity; one fetch per coverage.
+            progress_bar: Show a per-coverage `tqdm` bar (a request can expand to
+                many coverages). Defaults to `True`.
             aggregate: Must be `None`. SoilGrids is a single static prediction
                 with no temporal axis, so a non-`None` value raises
-                `NotImplementedError` (the facade already gates this; this is the
-                belt-and-suspenders guard for direct callers).
+                `NotImplementedError`. The facade forwards `aggregate=` to raster
+                backends without pre-rejecting it, so this guard is the actual
+                gate, not a secondary check.
 
         Returns:
             list[Path]: The written GeoTIFF path(s), one per
@@ -332,6 +342,7 @@ class SoilGrids(AbstractDataSource):
                 "is a static soil-property map with no temporal axis, so there "
                 "is nothing to reduce. Call download() without aggregate=."
             )
+        self._show_progress = progress_bar
         paths = self._api()
         logger.info(f"soilgrids attribution: {SOILGRIDS_ATTRIBUTION}")
         return paths

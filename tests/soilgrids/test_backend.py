@@ -18,6 +18,9 @@ LAT = [51.0, 52.0]
 LON = [5.0, 6.0]
 STD_DEPTHS = ["0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm"]
 
+#: A sentinel polygon mask — the faked crop only records it, never reads it.
+_GEOMETRY = object()
+
 
 class _BoomDataset:
     """A fake dataset whose close() raises, to exercise the best-effort guard."""
@@ -81,7 +84,9 @@ def test_output_crs_and_resolution_are_forwarded(
     fake_from_wcs: type[FakeDataset], tmp_path: Path
 ) -> None:
     """A native-CRS request forwards output_crs=None and a scalar resolution."""
-    _backend(tmp_path, ["clay"], depths=["0-5cm"], output_crs=None, resolution=250.0).download()
+    _backend(
+        tmp_path, ["clay"], depths=["0-5cm"], output_crs=None, resolution=250.0
+    ).download()
     call = fake_from_wcs.recorder[0]
     assert call["output_crs"] is None
     assert call["resolution"] == 250.0
@@ -93,6 +98,56 @@ def test_coverage_crs_override_is_used(
     """A custom coverage_crs overrides the default IGH shim."""
     _backend(tmp_path, ["clay"], depths=["0-5cm"], coverage_crs="EPSG:4326").download()
     assert fake_from_wcs.recorder[0]["coverage_crs"] == "EPSG:4326"
+
+
+def test_custom_output_crs_is_forwarded(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """A reprojecting output_crs is threaded through to from_wcs."""
+    _backend(tmp_path, ["clay"], depths=["0-5cm"], output_crs="EPSG:3857").download()
+    assert fake_from_wcs.recorder[0]["output_crs"] == "EPSG:3857"
+
+
+def test_multiple_properties_fetch_every_cell(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """Two properties at their defaults fetch all 12 (2 x 6 depths) coverages."""
+    paths = _backend(tmp_path, ["clay", "phh2o"]).download()
+    assert len(paths) == len(STD_DEPTHS) * 2
+    covers = {c["coverage"] for c in fake_from_wcs.recorder}
+    assert "clay_0-5cm_mean" in covers
+    assert "phh2o_100-200cm_mean" in covers
+
+
+def test_polygon_aoi_masks_the_result(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """A polygon aoi= masks the fetched coverage instead of writing bbox-only."""
+    backend = _backend(tmp_path, ["clay"], depths=["0-5cm"])
+    backend._attach_clip_geometry(_GEOMETRY)
+    paths = backend.download()
+    assert paths == [tmp_path / "clay_0-5cm_mean.tif"]
+    assert fake_from_wcs.recorder[0]["output"] is None
+    assert fake_from_wcs.masks == [_GEOMETRY]
+    assert fake_from_wcs.written == [str(tmp_path / "clay_0-5cm_mean.tif")]
+
+
+def test_bbox_only_path_skips_the_mask(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """With no polygon aoi= the coverage is written straight from from_wcs."""
+    _backend(tmp_path, ["clay"], depths=["0-5cm"]).download()
+    assert fake_from_wcs.recorder[0]["output"].endswith("clay_0-5cm_mean.tif")
+    assert fake_from_wcs.masks == []
+
+
+def test_progress_flag_is_wired(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """download(progress_bar=...) is recorded and drives the per-coverage bar."""
+    backend = _backend(tmp_path, ["clay"], depths=["0-5cm"])
+    backend.download(progress_bar=False)
+    assert backend._show_progress is False
 
 
 def test_search_plans_without_network(tmp_path: Path) -> None:

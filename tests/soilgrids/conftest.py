@@ -13,10 +13,14 @@ class FakeDataset:
 
     The class-level `recorder` collects one kwargs dict per `from_wcs` call so a
     test can assert the coverage ids, bbox, endpoint, and CRS shim the backend
-    passed, without any network or GDAL.
+    passed, without any network or GDAL; `masks` and `written` record the
+    polygon-mask crop and the `to_file` writes on the mask path.
     """
 
     recorder: list[dict[str, Any]] = []
+    masks: list[Any] = []
+    written: list[str] = []
+    no_data_value = (-32768.0,)
 
     def __init__(self, coverage: str) -> None:
         self.coverage = coverage
@@ -31,6 +35,16 @@ class FakeDataset:
             Path(output).write_bytes(b"MM\x00*stub-geotiff")
         return cls(kwargs["coverage"])
 
+    def crop(self, mask: Any = None, touch: bool = True) -> "FakeDataset":
+        """Record the polygon mask and return the (still-fake) masked dataset."""
+        FakeDataset.masks.append(mask)
+        return self
+
+    def to_file(self, path: str) -> None:
+        """Record and write a stub GeoTIFF (the mask-path write)."""
+        FakeDataset.written.append(path)
+        Path(path).write_bytes(b"MM\x00*stub-geotiff")
+
     def close(self) -> None:
         """Mark the fake dataset closed (the backend releases the handle)."""
         self.closed = True
@@ -42,6 +56,8 @@ def fake_from_wcs(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
     from pyramids.dataset import Dataset
 
     FakeDataset.recorder = []
+    FakeDataset.masks = []
+    FakeDataset.written = []
     monkeypatch.setattr(Dataset, "from_wcs", FakeDataset.from_wcs)
     return FakeDataset
 
