@@ -47,6 +47,8 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from loguru import logger
+
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -80,12 +82,17 @@ _UNIVERSAL_KEYS: frozenset[str] = frozenset({"area", "data_format", "format", "g
 _CACHE: dict[str, list[dict[str, Any]] | None] = {}
 
 
-def fetch_constraints(dataset: str) -> list[dict[str, Any]]:
+def fetch_constraints(dataset: str, base_url: str | None = None) -> list[dict[str, Any]]:
     """Fetch and cache the constraints document for `dataset`.
 
     Args:
         dataset: CDS dataset short name
             (e.g. `"reanalysis-era5-single-levels"`).
+        base_url: CADS instance API root the dataset lives on (e.g.
+            `"https://ewds.climate.copernicus.eu/api"`). When `None`, the CDS
+            catalogue host is used. Non-CDS datasets (EWDS GloFAS, …) must pass
+            their own endpoint so constraints are fetched from the host that
+            actually publishes them, not the CDS host (which 404s).
 
     Returns:
         list[dict[str, Any]]: Each entry is a dict mapping selector
@@ -116,8 +123,15 @@ def fetch_constraints(dataset: str) -> list[dict[str, Any]]:
 
             ```
     """
-    if dataset not in _CACHE:
-        url = CONSTRAINTS_URL_TEMPLATE.format(dataset=dataset)
+    cache_key = f"{base_url or ''}|{dataset}"
+    if cache_key not in _CACHE:
+        if base_url:
+            url = (
+                f"{base_url.rstrip('/')}/catalogue/v1/collections/"
+                f"{dataset}/constraints.json"
+            )
+        else:
+            url = CONSTRAINTS_URL_TEMPLATE.format(dataset=dataset)
         if not url.startswith("https://"):
             raise ValueError(
                 f"refusing to fetch constraints from non-https URL: {url!r}"
@@ -134,9 +148,14 @@ def fetch_constraints(dataset: str) -> list[dict[str, Any]]:
             # "no constraints" so callers fall back to letting CDS
             # itself reject the request.
             payload = None
+        if not isinstance(payload, list):
+            logger.debug(
+                f"no constraints available for {dataset!r} at {url}; "
+                "skipping client-side pre-flight validation"
+            )
         # Cache `None` for "fetched, unusable" so later calls are cheap.
-        _CACHE[dataset] = payload if isinstance(payload, list) else None
-    return _CACHE[dataset] or []
+        _CACHE[cache_key] = payload if isinstance(payload, list) else None
+    return _CACHE[cache_key] or []
 
 
 class Dates(BaseModel):
@@ -306,17 +325,19 @@ class RequestValidator:
         dataset: str,
         request: dict[str, Any],
         skip: bool = False,
+        base_url: str | None = None,
     ) -> None:
         self.dataset = dataset
         self.request = request
         self.skip = skip
+        self.base_url = base_url
         self._constraints: list[dict[str, Any]] | None = None
 
     @property
     def constraints(self) -> list[dict[str, Any]]:
         """Lazily fetched (and cached) constraints document for `dataset`."""
         if self._constraints is None:
-            self._constraints = fetch_constraints(self.dataset)
+            self._constraints = fetch_constraints(self.dataset, self.base_url)
         return self._constraints
 
     def check(self) -> None:

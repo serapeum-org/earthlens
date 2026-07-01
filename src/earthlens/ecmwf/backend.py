@@ -882,7 +882,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # invalid extras combinations client-side before they
         # consume a CDS queue slot. Pass `skip_constraints=True`
         # to `ECMWF(...)` to bypass.
-        RequestValidator(dataset, request, skip=self.skip_constraints).check()
+        base_url = (
+            None
+            if var_info.endpoint == "cds"
+            else _ENDPOINT_URLS.get(var_info.endpoint)
+        )
+        RequestValidator(
+            dataset, request, skip=self.skip_constraints, base_url=base_url
+        ).check()
 
         target = self.root_dir / f"{var_info.cds_variable}_{dataset}.nc"
         client = self._client_for(var_info.endpoint)

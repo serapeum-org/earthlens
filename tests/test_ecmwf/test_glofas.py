@@ -11,12 +11,34 @@ from __future__ import annotations
 import pytest
 
 from earthlens.ecmwf import Catalog, Variable
+from earthlens.ecmwf import constraints as constraints_mod
 from earthlens.ecmwf.backend import ECMWF
 
 pytestmark = [pytest.mark.unit]
 
 _GLOFAS = "cems-glofas-forecast"
 _GLOFAS_CODE = "river-discharge-in-the-last-24-hours"
+
+_CAPTURED_URL: dict[str, str] = {}
+
+
+class _FakeConstraintsResponse:
+    """Minimal urlopen context manager returning an empty constraints list."""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def read(self):
+        return b"[]"
+
+
+def _capturing_urlopen(url, timeout=15):
+    """Record the constraints URL and return an empty document."""
+    _CAPTURED_URL["url"] = url
+    return _FakeConstraintsResponse()
 
 
 def _glofas_backend(tmp_path):
@@ -127,6 +149,25 @@ class TestGridResolution:
 
         monkeypatch.setattr(backend_module, "Catalog", _boom)
         assert backend._grid_resolution_for_request() == pytest.approx(0.125)
+
+
+class TestGlofasConstraints:
+    """EWDS constraints are fetched from the EWDS host, not the CDS host."""
+
+    def test_constraints_url_uses_ewds_host(self, monkeypatch):
+        """A GloFAS constraints fetch targets the EWDS catalogue, not CDS."""
+        _CAPTURED_URL.clear()
+        constraints_mod._CACHE.clear()
+        monkeypatch.setattr(
+            constraints_mod.urllib.request, "urlopen", _capturing_urlopen
+        )
+        constraints_mod.fetch_constraints(
+            _GLOFAS, base_url="https://ewds.climate.copernicus.eu/api"
+        )
+        assert _CAPTURED_URL["url"] == (
+            "https://ewds.climate.copernicus.eu/api/catalogue/v1/collections/"
+            f"{_GLOFAS}/constraints.json"
+        )
 
 
 class TestApiRoutesByEndpoint:
