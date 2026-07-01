@@ -13,7 +13,6 @@ from earthlens.drought._helpers import (
     USDM_ATTRIBUTION,
     attribution_for,
     bbox_from_extent,
-    days_in_month,
     snap_to_cadence,
 )
 
@@ -149,10 +148,3 @@ def test_attribution_for_unknown_transport_raises():
     """An unknown transport key raises KeyError (caller-supplied bug)."""
     with pytest.raises(KeyError):
         attribution_for("ftp")
-
-
-def test_days_in_month_leap_year():
-    """`days_in_month` honours the leap-year rule."""
-    assert days_in_month(dt.date(2024, 2, 15)) == 29
-    assert days_in_month(dt.date(2025, 2, 15)) == 28
-    assert days_in_month(dt.date(2025, 4, 15)) == 30

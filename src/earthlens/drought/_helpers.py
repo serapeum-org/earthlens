@@ -3,7 +3,7 @@
 Three small stateless utilities the backend composes:
 
 * `snap_to_cadence` — clamp each requested date onto the source's release
-  calendar (USDM Thursday-valid, EDO/GDO 10-day dekads, SPEIbase month
+  calendar (USDM Tuesday-valid, EDO/GDO 10-day dekads, SPEIbase month
   start). The backend feeds the snapped list into one fetch per period
   (one FeatureCollection or one GeoTIFF each).
 * `bbox_from_extent` — turn a frozen `SpatialExtent` into the
@@ -18,7 +18,6 @@ do **no** network / file I/O.
 
 from __future__ import annotations
 
-import calendar
 import datetime as dt
 from typing import TYPE_CHECKING
 
@@ -116,9 +115,9 @@ def _snap_weekly(date: dt.date, today: dt.date | None = None) -> dt.date:
     Args:
         date: A calendar date.
         today: The reference "now" date the publication check is made
-            against. Defaults to `dt.date.today()` for live queries; tests
-            (and any caller wanting deterministic output) pass an explicit
-            date.
+            against. Defaults to `dt.date.today()` for live queries; pass
+            an explicit date for deterministic output against historical
+            data.
 
     Returns:
         datetime.date: The most recent Tuesday at-or-before `date` whose
@@ -280,18 +279,3 @@ def bbox_from_extent(
         float(space.longitude_max),
         float(space.latitude_max),
     )
-
-
-def days_in_month(date: dt.date) -> int:
-    """Return the number of days in `date`'s month.
-
-    Tiny wrapper kept module-scope (rather than nested in the backend) so
-    the SPEIbase month-end bound is testable in isolation.
-
-    Args:
-        date: A calendar date.
-
-    Returns:
-        int: 28 / 29 / 30 / 31 depending on month and leap year.
-    """
-    return calendar.monthrange(date.year, date.month)[1]
