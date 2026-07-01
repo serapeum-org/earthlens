@@ -47,6 +47,29 @@ def _raise_catalog_error():
     raise RuntimeError("catalog unreadable")
 
 
+_FETCH_CAPTURE: dict[str, object] = {}
+
+
+def _capturing_fetch_constraints(dataset, base_url=None):
+    """Record the `base_url` a constraints fetch was asked to use."""
+    _FETCH_CAPTURE["dataset"] = dataset
+    _FETCH_CAPTURE["base_url"] = base_url
+    return [{"variable": [_GLOFAS_CODE.replace("-", "_")], "system_version": ["operational"]}]
+
+
+_VALIDATOR_CAPTURE: dict[str, object] = {}
+
+
+class _CapturingValidator:
+    """Stand-in for `RequestValidator` that records the `base_url` it got."""
+
+    def __init__(self, dataset, request, skip=False, base_url=None):
+        _VALIDATOR_CAPTURE["base_url"] = base_url
+
+    def check(self):
+        return None
+
+
 def _glofas_backend(tmp_path):
     """Build a GloFAS-only `ECMWF` (offline; the client is never opened)."""
     return ECMWF(
@@ -213,6 +236,28 @@ class TestGlofasConstraints:
             "https://ewds.climate.copernicus.eu/api/catalogue/v1/collections/"
             f"{_GLOFAS}/constraints.json"
         )
+
+    def test_api_threads_ewds_base_url_into_validator(self, ecmwf_stub, monkeypatch):
+        """`_api` passes the EWDS constraints host to the RequestValidator."""
+        import earthlens.ecmwf.backend as backend_module
+
+        _VALIDATOR_CAPTURE.clear()
+        monkeypatch.setattr(backend_module, "RequestValidator", _CapturingValidator)
+        ecmwf_stub.skip_constraints = False
+        ecmwf_stub._api(Catalog().get_variable(_GLOFAS, _GLOFAS_CODE))
+        assert _VALIDATOR_CAPTURE["base_url"] == "https://ewds.climate.copernicus.eu/api"
+
+    def test_minimal_valid_request_uses_ewds_host(self, monkeypatch):
+        """`minimal_valid_request` fetches an EWDS dataset from the EWDS host."""
+        import earthlens.ecmwf.catalog as catalog_mod
+
+        _FETCH_CAPTURE.clear()
+        monkeypatch.setattr(
+            catalog_mod, "fetch_constraints", _capturing_fetch_constraints
+        )
+        request = Catalog().minimal_valid_request(_GLOFAS)
+        assert _FETCH_CAPTURE["base_url"] == "https://ewds.climate.copernicus.eu/api"
+        assert "variable" in request
 
 
 class TestApiRoutesByEndpoint:

@@ -25,11 +25,8 @@ from earthlens.base import (
 )
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
-from earthlens.ecmwf.endpoints import ENDPOINTS as _ENDPOINTS
+from earthlens.ecmwf.endpoints import constraints_base_url, endpoint_url
 from earthlens.ecmwf.endpoints import open_client as _open_endpoint_client
-
-# endpoint slug -> default URL, for building dataset / profile page links.
-_ENDPOINT_URLS: dict[str, str] = {slug: url for slug, (url, _u, _k) in _ENDPOINTS.items()}
 
 __all__ = ["AuthenticationError", "ECMWF", "ERA5_GRID_DEGREES"]
 
@@ -892,13 +889,11 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # invalid extras combinations client-side before they
         # consume a CDS queue slot. Pass `skip_constraints=True`
         # to `ECMWF(...)` to bypass.
-        base_url = (
-            None
-            if var_info.endpoint == "cds"
-            else _ENDPOINT_URLS.get(var_info.endpoint)
-        )
         RequestValidator(
-            dataset, request, skip=self.skip_constraints, base_url=base_url
+            dataset,
+            request,
+            skip=self.skip_constraints,
+            base_url=constraints_base_url(var_info.endpoint),
         ).check()
 
         target = self.root_dir / f"{var_info.cds_variable}_{dataset}.nc"
@@ -913,9 +908,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             Exception
         ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
             if _looks_like_licence_not_accepted(exc):
-                base = _ENDPOINT_URLS.get(
-                    var_info.endpoint, "https://cds.climate.copernicus.eu/api"
-                ).rsplit("/api", 1)[0]
+                base = endpoint_url(var_info.endpoint).rsplit("/api", 1)[0]
                 raise PermissionError(
                     f"{var_info.endpoint.upper()} rejected the request for "
                     f"{dataset!r}: licence not accepted. Open the dataset page "

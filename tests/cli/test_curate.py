@@ -655,7 +655,7 @@ class TestEcmwfProberBranches:
         import earthlens.ecmwf.constraints as constraints
 
         monkeypatch.setattr(
-            constraints, "fetch_constraints", lambda d: [{"variable": []}]
+            constraints, "fetch_constraints", lambda d, base_url=None: [{"variable": []}]
         )
         assert curate_mod._ecmwf_constraints("x") == [{"variable": []}]
 

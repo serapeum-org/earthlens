@@ -974,7 +974,11 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        constraints = fetch_constraints(dataset_name)
+        from earthlens.ecmwf.endpoints import constraints_base_url
+
+        dataset = self.datasets.get(dataset_name)
+        endpoint = dataset.endpoint if dataset is not None else "cds"
+        constraints = fetch_constraints(dataset_name, constraints_base_url(endpoint))
         request: dict[str, Any] = {"data_format": "netcdf"}
         if not constraints:
             return request

@@ -697,10 +697,19 @@ def _ghsl_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 
 
 def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
-    """Return a CDS dataset's public `constraints.json` rows (no creds)."""
-    from earthlens.ecmwf.constraints import fetch_constraints
+    """Return a dataset's public `constraints.json` rows (no creds).
 
-    return fetch_constraints(dataset)
+    Resolves the dataset's CADS endpoint from the catalog so EWDS/ADS datasets
+    are fetched from their own catalogue host rather than the CDS host (which
+    would 404 and silently return no rows).
+    """
+    from earthlens.ecmwf.catalog import Catalog
+    from earthlens.ecmwf.constraints import fetch_constraints
+    from earthlens.ecmwf.endpoints import constraints_base_url
+
+    record = Catalog().datasets.get(dataset)
+    endpoint = record.endpoint if record is not None else "cds"
+    return fetch_constraints(dataset, constraints_base_url(endpoint))
 
 
 def _ecmwf_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:

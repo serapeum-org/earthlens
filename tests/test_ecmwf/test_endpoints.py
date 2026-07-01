@@ -71,6 +71,15 @@ class TestOpenClient:
         assert client.url == "https://ewds.climate.copernicus.eu/api"
         assert client.key == "ewds-token"
 
+    def test_ads_uses_endpoint_url_and_key(self, monkeypatch):
+        """ADS builds `Client(url=ads, key=ADS_KEY)` from its own env key."""
+        _clear_cads_env(monkeypatch)
+        monkeypatch.setenv("ADS_KEY", "ads-token")
+        monkeypatch.setattr(cdsapi, "Client", _RecordingClient)
+        client = ep.open_client("ads")
+        assert client.url == "https://ads.atmosphere.copernicus.eu/api"
+        assert client.key == "ads-token"
+
     def test_ewds_falls_back_to_cdsapi_key_env(self, monkeypatch):
         """With no EWDS_KEY, EWDS reuses the shared `CDSAPI_KEY`."""
         _clear_cads_env(monkeypatch)

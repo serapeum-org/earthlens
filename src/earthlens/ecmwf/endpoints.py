@@ -23,7 +23,13 @@ from pathlib import Path
 
 import cdsapi
 
-__all__ = ["DEFAULT_ENDPOINT", "ENDPOINTS", "open_client"]
+__all__ = [
+    "DEFAULT_ENDPOINT",
+    "ENDPOINTS",
+    "constraints_base_url",
+    "endpoint_url",
+    "open_client",
+]
 
 DEFAULT_ENDPOINT: str = "cds"
 
@@ -36,6 +42,47 @@ ENDPOINTS: dict[str, tuple[str, str, str]] = {
     "ads": ("https://ads.atmosphere.copernicus.eu/api", "ADS_URL", "ADS_KEY"),
     "ewds": ("https://ewds.climate.copernicus.eu/api", "EWDS_URL", "EWDS_KEY"),
 }
+
+
+def endpoint_url(endpoint: str) -> str:
+    """Resolve a CADS endpoint's API root, honouring its URL-override env var.
+
+    The same resolution `open_client` uses, so the constraints host and the
+    licence/dataset-page links line up with the client's actual URL even when a
+    user points `<ENDPOINT>_URL` at a staging host.
+
+    Args:
+        endpoint: One of the slugs in `ENDPOINTS` (`"cds"` / `"ads"` / `"ewds"`).
+
+    Returns:
+        str: The resolved API root URL.
+
+    Raises:
+        ValueError: If `endpoint` is not a known slug.
+    """
+    if endpoint not in ENDPOINTS:
+        raise ValueError(
+            f"unknown ECMWF endpoint {endpoint!r}; expected one of {sorted(ENDPOINTS)}"
+        )
+    url_default, url_env, _key_env = ENDPOINTS[endpoint]
+    return os.environ.get(url_env, url_default)
+
+
+def constraints_base_url(endpoint: str) -> str | None:
+    """The base URL to fetch `constraints.json` from for `endpoint`.
+
+    Returns `None` for CDS so `fetch_constraints` uses its historic default
+    (`CONSTRAINTS_URL_TEMPLATE`); for a non-CDS endpoint it returns the
+    (env-aware) endpoint URL so EWDS/ADS datasets are validated against the
+    host that publishes their constraints.
+
+    Args:
+        endpoint: One of the slugs in `ENDPOINTS`.
+
+    Returns:
+        str | None: The base URL, or `None` for CDS.
+    """
+    return None if endpoint == "cds" else endpoint_url(endpoint)
 
 
 def _read_cdsapirc_key() -> str | None:
