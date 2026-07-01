@@ -130,7 +130,7 @@ datasets:
     native_crs: "EPSG:4326"
     timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
-  edo-lfinx:
+  edo-lfinx-lgs:
     source: "Copernicus European Drought Observatory (EDO)"
     transport: edo-wcs
     endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"

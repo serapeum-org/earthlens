@@ -13,7 +13,7 @@ from earthlens.drought import Catalog
 
 cat = Catalog()
 sorted(cat.datasets)[:5]
-# ['edo-cdiad', 'edo-cdinx', 'edo-cdirc', 'edo-fpanv', 'edo-lfinx']
+# ['edo-cdiad', 'edo-cdinx', 'edo-cdirc', 'edo-fpanv', 'edo-lfinx-lgs']
 
 row = cat.get("usdm")
 row.transport, row.output_kind, row.cadence
