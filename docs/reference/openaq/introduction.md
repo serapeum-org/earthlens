@@ -41,7 +41,7 @@ own server-side rollups via `temporal_resolution` (see
 
 ## Why it matters here
 
-The satellite and reanalysis backends (CAMS / ERA5 via CDS, TROPOMI and
+The satellite and reanalysis backends (ERA5 via CDS, TROPOMI and
 other atmospheric collections via Google Earth Engine) give you
 **modelled or remotely-sensed** air-quality fields with full spatial
 coverage but indirect measurements. OpenAQ is the complementary
