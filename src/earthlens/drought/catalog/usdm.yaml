@@ -1,0 +1,18 @@
+# US Drought Monitor (NDMC/UNL) — weekly D0-D4 polygon classes for the
+# continental United States. The live `.prj` ships EPSG:4326 (despite the
+# documented Albers projection — verified 2026-06-26, see captures/), so the
+# `to_crs("EPSG:4326")` step in the backend is a defensive no-op on current
+# files. The endpoint substitutes `{ymd}` (the Tuesday valid date in
+# `YYYYMMDD` form — USDM releases each Thursday, valid the prior Tuesday,
+# and the on-disk JSON / shapefile stem is keyed on that Tuesday) when
+# fetching a historical week; `usdm_current.json` exposes the latest release.
+datasets:
+  usdm:
+    source: "US Drought Monitor (NDMC / University of Nebraska-Lincoln)"
+    transport: usdm-geojson
+    endpoint: "https://droughtmonitor.unl.edu/data/json/usdm_{ymd}.json"
+    coverage: null
+    output_kind: vector
+    cadence: weekly
+    native_crs: "EPSG:4326"
+    license_note: "USDM public domain — cite NDMC / UNL"
