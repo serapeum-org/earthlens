@@ -91,8 +91,11 @@ def test_tailorconfig_rejects_bad_bbox(bbox):
 # --- happy path -------------------------------------------------------------
 
 
-def test_tailor_happy_path_builds_chain_streams_and_deletes(fake_eumdac, tmp_path):
+def test_tailor_happy_path_builds_chain_streams_and_deletes(
+    fake_eumdac, tmp_path, monkeypatch
+):
     """A tailorable request builds the Chain, polls to DONE, streams, deletes."""
+    monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_POLL_INITIAL_S", 0.0)
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
     cust = _FakeCustomisation(
         statuses=["QUEUED", "RUNNING", "DONE"], outputs=["a.tif", "b.tif"]
