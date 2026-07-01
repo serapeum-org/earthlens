@@ -106,7 +106,7 @@ class TestEdoLive:
 
         ds = Dataset.read_file(str(paths[0]))
         try:
-            assert ds.epsg in (4326, 0) or ds.epsg is not None
+            assert ds.epsg in (4326, 0)
         finally:
             ds.close()
 
