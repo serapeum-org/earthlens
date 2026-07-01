@@ -12,6 +12,7 @@ from earthlens.cli.validate import (
     ValidateResult,
     _live_ecmwf,
     _validate_bathymetry,
+    _validate_drought,
     _validate_erddap,
     _validate_nrel,
     _validate_nwp,
@@ -44,6 +45,7 @@ _CURATED_ENUM = (
     "radar",
     "tropycal",
     "gdacs",
+    "drought",
     "argo",
     "chc",
     "erddap",
@@ -108,6 +110,60 @@ class TestValidateOsm:
         )
         checked, issues = _validate_osm(catalog)
         assert any("missing ohsome_filter" in i for i in issues)
+
+
+class TestValidateDrought:
+    """Tests for the drought structural lint."""
+
+    def test_clean_rows_pass(self):
+        """A well-formed edo-wcs raster row and a usdm vector row report nothing."""
+        catalog = SimpleNamespace(
+            datasets={
+                "edo-spaST": SimpleNamespace(
+                    source="EDO", endpoint="https://x/wcs", output_kind="raster",
+                    cadence="10day", native_crs="EPSG:4326", transport="edo-wcs",
+                    coverage="spaST", timescale="01",
+                ),
+                "usdm": SimpleNamespace(
+                    source="USDM", endpoint="https://x/{ymd}.json",
+                    output_kind="vector", cadence="weekly", native_crs="EPSG:4326",
+                    transport="usdm-geojson", coverage=None, timescale=None,
+                ),
+            }
+        )
+        checked, issues = _validate_drought(catalog)
+        assert checked == 2
+        assert issues == []
+
+    def test_flags_edo_wcs_row_missing_coverage_and_timescale(self):
+        """An edo-wcs row without a coverage or timescale is flagged for each."""
+        catalog = SimpleNamespace(
+            datasets={
+                "edo-bad": SimpleNamespace(
+                    source="EDO", endpoint="https://x/wcs", output_kind="raster",
+                    cadence="10day", native_crs="EPSG:4326", transport="edo-wcs",
+                    coverage=None, timescale=None,
+                )
+            }
+        )
+        checked, issues = _validate_drought(catalog)
+        assert checked == 1
+        assert any("missing coverage" in i for i in issues)
+        assert any("missing timescale" in i for i in issues)
+
+    def test_flags_transport_output_kind_mismatch(self):
+        """A usdm-geojson row declared raster (or edo-wcs declared vector) is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "usdm": SimpleNamespace(
+                    source="USDM", endpoint="https://x", output_kind="raster",
+                    cadence="weekly", native_crs="EPSG:4326",
+                    transport="usdm-geojson", coverage=None, timescale=None,
+                )
+            }
+        )
+        _checked, issues = _validate_drought(catalog)
+        assert any("must be output_kind=vector" in i for i in issues)
 
 
 class TestValidateBathymetry:
