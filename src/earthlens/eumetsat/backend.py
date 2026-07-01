@@ -424,6 +424,12 @@ class EUMETSAT(AbstractDataSource):
         The two knobs compose — tailor server-side here, then reduce the
         result client-side with pyramids.
 
+        The tailor branch is **fail-fast per batch**: if one product's
+        customisation fails, the error propagates and paths already streamed
+        for earlier products are not returned (their files remain on disk).
+        This mirrors the native fetch; keep batches small when a partial
+        result would be costly to recompute.
+
         Args:
             progress_bar: Reserved for parity with the other backends;
                 `eumdac`'s streaming download has no built-in bar.
@@ -532,6 +538,9 @@ class EUMETSAT(AbstractDataSource):
                 carries the raw `eumdac` product handle and catalog row).
             tailor: The customisation request.
             datatailor: The live `eumdac.DataTailor` client.
+            used_dirs: Shared per-batch set of subdirectory names already
+                taken, mutated here to keep each product's output directory
+                unique across the request (`L3`).
 
         Returns:
             list[Path]: The customised output paths for this product.
