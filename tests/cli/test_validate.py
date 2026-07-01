@@ -128,7 +128,7 @@ class TestValidateSoilgrids:
         )
         checked, issues = _validate_soilgrids(catalog)
         assert checked == 1
-        assert any("maps.isric.org" in i for i in issues)
+        assert any("endpoint host is not" in i for i in issues)
         assert any("mean" in i for i in issues)
 
     def test_flags_spoofed_isric_host(self):
@@ -143,7 +143,7 @@ class TestValidateSoilgrids:
             }
         )
         checked, issues = _validate_soilgrids(catalog)
-        assert any("host is not maps.isric.org" in i for i in issues)
+        assert any("endpoint host is not" in i for i in issues)
 
     def test_flags_missing_endpoint_and_depths(self):
         """A row missing its endpoint and depths is flagged for each."""
