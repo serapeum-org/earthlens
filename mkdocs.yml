@@ -471,6 +471,10 @@ nav:
       - Quickstart — geoBoundaries ADM1 (live): examples/admin/01_admin_quickstart.ipynb
       - Catalog explorer (no network): examples/admin/02_catalog_explorer.ipynb
       - Natural Earth & TIGER (live): examples/admin/03_natural_earth_and_tiger.ipynb
+    - SoilGrids (soil properties):
+      - Quickstart — soil pH & clay (live): examples/soilgrids/01_soilgrids_quickstart.ipynb
+      - Catalog explorer (no network): examples/soilgrids/02_catalog_explorer.ipynb
+      - Depth profile (live): examples/soilgrids/03_depth_profile.ipynb
     - Air quality (OpenAQ):
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
