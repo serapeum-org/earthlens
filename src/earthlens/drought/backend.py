@@ -99,8 +99,8 @@ class Drought(AbstractDataSource):
 
     def __init__(
         self,
-        start: str,
-        end: str,
+        start: str | dt.date | dt.datetime,
+        end: str | dt.date | dt.datetime,
         lat_lim: list[float],
         lon_lim: list[float],
         dataset: str | None = None,
@@ -113,8 +113,10 @@ class Drought(AbstractDataSource):
         """Configure a drought-indicator request.
 
         Args:
-            start: Inclusive start date as a string (parsed with `fmt`).
-            end: Inclusive end date as a string (`fmt`).
+            start: Inclusive start date — a `date` / `datetime`, or a
+                string parsed with `fmt`.
+            end: Inclusive end date — a `date` / `datetime`, or a string
+                parsed with `fmt`.
             lat_lim: `[lat_min, lat_max]` in degrees. Required.
             lon_lim: `[lon_min, lon_max]` in degrees. Required.
             dataset: One curated dataset id — `"usdm"`, `"edo-spaST"`,
@@ -138,8 +140,8 @@ class Drought(AbstractDataSource):
             today: Reference "now" date used by the USDM weekly snap to
                 decide whether the same-week Tuesday's composite has been
                 released yet. Defaults to `dt.date.today()` for live
-                queries; tests and historical reruns pin this to a fixed
-                date so the snap result is deterministic.
+                queries; pin it to a fixed date for a deterministic snap
+                against historical data.
 
         Raises:
             ValueError: When `dataset` is missing or unknown, when
@@ -519,7 +521,10 @@ class Drought(AbstractDataSource):
                     self.root_dir
                     / f"{self._dataset.id}_{period.strftime('%Y%m')}.tif"
                 )
-                subset.to_file(str(out_path))
+                try:
+                    subset.to_file(str(out_path))
+                finally:
+                    subset.close()
                 written.append(out_path)
         finally:
             nc.close()
@@ -779,18 +784,24 @@ def _http_download(url: str, target: Path) -> None:
     """
     target.parent.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(target.suffix + ".partial")
-    with requests.get(
-        url,
-        timeout=_HTTP_TIMEOUT,
-        stream=True,
-        headers={"User-Agent": _USER_AGENT},
-    ) as response:
-        response.raise_for_status()
-        with tmp.open("wb") as fh:
-            for chunk in response.iter_content(chunk_size=1 << 16):
-                if chunk:
-                    fh.write(chunk)
-    tmp.replace(target)
+    try:
+        with requests.get(
+            url,
+            timeout=_HTTP_TIMEOUT,
+            stream=True,
+            headers={"User-Agent": _USER_AGENT},
+        ) as response:
+            response.raise_for_status()
+            with tmp.open("wb") as fh:
+                for chunk in response.iter_content(chunk_size=1 << 16):
+                    if chunk:
+                        fh.write(chunk)
+        tmp.replace(target)
+    except BaseException:
+        # A dropped connection (or interrupt) mid-stream would otherwise
+        # leave a stale `.partial` on disk; remove it before re-raising.
+        tmp.unlink(missing_ok=True)
+        raise
 
 
 def _http_download_raster(url: str, target: Path, *, label: str) -> None:
@@ -834,9 +845,15 @@ def _http_download_raster(url: str, target: Path, *, label: str) -> None:
         # A 2xx is NOT a guarantee of a raster: this Copernicus MapServer
         # answers an invalid `map=`/coverage with a plain-text or HTML body
         # under HTTP 200 (e.g. `ERROR: invalid map parameter`). Reject any
-        # body that does not start with the GeoTIFF magic so a non-raster
+        # body that does not start with the (Big)TIFF magic so a non-raster
         # error never reaches `Dataset.read_file` as an opaque GDAL failure.
-        if first[:4] not in (b"MM\x00*", b"II*\x00"):
+        # 42 = classic TIFF, 43 = BigTIFF, in both byte orders.
+        if first[:4] not in (
+            b"MM\x00*",
+            b"II*\x00",
+            b"MM\x00+",
+            b"II+\x00",
+        ):
             detail = first.decode("utf-8", errors="replace").strip()[:300]
             raise ValueError(
                 f"Copernicus EDO/GDO returned a non-raster body for "
