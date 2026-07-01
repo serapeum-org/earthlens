@@ -166,3 +166,22 @@ class TestSpeibaseLive:
         ).download(progress_bar=False)
         assert len(paths) == 1
         assert paths[0].suffix == ".tif" and paths[0].stat().st_size > 0
+        # The written raster's extent/CRS matches the requested bbox — the
+        # SPEIbase crop is the one spatial op the unit tests can only mock,
+        # so assert it here (a swapped bbox axis order would fail the bounds
+        # check rather than pass silently).
+        from pyramids.dataset import Dataset
+
+        ds = Dataset.read_file(str(paths[0]))
+        try:
+            assert ds.epsg in (4326, 0)
+            assert ds.rows > 0 and ds.columns > 0
+            x_min, y_min, x_max, y_max = ds.bbox
+            # Requested lon [-95, -85], lat [30, 40]; the 0.5° SPEIbase grid
+            # snaps to cell edges, so allow ~1° slack around each edge.
+            assert -96.0 <= x_min <= -94.0
+            assert -86.0 <= x_max <= -84.0
+            assert 29.0 <= y_min <= 31.0
+            assert 39.0 <= y_max <= 41.0
+        finally:
+            ds.close()
