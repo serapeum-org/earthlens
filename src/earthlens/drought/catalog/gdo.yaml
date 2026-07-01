@@ -1,0 +1,208 @@
+# Global Drought Observatory (GDO) — Copernicus EMS, the global counterpart of
+# EDO. Mirrors the 19 GDO WMS indicator codes (verified live 2026-07-01).
+#
+# IMPORTANT — the EDO/GDO split is a portal convention, not a data or endpoint
+# difference. The Copernicus drought WCS exposes a SINGLE map, `map=DO_WCS`;
+# there is NO separate `GDO_WCS` map (`map=GDO_WCS` answers `ERROR: invalid map
+# parameter` under HTTP 200). Every coverage on `DO_WCS` carries GLOBAL data —
+# verified: `coverageID=smand` over Africa / Asia / a whole-globe bbox all
+# return real rasters. So a GDO row and its EDO twin (e.g. `gdo-smand` vs
+# `edo-smand`) issue the byte-identical request; the "European vs global"
+# framing lives entirely in the bbox the caller passes (`lat_lim` / `lon_lim`),
+# not in the row. The two Low-Flow Index codes `lfinx_300_sms` / `lfinx_300_mds`
+# appear only in the GDO WMS. The rows are kept split to mirror the two
+# Copernicus portals; collapsing them into a single coverage set is a
+# catalog-curation follow-on. Upstream availability varies by indicator + date
+# (some coverages answer 422 outside their window or a transient 500); the
+# backend surfaces the Copernicus message verbatim.
+datasets:
+  gdo-spaST:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: spaST
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-spaLT:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: spaLT
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-spgTS:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: spgTS
+    output_kind: raster
+    cadence: monthly
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-smand:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: smand
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-fpanv:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: fpanv
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-cdinx:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: cdinx
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-twsan:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: twsan
+    output_kind: raster
+    cadence: monthly
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-lfinx-sms:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: lfinx_300_sms
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-lfinx-mds:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: lfinx_300_mds
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-smian:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: smian
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-smang:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: smang
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-spcST:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: spcST
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-spcLT:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: spcLT
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-cdiad:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: cdiad
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-cdirc:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: cdirc
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-lfinx-lgs:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: lfinx_300_lgs
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-msfTS:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: msfTS
+    output_kind: raster
+    cadence: monthly
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-snwvi:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: snwvi
+    output_kind: raster
+    cadence: 10day
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"
+  gdo-rdria:
+    source: "Copernicus Global Drought Observatory (GDO)"
+    transport: edo-wcs
+    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
+    coverage: rdria
+    output_kind: raster
+    cadence: monthly
+    native_crs: "EPSG:4326"
+    timescale: "01"
+    license_note: "Copernicus EMS — free reuse with attribution"

@@ -298,22 +298,23 @@ class EarthLens:
              'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
              'climate_indices', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
-             'earth-search', 'earthdata', 'ecmwf', 'erddap', 'etopo',
-             'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs', 'gebco',
-             'gee', 'geoboundaries', 'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
-             'global-forest-watch',
-             'global-solar-atlas', 'global-wind-atlas', 'google-earth-engine',
-             'gsa', 'gwa', 'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
+             'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo',
+             'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal',
+             'gbif', 'gdacs', 'gdo', 'gebco', 'gee', 'geoboundaries',
+             'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
+             'global-forest-watch', 'global-solar-atlas',
+             'global-wind-atlas', 'google-earth-engine', 'gsa', 'gwa',
+             'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
              'isric', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
-             'national-water-model',
-             'natural-earth', 'nexrad', 'nrel', 'nsrdb', 'nwis', 'nwm', 'nwp',
-             'obis', 'ohsome', 'openaq', 'openeo', 'openstreetmap', 'osm',
-             'overpass', 'overture', 'planetary-computer', 'protected-planet',
-             'pvgis', 'radar', 'redlist', 'rgi', 'risk-indicators',
-             'sentinel-hub',
-             'sentinelhub', 'soilgrids', 'solar-pv', 'solar-wind-atlas', 'stac',
-             'teleconnections', 'thinkhazard', 'tiger', 'tropycal',
-             'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wgms',
+             'national-water-model', 'natural-earth', 'nexrad', 'nrel',
+             'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'ohsome', 'openaq',
+             'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
+             'planetary-computer', 'protected-planet', 'pvgis', 'radar',
+             'redlist', 'rgi', 'risk-indicators', 'sentinel-hub',
+             'sentinelhub', 'soilgrids', 'solar-pv', 'solar-wind-atlas',
+             'stac', 'teleconnections', 'thinkhazard', 'tiger',
+             'tropycal', 'usdm', 'usgs-landsat', 'usgs-nwis',
+             'usgs-water', 'veda', 'wdpa', 'wgms',
              'wind-toolkit', 'world-pop', 'worldpop']
 
             ```
@@ -426,6 +427,14 @@ class EarthLens:
         :class:`earthlens.obis.OBIS`: OBIS marine occurrences via
             `pyobis` (anonymous); `vector` occurrence-point
             FeatureCollection; key `"obis"`.
+        :class:`earthlens.drought.Drought`: Drought-indicator backend over
+            three live services — US Drought Monitor (vector polygons via
+            GeoJSON), Copernicus EDO/GDO (raster via the Copernicus drought
+            `GetCoverage` REST endpoint), and CSIC SPEIbase (raster via
+            NetCDF). Per-instance `OUTPUT_KIND`. No SDK extra. Four
+            discoverability keys (`"drought"` / `"usdm"` / `"edo"` /
+            `"gdo"`) all resolve to the same backend; all require an
+            explicit `dataset=` kwarg.
         :class:`earthlens.wdpa.WDPA`: Protected Planet (WDPA)
             protected-area polygons via the direct v4 REST API
             (`?token=`); `vector` polygon FeatureCollection; keys
@@ -756,6 +765,25 @@ class EarthLens:
             # open, CC-BY 4.0, no auth. Alias "isric".
             "soilgrids": ("earthlens.soilgrids", "SoilGrids", "", {}),
             "isric": ("earthlens.soilgrids", "SoilGrids", "", {}),
+            # Drought-indicator backend over three live public services:
+            # USDM (vector GeoJSON polygon classes), Copernicus EDO/GDO (raster
+            # via the Copernicus drought GetCoverage REST endpoint —
+            # TIME + SELECTED_TIMESCALE custom params, not a conformant WCS),
+            # and CSIC SPEIbase (raster NetCDF). Per-instance OUTPUT_KIND from
+            # the resolved `dataset=` row. No SDK extra (requests + pyramids are
+            # core). The four keys (`drought` / `usdm` / `edo` / `gdo`) are
+            # discoverability aliases — all four resolve to the same backend
+            # and all four require an explicit `dataset=` kwarg (e.g.
+            # `EarthLens("usdm", dataset="usdm", ...)`,
+            # `EarthLens("edo", dataset="edo-spaST", ...)`). No alias pre-binds
+            # the dataset: pre-bound aliases collide with the facade's own
+            # `dataset=` plumbing (TypeError: multiple values) and only work for
+            # exactly one of the catalog rows, so they trade a tiny ergonomic
+            # win for two foot-guns.
+            "drought": ("earthlens.drought", "Drought", "", {}),
+            "usdm": ("earthlens.drought", "Drought", "", {}),
+            "edo": ("earthlens.drought", "Drought", "", {}),
+            "gdo": ("earthlens.drought", "Drought", "", {}),
         }
     )
 

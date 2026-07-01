@@ -1,0 +1,49 @@
+# Informational index of every dataset id the drought backend curates,
+# mirroring the eumetsat/earthdata layout: `available_datasets:` is the full
+# list, the per-source files carry the `datasets:` map keyed by the same ids.
+# Runtime code does not consume `available_datasets:`; it is the seed of the
+# `earthlens datasets list drought` CLI and the audit step.
+available_datasets:
+  - usdm
+  - edo-spaST
+  - edo-spaLT
+  - edo-spcST
+  - edo-spcLT
+  - edo-spgTS
+  - edo-smian
+  - edo-smang
+  - edo-smand
+  - edo-fpanv
+  - edo-cdiad
+  - edo-cdirc
+  - edo-cdinx
+  - edo-lfinx-lgs
+  - edo-twsan
+  - edo-snwvi
+  - edo-rdria
+  - edo-msfTS
+  - gdo-spaST
+  - gdo-spaLT
+  - gdo-spgTS
+  - gdo-smand
+  - gdo-fpanv
+  - gdo-cdinx
+  - gdo-twsan
+  - gdo-lfinx-sms
+  - gdo-lfinx-mds
+  - gdo-smian
+  - gdo-smang
+  - gdo-spcST
+  - gdo-spcLT
+  - gdo-cdiad
+  - gdo-cdirc
+  - gdo-lfinx-lgs
+  - gdo-msfTS
+  - gdo-snwvi
+  - gdo-rdria
+  - speibase-01
+  - speibase-03
+  - speibase-06
+  - speibase-12
+  - speibase-24
+  - speibase-48

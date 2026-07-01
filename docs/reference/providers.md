@@ -51,6 +51,7 @@ Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core inst
 | Argo float ocean profiles | `argo`, `argo-floats`, `argopy` | tabular | none (open data) | `argo` | [Argo](argo/introduction.md) |
 | Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER) | `admin`, `admin-boundaries`, `geoboundaries`, `natural-earth`, `tiger` | vector | none (public) | — | [Administrative boundaries](admin/introduction.md) |
 | ISRIC SoilGrids 2.0 soil properties (250 m, OGC WCS) | `soilgrids`, `isric` | raster | none (public, CC-BY 4.0) | — | [SoilGrids](soilgrids/introduction.md) |
+| Drought indicators (USDM / Copernicus EDO + GDO / CSIC SPEIbase) | `drought`, `usdm`, `edo`, `gdo` | per-dataset (vector USDM polygons / raster EDO+GDO+SPEIbase) | none | — | [Drought](drought/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)

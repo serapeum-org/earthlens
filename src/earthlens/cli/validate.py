@@ -288,6 +288,31 @@ def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("name", "description")))
 
 
+#: Drought transports whose output is a raster (vs USDM's vector polygons).
+_DROUGHT_RASTER_TRANSPORTS = frozenset({"edo-wcs", "netcdf-url"})
+
+
+def _check_drought_row(key: str, record: Any) -> list[str]:
+    """Flag a drought row missing a core field or with a transport mismatch."""
+    issues = _require(
+        key, record, ("source", "endpoint", "output_kind", "cadence", "native_crs")
+    )
+    transport = getattr(record, "transport", None)
+    output_kind = getattr(record, "output_kind", None)
+    if transport == "usdm-geojson" and output_kind != "vector":
+        issues.append(f"{key}: usdm-geojson transport must be output_kind=vector")
+    if transport in _DROUGHT_RASTER_TRANSPORTS and output_kind != "raster":
+        issues.append(f"{key}: {transport} transport must be output_kind=raster")
+    if transport == "edo-wcs":
+        issues.extend(_require(key, record, ("coverage", "timescale")))
+    return issues
+
+
+def _validate_drought(catalog: Any) -> tuple[int, list[str]]:
+    """Each drought row needs its core fields; edo-wcs rows a coverage + timescale."""
+    return _lint(catalog, _check_drought_row)
+
+
 def _validate_argo(catalog: Any) -> tuple[int, list[str]]:
     """Each Argo dataset family needs a description and a non-empty parameters map."""
     return _lint(catalog, lambda k, r: _require(k, r, ("description", "parameters")))
@@ -631,6 +656,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "radar": _validate_radar,
     "tropycal": _validate_tropycal,
     "gdacs": _validate_gdacs,
+    "drought": _validate_drought,
     "argo": _validate_argo,
     "chc": _validate_chc,
     "usgs_water": _validate_usgs_water,
