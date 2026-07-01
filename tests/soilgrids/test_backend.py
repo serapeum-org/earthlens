@@ -180,6 +180,50 @@ def test_partial_write_is_cleaned_up(
     assert not (tmp_path / "clay_5-15cm_mean.tif").exists()
 
 
+def _locked_unlink(self, *args, **kwargs) -> None:
+    """Stand-in for Path.unlink that fails as if the file were locked."""
+    raise OSError("file is locked")
+
+
+def test_cleanup_error_does_not_mask_the_fetch_error(
+    fake_from_wcs: type[FakeDataset],
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """A locked-file unlink is swallowed so the real fetch error still surfaces."""
+    monkeypatch.setattr(Path, "unlink", _locked_unlink)
+    fake_from_wcs.fail_after_write = {"clay_0-5cm_mean"}
+    backend = _backend(tmp_path, ["clay"], depths=["0-5cm"])
+    with pytest.raises(RuntimeError, match="all 1 requested coverage"):
+        backend.download()
+
+
+def test_mask_path_mid_write_failure_is_cleaned_up(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """A mask-path to_file that fails mid-write leaves no partial .tif behind."""
+    fake_from_wcs.fail_to_file = {"clay_0-5cm_mean"}
+    backend = _backend(tmp_path, ["clay"], depths=["0-5cm"])
+    backend._attach_clip_geometry(_GEOMETRY)
+    with pytest.raises(RuntimeError, match="all 1 requested coverage"):
+        backend.download()
+    assert not (tmp_path / "clay_0-5cm_mean.tif").exists()
+
+
+def test_prewrite_failure_keeps_a_preexisting_file(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """A fetch that fails before writing does not delete a prior run's GeoTIFF."""
+    out = tmp_path / "clay_0-5cm_mean.tif"
+    out.write_bytes(b"MM\x00*prior-good-geotiff")
+    fake_from_wcs.fail_coverages = {"clay_0-5cm_mean"}
+    backend = _backend(tmp_path, ["clay"], depths=["0-5cm"])
+    backend._attach_clip_geometry(_GEOMETRY)
+    with pytest.raises(RuntimeError, match="all 1 requested coverage"):
+        backend.download()
+    assert out.read_bytes() == b"MM\x00*prior-good-geotiff"
+
+
 def test_empty_plan_returns_no_paths(
     fake_from_wcs: type[FakeDataset], monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:

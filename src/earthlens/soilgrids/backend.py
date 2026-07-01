@@ -347,6 +347,12 @@ class SoilGrids(AbstractDataSource):
         # rectangular bbox. Fetch in-memory then mask + write; with no polygon,
         # let from_wcs write the bbox subset straight to disk.
         has_mask = getattr(self.space, "geometry", None) is not None
+        preexisting = out_path.exists()
+        dataset = None
+        masked = None
+        # The no-mask path hands out_path to from_wcs (which truncates on open);
+        # the mask path only touches out_path once to_file starts.
+        write_attempted = not has_mask
         try:
             dataset = Dataset.from_wcs(
                 row.endpoint,
@@ -361,14 +367,22 @@ class SoilGrids(AbstractDataSource):
             )
             if has_mask:
                 masked = mask_to_geometry(dataset, self.space)
+                write_attempted = True
                 masked.to_file(str(out_path))
-                _close_dataset(masked)
+            _close_dataset(masked)
             _close_dataset(dataset)
         except Exception:
-            # A write that fails mid-way can leave a truncated GeoTIFF behind;
-            # the _api loop skips a failed coverage, so remove any partial file
-            # rather than let it outlive the failed fetch.
-            out_path.unlink(missing_ok=True)
+            # Release the GDAL handles first so the file lock is gone (Windows)
+            # before cleanup, then remove only a partial file this call itself
+            # wrote — never a pre-existing GeoTIFF from a prior run — and never
+            # let a cleanup error mask the original fetch failure.
+            _close_dataset(masked)
+            _close_dataset(dataset)
+            if out_path.exists() and (write_attempted or not preexisting):
+                try:
+                    out_path.unlink()
+                except OSError:
+                    pass
             raise
         return out_path
 

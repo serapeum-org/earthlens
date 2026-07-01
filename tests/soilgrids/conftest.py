@@ -22,6 +22,7 @@ class FakeDataset:
     written: list[str] = []
     fail_coverages: set[str] = set()
     fail_after_write: set[str] = set()
+    fail_to_file: set[str] = set()
     no_data_value = (-32768.0,)
 
     def __init__(self, coverage: str) -> None:
@@ -52,9 +53,15 @@ class FakeDataset:
         return self
 
     def to_file(self, path: str) -> None:
-        """Record and write a stub GeoTIFF (the mask-path write)."""
+        """Record and write a stub GeoTIFF (the mask-path write).
+
+        A coverage in `fail_to_file` writes a partial file then raises, to
+        exercise a mask-path write that fails mid-way.
+        """
         FakeDataset.written.append(path)
         Path(path).write_bytes(b"MM\x00*stub-geotiff")
+        if self.coverage in FakeDataset.fail_to_file:
+            raise RuntimeError(f"faked to_file failure for {self.coverage}")
 
     def close(self) -> None:
         """Mark the fake dataset closed (the backend releases the handle)."""
@@ -71,6 +78,7 @@ def fake_from_wcs(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
     FakeDataset.written = []
     FakeDataset.fail_coverages = set()
     FakeDataset.fail_after_write = set()
+    FakeDataset.fail_to_file = set()
     monkeypatch.setattr(Dataset, "from_wcs", FakeDataset.from_wcs)
     return FakeDataset
 
