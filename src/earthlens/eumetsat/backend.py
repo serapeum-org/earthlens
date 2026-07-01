@@ -79,9 +79,12 @@ TAILOR_POLL_BACKOFF = 1.5
 TAILOR_SUBMIT_RETRIES = 3
 #: Base backoff between submit retries (scaled by the attempt number).
 TAILOR_SUBMIT_BACKOFF_S = 2.0
-#: Terminal Data Tailor `Customisation.status` values (`A1`); only `DONE`
-#: yields output, the rest are failures.
-_TAILOR_TERMINAL = frozenset({"DONE", "FAILED", "KILLED"})
+#: Non-terminal ("still working") Data Tailor `Customisation.status` values
+#: (`A1`). Polling continues only while the status is one of these; any other
+#: status (`DONE`, `FAILED`, `KILLED`, or an unexpected one like `INACTIVE`)
+#: is treated as terminal so an unknown stuck state fails fast instead of
+#: polling until the timeout.
+_TAILOR_ACTIVE = frozenset({"QUEUED", "RUNNING"})
 #: Substrings that mark a submit error as transient (worth retrying) — the
 #: EUMETSAT EPCS endpoint intermittently 502s (`A1`/`G8`).
 _TRANSIENT_MARKERS = (
@@ -618,37 +621,43 @@ class EUMETSAT(AbstractDataSource):
 
     @staticmethod
     def _poll_customisation(cust) -> str:
-        """Poll a customisation to a terminal state with bounded backoff.
+        """Poll a customisation until it stops being active; return its status.
 
-        Polls `cust.status` until it reaches a terminal value
-        (`_TAILOR_TERMINAL`), sleeping `TAILOR_POLL_INITIAL_S` and growing
-        the delay by `TAILOR_POLL_BACKOFF` up to `TAILOR_POLL_MAX_S`. Gives
-        up after `TAILOR_POLL_TIMEOUT_S` so a stuck job cannot hang forever
-        (`G8`).
+        Polls `cust.status` while it is `_TAILOR_ACTIVE` (`QUEUED` /
+        `RUNNING`), sleeping `TAILOR_POLL_INITIAL_S` and growing the delay
+        by `TAILOR_POLL_BACKOFF` up to `TAILOR_POLL_MAX_S`. Any other status
+        is terminal and is returned immediately — so `DONE` succeeds and
+        `FAILED` / `KILLED` / an unexpected stuck state (e.g. `INACTIVE`)
+        fail fast rather than polling to the timeout. Gives up after
+        `TAILOR_POLL_TIMEOUT_S` so a job stuck *active* cannot hang forever
+        (`G8`); the final sleep is clamped to the remaining budget so the
+        wall-clock never overshoots the timeout.
 
         Args:
             cust: The `eumdac` `Customisation` handle to poll.
 
         Returns:
-            str: The terminal status (`"DONE"`, `"FAILED"`, or `"KILLED"`).
+            str: The terminal status (`"DONE"`, `"FAILED"`, `"KILLED"`, or
+                any non-active value the service reports).
 
         Raises:
-            TimeoutError: When no terminal state is reached within
+            TimeoutError: When the job is still active after
                 `TAILOR_POLL_TIMEOUT_S`.
         """
         deadline = time.monotonic() + TAILOR_POLL_TIMEOUT_S
         delay = TAILOR_POLL_INITIAL_S
         while True:
             status = str(cust.status).upper()
-            if status in _TAILOR_TERMINAL:
+            if status not in _TAILOR_ACTIVE:
                 return status
-            if time.monotonic() >= deadline:
+            now = time.monotonic()
+            if now >= deadline:
                 raise TimeoutError(
                     f"Data Tailor customisation {cust} did not finish "
                     f"within {TAILOR_POLL_TIMEOUT_S:.0f}s (last status "
                     f"{status!r})."
                 )
-            time.sleep(delay)
+            time.sleep(min(delay, deadline - now))
             delay = min(delay * TAILOR_POLL_BACKOFF, TAILOR_POLL_MAX_S)
 
     @staticmethod

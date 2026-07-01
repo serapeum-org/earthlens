@@ -147,6 +147,17 @@ def test_tailor_non_done_terminal_raises_and_deletes(fake_eumdac, tmp_path, term
     assert "boom-in-log" in str(cust.logfile)
 
 
+def test_tailor_unknown_status_fails_fast(fake_eumdac, tmp_path):
+    """An unexpected non-active status (e.g. INACTIVE) fails fast, not a timeout."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    cust = _FakeCustomisation(statuses=["INACTIVE"], logfile="evicted")
+    fake_eumdac.tailor.customisation = cust
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    with pytest.raises(RuntimeError, match="INACTIVE"):
+        backend.download(progress_bar=False, tailor=TailorConfig())
+    assert cust.deleted == 1
+
+
 def test_tailor_timeout_raises_and_deletes(fake_eumdac, tmp_path, monkeypatch):
     """A job that never reaches a terminal state times out and is deleted."""
     monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_POLL_TIMEOUT_S", 0.0)
