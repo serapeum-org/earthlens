@@ -49,6 +49,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
@@ -558,7 +559,24 @@ class EUMETSAT(AbstractDataSource):
                 written.append(target)
             return written
         finally:
-            cust.delete()  # ALWAYS free quota — even on failure (G7)
+            self._safe_delete(cust)  # ALWAYS free quota — even on failure (G7)
+
+    @staticmethod
+    def _safe_delete(cust) -> None:
+        """Delete a customisation, never letting cleanup mask the real error.
+
+        Called from the `_tailor_one` `finally` (`G7`). A `delete()` that
+        itself raises must not replace the original `RuntimeError` /
+        `TimeoutError`, nor abort the remaining products in the batch — so
+        the failure is logged and swallowed.
+
+        Args:
+            cust: The `eumdac` `Customisation` handle to delete.
+        """
+        try:
+            cust.delete()
+        except Exception as exc:  # noqa: BLE001 - cleanup must never mask the cause
+            logger.warning(f"Data Tailor customisation {cust} delete failed: {exc}")
 
     @staticmethod
     def _submit_customisation(datatailor, product, chain):

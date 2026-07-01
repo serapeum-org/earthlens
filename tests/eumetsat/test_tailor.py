@@ -178,6 +178,30 @@ def test_tailor_missing_logfile_uses_placeholder(fake_eumdac, tmp_path):
     assert cust.deleted == 1
 
 
+def test_tailor_delete_failure_does_not_break_success(fake_eumdac, tmp_path):
+    """A delete() that raises on a DONE job is swallowed; the download succeeds."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    cust = _FakeCustomisation(outputs=["o.tif"])
+    cust.delete_error = RuntimeError("delete endpoint down")
+    fake_eumdac.tailor.customisation = cust
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    paths = backend.download(progress_bar=False, tailor=TailorConfig())
+    assert [p.name for p in paths] == ["o.tif"]
+    assert cust.deleted == 1
+
+
+def test_tailor_delete_failure_does_not_mask_original_error(fake_eumdac, tmp_path):
+    """A delete() that raises on a FAILED job must not hide the FAILED error."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    cust = _FakeCustomisation(statuses=["FAILED"], logfile="root cause here")
+    cust.delete_error = RuntimeError("delete endpoint down")
+    fake_eumdac.tailor.customisation = cust
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    with pytest.raises(RuntimeError, match="FAILED"):
+        backend.download(progress_bar=False, tailor=TailorConfig())
+    assert cust.deleted == 1
+
+
 # --- eligibility ------------------------------------------------------------
 
 

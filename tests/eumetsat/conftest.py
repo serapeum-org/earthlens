@@ -127,6 +127,7 @@ class _FakeCustomisation:
         self._logfile = logfile
         self._payload = payload
         self.deleted = 0
+        self.delete_error: BaseException | None = None
 
     @property
     def status(self) -> str:
@@ -144,6 +145,8 @@ class _FakeCustomisation:
 
     def delete(self) -> None:
         self.deleted += 1
+        if self.delete_error is not None:
+            raise self.delete_error
         return None
 
     def __str__(self) -> str:
