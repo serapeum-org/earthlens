@@ -627,6 +627,15 @@ class EUMETSAT(AbstractDataSource):
         non-transient error (e.g. an invalid product id) is re-raised
         immediately.
 
+        Note:
+            If a create actually succeeds server-side but its response is
+            lost (a dropped connection / timeout — the classified-transient
+            cases), the retry submits a **second** customisation and the
+            first is orphaned: the client never gets its handle, so it is
+            not polled or deleted and lingers against the quota. The EPCS
+            API offers no idempotency key to prevent this; recover by
+            sweeping stale jobs (`eumdac.DataTailor(token).customisations`).
+
         Args:
             datatailor: The live `eumdac.DataTailor` client.
             product: The `eumdac` product handle to customise.

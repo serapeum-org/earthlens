@@ -203,6 +203,8 @@ def test_tailor_product_types_are_valid_registry_ids(catalog):
 
     Guards the ~80-row catalog rewrite against typos: each value must be a
     member of the /epcs/products registry snapshot (captured 2026-07-01).
+    This checks membership only, not semantic correctness — a valid id
+    assigned to the wrong collection would still pass (see review L4).
     """
     import json
     from pathlib import Path
