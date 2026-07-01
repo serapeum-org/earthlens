@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/nwp/download_mode/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/ecmwf/floods_glofas_forecast/">
       
       
-        <link rel="prev" href="../nwp_polish_features/">
+        <link rel="prev" href="../cds_quickstart/">
       
       
-        <link rel="next" href="../gfs_temperature/">
+        <link rel="next" href="../hydrology_water_balance/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>NWP download mode — vs (no network) - earthlens</title>
+        <title>Flood forecasting with GloFAS — the EWDS endpoint - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#nwp-download-mode-vs-no-network" class="md-skip">
+        <a href="#flood-forecasting-with-glofas-the-ewds-endpoint" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              NWP download mode — vs (no network)
+              Flood forecasting with GloFAS — the EWDS endpoint
             
           </span>
         </div>
@@ -1735,6 +1735,34 @@
     
   
     Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/ecmwf/ewds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EWDS (GloFAS / floods)
   
 
     
@@ -9974,6 +10002,8 @@
                 
   
   
+    
+  
   
   
     
@@ -9984,11 +10014,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" checked>
         
           
           <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
@@ -10009,7 +10039,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
@@ -10027,7 +10057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/cds_quickstart/" class="md-nav__link">
+      <a href="../cds_quickstart/" class="md-nav__link">
         
   
   
@@ -10052,10 +10082,184 @@
                 
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flood forecasting with GloFAS — the EWDS endpoint
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flood forecasting with GloFAS — the EWDS endpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-one-backend-several-stores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — one backend, several stores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-verify-the-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — verify the token
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-request-a-glofas-forecast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — request a GloFAS forecast
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-read-the-result-and-confirm-the-native-grid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — read the result and confirm the native grid
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-map-the-river-discharge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — map the river discharge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#options-edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options &amp; edge cases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Takeaway
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/hydrology_water_balance/" class="md-nav__link">
+      <a href="../hydrology_water_balance/" class="md-nav__link">
         
   
   
@@ -10083,7 +10287,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/oceanography_sst_sea_ice/" class="md-nav__link">
+      <a href="../oceanography_sst_sea_ice/" class="md-nav__link">
         
   
   
@@ -10111,7 +10315,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/atmosphere_pressure_levels/" class="md-nav__link">
+      <a href="../atmosphere_pressure_levels/" class="md-nav__link">
         
   
   
@@ -10139,7 +10343,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/agriculture_crop_water/" class="md-nav__link">
+      <a href="../agriculture_crop_water/" class="md-nav__link">
         
   
   
@@ -10167,7 +10371,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/solar_resource_assessment/" class="md-nav__link">
+      <a href="../solar_resource_assessment/" class="md-nav__link">
         
   
   
@@ -10195,7 +10399,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/wind_energy_resource/" class="md-nav__link">
+      <a href="../wind_energy_resource/" class="md-nav__link">
         
   
   
@@ -10223,7 +10427,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/snow_cryosphere_winter/" class="md-nav__link">
+      <a href="../snow_cryosphere_winter/" class="md-nav__link">
         
   
   
@@ -10251,7 +10455,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/heat_waves_public_health/" class="md-nav__link">
+      <a href="../heat_waves_public_health/" class="md-nav__link">
         
   
   
@@ -10279,7 +10483,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/climate_change_anomalies/" class="md-nav__link">
+      <a href="../climate_change_anomalies/" class="md-nav__link">
         
   
   
@@ -10307,7 +10511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/drought_precipitation_deficit/" class="md-nav__link">
+      <a href="../drought_precipitation_deficit/" class="md-nav__link">
         
   
   
@@ -15010,8 +15214,6 @@
                 
   
   
-    
-  
   
   
     
@@ -15022,11 +15224,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_37" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_37" >
         
           
           <label class="md-nav__link" for="__nav_4_37" id="__nav_4_37_label" tabindex="0">
@@ -15047,7 +15249,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_37_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_37_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_37">
             <span class="md-nav__icon md-icon"></span>
             
@@ -15065,7 +15267,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../catalog_explorer/" class="md-nav__link">
+      <a href="../../nwp/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -15093,7 +15295,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../nwp_polish_features/" class="md-nav__link">
+      <a href="../../nwp/nwp_polish_features/" class="md-nav__link">
         
   
   
@@ -15118,151 +15320,10 @@
                 
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NWP download mode — vs (no network)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    NWP download mode — vs (no network)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Setup
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#1-is-the-default" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1 — is the default
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-forces-a-full-file-download" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2 — forces a full-file download
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-is-rejected" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3 — is rejected
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-the-facade-forwards-too" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4 — the facade forwards too
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recap
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
-      <a href="../gfs_temperature/" class="md-nav__link">
+      <a href="../../nwp/gfs_temperature/" class="md-nav__link">
         
   
   
@@ -15290,7 +15351,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../icon_precipitation/" class="md-nav__link">
+      <a href="../../nwp/icon_precipitation/" class="md-nav__link">
         
   
   
@@ -15318,7 +15379,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../eccc_gdps/" class="md-nav__link">
+      <a href="../../nwp/eccc_gdps/" class="md-nav__link">
         
   
   
@@ -16997,6 +17058,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17008,10 +17080,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#1-is-the-default" class="md-nav__link">
+  <a href="#step-1-one-backend-several-stores" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1 — is the default
+        Step 1 — one backend, several stores
       
     </span>
   </a>
@@ -17019,10 +17091,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-forces-a-full-file-download" class="md-nav__link">
+  <a href="#step-2-verify-the-token" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2 — forces a full-file download
+        Step 2 — verify the token
       
     </span>
   </a>
@@ -17030,10 +17102,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-is-rejected" class="md-nav__link">
+  <a href="#step-3-request-a-glofas-forecast" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3 — is rejected
+        Step 3 — request a GloFAS forecast
       
     </span>
   </a>
@@ -17041,10 +17113,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-the-facade-forwards-too" class="md-nav__link">
+  <a href="#step-4-read-the-result-and-confirm-the-native-grid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4 — the facade forwards too
+        Step 4 — read the result and confirm the native grid
       
     </span>
   </a>
@@ -17052,10 +17124,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#recap" class="md-nav__link">
+  <a href="#step-5-map-the-river-discharge" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Recap
+        Step 5 — map the river discharge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#options-edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options &amp; edge cases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Takeaway
       
     </span>
   </a>
@@ -17079,7 +17173,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/nwp/download_mode.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/ecmwf/floods_glofas_forecast.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -17088,7 +17182,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/nwp/download_mode.ipynb" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/ecmwf/floods_glofas_forecast.ipynb" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -17255,6 +17349,34 @@
           notice.hidden = true
         }, 1000)
       })
+</script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        
+        var widgetRendererSrc = 'https://unpkg.com/@jupyter-js-widgets@*/dist/embed.js';
+        
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
 </script>
 <style type="text/css">
     pre { line-height: 125%; }
@@ -17816,56 +17938,66 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=93684b36">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5ddfe281">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="nwp-download-mode-subset-vs-whole-no-network">NWP download mode — <code>subset</code> vs <code>whole</code> (no network)<a class="anchor-link" href="#nwp-download-mode-subset-vs-whole-no-network">¶</a></h1><p>The <code>NWP</code> backend downloads only the requested bands by default, using each
-model's <code>.idx</code> byte-range index where it has one — cutting <strong>&gt;99 %</strong> of the
-bytes off the wire. The <code>mode=</code> constructor kwarg lets you override that:</p>
-<table>
-<thead>
-<tr>
-<th><code>mode=</code></th>
-<th>behaviour</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>"subset"</code> <em>(default)</em></td>
-<td><code>.idx</code> byte-range subset where available, else whole-per-variable</td>
-</tr>
-<tr>
-<td><code>"whole"</code></td>
-<td>force a full-file download even for <code>.idx</code>-capable models, then crop</td>
-</tr>
-<tr>
-<td><code>"zarr"</code></td>
-<td>rejected — no NWP row carries a <code>zarr_url</code> (a documented follow-on)</td>
-</tr>
-</tbody>
-</table>
-<p>This notebook shows the mode API <strong>offline</strong> — no bucket access. The live
-size-difference proof (<code>whole</code> file &gt; <code>subset</code> file) runs in the gated e2e
-suite (<code>pytest -m "nwp and e2e"</code>).</p>
+<h1 id="flood-forecasting-with-glofas-the-ewds-endpoint">Flood forecasting with GloFAS — the EWDS endpoint<a class="anchor-link" href="#flood-forecasting-with-glofas-the-ewds-endpoint">¶</a></h1><p>The <code>earthlens.ecmwf</code> backend reaches more than one Copernicus Data Store
+through the same <code>cdsapi</code> client. Besides the Climate Data Store (CDS), it can
+retrieve from the <strong>CEMS Early Warning Data Store (EWDS)</strong> — the home of
+<strong>GloFAS</strong> (the Global Flood Awareness System). This notebook downloads a small
+GloFAS river-discharge forecast and maps it.</p>
+<p><strong>What you will learn</strong></p>
+<ol>
+<li>How a dataset's <code>endpoint</code> routes a retrieve to the right store (CDS vs EWDS).</li>
+<li>That a single Copernicus token authenticates against CDS <em>and</em> EWDS.</li>
+<li>How to pull <code>cems-glofas-forecast</code> through the unified
+<a href="../../reference/ecmwf/ewds.md"><code>EarthLens</code></a> facade.</li>
+<li>That GloFAS comes back on its <strong>native regular 0.05° grid</strong> as NetCDF, ready
+to read and plot with <code>pyramids</code>.</li>
+</ol>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b971c536">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=498e4111">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2>
+<h2 id="prerequisites">Prerequisites<a class="anchor-link" href="#prerequisites">¶</a></h2><ol>
+<li>A Copernicus account (the same single sign-on as CDS) — register at
+<a href="https://ewds.climate.copernicus.eu/">https://ewds.climate.copernicus.eu/</a>.</li>
+<li>A Personal Access Token in <code>~/.cdsapirc</code>. The <strong>same CDS token works for
+EWDS</strong> — only the URL differs, and the backend handles that for you:<pre><code>url: https://cds.climate.copernicus.eu/api
+key: &lt;YOUR-TOKEN&gt;
+</code></pre>
+</li>
+<li>The GloFAS licence accepted once on its dataset page:
+<a href="https://ewds.climate.copernicus.eu/datasets/cems-glofas-forecast">https://ewds.climate.copernicus.eu/datasets/cems-glofas-forecast</a>
+(tick it at the bottom of the <em>Download</em> tab).</li>
+</ol>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5d3fcccf">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c33bce80">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The imports this notebook needs, up front. <code>earthlens</code> provides the unified
+<code>EarthLens</code> entry point and the <code>ecmwf</code> <code>Catalog</code>; <code>pyramids</code> provides <code>NetCDF</code>
+for reading the file that lands on disk; <code>matplotlib</code> draws the map.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a9e76653">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17883,53 +18015,58 @@ suite (<code>pytest -m "nwp and e2e"</code>).</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">NWP</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="c1"># A tiny request skeleton reused across the cells below.</span>
-<span class="n">REQ</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'gfs'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'temperature_2m'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s1">'out/mode-demo'</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf.endpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENDPOINTS</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens.nwp import NWP
+<div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
-# A tiny request skeleton reused across the cells below.
-REQ = dict(
-    start='2024-06-01', end='2024-06-01',
-    variables={'gfs': ['temperature_2m']},
-    lat_lim=[40, 45], lon_lim=[-80, -75], path='out/mode-demo',
-)</div>
+import matplotlib.pyplot as plt
+import numpy as np
+from pyramids.netcdf import NetCDF
+
+from earthlens import EarthLens
+from earthlens.ecmwf import Catalog
+from earthlens.ecmwf.endpoints import ENDPOINTS</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:54 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=00d256df">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6a855d24">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1-subset-is-the-default">1 — <code>subset</code> is the default<a class="anchor-link" href="#1-subset-is-the-default">¶</a></h2>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=80fb49eb">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Constructing without <code>mode=</code> selects the byte-range subset path. No download
-happens at construction — the mode is just recorded for the later <code>.download()</code>.</p>
+<h2 id="step-1-one-backend-several-stores">Step 1 — one backend, several stores<a class="anchor-link" href="#step-1-one-backend-several-stores">¶</a></h2><p>Every dataset row in the catalog carries an <code>endpoint</code> slug that decides which
+Copernicus store the retrieve is sent to. GloFAS lives on <code>ewds</code>; the ERA5
+family stays on <code>cds</code> (the default). Let's read GloFAS's catalog row.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=04889a7d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1408778a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17947,11 +18084,17 @@ happens at construction — the mode is just recorded for the later <code>.downl
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="n">NWP</span><span class="p">(</span><span class="o">**</span><span class="n">REQ</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'default mode:'</span><span class="p">,</span> <span class="n">backend</span><span class="o">.</span><span class="n">_mode</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<span class="n">glofas</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s2">"cems-glofas-forecast"</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"endpoint:        </span><span class="si">{</span><span class="n">glofas</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"grid_resolution: </span><span class="si">{</span><span class="n">glofas</span><span class="o">.</span><span class="n">grid_resolution</span><span class="si">}</span><span class="s2">  # degrees (native GloFAS grid)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"provider:        </span><span class="si">{</span><span class="n">glofas</span><span class="o">.</span><span class="n">provider</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">backend = NWP(**REQ)
-print('default mode:', backend._mode)</div>
+<div class="clipboard-copy-txt" id="cell-2">catalog = Catalog()
+glofas = catalog.datasets["cems-glofas-forecast"]
+print(f"endpoint:        {glofas.endpoint}")
+print(f"grid_resolution: {glofas.grid_resolution}  # degrees (native GloFAS grid)")
+print(f"provider:        {glofas.provider}")</div>
 </div>
 </div>
 </div>
@@ -17963,7 +18106,9 @@ print('default mode:', backend._mode)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>default mode: subset
+<pre>endpoint:        ewds
+grid_resolution: 0.05  # degrees (native GloFAS grid)
+provider:        copernicus-cems
 </pre>
 </div>
 </div>
@@ -17971,32 +18116,46 @@ print('default mode:', backend._mode)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0ff49024">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a0897d67">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2-modewhole-forces-a-full-file-download">2 — <code>mode="whole"</code> forces a full-file download<a class="anchor-link" href="#2-modewhole-forces-a-full-file-download">¶</a></h2>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=84e6dfc4">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>whole</code> pulls the entire GRIB2 for each <code>(cycle, step)</code> even for <code>.idx</code>-capable
-models (the NOAA / Herbie ones), then crops to the bbox exactly like a subset.
-It only changes behaviour for the <code>.idx</code> centres — ECMWF Open Data, DWD, ECCC
-and Météo-France are already whole-per-variable, so they accept and ignore it.</p>
+<p>The backend maps each <code>endpoint</code> slug to a store URL. A single token
+authenticates against all of them, so switching stores is just a routing
+detail — you never manage a second credential.</p>
+<table>
+<thead>
+<tr>
+<th>endpoint</th>
+<th>store</th>
+<th>used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cds</code></td>
+<td>Climate Data Store</td>
+<td>ERA5, CARRA, seasonal, …</td>
+</tr>
+<tr>
+<td><code>ewds</code></td>
+<td>CEMS Early Warning Data Store</td>
+<td>GloFAS floods, fire danger</td>
+</tr>
+<tr>
+<td><code>ads</code></td>
+<td>Atmosphere Data Store</td>
+<td>(reserved)</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c91fe87f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=af27e1fa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -18014,11 +18173,11 @@ and Météo-France are already whole-per-variable, so they accept and ignore it.
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="n">NWP</span><span class="p">(</span><span class="o">**</span><span class="n">REQ</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'whole'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'mode:'</span><span class="p">,</span> <span class="n">backend</span><span class="o">.</span><span class="n">_mode</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">_url_env</span><span class="p">,</span> <span class="n">_key_env</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ENDPOINTS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">slug</span><span class="si">:</span><span class="s2">5</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">backend = NWP(**REQ, mode='whole')
-print('mode:', backend._mode)</div>
+<div class="clipboard-copy-txt" id="cell-3">for slug, (url, _url_env, _key_env) in ENDPOINTS.items():
+    print(f"{slug:5} -&gt; {url}")</div>
 </div>
 </div>
 </div>
@@ -18030,7 +18189,9 @@ print('mode:', backend._mode)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>mode: whole
+<pre>cds   -&gt; https://cds.climate.copernicus.eu/api
+ads   -&gt; https://ads.atmosphere.copernicus.eu/api
+ewds  -&gt; https://ewds.climate.copernicus.eu/api
 </pre>
 </div>
 </div>
@@ -18038,30 +18199,19 @@ print('mode:', backend._mode)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fb3242fe">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e1c3e5b3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3-modezarr-is-rejected">3 — <code>mode="zarr"</code> is rejected<a class="anchor-link" href="#3-modezarr-is-rejected">¶</a></h2>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a11ed1e6">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>No NWP catalog row carries a <code>zarr_url</code>, and Zarr sources (NWM, hrrrzarr) are
-separate backends — so <code>zarr</code> is rejected at construction with a clear message.</p>
+<h2 id="step-2-verify-the-token">Step 2 — verify the token<a class="anchor-link" href="#step-2-verify-the-token">¶</a></h2><p>If <code>~/.cdsapirc</code> is present, the backend reuses that token for EWDS
+automatically. A missing token raises <code>AuthenticationError</code> pointing at the file.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1713d606">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0fe3a93b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -18079,15 +18229,11 @@ separate backends — so <code>zarr</code> is rejected at construction with a cl
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">NWP</span><span class="p">(</span><span class="o">**</span><span class="n">REQ</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'zarr'</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'ValueError:'</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">rc</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">".cdsapirc"</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"~/.cdsapirc found: </span><span class="si">{</span><span class="n">rc</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">rc</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">try:
-    NWP(**REQ, mode='zarr')
-except ValueError as exc:
-    print('ValueError:', exc)</div>
+<div class="clipboard-copy-txt" id="cell-4">rc = Path.home() / ".cdsapirc"
+print(f"~/.cdsapirc found: {rc.is_file()} ({rc})")</div>
 </div>
 </div>
 </div>
@@ -18099,7 +18245,7 @@ except ValueError as exc:
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>ValueError: mode='zarr' is not supported: no NWP catalog row carries a `zarr_url`, and Zarr sources (NWM, hrrrzarr) are separate backends. Use mode='subset' (default) or mode='whole'.
+<pre>~/.cdsapirc found: True (C:\Users\main\.cdsapirc)
 </pre>
 </div>
 </div>
@@ -18107,31 +18253,21 @@ except ValueError as exc:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c419bd33">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=64a57b9f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="4-the-facade-forwards-mode-too">4 — the facade forwards <code>mode=</code> too<a class="anchor-link" href="#4-the-facade-forwards-mode-too">¶</a></h2>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=90ba6bb8">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The unified <code>EarthLens</code> facade passes any extra kwarg through to the backend,
-so <code>mode=</code> works the same way there — this is how you'd use it in practice
-(here we only construct; add <code>.download()</code> against the live bucket to fetch).</p>
+<h2 id="step-3-request-a-glofas-forecast">Step 3 — request a GloFAS forecast<a class="anchor-link" href="#step-3-request-a-glofas-forecast">¶</a></h2><p>We ask for one day of <code>river_discharge_in_the_last_24_hours</code> over a small window
+of the Ganges–Brahmaputra delta. GloFAS is requested with
+<code>temporal_resolution="daily"</code> — the forecast is keyed to a reference date, so
+the monthly path (which drops the <code>day</code> selector) is rejected with a clear error.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=432f8ace">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0227b628">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -18149,17 +18285,277 @@ so <code>mode=</code> works the same way there — this is how you'd use it in p
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/glofas"</span><span class="p">)</span>
+<span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'nwp'</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'whole'</span><span class="p">,</span> <span class="o">**</span><span class="n">REQ</span><span class="p">)</span>
-<span class="c1"># the facade stores the constructed backend as `.datasource`</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'facade wired mode=whole -&gt;'</span><span class="p">,</span> <span class="n">lens</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_mode</span><span class="p">)</span>
+<span class="n">request</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"cems-glofas-forecast"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"river-discharge-in-the-last-24-hours"</span><span class="p">]},</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-01-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2024-01-01"</span><span class="p">,</span>
+    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">89.0</span><span class="p">,</span> <span class="mf">91.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">request</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">from earthlens.earthlens import EarthLens
+<div class="clipboard-copy-txt" id="cell-5">out_dir = Path("data/glofas")
+out_dir.mkdir(parents=True, exist_ok=True)
 
-lens = EarthLens(data_source='nwp', mode='whole', **REQ)
-# the facade stores the constructed backend as `.datasource`
-print('facade wired mode=whole -&gt;', lens.datasource._mode)</div>
+request = dict(
+    data_source="ecmwf",
+    variables={"cems-glofas-forecast": ["river-discharge-in-the-last-24-hours"]},
+    start="2024-01-01",
+    end="2024-01-01",
+    temporal_resolution="daily",
+    lat_lim=[23.0, 25.0],
+    lon_lim=[89.0, 91.0],
+    path=str(out_dir),
+)
+request</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>{'data_source': 'ecmwf',
+ 'variables': {'cems-glofas-forecast': ['river-discharge-in-the-last-24-hours']},
+ 'start': '2024-01-01',
+ 'end': '2024-01-01',
+ 'temporal_resolution': 'daily',
+ 'lat_lim': [23.0, 25.0],
+ 'lon_lim': [89.0, 91.0],
+ 'path': 'data\\glofas'}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f7cd66ce">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>The catalog row already carries GloFAS's request defaults (<code>system_version</code>,
+<code>hydrological_model</code>, <code>leadtime_hour</code>), so the call stays short. <code>download()</code>
+blocks while the EWDS queue processes the request (usually under a minute for a
+window this small) and returns the written NetCDF path(s).</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cf0c3101">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="o">**</span><span class="n">request</span><span class="p">)</span>
+<span class="n">out_paths</span> <span class="o">=</span> <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">out_paths</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-6">earthlens = EarthLens(**request)
+out_paths = earthlens.download()
+out_paths</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre><span class="ansi-green-fg">2026-07-01 22:17:56.596</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.ecmwf.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">704</span> - <span class="ansi-bold">Download ECMWF cems-glofas-forecast/river-discharge-in-the-last-24-hours data for period 2024-01-01 00:00:00 till 2024-01-01 00:00:00</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre><span class="ansi-green-fg">2026-07-01 22:17:57.439</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.ecmwf.backend</span>:<span class="ansi-cyan-fg">_api</span>:<span class="ansi-cyan-fg">907</span> - <span class="ansi-bold">Requesting cems-glofas-forecast from EWDS; this may take several minutes</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:57,720 INFO [2024-02-01T00:00:00] Please note that accessing this dataset via CDS for time-critical operation is not advised or supported
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:57 | <span class="ansi-green-fg">INFO</span> | ecmwf.datastores.legacy_client | [2024-02-01T00:00:00] Please note that accessing this dataset via CDS for time-critical operation is not advised or supported
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:57,722 INFO [2024-02-01T00:00:00] Please note we suggest checking the list of known issues on the GloFAS wiki
+[here](https://confluence.ecmwf.int/display/CEMS/GloFAS+-+Known+Issues)
+before downloading the dataset.
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:57 | <span class="ansi-green-fg">INFO</span> | ecmwf.datastores.legacy_client | [2024-02-01T00:00:00] Please note we suggest checking the list of known issues on the GloFAS wiki
+[here](https://confluence.ecmwf.int/display/CEMS/GloFAS+-+Known+Issues)
+before downloading the dataset.
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:57,723 INFO Request ID is 986a967e-aa5b-44cc-8b83-dec5ee188199
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:57 | <span class="ansi-green-fg">INFO</span> | ecmwf.datastores.legacy_client | Request ID is 986a967e-aa5b-44cc-8b83-dec5ee188199
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:57,836 INFO status has been updated to accepted
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:17:57 | <span class="ansi-green-fg">INFO</span> | ecmwf.datastores.legacy_client | status has been updated to accepted
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:18:30,632 INFO status has been updated to successful
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:18:30 | <span class="ansi-green-fg">INFO</span> | ecmwf.datastores.legacy_client | status has been updated to successful
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-01 22:18:30 | <span class="ansi-green-fg">INFO</span> | multiurl.base | Downloading https://object-store.os-api.cci2.ecmwf.int:443/cci2-prod-cache-2/2026-07-01/5f14aa5e48b1235c19d9f974cb85d3d8.nc
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jupyter-widgets jp-OutputArea-output" id="625d3132-d86e-498b-9461-d8355fafc0e4" tabindex="0">
+<script type="text/javascript">
+var element = document.getElementById('625d3132-d86e-498b-9461-d8355fafc0e4');
+</script>
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "49fc56e858f14839929449e34ebf8f59", "version_major": 2, "version_minor": 0}
+</script>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre><span class="ansi-green-fg">2026-07-01 22:18:31.253</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.ecmwf.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">750</span> - <span class="ansi-bold">ECMWF download summary: all 1 variables succeeded ([('cems-glofas-forecast', 'river-discharge-in-the-last-24-hours')])</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[WindowsPath('C:/gdrive/algorithms/remote-sensing/earthlens/.claude/worktrees/ecmwf-ewds/docs/examples/ecmwf/data/glofas/river_discharge_in_the_last_24_hours_cems-glofas-forecast.nc')]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aa790b07">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="step-4-read-the-result-and-confirm-the-native-grid">Step 4 — read the result and confirm the native grid<a class="anchor-link" href="#step-4-read-the-result-and-confirm-the-native-grid">¶</a></h2><p>The file is a plain NetCDF (<code>dis24</code> = river discharge in the last 24 h, m³/s).
+<code>get_variable</code> hands back a <code>pyramids</code> raster whose geotransform confirms
+GloFAS's native <strong>0.05°</strong> grid — the backend snapped the requested bbox to it
+rather than to ERA5's 0.125°.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=78853801">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">nc_path</span> <span class="o">=</span> <span class="n">out_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nc_path</span><span class="p">))</span>
+<span class="n">discharge_var</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"dis24"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"file:       </span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">nc_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"variables:  </span><span class="si">{</span><span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"grid:       </span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2"> cells, "</span>
+      <span class="sa">f</span><span class="s2">"EPSG:</span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-7">nc_path = out_paths[0]
+nc = NetCDF.read_file(str(nc_path))
+discharge_var = nc.get_variable("dis24")
+print(f"file:       {Path(nc_path).name}")
+print(f"variables:  {nc.variable_names}")
+print(f"grid:       {discharge_var.rows} x {discharge_var.columns} cells, "
+      f"EPSG:{discharge_var.epsg}")</div>
 </div>
 </div>
 </div>
@@ -18171,7 +18567,58 @@ print('facade wired mode=whole -&gt;', lens.datasource._mode)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>facade wired mode=whole -&gt; whole
+<pre>file:       river_discharge_in_the_last_24_hours_cems-glofas-forecast.nc
+variables:  ['dis24']
+grid:       40 x 40 cells, EPSG:4326
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c6f9b5d7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">geotransform</span> <span class="o">=</span> <span class="n">discharge_var</span><span class="o">.</span><span class="n">geotransform</span>
+<span class="n">cell_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">geotransform</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">discharge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">read_array</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"cell size:  </span><span class="si">{</span><span class="n">cell_size</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> deg  # GloFAS native 0.05, not ERA5's 0.125"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"discharge:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">discharge</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">discharge</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> m3/s"</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-8">geotransform = discharge_var.geotransform
+cell_size = abs(geotransform[1])
+discharge = np.squeeze(discharge_var.read_array())
+print(f"cell size:  {cell_size:.3f} deg  # GloFAS native 0.05, not ERA5's 0.125")
+print(f"discharge:  {np.nanmin(discharge):.1f} .. {np.nanmax(discharge):.1f} m3/s")</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>cell size:  0.050 deg  # GloFAS native 0.05, not ERA5's 0.125
+discharge:  0.0 .. 9214.4 m3/s
 </pre>
 </div>
 </div>
@@ -18179,38 +18626,142 @@ print('facade wired mode=whole -&gt;', lens.datasource._mode)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dd20ec49">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5e293933">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="recap">Recap<a class="anchor-link" href="#recap">¶</a></h2>
+<h2 id="step-5-map-the-river-discharge">Step 5 — map the river discharge<a class="anchor-link" href="#step-5-map-the-river-discharge">¶</a></h2><p>Plotting the field makes the river network visible: the high-discharge cells
+trace the main channels of the delta, while the surrounding land sits near zero.
+A log-scaled colour ramp keeps the big rivers from washing out the tributaries.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c37ea07c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogNorm</span>
+
+<span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">discharge</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">geotransform</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">geotransform</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_min</span> <span class="o">+</span> <span class="n">cols</span> <span class="o">*</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">-</span> <span class="n">rows</span> <span class="o">*</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">y_max</span><span class="p">]</span>
+<span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_less_equal</span><span class="p">(</span><span class="n">discharge</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span>
+               <span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">max</span><span class="p">())))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"GloFAS river discharge (dis24) — Ganges-Brahmaputra delta"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"longitude (deg E)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"latitude (deg N)"</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"discharge (m3/s, log scale)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-9">from matplotlib.colors import LogNorm
+
+rows, cols = discharge.shape
+x_min, y_max = geotransform[0], geotransform[3]
+extent = [x_min, x_min + cols * cell_size, y_max - rows * cell_size, y_max]
+field = np.ma.masked_less_equal(discharge, 0)
+
+fig, ax = plt.subplots(figsize=(7, 6))
+im = ax.imshow(field, cmap="Blues", origin="upper", extent=extent,
+               norm=LogNorm(vmin=1, vmax=float(field.max())))
+ax.set_title("GloFAS river discharge (dis24) — Ganges-Brahmaputra delta")
+ax.set_xlabel("longitude (deg E)")
+ax.set_ylabel("latitude (deg N)")
+fig.colorbar(im, ax=ax, label="discharge (m3/s, log scale)")
+plt.show()</div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=082f8586">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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2zZVy4gTdMt0ler3piOPX69ice22P+3RL09lRWqaXoksl+iXnDqXoF/KqkzxwuKE8DD979PVootqt132xxGtdr2bVNbe5vLt+teDcV31F5kVtrAPnvr6T+22E65x5jk4ISnlv5ypOs7Gp2i3RbouO9vZiXPonMEeOiIiIqIgxx46IiIiyhdz6AoyBnREREREfoJh7t9++02+++47+fvvvyU1NVUqV66sKlV17NhRChf2bZoHh1yJiIjI7z10dt/yuvT0dJk1a5Y0aNBA2rZtq+rYo6LVvn375NNPP5WePXuqWvXjx4+XuLg4y9tnDx0RERHli0URMTExqqb7iBEj1C0vufrqqyUpKUlGjx4tffv2zVTGNCEhQVatWqVq2yPo27ZtW6Y22WFAR0RERPlCbGysREVFSV40adIk6dChQ5Z/j4yMlN69e6vbli1bJCzMWojGgI6IiIj8JkQcWBQheX/INbtgztOll15qefucQ0dEREQUAMePH5eff/5ZDcXmFgM6IiIi8vscOrtvwSQxMVGGDBkiFSpUUKtbT5w4oe6/5557ZOHChT5tkwEdERERkR9NnTpVDh48KH/99ZdUqfK/CkYPP/ywPPPMMz5tk3PobHAmLllSQ5OzbRNeSD92rlgyQrvtC70babdNS9cv8WKlGswjS//QbutESa8LCSmOlFuy4udD+mWvapYrJsHinIVSQy2r66/G+nG3/v7SLemVkJoW8HJeTh23hUL1ux861Cqr1W7ptsPa2wwL1T9vEpLTAl52K8zC9bZsiSJa7dItXD8vJumXlktK1SttZ/UanpcxsbDI8uXLZebMmXLJJZe4zSesX7++CvROnz4tpUuXtrRf2UNHRERE5Efnzp2TEiVKqJ/NAR3m0mE41uoKV2BAR0RERH7DOXQirVu3lsWLF2cK6KZNm6Zy0PmSeoVDrkRERJQvhlxj8nBiYTNUg2jXrp1s3bpV9dYhkNu8ebPKo7ds2TKftskeOiIiIsoXYmNjVTmtvBzMAebObdy4UdVwrV27tqrrWrVqVVm3bp10797dp22yh46IiIjyRemvYFKjRg2ZMWOGbdtjDx0RERFRkGMPHREREflNQU1bUr9+fTl8WC9d0K5du9RwrBUM6IiIiIgc9tprr0lCQoJWW6s56IABHREREfmPE6W6QiTP69atm6Pb5xw6IiIioiDHHjob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2Nir69p+zOz690LAe5aqD1ug1c6V7P9573jJdr/skODooJPFixfLF198obKB3HPPPWphaa9evdStZcuW/g/oUBUC3YII3tA7B7Vr11b3ExEREWWlIKctadKkiboh5xwKMixfvlzNo5s+fboUK1ZMevbsqYK7Ll26WKrjCtpf1ZHszhMCuMaNG6ubOZjz1paIiIgov9i7d68MHjxYLr30UpUY+Ny5c5b+fdmyZdVIJ6asnThxQj766CO1uhUZQ8qUKSM9evSwtE3tgK5Vq1by0EMPyZ9//pllG6x8RTqT3HYbEhERUf5kDLnaffM31LXv27evvPfee2pR6Pjx433eVnh4uMpFh566Xbt2ye+//6566YzSYLYOuSI3ylNPPSXNmzeXGjVqqAAPdccwB+Lo0aMSGxurEgvffPPN6okQERER5WWnTp1S+XOrVauWZZvjx4+rUcgSJUq43f/JJ5+oFatw/fXXqzjIV2fOnJGEhASpXLmy+h256B5++GFL29DuoatUqZJKfod0JQ8++KDKZLxp0yYV6CEH3WOPPaYiVLSpWLGipSW8O3fulN27d+eYGRldjz/++KNaWavj0KFDsmHDBlUENzdtiIiIyN60JXbfrFixYoX07t3breKVp40bN0qjRo3UGgEMgV533XVy9uzZjL8bwRw6s9555x2VVy4nWEiKBaTY5p133ikpKSly//33q+3juVxxxRVqbp0vLC93Q7B23333ybx58+SHH35QNcjwM8aP0WNnBZLp4QUgsr3mmmtUoVpMDvQGPYE33XSTdOzYUV599dUcy5Rhm/Xr15dbbrlFPefXX3/dchsiIiLKfxYsWKBq1CMO8QYlTrE44corr1S9Z0eOHFGdSXfffbdbu7/++kula8OwK2KYnLz00kuybNkyNZq5bds2GTRokCqlOn/+fPX/ixcvqiINflvlagf0zKF7cceOHRkJiidMmKB2DCYaevbyvfzyy+rfYHVITiZOnCi//fab2g56Fj///HNVXgOZmNu0aaPdhoiIiIInbcl5j9G2IkWKqJun999/P9tEvp999pnqKUM2D8xvwwKGJ598UnUsIX8cOrAwYogFDAgOdYI5QDD31ltvqd5B9Mwh/kAqE+SmgwYNGkhMTIzXpMM5cSYhlQZ0VU6ePNmt2gR6+TCWjaFcz25PTBREBKyzNBntEHljRwEmLSIQ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9hly//33q//PmDEj4+esoA0RERGRP8XExEihQoVkxIgR6paX1ahRw9Z4STug++eff7z+TERERGRlZMnu0aWQ/98eK0Vo+PzzzzN+fvbZZ7NNLExERERE3tWsWTPLzrHChQurJMODBw+WJ598Uv2uw6dJCUge7HK5LP+NiIiICjbOoROZNGmSDB8+XIYNG6YWR6Ds1++//66GYAcNGqQCvhdffFHi4+PVPDsdTCxMREREfsNarqKyhrz22mty5513ZuyXPn36SN++faV3795y4MAB6dSpk7o5EtAxsTARERFR7qA3bsKECZnub9q0qaoSgVQmLVq0UHMDz549KyVLlsxxm0wsTERERH4TGhKibnZvM5iUKVNGFi5cmCmoQ0mwtLQ0iYyMVIEd/q8TzAETCxMRERH50dNPP62GVr///ns1hw4LH7Zt2yZLly5V8+vwO2q9YlGELiYWJiIiIr/hogiRbt26qSoRSCS8evVqSU5Olrp168qKFSukc+fOGUGfFT4vikhNTZUdO3bIwYMH1c9mmNRHRERERJmhjmvPnj1l1qxZYhefArrdu3eroO2vv/5SY73h4eGSkpKi/lasWDGJi4uTgqRBlSifCulmZdP+M9ptW9YqJU4oHhHmSFsnbHnzJu226RZK8tQqX0y7bakb7Tsp3VSso9fu6F7tTVbqrN+Ff2bds9ptT11I0m4bXTRcu+2RM4la7fYc07/utHLovNlyRP/4WrHjX+22F5L0S4rplhksHKZfcirVpV8qLV0slEpL0X9dR84kaLetXCpSu61umi0riXDDCgW+JGOgr8vZCvlvpavd2wwmjz/+uLRp00aqV69u2zZ9KiKH1a4dO3aUixcvqt8TExNVTbJLL71Upkxxpk4kERERUU6lvxo1aqTmn+VlKM6wefNmW7fpUwi/fv16ee+991QiPEAvXcuWLeWDDz6Qfv36yahRo2x9kkRERJQ/hEqIutm9zWAq/XXPPffI/fffr1ayIj1JRESE298xny4sLMz5gA5PoHz58urnsmXLytGjR6VatWpSp04dOXz4sC+bJCIiogKAiYVFBXOIl+644w6v++jQoUOq/JcVuR5kb926tart+tBDD8mcOXNUVElERERE3m3YsCHTglKzSpUqiVVhvnYVGhDM9erVS9544w0pVaqULFq0yJdNEhERUQHAtCUiFStWtH+/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70urVq3c7sPrQ1USzLvIjRtvvFEltL7ttttUAu0FCxao9xBVTDCPCvCcvL0uJObeuXOn1uPMnj1bzXFBRRRPt956q9x8880qUTcqsmC7uaVz/vhyLgT6HNM5fzC37syZM5mOGVS8sfL4/j7HdM4fX8+FQJ5jOucPHh/noXHOGY+POY2///570J5jvnD6HMM+xvzIerWqSYUy0bbe6tWqpubCY44k5ukZN8/CBbp++eUXadCggaogZUBhA8yn27Bhg/p94sSJqlIVKlkNGzZMXnzxRQmkApmH7vbbb1cn1mOPPaYOsAsXLqiSYsYkXVx8JkyYIP369ZOHHnpI/X3KlCmqckVWEx5xPyZiek5ox0ls/BudNrmBpdNLlixRlTYqV66sPlyefvpp9bPx4YCL6r333quChpIlS8prr72m9oHu4x89elQFirhImRcm9O7dW1566SX1WnDAY7UP9iMuylickRs4WW655RZ5/vnn1WvAAoK+ffuqi64BzwmvFZOecXH++uuvZevWreqChwszJrR6wgRWPD9ciGHRokUyaNAgNSEd7z1gv5irkgB+xzaxbc+/WYHJ1yNHjpRHH31UfXAgEMC+wmszoMTdFVdcISNGjJA+ffqoDyF8eBjPLSdo89lnn8lzzz3ndj+OZdxvPBYCZlysMDH41VdfldzQOX98ORcCfY7pnD/G/70dM7rBQSDOMZ3zx5dzIdDnmM75k9Xjm9sE4znmC6fPsYiICHX9Nld2spPL5cq0cMHXChhY0OO5qND4HX8DnCt4PViYgmMaC9sCqcD10GFlEk6qe+65R60aw0mG0mK4UP/666+qDS7UiMDxrRGlwT799FN599131cGIE8YbHNzectAkJCRkfPPTaZOb1a2oTYtvKP/884/6prRp0yb17QQfAgYEfA888IAsXrxYvTZ8c8T+yOp1meFk7datm+oZePPNNzNdYIyLIFY74ZsKPnS++uorya1Ro0ap3lScNPj2iRVme/fulcGDB2e0wYcbSrfh7wj8cMEZO3as2ufegjlo3759xgcNDBgwQK6++mrVU2bw9p7h/YLcvmcoYYfeU/QS48MTxya+4Xfq1EldoKFNmzaqNB0ugHhd+HCcNWuW+pvOezZv3jz1fwTEZqiVbA4csR9wXJhfu690zh9fzoVAn2M654/xIeftmNF5/ECdYzrnjy/nQqDP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"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=84c995ad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<ul>
-<li><code>subset</code> (default) → <code>.idx</code> byte-range subset (&gt;99 % less bandwidth) where
-the model has an index, else whole-per-variable.</li>
-<li><code>whole</code> → force the full file even for <code>.idx</code> models, then crop.</li>
-<li><code>zarr</code> → rejected (documented follow-on, pending a <code>zarr_url</code> field).</li>
-<li><code>mode=</code> only changes behaviour for the NOAA / Herbie centre; the other
-centres accept and ignore it.</li>
+<p>The bright ribbons are the river channels carrying thousands of m³/s; the dark
+background is off-river land at near-zero discharge — exactly the sparse,
+network-structured field GloFAS models on its 0.05° grid.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0cfc9e60">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="options-edge-cases">Options &amp; edge cases<a class="anchor-link" href="#options-edge-cases">¶</a></h2><ul>
+<li><strong>Other GloFAS variables.</strong> The forecast row also exposes
+<code>runoff_water_equivalent</code>, <code>snow_depth_water_equivalent</code>, and
+<code>soil_wetness_index</code> — swap the variable code to retrieve them.</li>
+<li><strong>Lead time.</strong> The catalog default is a 24 h lead; longer horizons (up to
+720 h) are selected via the row's <code>leadtime_hour</code> extra.</li>
+<li><strong>Daily only.</strong> GloFAS must be requested with <code>temporal_resolution="daily"</code>;
+a <code>"monthly"</code> request raises <code>ValueError</code> because the forecast reference date
+needs the <code>day</code> selector the monthly path omits.</li>
+<li><strong>Bigger areas.</strong> Widen <code>lat_lim</code> / <code>lon_lim</code> for a basin-scale map; the
+retrieve time grows with the area.</li>
 </ul>
-<p>See the <a href="../../reference/nwp/usage.md">NWP usage guide</a> for the full write-up.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d6b2b45a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="takeaway">Takeaway<a class="anchor-link" href="#takeaway">¶</a></h2><p>A GloFAS flood forecast is one <code>EarthLens("ecmwf", …)</code> call away: the dataset's
+<code>endpoint</code> routes it to EWDS, your existing CDS token authenticates there, and
+the result arrives as NetCDF on GloFAS's native 0.05° grid — ready to read and
+map with <code>pyramids</code> + <code>matplotlib</code>. See the
+<a href="../../reference/ecmwf/ewds.md">EWDS reference page</a> for the full dataset list
+and credential setup.</p>
 </div>
 </div>
 </div>
 </div>
 </div> <!-- jp-Notebook -->
 </div> <!-- jupyter-wrapper -->
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"0b9222df580a4a91a68e2c3cbc4c52b6": {"model_module": "@jupyter-widgets\/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "41936a09a45841ad8f3cb139e640b6de": {"model_module": "@jupyter-widgets\/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": "hidden", "width": null}}, "41d1052884ac4a448a10cd8848174163": {"model_module": "@jupyter-widgets\/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets\/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets\/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_0b9222df580a4a91a68e2c3cbc4c52b6", "placeholder": "\u200b", "style": "IPY_MODEL_c76f95fb97f042db94a77fe03b23f24f", "tabbable": null, "tooltip": null, "value": "\u200731.9k\/31.9k\u2007[00:00&lt;00:00,\u2007131kB\/s]"}}, "49fc56e858f14839929449e34ebf8f59": {"model_module": "@jupyter-widgets\/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets\/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets\/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_90b7c63716d944ceb6d72e38aac7a9e9", "IPY_MODEL_d59187a57c11416f85a41cc99c09a405", "IPY_MODEL_41d1052884ac4a448a10cd8848174163"], "layout": "IPY_MODEL_41936a09a45841ad8f3cb139e640b6de", "tabbable": null, "tooltip": null}}, "5d8983091f314928801e599cdde397ef": {"model_module": "@jupyter-widgets\/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "636f1f5fce1847408949d0a60bf5a935": {"model_module": "@jupyter-widgets\/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets\/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "8c78d5aac4f84e90b9b5d37562401e4f": {"model_module": "@jupyter-widgets\/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "90b7c63716d944ceb6d72e38aac7a9e9": {"model_module": "@jupyter-widgets\/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets\/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets\/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_5d8983091f314928801e599cdde397ef", "placeholder": "\u200b", "style": "IPY_MODEL_bbdceeca8d684210aab8fc134004e3fe", "tabbable": null, "tooltip": null, "value": "5f14aa5e48b1235c19d9f974cb85d3d8.nc:\u2007100%"}}, "bbdceeca8d684210aab8fc134004e3fe": {"model_module": "@jupyter-widgets\/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets\/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "c76f95fb97f042db94a77fe03b23f24f": {"model_module": "@jupyter-widgets\/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets\/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "d59187a57c11416f85a41cc99c09a405": {"model_module": "@jupyter-widgets\/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets\/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets\/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_8c78d5aac4f84e90b9b5d37562401e4f", "max": 32657.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_636f1f5fce1847408949d0a60bf5a935", "tabbable": null, "tooltip": null, "value": 32657.0}}}, "version_major": 2, "version_minor": 0}
+</script>
 
         <style>
         ['pre { line-height: 125%; }\ntd.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }\nspan.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }\ntd.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }\nspan.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }\n.highlight-ipynb .hll { background-color: var(--jp-cell-editor-active-background) }\n.highlight-ipynb { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }\n.highlight-ipynb .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */\n.highlight-ipynb .err { color: var(--jp-mirror-editor-error-color) } /* Error */\n.highlight-ipynb .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */\n.highlight-ipynb .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */\n.highlight-ipynb .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */\n.highlight-ipynb .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */\n.highlight-ipynb .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */\n.highlight-ipynb .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */\n.highlight-ipynb .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */\n.highlight-ipynb .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */\n.highlight-ipynb .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */\n.highlight-ipynb .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */\n.highlight-ipynb .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */\n.highlight-ipynb .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */\n.highlight-ipynb .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */\n.highlight-ipynb .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */\n.highlight-ipynb .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */\n.highlight-ipynb .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */\n.highlight-ipynb .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */\n.highlight-ipynb .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */\n.highlight-ipynb .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */\n.highlight-ipynb .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */\n.highlight-ipynb .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */\n.highlight-ipynb .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */\n.highlight-ipynb .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */\n.highlight-ipynb .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */\n.highlight-ipynb .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */\n.highlight-ipynb .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */\n.highlight-ipynb .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */\n.highlight-ipynb .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */\n.highlight-ipynb .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */\n.highlight-ipynb .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */\n.highlight-ipynb .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */\n.highlight-ipynb .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */\n.highlight-ipynb .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */\n.highlight-ipynb .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */\n.highlight-ipynb .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */\n.highlight-ipynb .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */\n.highlight-ipynb .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */\n.highlight-ipynb .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */\n.highlight-ipynb .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */']
@@ -18251,7 +18802,7 @@ centres accept and ignore it.</li>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../nwp_polish_features/" class="md-footer__link md-footer__link--prev" aria-label="Previous: NWP polish features — catalog metadata &amp;amp; guards (no network)">
+          <a href="../cds_quickstart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: CDS quickstart — downloading ERA5 via the facade">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -18261,20 +18812,20 @@ centres accept and ignore it.</li>
                 Previous
               </span>
               <div class="md-ellipsis">
-                NWP polish features — catalog metadata &amp; guards (no network)
+                CDS quickstart — downloading ERA5 via the facade
               </div>
             </div>
           </a>
         
         
           
-          <a href="../gfs_temperature/" class="md-footer__link md-footer__link--next" aria-label="Next: GFS 2 m temperature — NWP quickstart">
+          <a href="../hydrology_water_balance/" class="md-footer__link md-footer__link--next" aria-label="Next: Hydrology — catchment water balance from ERA5">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                GFS 2 m temperature — NWP quickstart
+                Hydrology — catchment water balance from ERA5
               </div>
             </div>
             <div class="md-footer__button md-icon">

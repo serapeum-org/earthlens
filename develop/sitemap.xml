@@ -209,6 +209,10 @@
          <lastmod>2026-07-01</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/ecmwf/floods_glofas_forecast/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/ecmwf/heat_waves_public_health/</loc>
          <lastmod>2026-07-01</lastmod>
     </url>
@@ -482,10 +486,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwp/catalog_explorer/</loc>
-         <lastmod>2026-07-01</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nwp/download_mode/</loc>
          <lastmod>2026-07-01</lastmod>
     </url>
     <url>
@@ -1042,6 +1042,10 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/ecmwf/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/ewds/</loc>
          <lastmod>2026-07-01</lastmod>
     </url>
     <url>
