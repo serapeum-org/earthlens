@@ -210,6 +210,8 @@ def _provider_for_dataset(ds_name: str) -> str:
         return "cmip5-modelling-centres"
     if ds_name.startswith("projections-cordex"):
         return "cordex-consortium"
+    if ds_name.startswith(("cems-", "efas-")):
+        return "copernicus-cems"
     return "ecmwf"
 
 
@@ -245,6 +247,8 @@ def _build_dataset_map(
         ds_product_type = ds_body.get("product_type")
         ds_extras = dict(ds_body.get("extras") or {})
         ds_request_kind = ds_body.get("request_kind", "form")
+        ds_endpoint = ds_body.get("endpoint", "cds")
+        ds_grid_resolution = ds_body.get("grid_resolution")
         ds_vars: dict[str, Variable] = {}
         for code, entry in (ds_body.get("variables") or {}).items():
             merged = dict(entry)
@@ -271,6 +275,9 @@ def _build_dataset_map(
             row_extras = dict(merged.get("extras") or {})
             merged["extras"] = {**ds_extras, **row_extras}
             merged.setdefault("request_kind", ds_request_kind)
+            merged.setdefault("endpoint", ds_endpoint)
+            if "grid_resolution" not in merged and ds_grid_resolution is not None:
+                merged["grid_resolution"] = ds_grid_resolution
             try:
                 ds_vars[code] = Variable(**merged)
             except ValidationError as exc:
@@ -284,6 +291,8 @@ def _build_dataset_map(
             product_type=ds_product_type,
             extras=ds_extras,
             request_kind=ds_request_kind,
+            endpoint=ds_endpoint,
+            grid_resolution=ds_grid_resolution,
             provider=_provider_for_dataset(ds_name),
             variables=ds_vars,
         )
@@ -335,9 +344,49 @@ def _synthesize_monthly_entries(
             product_type=monthly_pt,
             extras=dict(ds.extras),
             request_kind=ds.request_kind,
+            endpoint=ds.endpoint,
+            grid_resolution=ds.grid_resolution,
             provider=_provider_for_dataset(ds.monthly),
             variables=rebranded,
         )
+
+
+def _validate_endpoint(value: str) -> str:
+    """Reject an `endpoint` slug the endpoint router does not know.
+
+    Args:
+        value: The endpoint slug from the catalog.
+
+    Returns:
+        str: The validated slug.
+
+    Raises:
+        ValueError: If `value` is not a known CADS endpoint.
+    """
+    from earthlens.ecmwf.endpoints import ENDPOINTS
+
+    if value not in ENDPOINTS:
+        raise ValueError(
+            f"unknown endpoint {value!r}; expected one of {sorted(ENDPOINTS)}"
+        )
+    return value
+
+
+def _validate_grid_resolution(value: float | None) -> float | None:
+    """Reject a non-positive `grid_resolution` (a zero would divide the snap).
+
+    Args:
+        value: The grid spacing in degrees, or `None`.
+
+    Returns:
+        float | None: The validated value.
+
+    Raises:
+        ValueError: If `value` is not `None` and not strictly positive.
+    """
+    if value is not None and value <= 0:
+        raise ValueError(f"grid_resolution must be > 0, got {value!r}")
+    return value
 
 
 class Variable(FluxableLeaf):
@@ -387,6 +436,15 @@ class Variable(FluxableLeaf):
             for CARRA, `{"experiment": "ssp585", "model": "ec_earth3"}`
             for CMIP6. Keys not enumerated in this model are not
             silently dropped: they live here and reach the server.
+        endpoint: CADS instance this dataset lives on — `"cds"`
+            (default), `"ads"`, or `"ewds"`. Propagated from the parent
+            dataset; selects the retrieve URL via
+            `earthlens.ecmwf.endpoints.open_client`.
+        grid_resolution: Native grid spacing in degrees for the
+            dataset (e.g. `0.05` for GloFAS on EWDS), or `None` to
+            fall back to the ERA5 default (`ERA5_GRID_DEGREES`).
+            Propagated from the parent dataset; used by
+            `ECMWF._create_grid` to snap the bbox to the right grid.
     """
 
     # `model_config` (frozen=True, extra="forbid") and the `types` field
@@ -400,6 +458,8 @@ class Variable(FluxableLeaf):
     cds_pressure_level: list[str] | None = None
     extras: dict[str, Any] = Field(default_factory=dict)
     request_kind: str = "form"
+    endpoint: str = "cds"
+    grid_resolution: float | None = None
 
     @field_validator("extras", mode="before")
     @classmethod
@@ -421,6 +481,18 @@ class Variable(FluxableLeaf):
                 "these are not valid under cdsapi"
             )
         return value
+
+    @field_validator("endpoint")
+    @classmethod
+    def _known_endpoint(cls, value: str) -> str:
+        """Reject an `endpoint` slug the router does not know."""
+        return _validate_endpoint(value)
+
+    @field_validator("grid_resolution")
+    @classmethod
+    def _positive_grid_resolution(cls, value: float | None) -> float | None:
+        """Reject a non-positive `grid_resolution` (would divide the snap by zero)."""
+        return _validate_grid_resolution(value)
 
     # `is_flux` property is inherited from `FluxableLeaf` (N1 in
     # planning/catalog-cross-backend-comparison.md).
@@ -450,6 +522,12 @@ class Dataset(BaseModel):
             the family-wide selectors (e.g. `domain`, `leadtime_hour`,
             `experiment`, `model`) that the dataset's request shape
             requires beyond the ERA5 standard set.
+        endpoint: CADS instance the dataset lives on — `"cds"`
+            (default), `"ads"`, or `"ewds"`. Inherited by every child
+            variable and used to route the retrieve URL.
+        grid_resolution: Native grid spacing in degrees (e.g. `0.05`
+            for GloFAS), or `None` to use the ERA5 default. Inherited
+            by every child variable.
         variables: Per-variable map keyed by the slugified short code
             (e.g. `"2m-temperature"`).
 
@@ -489,8 +567,22 @@ class Dataset(BaseModel):
     product_type: list[str] | None = None
     extras: dict[str, Any] = Field(default_factory=dict)
     request_kind: str = "form"
+    endpoint: str = "cds"
+    grid_resolution: float | None = None
     provider: str | None = None
     variables: dict[str, Variable] = Field(default_factory=dict)
+
+    @field_validator("endpoint")
+    @classmethod
+    def _known_endpoint(cls, value: str) -> str:
+        """Reject an `endpoint` slug the router does not know."""
+        return _validate_endpoint(value)
+
+    @field_validator("grid_resolution")
+    @classmethod
+    def _positive_grid_resolution(cls, value: float | None) -> float | None:
+        """Reject a non-positive `grid_resolution` (would divide the snap by zero)."""
+        return _validate_grid_resolution(value)
 
 
 class Catalog(AbstractCatalog):
@@ -882,7 +974,11 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        constraints = fetch_constraints(dataset_name)
+        from earthlens.ecmwf.endpoints import constraints_base_url
+
+        dataset = self.datasets.get(dataset_name)
+        endpoint = dataset.endpoint if dataset is not None else "cds"
+        constraints = fetch_constraints(dataset_name, constraints_base_url(endpoint))
         request: dict[str, Any] = {"data_format": "netcdf"}
         if not constraints:
             return request

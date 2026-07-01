@@ -140,6 +140,7 @@ nav:
     - ECMWF:
       - Introduction: reference/ecmwf/introduction.md
       - Usage: reference/ecmwf/usage.md
+      - EWDS (GloFAS / floods): reference/ecmwf/ewds.md
       - Catalog & tooling: reference/ecmwf/catalog.md
       - Reference: reference/ecmwf/ecmwf.md
     - EUMETSAT (Data Store):
@@ -387,6 +388,7 @@ nav:
       - OPERA Sentinel-1 SAR backscatter (live): examples/earthdata/opera_s1_backscatter.ipynb
     - CDS / ECMWF:
       - Quickstart: examples/ecmwf/cds_quickstart.ipynb
+      - Floods — GloFAS forecast (EWDS): examples/ecmwf/floods_glofas_forecast.ipynb
       - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb
       - Oceanography — SST & sea ice: examples/ecmwf/oceanography_sst_sea_ice.ipynb
       - Atmosphere — pressure levels: examples/ecmwf/atmosphere_pressure_levels.ipynb

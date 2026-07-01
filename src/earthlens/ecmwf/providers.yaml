@@ -19,3 +19,6 @@ providers:
     display_name: "CARRA consortium (MET Norway / DMI / SMHI / FMI Arctic reanalysis)"
   cerra-consortium:
     display_name: "CERRA consortium (Meteo-France / SMHI / MET Norway European reanalysis)"
+  copernicus-cems:
+    display_name: "Copernicus Emergency Management Service (CEMS — GloFAS / EFAS / fire danger, operated by ECMWF)"
+    parent: ecmwf

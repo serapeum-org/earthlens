@@ -32,6 +32,10 @@ variable, validates each request against the dataset's `constraints.json`
 before it consumes a queue slot, and writes the result as
 `<path>/<cds_variable>_<dataset>.nc`.
 
+Beyond CDS, the same backend can reach the **CEMS Early Warning Data Store
+(EWDS)** — GloFAS flood forecasts — with the very same token; see
+[EWDS (GloFAS / floods)](ewds.md).
+
 ## Authentication
 
 CDS access needs a personal API token in a `~/.cdsapirc` file:

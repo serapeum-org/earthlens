@@ -25,6 +25,8 @@ from earthlens.base import (
 )
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
+from earthlens.ecmwf.endpoints import constraints_base_url, endpoint_url
+from earthlens.ecmwf.endpoints import open_client as _open_endpoint_client
 
 __all__ = ["AuthenticationError", "ECMWF", "ERA5_GRID_DEGREES"]
 
@@ -48,6 +50,10 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # because the aggregate is over the window indicated by
     # `time_aggregation`.
     "carra_means": ("time",),
+    # GloFAS (EWDS): the forecast horizon is selected by `leadtime_hour`
+    # (carried in `extras`), not a time-of-day; the dataset rejects the
+    # four 6-hourly `time` slots the daily template adds, so drop `time`.
+    "glofas": ("time",),
 }
 
 
@@ -208,8 +214,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     `"monthly"`. `_check_input_dates` raises `ValueError` for
     anything else; that is the authoritative gate. Spatial cell
     size lives on :attr:`SpatialExtent.resolution` (populated by
-    :meth:`_create_grid`) and is sourced from
-    :data:`ERA5_GRID_DEGREES`.
+    :meth:`_create_grid`) and is the request's native grid spacing —
+    :data:`ERA5_GRID_DEGREES` (0.125°) for regular CDS datasets, or a
+    dataset's own `grid_resolution` (e.g. GloFAS's 0.05° on EWDS).
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -263,6 +270,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 dataset, or when running offline. Defaults to `False`.
         """
         self.skip_constraints = skip_constraints
+        # Per-endpoint cdsapi client cache (cds / ads / ewds). Populated
+        # lazily by `_client_for` so a multi-endpoint download reuses one
+        # connection per CADS instance. `_injected_client` holds a client
+        # bound via the `client` setter (used for every endpoint); it stays
+        # `None` for the normal lazy path so reading `self.client` cannot
+        # poison endpoint routing.
+        self._clients: dict[str, Any] = {}
+        self._injected_client: Any = None
         super().__init__(
             start=start,
             end=end,
@@ -337,25 +352,29 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         """
         return None
 
-    def _open_client(self):
-        """Construct the :class:`cdsapi.Client` for talking to CDS.
+    def _open_client(self, endpoint: str = "cds"):
+        """Construct a :class:`cdsapi.Client` for the named CADS endpoint.
 
-        Reads credentials from `~/.cdsapirc` (or the `CDSAPI_URL` /
-        `CDSAPI_KEY` environment variables, which cdsapi falls back to
-        when the dotfile is absent). If neither is configured, the
-        underlying cdsapi exception is wrapped in
-        :class:`AuthenticationError` with a message that tells the user
-        exactly where to put their Personal Access Token. Called lazily
-        by :attr:`~earthlens.base.LazyClientMixin.client` on first use.
+        Delegates to :func:`earthlens.ecmwf.endpoints.open_client`, which maps
+        the endpoint slug (`"cds"` / `"ads"` / `"ewds"`) to its URL and resolves
+        the token (the endpoint's own `<ENDPOINT>_KEY`, else the shared CDS
+        Personal Access Token from `CDSAPI_KEY` / `~/.cdsapirc`). Missing-CDS-
+        credential errors are re-raised as :class:`AuthenticationError` with a
+        message telling the user where to put their token. Called via
+        :meth:`_client_for` (and, for the default endpoint, by the
+        :class:`~earthlens.base.LazyClientMixin` `client` property).
+
+        Args:
+            endpoint: CADS instance slug. Defaults to `"cds"`.
 
         Returns:
-            cdsapi.Client: Authenticated CDS client. Calls to
+            cdsapi.Client: Authenticated client for `endpoint`. Calls to
             `client.retrieve(...)` use this connection.
 
         Raises:
-            AuthenticationError: If cdsapi cannot construct a Client —
-                typically because `~/.cdsapirc` is missing,
-                malformed, or contains an old-API-style `email` line.
+            AuthenticationError: If cdsapi cannot authenticate — typically
+                because `~/.cdsapirc` is missing, malformed, or contains an
+                old-API-style `email` line.
 
         Examples:
             - Construct a client when credentials are properly
@@ -378,10 +397,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ```
         """
         try:
-            client = cdsapi.Client()
+            client = _open_endpoint_client(endpoint)
         except (
             Exception
         ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as AuthenticationError
+            if isinstance(exc, AuthenticationError):
+                raise
             if _looks_like_missing_credentials(exc):
                 raise AuthenticationError(
                     "cdsapi could not authenticate against the Climate "
@@ -399,21 +420,119 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         return client
 
-    def _create_grid(self, lat_lim: list, lon_lim: list):
-        """Snap a lat/lon bounding box to ERA5 grid edges.
+    @property
+    def client(self):
+        """The default (CDS) cdsapi client — opened lazily and cached per endpoint.
 
-        Floors the south/west limits and ceils the north/east limits to
-        the nearest multiple of :data:`ERA5_GRID_DEGREES` (0.125°), so
-        every CDS retrieve aligns with the ERA5 native grid and no
-        cell straddles the requested area boundary.
+        Overrides :class:`~earthlens.base.LazyClientMixin` so that reading
+        `self.client` (e.g. via `authenticate()`) routes through the same
+        per-endpoint cache as a retrieve, rather than seeding a shared slot that
+        would then be returned for every endpoint. Resolves the `"cds"` client;
+        `authenticate()` therefore warms the CDS endpoint, while a non-CDS
+        endpoint (e.g. EWDS for GloFAS) is built lazily on its first retrieve.
+
+        Returns:
+            cdsapi.Client: The CDS client (built on first use, then cached).
+        """
+        return self._client_for("cds")
+
+    @client.setter
+    def client(self, value) -> None:
+        """Bind a client used for every endpoint (a deliberate override).
+
+        A client set here overrides endpoint routing and is returned by
+        :meth:`_client_for` for all endpoints — unlike a lazily-built endpoint
+        client, which is cached per endpoint and never treated as injected.
+
+        Args:
+            value: The client object to use for every endpoint.
+        """
+        self._injected_client = value
+
+    def _client_for(self, endpoint: str):
+        """Return the cdsapi client for `endpoint`, honouring an injected one.
+
+        An **explicitly bound** client (set via the `client` setter) is returned
+        for every endpoint. Otherwise a client is built once per endpoint and
+        cached on `self._clients` so repeated retrieves against the same CADS
+        instance reuse the connection. A lazily-built endpoint client is never
+        mistaken for a bound one, so reading `self.client` (which resolves
+        `"cds"`) cannot poison routing to another endpoint.
+
+        Args:
+            endpoint: CADS instance slug (`"cds"` / `"ads"` / `"ewds"`).
+
+        Returns:
+            cdsapi.Client: The client to use for a retrieve against `endpoint`.
+        """
+        injected = getattr(self, "_injected_client", None)
+        if injected is not None:
+            return injected
+        if endpoint not in self._clients:
+            self._clients[endpoint] = self._open_client(endpoint)
+        return self._clients[endpoint]
+
+    def _grid_resolution_for_request(self) -> float:
+        """Resolve the grid spacing to snap the bbox to for this request.
+
+        Reads the requested datasets from `self.vars` and returns the finest
+        (smallest) `grid_resolution` declared among them in the catalog,
+        falling back to :data:`ERA5_GRID_DEGREES` for any dataset that declares
+        none. When `self.vars` is absent (a bare instance with no requested
+        datasets) or the catalog lookup fails, the ERA5 default is used — so
+        regular CDS datasets keep their historic 0.125° snap while an EWDS
+        dataset like GloFAS snaps to its native 0.05°.
+
+        Mixing datasets of differing native resolution in one request is
+        best-effort: the single instance-level bbox is snapped to the finest
+        grid, so a coarser dataset's `area` may not sit exactly on its own cell
+        edges (the server re-snaps to the delivered grid regardless). Split
+        datasets of differing native resolution into separate calls if exact
+        per-dataset bbox alignment matters.
+
+        Returns:
+            float: The grid spacing in degrees to snap the bbox to.
+        """
+        variables = getattr(self, "vars", None)
+        if not variables:
+            return ERA5_GRID_DEGREES
+        try:
+            catalog = Catalog()
+        except Exception:  # noqa: BLE001 - a bad catalog must not break grid snapping
+            return ERA5_GRID_DEGREES
+        resolutions: list[float] = []
+        for dataset_name in variables:
+            dataset = catalog.datasets.get(dataset_name)
+            # Each dataset contributes its own native spacing; a dataset that
+            # declares none (or is unknown) falls back to the ERA5 default. The
+            # ERA5 default is a per-dataset fallback, not a global floor, so a
+            # dataset coarser than 0.125° keeps its native grid.
+            if dataset is not None and dataset.grid_resolution is not None:
+                resolutions.append(dataset.grid_resolution)
+            else:
+                resolutions.append(ERA5_GRID_DEGREES)
+        return min(resolutions) if resolutions else ERA5_GRID_DEGREES
+
+    def _create_grid(self, lat_lim: list, lon_lim: list):
+        """Snap a lat/lon bounding box to the request's native grid edges.
+
+        Floors the south/west limits and ceils the north/east limits to the
+        nearest multiple of the request's grid spacing (see
+        :meth:`_grid_resolution_for_request`) — :data:`ERA5_GRID_DEGREES`
+        (0.125°) for regular CDS datasets, or a dataset's own
+        `grid_resolution` (e.g. GloFAS's 0.05° on EWDS) — so every retrieve
+        aligns with the native grid and no cell straddles the requested area
+        boundary.
 
         Args:
             lat_lim: `[lat_min, lat_max]` in degrees north.
             lon_lim: `[lon_min, lon_max]` in degrees east.
 
         Returns:
-            SpatialExtent: Grid-aligned bounding box with
-            `resolution` set to :data:`ERA5_GRID_DEGREES`.
+            SpatialExtent: Grid-aligned bounding box with `resolution` set to
+            the request's native grid spacing (see
+            :meth:`_grid_resolution_for_request`) — the ERA5 default or a
+            dataset's `grid_resolution`.
 
         Examples:
             - Snap a 1° box to the ERA5 grid:
@@ -439,7 +558,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
                 ```
         """
-        cell_size = ERA5_GRID_DEGREES
+        cell_size = self._grid_resolution_for_request()
         lat_lim_floor = np.floor(lat_lim[0] / cell_size) * cell_size
         lat_lim_ceil = np.ceil(lat_lim[1] / cell_size) * cell_size
         lat_lim = [lat_lim_floor, lat_lim_ceil]
@@ -776,23 +895,32 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # invalid extras combinations client-side before they
         # consume a CDS queue slot. Pass `skip_constraints=True`
         # to `ECMWF(...)` to bypass.
-        RequestValidator(dataset, request, skip=self.skip_constraints).check()
+        RequestValidator(
+            dataset,
+            request,
+            skip=self.skip_constraints,
+            base_url=constraints_base_url(var_info.endpoint),
+        ).check()
 
         target = self.root_dir / f"{var_info.cds_variable}_{dataset}.nc"
-        logger.info(f"Requesting {dataset} from CDS; this may take several minutes")
+        client = self._client_for(var_info.endpoint)
+        logger.info(
+            f"Requesting {dataset} from {var_info.endpoint.upper()}; "
+            "this may take several minutes"
+        )
         try:
-            self.client.retrieve(dataset, request, str(target))
+            client.retrieve(dataset, request, str(target))
         except (
             Exception
         ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
             if _looks_like_licence_not_accepted(exc):
+                base = endpoint_url(var_info.endpoint).rsplit("/api", 1)[0]
                 raise PermissionError(
-                    f"CDS rejected the request for {dataset!r}: licence "
-                    "not accepted. Open the dataset page at "
-                    f"https://cds.climate.copernicus.eu/datasets/{dataset} "
-                    "and tick the licence at the bottom of the "
-                    "'Download' tab. The acceptance is permanent and "
-                    "tied to your CDS account."
+                    f"{var_info.endpoint.upper()} rejected the request for "
+                    f"{dataset!r}: licence not accepted. Open the dataset page "
+                    f"at {base}/datasets/{dataset} and tick the licence at the "
+                    "bottom of the 'Download' tab. The acceptance is permanent "
+                    "and tied to your Copernicus account."
                 ) from exc
             raise
         _unwrap_zipped_netcdf(target)
@@ -882,6 +1010,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             second positional argument to
             :meth:`cdsapi.Client.retrieve`.
         """
+        if var_info.request_kind == "glofas" and self.temporal_resolution == "monthly":
+            raise ValueError(
+                f"{var_info.cds_dataset!r} (GloFAS) must be requested with "
+                "temporal_resolution='daily': the monthly branch omits the "
+                "'day' selector that the forecast-reference date requires. "
+                "Set temporal_resolution='daily'."
+            )
         dates = self.time.dates
         request: dict[str, Any] = {
             "variable": [var_info.cds_variable],
