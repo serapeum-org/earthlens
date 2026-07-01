@@ -484,15 +484,40 @@ class EUMETSAT(AbstractDataSource):
         datatailor = self._auth.datatailor()
         products = self._search()
         out_paths: list[Path] = []
+        used_dirs: set[str] = set()
         for rp in products:
-            out_paths.extend(self._tailor_one(rp, tailor, datatailor))
+            out_paths.extend(self._tailor_one(rp, tailor, datatailor, used_dirs))
         return out_paths
+
+    @staticmethod
+    def _dedupe_name(name: str, used: set[str]) -> str:
+        """Return `name`, suffixed if needed so it is unique within `used`.
+
+        Guarantees a distinct on-disk name even when two products share an
+        id (`L3`) or two customisation outputs sanitise to one basename
+        (`L2`). Adds the chosen name to `used`.
+
+        Args:
+            name: The candidate (already path-safe) name.
+            used: The set of names already taken; mutated in place.
+
+        Returns:
+            str: A name not already in `used`.
+        """
+        candidate = name
+        counter = 1
+        while candidate in used:
+            candidate = f"{name}_{counter}"
+            counter += 1
+        used.add(candidate)
+        return candidate
 
     def _tailor_one(
         self,
         product: RemoteProduct,
         tailor: TailorConfig,
         datatailor,
+        used_dirs: set[str],
     ) -> list[Path]:
         """Customise one product via Data Tailor; always clean up (`G7`).
 
@@ -544,8 +569,13 @@ class EUMETSAT(AbstractDataSource):
         cust = self._submit_customisation(datatailor, product_handle, chain)
         # Namespace every output under a per-product subdirectory so two
         # granules of the same collection (the common multi-granule case)
-        # cannot collide on a shared Data Tailor output basename (H1).
-        product_dir = self.root_dir / safe_product_filename(str(product_handle))
+        # cannot collide on a shared Data Tailor output basename (H1). The
+        # subdir name is de-duped so an (unlikely) repeated product id does
+        # not reuse a directory (L3).
+        subdir = self._dedupe_name(
+            safe_product_filename(str(product_handle)), used_dirs
+        )
+        product_dir = self.root_dir / subdir
         try:
             status = self._poll_customisation(cust)
             if status != "DONE":
@@ -555,8 +585,14 @@ class EUMETSAT(AbstractDataSource):
                 )
             product_dir.mkdir(parents=True, exist_ok=True)
             written: list[Path] = []
+            used_names: set[str] = set()
             for name in cust.outputs:
-                target = product_dir / safe_product_filename(str(name))
+                # De-dupe within a customisation so two outputs sharing a
+                # basename do not overwrite each other (L2).
+                out_name = self._dedupe_name(
+                    safe_product_filename(str(name)), used_names
+                )
+                target = product_dir / out_name
                 with cust.stream_output(name) as src, open(target, "wb") as fh:
                     shutil.copyfileobj(src, fh)
                 written.append(target)

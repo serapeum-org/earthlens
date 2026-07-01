@@ -132,6 +132,28 @@ def test_tailor_multiple_products_namespaced_no_collision(fake_eumdac, tmp_path)
         assert p.read_bytes().startswith(b"TAILORED")
 
 
+def test_tailor_duplicate_product_ids_get_distinct_dirs(fake_eumdac, tmp_path):
+    """Two products with an identical id write to distinct subdirs (L3)."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("dup"), _FakeProduct("dup")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(outputs=["out.tif"])
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    paths = backend.download(progress_bar=False, tailor=TailorConfig())
+    assert len(set(paths)) == 2
+    assert {p.parent.name for p in paths} == {"dup", "dup_1"}
+
+
+def test_tailor_outputs_sharing_basename_do_not_overwrite(fake_eumdac, tmp_path):
+    """Two outputs that sanitise to one basename get distinct files (L2)."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(
+        outputs=["a/out.tif", "b/out.tif"]
+    )
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    paths = backend.download(progress_bar=False, tailor=TailorConfig())
+    assert len(set(paths)) == 2
+    assert {p.name for p in paths} == {"out.tif", "out.tif_1"}
+
+
 def test_tailor_roi_falls_back_to_request_extent(fake_eumdac, tmp_path):
     """With no bbox, the ROI comes from the request lat_lim / lon_lim."""
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
@@ -264,7 +286,7 @@ def test_tailor_one_defensive_eligibility_guard(fake_eumdac, tmp_path):
         metadata={"product": object(), "dataset": ineligible}
     )
     with pytest.raises(ValueError, match="not Data-Tailor-eligible"):
-        backend._tailor_one(product, TailorConfig(), fake_eumdac.tailor)
+        backend._tailor_one(product, TailorConfig(), fake_eumdac.tailor, set())
 
 
 # --- submit retry (G8) ------------------------------------------------------
