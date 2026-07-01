@@ -81,12 +81,16 @@ class MeteoFranceAPICentre(_NWPCentre):
         params: list[str],
         mirror: str,
         member: str | None = None,
+        *,
+        whole: bool = False,
     ) -> Path:
         """Fetch each variable via WCS GetCoverage into one `.grib2`.
 
-        `member` is accepted for interface parity but ignored (the
-        Météo-France rows here are deterministic; PEARP/PEAROME are a
-        follow-on).
+        `member` and `whole` are accepted for interface parity but
+        ignored (the Météo-France rows here are deterministic;
+        PEARP/PEAROME are a follow-on — and each WCS `GetCoverage`
+        returns one per-variable coverage, so there is no subset for
+        `whole` to override).
 
         Args:
             model: The resolved catalog row. `request_options` must carry
@@ -96,6 +100,8 @@ class MeteoFranceAPICentre(_NWPCentre):
             step: The forecast lead time in hours.
             params: The requested earthlens parameter names.
             mirror: Ignored — the portal is a single origin.
+            member: Ignored (see above).
+            whole: Ignored — already whole-per-variable.
 
         Returns:
             pathlib.Path: One local `.grib2` with every requested band's

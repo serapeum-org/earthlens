@@ -54,6 +54,13 @@ if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
     from earthlens.nwp.centres.base import _NWPCentre
 
+#: The download modes `NWP` accepts. `"subset"` fetches only the
+#: requested bands (`.idx` byte-range where the model has one, else the
+#: whole field); `"whole"` forces a full-file download even for
+#: `.idx`-capable models. `"zarr"` is deliberately excluded — no NWP
+#: catalog row carries a `zarr_url` — and is rejected with a clear error.
+_VALID_MODES: frozenset[str] = frozenset({"subset", "whole"})
+
 
 class NWP(AbstractDataSource):
     """Open numerical-weather-prediction backend (forecast time axis).
@@ -85,6 +92,7 @@ class NWP(AbstractDataSource):
         steps: list[int] | None = None,
         horizon: int | None = None,
         members: list[str] | None = None,
+        mode: str = "subset",
         catalog: Catalog | None = None,
     ):
         """Initialise an NWP backend instance.
@@ -121,18 +129,40 @@ class NWP(AbstractDataSource):
                 model's first listed member when omitted; ignored for
                 deterministic models. One COG is written per
                 `(cycle, step, member)`.
+            mode: How much of each GRIB2 to download — `"subset"` (the
+                default) fetches only the requested bands via the
+                `.idx` byte-range index where the model has one
+                (`idx: true`), else the whole field; `"whole"` forces
+                a full-file download even for `.idx`-capable models,
+                then crops. `"whole"` only changes behaviour for the
+                NOAA / Herbie centre — the other centres are already
+                whole-per-variable, so `mode` is a no-op there.
+                `"zarr"` is rejected (no `nwp` catalog row carries a
+                `zarr_url`).
             catalog: Optional pre-built :class:`Catalog` (tests inject
                 a faked one); defaults to the bundled catalog.
 
         Raises:
-            ValueError: When `variables` is empty, a model key is
-                unknown, or a model declares an unknown `backend:`.
+            ValueError: When `variables` is empty, `mode` is not
+                `"subset"` / `"whole"`, a model key is unknown, or a
+                model declares an unknown `backend:`.
         """
         if not variables:
             raise ValueError(
                 "NWP requires a non-empty `variables` mapping of "
                 "{model_key: [param, ...]}."
             )
+        if mode not in _VALID_MODES:
+            if mode == "zarr":
+                raise ValueError(
+                    "mode='zarr' is not supported: no NWP catalog row carries a "
+                    "`zarr_url`, and Zarr sources (NWM, hrrrzarr) are separate "
+                    "backends. Use mode='subset' (default) or mode='whole'."
+                )
+            raise ValueError(
+                f"mode must be one of {sorted(_VALID_MODES)}; got {mode!r}."
+            )
+        self._mode = mode
         self._mirror = mirror
         self._steps_arg = steps
         self._horizon_arg = horizon
@@ -495,6 +525,7 @@ class NWP(AbstractDataSource):
             meta["params"],
             self._mirror,
             meta.get("member"),
+            whole=self._mode == "whole",
         )
         dataset = open_grib(str(grib_path))
         dataset = self._normalise_longitude(dataset)

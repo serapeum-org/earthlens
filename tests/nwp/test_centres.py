@@ -1001,8 +1001,8 @@ def test_base_centre_fetch_one_raises_not_implemented(tmp_path):
     from earthlens.nwp.centres.base import _NWPCentre
 
     class _Bare(_NWPCentre):
-        def fetch_one(self, model, cycle, step, params, mirror, member=None):
-            return super().fetch_one(model, cycle, step, params, mirror, member)
+        def fetch_one(self, model, cycle, step, params, mirror, member=None, *, whole=False):
+            return super().fetch_one(model, cycle, step, params, mirror, member, whole=whole)
 
     with pytest.raises(NotImplementedError):
         _Bare(tmp_path).fetch_one(None, dt.datetime(2026, 1, 1), 0, [], "auto")

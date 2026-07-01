@@ -122,8 +122,15 @@ class ECMWFCentre(_NWPCentre):
         params: list[str],
         mirror: str,
         member: str | None = None,
+        *,
+        whole: bool = False,
     ) -> Path:
         """Retrieve the param-subset GRIB2 for one `(cycle, step[, member])`.
+
+        `whole` is accepted for interface parity but ignored: `ecmwf-opendata`
+        is param-addressed (`Client.retrieve(param=...)`), so there is no
+        whole-file request to force — every retrieve is already the
+        requested subset.
 
         Args:
             model: The resolved catalog row.
@@ -134,6 +141,7 @@ class ECMWFCentre(_NWPCentre):
             member: ENS member id — a numeric id selects `type=pf` +
                 `number=<id>`; `"control"` (or `None`) keeps the
                 row's configured type (`cf` for the ENS control).
+            whole: Ignored (see above); accepted for `NWP(mode=)` parity.
 
         Returns:
             pathlib.Path: The local param-subset GRIB2 file.

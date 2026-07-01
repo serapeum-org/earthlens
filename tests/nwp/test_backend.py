@@ -50,9 +50,9 @@ class _CountingCentre:
         self.save_dir = save_dir
         self.calls = []
 
-    def fetch_one(self, model, cycle, step, params, mirror, member=None):
-        """Record the call and return a fabricated GRIB path."""
-        self.calls.append((cycle, step, tuple(params), mirror, member))
+    def fetch_one(self, model, cycle, step, params, mirror, member=None, *, whole=False):
+        """Record the call (incl. `whole`) and return a fabricated GRIB path."""
+        self.calls.append((cycle, step, tuple(params), mirror, member, whole))
         suffix = f"_m{member}" if member is not None else ""
         return str(
             self.save_dir
@@ -67,11 +67,11 @@ class _FlakyCentre(_CountingCentre):
         super().__init__(save_dir)
         self.fail_step = fail_step
 
-    def fetch_one(self, model, cycle, step, params, mirror, member=None):
+    def fetch_one(self, model, cycle, step, params, mirror, member=None, *, whole=False):
         """Raise for `fail_step`; otherwise behave like the counting centre."""
         if step == self.fail_step:
             raise RuntimeError(f"f{step:03d} not published")
-        return super().fetch_one(model, cycle, step, params, mirror, member)
+        return super().fetch_one(model, cycle, step, params, mirror, member, whole=whole)
 
 
 class TestConstruction:

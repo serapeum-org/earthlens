@@ -81,6 +81,8 @@ class _NWPCentre(ABC):
         params: list[str],
         mirror: str,
         member: str | None = None,
+        *,
+        whole: bool = False,
     ) -> Path:
         """Download the variable-subset GRIB2 for one `(cycle, step[, member])`.
 
@@ -95,6 +97,11 @@ class _NWPCentre(ABC):
             member: Ensemble member id for an ensemble model, or `None`
                 for a deterministic one. Only the ensemble-capable centres
                 (NOAA GEFS, ECMWF ENS) use it; the others ignore it.
+            whole: When `True`, force a full-file download instead of a
+                byte-range subset (the `NWP(mode="whole")` override).
+                Only the `.idx`-capable NOAA / Herbie centre acts on it;
+                every other centre already downloads whole-per-variable,
+                so it accepts and ignores the flag.
 
         Returns:
             pathlib.Path: The local GRIB2 file holding every requested
