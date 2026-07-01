@@ -1,0 +1,16 @@
+# SoilGrids curated catalog — physical-properties slice.
+#
+# One slice of the per-group split of the SoilGrids catalog (see texture.yaml
+# for the loader / scaled-integer convention). Values are stored as scaled
+# integers: divide by `scale_factor` to convert `mapped_units` to `unit`.
+
+datasets:
+
+  bdod:
+    endpoint: "https://maps.isric.org/mapserv?map=/map/bdod.map"
+    title: "Bulk density of the fine earth fraction"
+    depths: ["0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm"]
+    quantiles: ["Q0.05", "Q0.5", "Q0.95", "mean", "uncertainty"]
+    unit: "kg/dm3"
+    mapped_units: "cg/cm3"
+    scale_factor: 100.0

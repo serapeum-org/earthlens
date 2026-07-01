@@ -1,0 +1,22 @@
+# Informational index: every SoilGrids 2.0 soil property curated across the
+# per-group *.yaml files in this directory (texture / chemistry / carbon /
+# physical). The curated `datasets:` blocks live in those files; every curated
+# property id is a member of this list, and the loader enforces that. SoilGrids'
+# curated surface is the full numeric-property set published over WCS at
+# maps.isric.org (the categorical `wrb` soil-class service is out of scope), so
+# this index equals the curated keys — there is no larger auto-discovered
+# universe to track. Verified live 2026-07-01; see
+# planning/soilgrids/captures/soilgrids-sdk-facts.md.
+
+available_datasets:
+  - clay
+  - sand
+  - silt
+  - cfvo
+  - phh2o
+  - cec
+  - nitrogen
+  - soc
+  - ocd
+  - ocs
+  - bdod
