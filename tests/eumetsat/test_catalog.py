@@ -212,8 +212,7 @@ def test_tailor_product_types_are_valid_registry_ids(catalog):
     offenders = {
         key: ds.tailor_product_type
         for key, ds in catalog.datasets.items()
-        if ds.tailor_product_type is not None
-        and ds.tailor_product_type not in valid
+        if ds.tailor_product_type is not None and ds.tailor_product_type not in valid
     }
     assert not offenders, f"unknown tailor_product_type values: {offenders}"
 

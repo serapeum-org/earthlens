@@ -44,6 +44,7 @@ def test_tailorconfig_defaults_and_no_bbox():
     assert cfg.format == "geotiff"
     assert cfg.crs == "geographic"
     assert cfg.nswe is None
+    assert TailorConfig(bbox=None).nswe is None  # explicit None passes validation
 
 
 def test_tailorconfig_is_frozen_and_forbids_extra():
