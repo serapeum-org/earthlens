@@ -82,3 +82,25 @@ class TestSoilGridsLiveFetch:
         low, high = _valid_stats(paths[0])
         # Values are pH x10 scaled integers, so a physical pH 2..11 -> 20..110.
         assert 20.0 <= low <= high <= 120.0, f"implausible scaled pH: {low}..{high}"
+
+    def test_polygon_aoi_masks_the_topsoil(self, tmp_path: Path) -> None:
+        """A polygon aoi= exercises the live mask -> crop -> write -> rename path."""
+        from shapely.geometry import Polygon
+
+        triangle = Polygon([(5.0, 51.0), (5.5, 51.0), (5.25, 51.5)])
+        paths = EarthLens(
+            data_source="soilgrids",
+            variables=["phh2o"],
+            aoi=triangle,
+            path=str(tmp_path),
+            depths=["0-5cm"],
+            quantiles=["mean"],
+        ).download(progress_bar=False)
+
+        assert len(paths) == 1, f"expected one GeoTIFF, got {paths}"
+        assert paths[0].name == "phh2o_0-5cm_mean.tif"
+        assert paths[0].exists()
+        # No temp orphan remains from the mask-path write-and-rename.
+        assert not (tmp_path / ".soilgrids-tmp" / "phh2o_0-5cm_mean.tif").exists()
+        low, high = _valid_stats(paths[0])
+        assert 20.0 <= low <= high <= 120.0, f"implausible scaled pH: {low}..{high}"
