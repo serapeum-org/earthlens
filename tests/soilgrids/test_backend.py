@@ -150,6 +150,48 @@ def test_progress_flag_is_wired(
     assert backend._show_progress is False
 
 
+def test_one_failed_coverage_is_skipped_not_fatal(
+    fake_from_wcs: type[FakeDataset], info_log: list[str], tmp_path: Path
+) -> None:
+    """A single failed coverage is logged and skipped; the rest still land."""
+    fake_from_wcs.fail_coverages = {"clay_5-15cm_mean"}
+    paths = _backend(tmp_path, ["clay"]).download()
+    assert len(paths) == len(STD_DEPTHS) - 1
+    assert tmp_path / "clay_5-15cm_mean.tif" not in paths
+    assert any("clay_5-15cm_mean failed" in m for m in info_log)
+
+
+def test_all_coverages_failing_raises(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """When every coverage fails, download raises rather than returning []."""
+    fake_from_wcs.fail_coverages = {f"clay_{d}_mean" for d in STD_DEPTHS}
+    with pytest.raises(RuntimeError, match="all 6 requested coverage"):
+        _backend(tmp_path, ["clay"]).download()
+
+
+def test_empty_plan_returns_no_paths(
+    fake_from_wcs: type[FakeDataset], monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """An empty search plan short-circuits to no fetches and no paths."""
+    backend = _backend(tmp_path, ["clay"], depths=["0-5cm"])
+    monkeypatch.setattr(backend, "_search", list)
+    assert backend.download() == []
+    assert fake_from_wcs.recorder == []
+
+
+def test_empty_depths_list_rejected(tmp_path: Path) -> None:
+    """An explicitly-empty depths=[] is rejected (it selects no coverages)."""
+    with pytest.raises(ValueError, match=r"depths=\[\] selects no coverages"):
+        _backend(tmp_path, ["clay"], depths=[])
+
+
+def test_empty_quantiles_list_rejected(tmp_path: Path) -> None:
+    """An explicitly-empty quantiles=[] is rejected (it selects no coverages)."""
+    with pytest.raises(ValueError, match=r"quantiles=\[\] selects no coverages"):
+        _backend(tmp_path, ["clay"], quantiles=[])
+
+
 def test_search_plans_without_network(tmp_path: Path) -> None:
     """_search returns one product per coverage triple with no network call."""
     plan = _backend(tmp_path, ["ocs"])._search()

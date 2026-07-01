@@ -131,12 +131,13 @@ class SoilGrids(AbstractDataSource):
                 the SoilGrids IGH grid resolves. Defaults to `IGH_PROJ4`;
                 override only if ISRIC changes its native projection.
             timeout: Per-request HTTP timeout (seconds) for the WCS calls.
-            catalog: Optional pre-built `Catalog` (tests inject a faked one);
-                defaults to the bundled catalog.
+            catalog: A pre-built `Catalog` to use instead of loading the bundled
+                one; defaults to the bundled catalog.
 
         Raises:
             ValueError: If `variables` is empty / unknown (did-you-mean
-                surfaced) or the bounding box is missing.
+                surfaced), the bounding box is missing, or `depths` / `quantiles`
+                is an explicitly-empty list (which would select no coverages).
             TypeError: If `variables` is a mapping (properties are named by id,
                 not a per-dataset map).
         """
@@ -156,6 +157,16 @@ class SoilGrids(AbstractDataSource):
                 "SoilGrids requires a bounding box (lat_lim=[s, n], "
                 "lon_lim=[w, e]) — a property subset has no default global "
                 "extent."
+            )
+        if depths is not None and not depths:
+            raise ValueError(
+                "SoilGrids depths=[] selects no coverages; pass depths=None for "
+                "every depth, or a non-empty list of depth intervals."
+            )
+        if quantiles is not None and not quantiles:
+            raise ValueError(
+                "SoilGrids quantiles=[] selects no coverages; pass quantiles=None "
+                "for the 'mean' layer, or a non-empty list of quantile tokens."
             )
 
         self._catalog = catalog if catalog is not None else Catalog()
@@ -220,12 +231,53 @@ class SoilGrids(AbstractDataSource):
         )
 
     def _api(self) -> list[Path]:
-        """Map `_fetch_one` over the plan under an optional per-coverage bar."""
-        return self._search_fetch_each(
-            progress_bar=self._show_progress,
+        """Fetch each coverage under a progress bar, isolating per-coverage faults.
+
+        A single SoilGrids request fans out to many coverages against one public
+        MapServer WCS, so — unlike the shared `_search_fetch_each` all-or-nothing
+        composition — this isolates each `_fetch_one`: a coverage whose WCS fetch
+        fails is logged and skipped so the rest still land and are returned, and
+        only an empty result set (every coverage failed) raises.
+
+        Returns:
+            list[Path]: The GeoTIFFs that were written, in plan order (a subset
+                when some coverages failed).
+
+        Raises:
+            RuntimeError: If every requested coverage failed to fetch.
+        """
+        products = self._search()
+        if not products:
+            return []
+        from tqdm import tqdm
+
+        written: list[Path] = []
+        failed: list[str] = []
+        for product in tqdm(
+            products,
+            disable=not self._show_progress,
             desc="soilgrids",
             unit="coverage",
-        )
+        ):
+            try:
+                written.append(self._fetch_one(product))
+            except Exception as exc:  # noqa: BLE001 - isolate one flaky coverage
+                failed.append(product.id)
+                logger.warning(
+                    f"soilgrids: coverage {product.id} failed "
+                    f"({type(exc).__name__}: {exc}); skipping."
+                )
+        if failed and not written:
+            raise RuntimeError(
+                f"soilgrids: all {len(failed)} requested coverage(s) failed to "
+                f"fetch: {failed}."
+            )
+        if failed:
+            logger.warning(
+                f"soilgrids: {len(failed)} of {len(products)} coverage(s) failed "
+                f"and were skipped: {failed}."
+            )
+        return written
 
     def _search(self) -> list[RemoteProduct]:
         """Expand the request into one `RemoteProduct` per coverage triple.

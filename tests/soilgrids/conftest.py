@@ -20,6 +20,7 @@ class FakeDataset:
     recorder: list[dict[str, Any]] = []
     masks: list[Any] = []
     written: list[str] = []
+    fail_coverages: set[str] = set()
     no_data_value = (-32768.0,)
 
     def __init__(self, coverage: str) -> None:
@@ -27,15 +28,22 @@ class FakeDataset:
         self.closed = False
 
     @classmethod
-    def from_wcs(cls, endpoint: str, **kwargs: Any) -> "FakeDataset":
-        """Record the call, write a stub GeoTIFF to `output`, return a fake."""
+    def from_wcs(cls, endpoint: str, **kwargs: Any) -> FakeDataset:
+        """Record the call, write a stub GeoTIFF to `output`, return a fake.
+
+        A coverage listed in `fail_coverages` raises, to exercise the backend's
+        per-coverage failure isolation.
+        """
         cls.recorder.append({"endpoint": endpoint, **kwargs})
+        coverage = kwargs["coverage"]
+        if coverage in cls.fail_coverages:
+            raise RuntimeError(f"faked WCS failure for {coverage}")
         output = kwargs.get("output")
         if output is not None:
             Path(output).write_bytes(b"MM\x00*stub-geotiff")
-        return cls(kwargs["coverage"])
+        return cls(coverage)
 
-    def crop(self, mask: Any = None, touch: bool = True) -> "FakeDataset":
+    def crop(self, mask: Any = None, touch: bool = True) -> FakeDataset:
         """Record the polygon mask and return the (still-fake) masked dataset."""
         FakeDataset.masks.append(mask)
         return self
@@ -58,6 +66,7 @@ def fake_from_wcs(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
     FakeDataset.recorder = []
     FakeDataset.masks = []
     FakeDataset.written = []
+    FakeDataset.fail_coverages = set()
     monkeypatch.setattr(Dataset, "from_wcs", FakeDataset.from_wcs)
     return FakeDataset
 
