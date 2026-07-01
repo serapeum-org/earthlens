@@ -387,6 +387,7 @@ nav:
     - EUMETSAT Data Store:
       - Catalog explorer (no network): examples/eumetsat/catalog_explorer.ipynb
       - Output kinds & formats (no network): examples/eumetsat/output_kinds_and_formats.ipynb
+      - Data Tailor config & eligibility (no network): examples/eumetsat/data_tailor_config.ipynb
       - MSG SEVIRI L1.5 imagery (live): examples/eumetsat/msg_hrseviri_fetch.ipynb
       - Sentinel-3 OLCI L2 ocean colour (live): examples/eumetsat/sentinel3_olci_ocean_colour.ipynb
       - Sentinel-5P TROPOMI NO2 (live): examples/eumetsat/sentinel5p_no2.ipynb
