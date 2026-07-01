@@ -83,17 +83,22 @@ from earthlens import EarthLens
 facade = EarthLens(
     data_source="drought",
     dataset="speibase-12",
-    start="2024-01-01", end="2024-03-31",
+    start="2023-01-01", end="2023-03-31",
     variables=[],
     lat_lim=[30.0, 40.0],
     lon_lim=[-95.0, -85.0],
     path="speibase_out",
 )
 paths = facade.download()
-# [Path('speibase_out/speibase-12_202401.tif'),
-#  Path('speibase_out/speibase-12_202402.tif'),
-#  Path('speibase_out/speibase-12_202403.tif')]
+# [Path('speibase_out/speibase-12_202301.tif'),
+#  Path('speibase_out/speibase-12_202302.tif'),
+#  Path('speibase_out/speibase-12_202303.tif')]
 ```
+
+The last usable month depends on the timescale — a k-month SPEI needs k
+months to accumulate, so `speibase-12` currently ends 2023-12. The
+backend reads the axis from the file and raises a clear error for an
+out-of-range month.
 
 The downloaded NetCDF stays under `path/` between runs, so a second
 `download()` for the same dataset reuses the cached `.nc` without
@@ -185,4 +190,4 @@ single info line (no `LicenseWarning`):
 * **EDO/GDO**: "Copernicus European/Global Drought Observatory (EMS) —
   free reuse with attribution to Copernicus EMS."
 * **SPEIbase**: "CSIC Standardised Precipitation-Evapotranspiration
-  Index database v2.10 (Vicente-Serrano et al.), CC-BY 4.0."
+  Index database v2.11 (Vicente-Serrano et al.), CC-BY 4.0."

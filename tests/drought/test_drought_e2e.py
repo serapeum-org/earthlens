@@ -9,9 +9,12 @@ Run with:
     pixi run -e dev pytest -m "drought and e2e" tests/drought
 
 Each test first checks its source host is reachable and serving real data and
-skips cleanly otherwise (the USDM / Copernicus endpoints are normally up; the
-CSIC `digital.csic.es` host bot-walls direct downloads from some networks, so
-the SPEIbase test skips when it gets an HTML challenge page instead of NetCDF).
+skips cleanly otherwise (the USDM / Copernicus endpoints are normally up).
+`digital.csic.es` fronts SPEIbase with an Anubis proof-of-work wall that only
+challenges browser-like (`Mozilla…`) User-Agents; the backend and the
+reachability probe both send a plain `earthlens-…` UA, so the wall passes the
+raw NetCDF through and the SPEIbase test runs — the skip is a network-outage
+guard, not an expected bot-wall.
 """
 
 from __future__ import annotations
@@ -133,29 +136,30 @@ class TestEdoLive:
 
 @pytest.mark.e2e
 class TestSpeibaseLive:
-    """Live CSIC SPEIbase NetCDF fetch (public CC-BY; host may bot-wall direct GETs)."""
+    """Live CSIC SPEIbase v2.11 NetCDF fetch (public CC-BY, no credentials)."""
 
     def test_speibase_month_returns_geotiff(self, tmp_path: Path):
         """A SPEIbase month slices into a per-month GeoTIFF.
 
-        `digital.csic.es` bot-walls direct downloads from some networks (it
-        answers an HTML challenge page instead of the NetCDF); the test skips
-        cleanly in that case rather than failing on a non-NetCDF body.
+        `digital.csic.es` fronts the bitstream with an Anubis wall that only
+        challenges `Mozilla…` User-Agents; the plain `earthlens-…` UA passes
+        through, so this normally runs. The reachability guard only skips on a
+        genuine network outage (or a non-NetCDF body).
         """
         from earthlens.drought import Catalog
 
         endpoint = Catalog().get("speibase-12").endpoint
         if not _reachable(endpoint, want_binary=True):
             pytest.skip(
-                "SPEIbase host bot-walled / unreachable (digital.csic.es serves an "
-                "HTML challenge page instead of NetCDF from this network)"
+                "SPEIbase host unreachable (digital.csic.es did not serve NetCDF "
+                "from this network)"
             )
         paths = EarthLens(
             data_source="drought",
             dataset="speibase-12",
             variables=[],
-            start="2024-06-01",
-            end="2024-06-30",
+            start="2023-06-01",
+            end="2023-06-30",
             lat_lim=[30.0, 40.0],
             lon_lim=[-95.0, -85.0],
             path=str(tmp_path),

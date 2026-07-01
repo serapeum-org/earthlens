@@ -42,7 +42,7 @@ indicators. Logged once per `download()`."""
 
 SPEIBASE_ATTRIBUTION: str = (
     "SPEIbase: CSIC Standardised Precipitation-Evapotranspiration Index "
-    "database v2.10 (Vicente-Serrano et al.), CC-BY 4.0."
+    "database v2.11 (Vicente-Serrano et al.), CC-BY 4.0."
 )
 """Single-line success-log attribution for the CSIC SPEIbase NetCDF
 transport. Logged once per `download()`."""

@@ -179,8 +179,8 @@ class Dataset(BaseModel):
             `"edo-spaST"`, `"speibase-12"`). Copied from the YAML key.
         source: Human-readable source / version string used in the
             success log line (`"Copernicus European Drought Observatory
-            (EDO)"`, `"CSIC SPEIbase v2.10 (Vicente-Serrano et al., CRU
-            TS 4.08)"`, …).
+            (EDO)"`, `"CSIC SPEIbase v2.11 (Vicente-Serrano et al., CRU
+            TS 4.09)"`, …).
         transport: The transport the backend's `_fetch` dispatches on.
             One of `"usdm-geojson"`, `"edo-wcs"`, `"netcdf-url"`.
         endpoint: URL or URL template. USDM has a `{ymd}` placeholder
@@ -215,7 +215,7 @@ class Dataset(BaseModel):
         license_note: Short attribution string logged once on success
             (`"Copernicus EMS — free reuse with attribution"`,
             `"USDM public domain — cite NDMC / UNL"`, `"CC-BY 4.0 — cite
-            Vicente-Serrano et al. and SPEIbase v2.10"`).
+            Vicente-Serrano et al. and SPEIbase v2.11"`).
 
     Examples:
         - Inspect a USDM vector row:
