@@ -28,6 +28,9 @@ __all__ = ["DEFAULT_ENDPOINT", "ENDPOINTS", "open_client"]
 DEFAULT_ENDPOINT: str = "cds"
 
 # endpoint slug -> (default URL, URL-override env var, key-override env var).
+# The `cds` row's env-var names are documentary only: `open_client("cds")`
+# short-circuits to a bare `cdsapi.Client()`, which reads CDSAPI_URL / CDSAPI_KEY
+# / ~/.cdsapirc itself. The URL/env names matter for the non-CDS endpoints.
 ENDPOINTS: dict[str, tuple[str, str, str]] = {
     "cds": ("https://cds.climate.copernicus.eu/api", "CDSAPI_URL", "CDSAPI_KEY"),
     "ads": ("https://ads.atmosphere.copernicus.eu/api", "ADS_URL", "ADS_KEY"),
@@ -48,8 +51,9 @@ def _read_cdsapirc_key() -> str | None:
     if not path.is_file():
         return None
     for line in path.read_text().splitlines():
-        if line.strip().startswith("key"):
-            return line.partition(":")[2].strip() or None
+        name, sep, value = line.partition(":")
+        if sep and name.strip() == "key":
+            return value.strip() or None
     return None
 
 
