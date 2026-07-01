@@ -18,6 +18,7 @@ import datetime as dt
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
+from urllib.parse import urlsplit
 
 import requests
 
@@ -600,8 +601,10 @@ def _soilgrids_row_issues(key: str, record: Any) -> list[str]:
     """
     issues = _require(key, record, ("endpoint", "depths", "quantiles"))
     endpoint = getattr(record, "endpoint", "") or ""
-    if endpoint and "maps.isric.org" not in endpoint:
-        issues.append(f"{key}: endpoint is not a maps.isric.org WCS URL")
+    # Compare the parsed host exactly, not a substring — a substring check would
+    # accept a spoofed host like `maps.isric.org.example.com`.
+    if endpoint and urlsplit(endpoint).hostname != "maps.isric.org":
+        issues.append(f"{key}: endpoint host is not maps.isric.org")
     quantiles = getattr(record, "quantiles", None) or []
     if quantiles and "mean" not in quantiles:
         issues.append(f"{key}: quantiles missing the default 'mean' layer")

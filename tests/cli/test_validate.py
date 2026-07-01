@@ -131,6 +131,20 @@ class TestValidateSoilgrids:
         assert any("maps.isric.org" in i for i in issues)
         assert any("mean" in i for i in issues)
 
+    def test_flags_spoofed_isric_host(self):
+        """A look-alike host (maps.isric.org.evil.com) is rejected, not accepted."""
+        catalog = SimpleNamespace(
+            datasets={
+                "clay": SimpleNamespace(
+                    endpoint="https://maps.isric.org.evil.com/wcs",
+                    depths=["0-5cm"],
+                    quantiles=["mean"],
+                )
+            }
+        )
+        checked, issues = _validate_soilgrids(catalog)
+        assert any("host is not maps.isric.org" in i for i in issues)
+
     def test_flags_missing_endpoint_and_depths(self):
         """A row missing its endpoint and depths is flagged for each."""
         catalog = SimpleNamespace(
