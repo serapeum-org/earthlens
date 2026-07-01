@@ -9,6 +9,7 @@ variable's endpoint. No network.
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from earthlens.ecmwf import Catalog, Variable
 from earthlens.ecmwf import constraints as constraints_mod
@@ -74,6 +75,34 @@ class TestGlofasCatalog:
         assert var.endpoint == "ewds"
         assert var.grid_resolution == 0.05
         assert var.nc_variable == "dis24"
+
+
+class TestCatalogFieldValidation:
+    """`endpoint` and `grid_resolution` are validated at catalog-load time."""
+
+    def test_unknown_endpoint_rejected(self):
+        """An endpoint slug the router doesn't know fails validation."""
+        with pytest.raises(ValidationError, match="unknown endpoint"):
+            Variable(
+                cds_dataset="x",
+                cds_variable="x",
+                nc_variable="x",
+                units="m",
+                product_type=["p"],
+                endpoint="edws",
+            )
+
+    def test_nonpositive_grid_resolution_rejected(self):
+        """A zero/negative grid resolution (would divide the snap by zero) is rejected."""
+        with pytest.raises(ValidationError, match="grid_resolution must be > 0"):
+            Variable(
+                cds_dataset="x",
+                cds_variable="x",
+                nc_variable="x",
+                units="m",
+                product_type=["p"],
+                grid_resolution=0,
+            )
 
 
 class TestGlofasRequest:

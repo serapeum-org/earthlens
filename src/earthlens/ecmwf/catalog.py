@@ -351,6 +351,44 @@ def _synthesize_monthly_entries(
         )
 
 
+def _validate_endpoint(value: str) -> str:
+    """Reject an `endpoint` slug the endpoint router does not know.
+
+    Args:
+        value: The endpoint slug from the catalog.
+
+    Returns:
+        str: The validated slug.
+
+    Raises:
+        ValueError: If `value` is not a known CADS endpoint.
+    """
+    from earthlens.ecmwf.endpoints import ENDPOINTS
+
+    if value not in ENDPOINTS:
+        raise ValueError(
+            f"unknown endpoint {value!r}; expected one of {sorted(ENDPOINTS)}"
+        )
+    return value
+
+
+def _validate_grid_resolution(value: float | None) -> float | None:
+    """Reject a non-positive `grid_resolution` (a zero would divide the snap).
+
+    Args:
+        value: The grid spacing in degrees, or `None`.
+
+    Returns:
+        float | None: The validated value.
+
+    Raises:
+        ValueError: If `value` is not `None` and not strictly positive.
+    """
+    if value is not None and value <= 0:
+        raise ValueError(f"grid_resolution must be > 0, got {value!r}")
+    return value
+
+
 class Variable(FluxableLeaf):
     """Per-variable catalog entry consumed by :class:`ECMWF`.
 
@@ -444,6 +482,18 @@ class Variable(FluxableLeaf):
             )
         return value
 
+    @field_validator("endpoint")
+    @classmethod
+    def _known_endpoint(cls, value: str) -> str:
+        """Reject an `endpoint` slug the router does not know."""
+        return _validate_endpoint(value)
+
+    @field_validator("grid_resolution")
+    @classmethod
+    def _positive_grid_resolution(cls, value: float | None) -> float | None:
+        """Reject a non-positive `grid_resolution` (would divide the snap by zero)."""
+        return _validate_grid_resolution(value)
+
     # `is_flux` property is inherited from `FluxableLeaf` (N1 in
     # planning/catalog-cross-backend-comparison.md).
 
@@ -521,6 +571,18 @@ class Dataset(BaseModel):
     grid_resolution: float | None = None
     provider: str | None = None
     variables: dict[str, Variable] = Field(default_factory=dict)
+
+    @field_validator("endpoint")
+    @classmethod
+    def _known_endpoint(cls, value: str) -> str:
+        """Reject an `endpoint` slug the router does not know."""
+        return _validate_endpoint(value)
+
+    @field_validator("grid_resolution")
+    @classmethod
+    def _positive_grid_resolution(cls, value: float | None) -> float | None:
+        """Reject a non-positive `grid_resolution` (would divide the snap by zero)."""
+        return _validate_grid_resolution(value)
 
 
 class Catalog(AbstractCatalog):
