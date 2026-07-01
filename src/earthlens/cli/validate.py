@@ -586,6 +586,33 @@ def _validate_glaciers(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, _glaciers_row_issues)
 
 
+def _soilgrids_row_issues(key: str, record: Any) -> list[str]:
+    """Lint one soilgrids property: WCS endpoint, depths, quantiles + `mean`.
+
+    Args:
+        key: The property id.
+        record: The `earthlens.soilgrids.Property` row.
+
+    Returns:
+        One issue string per problem — a missing `endpoint` / `depths` /
+        `quantiles`, an endpoint that is not an ISRIC WCS URL, or a
+        `quantiles` list that omits the default `mean` layer.
+    """
+    issues = _require(key, record, ("endpoint", "depths", "quantiles"))
+    endpoint = getattr(record, "endpoint", "") or ""
+    if endpoint and "maps.isric.org" not in endpoint:
+        issues.append(f"{key}: endpoint is not a maps.isric.org WCS URL")
+    quantiles = getattr(record, "quantiles", None) or []
+    if quantiles and "mean" not in quantiles:
+        issues.append(f"{key}: quantiles missing the default 'mean' layer")
+    return issues
+
+
+def _validate_soilgrids(catalog: Any) -> tuple[int, list[str]]:
+    """Each soilgrids property needs a WCS endpoint, depths, and quantiles."""
+    return _lint(catalog, _soilgrids_row_issues)
+
+
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
@@ -616,6 +643,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,
     "glaciers": _validate_glaciers,
+    "soilgrids": _validate_soilgrids,
 }
 
 

@@ -18,6 +18,7 @@ from earthlens.cli.validate import (
     _validate_osm,
     _validate_overture,
     _validate_radar,
+    _validate_soilgrids,
     _validate_tropycal,
     supported_providers,
     validate_one,
@@ -54,6 +55,7 @@ _CURATED_ENUM = (
     "bathymetry",
     "pvgis",
     "glaciers",
+    "soilgrids",
 )
 
 
@@ -108,6 +110,37 @@ class TestValidateOsm:
         )
         checked, issues = _validate_osm(catalog)
         assert any("missing ohsome_filter" in i for i in issues)
+
+
+class TestValidateSoilgrids:
+    """Tests for the soilgrids structural lint."""
+
+    def test_flags_non_isric_endpoint_and_missing_mean(self):
+        """A row with a non-ISRIC endpoint and no mean quantile is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "clay": SimpleNamespace(
+                    endpoint="https://example.com/wcs",
+                    depths=["0-5cm"],
+                    quantiles=["Q0.5"],
+                )
+            }
+        )
+        checked, issues = _validate_soilgrids(catalog)
+        assert checked == 1
+        assert any("maps.isric.org" in i for i in issues)
+        assert any("mean" in i for i in issues)
+
+    def test_flags_missing_endpoint_and_depths(self):
+        """A row missing its endpoint and depths is flagged for each."""
+        catalog = SimpleNamespace(
+            datasets={
+                "bad": SimpleNamespace(endpoint="", depths=[], quantiles=["mean"])
+            }
+        )
+        checked, issues = _validate_soilgrids(catalog)
+        assert any("missing endpoint" in i for i in issues)
+        assert any("missing depths" in i for i in issues)
 
 
 class TestValidateBathymetry:
