@@ -502,10 +502,15 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         resolutions: list[float] = []
         for dataset_name in variables:
             dataset = catalog.datasets.get(dataset_name)
+            # Each dataset contributes its own native spacing; a dataset that
+            # declares none (or is unknown) falls back to the ERA5 default. The
+            # ERA5 default is a per-dataset fallback, not a global floor, so a
+            # dataset coarser than 0.125° keeps its native grid.
             if dataset is not None and dataset.grid_resolution is not None:
                 resolutions.append(dataset.grid_resolution)
-        resolutions.append(ERA5_GRID_DEGREES)
-        return min(resolutions)
+            else:
+                resolutions.append(ERA5_GRID_DEGREES)
+        return min(resolutions) if resolutions else ERA5_GRID_DEGREES
 
     def _create_grid(self, lat_lim: list, lon_lim: list):
         """Snap a lat/lon bounding box to the request's native grid edges.

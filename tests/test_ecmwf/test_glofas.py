@@ -57,6 +57,13 @@ def _capturing_fetch_constraints(dataset, base_url=None):
     return [{"variable": [_GLOFAS_CODE.replace("-", "_")], "system_version": ["operational"]}]
 
 
+class _FakeCatalog:
+    """Catalog stand-in exposing a fixed `datasets` map for the grid resolver."""
+
+    def __init__(self, datasets):
+        self.datasets = datasets
+
+
 _VALIDATOR_CAPTURE: dict[str, object] = {}
 
 
@@ -209,6 +216,17 @@ class TestGridResolution:
         """With no `vars` (bare instance) the resolver falls back to ERA5's."""
         bare = ECMWF.__new__(ECMWF)
         assert bare._grid_resolution_for_request() == pytest.approx(0.125)
+
+    def test_coarse_dataset_keeps_its_native_resolution(self, tmp_path, monkeypatch):
+        """A dataset coarser than ERA5 (0.25°) is not capped at 0.125°."""
+        from earthlens.ecmwf.catalog import Dataset
+        import earthlens.ecmwf.backend as backend_module
+
+        backend = _glofas_backend(tmp_path)
+        backend.vars = {"coarse-ds": ["v"]}
+        fake = _FakeCatalog({"coarse-ds": Dataset(endpoint="ewds", grid_resolution=0.25)})
+        monkeypatch.setattr(backend_module, "Catalog", lambda: fake)
+        assert backend._grid_resolution_for_request() == pytest.approx(0.25)
 
     def test_resolver_falls_back_when_catalog_fails(self, tmp_path, monkeypatch):
         """A catalog-load failure must not break grid snapping."""
