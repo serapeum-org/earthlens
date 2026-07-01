@@ -89,7 +89,22 @@ def test_tailor_happy_path_builds_chain_streams_and_deletes(fake_eumdac, tmp_pat
     assert chain.roi.NSWE == [52.0, 48.0, 4.0, 8.0]
     assert chain.filter is None
     assert cust.deleted == 1
-    assert (tmp_path / "a.tif").read_bytes().startswith(b"TAILORED")
+    # outputs are namespaced under a per-product subdirectory (H1)
+    assert {p.parent.name for p in paths} == {"p1"}
+    assert (tmp_path / "p1" / "a.tif").read_bytes().startswith(b"TAILORED")
+
+
+def test_tailor_multiple_products_namespaced_no_collision(fake_eumdac, tmp_path):
+    """Two granules sharing an output basename land in distinct product dirs."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1"), _FakeProduct("p2")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(outputs=["out.tif"])
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    paths = backend.download(progress_bar=False, tailor=TailorConfig())
+    assert len(paths) == 2
+    assert len(set(paths)) == 2, "outputs collided across products"
+    assert {p.parent.name for p in paths} == {"p1", "p2"}
+    for p in paths:
+        assert p.read_bytes().startswith(b"TAILORED")
 
 
 def test_tailor_roi_falls_back_to_request_extent(fake_eumdac, tmp_path):

@@ -536,9 +536,12 @@ class EUMETSAT(AbstractDataSource):
             ),
             quicklook=tailor.quicklook or None,
         )
-        cust = self._submit_customisation(
-            datatailor, product.metadata["product"], chain
-        )
+        product_handle = product.metadata["product"]
+        cust = self._submit_customisation(datatailor, product_handle, chain)
+        # Namespace every output under a per-product subdirectory so two
+        # granules of the same collection (the common multi-granule case)
+        # cannot collide on a shared Data Tailor output basename (H1).
+        product_dir = self.root_dir / safe_product_filename(str(product_handle))
         try:
             status = self._poll_customisation(cust)
             if status != "DONE":
@@ -546,9 +549,10 @@ class EUMETSAT(AbstractDataSource):
                     f"Data Tailor customisation {cust} ended {status}: "
                     f"{self._logfile_tail(cust)}"
                 )
+            product_dir.mkdir(parents=True, exist_ok=True)
             written: list[Path] = []
             for name in cust.outputs:
-                target = self.root_dir / safe_product_filename(str(name))
+                target = product_dir / safe_product_filename(str(name))
                 with cust.stream_output(name) as src, open(target, "wb") as fh:
                     shutil.copyfileobj(src, fh)
                 written.append(target)
