@@ -17,8 +17,8 @@ needs) and carries the fields the backend shapes a search and a fetch
 from: `group`, `mission`, the per-instance `output_kind` (`G1`), the
 on-disk `format` (so the `aggregate=` path knows which products are
 pyramids-readable NetCDF vs native), the informational `selectors`
-(`G2`), the `tailor_product_type` for the deferred Data Tailor `Chain`
-(`H4`), and the spatial / temporal coverage.
+(`G2`), the `tailor_product_type` for the Data Tailor `Chain`
+(the `tailor=` server-side path), and the spatial / temporal coverage.
 
 `available_datasets:` is the informational index of every Data Store
 collection id the browse walk found (the `C7` auto-generated index); the
@@ -316,10 +316,11 @@ class EumetsatDataset(BaseModel):
             reprocessed archive (the Sentinel-5P collections mix the two).
         selectors: Informational product-type / band selectors (`G2`).
             EUMETSAT delivers whole products, so selectors do not subset
-            the download; they seed catalog metadata and the future Data
-            Tailor `Chain`.
+            the download; they seed catalog metadata and the Data Tailor
+            `Chain`.
         tailor_product_type: The Data Tailor product-type id for the
-            deferred server-side subset/reproject path (`H4`).
+            `tailor=` server-side subset / reproject / reformat path;
+            `None` when the collection is not Data-Tailor-eligible.
         extent: `Extent` — lat / lon coverage.
         temporal: `TemporalCoverage` — start / end dates.
 

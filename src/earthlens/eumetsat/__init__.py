@@ -4,9 +4,10 @@ One unified backend over the EUMETSAT Data Store: a single OAuth2
 consumer key / secret mints a bearer token that reaches every
 collection — MTG-I1 FCI, MSG SEVIRI, Metop (ASCAT / IASI), Metop-SG, the
 Sentinel-3 / -5P / -6 mirrors, and the OSI SAF / CDR / FDR families. The
-MVP fetches whole native products to disk; server-side subsetting /
-reprojection (Data Tailor) and native SEVIRI / FCI client-side reading
-(the satpy bridge) are deferred follow-ons.
+backend fetches whole native products to disk, and supports server-side
+subset / reproject / reformat via the `tailor=TailorConfig(...)` Data
+Tailor path; native SEVIRI / FCI client-side reading (the satpy bridge)
+is a deferred follow-on.
 
 Like the NASA Earthdata backend, the output shape is **per-collection,
 not fixed** — `EUMETSAT` sets `OUTPUT_KIND` from the resolved catalog
