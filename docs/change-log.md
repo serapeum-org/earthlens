@@ -4,6 +4,23 @@
 
 ### Feat
 
+- **soilgrids**: add `earthlens.soilgrids` — ISRIC SoilGrids 2.0 global 250 m
+  soil-property maps (clay, sand, silt, cfvo, phh2o, cec, nitrogen, soc, ocd,
+  ocs, bdod) subset **server-side over OGC WCS** and written as GeoTIFF
+  (`OUTPUT_KIND="raster"`). A request expands `variables` × `depths` ×
+  `quantiles` into `(property, depth, quantile)` coverage triples, one GeoTIFF
+  per cell named `{property}_{depth}_{quantile}.tif`. The WCS transport is
+  consumed from pyramids' `Dataset.from_wcs` (0.38.0) — earthlens imports no
+  OGC-WCS SDK; SoilGrids' native Interrupted Goode Homolosine grid
+  (`EPSG:152160`, unresolvable in PROJ) is handled with a `coverage_crs` shim and
+  reprojected to EPSG:4326 by default. Values are scaled integers (divide by a
+  per-property `scale_factor`); the backend records the unit/scale but never
+  rescales pixels. A polygon `aoi=` is masked to shape; per-coverage WCS failures
+  are isolated (skip-and-continue) under a progress bar; `aggregate=` is rejected
+  (static, no time axis). Ships a sharded property catalog, the `soilgrids` /
+  `isric` facade keys, a `datasets validate soilgrids` structural lint, a live
+  gated e2e, intro / usage / datasets / reference docs, and three example
+  notebooks. No extra SDK and no auth module — open, CC-BY 4.0.
 - **erddap**: add `earthlens.erddap` — a generic ERDDAP client that reaches many
   public ERDDAP servers (NOAA CoastWatch / Coral Reef Watch, NCEI, …) from one
   backend. A curated sharded catalog pins each dataset to a concrete
