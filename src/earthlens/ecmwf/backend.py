@@ -274,8 +274,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         self.skip_constraints = skip_constraints
         # Per-endpoint cdsapi client cache (cds / ads / ewds). Populated
         # lazily by `_client_for` so a multi-endpoint download reuses one
-        # connection per CADS instance.
+        # connection per CADS instance. `_injected_client` holds a client
+        # bound via the `client` setter (used for every endpoint); it stays
+        # `None` for the normal lazy path so reading `self.client` cannot
+        # poison endpoint routing.
         self._clients: dict[str, Any] = {}
+        self._injected_client: Any = None
         super().__init__(
             start=start,
             end=end,
@@ -418,14 +422,43 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         return client
 
+    @property
+    def client(self):
+        """The default (CDS) cdsapi client — opened lazily and cached per endpoint.
+
+        Overrides :class:`~earthlens.base.LazyClientMixin` so that reading
+        `self.client` (e.g. via `authenticate()`) routes through the same
+        per-endpoint cache as a retrieve, rather than seeding a shared slot that
+        would then be returned for every endpoint. Resolves the `"cds"` client.
+
+        Returns:
+            cdsapi.Client: The CDS client (built on first use, then cached).
+        """
+        return self._client_for("cds")
+
+    @client.setter
+    def client(self, value) -> None:
+        """Inject a client used for every endpoint (tests and manual overrides).
+
+        A client set here is a deliberate override and is returned by
+        :meth:`_client_for` for all endpoints — unlike a lazily-built endpoint
+        client, which is cached per endpoint and never treated as injected.
+
+        Args:
+            value: The client object to use for every endpoint.
+        """
+        self._injected_client = value
+
     def _client_for(self, endpoint: str):
         """Return the cdsapi client for `endpoint`, honouring an injected one.
 
-        If a client was injected via the `client` setter (tests and manual
-        overrides seed `_client_obj`), that single client is returned for every
-        endpoint. Otherwise a client is built once per endpoint and cached on
-        `self._clients` so repeated retrieves against the same CADS instance
-        reuse the connection.
+        An **explicitly injected** client (set via the `client` setter — tests
+        and manual overrides) is returned for every endpoint. Otherwise a client
+        is built once per endpoint and cached on `self._clients` so repeated
+        retrieves against the same CADS instance reuse the connection. A
+        lazily-built endpoint client is never mistaken for an injected one, so
+        reading `self.client` (which resolves `"cds"`) cannot poison routing to
+        another endpoint.
 
         Args:
             endpoint: CADS instance slug (`"cds"` / `"ads"` / `"ewds"`).
@@ -433,7 +466,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Returns:
             cdsapi.Client: The client to use for a retrieve against `endpoint`.
         """
-        injected = self.__dict__.get("_client_obj")
+        injected = getattr(self, "_injected_client", None)
         if injected is not None:
             return injected
         if endpoint not in self._clients:

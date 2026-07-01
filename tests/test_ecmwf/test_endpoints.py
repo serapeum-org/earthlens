@@ -134,6 +134,17 @@ class TestClientFor:
         assert ecmwf._client_for("cds") is injected
         assert ecmwf._client_for("ewds") is injected
 
+    def test_reading_client_does_not_poison_endpoint_routing(self, monkeypatch):
+        """Reading `self.client` (cds) must not make `_client_for('ewds')` return it."""
+        ecmwf = ECMWF.__new__(ECMWF)
+        ecmwf._clients = {}
+        ecmwf._injected_client = None
+        monkeypatch.setattr(
+            ECMWF, "_open_client", lambda self, endpoint: f"client-{endpoint}"
+        )
+        assert ecmwf.client == "client-cds"  # lazily builds + caches the CDS client
+        assert ecmwf._client_for("ewds") == "client-ewds"  # not the CDS client
+
     def test_open_client_propagates_endpoint_auth_error(self, monkeypatch, tmp_path):
         """`_open_client` re-raises an EWDS AuthenticationError unwrapped."""
         _clear_cads_env(monkeypatch)
