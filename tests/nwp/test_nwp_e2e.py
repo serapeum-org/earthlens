@@ -21,6 +21,7 @@ import pytest
 from earthlens.earthlens import EarthLens
 from earthlens.nwp import Catalog
 from earthlens.nwp.centres.dwd import DWDCentre
+from earthlens.nwp.centres.noaa import NOAACentre
 
 pytestmark = [pytest.mark.nwp, pytest.mark.e2e]
 
@@ -116,3 +117,31 @@ class TestICONLive:
         except Exception as exc:
             pytest.skip(f"ICON live fetch unavailable: {exc}")
         assert out.exists() and out.stat().st_size > 0
+
+
+class TestModeLive:
+    """Live proof that mode='whole' downloads more than mode='subset'."""
+
+    @pytest.mark.skipif(not _herbie_available(), reason="herbie/eccodes not installed")
+    def test_whole_is_larger_than_subset(self, tmp_path):
+        """A whole GFS file is larger than the one-variable .idx subset."""
+        model = Catalog().get_model("gfs")
+        cycle = _recent_cycle()
+        subset_dir = tmp_path / "subset"
+        whole_dir = tmp_path / "whole"
+        subset_dir.mkdir()
+        whole_dir.mkdir()
+        try:
+            subset = NOAACentre(subset_dir).fetch_one(
+                model, cycle, 0, ["temperature_2m"], "auto"
+            )
+            whole = NOAACentre(whole_dir).fetch_one(
+                model, cycle, 0, ["temperature_2m"], "auto", whole=True
+            )
+        except Exception as exc:  # network / data-availability flake
+            pytest.skip(f"GFS live fetch unavailable: {exc}")
+        assert subset.exists() and subset.stat().st_size > 0
+        assert whole.exists() and whole.stat().st_size > 0
+        # The whole GFS field carries every variable/level; the subset is one
+        # band via the .idx byte-range — so whole must be substantially larger.
+        assert whole.stat().st_size > subset.stat().st_size
