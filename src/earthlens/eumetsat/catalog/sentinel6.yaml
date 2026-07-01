@@ -25,7 +25,7 @@ datasets:
     format: netcdf
     cadence: irregular
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: S6MWL2AMR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2025-04-20, end: null }
   s6-climate-quality-advanced-microwave-radiometer-2:
@@ -69,7 +69,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: S6P4L2PHR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2022-12-06, end: null }
   s6-poseidon-4-2p-altimetry-low-resolution:
@@ -80,7 +80,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: S6P4L2PLR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2022-12-06, end: null }
   s6-poseidon-4-2p-wind-wave-low:
@@ -102,7 +102,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: S6P4L3HR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2022-04-06, end: null }
   s6-poseidon-4-3-altimetry-low-resolution:
@@ -135,7 +135,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: S6P4L3LRW
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2022-04-06, end: null }
   s6-poseidon-4-altimetry-1a-high-resolution:
@@ -157,7 +157,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: S6P4L1AHR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2025-04-20, end: null }
   s6-poseidon-4-altimetry-1a-high-resolution-3:
@@ -190,7 +190,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: S6P4L1BHR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2025-04-20, end: null }
   s6-poseidon-4-altimetry-1b-high-resolution-3:
@@ -223,7 +223,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: S6P4L1BLR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2025-04-20, end: null }
   s6-poseidon-4-altimetry-1b-low-resolution-3:

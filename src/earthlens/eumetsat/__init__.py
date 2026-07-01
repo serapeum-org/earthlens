@@ -26,6 +26,8 @@ Public surface (re-exported from this package):
 * `EumetsatAuth` — `AbstractAuth` wrapper over `eumdac.AccessToken`.
   Idempotent; safe to call repeatedly.
 * `EumetsatCredentials` — frozen value object the auth class binds to.
+* `TailorConfig` — frozen request shape for the Data Tailor server-side
+  subset / reproject / reformat path (`download(tailor=...)`).
 * `AuthenticationError` — raised when token minting fails; subclass of
   `earthlens.base.AuthenticationError`.
 * `CATALOG_PATH` — absolute path to the bundled `catalog/` directory.
@@ -51,6 +53,7 @@ from earthlens.eumetsat.catalog import (
     TemporalCoverage,
     clear_catalog_cache,
 )
+from earthlens.eumetsat.tailor import TailorConfig
 
 __all__ = [
     "AuthenticationError",
@@ -62,6 +65,7 @@ __all__ = [
     "EumetsatDataset",
     "EumetsatCredentials",
     "Extent",
+    "TailorConfig",
     "TemporalCoverage",
     "clear_catalog_cache",
 ]

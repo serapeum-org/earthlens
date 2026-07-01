@@ -25,7 +25,7 @@ datasets:
     format: native
     cadence: subdaily
     selectors: [AMSUL1]
-    tailor_product_type: AMSUL1
+    tailor_product_type: AMSAL1
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2006-10-19, end: null }
   metop-ascat-1-sigma0-resampled-25-km:
@@ -36,7 +36,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: ASCATL1SZO
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2013-01-01, end: null }
   metop-ascat-1-szf-climate-record-release:
@@ -47,7 +47,7 @@ datasets:
     format: netcdf
     cadence: irregular
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: ASCATL1SZF
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2007-01-01, end: 2014-03-31 }
   metop-ascat-1-szo-climate-record-release:
@@ -58,7 +58,7 @@ datasets:
     format: netcdf
     cadence: irregular
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: ASCATL1SZO
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2007-01-01, end: 2014-03-31 }
   metop-ascat-1-szr-climate-record-release:
@@ -69,7 +69,7 @@ datasets:
     format: netcdf
     cadence: irregular
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: ASCATL1SZR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2007-01-01, end: 2014-03-31 }
   metop-ascat-coastal-winds-12-5-km:
@@ -80,7 +80,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: OASWC12
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2013-06-03, end: null }
   metop-ascat-l1-szf:
@@ -113,7 +113,7 @@ datasets:
     format: netcdf
     cadence: irregular
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: OR1ASWC12
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2007-01-01, end: 2014-03-31 }
   metop-ascat-l2-25-km-winds-record:
@@ -124,7 +124,7 @@ datasets:
     format: netcdf
     cadence: irregular
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: OR1ASW025
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2007-01-01, end: 2014-03-31 }
   metop-ascat-soil-moisture-12km:
@@ -135,7 +135,7 @@ datasets:
     format: bufr
     cadence: subdaily
     selectors: [SOMO12]
-    tailor_product_type: ASCATL2SM
+    tailor_product_type: ASCATL2SMR
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2007-01-01, end: null }
   metop-ascat-soil-moisture-25km:
@@ -146,7 +146,7 @@ datasets:
     format: bufr
     cadence: subdaily
     selectors: [SOMO25]
-    tailor_product_type: ASCATL2SM
+    tailor_product_type: ASCATL2SMO
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2007-01-01, end: null }
   metop-ascat-winds-soil-moisture-25-km:
@@ -157,7 +157,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: OAS025_BUFR
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2011-02-28, end: null }
   metop-avhrr-fundamental-record:
@@ -256,7 +256,7 @@ datasets:
     format: native
     cadence: subdaily
     selectors: [GOMEL1]
-    tailor_product_type: GOMEL1
+    tailor_product_type: GOME2L1
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2007-01-09, end: null }
   metop-hirs-1b:
@@ -267,7 +267,7 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: HIRSL1
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2007-03-02, end: 2025-01-21 }
   metop-iasi-1-principal-component-scores:
@@ -333,7 +333,7 @@ datasets:
     format: native
     cadence: subdaily
     selectors: [IASIL1C]
-    tailor_product_type: IASIL1C
+    tailor_product_type: IASIL1
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2007-05-29, end: null }
   metop-iasi-l2:
@@ -344,7 +344,7 @@ datasets:
     format: bufr
     cadence: subdaily
     selectors: [IASSND02]
-    tailor_product_type: IASIL2
+    tailor_product_type: IASISND02
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2008-01-01, end: null }
   metop-iasi-noise-covariance-matrix:
@@ -377,7 +377,7 @@ datasets:
     format: netcdf
     cadence: irregular
     selectors: []
-    tailor_product_type: null
+    tailor_product_type: IASL1PCS
     extent: { lat: [-90, 90], lon: [-180, 180] }
     temporal: { start: 2007-07-10, end: 2024-12-31 }
   metop-iasi-so2-climate-record-release-1:

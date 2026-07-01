@@ -36,6 +36,6 @@ datasets:
     format: netcdf
     cadence: subdaily
     selectors: [GRAS-L1B]
-    tailor_product_type: null
+    tailor_product_type: ROL1BND
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2026-02-26, end: null }

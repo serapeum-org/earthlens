@@ -15,7 +15,7 @@ datasets:
     cadence: subdaily
     timeliness: reprocessed
     selectors: [L2__CH4___]
-    tailor_product_type: S5PL2CH4
+    tailor_product_type: null
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2018-04-30, end: null }
   s5p-l2-co:
@@ -27,7 +27,7 @@ datasets:
     cadence: subdaily
     timeliness: nrt
     selectors: [L2__CO____]
-    tailor_product_type: S5PL2CO
+    tailor_product_type: null
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2018-04-30, end: null }
   s5p-l2-no2:
@@ -39,7 +39,7 @@ datasets:
     cadence: subdaily
     timeliness: nrt
     selectors: [L2__NO2___]
-    tailor_product_type: S5PL2NO2
+    tailor_product_type: null
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2018-04-30, end: null }
   s5p-l2-o3:
@@ -51,7 +51,7 @@ datasets:
     cadence: subdaily
     timeliness: nrt
     selectors: [L2__O3____]
-    tailor_product_type: S5PL2O3
+    tailor_product_type: null
     extent: { lat: [-90.0, 90.0], lon: [-180.0, 180.0] }
     temporal: { start: 2018-04-30, end: null }
   s5p-tropomi-1b-consolidated-earth-radiances-measurements:
