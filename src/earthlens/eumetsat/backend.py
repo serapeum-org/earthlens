@@ -575,6 +575,13 @@ class EUMETSAT(AbstractDataSource):
         subdir = self._dedupe_name(
             safe_product_filename(str(product_handle)), used_dirs
         )
+        # A prior native download into the same `path` may have written a file
+        # with this exact basename; bump the subdir name so `mkdir` cannot hit
+        # a file-vs-directory clash (L3).
+        while (self.root_dir / subdir).exists() and not (
+            self.root_dir / subdir
+        ).is_dir():
+            subdir = self._dedupe_name(subdir, used_dirs)
         product_dir = self.root_dir / subdir
         try:
             status = self._poll_customisation(cust)

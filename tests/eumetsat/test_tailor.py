@@ -154,6 +154,17 @@ def test_tailor_outputs_sharing_basename_do_not_overwrite(fake_eumdac, tmp_path)
     assert {p.name for p in paths} == {"out.tif", "out.tif_1"}
 
 
+def test_tailor_subdir_avoids_existing_native_file(fake_eumdac, tmp_path):
+    """A pre-existing native file with the product basename doesn't break mkdir (L3)."""
+    (tmp_path / "p1").write_bytes(b"native")  # a prior native download's output
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(outputs=["o.tif"])
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    paths = backend.download(progress_bar=False, tailor=TailorConfig())
+    assert paths[0].parent.name == "p1_1"
+    assert (tmp_path / "p1").read_bytes() == b"native"  # native file untouched
+
+
 def test_tailor_roi_falls_back_to_request_extent(fake_eumdac, tmp_path):
     """With no bbox, the ROI comes from the request lat_lim / lon_lim."""
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
