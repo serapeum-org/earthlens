@@ -1015,6 +1015,40 @@ def test_http_download_raster_rejects_non_raster_200(monkeypatch, tmp_path):
     assert not target.exists(), "no file written for a non-raster response"
 
 
+def test_http_download_raster_accepts_bigtiff(monkeypatch, tmp_path):
+    """A 200 body with BigTIFF magic is accepted (not rejected as non-raster)."""
+    import requests
+
+    body = b"II+\x00" + b"z" * (1 << 16)  # little-endian BigTIFF
+    monkeypatch.setattr(
+        requests, "get", lambda *a, **k: _FakeResponse(status=200, body=body)
+    )
+    target = tmp_path / "big.tif"
+    backend_module._http_download_raster(
+        "https://example.com/wcs", target, label="edo-spaST"
+    )
+    assert target.read_bytes() == body
+
+
+def test_http_download_removes_partial_on_stream_failure(monkeypatch, tmp_path):
+    """A mid-stream connection drop leaves no stale `.partial` on disk."""
+    import requests
+
+    class _BrokenResponse(_FakeResponse):
+        def iter_content(self, chunk_size: int = 1024):
+            yield b"first-chunk"
+            raise requests.ConnectionError("connection dropped mid-stream")
+
+    monkeypatch.setattr(
+        requests, "get", lambda *a, **k: _BrokenResponse(status=200, body=b"")
+    )
+    target = tmp_path / "file.nc"
+    with pytest.raises(requests.ConnectionError):
+        backend_module._http_download("https://example.com/file.nc", target)
+    assert not target.exists()
+    assert not target.with_suffix(target.suffix + ".partial").exists()
+
+
 def test_usdm_reprojects_non_4326_payload(monkeypatch, tmp_path):
     """A payload arriving in EPSG:3857 is reprojected to 4326."""
     # Inject a payload through a custom `_geojson_to_gdf` shim that hands
