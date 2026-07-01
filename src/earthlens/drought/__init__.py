@@ -40,7 +40,7 @@ Public surface (re-exported from this package):
 * `Dataset` — one curated row (transport, endpoint, coverage,
   output_kind, cadence, native_crs, timescale, license_note).
 * `CATALOG_PATH` — absolute path to the bundled `catalog/` directory.
-* `clear_catalog_cache` — drop the parse cache (tests).
+* `clear_catalog_cache` — drop the parse cache to force a re-read.
 
 The backend pulls no new SDK extra: all three transports use core
 `requests` plus the already-shipped `pyramids` reader stack (`Dataset` /

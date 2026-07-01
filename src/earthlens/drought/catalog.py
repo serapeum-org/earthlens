@@ -18,8 +18,8 @@ facade and the per-source attribution log need (`source`, `cadence`,
 `Catalog.get(id)` resolves a dataset id and emits a did-you-mean
 `ValueError` when the id is unknown (the shipped helper on
 `AbstractCatalog`). The catalog is cached on `(path, mtime_ns)` so repeated
-construction is free; tests redirect the loader by monkey-patching the
-module-level `CATALOG_PATH`.
+construction is free; reassigning the module-level `CATALOG_PATH` redirects
+the loader at another directory or a single YAML file.
 """
 
 from __future__ import annotations
@@ -34,8 +34,8 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 """Path to the bundled `catalog/` directory of per-source YAML files plus
-the `_index.yaml` informational index. Tests can monkey-patch this attribute
-to redirect the loader at a temporary directory or a single YAML file."""
+the `_index.yaml` informational index. Reassign this attribute to redirect
+the loader at another directory or a single YAML file."""
 
 _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
 
@@ -59,10 +59,10 @@ USDM is weekly (Thursday release, Tuesday valid), EDO/GDO indicators are
 def clear_catalog_cache() -> None:
     """Empty the module-level catalog parse cache.
 
-    Useful in tests that rewrite the catalog on disk and want to force a
-    re-parse. Production callers do not need this — the cache keys include
-    every contributing file's `st_mtime_ns`, so any real file mutation
-    invalidates the entry on its own.
+    Useful after rewriting the catalog on disk to force a re-parse.
+    Production callers do not need this — the cache keys include every
+    contributing file's `st_mtime_ns`, so any real file mutation invalidates
+    the entry on its own.
     """
     _CATALOG_CACHE.clear()
 
@@ -72,8 +72,8 @@ def _yaml_files_for(path: Path) -> list[Path]:
 
     Args:
         path: A catalog directory of per-source `*.yaml` files (the default
-            layout, including `_index.yaml`) or a single `*.yaml` file
-            (back-compat for tests that redirect `CATALOG_PATH`).
+            layout, including `_index.yaml`) or a single `*.yaml` file (the
+            supported form when `CATALOG_PATH` is redirected at one file).
 
     Returns:
         list[Path]: Sorted YAML paths — every `*.yaml` for a directory, or
