@@ -88,6 +88,39 @@ are a follow-on.
 | `"azure"` | `azure` | `azure` |
 | `"origin"` | `nomads` | `ecmwf` |
 
+## Download mode: `subset` vs `whole`
+
+`mode=` controls how much of each GRIB2 is pulled off the wire before the
+bbox crop:
+
+| `mode=` | behaviour |
+|---------|-----------|
+| `"subset"` *(default)* | fetch only the requested bands. For a model with a `.idx` byte-range index (`idx: true` — the NOAA / Herbie models) this downloads just the matching messages, cutting **>99 %** of the bytes. Models without an index already download the whole per-variable file. |
+| `"whole"` | force a full-file download **even for `.idx`-capable models**, then crop. Useful when you want every variable/level from one cycle, or to work around an occasionally-stale `.idx`. |
+
+```python
+lens = EarthLens(
+    data_source="nwp",
+    variables={"gfs": ["temperature_2m"]},
+    start="2024-06-01",
+    end="2024-06-01",
+    lat_lim=[40, 45],
+    lon_lim=[-80, -75],
+    path="out/gfs",
+    mode="whole",                  # full GFS file, then crop (default is "subset")
+)
+```
+
+`mode` only changes behaviour for the **`.idx`-capable NOAA / Herbie
+centre** — every other centre (ECMWF Open Data, DWD, ECCC, Météo-France)
+is already whole-per-variable, so it accepts the flag and ignores it. The
+default `"subset"` path is unchanged from earlier releases.
+
+`mode="zarr"` is **rejected** with a `ValueError`: no NWP catalog row
+carries a `zarr_url`, and Zarr sources (NWM, hrrrzarr) are separate
+backends. A Zarr download mode is a documented follow-on, gated on a
+future `zarr_url` catalog field (read through `pyramids.zarr`).
+
 ## Output: bbox-cropped COGs
 
 Each `(cycle, step)` yields one Cloud-Optimized GeoTIFF named
