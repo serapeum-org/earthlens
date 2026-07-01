@@ -26,9 +26,9 @@ paths = el.download()
 Each key is a **curated dataset key** (e.g. `"msg-hrseviri"`,
 `"s3-olci-l2-wfr"`; see the [catalog reference](catalog.md) for the full
 list). The list holds **selectors** that are *informational* — EUMETSAT
-delivers whole products, so you cannot band-subset a download without
-Data Tailor. The selectors seed catalog metadata and the future Data
-Tailor request.
+delivers whole products, so you cannot band-subset a native download
+without Data Tailor. The selectors seed catalog metadata; a band subset
+uses the `tailor=` `filter` ([Data Tailor](data-tailor.md)).
 
 A request may name several datasets at once, but they must all share one
 `output_kind` — most datasets are `raster`, but the point/vector products
@@ -41,8 +41,9 @@ event/flash/group products) are `vector`, so a mixed request is rejected.
   the `eumdac` `W,S,E,N` comma-string the Data Store's OpenSearch
   endpoint expects.
 * The bbox is a **search filter** — it selects which products *intersect*
-  it. It is **not** a pixel crop; you receive whole products. (Pixel
-  cropping is the deferred [Data Tailor](data-tailor.md) path.)
+  it. It is **not** a pixel crop; you receive whole products. For a
+  server-side pixel crop / reproject / reformat, use the `tailor=` knob
+  ([Data Tailor](data-tailor.md)).
 * `start` / `end` are inclusive dates parsed with `fmt` (default
   `"%Y-%m-%d"`).
 
@@ -64,22 +65,29 @@ product, written into `path`. The file name is the product id
 (`str(product)`). An empty list means the search matched nothing in the
 window.
 
-## Output kind and `aggregate=`
+## Output kind, `tailor=`, and `aggregate=`
 
 The backend sets `OUTPUT_KIND` from the resolved dataset row (`G1`).
 Most datasets are `"raster"`; the Atmospheric Motion Vector, ASCAT wind,
 and Lightning Imager event/flash/group datasets are `"vector"`.
 
-`aggregate=` is the server-side subset / reduce path, which on the Data
-Store is **Data Tailor** — not part of the MVP. A non-`None`
-`aggregate=` raises `NotImplementedError` naming Data Tailor:
+Two customisation knobs, doing different things:
+
+* `tailor=TailorConfig(...)` — **spatial**, server-side subset / reproject /
+  reformat via [Data Tailor](data-tailor.md). Returns the customised
+  GeoTIFF / NetCDF paths. Only catalog rows with a `tailor_product_type`
+  are eligible.
+* `aggregate=` — **temporal** reducer, *not* implemented for EUMETSAT. A
+  non-`None` `aggregate=` raises `NotImplementedError`:
 
 ```python
-el.download(aggregate=some_config)   # NotImplementedError → see data-tailor.md
+el.download(aggregate=some_config)   # NotImplementedError (temporal reducer)
 ```
 
-To aggregate, download the native products and reduce the NetCDF ones
-client-side with `pyramids` (see the format tags below).
+To reduce a time axis, download the products (optionally with `tailor=`)
+and reduce the NetCDF ones client-side with `pyramids` (see the format tags
+below). The two knobs compose: tailor server-side, then aggregate
+client-side.
 
 ## Product formats — native vs NetCDF
 
@@ -168,11 +176,12 @@ print(Catalog().get_dataset("s5p-l2-no2").timeliness)   # 'nrt'
   and window small to limit how many products match.
 * **Search is lazily paginated** — the backend iterates the
   `SearchResults`; a huge window can match thousands of products.
-* **Data Tailor quota** (when that path lands): customisations must be
-  deleted after streaming or the account fills up.
+* **Data Tailor quota**: `tailor=` customisations are deleted after
+  streaming (including on failure), but the account quota is limited —
+  see [Data Tailor](data-tailor.md).
 * **Native reading**: a `native`-format product is fetched but not yet
-  readable through `pyramids`; use Data Tailor or satpy externally for
-  now.
+  readable through `pyramids`; tailor it to GeoTIFF, or use satpy
+  externally for now.
 
 ## Catalog tooling
 

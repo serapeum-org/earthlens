@@ -12,7 +12,7 @@ catalogs: `datasets` (the curated map) + `available_datasets` (the index).
 Each row maps a **friendly key** (what you pass in `variables=`) to the
 real Data Store `EO:EUM:DAT:…` collection id, plus the group, output
 kind, on-disk format, native selectors, the Data Tailor product type (for
-the deferred server-side path), and the spatial / temporal coverage.
+the `tailor=` server-side path), and the spatial / temporal coverage.
 
 ```python
 from earthlens.eumetsat import Catalog

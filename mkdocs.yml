@@ -147,7 +147,7 @@ nav:
       - Usage: reference/eumetsat/usage.md
       - Authentication: reference/eumetsat/authentication.md
       - Catalog & tooling: reference/eumetsat/catalog.md
-      - Data Tailor (deferred): reference/eumetsat/data-tailor.md
+      - Data Tailor: reference/eumetsat/data-tailor.md
       - Reference: reference/eumetsat/eumetsat.md
     - FDSN (earthquakes):
       - Introduction: reference/fdsn/introduction.md
