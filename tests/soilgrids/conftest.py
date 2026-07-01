@@ -21,7 +21,6 @@ class FakeDataset:
     masks: list[Any] = []
     written: list[str] = []
     fail_coverages: set[str] = set()
-    fail_after_write: set[str] = set()
     fail_to_file: set[str] = set()
     no_data_value = (-32768.0,)
 
@@ -31,9 +30,10 @@ class FakeDataset:
 
     @classmethod
     def from_wcs(cls, endpoint: str, **kwargs: Any) -> FakeDataset:
-        """Record the call, write a stub GeoTIFF to `output`, return a fake.
+        """Record the call and return an in-memory fake (never writes a file).
 
-        A coverage listed in `fail_coverages` raises, to exercise the backend's
+        A coverage listed in `fail_coverages` raises before returning, modelling
+        pyramids' pre-write (fetch/MEM) failure, to exercise the backend's
         per-coverage failure isolation.
         """
         cls.recorder.append({"endpoint": endpoint, **kwargs})
@@ -43,14 +43,12 @@ class FakeDataset:
         output = kwargs.get("output")
         if output is not None:
             Path(output).write_bytes(b"MM\x00*stub-geotiff")
-        if coverage in cls.fail_after_write:
-            raise RuntimeError(f"faked write failure after output for {coverage}")
         return cls(coverage)
 
     def crop(self, mask: Any = None, touch: bool = True) -> FakeDataset:
-        """Record the polygon mask and return the (still-fake) masked dataset."""
+        """Record the polygon mask and return a distinct masked fake dataset."""
         FakeDataset.masks.append(mask)
-        return self
+        return FakeDataset(self.coverage)
 
     def to_file(self, path: str) -> None:
         """Record and write a stub GeoTIFF (the mask-path write).
@@ -77,7 +75,6 @@ def fake_from_wcs(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
     FakeDataset.masks = []
     FakeDataset.written = []
     FakeDataset.fail_coverages = set()
-    FakeDataset.fail_after_write = set()
     FakeDataset.fail_to_file = set()
     monkeypatch.setattr(Dataset, "from_wcs", FakeDataset.from_wcs)
     return FakeDataset

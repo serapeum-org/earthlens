@@ -343,16 +343,16 @@ class SoilGrids(AbstractDataSource):
             f"(values are scaled integers in {row.mapped_units or 'native units'}"
             f"; divide by {row.scale_factor:g} for {row.unit or 'the unit'})"
         )
-        # A polygon aoi= needs a client-side mask; the server only honours a
-        # rectangular bbox. Fetch in-memory then mask + write; with no polygon,
-        # let from_wcs write the bbox subset straight to disk.
+        # Always fetch in-memory (`output=None`) and let earthlens own the single
+        # `to_file`, so both the plain-bbox and the polygon-mask paths write
+        # out_path at exactly one point — `from_wcs` never touches out_path
+        # itself (it builds the coverage in memory and only writes when handed an
+        # `output=`). A polygon aoi= is masked to shape before that write.
         has_mask = getattr(self.space, "geometry", None) is not None
         preexisting = out_path.exists()
         dataset = None
-        masked = None
-        # The no-mask path hands out_path to from_wcs (which truncates on open);
-        # the mask path only touches out_path once to_file starts.
-        write_attempted = not has_mask
+        result = None
+        write_attempted = False
         try:
             dataset = Dataset.from_wcs(
                 row.endpoint,
@@ -362,21 +362,23 @@ class SoilGrids(AbstractDataSource):
                 coverage_crs=self._coverage_crs,
                 output_crs=self._output_crs,
                 resolution=self._resolution,
-                output=None if has_mask else str(out_path),
+                output=None,
                 timeout=self._timeout,
             )
-            if has_mask:
-                masked = mask_to_geometry(dataset, self.space)
-                write_attempted = True
-                masked.to_file(str(out_path))
-            _close_dataset(masked)
+            result = mask_to_geometry(dataset, self.space) if has_mask else dataset
+            write_attempted = True
+            result.to_file(str(out_path))
+            if result is not dataset:
+                _close_dataset(result)
             _close_dataset(dataset)
         except Exception:
             # Release the GDAL handles first so the file lock is gone (Windows)
-            # before cleanup, then remove only a partial file this call itself
-            # wrote — never a pre-existing GeoTIFF from a prior run — and never
-            # let a cleanup error mask the original fetch failure.
-            _close_dataset(masked)
+            # before cleanup, then remove out_path only when this call wrote it —
+            # a partial from a failed to_file, or a brand-new file — never a
+            # pre-existing GeoTIFF from a prior run that a pre-write failure left
+            # untouched, and never let a cleanup error mask the original failure.
+            if result is not None and result is not dataset:
+                _close_dataset(result)
             _close_dataset(dataset)
             if out_path.exists() and (write_attempted or not preexisting):
                 try:

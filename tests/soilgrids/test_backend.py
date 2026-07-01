@@ -58,7 +58,7 @@ def test_from_wcs_receives_the_pinned_arguments(
     assert call["coverage_crs"] == IGH_PROJ4
     assert call["output_crs"] == "EPSG:4326"
     assert call["resolution"] is None
-    assert call["output"].endswith("clay_0-5cm_mean.tif")
+    assert call["output"] is None  # earthlens owns the to_file write
 
 
 def test_quantiles_double_the_fetched_cells(
@@ -135,10 +135,11 @@ def test_polygon_aoi_masks_the_result(
 def test_bbox_only_path_skips_the_mask(
     fake_from_wcs: type[FakeDataset], tmp_path: Path
 ) -> None:
-    """With no polygon aoi= the coverage is written straight from from_wcs."""
+    """With no polygon aoi= the coverage is fetched in memory and written once."""
     _backend(tmp_path, ["clay"], depths=["0-5cm"]).download()
-    assert fake_from_wcs.recorder[0]["output"].endswith("clay_0-5cm_mean.tif")
+    assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == []
+    assert fake_from_wcs.written == [str(tmp_path / "clay_0-5cm_mean.tif")]
 
 
 def test_progress_flag_is_wired(
@@ -173,8 +174,8 @@ def test_all_coverages_failing_raises(
 def test_partial_write_is_cleaned_up(
     fake_from_wcs: type[FakeDataset], tmp_path: Path
 ) -> None:
-    """A coverage that fails after writing leaves no partial .tif behind."""
-    fake_from_wcs.fail_after_write = {"clay_5-15cm_mean"}
+    """A bbox coverage whose write fails mid-way leaves no partial .tif behind."""
+    fake_from_wcs.fail_to_file = {"clay_5-15cm_mean"}
     paths = _backend(tmp_path, ["clay"]).download()
     assert len(paths) == len(STD_DEPTHS) - 1
     assert not (tmp_path / "clay_5-15cm_mean.tif").exists()
@@ -192,7 +193,7 @@ def test_cleanup_error_does_not_mask_the_fetch_error(
 ) -> None:
     """A locked-file unlink is swallowed so the real fetch error still surfaces."""
     monkeypatch.setattr(Path, "unlink", _locked_unlink)
-    fake_from_wcs.fail_after_write = {"clay_0-5cm_mean"}
+    fake_from_wcs.fail_to_file = {"clay_0-5cm_mean"}
     backend = _backend(tmp_path, ["clay"], depths=["0-5cm"])
     with pytest.raises(RuntimeError, match="all 1 requested coverage"):
         backend.download()
@@ -221,6 +222,18 @@ def test_prewrite_failure_keeps_a_preexisting_file(
     backend._attach_clip_geometry(_GEOMETRY)
     with pytest.raises(RuntimeError, match="all 1 requested coverage"):
         backend.download()
+    assert out.read_bytes() == b"MM\x00*prior-good-geotiff"
+
+
+def test_prewrite_failure_keeps_a_preexisting_file_no_mask(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """A default-path fetch failing before any write keeps a prior run's GeoTIFF."""
+    out = tmp_path / "clay_0-5cm_mean.tif"
+    out.write_bytes(b"MM\x00*prior-good-geotiff")
+    fake_from_wcs.fail_coverages = {"clay_0-5cm_mean"}
+    with pytest.raises(RuntimeError, match="all 1 requested coverage"):
+        _backend(tmp_path, ["clay"], depths=["0-5cm"]).download()
     assert out.read_bytes() == b"MM\x00*prior-good-geotiff"
 
 
