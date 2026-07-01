@@ -63,6 +63,8 @@ class Property(BaseModel):
         endpoint: The property's MapServer WCS endpoint
             (`".../mapserv?map=/map/clay.map"`); a `(property, depth,
             quantile)` request resolves to one `COVERAGEID` served here.
+        title: Human-readable property title from the catalog (e.g.
+            `"Soil pH in H2O"`).
         depths: The published depth intervals (`["0-5cm", ...]`; a single
             `["0-30cm"]` for the `ocs` carbon-stock property).
         quantiles: The published quantile / layer tokens (`["Q0.05", "Q0.5",
