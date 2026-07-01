@@ -3,7 +3,8 @@
 Submits one tiny `cems-glofas-forecast` retrieve through the EWDS endpoint (the
 shared CDS Personal Access Token authenticates against EWDS) and checks a
 NetCDF with river-discharge values on the native 0.05° grid comes back. Runs
-only under `-m e2e`; skips cleanly when no Copernicus token is configured.
+only under `-m e2e` (gated by the marker, like the rest of the e2e suite);
+needs a configured Copernicus token and the GloFAS licence accepted.
 """
 
 from __future__ import annotations
@@ -11,16 +12,9 @@ from __future__ import annotations
 import pytest
 
 from earthlens.ecmwf import Catalog
-from earthlens.ecmwf import endpoints as ep
 from earthlens.ecmwf.backend import ECMWF
 
-pytestmark = [
-    pytest.mark.e2e,
-    pytest.mark.skipif(
-        ep._resolve_key("EWDS_KEY") is None,
-        reason="no Copernicus token (EWDS_KEY / CDSAPI_KEY / ~/.cdsapirc) available",
-    ),
-]
+pytestmark = [pytest.mark.e2e]
 
 _GLOFAS = "cems-glofas-forecast"
 _GLOFAS_CODE = "river-discharge-in-the-last-24-hours"
@@ -32,8 +26,8 @@ class TestGlofasE2E:
     def test_live_glofas_forecast_retrieve(self, tmp_path):
         """A tiny GloFAS forecast retrieves a NetCDF on the native 0.05° grid."""
         ecmwf = ECMWF(
-            start="2026-07-01",
-            end="2026-07-01",
+            start="2024-01-01",
+            end="2024-01-01",
             variables={_GLOFAS: [_GLOFAS_CODE]},
             lat_lim=[0.0, 1.0],
             lon_lim=[0.0, 1.0],
