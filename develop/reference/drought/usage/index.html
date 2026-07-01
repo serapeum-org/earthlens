@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -16803,8 +16803,10 @@ backend reads the axis from the file and raises a clear error for an
 out-of-range month.</p>
 <p>The downloaded NetCDF stays under <code>path/</code> between runs, so a second
 <code>download()</code> for the same dataset reuses the cached <code>.nc</code> without
-re-hitting <code>digital.csic.es</code>. Bump the catalog row's <code>endpoint</code> to point
-at a newer SPEIbase release when one ships — no code change.</p>
+re-hitting <code>digital.csic.es</code>. The cache file name embeds a hash of the
+row's <code>endpoint</code>, so bumping the catalog row to a newer SPEIbase release
+when one ships fetches the new file fresh (the stale cache is ignored) — a
+pure YAML edit, no code change and no manual cache cleanup.</p>
 <h2 id="edo-gdo-copernicus-drought-indicators-raster"><a class="toclink" href="#edo-gdo-copernicus-drought-indicators-raster">EDO / GDO — Copernicus drought indicators (raster)</a><a class="headerlink" href="#edo-gdo-copernicus-drought-indicators-raster" title="Permanent link">#</a></h2>
 <p>EDO/GDO catalog rows resolve through the same facade — <code>dataset="edo-spaST"</code>
 for SPI ERA5 short-term, <code>dataset="gdo-smand"</code> for the ensemble soil-moisture
