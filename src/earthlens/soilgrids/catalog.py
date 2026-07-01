@@ -27,29 +27,29 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
 from earthlens.base.yaml_loader import load_yaml_strict
 
 #: Path to the bundled catalog directory of per-group `*.yaml` files plus the
-#: `_index.yaml` informational index. Tests can monkey-patch this attribute to
-#: redirect the loader at a temporary directory or a single YAML file.
+#: `_index.yaml` informational index. Override this attribute to redirect the
+#: loader at another directory or a single YAML file.
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
 #: Module-level cache of parsed catalog data, keyed on the resolved path plus a
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-group file invalidates the entry without re-parsing an unchanged tree.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Property"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Property]]] = {}
 
 
 def clear_catalog_cache() -> None:
     """Empty the module-level catalog parse cache.
 
-    Useful in tests that rewrite the catalog on disk and want to force a
-    re-parse. Production callers do not need this — the cache keys include
-    every contributing file's `st_mtime_ns`, so any real file mutation
-    invalidates the entry on its own.
+    Forces a re-parse after the catalog files on disk change. Production
+    callers do not need this — the cache keys include every contributing
+    file's `st_mtime_ns`, so any real file mutation invalidates the entry on
+    its own.
     """
     _CATALOG_CACHE.clear()
 
@@ -95,7 +95,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     Args:
         path: A catalog directory of per-group `*.yaml` files (the default
             layout, including `_index.yaml`) or a single `*.yaml` file
-            (back-compat for tests / a monolithic catalog).
+            (back-compat for a single monolithic catalog file).
 
     Returns:
         list[Path]: Sorted YAML paths — every `*.yaml` for a directory, or
@@ -208,14 +208,13 @@ class Catalog(AbstractCatalog):
     _entry_noun: str = "properties"
 
     datasets: dict[str, Property] = Field(default_factory=dict)
-    _alias_index: dict[str, str] = PrivateAttr(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no properties were supplied.
 
         `Catalog()` with no args reads `CATALOG_PATH` (through the
-        `(path, mtime_ns)`-keyed parse cache); passing `datasets=...` skips the
-        disk read (used in tests).
+        `(path, mtime_ns)`-keyed parse cache); passing `datasets=...` bypasses
+        the disk read.
 
         Raises:
             ValueError: Propagated from `load` when the catalog is missing,
