@@ -144,16 +144,18 @@ def test_tailor_timeout_raises_and_deletes(fake_eumdac, tmp_path, monkeypatch):
     assert cust.deleted == 1
 
 
+class _NoLogCustomisation(_FakeCustomisation):
+    """A customisation whose `logfile` read fails (exercises the placeholder)."""
+
+    @property
+    def logfile(self):
+        raise RuntimeError("log endpoint down")
+
+
 def test_tailor_missing_logfile_uses_placeholder(fake_eumdac, tmp_path):
     """A FAILED job whose logfile read fails still raises with a placeholder."""
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
-
-    class _NoLog(_FakeCustomisation):
-        @property
-        def logfile(self):
-            raise RuntimeError("log endpoint down")
-
-    cust = _NoLog(statuses=["FAILED"])
+    cust = _NoLogCustomisation(statuses=["FAILED"])
     fake_eumdac.tailor.customisation = cust
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     with pytest.raises(RuntimeError, match="no customisation log"):
@@ -180,8 +182,12 @@ def test_tailor_one_defensive_eligibility_guard(fake_eumdac, tmp_path):
     from earthlens.eumetsat.catalog import EumetsatDataset
 
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
-    ineligible = EumetsatDataset(collection_id="X", group="MSG", tailor_product_type=None)
-    product = types.SimpleNamespace(metadata={"product": object(), "dataset": ineligible})
+    ineligible = EumetsatDataset(
+        collection_id="X", group="MSG", tailor_product_type=None
+    )
+    product = types.SimpleNamespace(
+        metadata={"product": object(), "dataset": ineligible}
+    )
     with pytest.raises(ValueError, match="not Data-Tailor-eligible"):
         backend._tailor_one(product, TailorConfig(), fake_eumdac.tailor)
 
@@ -189,7 +195,9 @@ def test_tailor_one_defensive_eligibility_guard(fake_eumdac, tmp_path):
 # --- submit retry (G8) ------------------------------------------------------
 
 
-def test_tailor_submit_retries_transient_then_succeeds(fake_eumdac, tmp_path, monkeypatch):
+def test_tailor_submit_retries_transient_then_succeeds(
+    fake_eumdac, tmp_path, monkeypatch
+):
     """A transient 502 on submit is retried and the second attempt succeeds."""
     monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_SUBMIT_BACKOFF_S", 0.0)
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
@@ -211,7 +219,9 @@ def test_tailor_submit_non_transient_raised_immediately(fake_eumdac, tmp_path):
     assert len(fake_eumdac.tailor.submitted) == 1
 
 
-def test_tailor_submit_transient_exhausted_raises_runtime(fake_eumdac, tmp_path, monkeypatch):
+def test_tailor_submit_transient_exhausted_raises_runtime(
+    fake_eumdac, tmp_path, monkeypatch
+):
     """Repeated transient submit failures exhaust the retries and raise."""
     monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_SUBMIT_BACKOFF_S", 0.0)
     monkeypatch.setattr("earthlens.eumetsat.backend.TAILOR_SUBMIT_RETRIES", 3)
@@ -246,7 +256,9 @@ def _eumetsat_py_files() -> list[Path]:
 
 def test_no_xarray_import_in_eumetsat():
     """The customised file reads via pyramids — the backend never imports xarray."""
-    offenders = [p for p in _eumetsat_py_files() if "xarray" in p.read_text(encoding="utf-8")]
+    offenders = [
+        p for p in _eumetsat_py_files() if "xarray" in p.read_text(encoding="utf-8")
+    ]
     assert not offenders, f"xarray referenced in {offenders}"
 
 
@@ -255,5 +267,7 @@ def test_no_hardcoded_credentials_in_eumetsat():
     import re
 
     pattern = re.compile(r"consumer_(?:key|secret)\s*=\s*[\"'][A-Za-z0-9]{20,}[\"']")
-    offenders = [p for p in _eumetsat_py_files() if pattern.search(p.read_text(encoding="utf-8"))]
+    offenders = [
+        p for p in _eumetsat_py_files() if pattern.search(p.read_text(encoding="utf-8"))
+    ]
     assert not offenders, f"hardcoded credential literal in {offenders}"

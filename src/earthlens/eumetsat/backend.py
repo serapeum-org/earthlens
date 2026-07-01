@@ -83,7 +83,14 @@ TAILOR_SUBMIT_BACKOFF_S = 2.0
 _TAILOR_TERMINAL = frozenset({"DONE", "FAILED", "KILLED"})
 #: Substrings that mark a submit error as transient (worth retrying) — the
 #: EUMETSAT EPCS endpoint intermittently 502s (`A1`/`G8`).
-_TRANSIENT_MARKERS = ("502", "bad gateway", "server-side", "timed out", "timeout", "connection")
+_TRANSIENT_MARKERS = (
+    "502",
+    "bad gateway",
+    "server-side",
+    "timed out",
+    "timeout",
+    "connection",
+)
 
 
 class EUMETSAT(AbstractDataSource):
@@ -529,7 +536,9 @@ class EUMETSAT(AbstractDataSource):
             ),
             quicklook=tailor.quicklook or None,
         )
-        cust = self._submit_customisation(datatailor, product.metadata["product"], chain)
+        cust = self._submit_customisation(
+            datatailor, product.metadata["product"], chain
+        )
         try:
             status = self._poll_customisation(cust)
             if status != "DONE":
