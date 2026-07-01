@@ -129,7 +129,8 @@ def test_polygon_aoi_masks_the_result(
     assert paths == [tmp_path / "clay_0-5cm_mean.tif"]
     assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == [_GEOMETRY]
-    assert fake_from_wcs.written == [str(tmp_path / "clay_0-5cm_mean.tif")]
+    assert (tmp_path / "clay_0-5cm_mean.tif").exists()
+    assert not (tmp_path / "clay_0-5cm_mean.tif.part").exists()
 
 
 def test_bbox_only_path_skips_the_mask(
@@ -139,7 +140,8 @@ def test_bbox_only_path_skips_the_mask(
     _backend(tmp_path, ["clay"], depths=["0-5cm"]).download()
     assert fake_from_wcs.recorder[0]["output"] is None
     assert fake_from_wcs.masks == []
-    assert fake_from_wcs.written == [str(tmp_path / "clay_0-5cm_mean.tif")]
+    assert (tmp_path / "clay_0-5cm_mean.tif").exists()
+    assert not (tmp_path / "clay_0-5cm_mean.tif.part").exists()
 
 
 def test_progress_flag_is_wired(

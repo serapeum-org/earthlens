@@ -20,6 +20,7 @@ transport and GeoTIFF I/O are pyramids' job, via `Dataset.from_wcs`).
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -343,16 +344,18 @@ class SoilGrids(AbstractDataSource):
             f"(values are scaled integers in {row.mapped_units or 'native units'}"
             f"; divide by {row.scale_factor:g} for {row.unit or 'the unit'})"
         )
-        # Always fetch in-memory (`output=None`) and let earthlens own the single
-        # `to_file`, so both the plain-bbox and the polygon-mask paths write
-        # out_path at exactly one point — `from_wcs` never touches out_path
-        # itself (it builds the coverage in memory and only writes when handed an
-        # `output=`). A polygon aoi= is masked to shape before that write.
+        # Always fetch in-memory (`output=None`) and write to a temporary sibling
+        # file, then atomically rename onto out_path only after a fully successful
+        # write. `from_wcs` never touches a file itself (it builds the coverage in
+        # memory and only writes when handed an `output=`); a polygon aoi= is
+        # masked to shape before the write. Because out_path is touched only by the
+        # final rename, any failure leaves a pre-existing GeoTIFF from a prior run
+        # untouched and never leaves a partial behind — the temp file is the only
+        # thing cleaned up.
         has_mask = getattr(self.space, "geometry", None) is not None
-        preexisting = out_path.exists()
+        tmp_path = out_path.with_name(out_path.name + ".part")
         dataset = None
         result = None
-        write_attempted = False
         try:
             dataset = Dataset.from_wcs(
                 row.endpoint,
@@ -366,26 +369,26 @@ class SoilGrids(AbstractDataSource):
                 timeout=self._timeout,
             )
             result = mask_to_geometry(dataset, self.space) if has_mask else dataset
-            write_attempted = True
-            result.to_file(str(out_path))
-            if result is not dataset:
-                _close_dataset(result)
-            _close_dataset(dataset)
+            result.to_file(str(tmp_path))
         except Exception:
-            # Release the GDAL handles first so the file lock is gone (Windows)
-            # before cleanup, then remove out_path only when this call wrote it —
-            # a partial from a failed to_file, or a brand-new file — never a
-            # pre-existing GeoTIFF from a prior run that a pre-write failure left
-            # untouched, and never let a cleanup error mask the original failure.
+            # Release the GDAL handles first (Windows file lock), then remove only
+            # the temp file — never out_path — and never let a cleanup error mask
+            # the original fetch failure.
             if result is not None and result is not dataset:
                 _close_dataset(result)
             _close_dataset(dataset)
-            if out_path.exists() and (write_attempted or not preexisting):
-                try:
-                    out_path.unlink()
-                except OSError:
-                    pass
+            try:
+                tmp_path.unlink(missing_ok=True)
+            except OSError:
+                pass
             raise
+        # Success: close the handles (outside the try, so a best-effort close can
+        # never alter control flow) to release the temp file's lock, then swap it
+        # onto out_path atomically.
+        if result is not dataset:
+            _close_dataset(result)
+        _close_dataset(dataset)
+        os.replace(tmp_path, out_path)
         return out_path
 
     def download(
