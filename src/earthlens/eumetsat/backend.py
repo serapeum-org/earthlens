@@ -575,23 +575,20 @@ class EUMETSAT(AbstractDataSource):
             quicklook=tailor.quicklook or None,
         )
         product_handle = product.metadata["product"]
-        cust = self._submit_customisation(datatailor, product_handle, chain)
-        # Namespace every output under a per-product subdirectory so two
-        # granules of the same collection (the common multi-granule case)
-        # cannot collide on a shared Data Tailor output basename (H1). The
-        # subdir name is de-duped so an (unlikely) repeated product id does
-        # not reuse a directory (L3).
+        # Choose the per-product output subdir *before* submitting, so nothing
+        # between the submit and the `try/finally` can raise and orphan the
+        # customisation (quota hygiene, G7). Namespacing avoids cross-granule
+        # basename collisions (H1); the name is de-duped against this batch and
+        # against any pre-existing native file of the same basename (L3).
         subdir = self._dedupe_name(
             safe_product_filename(str(product_handle)), used_dirs
         )
-        # A prior native download into the same `path` may have written a file
-        # with this exact basename; bump the subdir name so `mkdir` cannot hit
-        # a file-vs-directory clash (L3).
         while (self.root_dir / subdir).exists() and not (
             self.root_dir / subdir
         ).is_dir():
             subdir = self._dedupe_name(subdir, used_dirs)
         product_dir = self.root_dir / subdir
+        cust = self._submit_customisation(datatailor, product_handle, chain)
         try:
             status = self._poll_customisation(cust)
             if status != "DONE":
