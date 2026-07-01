@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2025,10 +2025,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#output-kind-and-aggregate" class="md-nav__link">
+  <a href="#output-kind-tailor-and-aggregate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Output kind and aggregate=
+        Output kind, tailor=, and aggregate=
       
     </span>
   </a>
@@ -2208,7 +2208,7 @@
   <span class="md-ellipsis">
     
   
-    Data Tailor (deferred)
+    Data Tailor
   
 
     
@@ -10494,6 +10494,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/data_tailor_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EUMETSAT Data Tailor: (config + eligibility, no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
         
   
@@ -16790,10 +16818,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#output-kind-and-aggregate" class="md-nav__link">
+  <a href="#output-kind-tailor-and-aggregate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Output kind and aggregate=
+        Output kind, tailor=, and aggregate=
       
     </span>
   </a>
@@ -16949,9 +16977,9 @@
 <p>Each key is a <strong>curated dataset key</strong> (e.g. <code>"msg-hrseviri"</code>,
 <code>"s3-olci-l2-wfr"</code>; see the <a href="../catalog/">catalog reference</a> for the full
 list). The list holds <strong>selectors</strong> that are <em>informational</em> — EUMETSAT
-delivers whole products, so you cannot band-subset a download without
-Data Tailor. The selectors seed catalog metadata and the future Data
-Tailor request.</p>
+delivers whole products, so you cannot band-subset a native download
+without Data Tailor. The selectors seed catalog metadata; a band subset
+uses the <code>tailor=</code> <code>filter</code> (<a href="../data-tailor/">Data Tailor</a>).</p>
 <p>A request may name several datasets at once, but they must all share one
 <code>output_kind</code> — most datasets are <code>raster</code>, but the point/vector products
 (Atmospheric Motion Vectors, ASCAT winds, the Lightning Imager
@@ -16962,8 +16990,9 @@ event/flash/group products) are <code>vector</code>, so a mixed request is rejec
   the <code>eumdac</code> <code>W,S,E,N</code> comma-string the Data Store's OpenSearch
   endpoint expects.</li>
 <li>The bbox is a <strong>search filter</strong> — it selects which products <em>intersect</em>
-  it. It is <strong>not</strong> a pixel crop; you receive whole products. (Pixel
-  cropping is the deferred <a href="../data-tailor/">Data Tailor</a> path.)</li>
+  it. It is <strong>not</strong> a pixel crop; you receive whole products. For a
+  server-side pixel crop / reproject / reformat, use the <code>tailor=</code> knob
+  (<a href="../data-tailor/">Data Tailor</a>).</li>
 <li><code>start</code> / <code>end</code> are inclusive dates parsed with <code>fmt</code> (default
   <code>"%Y-%m-%d"</code>).</li>
 </ul>
@@ -16997,17 +17026,25 @@ forwarded verbatim to the backend constructor.</p>
 product, written into <code>path</code>. The file name is the product id
 (<code>str(product)</code>). An empty list means the search matched nothing in the
 window.</p>
-<h2 id="output-kind-and-aggregate"><a class="toclink" href="#output-kind-and-aggregate">Output kind and <code>aggregate=</code></a><a class="headerlink" href="#output-kind-and-aggregate" title="Permanent link">#</a></h2>
+<h2 id="output-kind-tailor-and-aggregate"><a class="toclink" href="#output-kind-tailor-and-aggregate">Output kind, <code>tailor=</code>, and <code>aggregate=</code></a><a class="headerlink" href="#output-kind-tailor-and-aggregate" title="Permanent link">#</a></h2>
 <p>The backend sets <code>OUTPUT_KIND</code> from the resolved dataset row (<code>G1</code>).
 Most datasets are <code>"raster"</code>; the Atmospheric Motion Vector, ASCAT wind,
 and Lightning Imager event/flash/group datasets are <code>"vector"</code>.</p>
-<p><code>aggregate=</code> is the server-side subset / reduce path, which on the Data
-Store is <strong>Data Tailor</strong> — not part of the MVP. A non-<code>None</code>
-<code>aggregate=</code> raises <code>NotImplementedError</code> naming Data Tailor:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">some_config</span><span class="p">)</span>   <span class="c1"># NotImplementedError → see data-tailor.md</span>
+<p>Two customisation knobs, doing different things:</p>
+<ul>
+<li><code>tailor=TailorConfig(...)</code> — <strong>spatial</strong>, server-side subset / reproject /
+  reformat via <a href="../data-tailor/">Data Tailor</a>. Returns the customised
+  GeoTIFF / NetCDF paths. Only catalog rows with a <code>tailor_product_type</code>
+  are eligible.</li>
+<li><code>aggregate=</code> — <strong>temporal</strong> reducer, <em>not</em> implemented for EUMETSAT. A
+  non-<code>None</code> <code>aggregate=</code> raises <code>NotImplementedError</code>:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">some_config</span><span class="p">)</span>   <span class="c1"># NotImplementedError (temporal reducer)</span>
 </code></pre></div>
-<p>To aggregate, download the native products and reduce the NetCDF ones
-client-side with <code>pyramids</code> (see the format tags below).</p>
+<p>To reduce a time axis, download the products (optionally with <code>tailor=</code>)
+and reduce the NetCDF ones client-side with <code>pyramids</code> (see the format tags
+below). The two knobs compose: tailor server-side, then aggregate
+client-side.</p>
 <h2 id="product-formats-native-vs-netcdf"><a class="toclink" href="#product-formats-native-vs-netcdf">Product formats — native vs NetCDF</a><a class="headerlink" href="#product-formats-native-vs-netcdf" title="Permanent link">#</a></h2>
 <p>Each catalog row carries a <code>format</code>:</p>
 <ul>
@@ -17100,11 +17137,12 @@ Space. Inspect the value with:</p>
   and window small to limit how many products match.</li>
 <li><strong>Search is lazily paginated</strong> — the backend iterates the
   <code>SearchResults</code>; a huge window can match thousands of products.</li>
-<li><strong>Data Tailor quota</strong> (when that path lands): customisations must be
-  deleted after streaming or the account fills up.</li>
+<li><strong>Data Tailor quota</strong>: <code>tailor=</code> customisations are deleted after
+  streaming (including on failure), but the account quota is limited —
+  see <a href="../data-tailor/">Data Tailor</a>.</li>
 <li><strong>Native reading</strong>: a <code>native</code>-format product is fetched but not yet
-  readable through <code>pyramids</code>; use Data Tailor or satpy externally for
-  now.</li>
+  readable through <code>pyramids</code>; tailor it to GeoTIFF, or use satpy
+  externally for now.</li>
 </ul>
 <h2 id="catalog-tooling"><a class="toclink" href="#catalog-tooling">Catalog tooling</a><a class="headerlink" href="#catalog-tooling" title="Permanent link">#</a></h2>
 <p>Three scripts under <code>tools/eumetsat/</code> keep the catalog honest. They use

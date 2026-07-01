@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://serapeum-org.github.io/earthlens/main/examples/eumetsat/msg_hrseviri_fetch/">
       
       
-        <link rel="prev" href="../output_kinds_and_formats/">
+        <link rel="prev" href="../data_tailor_config/">
       
       
         <link rel="next" href="../sentinel3_olci_ocean_colour/">
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1988,7 +1988,7 @@
   <span class="md-ellipsis">
     
   
-    Data Tailor (deferred)
+    Data Tailor
   
 
     
@@ -10278,6 +10278,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_tailor_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EUMETSAT Data Tailor: (config + eligibility, no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -17426,7 +17454,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7ece4bbb">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=759aab4d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17437,7 +17465,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=47aa913a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e2ff4356">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17448,7 +17476,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=55a23464">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9a11540d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17459,7 +17487,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2f31ffb7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=89ecd631">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17496,7 +17524,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=01e96c2e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=799e1f92">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17507,7 +17535,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ae78739c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=02da6177">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17550,7 +17578,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=08551fdb">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f533889c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17561,7 +17589,7 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=677d90e2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3b3ebb7c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17602,7 +17630,7 @@ except Exception as exc:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=69795e02">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8bc62966">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -17655,7 +17683,7 @@ except Exception as exc:
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../output_kinds_and_formats/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Output kinds &amp;amp; product formats (no network)">
+          <a href="../data_tailor_config/" class="md-footer__link md-footer__link--prev" aria-label="Previous: EUMETSAT Data Tailor: (config + eligibility, no network)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -17665,7 +17693,7 @@ except Exception as exc:
                 Previous
               </span>
               <div class="md-ellipsis">
-                Output kinds &amp; product formats (no network)
+                EUMETSAT Data Tailor: (config + eligibility, no network)
               </div>
             </div>
           </a>

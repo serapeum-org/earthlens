@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1969,10 +1969,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-in-the-mvp-and-whats-deferred" class="md-nav__link">
+  <a href="#capabilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's in the MVP — and what's deferred
+        Capabilities
       
     </span>
   </a>
@@ -2086,7 +2086,7 @@
   <span class="md-ellipsis">
     
   
-    Data Tailor (deferred)
+    Data Tailor
   
 
     
@@ -10372,6 +10372,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/data_tailor_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EUMETSAT Data Tailor: (config + eligibility, no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
         
   
@@ -16640,10 +16668,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-in-the-mvp-and-whats-deferred" class="md-nav__link">
+  <a href="#capabilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's in the MVP — and what's deferred
+        Capabilities
       
     </span>
   </a>
@@ -16775,16 +16803,18 @@ the <code>eumdac</code> import is lazy and only happens when you actually
 authenticate or download.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>eumetsat<span class="o">]</span>
 </code></pre></div>
-<h2 id="whats-in-the-mvp-and-whats-deferred"><a class="toclink" href="#whats-in-the-mvp-and-whats-deferred">What's in the MVP — and what's deferred</a><a class="headerlink" href="#whats-in-the-mvp-and-whats-deferred" title="Permanent link">#</a></h2>
-<p>The MVP <strong>fetches native products</strong>. Two capabilities are deferred
-follow-ons:</p>
+<h2 id="capabilities"><a class="toclink" href="#capabilities">Capabilities</a><a class="headerlink" href="#capabilities" title="Permanent link">#</a></h2>
+<p>The backend <strong>fetches native products</strong> by default, and supports EUMETSAT
+<strong>Data Tailor</strong> for server-side customisation:</p>
 <ul>
-<li><strong>Data Tailor</strong> (server-side subset / reproject / format-convert) — the
-  <code>aggregate=</code> / bbox-crop path. <code>download(aggregate=...)</code> raises
-  <code>NotImplementedError</code> naming it. See <a href="../data-tailor/">Data Tailor</a>.</li>
+<li><strong>Data Tailor</strong> (server-side subset / reproject / reformat) — the
+  <code>tailor=TailorConfig(...)</code> knob. Returns the customised GeoTIFF / NetCDF.
+  See <a href="../data-tailor/">Data Tailor</a>. (<code>aggregate=</code> is the separate,
+  unimplemented <em>temporal</em> reducer and raises <code>NotImplementedError</code>.)</li>
 <li><strong>Native SEVIRI / FCI client-side reading</strong> — needs a satpy reader
-  bridge in <code>pyramids</code>. NetCDF mirror products (Sentinel-3 / -5P / -6,
-  OSI SAF) are readable with <code>pyramids</code> today.</li>
+  bridge in <code>pyramids</code> (a deferred follow-on); tailoring to GeoTIFF
+  sidesteps it. NetCDF mirror products (Sentinel-3 / -5P / -6, OSI SAF)
+  are readable with <code>pyramids</code> today.</li>
 </ul>
 <p>See <a href="../authentication/">Authentication</a>, <a href="../usage/">Usage</a>, and the
 <a href="../catalog/">Catalog &amp; tooling</a> reference for the full picture.</p>

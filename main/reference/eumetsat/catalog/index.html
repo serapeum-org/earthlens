@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2219,7 +2219,7 @@
   <span class="md-ellipsis">
     
   
-    Data Tailor (deferred)
+    Data Tailor
   
 
     
@@ -10505,6 +10505,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../examples/eumetsat/data_tailor_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EUMETSAT Data Tailor: (config + eligibility, no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
         
   
@@ -16961,7 +16989,7 @@ catalogs: <code>datasets</code> (the curated map) + <code>available_datasets</co
 <p>Each row maps a <strong>friendly key</strong> (what you pass in <code>variables=</code>) to the
 real Data Store <code>EO:EUM:DAT:…</code> collection id, plus the group, output
 kind, on-disk format, native selectors, the Data Tailor product type (for
-the deferred server-side path), and the spatial / temporal coverage.</p>
+the <code>tailor=</code> server-side path), and the spatial / temporal coverage.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.eumetsat</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
@@ -18835,13 +18863,13 @@ from the index). <code>--strict</code> exits non-zero on any drift, for CI.</p>
         
         
           
-          <a href="../data-tailor/" class="md-footer__link md-footer__link--next" aria-label="Next: Data Tailor (deferred)">
+          <a href="../data-tailor/" class="md-footer__link md-footer__link--next" aria-label="Next: Data Tailor">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Data Tailor (deferred)
+                Data Tailor
               </div>
             </div>
             <div class="md-footer__button md-icon">
