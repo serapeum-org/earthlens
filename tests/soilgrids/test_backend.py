@@ -170,6 +170,16 @@ def test_all_coverages_failing_raises(
         _backend(tmp_path, ["clay"]).download()
 
 
+def test_partial_write_is_cleaned_up(
+    fake_from_wcs: type[FakeDataset], tmp_path: Path
+) -> None:
+    """A coverage that fails after writing leaves no partial .tif behind."""
+    fake_from_wcs.fail_after_write = {"clay_5-15cm_mean"}
+    paths = _backend(tmp_path, ["clay"]).download()
+    assert len(paths) == len(STD_DEPTHS) - 1
+    assert not (tmp_path / "clay_5-15cm_mean.tif").exists()
+
+
 def test_empty_plan_returns_no_paths(
     fake_from_wcs: type[FakeDataset], monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:

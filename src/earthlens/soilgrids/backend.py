@@ -347,22 +347,29 @@ class SoilGrids(AbstractDataSource):
         # rectangular bbox. Fetch in-memory then mask + write; with no polygon,
         # let from_wcs write the bbox subset straight to disk.
         has_mask = getattr(self.space, "geometry", None) is not None
-        dataset = Dataset.from_wcs(
-            row.endpoint,
-            coverage=product.id,
-            bbox=bbox_from_extent(self.space),
-            crs="EPSG:4326",
-            coverage_crs=self._coverage_crs,
-            output_crs=self._output_crs,
-            resolution=self._resolution,
-            output=None if has_mask else str(out_path),
-            timeout=self._timeout,
-        )
-        if has_mask:
-            masked = mask_to_geometry(dataset, self.space)
-            masked.to_file(str(out_path))
-            _close_dataset(masked)
-        _close_dataset(dataset)
+        try:
+            dataset = Dataset.from_wcs(
+                row.endpoint,
+                coverage=product.id,
+                bbox=bbox_from_extent(self.space),
+                crs="EPSG:4326",
+                coverage_crs=self._coverage_crs,
+                output_crs=self._output_crs,
+                resolution=self._resolution,
+                output=None if has_mask else str(out_path),
+                timeout=self._timeout,
+            )
+            if has_mask:
+                masked = mask_to_geometry(dataset, self.space)
+                masked.to_file(str(out_path))
+                _close_dataset(masked)
+            _close_dataset(dataset)
+        except Exception:
+            # A write that fails mid-way can leave a truncated GeoTIFF behind;
+            # the _api loop skips a failed coverage, so remove any partial file
+            # rather than let it outlive the failed fetch.
+            out_path.unlink(missing_ok=True)
+            raise
         return out_path
 
     def download(

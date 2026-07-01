@@ -21,6 +21,7 @@ class FakeDataset:
     masks: list[Any] = []
     written: list[str] = []
     fail_coverages: set[str] = set()
+    fail_after_write: set[str] = set()
     no_data_value = (-32768.0,)
 
     def __init__(self, coverage: str) -> None:
@@ -41,6 +42,8 @@ class FakeDataset:
         output = kwargs.get("output")
         if output is not None:
             Path(output).write_bytes(b"MM\x00*stub-geotiff")
+        if coverage in cls.fail_after_write:
+            raise RuntimeError(f"faked write failure after output for {coverage}")
         return cls(coverage)
 
     def crop(self, mask: Any = None, touch: bool = True) -> FakeDataset:
@@ -67,6 +70,7 @@ def fake_from_wcs(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
     FakeDataset.masks = []
     FakeDataset.written = []
     FakeDataset.fail_coverages = set()
+    FakeDataset.fail_after_write = set()
     monkeypatch.setattr(Dataset, "from_wcs", FakeDataset.from_wcs)
     return FakeDataset
 
