@@ -717,6 +717,18 @@
          <lastmod>2026-07-01</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/soilgrids/01_soilgrids_quickstart/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/soilgrids/02_catalog_explorer/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/soilgrids/03_depth_profile/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/solar_wind_atlas/01_wind_quickstart/</loc>
          <lastmod>2026-07-01</lastmod>
     </url>
@@ -1458,6 +1470,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/sentinel-hub/usage/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/soilgrids/datasets/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/soilgrids/introduction/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/soilgrids/soilgrids/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/soilgrids/usage/</loc>
          <lastmod>2026-07-01</lastmod>
     </url>
     <url>
