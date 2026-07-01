@@ -98,6 +98,20 @@ class TestGlofasRequest:
         assert request["download_format"] == "unarchived"
         assert request["variable"] == ["river_discharge_in_the_last_24_hours"]
 
+    def test_monthly_glofas_request_is_rejected(self, tmp_path):
+        """Requesting GloFAS monthly raises a clear error (the day selector is required)."""
+        backend = ECMWF(
+            start="2026-07-01",
+            end="2026-07-01",
+            variables={_GLOFAS: [_GLOFAS_CODE]},
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            temporal_resolution="monthly",
+            path=str(tmp_path),
+        )
+        with pytest.raises(ValueError, match="temporal_resolution='daily'"):
+            backend._build_request(Catalog().get_variable(_GLOFAS, _GLOFAS_CODE))
+
 
 class TestGridResolution:
     """`_create_grid` snaps to the request's native resolution."""

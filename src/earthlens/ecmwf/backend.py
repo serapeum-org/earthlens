@@ -1001,6 +1001,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             second positional argument to
             :meth:`cdsapi.Client.retrieve`.
         """
+        if var_info.request_kind == "glofas" and self.temporal_resolution == "monthly":
+            raise ValueError(
+                f"{var_info.cds_dataset!r} (GloFAS) must be requested with "
+                "temporal_resolution='daily': the monthly branch omits the "
+                "'day' selector that the forecast-reference date requires. "
+                "Set temporal_resolution='daily'."
+            )
         dates = self.time.dates
         request: dict[str, Any] = {
             "variable": [var_info.cds_variable],
