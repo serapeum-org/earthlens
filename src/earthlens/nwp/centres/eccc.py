@@ -87,6 +87,8 @@ class ECCCCentre(_NWPCentre):
         params: list[str],
         mirror: str,
         member: str | None = None,
+        *,
+        whole: bool = False,
     ) -> Path:
         """Download the per-`(cycle, step[, member])` GRIB2 for the requested bands.
 
@@ -95,6 +97,10 @@ class ECCCCentre(_NWPCentre):
         not leave a truncated `.grib2` for a later `open_grib` to misread.
         The HTTP body is streamed in 1 MiB chunks straight to disk, so
         a multi-GB GEPS `_allmbrs` file never has to fit in RAM.
+
+        `whole` is accepted for interface parity but ignored — Datamart
+        serves one whole GRIB2 per variable, so there is no byte-range
+        subset for `whole` to override.
 
         Args:
             model: The resolved catalog row.
@@ -110,6 +116,7 @@ class ECCCCentre(_NWPCentre):
                 the control or `"1"` … `"20"` for the perturbations);
                 `None` for the deterministic models. Forwarded into the
                 `url_template` as `{member:03d}` when present.
+            whole: Ignored (see above); accepted for `NWP(mode=)` parity.
 
         Returns:
             pathlib.Path: One local `.grib2` holding every requested

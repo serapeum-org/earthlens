@@ -50,9 +50,9 @@ class _CountingCentre:
         self.save_dir = save_dir
         self.calls = []
 
-    def fetch_one(self, model, cycle, step, params, mirror, member=None):
-        """Record the call and return a fabricated GRIB path."""
-        self.calls.append((cycle, step, tuple(params), mirror, member))
+    def fetch_one(self, model, cycle, step, params, mirror, member=None, *, whole=False):
+        """Record the call (incl. `whole`) and return a fabricated GRIB path."""
+        self.calls.append((cycle, step, tuple(params), mirror, member, whole))
         suffix = f"_m{member}" if member is not None else ""
         return str(
             self.save_dir
@@ -67,11 +67,11 @@ class _FlakyCentre(_CountingCentre):
         super().__init__(save_dir)
         self.fail_step = fail_step
 
-    def fetch_one(self, model, cycle, step, params, mirror, member=None):
+    def fetch_one(self, model, cycle, step, params, mirror, member=None, *, whole=False):
         """Raise for `fail_step`; otherwise behave like the counting centre."""
         if step == self.fail_step:
             raise RuntimeError(f"f{step:03d} not published")
-        return super().fetch_one(model, cycle, step, params, mirror, member)
+        return super().fetch_one(model, cycle, step, params, mirror, member, whole=whole)
 
 
 class TestConstruction:
@@ -104,6 +104,57 @@ class TestConstruction:
             variables={"gfs": ["temperature_2m"], "icon-global": ["temperature_2m"]},
         )
         assert [key for key, _, _ in b._requests] == ["gfs", "icon-global"]
+
+
+class TestMode:
+    """Tests for the mode={subset,whole} download override."""
+
+    def test_default_is_subset(self, mini_catalog, tmp_path):
+        """mode defaults to subset."""
+        assert _make(mini_catalog, tmp_path)._mode == "subset"
+
+    def test_whole_accepted(self, mini_catalog, tmp_path):
+        """mode='whole' is accepted and stashed."""
+        assert _make(mini_catalog, tmp_path, mode="whole")._mode == "whole"
+
+    def test_zarr_rejected_with_reason(self, mini_catalog, tmp_path):
+        """mode='zarr' raises ValueError naming the no-zarr_url reason."""
+        with pytest.raises(ValueError, match="zarr_url"):
+            _make(mini_catalog, tmp_path, mode="zarr")
+
+    def test_unknown_mode_rejected(self, mini_catalog, tmp_path):
+        """An unrecognised mode raises ValueError listing the valid options."""
+        with pytest.raises(ValueError, match="subset.*whole|whole.*subset"):
+            _make(mini_catalog, tmp_path, mode="nope")
+
+    def test_whole_threads_into_fetch_one(self, mini_catalog, tmp_path, fake_pyramids):
+        """mode='whole' passes whole=True into every centre.fetch_one call."""
+        b = _make(mini_catalog, tmp_path, mode="whole")
+        b._centres["herbie"] = _CountingCentre(tmp_path)
+        b._fetch(b._search())
+        assert b._centres["herbie"].calls, "centre was never called"
+        assert all(call[-1] is True for call in b._centres["herbie"].calls)
+
+    def test_subset_threads_false(self, mini_catalog, tmp_path, fake_pyramids):
+        """The default mode passes whole=False into every centre.fetch_one call."""
+        b = _make(mini_catalog, tmp_path)
+        b._centres["herbie"] = _CountingCentre(tmp_path)
+        b._fetch(b._search())
+        assert all(call[-1] is False for call in b._centres["herbie"].calls)
+
+
+def test_no_xarray_or_cfgrib_imports_in_nwp():
+    """No module under src/earthlens/nwp imports the banned xarray / cfgrib."""
+    import pathlib
+
+    root = pathlib.Path(backend_mod.__file__).parent
+    offenders = []
+    for path in root.rglob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        for marker in ("import xarray", "import cfgrib", "from xarray", "from cfgrib"):
+            if marker in text:
+                offenders.append((path.name, marker))
+    assert offenders == [], f"banned imports found: {offenders}"
 
 
 class TestHooks:

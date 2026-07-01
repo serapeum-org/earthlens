@@ -46,11 +46,15 @@ class DWDCentre(_NWPCentre):
         params: list[str],
         mirror: str,
         member: str | None = None,
+        *,
+        whole: bool = False,
     ) -> Path:
         """Download + decompress one `.bz2` per variable into one GRIB2.
 
-        `member` is accepted for interface parity but ignored — the ICON
-        rows here are deterministic (ICON-EPS is a separate model).
+        `member` and `whole` are accepted for interface parity but ignored
+        — the ICON rows here are deterministic (ICON-EPS is a separate
+        model), and DWD already serves one whole `.bz2` per variable, so
+        there is no byte-range subset for `whole` to override.
 
         Args:
             model: The resolved catalog row (carries `url_template` and
@@ -60,6 +64,8 @@ class DWDCentre(_NWPCentre):
             params: The requested earthlens parameter names.
             mirror: Ignored — DWD serves from a single origin host
                 (kept for interface parity with the other centres).
+            member: Ignored (see above).
+            whole: Ignored — already whole-per-variable.
 
         Returns:
             pathlib.Path: One local `.grib2` holding every requested

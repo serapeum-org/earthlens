@@ -77,11 +77,15 @@ class MeteoFranceCentre(_NWPCentre):
         params: list[str],
         mirror: str,
         member: str | None = None,
+        *,
+        whole: bool = False,
     ) -> Path:
         """Download each variable's S3 object into one `.grib2`.
 
-        `member` is accepted for interface parity but ignored (the
-        Météo-France rows here are deterministic).
+        `member` and `whole` are accepted for interface parity but
+        ignored (the Météo-France rows here are deterministic, and each
+        S3 object is a whole per-variable file — no subset for `whole`
+        to override).
 
         Args:
             model: The resolved catalog row (carries `request_options`
@@ -92,6 +96,8 @@ class MeteoFranceCentre(_NWPCentre):
             params: The requested earthlens parameter names.
             mirror: Ignored — the bucket is a single origin (kept for
                 interface parity).
+            member: Ignored (see above).
+            whole: Ignored — already whole-per-variable.
 
         Returns:
             pathlib.Path: One local `.grib2` holding every requested

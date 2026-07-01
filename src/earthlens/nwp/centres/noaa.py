@@ -103,12 +103,17 @@ class NOAACentre(_NWPCentre):
         params: list[str],
         mirror: str,
         member: str | None = None,
+        *,
+        whole: bool = False,
     ) -> Path:
-        """Download the variable-subset GRIB2 for one `(cycle, step[, member])`.
+        """Download the GRIB2 for one `(cycle, step[, member])`.
 
-        Joins the requested params' Herbie `search` regexes with `|`
-        into a single `.idx` selector, runs `Herbie(...).download(...)`,
-        and returns the path Herbie wrote.
+        In the default `subset` path, joins the requested params' Herbie
+        `search` regexes with `|` into a single `.idx` selector, runs
+        `Herbie(...).download(search)`, and returns the path Herbie
+        wrote. When `whole` is set, calls `Herbie(...).download(None)`
+        instead — Herbie's contract for a full-file download (the whole
+        GRIB2 is cropped downstream exactly like a subset).
 
         Args:
             model: The resolved catalog row.
@@ -119,9 +124,13 @@ class NOAACentre(_NWPCentre):
             member: Ensemble member id (e.g. GEFS `"mean"` or `"5"`),
                 forwarded to Herbie's `member=` — numeric ids become an
                 `int`. `None` for a deterministic model.
+            whole: When `True`, download the full file (no `.idx`
+                byte-range subset) via `download(None)`; when `False`
+                (default), subset to the requested bands.
 
         Returns:
-            pathlib.Path: The local variable-subset GRIB2 file.
+            pathlib.Path: The local GRIB2 file — a variable subset by
+                default, or the full field when `whole` is set.
         """
         herbie_cls = _import_herbie()
         search = "|".join(model.bands[p] for p in params)
@@ -141,4 +150,5 @@ class NOAACentre(_NWPCentre):
         # row can override a default if it ever needs to.
         kwargs.update(model.request_options)
         handle = herbie_cls(cycle, **kwargs)
-        return Path(handle.download(search))
+        # `search=None` is Herbie's full-file download; a regex subsets via .idx.
+        return Path(handle.download(None if whole else search))
