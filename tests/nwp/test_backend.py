@@ -106,6 +106,57 @@ class TestConstruction:
         assert [key for key, _, _ in b._requests] == ["gfs", "icon-global"]
 
 
+class TestMode:
+    """Tests for the mode={subset,whole} download override."""
+
+    def test_default_is_subset(self, mini_catalog, tmp_path):
+        """mode defaults to subset."""
+        assert _make(mini_catalog, tmp_path)._mode == "subset"
+
+    def test_whole_accepted(self, mini_catalog, tmp_path):
+        """mode='whole' is accepted and stashed."""
+        assert _make(mini_catalog, tmp_path, mode="whole")._mode == "whole"
+
+    def test_zarr_rejected_with_reason(self, mini_catalog, tmp_path):
+        """mode='zarr' raises ValueError naming the no-zarr_url reason."""
+        with pytest.raises(ValueError, match="zarr_url"):
+            _make(mini_catalog, tmp_path, mode="zarr")
+
+    def test_unknown_mode_rejected(self, mini_catalog, tmp_path):
+        """An unrecognised mode raises ValueError listing the valid options."""
+        with pytest.raises(ValueError, match="subset.*whole|whole.*subset"):
+            _make(mini_catalog, tmp_path, mode="nope")
+
+    def test_whole_threads_into_fetch_one(self, mini_catalog, tmp_path, fake_pyramids):
+        """mode='whole' passes whole=True into every centre.fetch_one call."""
+        b = _make(mini_catalog, tmp_path, mode="whole")
+        b._centres["herbie"] = _CountingCentre(tmp_path)
+        b._fetch(b._search())
+        assert b._centres["herbie"].calls, "centre was never called"
+        assert all(call[-1] is True for call in b._centres["herbie"].calls)
+
+    def test_subset_threads_false(self, mini_catalog, tmp_path, fake_pyramids):
+        """The default mode passes whole=False into every centre.fetch_one call."""
+        b = _make(mini_catalog, tmp_path)
+        b._centres["herbie"] = _CountingCentre(tmp_path)
+        b._fetch(b._search())
+        assert all(call[-1] is False for call in b._centres["herbie"].calls)
+
+
+def test_no_xarray_or_cfgrib_imports_in_nwp():
+    """No module under src/earthlens/nwp imports the banned xarray / cfgrib."""
+    import pathlib
+
+    root = pathlib.Path(backend_mod.__file__).parent
+    offenders = []
+    for path in root.rglob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        for marker in ("import xarray", "import cfgrib", "from xarray", "from cfgrib"):
+            if marker in text:
+                offenders.append((path.name, marker))
+    assert offenders == [], f"banned imports found: {offenders}"
+
+
 class TestHooks:
     """Tests for _initialize, _create_grid, and _check_input_dates."""
 

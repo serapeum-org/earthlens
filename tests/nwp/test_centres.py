@@ -109,6 +109,30 @@ class TestNOAACentre:
         assert "product" not in handle.kwargs
         assert str(out).endswith("subset_gfs_f6.grib2")
 
+    def test_fetch_one_whole_downloads_full_file(self, fake_herbie, tmp_path):
+        """whole=True calls Herbie's download with no search selector (full file)."""
+        NOAACentre(tmp_path).fetch_one(
+            _gfs(),
+            dt.datetime(2024, 6, 1, 0),
+            6,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
+            whole=True,
+        )
+        # download(None) is Herbie's full-file contract; the .idx search is dropped.
+        assert fake_herbie.instances[-1].download_calls == [None]
+
+    def test_fetch_one_subset_is_default_and_unchanged(self, fake_herbie, tmp_path):
+        """whole defaults to False and the subset call passes the .idx search (regression)."""
+        NOAACentre(tmp_path).fetch_one(
+            _gfs(),
+            dt.datetime(2024, 6, 1, 0),
+            6,
+            ["temperature_2m"],
+            "auto",
+        )
+        assert fake_herbie.instances[-1].download_calls == [":TMP:2 m above ground:"]
+
     def test_fetch_one_passes_product_when_set(self, fake_herbie, tmp_path):
         """A model with a product (HRRR) forwards product= to Herbie."""
         NOAACentre(tmp_path).fetch_one(
@@ -299,6 +323,17 @@ class TestECMWFCentre:
         assert call["date"] == "2024-06-01"
         assert "stream" not in call
         assert out.exists() and out.name == "ifs_2024060112_f024.grib2"
+
+    def test_whole_is_a_noop(self, fake_ecmwf_client, tmp_path):
+        """whole=True retrieves identically to whole=False (param-addressed, no subset)."""
+        args = (self._ifs(), dt.datetime(2024, 6, 1, 12), 24, ["temperature_2m"], "aws")
+        ECMWFCentre(tmp_path).fetch_one(*args)
+        subset_call = dict(fake_ecmwf_client.instances[-1].retrieve_calls[-1])
+        ECMWFCentre(tmp_path).fetch_one(*args, whole=True)
+        whole_call = dict(fake_ecmwf_client.instances[-1].retrieve_calls[-1])
+        subset_call.pop("target", None)
+        whole_call.pop("target", None)
+        assert whole_call == subset_call
 
     def test_fetch_one_perturbed_member_sets_pf_and_number(
         self, fake_ecmwf_client, tmp_path
