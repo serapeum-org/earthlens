@@ -217,8 +217,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     `"monthly"`. `_check_input_dates` raises `ValueError` for
     anything else; that is the authoritative gate. Spatial cell
     size lives on :attr:`SpatialExtent.resolution` (populated by
-    :meth:`_create_grid`) and is sourced from
-    :data:`ERA5_GRID_DEGREES`.
+    :meth:`_create_grid`) and is the request's native grid spacing —
+    :data:`ERA5_GRID_DEGREES` (0.125°) for regular CDS datasets, or a
+    dataset's own `grid_resolution` (e.g. GloFAS's 0.05° on EWDS).
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -484,6 +485,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         default is used — so regular CDS datasets keep their historic 0.125°
         snap while an EWDS dataset like GloFAS snaps to its native 0.05°.
 
+        Mixing datasets of differing native resolution in one request is
+        best-effort: the single instance-level bbox is snapped to the finest
+        grid, so a coarser dataset's `area` may not sit exactly on its own cell
+        edges (the server re-snaps to the delivered grid regardless). Split
+        datasets of differing native resolution into separate calls if exact
+        per-dataset bbox alignment matters.
+
         Returns:
             float: The grid spacing in degrees to snap the bbox to.
         """
@@ -518,8 +526,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             lon_lim: `[lon_min, lon_max]` in degrees east.
 
         Returns:
-            SpatialExtent: Grid-aligned bounding box with
-            `resolution` set to :data:`ERA5_GRID_DEGREES`.
+            SpatialExtent: Grid-aligned bounding box with `resolution` set to
+            the request's native grid spacing (see
+            :meth:`_grid_resolution_for_request`) — the ERA5 default or a
+            dataset's `grid_resolution`.
 
         Examples:
             - Snap a 1° box to the ERA5 grid:
