@@ -53,6 +53,10 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # because the aggregate is over the window indicated by
     # `time_aggregation`.
     "carra_means": ("time",),
+    # GloFAS (EWDS): the forecast horizon is selected by `leadtime_hour`
+    # (carried in `extras`), not a time-of-day; the dataset rejects the
+    # four 6-hourly `time` slots the daily template adds, so drop `time`.
+    "glofas": ("time",),
 }
 
 
@@ -436,13 +440,45 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             self._clients[endpoint] = self._open_client(endpoint)
         return self._clients[endpoint]
 
-    def _create_grid(self, lat_lim: list, lon_lim: list):
-        """Snap a lat/lon bounding box to ERA5 grid edges.
+    def _grid_resolution_for_request(self) -> float:
+        """Resolve the grid spacing to snap the bbox to for this request.
 
-        Floors the south/west limits and ceils the north/east limits to
-        the nearest multiple of :data:`ERA5_GRID_DEGREES` (0.125°), so
-        every CDS retrieve aligns with the ERA5 native grid and no
-        cell straddles the requested area boundary.
+        Reads the requested datasets from `self.vars` and returns the finest
+        (smallest) `grid_resolution` declared among them in the catalog,
+        falling back to :data:`ERA5_GRID_DEGREES` for any dataset that declares
+        none. When `self.vars` is absent (e.g. an instance built via
+        `ECMWF.__new__` in a doctest) or the catalog lookup fails, the ERA5
+        default is used — so regular CDS datasets keep their historic 0.125°
+        snap while an EWDS dataset like GloFAS snaps to its native 0.05°.
+
+        Returns:
+            float: The grid spacing in degrees to snap the bbox to.
+        """
+        variables = getattr(self, "vars", None)
+        if not variables:
+            return ERA5_GRID_DEGREES
+        try:
+            catalog = Catalog()
+        except Exception:  # noqa: BLE001 - a bad catalog must not break grid snapping
+            return ERA5_GRID_DEGREES
+        resolutions: list[float] = []
+        for dataset_name in variables:
+            dataset = catalog.datasets.get(dataset_name)
+            if dataset is not None and dataset.grid_resolution is not None:
+                resolutions.append(dataset.grid_resolution)
+        resolutions.append(ERA5_GRID_DEGREES)
+        return min(resolutions)
+
+    def _create_grid(self, lat_lim: list, lon_lim: list):
+        """Snap a lat/lon bounding box to the request's native grid edges.
+
+        Floors the south/west limits and ceils the north/east limits to the
+        nearest multiple of the request's grid spacing (see
+        :meth:`_grid_resolution_for_request`) — :data:`ERA5_GRID_DEGREES`
+        (0.125°) for regular CDS datasets, or a dataset's own
+        `grid_resolution` (e.g. GloFAS's 0.05° on EWDS) — so every retrieve
+        aligns with the native grid and no cell straddles the requested area
+        boundary.
 
         Args:
             lat_lim: `[lat_min, lat_max]` in degrees north.
@@ -476,7 +512,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
                 ```
         """
-        cell_size = ERA5_GRID_DEGREES
+        cell_size = self._grid_resolution_for_request()
         lat_lim_floor = np.floor(lat_lim[0] / cell_size) * cell_size
         lat_lim_ceil = np.ceil(lat_lim[1] / cell_size) * cell_size
         lat_lim = [lat_lim_floor, lat_lim_ceil]

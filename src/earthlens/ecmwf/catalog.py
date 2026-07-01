@@ -210,6 +210,8 @@ def _provider_for_dataset(ds_name: str) -> str:
         return "cmip5-modelling-centres"
     if ds_name.startswith("projections-cordex"):
         return "cordex-consortium"
+    if ds_name.startswith(("cems-", "efas-")):
+        return "copernicus-cems"
     return "ecmwf"
 
 

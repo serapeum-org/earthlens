@@ -1,0 +1,57 @@
+# CEMS Early Warning Data Store (EWDS) datasets for the ECMWF backend.
+#
+# Reached via the EWDS endpoint (`endpoint: ewds`) with the shared CDS
+# Personal Access Token (the same token authenticates against CDS / ADS /
+# EWDS; only the URL differs). See `earthlens.ecmwf.endpoints`.
+#
+# GloFAS (Global Flood Awareness System) river-discharge forecasts sit on a
+# regular 0.05-degree WGS84 lat/lon grid (`grid_resolution: 0.05`) and are
+# delivered as NetCDF, so the shipped NetCDF pipeline handles them unchanged.
+# GloFAS selects the forecast horizon with `leadtime_hour` (in `extras`) rather
+# than a time-of-day, so the row uses `request_kind: glofas`, which drops the
+# four 6-hourly `time` slots the daily template adds.
+#
+# Verified live 2026-07-01 (real retrieve + grid inspection); see
+# `planning/ecmwf/captures/ecmwf-ewds-facts.md`. GloFAS must be requested with
+# `temporal_resolution="daily"` (the forecast-reference date is a day, and the
+# monthly branch would drop the required `day` selector).
+
+# Informational: every EWDS collection (verified live 2026-07-01). Only the
+# curated entries under `datasets:` below are wired for download; the rest are
+# documented follow-ups (see planning/ecmwf/ewds-completion.md open gaps):
+#   - cems-glofas-reforecast / cems-glofas-historical use hyear/hmonth/hday date
+#     keys (need a date-key remap before they fit the request builder);
+#   - cems-glofas-seasonal is monthly + leadtime (year/month, no day);
+#   - cems-fire-historical-v1 / cems-fire-seasonal need their valid
+#     product_type / dataset_type / system_version combos pinned;
+#   - the efas-* collections are the EFAS archive (public, licence-gated).
+available_datasets:
+- cems-glofas-forecast
+- cems-glofas-reforecast
+- cems-glofas-seasonal
+- cems-glofas-seasonal-reforecast
+- cems-glofas-historical
+- cems-fire-historical-v1
+- cems-fire-seasonal
+- efas-forecast
+- efas-historical
+- efas-reforecast
+- efas-seasonal
+- efas-seasonal-reforecast
+
+datasets:
+  cems-glofas-forecast:
+    endpoint: ewds
+    grid_resolution: 0.05
+    request_kind: glofas
+    product_type: [control_forecast]
+    extras:
+      system_version: [operational]
+      hydrological_model: [lisflood]
+      leadtime_hour: ["24"]
+      download_format: unarchived
+    variables:
+      river-discharge-in-the-last-24-hours:
+        cds_variable: river_discharge_in_the_last_24_hours
+        nc_variable: dis24
+        units: m3 s-1
