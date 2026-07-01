@@ -253,10 +253,6 @@
          <lastmod>2026-07-01</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/data_tailor_config/</loc>
-         <lastmod>2026-07-01</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/eumetsat/metop_ascat_soil_moisture/</loc>
          <lastmod>2026-07-01</lastmod>
     </url>
@@ -714,6 +710,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcase/wildfire_smoke_air_quality/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/soilgrids/01_soilgrids_quickstart/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/soilgrids/02_catalog_explorer/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/soilgrids/03_depth_profile/</loc>
          <lastmod>2026-07-01</lastmod>
     </url>
     <url>
@@ -1458,6 +1466,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/sentinel-hub/usage/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/soilgrids/datasets/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/soilgrids/introduction/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/soilgrids/soilgrids/</loc>
+         <lastmod>2026-07-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/soilgrids/usage/</loc>
          <lastmod>2026-07-01</lastmod>
     </url>
     <url>
