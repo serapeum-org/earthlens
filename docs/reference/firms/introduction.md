@@ -45,7 +45,7 @@ with pyramids, …).
 
 ## Why it matters here
 
-The raster backends (ERA5 / CAMS via CDS, MODIS/VIIRS imagery and the
+The raster backends (ERA5 via CDS, MODIS/VIIRS imagery and the
 burned-area products via Google Earth Engine) give you gridded fields
 with full spatial coverage. FIRMS is the complementary **event feed**:
 sparse but direct per-pixel fire detections, refreshed within hours.
