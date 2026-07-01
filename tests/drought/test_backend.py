@@ -1,9 +1,9 @@
-"""Backend tests for `earthlens.drought.Drought` (USDM + SPEIbase routes).
+"""Backend tests for `earthlens.drought.Drought` (all three routes).
 
-The EDO/GDO `edo-wcs` route waits on the cross-repo `PY-A` pyramids
-temporal `read_wcs` extension and is exercised here only for the
-`NotImplementedError` boundary. Once `PY-A` ships, a real EDO test lands
-alongside the USDM/SPEIbase ones.
+Covers the USDM GeoJSON, Copernicus EDO/GDO `GetCoverage`, and SPEIbase
+NetCDF transports. The EDO/GDO route is exercised end-to-end at the HTTP
+boundary — `GetCoverage` URL rendering, a mocked fetch writing one TIFF per
+period, the single `map=DO_WCS` request, and Copernicus error surfacing.
 
 All transports are mocked at the HTTP / pyramids boundary so the suite is
 network-free.
@@ -12,6 +12,7 @@ network-free.
 from __future__ import annotations
 
 import datetime as dt
+import re
 from pathlib import Path
 from typing import Any
 
@@ -575,11 +576,16 @@ def test_raster_aggregate_rejected_until_reducer_lands(tmp_path):
 class _FakeSubset:
     """Stand-in for `pyramids.dataset.Dataset` returned by `nc.subset`."""
 
+    closed: list[Path] = []
+
     def __init__(self, target: Path):
         self._target = target
 
     def to_file(self, path: str) -> None:
         Path(path).write_bytes(b"FAKE-GTIFF-" + str(self._target).encode())
+
+    def close(self) -> None:
+        _FakeSubset.closed.append(self._target)
 
 
 class _FakeNetCDF:
@@ -637,8 +643,10 @@ def fake_netcdf(monkeypatch):
     )
     saved_n_time = _FakeNetCDF.n_time
     _FakeNetCDF.calls.clear()
+    _FakeSubset.closed.clear()
     yield _FakeNetCDF
     _FakeNetCDF.calls.clear()
+    _FakeSubset.closed.clear()
     _FakeNetCDF.n_time = saved_n_time
 
 
@@ -671,6 +679,8 @@ def test_speibase_fetch_writes_one_tif_per_month(monkeypatch, tmp_path, fake_net
     assert calls[0]["variable"] == "spei"
     assert calls[0]["bbox"] == (-95.0, 30.0, -85.0, 40.0)
     assert calls[0]["crs"] == 4326
+    # Each per-period subset Dataset is closed after it is written.
+    assert len(_FakeSubset.closed) == 2
 
 
 def test_speibase_reuses_cached_nc(monkeypatch, tmp_path, fake_netcdf):
@@ -781,9 +791,7 @@ def test_speibase_rejects_period_past_time_axis(monkeypatch, tmp_path, fake_netc
         backend.download(progress_bar=False)
 
 
-import re as _re
-
-_LEAK_PATTERN = _re.compile(r"\b(?:owslib|xarray)\b")
+_LEAK_PATTERN = re.compile(r"\b(?:owslib|xarray)\b")
 
 
 def _scan_for_leaky_imports(src_dir: Path) -> list[tuple[Path, str]]:
