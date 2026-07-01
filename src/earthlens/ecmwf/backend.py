@@ -427,7 +427,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Overrides :class:`~earthlens.base.LazyClientMixin` so that reading
         `self.client` (e.g. via `authenticate()`) routes through the same
         per-endpoint cache as a retrieve, rather than seeding a shared slot that
-        would then be returned for every endpoint. Resolves the `"cds"` client.
+        would then be returned for every endpoint. Resolves the `"cds"` client;
+        `authenticate()` therefore warms the CDS endpoint, while a non-CDS
+        endpoint (e.g. EWDS for GloFAS) is built lazily on its first retrieve.
 
         Returns:
             cdsapi.Client: The CDS client (built on first use, then cached).
@@ -436,9 +438,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
     @client.setter
     def client(self, value) -> None:
-        """Inject a client used for every endpoint (tests and manual overrides).
+        """Bind a client used for every endpoint (a deliberate override).
 
-        A client set here is a deliberate override and is returned by
+        A client set here overrides endpoint routing and is returned by
         :meth:`_client_for` for all endpoints — unlike a lazily-built endpoint
         client, which is cached per endpoint and never treated as injected.
 
@@ -450,13 +452,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     def _client_for(self, endpoint: str):
         """Return the cdsapi client for `endpoint`, honouring an injected one.
 
-        An **explicitly injected** client (set via the `client` setter — tests
-        and manual overrides) is returned for every endpoint. Otherwise a client
-        is built once per endpoint and cached on `self._clients` so repeated
-        retrieves against the same CADS instance reuse the connection. A
-        lazily-built endpoint client is never mistaken for an injected one, so
-        reading `self.client` (which resolves `"cds"`) cannot poison routing to
-        another endpoint.
+        An **explicitly bound** client (set via the `client` setter) is returned
+        for every endpoint. Otherwise a client is built once per endpoint and
+        cached on `self._clients` so repeated retrieves against the same CADS
+        instance reuse the connection. A lazily-built endpoint client is never
+        mistaken for a bound one, so reading `self.client` (which resolves
+        `"cds"`) cannot poison routing to another endpoint.
 
         Args:
             endpoint: CADS instance slug (`"cds"` / `"ads"` / `"ewds"`).
@@ -477,10 +478,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Reads the requested datasets from `self.vars` and returns the finest
         (smallest) `grid_resolution` declared among them in the catalog,
         falling back to :data:`ERA5_GRID_DEGREES` for any dataset that declares
-        none. When `self.vars` is absent (e.g. an instance built via
-        `ECMWF.__new__` in a doctest) or the catalog lookup fails, the ERA5
-        default is used — so regular CDS datasets keep their historic 0.125°
-        snap while an EWDS dataset like GloFAS snaps to its native 0.05°.
+        none. When `self.vars` is absent (a bare instance with no requested
+        datasets) or the catalog lookup fails, the ERA5 default is used — so
+        regular CDS datasets keep their historic 0.125° snap while an EWDS
+        dataset like GloFAS snaps to its native 0.05°.
 
         Mixing datasets of differing native resolution in one request is
         best-effort: the single instance-level bbox is snapped to the finest
