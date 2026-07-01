@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -17134,7 +17134,7 @@ time-window reducer has no meaning on point detections. Post-process the
 returned <code>GeoDataFrame</code> directly instead (count per day, sum FRP, rasterise
 with pyramids, …).</p>
 <h2 id="why-it-matters-here"><a class="toclink" href="#why-it-matters-here">Why it matters here</a><a class="headerlink" href="#why-it-matters-here" title="Permanent link">#</a></h2>
-<p>The raster backends (ERA5 / CAMS via CDS, MODIS/VIIRS imagery and the
+<p>The raster backends (ERA5 via CDS, MODIS/VIIRS imagery and the
 burned-area products via Google Earth Engine) give you gridded fields
 with full spatial coverage. FIRMS is the complementary <strong>event feed</strong>:
 sparse but direct per-pixel fire detections, refreshed within hours.
