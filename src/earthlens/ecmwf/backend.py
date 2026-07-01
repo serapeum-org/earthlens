@@ -25,6 +25,11 @@ from earthlens.base import (
 )
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
+from earthlens.ecmwf.endpoints import ENDPOINTS as _ENDPOINTS
+from earthlens.ecmwf.endpoints import open_client as _open_endpoint_client
+
+# endpoint slug -> default URL, for building dataset / profile page links.
+_ENDPOINT_URLS: dict[str, str] = {slug: url for slug, (url, _u, _k) in _ENDPOINTS.items()}
 
 __all__ = ["AuthenticationError", "ECMWF", "ERA5_GRID_DEGREES"]
 
@@ -263,6 +268,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 dataset, or when running offline. Defaults to `False`.
         """
         self.skip_constraints = skip_constraints
+        # Per-endpoint cdsapi client cache (cds / ads / ewds). Populated
+        # lazily by `_client_for` so a multi-endpoint download reuses one
+        # connection per CADS instance.
+        self._clients: dict[str, Any] = {}
         super().__init__(
             start=start,
             end=end,
@@ -337,25 +346,29 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         """
         return None
 
-    def _open_client(self):
-        """Construct the :class:`cdsapi.Client` for talking to CDS.
+    def _open_client(self, endpoint: str = "cds"):
+        """Construct a :class:`cdsapi.Client` for the named CADS endpoint.
 
-        Reads credentials from `~/.cdsapirc` (or the `CDSAPI_URL` /
-        `CDSAPI_KEY` environment variables, which cdsapi falls back to
-        when the dotfile is absent). If neither is configured, the
-        underlying cdsapi exception is wrapped in
-        :class:`AuthenticationError` with a message that tells the user
-        exactly where to put their Personal Access Token. Called lazily
-        by :attr:`~earthlens.base.LazyClientMixin.client` on first use.
+        Delegates to :func:`earthlens.ecmwf.endpoints.open_client`, which maps
+        the endpoint slug (`"cds"` / `"ads"` / `"ewds"`) to its URL and resolves
+        the token (the endpoint's own `<ENDPOINT>_KEY`, else the shared CDS
+        Personal Access Token from `CDSAPI_KEY` / `~/.cdsapirc`). Missing-CDS-
+        credential errors are re-raised as :class:`AuthenticationError` with a
+        message telling the user where to put their token. Called via
+        :meth:`_client_for` (and, for the default endpoint, by the
+        :class:`~earthlens.base.LazyClientMixin` `client` property).
+
+        Args:
+            endpoint: CADS instance slug. Defaults to `"cds"`.
 
         Returns:
-            cdsapi.Client: Authenticated CDS client. Calls to
+            cdsapi.Client: Authenticated client for `endpoint`. Calls to
             `client.retrieve(...)` use this connection.
 
         Raises:
-            AuthenticationError: If cdsapi cannot construct a Client —
-                typically because `~/.cdsapirc` is missing,
-                malformed, or contains an old-API-style `email` line.
+            AuthenticationError: If cdsapi cannot authenticate — typically
+                because `~/.cdsapirc` is missing, malformed, or contains an
+                old-API-style `email` line.
 
         Examples:
             - Construct a client when credentials are properly
@@ -378,10 +391,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ```
         """
         try:
-            client = cdsapi.Client()
+            client = _open_endpoint_client(endpoint)
         except (
             Exception
         ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as AuthenticationError
+            if isinstance(exc, AuthenticationError):
+                raise
             if _looks_like_missing_credentials(exc):
                 raise AuthenticationError(
                     "cdsapi could not authenticate against the Climate "
@@ -398,6 +413,28 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             raise
 
         return client
+
+    def _client_for(self, endpoint: str):
+        """Return the cdsapi client for `endpoint`, honouring an injected one.
+
+        If a client was injected via the `client` setter (tests and manual
+        overrides seed `_client_obj`), that single client is returned for every
+        endpoint. Otherwise a client is built once per endpoint and cached on
+        `self._clients` so repeated retrieves against the same CADS instance
+        reuse the connection.
+
+        Args:
+            endpoint: CADS instance slug (`"cds"` / `"ads"` / `"ewds"`).
+
+        Returns:
+            cdsapi.Client: The client to use for a retrieve against `endpoint`.
+        """
+        injected = self.__dict__.get("_client_obj")
+        if injected is not None:
+            return injected
+        if endpoint not in self._clients:
+            self._clients[endpoint] = self._open_client(endpoint)
+        return self._clients[endpoint]
 
     def _create_grid(self, lat_lim: list, lon_lim: list):
         """Snap a lat/lon bounding box to ERA5 grid edges.
@@ -779,20 +816,26 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         RequestValidator(dataset, request, skip=self.skip_constraints).check()
 
         target = self.root_dir / f"{var_info.cds_variable}_{dataset}.nc"
-        logger.info(f"Requesting {dataset} from CDS; this may take several minutes")
+        client = self._client_for(var_info.endpoint)
+        logger.info(
+            f"Requesting {dataset} from {var_info.endpoint.upper()}; "
+            "this may take several minutes"
+        )
         try:
-            self.client.retrieve(dataset, request, str(target))
+            client.retrieve(dataset, request, str(target))
         except (
             Exception
         ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
             if _looks_like_licence_not_accepted(exc):
+                base = _ENDPOINT_URLS.get(
+                    var_info.endpoint, "https://cds.climate.copernicus.eu/api"
+                ).rsplit("/api", 1)[0]
                 raise PermissionError(
-                    f"CDS rejected the request for {dataset!r}: licence "
-                    "not accepted. Open the dataset page at "
-                    f"https://cds.climate.copernicus.eu/datasets/{dataset} "
-                    "and tick the licence at the bottom of the "
-                    "'Download' tab. The acceptance is permanent and "
-                    "tied to your CDS account."
+                    f"{var_info.endpoint.upper()} rejected the request for "
+                    f"{dataset!r}: licence not accepted. Open the dataset page "
+                    f"at {base}/datasets/{dataset} and tick the licence at the "
+                    "bottom of the 'Download' tab. The acceptance is permanent "
+                    "and tied to your Copernicus account."
                 ) from exc
             raise
         _unwrap_zipped_netcdf(target)
