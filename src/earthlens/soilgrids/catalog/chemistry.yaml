@@ -1,0 +1,34 @@
+# SoilGrids curated catalog — soil-chemistry slice.
+#
+# One slice of the per-group split of the SoilGrids catalog (see texture.yaml
+# for the loader / scaled-integer convention). Values are stored as scaled
+# integers: divide by `scale_factor` to convert `mapped_units` to `unit`.
+
+datasets:
+
+  phh2o:
+    endpoint: "https://maps.isric.org/mapserv?map=/map/phh2o.map"
+    title: "Soil pH in H2O"
+    depths: ["0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm"]
+    quantiles: ["Q0.05", "Q0.5", "Q0.95", "mean", "uncertainty"]
+    unit: "pH"
+    mapped_units: "pH*10"
+    scale_factor: 10.0
+
+  cec:
+    endpoint: "https://maps.isric.org/mapserv?map=/map/cec.map"
+    title: "Cation exchange capacity of the soil at pH 7"
+    depths: ["0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm"]
+    quantiles: ["Q0.05", "Q0.5", "Q0.95", "mean", "uncertainty"]
+    unit: "cmol(c)/kg"
+    mapped_units: "mmol(c)/kg"
+    scale_factor: 10.0
+
+  nitrogen:
+    endpoint: "https://maps.isric.org/mapserv?map=/map/nitrogen.map"
+    title: "Total nitrogen (N)"
+    depths: ["0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm"]
+    quantiles: ["Q0.05", "Q0.5", "Q0.95", "mean", "uncertainty"]
+    unit: "g/kg"
+    mapped_units: "cg/kg"
+    scale_factor: 100.0

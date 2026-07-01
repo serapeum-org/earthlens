@@ -298,20 +298,23 @@ class EarthLens:
              'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
              'climate_indices', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
-             'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo', 'erddap',
-             'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal', 'gbif', 'gdacs',
-             'gdo', 'gebco', 'gee', 'geoboundaries', 'gfw', 'ghs', 'ghsl',
-             'glaciers', 'glims', 'global-forest-watch', 'global-solar-atlas',
-             'global-wind-atlas', 'google-earth-engine', 'gsa', 'gwa', 'hdx',
-             'human-settlement', 'inform', 'insar', 'ioos', 'iucn', 'jaxa',
-             'jaxa-earth', 'landsat', 'national-water-model', 'natural-earth',
-             'nexrad', 'nrel', 'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'ohsome',
-             'openaq', 'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
+             'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo',
+             'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal',
+             'gbif', 'gdacs', 'gdo', 'gebco', 'gee', 'geoboundaries',
+             'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
+             'global-forest-watch', 'global-solar-atlas',
+             'global-wind-atlas', 'google-earth-engine', 'gsa', 'gwa',
+             'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
+             'isric', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
+             'national-water-model', 'natural-earth', 'nexrad', 'nrel',
+             'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'ohsome', 'openaq',
+             'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
              'planetary-computer', 'protected-planet', 'pvgis', 'radar',
-             'redlist', 'rgi', 'risk-indicators', 'sentinel-hub', 'sentinelhub',
-             'solar-pv', 'solar-wind-atlas', 'stac', 'teleconnections',
-             'thinkhazard', 'tiger', 'tropycal', 'usdm', 'usgs-landsat',
-             'usgs-nwis', 'usgs-water', 'veda', 'wdpa', 'wgms',
+             'redlist', 'rgi', 'risk-indicators', 'sentinel-hub',
+             'sentinelhub', 'soilgrids', 'solar-pv', 'solar-wind-atlas',
+             'stac', 'teleconnections', 'thinkhazard', 'tiger',
+             'tropycal', 'usdm', 'usgs-landsat', 'usgs-nwis',
+             'usgs-water', 'veda', 'wdpa', 'wgms',
              'wind-toolkit', 'world-pop', 'worldpop']
 
             ```
@@ -754,6 +757,14 @@ class EarthLens:
             "geoboundaries": ("earthlens.admin", "AdminBoundaries", "", {}),
             "natural-earth": ("earthlens.admin", "AdminBoundaries", "", {}),
             "tiger": ("earthlens.admin", "AdminBoundaries", "", {}),
+            # ISRIC SoilGrids 2.0 — global 250 m soil properties (clay, sand,
+            # silt, cfvo, phh2o, cec, nitrogen, soc, ocd, ocs, bdod) subset
+            # server-side over OGC WCS at maps.isric.org and written as GeoTIFF
+            # (OUTPUT_KIND="raster"; aggregate= rejected — static, no time axis).
+            # No extra SDK — the WCS transport is pyramids' Dataset.from_wcs;
+            # open, CC-BY 4.0, no auth. Alias "isric".
+            "soilgrids": ("earthlens.soilgrids", "SoilGrids", "", {}),
+            "isric": ("earthlens.soilgrids", "SoilGrids", "", {}),
             # Drought-indicator backend over three live public services:
             # USDM (vector GeoJSON polygon classes), Copernicus EDO/GDO (raster
             # via the Copernicus drought GetCoverage REST endpoint —
