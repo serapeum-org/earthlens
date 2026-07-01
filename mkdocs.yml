@@ -348,6 +348,7 @@ nav:
     - Drought indicators (USDM / EDO / GDO / SPEIbase):
       - Catalog explorer (no network): examples/drought/catalog_explorer.ipynb
       - Quickstart — USDM week (live): examples/drought/quickstart.ipynb
+      - EDO/GDO raster indicators (live): examples/drought/edo_gdo_raster.ipynb
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Catalog explorer (no network): examples/chc/catalog_explorer.ipynb
       - Daily rainfall quickstart (live): examples/chc/quickstart.ipynb
