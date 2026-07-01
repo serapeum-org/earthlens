@@ -67,6 +67,16 @@ Metop ASCAT / IASI / AVHRR / GOME-2, Sentinel-3 OLCI / SLSTR / SRAL,
 Sentinel-6, OSI SAF SST, …). Notably **Sentinel-5P TROPOMI and OSI-SAF sea
 ice are *not* tailorable** by this service.
 
+!!! note "Multi-channel / vector collections use a representative product type"
+    A few eligible collections (e.g. `mtg-amv`, the ASCAT wind and Lightning
+    Imager products) are `output_kind: vector` and/or span several Data Tailor
+    per-channel products. Their `tailor_product_type` records one representative
+    product from the registry — so eligibility is correct, but the default
+    `format="geotiff"` may not be the meaningful output for a swath / vector
+    collection (prefer `format="netcdf4"`), and a specific channel may need its
+    own product type. Verify the mapping against your use case before relying on
+    it.
+
 A `tailor=` request against a non-eligible dataset raises a clear error:
 
 ```python
