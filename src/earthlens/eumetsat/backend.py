@@ -613,7 +613,8 @@ class EUMETSAT(AbstractDataSource):
                 if not any(mark in message for mark in _TRANSIENT_MARKERS):
                     raise
                 last_exc = exc
-                time.sleep(TAILOR_SUBMIT_BACKOFF_S * attempt)
+                if attempt < TAILOR_SUBMIT_RETRIES:
+                    time.sleep(TAILOR_SUBMIT_BACKOFF_S * attempt)
         raise RuntimeError(
             f"Data Tailor submit failed after {TAILOR_SUBMIT_RETRIES} "
             f"transient attempts: {last_exc}"
