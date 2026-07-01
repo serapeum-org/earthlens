@@ -42,6 +42,11 @@ def _capturing_urlopen(url, timeout=15):
     return _FakeConstraintsResponse()
 
 
+def _raise_catalog_error():
+    """Stand-in for `Catalog()` that fails, to exercise the resolver fallback."""
+    raise RuntimeError("catalog unreadable")
+
+
 def _glofas_backend(tmp_path):
     """Build a GloFAS-only `ECMWF` (offline; the client is never opened)."""
     return ECMWF(
@@ -187,10 +192,7 @@ class TestGridResolution:
         backend = _glofas_backend(tmp_path)
         import earthlens.ecmwf.backend as backend_module
 
-        def _boom():
-            raise RuntimeError("catalog unreadable")
-
-        monkeypatch.setattr(backend_module, "Catalog", _boom)
+        monkeypatch.setattr(backend_module, "Catalog", _raise_catalog_error)
         assert backend._grid_resolution_for_request() == pytest.approx(0.125)
 
 
