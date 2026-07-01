@@ -767,7 +767,7 @@ class EarthLens:
             # `EarthLens("edo", dataset="edo-spaST", ...)`). No alias pre-binds
             # the dataset: pre-bound aliases collide with the facade's own
             # `dataset=` plumbing (TypeError: multiple values) and only work for
-            # exactly one of the 32 catalog rows, so they trade a tiny ergonomic
+            # exactly one of the catalog rows, so they trade a tiny ergonomic
             # win for two foot-guns.
             "drought": ("earthlens.drought", "Drought", "", {}),
             "usdm": ("earthlens.drought", "Drought", "", {}),

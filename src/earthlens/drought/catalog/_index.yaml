@@ -21,6 +21,7 @@ available_datasets:
   - edo-twsan
   - edo-snwvi
   - edo-rdria
+  - edo-msfTS
   - gdo-spaST
   - gdo-spaLT
   - gdo-spgTS
@@ -30,6 +31,16 @@ available_datasets:
   - gdo-twsan
   - gdo-lfinx-sms
   - gdo-lfinx-mds
+  - gdo-smian
+  - gdo-smang
+  - gdo-spcST
+  - gdo-spcLT
+  - gdo-cdiad
+  - gdo-cdirc
+  - gdo-lfinx-lgs
+  - gdo-msfTS
+  - gdo-snwvi
+  - gdo-rdria
   - speibase-01
   - speibase-03
   - speibase-06
