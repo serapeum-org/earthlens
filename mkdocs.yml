@@ -215,6 +215,11 @@ nav:
       - Usage: reference/glaciers/usage.md
       - Available datasets: reference/glaciers/datasets.md
       - Reference: reference/glaciers/glaciers.md
+    - SoilGrids (soil properties):
+      - Introduction: reference/soilgrids/introduction.md
+      - Usage: reference/soilgrids/usage.md
+      - Available properties: reference/soilgrids/datasets.md
+      - Reference: reference/soilgrids/soilgrids.md
     - OpenStreetMap (Overpass / ohsome):
       - Introduction: reference/osm/introduction.md
       - Usage: reference/osm/usage.md
