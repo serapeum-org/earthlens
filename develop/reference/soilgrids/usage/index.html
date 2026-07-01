@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/drought/introduction/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/soilgrids/usage/">
       
       
-        <link rel="prev" href="../../argo/argo/">
+        <link rel="prev" href="../introduction/">
       
       
-        <link rel="next" href="../usage/">
+        <link rel="next" href="../datasets/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Introduction - earthlens</title>
+        <title>Usage - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#drought-indicators-introduction" class="md-skip">
+        <a href="#soilgrids-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Usage
             
           </span>
         </div>
@@ -4285,6 +4285,280 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_22" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_22" id="__nav_3_22_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SoilGrids (soil properties)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_22_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    SoilGrids (soil properties)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#a-two-property-subset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A two-property subset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-depths-and-quantiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing depths and quantiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-a-result-the-scaled-integer-units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading a result — the scaled-integer units
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-crs-and-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output CRS and resolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-temporal-aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No temporal aggregation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available properties
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../soilgrids/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -4299,10 +4573,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_22" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_23" >
         
           
-          <label class="md-nav__link" for="__nav_3_22" id="__nav_3_22_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_23" id="__nav_3_23_label" tabindex="0">
             
   
   
@@ -4320,8 +4594,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_22_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_22">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_23">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4441,10 +4715,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_23" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_24" >
         
           
-          <label class="md-nav__link" for="__nav_3_23" id="__nav_3_23_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_24" id="__nav_3_24_label" tabindex="0">
             
   
   
@@ -4462,8 +4736,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_23_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_23">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_24_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_24">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4611,10 +4885,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_24" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_25" >
         
           
-          <label class="md-nav__link" for="__nav_3_24" id="__nav_3_24_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_25" id="__nav_3_25_label" tabindex="0">
             
   
   
@@ -4632,8 +4906,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_24_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_24">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_25_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_25">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4781,10 +5055,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_25" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_26" >
         
           
-          <label class="md-nav__link" for="__nav_3_25" id="__nav_3_25_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_26" id="__nav_3_26_label" tabindex="0">
             
   
   
@@ -4802,8 +5076,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_25_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_25">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_26_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_26">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4979,10 +5253,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_26" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_27" >
         
           
-          <label class="md-nav__link" for="__nav_3_26" id="__nav_3_26_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_27" id="__nav_3_27_label" tabindex="0">
             
   
   
@@ -5000,8 +5274,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_26_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_26">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_27_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_27">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5205,10 +5479,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_27" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_28" >
         
           
-          <label class="md-nav__link" for="__nav_3_27" id="__nav_3_27_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_28" id="__nav_3_28_label" tabindex="0">
             
   
   
@@ -5226,8 +5500,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_27_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_27">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_28_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_28">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5347,10 +5621,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_28" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_29" >
         
           
-          <label class="md-nav__link" for="__nav_3_28" id="__nav_3_28_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_29" id="__nav_3_29_label" tabindex="0">
             
   
   
@@ -5368,8 +5642,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_28_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_28">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_29_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_29">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5517,10 +5791,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_29" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_30" >
         
           
-          <label class="md-nav__link" for="__nav_3_29" id="__nav_3_29_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_30" id="__nav_3_30_label" tabindex="0">
             
   
   
@@ -5538,8 +5812,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_29_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_29">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_30_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_30">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5687,10 +5961,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_30" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_31" >
         
           
-          <label class="md-nav__link" for="__nav_3_30" id="__nav_3_30_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_31" id="__nav_3_31_label" tabindex="0">
             
   
   
@@ -5708,8 +5982,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_30_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_30">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_31_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_31">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5857,10 +6131,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_31" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_32" >
         
           
-          <label class="md-nav__link" for="__nav_3_31" id="__nav_3_31_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_32" id="__nav_3_32_label" tabindex="0">
             
   
   
@@ -5878,8 +6152,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_31_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_31">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_32_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_32">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6055,10 +6329,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_32" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_33" >
         
           
-          <label class="md-nav__link" for="__nav_3_32" id="__nav_3_32_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_33" id="__nav_3_33_label" tabindex="0">
             
   
   
@@ -6076,8 +6350,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_32_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_32">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_33_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_33">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6225,10 +6499,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_33" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_34" >
         
           
-          <label class="md-nav__link" for="__nav_3_33" id="__nav_3_33_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_34" id="__nav_3_34_label" tabindex="0">
             
   
   
@@ -6246,8 +6520,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_33_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_33">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_34_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_34">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6395,10 +6669,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_34" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_35" >
         
           
-          <label class="md-nav__link" for="__nav_3_34" id="__nav_3_34_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_35" id="__nav_3_35_label" tabindex="0">
             
   
   
@@ -6416,8 +6690,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_34_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_34">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_35_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_35">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6593,10 +6867,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_35" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_36" >
         
           
-          <label class="md-nav__link" for="__nav_3_35" id="__nav_3_35_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_36" id="__nav_3_36_label" tabindex="0">
             
   
   
@@ -6614,8 +6888,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_35_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_35">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_36_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_36">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6819,10 +7093,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_36" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_37" >
         
           
-          <label class="md-nav__link" for="__nav_3_36" id="__nav_3_36_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_37" id="__nav_3_37_label" tabindex="0">
             
   
   
@@ -6840,8 +7114,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_36_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_36">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_37_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_37">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7017,10 +7291,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_37" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_38" >
         
           
-          <label class="md-nav__link" for="__nav_3_37" id="__nav_3_37_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_38" id="__nav_3_38_label" tabindex="0">
             
   
   
@@ -7038,8 +7312,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_37_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_37">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_38_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_38">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7103,10 +7377,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_38" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_39" >
         
           
-          <label class="md-nav__link" for="__nav_3_38" id="__nav_3_38_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_39" id="__nav_3_39_label" tabindex="0">
             
   
   
@@ -7124,8 +7398,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_38_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_38">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_39_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_39">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7245,10 +7519,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_39" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_40" >
         
           
-          <label class="md-nav__link" for="__nav_3_39" id="__nav_3_39_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_40" id="__nav_3_40_label" tabindex="0">
             
   
   
@@ -7266,8 +7540,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_39_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_39">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_40_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_40">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7387,10 +7661,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_40" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_41" >
         
           
-          <label class="md-nav__link" for="__nav_3_40" id="__nav_3_40_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_41" id="__nav_3_41_label" tabindex="0">
             
   
   
@@ -7408,8 +7682,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_40_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_40">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_41_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_41">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7557,10 +7831,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_41" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_42" >
         
           
-          <label class="md-nav__link" for="__nav_3_41" id="__nav_3_41_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_42" id="__nav_3_42_label" tabindex="0">
             
   
   
@@ -7578,8 +7852,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_41_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_41">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7727,10 +8001,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_42" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_43" >
         
           
-          <label class="md-nav__link" for="__nav_3_42" id="__nav_3_42_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_43" id="__nav_3_43_label" tabindex="0">
             
   
   
@@ -7748,8 +8022,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_42_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_42">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_43_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_43">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7823,241 +8097,6 @@
   
     <li class="md-nav__item">
       <a href="../../argo/argo/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_43" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_43" id="__nav_3_43_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Drought indicators (USDM / EDO / GDO / SPEIbase)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_43_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_43">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Drought indicators (USDM / EDO / GDO / SPEIbase)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Authentication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#per-dataset-cadence-and-date-snapping" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Per-dataset cadence and date snapping
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-shape" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output shape
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-the-edogdo-route-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How the EDO/GDO route works
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../drought/" class="md-nav__link">
         
   
   
@@ -8761,7 +8800,7 @@
   <span class="md-ellipsis">
     
   
-    Drought indicators (USDM / EDO / GDO / SPEIbase)
+    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
   
 
     
@@ -8774,148 +8813,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Drought indicators (USDM / EDO / GDO / SPEIbase)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/drought/catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Drought catalog explorer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/drought/quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Drought quickstart — US Drought Monitor weekly polygons
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/drought/edo_gdo_raster/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Drought raster indicators — Copernicus EDO / GDO
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -9007,10 +8904,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
         
           
-          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
             
   
   
@@ -9028,8 +8925,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -9177,10 +9074,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
             
   
   
@@ -9198,8 +9095,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -9459,10 +9356,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
         
           
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
             
   
   
@@ -9480,8 +9377,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -9657,10 +9554,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
@@ -9678,8 +9575,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -9911,10 +9808,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -9932,8 +9829,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -10277,10 +10174,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
         
           
-          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
             
   
   
@@ -10298,8 +10195,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -10503,10 +10400,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
             
   
   
@@ -10524,8 +10421,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -10645,10 +10542,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
         
           
-          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
             
   
   
@@ -10666,8 +10563,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11039,10 +10936,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
@@ -11060,8 +10957,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11293,10 +11190,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
         
           
-          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
             
   
   
@@ -11314,8 +11211,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_16">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11463,10 +11360,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
         
           
-          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
             
   
   
@@ -11484,8 +11381,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11577,10 +11474,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
         
           
-          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
             
   
   
@@ -11598,8 +11495,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11719,10 +11616,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
         
           
-          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
             
   
   
@@ -11740,8 +11637,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_19">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11889,10 +11786,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
         
           
-          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
             
   
   
@@ -11910,8 +11807,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_20">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12115,10 +12012,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
         
           
-          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
             
   
   
@@ -12136,8 +12033,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_21">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12257,10 +12154,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_22" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
         
           
-          <label class="md-nav__link" for="__nav_4_22" id="__nav_4_22_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
             
   
   
@@ -12278,8 +12175,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_22_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_22">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12371,10 +12268,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_23" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_22" >
         
           
-          <label class="md-nav__link" for="__nav_4_23" id="__nav_4_23_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_22" id="__nav_4_22_label" tabindex="0">
             
   
   
@@ -12392,8 +12289,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_23_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_23">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12485,10 +12382,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_24" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_23" >
         
           
-          <label class="md-nav__link" for="__nav_4_24" id="__nav_4_24_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_23" id="__nav_4_23_label" tabindex="0">
             
   
   
@@ -12506,8 +12403,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_24_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_24">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_23">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12627,10 +12524,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_25" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_24" >
         
           
-          <label class="md-nav__link" for="__nav_4_25" id="__nav_4_25_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_24" id="__nav_4_24_label" tabindex="0">
             
   
   
@@ -12648,8 +12545,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_25_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_25">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_24_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_24">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12769,10 +12666,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_26" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_25" >
         
           
-          <label class="md-nav__link" for="__nav_4_26" id="__nav_4_26_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_25" id="__nav_4_25_label" tabindex="0">
             
   
   
@@ -12790,8 +12687,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_26_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_26">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_25_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_25">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12911,10 +12808,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_27" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_26" >
         
           
-          <label class="md-nav__link" for="__nav_4_27" id="__nav_4_27_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_26" id="__nav_4_26_label" tabindex="0">
             
   
   
@@ -12932,8 +12829,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_27_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_27">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_26_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_26">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13014,6 +12911,148 @@
     
   
     Administrative boundaries — Natural Earth &amp; US Census TIGER
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_27" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_27" id="__nav_4_27_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SoilGrids (soil properties)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_27_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_27">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    SoilGrids (soil properties)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/soilgrids/01_soilgrids_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SoilGrids quickstart — soil properties over a bounding box
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/soilgrids/02_catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SoilGrids catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/soilgrids/03_depth_profile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SoilGrids depth profile — how a request expands
   
 
     
@@ -16607,10 +16646,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#a-two-property-subset" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        A two-property subset
       
     </span>
   </a>
@@ -16618,10 +16657,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#per-dataset-cadence-and-date-snapping" class="md-nav__link">
+  <a href="#choosing-depths-and-quantiles" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Per-dataset cadence and date snapping
+        Choosing depths and quantiles
       
     </span>
   </a>
@@ -16629,10 +16668,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#output-shape" class="md-nav__link">
+  <a href="#reading-a-result-the-scaled-integer-units" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Output shape
+        Reading a result — the scaled-integer units
       
     </span>
   </a>
@@ -16640,10 +16679,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-the-edogdo-route-works" class="md-nav__link">
+  <a href="#output-crs-and-resolution" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How the EDO/GDO route works
+        Output CRS and resolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-temporal-aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No temporal aggregation
       
     </span>
   </a>
@@ -16667,7 +16717,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/drought/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/soilgrids/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -16676,135 +16726,97 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/drought/introduction.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/soilgrids/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="drought-indicators-introduction"><a class="toclink" href="#drought-indicators-introduction">Drought indicators — introduction</a><a class="headerlink" href="#drought-indicators-introduction" title="Permanent link">#</a></h1>
-<p>The drought backend reaches three public drought-monitoring services through
-one unified <code>EarthLens("drought", dataset=...)</code> shape:</p>
-<ul>
-<li><strong>US Drought Monitor (USDM)</strong> — weekly D0–D4 drought-class polygons for the
-  continental United States, produced jointly by NDMC, UNL, USDA, and NOAA
-  (<a href="https://droughtmonitor.unl.edu/">droughtmonitor.unl.edu</a>).</li>
-<li><strong>Copernicus European / Global Drought Observatory (EDO / GDO)</strong> —
-  Standardised Precipitation Index, soil-moisture anomaly, fAPAR anomaly,
-  Combined Drought Indicator, GRACE TWS anomaly, and friends, served as
-  raster GeoTIFFs over <strong>OGC WCS 2.0.0</strong>
-  (<a href="https://drought.emergency.copernicus.eu/data/wcs-service">drought.emergency.copernicus.eu</a>).</li>
-<li><strong>CSIC SPEIbase</strong> — the global Standardised Precipitation Evapotranspiration
-  Index, monthly 0.5° rasters at scales 1–48 months from 1901 to present,
-  shipped as NetCDF (<a href="https://spei.csic.es/database.html">spei.csic.es</a>).</li>
-</ul>
-<p>Each catalog row pins one dataset; the backend's <code>OUTPUT_KIND</code> is
-per-instance — <code>vector</code> for USDM (returns a
-<code>pyramids.feature.collection.FeatureCollection</code> in EPSG:4326) and <code>raster</code>
-for EDO/GDO and SPEIbase (returns a <code>list[Path]</code> of written GeoTIFFs).</p>
-<h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
-<p>None — all three sources are open:</p>
-<ul>
-<li>USDM: public domain weekly composite.</li>
-<li>EDO/GDO: Copernicus EMS free reuse (attribution required).</li>
-<li>SPEIbase: CC-BY 4.0.</li>
-</ul>
-<p>On every successful <code>download()</code> the backend logs the per-source attribution
-line as a single info message — no <code>LicenseWarning</code> (none of the three
-carry a non-commercial or restricted-redistribution clause).</p>
-<h2 id="per-dataset-cadence-and-date-snapping"><a class="toclink" href="#per-dataset-cadence-and-date-snapping">Per-dataset cadence and date snapping</a><a class="headerlink" href="#per-dataset-cadence-and-date-snapping" title="Permanent link">#</a></h2>
-<p>Each catalog row carries a <code>cadence</code> field; the backend snaps every
-requested date onto the source's release calendar before fetching:</p>
-<table>
-<thead>
-<tr>
-<th>Cadence</th>
-<th>Where</th>
-<th>Snap rule</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>weekly</code></td>
-<td>USDM</td>
-<td>Most recent <strong>Tuesday</strong> at or before the requested date, <strong>then walk back one more week if that Tuesday's composite has not yet been released</strong> (its release Thursday is still in the future relative to <code>today</code>). USDM releases on Thursday for the prior Tuesday's valid date, and the JSON URL is keyed on the Tuesday valid date.</td>
-</tr>
-<tr>
-<td><code>10day</code></td>
-<td>Most EDO/GDO indicators</td>
-<td>Start of the <strong>dekad</strong> containing the date (the 1st, 11th, or 21st of the month).</td>
-</tr>
-<tr>
-<td><code>monthly</code></td>
-<td>SPEIbase + some EDO/GDO indicators (<code>spgTS</code>, <code>twsan</code>, <code>rdria</code>)</td>
-<td>The <strong>first</strong> of the month.</td>
-</tr>
-</tbody>
-</table>
-<p>Two dates that snap to the same Tuesday yield one fetch — so a two-week
-window over USDM returns at most two <code>FeatureCollection</code>s merged into one.</p>
-<h2 id="output-shape"><a class="toclink" href="#output-shape">Output shape</a><a class="headerlink" href="#output-shape" title="Permanent link">#</a></h2>
-<table>
-<thead>
-<tr>
-<th>Dataset family</th>
-<th><code>OUTPUT_KIND</code></th>
-<th><code>download()</code> returns</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>usdm</code></td>
-<td><code>vector</code></td>
-<td>A <code>FeatureCollection</code> of drought-class polygons in EPSG:4326 with <code>OBJECTID</code>, <code>DM</code> (drought class 0–4), <code>Shape_Length</code>, <code>Shape_Area</code>, <code>release_date</code>.</td>
-</tr>
-<tr>
-<td><code>edo-*</code> / <code>gdo-*</code></td>
-<td><code>raster</code></td>
-<td>One GeoTIFF per snapped period in <code>path/</code>.</td>
-</tr>
-<tr>
-<td><code>speibase-*</code></td>
-<td><code>raster</code></td>
-<td>One GeoTIFF per snapped month in <code>path/</code>.</td>
-</tr>
-</tbody>
-</table>
-<p>The facade gates <code>aggregate=</code> from the per-instance <code>OUTPUT_KIND</code>:
-the USDM vector route <strong>rejects</strong> <code>aggregate=</code> with <code>NotImplementedError</code>
-(drought-class polygons have no gridded reduction); the raster routes
-forward it (currently behind a <code>NotImplementedError</code> placeholder until the
-stack reducer ships).</p>
-<h2 id="how-the-edogdo-route-works"><a class="toclink" href="#how-the-edogdo-route-works">How the EDO/GDO route works</a><a class="headerlink" href="#how-the-edogdo-route-works" title="Permanent link">#</a></h2>
-<p>The Copernicus EMS drought endpoint is <strong>not a conformant OGC WCS server</strong> —
-it is a REST shim. Only its <code>GetCoverage</code> operation is reliable; the
-standard <code>GetCapabilities</code> / <code>DescribeCoverage</code> discovery operations answer
-<code>502</code> / <code>400</code> (they require a non-standard <code>SELECTED_TIMESCALE</code> parameter),
-so pyramids' <code>Dataset.from_wcs</code> (which wraps GDAL's WCS driver and needs
-that discovery handshake) cannot read it.</p>
-<p>Instead the backend builds the documented <code>GetCoverage</code> URL by hand with
-core <code>requests</code> and two Copernicus-custom parameters:</p>
-<ul>
-<li><code>TIME=&lt;YYYY-MM-DD&gt;</code> — the snapped period (10-day dekad or month).</li>
-<li><code>SELECTED_TIMESCALE=&lt;NN&gt;</code> — the SPI / SPEI integration window in months
-  (<code>01</code>, <code>03</code>, <code>06</code>, <code>12</code>, …). The SPI coverages require it; the other
-  indicators accept and ignore it. Each <code>edo-*</code> / <code>gdo-*</code> catalog row
-  carries a <code>timescale</code> (default <code>"01"</code>, a config-as-code tunable).</li>
-</ul>
-<p>plus a <code>SUBSET=Long(west,east)</code> / <code>SUBSET=Lat(south,north)</code> bbox and
-<code>CRS=EPSG:4326&amp;format=GEOTIFF</code>. The response is streamed to disk and opened
-through <code>pyramids.dataset.Dataset.read_file</code> to validate it is a real
-raster — no <code>owslib</code>, no GDAL WCS driver, no <code>xarray</code>. When the server
-rejects a request (e.g. a date outside an indicator's available coverage
-range, an HTTP 422), the Copernicus error message is surfaced verbatim.</p>
-<p><strong>One map, not two.</strong> The Copernicus WCS exposes a single <code>map=DO_WCS</code>;
-there is no separate <code>GDO_WCS</code> map. The European-vs-global split is a
-data-extent distinction, so every <code>gdo-*</code> row uses the same <code>map=DO_WCS</code>
-endpoint as the EDO rows (the two Low-Flow Index codes
-<code>lfinx_300_sms</code> / <code>lfinx_300_mds</code> are genuinely GDO-specific).</p>
-<p>All three transports are fully wired against the shipped pyramids reader
-stack — no extra pyramids work is needed.</p>
+<h1 id="soilgrids-usage"><a class="toclink" href="#soilgrids-usage">SoilGrids — usage</a><a class="headerlink" href="#soilgrids-usage" title="Permanent link">#</a></h1>
+<p>The <code>soilgrids</code> backend downloads ISRIC SoilGrids 2.0 soil-property maps for a
+bounding box and writes one GeoTIFF per <code>(property, depth, quantile)</code>. It needs
+no credentials (CC-BY 4.0). See <a href="../datasets/">Available properties</a> for the
+<code>variables=</code> / <code>depths=</code> / <code>quantiles=</code> ids and <a href="../introduction/">Introduction</a>
+for how the WCS transport and scaled-integer units work.</p>
+<h2 id="a-two-property-subset"><a class="toclink" href="#a-two-property-subset">A two-property subset</a><a class="headerlink" href="#a-two-property-subset" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;soilgrids&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;clay&quot;</span><span class="p">,</span> <span class="s2">&quot;phh2o&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>     <span class="c1"># [south, north]</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span>       <span class="c1"># [west, east], -180..180</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;soil_out&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>   <span class="c1"># 12 — 2 properties x 6 standard depths x the `mean` layer</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>     <span class="c1"># Path(&#39;soil_out/clay_0-5cm_mean.tif&#39;)</span>
+</code></pre></div>
+<p><code>download()</code> returns the list of written GeoTIFF paths, one per requested
+<code>(property, depth, quantile)</code>, named <code>&lt;property&gt;_&lt;depth&gt;_&lt;quantile&gt;.tif</code> under
+<code>path</code>.</p>
+<h2 id="choosing-depths-and-quantiles"><a class="toclink" href="#choosing-depths-and-quantiles">Choosing depths and quantiles</a><a class="headerlink" href="#choosing-depths-and-quantiles" title="Permanent link">#</a></h2>
+<p>By default a request fetches <strong>every depth the property publishes at the <code>mean</code>
+layer</strong>. Narrow it with <code>depths=</code> and <code>quantiles=</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;soilgrids&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;phh2o&quot;</span><span class="p">],</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;soil_out&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">depths</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;0-5cm&quot;</span><span class="p">,</span> <span class="s2">&quot;5-15cm&quot;</span><span class="p">],</span>       <span class="c1"># topsoil only</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">quantiles</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Q0.05&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;Q0.95&quot;</span><span class="p">],</span>  <span class="c1"># add the 5th/95th percentiles</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># -&gt; 6 GeoTIFFs: phh2o x {0-5cm, 5-15cm} x {Q0.05, mean, Q0.95}</span>
+</code></pre></div>
+<p>The standard depths are <code>0-5cm, 5-15cm, 15-30cm, 30-60cm, 60-100cm, 100-200cm</code>;
+the layers are <code>Q0.05, Q0.5, Q0.95, mean, uncertainty</code>. The <code>ocs</code> (organic
+carbon stock) property is the exception — it publishes a single <code>0-30cm</code> depth.
+An unknown property, depth or quantile raises a <code>ValueError</code> with a did-you-mean
+hint. List the curated properties with
+<code>earthlens.soilgrids.Catalog().parameters()</code>.</p>
+<h2 id="reading-a-result-the-scaled-integer-units"><a class="toclink" href="#reading-a-result-the-scaled-integer-units">Reading a result — the scaled-integer units</a><a class="headerlink" href="#reading-a-result-the-scaled-integer-units" title="Permanent link">#</a></h2>
+<p>SoilGrids stores each property as a <strong>scaled integer</strong>; divide by the
+property's factor to get the conventional unit. The backend keeps the raw
+integers in the GeoTIFF (it does not rescale), so apply the factor yourself:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">ph</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;soil_out/phh2o_0-5cm_mean.tif&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">ph</span><span class="o">.</span><span class="n">epsg</span>                              <span class="c1"># 4326 (WGS84, the default output CRS)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">scaled</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>             <span class="c1"># e.g. 65  (pH x10)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">real_ph</span> <span class="o">=</span> <span class="n">scaled</span> <span class="o">/</span> <span class="mf">10.0</span>              <span class="c1"># -&gt; 6.5   (phh2o scale factor is 10)</span>
+</code></pre></div>
+<p>The no-data sentinel is <code>-32768</code>. The per-property scale factors are on the
+<a href="../datasets/">Available properties</a> page (and in each <code>Catalog</code> row's
+<code>scale_factor</code>).</p>
+<h2 id="output-crs-and-resolution"><a class="toclink" href="#output-crs-and-resolution">Output CRS and resolution</a><a class="headerlink" href="#output-crs-and-resolution" title="Permanent link">#</a></h2>
+<p>By default the result is reprojected to <strong>EPSG:4326</strong> (lon/lat). Keep the
+native Interrupted Goode Homolosine grid with <code>output_crs=None</code>, or reproject
+anywhere with <code>output_crs="EPSG:3857"</code>; set the pixel size in output-CRS units
+with <code>resolution=</code> (defaults to the native 250 m):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;isric&quot;</span><span class="p">,</span>                 <span class="c1"># `isric` is an alias for `soilgrids`</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;soc&quot;</span><span class="p">],</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;soil_out&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">output_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                     <span class="c1"># native IGH equal-area grid</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="no-temporal-aggregation"><a class="toclink" href="#no-temporal-aggregation">No temporal aggregation</a><a class="headerlink" href="#no-temporal-aggregation" title="Permanent link">#</a></h2>
+<p>SoilGrids is a single static prediction with no time axis, so there is nothing
+to reduce over time. Passing <code>aggregate=</code> raises <code>NotImplementedError</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;soilgrids&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;clay&quot;</span><span class="p">],</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;YS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># NotImplementedError: ... static soil-property map with no temporal axis ...</span>
+</code></pre></div>
 
 
 
@@ -16840,7 +16852,7 @@ stack — no extra pyramids work is needed.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../argo/argo/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
+          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -16850,20 +16862,20 @@ stack — no extra pyramids work is needed.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Reference
+                Introduction
               </div>
             </div>
           </a>
         
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
+          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Available properties">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Usage
+                Available properties
               </div>
             </div>
             <div class="md-footer__button md-icon">
