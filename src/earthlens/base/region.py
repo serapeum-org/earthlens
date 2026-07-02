@@ -23,6 +23,7 @@ dependency.
 from __future__ import annotations
 
 import os
+import urllib.request
 
 #: The process runs in the same region as the target bucket.
 IN_REGION = "in-region"
@@ -32,6 +33,39 @@ EGRESS = "egress"
 
 #: The caller region could not be determined.
 UNKNOWN = "unknown"
+
+#: Hard timeout (seconds) for every instance-metadata probe. Keeps the
+#: fallback from ever blocking a download when the endpoint is absent.
+PROBE_TIMEOUT = 1.0
+
+#: AWS IMDSv2 base — a token PUT then a region GET.
+_AWS_TOKEN_URL = "http://169.254.169.254/latest/api/token"
+_AWS_REGION_URL = "http://169.254.169.254/latest/meta-data/placement/region"
+
+#: GCP metadata zone endpoint (needs the `Metadata-Flavor: Google` header).
+_GCP_ZONE_URL = "http://metadata.google.internal/computeMetadata/v1/instance/zone"
+
+#: Azure IMDS location endpoint (needs the `Metadata: true` header).
+_AZURE_LOCATION_URL = (
+    "http://169.254.169.254/metadata/instance/compute/location?api-version=2021-02-01"
+)
+
+#: Sentinel marking the per-process probe cache as not-yet-populated.
+_UNSET: object = object()
+
+#: Per-process cache of the detected caller region (`None` = probed but
+#: undetermined). Reset with :func:`clear_region_cache`.
+_cached_region: str | None | object = _UNSET
+
+
+def clear_region_cache() -> None:
+    """Reset the per-process caller-region probe cache.
+
+    The metadata probe runs at most once per process; call this to force
+    a fresh probe (chiefly in tests that inject different probe results).
+    """
+    global _cached_region
+    _cached_region = _UNSET
 
 
 def _caller_region_from_env() -> str | None:
@@ -47,17 +81,112 @@ def _caller_region_from_env() -> str | None:
     return os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION") or None
 
 
-def _detect_caller_region() -> str | None:
-    """Detect the caller region from instance metadata (env-only in `C1`).
+def _metadata_request(
+    url: str,
+    *,
+    headers: dict[str, str],
+    method: str = "GET",
+    timeout: float = PROBE_TIMEOUT,
+) -> str | None:
+    """Fetch an instance-metadata endpoint, fail-safe to `None`.
 
-    The metadata-probe fallback (AWS IMDSv2 / GCP / Azure) lands in `C2`;
-    the `C1` env-only cut returns `None` so callers relying purely on the
-    environment resolve deterministically.
+    The single network seam for every probe: any error (no route,
+    timeout, non-200, decode failure) yields `None` rather than raising,
+    so detection never blocks or crashes a download.
+
+    Args:
+        url: The metadata endpoint URL.
+        headers: Request headers required by the endpoint.
+        method: HTTP method (`"GET"`, or `"PUT"` for the AWS token).
+        timeout: Hard timeout in seconds.
 
     Returns:
-        The detected region, or `None` when it cannot be determined.
+        The stripped response body, or `None` on any failure / empty body.
     """
-    return None
+    request = urllib.request.Request(url, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
+            status = getattr(response, "status", 200) or 200
+            if status != 200:
+                return None
+            body = response.read().decode("utf-8", "replace").strip()
+            return body or None
+    except (OSError, ValueError):
+        return None
+
+
+def _probe_aws(timeout: float) -> str | None:
+    """Probe AWS IMDSv2 for the caller region (token dance, then region)."""
+    token = _metadata_request(
+        _AWS_TOKEN_URL,
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "21600"},
+        method="PUT",
+        timeout=timeout,
+    )
+    if not token:
+        return None
+    return _metadata_request(
+        _AWS_REGION_URL,
+        headers={"X-aws-ec2-metadata-token": token},
+        timeout=timeout,
+    )
+
+
+def _normalize_gcp_zone(zone: str) -> str | None:
+    """Normalise a GCP zone string to a region.
+
+    Turns `projects/123/zones/us-west1-a` (or the bare `us-west1-a`) into
+    `us-west1` by dropping the path prefix and the trailing zone letter.
+
+    Args:
+        zone: The raw zone string from the metadata endpoint.
+
+    Returns:
+        The region, or `None` when the input is empty.
+    """
+    tail = zone.rsplit("/", 1)[-1]
+    if not tail:
+        return None
+    region, _, letter = tail.rpartition("-")
+    return region if region and letter else tail
+
+
+def _probe_gcp(timeout: float) -> str | None:
+    """Probe the GCP metadata server for the caller region."""
+    zone = _metadata_request(
+        _GCP_ZONE_URL, headers={"Metadata-Flavor": "Google"}, timeout=timeout
+    )
+    return _normalize_gcp_zone(zone) if zone else None
+
+
+def _probe_azure(timeout: float) -> str | None:
+    """Probe Azure IMDS for the caller region (a `location` string)."""
+    return _metadata_request(
+        _AZURE_LOCATION_URL, headers={"Metadata": "true"}, timeout=timeout
+    )
+
+
+def _detect_caller_region(*, timeout: float = PROBE_TIMEOUT) -> str | None:
+    """Detect the caller region from instance metadata, cached per process.
+
+    Tries AWS IMDSv2, then GCP, then Azure — each behind the hard
+    `timeout` and each fail-safe to `None`. The first non-empty result
+    wins. The outcome (including `None`) is cached for the process so a
+    cold, off-cloud caller pays the probe cost at most once; reset with
+    :func:`clear_region_cache`.
+
+    Args:
+        timeout: Hard per-probe timeout in seconds.
+
+    Returns:
+        The detected region, or `None` when no cloud metadata answers.
+    """
+    global _cached_region
+    if _cached_region is not _UNSET:
+        return _cached_region  # type: ignore[return-value]
+    region = _probe_aws(timeout) or _probe_gcp(timeout) or _probe_azure(timeout) or None
+    _cached_region = region
+    return region
 
 
 def region_affinity(

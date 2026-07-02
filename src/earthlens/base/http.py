@@ -324,7 +324,9 @@ class HttpClient:
         dest.parent.mkdir(parents=True, exist_ok=True)
         response = self.stream(url, headers=headers, timeout=timeout, **kwargs)
         raw_length = response.headers.get("Content-Length")
-        total = int(raw_length) if raw_length is not None and raw_length.isdigit() else None
+        total = (
+            int(raw_length) if raw_length is not None and raw_length.isdigit() else None
+        )
         bar = tqdm(
             total=total,
             unit="B",
