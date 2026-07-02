@@ -344,6 +344,11 @@ class S3(AbstractDataSource):
         nothing and never warn. The warning is advisory — the download
         proceeds unchanged.
 
+        `probe=False` keeps this advisory check off the network: the
+        caller region is taken from `AWS_REGION` / `AWS_DEFAULT_REGION`
+        only, so a warning never blocks the first download on the
+        instance-metadata probe chain (matching earthdata's re-point).
+
         Args:
             products: The planned products about to be fetched.
         """
@@ -353,7 +358,7 @@ class S3(AbstractDataSource):
             if "size_bytes" in product.metadata
         ]
         if known:
-            warn_if_egress(self._dataset.region, size_bytes=sum(known))
+            warn_if_egress(self._dataset.region, size_bytes=sum(known), probe=False)
 
     def _localise(self, raw: Path, product: RemoteProduct) -> Path:
         """Crop a downloaded granule to the AOI and write it.

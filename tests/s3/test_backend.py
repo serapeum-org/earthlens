@@ -92,10 +92,10 @@ def test_egress_warning_sums_known_sizes(tmp_path, monkeypatch):
     """The egress check sums size_bytes across products that carry one."""
     from earthlens.base import RemoteProduct
 
-    calls: list[tuple[str | None, int]] = []
+    calls: list[tuple[str | None, int, bool]] = []
     monkeypatch.setattr(
         "earthlens.s3.backend.warn_if_egress",
-        lambda region, *, size_bytes: calls.append((region, size_bytes)),
+        lambda region, *, size_bytes, probe: calls.append((region, size_bytes, probe)),
     )
     source = _dem_source(tmp_path)
     products = [
@@ -104,7 +104,7 @@ def test_egress_warning_sums_known_sizes(tmp_path, monkeypatch):
         RemoteProduct(id="c", href="c.tif", metadata={"bucket": "b"}),
     ]
     source._warn_cross_region_egress(products)
-    assert calls == [(source._dataset.region, 30)]
+    assert calls == [(source._dataset.region, 30, False)]
 
 
 def test_no_egress_warning_when_no_sizes(tmp_path, monkeypatch):
