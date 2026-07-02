@@ -10,14 +10,13 @@ GCP + Azure detection.
 
 Resolution is **env-first** (zero-cost, covers most CI / Lambda / EC2
 cases), then an optional **instance-metadata probe** behind a hard short
-timeout and a per-process cache (`C2`). Detection **never raises and
-never blocks**: any failure yields `"unknown"`, and `probe=False`
-disables the network probe entirely.
+timeout and a per-process cache. Detection **never raises and never
+blocks**: any failure yields `"unknown"`, and `probe=False` disables the
+network probe entirely.
 
-Detection is stdlib `os.environ` + (in `C2`) a small `urllib.request`
-GET with an explicit timeout — no `boto3` / `google-cloud-*` /
-`azure-*` import merely to read a region, so this module adds no
-dependency.
+Detection is stdlib `os.environ` plus a small `urllib.request` GET with
+an explicit timeout — no `boto3` / `google-cloud-*` / `azure-*` import
+merely to read a region, so this module adds no dependency.
 """
 
 from __future__ import annotations
