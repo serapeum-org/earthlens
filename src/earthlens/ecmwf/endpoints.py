@@ -29,6 +29,7 @@ __all__ = [
     "constraints_base_url",
     "endpoint_url",
     "open_client",
+    "open_modern_client",
 ]
 
 DEFAULT_ENDPOINT: str = "cds"
@@ -114,7 +115,9 @@ def _resolve_key(key_env: str) -> str | None:
         str | None: The token to authenticate with, or `None` when neither the
         endpoint-specific env var nor the shared CDS token is available.
     """
-    return os.environ.get(key_env) or os.environ.get("CDSAPI_KEY") or _read_cdsapirc_key()
+    return (
+        os.environ.get(key_env) or os.environ.get("CDSAPI_KEY") or _read_cdsapirc_key()
+    )
 
 
 def open_client(endpoint: str = DEFAULT_ENDPOINT) -> cdsapi.Client:
@@ -133,7 +136,16 @@ def open_client(endpoint: str = DEFAULT_ENDPOINT) -> cdsapi.Client:
         ValueError: If `endpoint` is not a known slug.
         AuthenticationError: If a non-CDS endpoint has no resolvable token
             (neither `<ENDPOINT>_KEY` nor a shared CDS PAT).
+
+    Note:
+        Opt-in modern client: when `EARTHLENS_ECMWF_MODERN` is truthy
+        (`1`/`true`/`yes`/`on`), this delegates to `open_modern_client`, which
+        returns an `ecmwf.datastores.Client` (the `cdsapi` successor) instead —
+        requires the `earthlens[ecmwf-modern]` extra. Unset (the default), the
+        behaviour below is byte-identical to before.
     """
+    if _use_modern_client():
+        return open_modern_client(endpoint)
     if endpoint not in ENDPOINTS:
         raise ValueError(
             f"unknown ECMWF endpoint {endpoint!r}; expected one of {sorted(ENDPOINTS)}"
@@ -161,3 +173,73 @@ def open_client(endpoint: str = DEFAULT_ENDPOINT) -> cdsapi.Client:
             f"Generate one at {profile} and accept the dataset licence."
         )
     return cdsapi.Client(url=url, key=key)
+
+
+def _use_modern_client() -> bool:
+    """Whether the opt-in `ecmwf-datastores-client` path is enabled.
+
+    Controlled by the `EARTHLENS_ECMWF_MODERN` environment variable (truthy =
+    `1` / `true` / `yes` / `on`, case-insensitive). Off by default so the
+    historic `cdsapi` path is untouched.
+
+    Returns:
+        bool: `True` when the modern client should be built.
+    """
+    return os.environ.get("EARTHLENS_ECMWF_MODERN", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def open_modern_client(endpoint: str = DEFAULT_ENDPOINT):
+    """Build an `ecmwf.datastores.Client` for the named CADS endpoint.
+
+    The `ecmwf-datastores-client` package (installed via the
+    `earthlens[ecmwf-modern]` extra) is the strategic successor to `cdsapi`. Its
+    blocking `retrieve(collection_id, request, target=...)` matches the `cdsapi`
+    call the backend makes, so it is a drop-in for the download path; the
+    async `submit()` / `download()` API is available to callers who want it.
+
+    Token resolution mirrors `open_client` (`<ENDPOINT>_KEY`, else `CDSAPI_KEY`,
+    else `~/.cdsapirc`), so the same Personal Access Token authenticates. This
+    is opt-in — reached only when `EARTHLENS_ECMWF_MODERN` is truthy.
+
+    Args:
+        endpoint: One of the slugs in `ENDPOINTS`. Defaults to `"cds"`.
+
+    Returns:
+        ecmwf.datastores.Client: A client pointed at the endpoint's URL.
+
+    Raises:
+        ValueError: If `endpoint` is not a known slug.
+        ImportError: If the `ecmwf-modern` extra is not installed.
+        AuthenticationError: If no token can be resolved for `endpoint`.
+    """
+    if endpoint not in ENDPOINTS:
+        raise ValueError(
+            f"unknown ECMWF endpoint {endpoint!r}; expected one of {sorted(ENDPOINTS)}"
+        )
+    try:
+        from ecmwf.datastores import Client as ModernClient
+    except ImportError as exc:
+        raise ImportError(
+            "EARTHLENS_ECMWF_MODERN is set but the modern client is not "
+            "installed. Install it with: pip install earthlens[ecmwf-modern]"
+        ) from exc
+
+    url_default, url_env, key_env = ENDPOINTS[endpoint]
+    url = os.environ.get(url_env, url_default)
+    key = _resolve_key(key_env)
+    if not key:
+        from earthlens.ecmwf.backend import AuthenticationError
+
+        profile = url.rsplit("/api", 1)[0] + "/profile"
+        raise AuthenticationError(
+            f"ECMWF {endpoint.upper()} needs a Personal Access Token. Set the "
+            f"{key_env} (or CDSAPI_KEY) environment variable, or configure "
+            f"~/.cdsapirc with your CDS token. Generate one at {profile} and "
+            f"accept the dataset licence."
+        )
+    return ModernClient(url=url, key=key)

@@ -126,7 +126,9 @@ class TestOpenClient:
 
     def test_read_cdsapirc_key_none_when_no_key_line(self, monkeypatch, tmp_path):
         """A `~/.cdsapirc` without a `key:` line resolves to no token."""
-        (tmp_path / ".cdsapirc").write_text("url: https://cds.climate.copernicus.eu/api\n")
+        (tmp_path / ".cdsapirc").write_text(
+            "url: https://cds.climate.copernicus.eu/api\n"
+        )
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
         assert ep._read_cdsapirc_key() is None
 
@@ -168,7 +170,9 @@ class TestClientFor:
         ecmwf._clients = {}
         built: list[str] = []
         monkeypatch.setattr(
-            ECMWF, "_open_client", lambda self, endpoint: built.append(endpoint) or object()
+            ECMWF,
+            "_open_client",
+            lambda self, endpoint: built.append(endpoint) or object(),
         )
         first = ecmwf._client_for("ewds")
         second = ecmwf._client_for("ewds")
@@ -176,3 +180,81 @@ class TestClientFor:
         assert first is second
         assert third is not first
         assert built == ["ewds", "cds"]
+
+
+class _RecordingModernClient:
+    """Fake `ecmwf.datastores.Client` that records its url/key."""
+
+    def __init__(self, url=None, key=None):
+        self.url = url
+        self.key = key
+
+
+def _install_fake_datastores(monkeypatch):
+    """Inject a fake `ecmwf.datastores` module exposing `Client`."""
+    import sys
+    import types
+
+    module = types.ModuleType("ecmwf.datastores")
+    module.Client = _RecordingModernClient
+    monkeypatch.setitem(sys.modules, "ecmwf.datastores", module)
+
+
+class TestModernClient:
+    """Tests for the opt-in `ecmwf-datastores-client` path."""
+
+    @pytest.mark.parametrize(
+        "value,expected",
+        [
+            ("1", True),
+            ("true", True),
+            ("YES", True),
+            ("on", True),
+            ("", False),
+            ("0", False),
+            ("no", False),
+        ],
+    )
+    def test_use_modern_flag(self, monkeypatch, value, expected):
+        """`EARTHLENS_ECMWF_MODERN` truthiness is parsed case-insensitively."""
+        monkeypatch.setenv("EARTHLENS_ECMWF_MODERN", value)
+        assert ep._use_modern_client() is expected
+
+    def test_open_modern_client_resolves_url_and_key(self, monkeypatch, tmp_path):
+        """`open_modern_client` builds the modern client with the endpoint url + token."""
+        _clear_cads_env(monkeypatch)
+        _home_without_dotfile(monkeypatch, tmp_path)
+        monkeypatch.setenv("EWDS_KEY", "tok-123")
+        _install_fake_datastores(monkeypatch)
+        client = ep.open_modern_client("ewds")
+        assert isinstance(client, _RecordingModernClient)
+        assert client.url == "https://ewds.climate.copernicus.eu/api"
+        assert client.key == "tok-123"
+
+    def test_open_client_delegates_when_flag_set(self, monkeypatch, tmp_path):
+        """With the flag set, `open_client` returns the modern client."""
+        _clear_cads_env(monkeypatch)
+        _home_without_dotfile(monkeypatch, tmp_path)
+        monkeypatch.setenv("CDSAPI_KEY", "pat")
+        monkeypatch.setenv("EARTHLENS_ECMWF_MODERN", "1")
+        _install_fake_datastores(monkeypatch)
+        assert isinstance(ep.open_client("ads"), _RecordingModernClient)
+
+    def test_missing_extra_raises_importerror(self, monkeypatch, tmp_path):
+        """A missing `ecmwf-datastores-client` raises a clear ImportError."""
+        import sys
+
+        _clear_cads_env(monkeypatch)
+        _home_without_dotfile(monkeypatch, tmp_path)
+        monkeypatch.setenv("EWDS_KEY", "tok")
+        monkeypatch.setitem(sys.modules, "ecmwf.datastores", None)
+        with pytest.raises(ImportError, match="ecmwf-modern"):
+            ep.open_modern_client("ewds")
+
+    def test_default_path_unchanged_without_flag(self, monkeypatch):
+        """Without the flag, `open_client('cds')` is the historic bare client."""
+        _clear_cads_env(monkeypatch)
+        monkeypatch.delenv("EARTHLENS_ECMWF_MODERN", raising=False)
+        sentinel = object()
+        monkeypatch.setattr(cdsapi, "Client", lambda *a, **k: sentinel)
+        assert ep.open_client("cds") is sentinel
