@@ -387,10 +387,20 @@ class HttpClient:
                     f"HTTP {response.status_code} on {url!r}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
+                # Release the (possibly streamed) connection before retrying;
+                # a stream=True body is otherwise never consumed and its socket
+                # leaks out of the pool.
+                response.close()
                 self._sleep(wait)
                 attempt += 1
                 continue
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except requests.HTTPError:
+                # Close the final errored response too — for a streamed request
+                # the caller never receives it, so nothing else would.
+                response.close()
+                raise
             return response
 
     def _send(self, method: str, url: str, **kwargs: Any) -> requests.Response:

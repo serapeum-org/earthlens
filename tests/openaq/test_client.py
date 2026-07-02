@@ -30,6 +30,9 @@ class _Resp:
         if self.status_code >= 400:
             raise requests.HTTPError(f"HTTP {self.status_code}")
 
+    def close(self) -> None:
+        return None
+
 
 class _SeqSession:
     """Returns queued responses in order, recording each GET's args."""

@@ -228,6 +228,21 @@ class TestRetry:
             client.get("http://x")
         assert len(session.calls) == 1
 
+    def test_retried_response_is_closed(self):
+        """A retried response is closed before the next attempt (no leak)."""
+        first = _Resp(status=503, headers={"Retry-After": "0"})
+        session = _RecordingSession([first, _Resp(body={"ok": 1})])
+        HttpClient(session=session, sleep=lambda _: None).get("http://x")
+        assert first.closed is True
+
+    def test_errored_response_is_closed(self):
+        """The final errored response is closed before the error propagates."""
+        errored = _Resp(status=404)
+        session = _RecordingSession([errored])
+        with pytest.raises(requests.HTTPError):
+            HttpClient(session=session).get("http://x")
+        assert errored.closed is True
+
 
 @pytest.mark.unit
 class TestDownload:
