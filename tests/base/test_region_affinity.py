@@ -189,6 +189,16 @@ class TestMetadataRequest:
         monkeypatch.setattr(region_mod.urllib.request, "urlopen", _raise)
         assert region_mod._metadata_request("http://x", headers={}) is None
 
+    def test_none_on_http_exception(self, monkeypatch: pytest.MonkeyPatch):
+        """A non-OSError HTTPException (e.g. BadStatusLine) yields None."""
+        import http.client
+
+        def _raise(*args: Any, **kwargs: Any):
+            raise http.client.BadStatusLine("garbage from an intercepting proxy")
+
+        monkeypatch.setattr(region_mod.urllib.request, "urlopen", _raise)
+        assert region_mod._metadata_request("http://x", headers={}) is None
+
 
 @pytest.mark.unit
 class TestNormalizeGcpZone:

@@ -22,6 +22,7 @@ dependency.
 
 from __future__ import annotations
 
+import http.client
 import os
 import urllib.request
 
@@ -118,7 +119,7 @@ def _metadata_request(
                 return None
             body = response.read().decode("utf-8", "replace").strip()
             return body or None
-    except (OSError, ValueError):
+    except (OSError, ValueError, http.client.HTTPException):
         return None
 
 
