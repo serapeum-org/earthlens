@@ -1,0 +1,21 @@
+# AirNow pollutant dispatch table.
+#
+# AirNow's `/aq/data/` endpoint filters observations by a comma list of
+# `parameters` codes. Users pass earthlens pollutant names in
+# `variables=[...]`; this table is the name -> AirNow-code bridge plus
+# light metadata. Like the OpenAQ / FDSN tables it is deliberately tiny
+# and fixed (AirNow reports six criteria pollutants), so there is no
+# refresh / probe / audit tooling — adding a row is a hand-edit.
+#
+# `code` is the exact spelling the `parameters` query argument accepts
+# (`OZONE`, `PM25`, `PM10`, `CO`, `NO2`, `SO2`); AirNow echoes the
+# pollutant back under a slightly different `Parameter` label in each
+# response row (e.g. `PM2.5`), which the backend carries through
+# verbatim. Codes verified against `docs.airnowapi.org` (2026-07-03).
+pollutants:
+  o3: { name: o3, code: OZONE, units: "PPB", display_name: "Ozone", group: criteria }
+  pm25: { name: pm25, code: PM25, units: "UG/M3", display_name: "PM2.5", group: particulate }
+  pm10: { name: pm10, code: PM10, units: "UG/M3", display_name: "PM10", group: particulate }
+  co: { name: co, code: CO, units: "PPM", display_name: "Carbon monoxide", group: criteria }
+  no2: { name: no2, code: NO2, units: "PPB", display_name: "Nitrogen dioxide", group: criteria }
+  so2: { name: so2, code: SO2, units: "PPB", display_name: "Sulphur dioxide", group: criteria }
