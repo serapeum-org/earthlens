@@ -50,40 +50,6 @@ _MAX_PAGE_SIZE = 1000
 _DATE_FILTER_ROLLUPS = frozenset({"days", "months", "years"})
 
 
-def _parse_retry_after(value: str | None) -> float | None:
-    """Parse a `Retry-After` header value into seconds.
-
-    OpenAQ returns `Retry-After` as an integer number of seconds. A
-    missing or non-numeric value yields `None` so the caller falls
-    back to exponential back-off.
-
-    Args:
-        value: The raw `Retry-After` header value, or `None`.
-
-    Returns:
-        The delay in seconds, or `None` when absent / unparseable.
-
-    Examples:
-        - A numeric value parses to seconds; junk yields `None`:
-            ```python
-            >>> from earthlens.openaq.client import _parse_retry_after
-            >>> _parse_retry_after("5")
-            5.0
-            >>> _parse_retry_after(None) is None
-            True
-            >>> _parse_retry_after("soon") is None
-            True
-
-            ```
-    """
-    if value is None:
-        return None
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
-
-
 class OpenaqClient:
     """Minimal OpenAQ v3 client: auth header, pagination, back-off.
 
@@ -132,7 +98,6 @@ class OpenaqClient:
         self.max_retries = max_retries
         self.backoff_factor = backoff_factor
         self.timeout = timeout
-        self._sleep = sleep
         self._http = HttpClient(
             session=self._session,
             headers={"X-API-Key": api_key},
