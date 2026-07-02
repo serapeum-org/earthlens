@@ -8,11 +8,12 @@ rate-limits (historically ~60 req/min, ~2000/hour), and the
 locations -> sensors -> measurements fan-out makes a continental bbox
 hundreds-to-thousands of requests, so back-off is not optional.
 
-This is the local `_request_with_backoff` substrate the plan's `R2`
-finding settled on: the shared `earthlens.base.http.HttpClient` (the
-planned foundation task) does not exist yet, so the client owns its
-own retry loop. If that primitive lands later, this client can be
-re-pointed at it without changing the backend.
+The transport — session, `X-API-Key` header, and the `Retry-After`-aware
+`429` back-off loop — is delegated to the shared
+`earthlens.base.http.HttpClient`; this module keeps only the `API`-shaped
+concerns (endpoint paths, the v3 pagination envelope, and the raw-vs-rollup
+date-filter routing). The `429`-only retry policy is preserved exactly by
+constructing the client with `status_forcelist=(429,)`.
 
 `requests` is already a core earthlens dependency, so this client adds
 none. The session is injectable (`session=`) so tests can drive the
@@ -27,7 +28,8 @@ from collections.abc import Callable, Iterator
 from typing import Any
 
 import requests
-from loguru import logger
+
+from earthlens.base.http import HttpClient
 
 #: OpenAQ v3 API base URL. All endpoint paths are joined onto this.
 BASE_URL = "https://api.openaq.org/v3"
@@ -131,6 +133,15 @@ class OpenaqClient:
         self.backoff_factor = backoff_factor
         self.timeout = timeout
         self._sleep = sleep
+        self._http = HttpClient(
+            session=self._session,
+            headers={"X-API-Key": api_key},
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            timeout=timeout,
+            status_forcelist=(429,),
+            sleep=sleep,
+        )
 
     def _request(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
         """GET one page of `path`, retrying on `429`.
@@ -154,29 +165,7 @@ class OpenaqClient:
             requests.HTTPError: On a non-`429` error status, or after
                 `max_retries` exhausted `429` responses.
         """
-        url = f"{BASE_URL}/{path}"
-        headers = {"X-API-Key": self._api_key}
-        attempt = 0
-        while True:
-            response = self._session.get(
-                url, params=params, headers=headers, timeout=self.timeout
-            )
-            if response.status_code == 429 and attempt < self.max_retries:
-                retry_after = _parse_retry_after(response.headers.get("Retry-After"))
-                wait = (
-                    retry_after
-                    if retry_after is not None
-                    else self.backoff_factor * (2**attempt)
-                )
-                logger.warning(
-                    f"OpenAQ rate-limited (429) on {path!r}; retry "
-                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
-                )
-                self._sleep(wait)
-                attempt += 1
-                continue
-            response.raise_for_status()
-            return response.json()
+        return self._http.get_json(f"{BASE_URL}/{path}", params=params)
 
     def paginate(
         self,
