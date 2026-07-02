@@ -26,10 +26,12 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import requests
 from loguru import logger
+from tqdm import tqdm
 
 #: Per-request timeout (seconds) applied when a call passes no `timeout`.
 DEFAULT_TIMEOUT = 60.0
@@ -45,6 +47,9 @@ DEFAULT_BACKOFF_FACTOR = 1.0
 #: HTTP statuses that trigger a retry. `429` (rate-limited) plus the
 #: transient `5xx` gateway/unavailable family.
 DEFAULT_STATUS_FORCELIST: tuple[int, ...] = (429, 500, 502, 503, 504)
+
+#: Streaming chunk size (bytes) for :meth:`HttpClient.download` — 1 MiB.
+DEFAULT_CHUNK_SIZE = 1 << 20
 
 
 def _parse_retry_after(value: str | None) -> float | None:
@@ -261,6 +266,83 @@ class HttpClient:
                 the retryable status is exhausted.
         """
         return self.get(url, **kwargs).json()
+
+    def stream(self, url: str, **kwargs: Any) -> requests.Response:
+        """Send a streaming `GET` (`stream=True`), retry-wrapped.
+
+        Returns the open response without consuming its body, so the
+        caller can iterate `iter_content`. Retries follow the same
+        `Retry-After`/back-off policy as the other verbs; the retry
+        decision reads only the status line, never the body.
+
+        Args:
+            url: Absolute request URL.
+            **kwargs: Keyword arguments forwarded to :meth:`get`.
+
+        Returns:
+            requests.Response: The open streaming response.
+        """
+        return self.get(url, stream=True, **kwargs)
+
+    def download(
+        self,
+        url: str,
+        dest: str | Path,
+        *,
+        chunk: int = DEFAULT_CHUNK_SIZE,
+        progress: bool = True,
+        headers: dict[str, str] | None = None,
+        timeout: float | None = None,
+        **kwargs: Any,
+    ) -> Path:
+        """Stream `url` to `dest`, optionally showing a `tqdm` bar.
+
+        Absorbs the chunk-loop the streamed-download backends each
+        re-implement: streams with `stream=True`, sizes a progress bar
+        from `Content-Length` when present, writes 1 MiB blocks to
+        `dest` (creating parent directories), and returns the path. The
+        initial response is retry-wrapped via :meth:`stream`.
+
+        Args:
+            url: Absolute request URL.
+            dest: Output file path. Parent directories are created.
+            chunk: Streaming block size in bytes (default 1 MiB).
+            progress: Show a `tqdm` progress bar. `False` (or a
+                non-interactive / test context) suppresses it.
+            headers: Per-request headers merged over the client defaults.
+            timeout: Per-request timeout override (seconds).
+            **kwargs: Extra keyword arguments forwarded to `requests`.
+
+        Returns:
+            Path: The `dest` path the bytes were written to.
+
+        Raises:
+            requests.HTTPError: On a non-retryable error status, or after
+                the retryable status is exhausted.
+        """
+        dest = Path(dest)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        response = self.stream(url, headers=headers, timeout=timeout, **kwargs)
+        raw_length = response.headers.get("Content-Length")
+        total = int(raw_length) if raw_length is not None and raw_length.isdigit() else None
+        bar = tqdm(
+            total=total,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            disable=not progress,
+            desc=dest.name,
+        )
+        try:
+            with open(dest, "wb") as handle:
+                for block in response.iter_content(chunk_size=chunk):
+                    if block:
+                        handle.write(block)
+                        bar.update(len(block))
+        finally:
+            bar.close()
+            response.close()
+        return dest
 
     def _request_with_retry(
         self, method: str, url: str, **kwargs: Any
