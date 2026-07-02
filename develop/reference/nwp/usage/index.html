@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -6436,6 +6436,17 @@
     <span class="md-ellipsis">
       
         Cloud mirror selection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#download-mode-subset-vs-whole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download mode: subset vs whole
       
     </span>
   </a>
@@ -15307,6 +15318,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../examples/nwp/download_mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NWP download mode — vs (no network)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../examples/nwp/gfs_temperature/" class="md-nav__link">
         
   
@@ -16895,6 +16934,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../base/http-client/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP client (base)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../base/region-affinity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Region affinity (base)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -17103,6 +17198,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#download-mode-subset-vs-whole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download mode: subset vs whole
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#output-bbox-cropped-cogs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17290,6 +17396,46 @@ are a follow-on.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="download-mode-subset-vs-whole"><a class="toclink" href="#download-mode-subset-vs-whole">Download mode: <code>subset</code> vs <code>whole</code></a><a class="headerlink" href="#download-mode-subset-vs-whole" title="Permanent link">#</a></h2>
+<p><code>mode=</code> controls how much of each GRIB2 is pulled off the wire before the
+bbox crop:</p>
+<table>
+<thead>
+<tr>
+<th><code>mode=</code></th>
+<th>behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"subset"</code> <em>(default)</em></td>
+<td>fetch only the requested bands. For a model with a <code>.idx</code> byte-range index (<code>idx: true</code> — the NOAA / Herbie models) this downloads just the matching messages, cutting <strong>&gt;99 %</strong> of the bytes. Models without an index already download the whole per-variable file.</td>
+</tr>
+<tr>
+<td><code>"whole"</code></td>
+<td>force a full-file download <strong>even for <code>.idx</code>-capable models</strong>, then crop. Useful when you want every variable/level from one cycle, or to work around an occasionally-stale <code>.idx</code>.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;nwp&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;gfs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;temperature_2m&quot;</span><span class="p">]},</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">],</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/gfs&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;whole&quot;</span><span class="p">,</span>                  <span class="c1"># full GFS file, then crop (default is &quot;subset&quot;)</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">)</span>
+</code></pre></div>
+<p><code>mode</code> only changes behaviour for the <strong><code>.idx</code>-capable NOAA / Herbie
+centre</strong> — every other centre (ECMWF Open Data, DWD, ECCC, Météo-France)
+is already whole-per-variable, so it accepts the flag and ignores it. The
+default <code>"subset"</code> path is unchanged from earlier releases.</p>
+<p><code>mode="zarr"</code> is <strong>rejected</strong> with a <code>ValueError</code>: no NWP catalog row
+carries a <code>zarr_url</code>, and Zarr sources (NWM, hrrrzarr) are separate
+backends. A Zarr download mode is a documented follow-on, gated on a
+future <code>zarr_url</code> catalog field (read through <code>pyramids.zarr</code>).</p>
 <h2 id="output-bbox-cropped-cogs"><a class="toclink" href="#output-bbox-cropped-cogs">Output: bbox-cropped COGs</a><a class="headerlink" href="#output-bbox-cropped-cogs" title="Permanent link">#</a></h2>
 <p>Each <code>(cycle, step)</code> yields one Cloud-Optimized GeoTIFF named
 <code>{model}_{YYYYMMDDHH}_f{step:03d}.tif</code> in <code>path</code>. The download fetches
@@ -17315,18 +17461,18 @@ side) and mosaic the results.</p>
 <h2 id="aggregating-the-forecast-stack"><a class="toclink" href="#aggregating-the-forecast-stack">Aggregating the forecast stack</a><a class="headerlink" href="#aggregating-the-forecast-stack" title="Permanent link">#</a></h2>
 <p>Pass <code>aggregate=</code> to reduce the per-<code>(cycle, step)</code> COGs into windowed
 composites (by <strong>valid time</strong> = <code>cycle + step</code>):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;nwp&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;gfs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;temperature_2m&quot;</span><span class="p">]},</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-07&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/gfs&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">)</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">),</span>  <span class="c1"># daily means</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;nwp&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;gfs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;temperature_2m&quot;</span><span class="p">]},</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-06-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-07&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/gfs&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">),</span>  <span class="c1"># daily means</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
 </code></pre></div>
 <p>Aggregation requires a <strong>single model</strong> per request — different models
 have different native grids and cannot be co-registered into one stack.
