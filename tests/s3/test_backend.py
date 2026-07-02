@@ -88,6 +88,41 @@ def test_all_missing_raises(tmp_path, fake_client_factory, patch_auth):
         source.download(progress_bar=False)
 
 
+def test_egress_warning_sums_known_sizes(tmp_path, monkeypatch):
+    """The egress check sums size_bytes across products that carry one."""
+    from earthlens.base import RemoteProduct
+
+    calls: list[tuple[str | None, int]] = []
+    monkeypatch.setattr(
+        "earthlens.s3.backend.warn_if_egress",
+        lambda region, *, size_bytes: calls.append((region, size_bytes)),
+    )
+    source = _dem_source(tmp_path)
+    products = [
+        RemoteProduct(id="a", href="a.tif", metadata={"bucket": "b", "size_bytes": 10}),
+        RemoteProduct(id="b", href="b.tif", metadata={"bucket": "b", "size_bytes": 20}),
+        RemoteProduct(id="c", href="c.tif", metadata={"bucket": "b"}),
+    ]
+    source._warn_cross_region_egress(products)
+    assert calls == [(source._dataset.region, 30)]
+
+
+def test_no_egress_warning_when_no_sizes(tmp_path, monkeypatch):
+    """No product carries a size, so the egress helper is not consulted."""
+    from earthlens.base import RemoteProduct
+
+    calls: list[int] = []
+    monkeypatch.setattr(
+        "earthlens.s3.backend.warn_if_egress",
+        lambda *args, **kwargs: calls.append(1),
+    )
+    source = _dem_source(tmp_path)
+    source._warn_cross_region_egress(
+        [RemoteProduct(id="a", href="a.tif", metadata={"bucket": "b"})]
+    )
+    assert calls == []
+
+
 def test_cog_dataset_rejects_aggregate(tmp_path, fake_client_factory, patch_auth):
     """aggregate= is rejected for a COG dataset with a clear message."""
     patch_auth(fake_client_factory())
