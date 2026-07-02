@@ -62,7 +62,10 @@ _AZURE_LOCATION_URL = (
 _UNSET: object = object()
 
 #: Per-process cache of the detected caller region (`None` = probed but
-#: undetermined). Reset with :func:`clear_region_cache`.
+#: undetermined). Reset with :func:`clear_region_cache`. Intentionally
+#: lock-free: a first-call race between threads only repeats the fail-safe
+#: probe, and the assignment is atomic under the GIL, so there is no
+#: correctness bug — only (at most) a redundant probe on a cold start.
 _cached_region: str | None | object = _UNSET
 
 
@@ -198,7 +201,7 @@ def _detect_caller_region(*, timeout: float = PROBE_TIMEOUT) -> str | None:
 
 
 def region_affinity(
-    bucket_region: str,
+    bucket_region: str | None,
     *,
     caller_region: str | None = None,
     probe: bool = True,
@@ -213,7 +216,7 @@ def region_affinity(
 
     Args:
         bucket_region: The region the target bucket lives in (e.g.
-            `"us-west-2"`).
+            `"us-west-2"`). `None` or empty yields `"unknown"`.
         caller_region: An explicit override for the caller's region. When
             given, the environment and probe are not consulted.
         probe: Whether to fall back to the instance-metadata probe when
@@ -251,7 +254,7 @@ def region_affinity(
 
 
 def warn_if_egress(
-    bucket_region: str,
+    bucket_region: str | None,
     *,
     size_bytes: int,
     threshold_bytes: int = DEFAULT_EGRESS_THRESHOLD_BYTES,
