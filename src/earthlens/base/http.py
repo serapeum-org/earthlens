@@ -29,6 +29,7 @@ from collections.abc import Callable
 from typing import Any
 
 import requests
+from loguru import logger
 
 #: Per-request timeout (seconds) applied when a call passes no `timeout`.
 DEFAULT_TIMEOUT = 60.0
@@ -44,6 +45,41 @@ DEFAULT_BACKOFF_FACTOR = 1.0
 #: HTTP statuses that trigger a retry. `429` (rate-limited) plus the
 #: transient `5xx` gateway/unavailable family.
 DEFAULT_STATUS_FORCELIST: tuple[int, ...] = (429, 500, 502, 503, 504)
+
+
+def _parse_retry_after(value: str | None) -> float | None:
+    """Parse a `Retry-After` header value into seconds.
+
+    Handles the integer-seconds form servers commonly return (e.g.
+    `Retry-After: 5`). A missing or non-numeric value yields `None` so
+    the caller falls back to exponential back-off. The HTTP-date form is
+    not parsed (no surveyed backend emits it); it also yields `None`.
+
+    Args:
+        value: The raw `Retry-After` header value, or `None`.
+
+    Returns:
+        The delay in seconds, or `None` when absent / unparseable.
+
+    Examples:
+        - A numeric value parses to seconds; junk yields `None`:
+            ```python
+            >>> from earthlens.base.http import _parse_retry_after
+            >>> _parse_retry_after("5")
+            5.0
+            >>> _parse_retry_after(None) is None
+            True
+            >>> _parse_retry_after("soon") is None
+            True
+
+            ```
+    """
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _default_user_agent() -> str:
@@ -206,13 +242,37 @@ class HttpClient:
         """Send a `POST` request. See :meth:`request` for arguments."""
         return self.request("POST", url, **kwargs)
 
+    def get_json(self, url: str, **kwargs: Any) -> Any:
+        """Send a `GET` request and decode the JSON response body.
+
+        Convenience over :meth:`get` for the REST endpoints that return
+        JSON envelopes.
+
+        Args:
+            url: Absolute request URL.
+            **kwargs: Keyword arguments forwarded to :meth:`get`
+                (`params`, `headers`, `timeout`, ...).
+
+        Returns:
+            The parsed JSON body (typically a `dict` or `list`).
+
+        Raises:
+            requests.HTTPError: On a non-retryable error status, or after
+                the retryable status is exhausted.
+        """
+        return self.get(url, **kwargs).json()
+
     def _request_with_retry(
         self, method: str, url: str, **kwargs: Any
     ) -> requests.Response:
-        """Send one request and raise for status (single-shot).
+        """Send one request, retrying retryable statuses with back-off.
 
-        The retry/back-off loop is layered on in `C2`; this base form
-        issues a single request and raises on any error status.
+        Retries while the response status is in `status_forcelist` and
+        the attempt budget is not spent: it waits `Retry-After` seconds
+        when the header is present and numeric, otherwise
+        `backoff_factor * 2**attempt`. Once the status is non-retryable
+        or the retries are exhausted, `raise_for_status` decides success
+        or error.
 
         Args:
             method: HTTP verb.
@@ -221,10 +281,33 @@ class HttpClient:
 
         Returns:
             requests.Response: The response after `raise_for_status`.
+
+        Raises:
+            requests.HTTPError: On a non-retryable error status, or after
+                the retryable status is exhausted.
         """
-        response = self._send(method, url, **kwargs)
-        response.raise_for_status()
-        return response
+        attempt = 0
+        while True:
+            response = self._send(method, url, **kwargs)
+            if (
+                response.status_code in self.status_forcelist
+                and attempt < self.max_retries
+            ):
+                retry_after = _parse_retry_after(response.headers.get("Retry-After"))
+                wait = (
+                    retry_after
+                    if retry_after is not None
+                    else self.backoff_factor * (2**attempt)
+                )
+                logger.warning(
+                    f"HTTP {response.status_code} on {url!r}; retry "
+                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
+                )
+                self._sleep(wait)
+                attempt += 1
+                continue
+            response.raise_for_status()
+            return response
 
     def _send(self, method: str, url: str, **kwargs: Any) -> requests.Response:
         """Dispatch to the session's verb method, falling back to `request`.
