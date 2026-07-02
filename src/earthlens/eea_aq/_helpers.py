@@ -26,9 +26,12 @@ import pandas as pd
 #: Approximate WGS84 bounding boxes `(lon_min, lat_min, lon_max, lat_max)`
 #: for the EEA reporting countries (EU-27 + EFTA + Western Balkans + Turkey
 #: + UK + reporting microstates). Mainland boxes only (overseas territories
-#: and remote islands are omitted). Used to resolve a request bbox to the
-#: countries whose data to download; pass an explicit `country=` to skip
-#: this heuristic.
+#: and remote islands are omitted). Every code here is in airbase's served
+#: `client.countries` set (e.g. `LI`/Liechtenstein is omitted — airbase does
+#: not serve it); the backend additionally intersects the derived set with
+#: the live `client.countries` at request time. Used to resolve a request
+#: bbox to the countries whose data to download; pass an explicit `country=`
+#: to skip this heuristic.
 EEA_COUNTRY_BBOXES: dict[str, tuple[float, float, float, float]] = {
     "AD": (1.41, 42.42, 1.79, 42.66),
     "AL": (19.29, 39.62, 21.06, 42.66),
@@ -52,7 +55,6 @@ EEA_COUNTRY_BBOXES: dict[str, tuple[float, float, float, float]] = {
     "IE": (-10.48, 51.42, -6.01, 55.39),
     "IS": (-24.55, 63.30, -13.50, 66.57),
     "IT": (6.63, 36.62, 18.52, 47.10),
-    "LI": (9.47, 47.05, 9.64, 47.27),
     "LT": (20.94, 53.90, 26.84, 56.45),
     "LU": (5.73, 49.44, 6.53, 50.19),
     "LV": (20.97, 55.67, 28.24, 58.09),

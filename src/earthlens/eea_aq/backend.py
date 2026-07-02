@@ -248,6 +248,36 @@ class EEA_AQ(AbstractDataSource):
             (self.space.west, self.space.east),
         )
 
+    def _supported_countries(self, client: Any, countries: list[str]) -> list[str]:
+        """Drop countries the airbase client does not serve, order-stable.
+
+        `airbase.request()` raises `ValueError` for any code outside its live
+        `client.countries` set, which would abort an otherwise-valid request
+        (a bbox can intersect a country airbase does not serve). Intersecting
+        here lets the request degrade gracefully to the served countries. A
+        client without a `countries` attribute (e.g. a test stand-in) skips
+        the filter.
+
+        Args:
+            client: The airbase client (or a compatible stand-in).
+            countries: The resolved ISO2 country codes.
+
+        Returns:
+            list[str]: `countries` keeping only airbase-served codes; a
+                dropped code is logged.
+        """
+        supported = getattr(client, "countries", None)
+        if supported is None:
+            return countries
+        kept = [code for code in countries if code in supported]
+        dropped = [code for code in countries if code not in supported]
+        if dropped:
+            logger.warning(
+                f"EEA download: skipping countries not served by the EEA "
+                f"download service: {dropped}."
+            )
+        return kept
+
     def _window(self) -> tuple[pd.Timestamp, pd.Timestamp]:
         """Return the `[lower, upper)` UTC filter bounds for the request.
 
@@ -280,6 +310,14 @@ class EEA_AQ(AbstractDataSource):
                 "bbox; returning an empty frame. Pass country= explicitly."
             )
             return empty_frame()
+        client = self._airbase_client()
+        countries = self._supported_countries(client, countries)
+        if not countries:
+            logger.warning(
+                "EEA download: none of the requested countries are served by "
+                "the EEA download service; returning an empty frame."
+            )
+            return empty_frame()
         polls = self._catalog.polls_for(self.vars)
         # Restrict the code -> name map to the requested pollutants so a
         # Parquet that happens to carry extra pollutants never leaks rows the
@@ -290,7 +328,6 @@ class EEA_AQ(AbstractDataSource):
         datasets = datasets_for_years(
             self.time.start_date.year, self.time.end_date.year
         )
-        client = self._airbase_client()
 
         frames: list[pd.DataFrame] = []
         for dataset in datasets:
