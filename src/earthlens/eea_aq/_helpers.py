@@ -18,6 +18,7 @@ Three concerns the backend needs but that carry no instance state:
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 import pandas as pd
@@ -221,3 +222,44 @@ def empty_frame() -> pd.DataFrame:
         pd.DataFrame: Zero rows, `SCHEMA` columns and dtypes.
     """
     return pd.DataFrame({column: [] for column in SCHEMA}).astype(SCHEMA)
+
+
+def _patch_running_loop() -> None:
+    """Allow airbase's `asyncio.run()` to nest under a running event loop.
+
+    airbase's `download()` calls `asyncio.run()` internally, which raises
+    `RuntimeError` when a loop is already running (e.g. inside a Jupyter
+    kernel). In a plain script there is no running loop and this is a no-op;
+    under a running loop it applies `nest_asyncio` (present wherever a
+    Jupyter kernel runs, via `ipykernel`) so the nested `run()` succeeds —
+    keeping the download on the calling thread (airbase's SQLite session is
+    thread-bound, so a worker thread is not an option).
+
+    Raises:
+        RuntimeError: When a loop is running but `nest_asyncio` is not
+            installed; the message names the fix.
+    """
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return
+    try:
+        import nest_asyncio
+    except ImportError as exc:  # pragma: no cover - only without nest_asyncio
+        raise RuntimeError(
+            "eea_aq download is running inside an active event loop (e.g. a "
+            "Jupyter kernel); install nest_asyncio (`pip install nest_asyncio`) "
+            "so airbase's asyncio.run() can nest."
+        ) from exc
+    nest_asyncio.apply()
+
+
+def download_request(request: Any, directory: str) -> None:
+    """Run an airbase `request.download()`, tolerating a running event loop.
+
+    Args:
+        request: The `airbase.AirbaseRequest` (or a compatible stand-in).
+        directory: Destination directory for the downloaded Parquet.
+    """
+    _patch_running_loop()
+    request.download(dir=directory, skip_existing=True, raise_for_status=True)

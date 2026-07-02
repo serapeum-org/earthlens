@@ -46,6 +46,7 @@ from earthlens.base import (
 from earthlens.eea_aq._helpers import (
     countries_in_bbox,
     datasets_for_years,
+    download_request,
     empty_frame,
     shape_frame,
 )
@@ -295,7 +296,7 @@ class EEA_AQ(AbstractDataSource):
         for dataset in datasets:
             with tempfile.TemporaryDirectory(prefix="earthlens_eea_") as tmp:
                 request = client.request(dataset, *countries, poll=polls, verbose=False)
-                request.download(dir=tmp, skip_existing=True, raise_for_status=True)
+                download_request(request, tmp)
                 parquets = sorted(Path(tmp).rglob("*.parquet"))
                 if not parquets:
                     logger.info(

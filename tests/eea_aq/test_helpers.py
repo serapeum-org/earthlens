@@ -2,15 +2,31 @@
 
 from __future__ import annotations
 
+import asyncio
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
 from earthlens.eea_aq._helpers import (
     countries_in_bbox,
     datasets_for_years,
+    download_request,
     empty_frame,
     shape_frame,
 )
+
+
+class _LoopRequest:
+    """Stand-in airbase request that writes a marker file on download."""
+
+    def download(self, dir: str, skip_existing: bool = True, raise_for_status: bool = True) -> None:
+        Path(dir, "ok.txt").write_text("x", encoding="utf-8")
+
+
+async def _adownload(request: _LoopRequest, directory: str) -> None:
+    """Call `download_request` from inside a running event loop."""
+    download_request(request, directory)
 
 
 @pytest.mark.eea
@@ -107,3 +123,17 @@ def test_empty_frame_schema():
     """`empty_frame` has the full long schema and zero rows."""
     frame = empty_frame()
     assert frame.empty and "station_id" in frame.columns
+
+
+@pytest.mark.eea
+def test_download_request_direct(tmp_path):
+    """`download_request` runs the request outside any event loop."""
+    download_request(_LoopRequest(), str(tmp_path))
+    assert (tmp_path / "ok.txt").exists()
+
+
+@pytest.mark.eea
+def test_download_request_nests_under_running_loop(tmp_path):
+    """`download_request` applies nest_asyncio under a running loop (Jupyter)."""
+    asyncio.run(_adownload(_LoopRequest(), str(tmp_path)))
+    assert (tmp_path / "ok.txt").exists()
