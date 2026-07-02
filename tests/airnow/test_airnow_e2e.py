@@ -66,6 +66,7 @@ class TestAirnowLiveQuery:
 
         assert not df.empty, "expected at least one PM2.5 observation in LA"
         assert _SCHEMA_COLUMNS <= set(df.columns), f"missing columns: {df.columns}"
+        assert df["value"].notna().any(), "the value column is entirely NaN (wrong field?)"
         assert (df["value"].dropna() >= 0).all(), "negative pollutant concentration"
         assert df["lat"].between(_LA_LAT[0], _LA_LAT[1]).all()
         assert df["lon"].between(_LA_LON[0], _LA_LON[1]).all()

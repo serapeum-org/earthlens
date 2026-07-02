@@ -448,11 +448,17 @@ def _observation_row(observation: dict[str, Any]) -> dict[str, Any]:
     Returns:
         dict[str, Any]: A row keyed by the `_SCHEMA` columns.
     """
+    # The `/aq/data/` endpoint returns the concentration under `Value`
+    # (with `RawConcentration` for the unadjusted value); older/other
+    # AirNow surfaces spell it `Concentration`, so fall back to that.
+    concentration = observation.get("Value")
+    if concentration is None:
+        concentration = observation.get("Concentration")
     return {
         "station_id": observation.get("FullAQSCode"),
         "parameter": observation.get("Parameter"),
         "datetime_utc": pd.to_datetime(observation.get("UTC"), utc=True),
-        "value": _scrub_sentinel(observation.get("Concentration")),
+        "value": _scrub_sentinel(concentration),
         "units": observation.get("Unit"),
         "aqi": _scrub_sentinel(observation.get("AQI")),
         "category": _scrub_sentinel(observation.get("Category")),

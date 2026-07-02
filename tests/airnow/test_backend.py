@@ -136,6 +136,20 @@ class TestOutputFrame:
         assert str(df["datetime_utc"].dtype) == "datetime64[ns, UTC]"
         assert df.loc[0, "value"] == 12.3
 
+    def test_reads_value_field(self, tmp_path, fake_airnow):
+        """The concentration is read from AirNow's `Value` field."""
+        state = _FakeAirnow(rows=[_observation(concentration=9.9)])
+        df = _backend(state, tmp_path).download(progress_bar=False)
+        assert df.loc[0, "value"] == 9.9
+
+    def test_concentration_field_fallback(self, tmp_path, fake_airnow):
+        """A row spelling the value `Concentration` is still read."""
+        row = _observation(concentration=7.5)
+        del row["Value"]
+        row["Concentration"] = 7.5
+        df = _backend(_FakeAirnow(rows=[row]), tmp_path).download(progress_bar=False)
+        assert df.loc[0, "value"] == 7.5
+
     def test_missing_sentinel_scrubbed(self, tmp_path, fake_airnow):
         """AirNow's -999 sentinel becomes NaN for value/aqi/category."""
         state = _FakeAirnow(
