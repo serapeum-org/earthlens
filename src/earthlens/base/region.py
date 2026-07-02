@@ -25,6 +25,8 @@ from __future__ import annotations
 import os
 import urllib.request
 
+from loguru import logger
+
 #: The process runs in the same region as the target bucket.
 IN_REGION = "in-region"
 
@@ -33,6 +35,11 @@ EGRESS = "egress"
 
 #: The caller region could not be determined.
 UNKNOWN = "unknown"
+
+#: Default size above which a cross-region pull warrants an egress warning
+#: (1 GiB). A parameter of :func:`warn_if_egress`, never hard-coded at a
+#: call site.
+DEFAULT_EGRESS_THRESHOLD_BYTES = 1 << 30
 
 #: Hard timeout (seconds) for every instance-metadata probe. Keeps the
 #: fallback from ever blocking a download when the endpoint is absent.
@@ -240,3 +247,41 @@ def region_affinity(
     if caller is None:
         return UNKNOWN
     return IN_REGION if caller == bucket_region else EGRESS
+
+
+def warn_if_egress(
+    bucket_region: str,
+    *,
+    size_bytes: int,
+    threshold_bytes: int = DEFAULT_EGRESS_THRESHOLD_BYTES,
+    caller_region: str | None = None,
+    probe: bool = True,
+) -> str:
+    """Warn once before a large cross-region pull, returning the hint.
+
+    Computes the region affinity and, when the caller is in a different
+    region than the bucket (`"egress"`) and the transfer exceeds
+    `threshold_bytes`, emits a single `loguru` warning so the user learns
+    about the cross-region cost and latency up front. The hint is
+    returned so a caller can branch on it too.
+
+    Args:
+        bucket_region: The region the target bucket lives in.
+        size_bytes: The size of the pending transfer in bytes.
+        threshold_bytes: The size above which the warning fires (default
+            1 GiB). A parameter, never hard-coded at the call site.
+        caller_region: An explicit override for the caller's region.
+        probe: Whether to allow the instance-metadata probe (see
+            :func:`region_affinity`).
+
+    Returns:
+        The affinity hint — `"in-region"`, `"egress"`, or `"unknown"`.
+    """
+    hint = region_affinity(bucket_region, caller_region=caller_region, probe=probe)
+    if hint == EGRESS and size_bytes > threshold_bytes:
+        logger.warning(
+            f"Cross-region egress: pulling {size_bytes / (1 << 30):.2f} GiB "
+            f"from {bucket_region!r} while running elsewhere — expect slower, "
+            f"billed transfer. Run in {bucket_region!r} to stream in-region."
+        )
+    return hint

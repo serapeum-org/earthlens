@@ -21,7 +21,11 @@ from earthlens.base.auth import AbstractAuth, AuthenticationError
 from earthlens.base.http import HttpClient
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
-from earthlens.base.region import clear_region_cache, region_affinity
+from earthlens.base.region import (
+    clear_region_cache,
+    region_affinity,
+    warn_if_egress,
+)
 from earthlens.base.spatial import (
     METRES_PER_DEGREE,
     crop_to_aoi,
@@ -56,4 +60,5 @@ __all__ = [
     "resolve_aoi",
     "split_time",
     "to_datetime",
+    "warn_if_egress",
 ]
