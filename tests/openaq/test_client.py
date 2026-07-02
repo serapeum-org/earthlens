@@ -88,6 +88,14 @@ class TestRequest:
         assert session.calls[0]["headers"]["X-API-Key"] == "key"
         assert session.calls[0]["url"] == f"{BASE_URL}/locations"
 
+    def test_sends_earthlens_user_agent(self):
+        """The HttpClient migration sends the non-Mozilla earthlens UA (G4)."""
+        client, session = _client([_Resp({"results": []})])
+        client._request("locations", {"limit": 10})
+        user_agent = session.calls[0]["headers"]["User-Agent"]
+        assert user_agent.startswith("earthlens/")
+        assert "mozilla" not in user_agent.lower()
+
     def test_429_then_success(self):
         """A 429 with Retry-After is retried, then succeeds."""
         client, session = _client(
