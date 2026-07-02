@@ -18,6 +18,7 @@ from earthlens.base.abstractdatasource import (
     TemporalExtent,
 )
 from earthlens.base.auth import AbstractAuth, AuthenticationError
+from earthlens.base.http import HttpClient
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
 from earthlens.base.spatial import (
@@ -35,6 +36,7 @@ __all__ = [
     "AbstractDataSource",
     "AuthenticationError",
     "FluxableLeaf",
+    "HttpClient",
     "LazyClientMixin",
     "METRES_PER_DEGREE",
     "OutputKind",
