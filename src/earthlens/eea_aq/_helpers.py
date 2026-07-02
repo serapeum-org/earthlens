@@ -75,10 +75,17 @@ EEA_COUNTRY_BBOXES: dict[str, tuple[float, float, float, float]] = {
 }
 
 #: EEA dataset name -> inclusive `(first_year, last_year)` reporting era.
-#: `Unverified` is open-ended (a large sentinel upper bound).
+#: `Verified` is left open-ended (not capped at 2022) on purpose: the EEA
+#: promotes a year from the near-real-time `Unverified` (E2a/UTD) stream into
+#: `Verified` (E1a) once validated (~September of the following year), and the
+#: UTD stream keeps only a rolling window. So any year from 2023 on is queried
+#: against *both* `Verified` and `Unverified` and the rows de-duplicated,
+#: rather than routed to a single era by a hard-coded cutoff that goes stale
+#: every year. Years 2013–2022 still resolve to `Verified` alone (the
+#: `Unverified` era starts in 2023 and does not intersect them).
 EEA_DATASET_YEARS: dict[str, tuple[int, int]] = {
     "Historical": (2002, 2012),
-    "Verified": (2013, 2022),
+    "Verified": (2013, 9999),
     "Unverified": (2023, 9999),
 }
 

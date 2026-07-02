@@ -348,6 +348,11 @@ class EEA_AQ(AbstractDataSource):
         if not non_empty:
             return empty_frame()
         combined = pd.concat(non_empty, ignore_index=True)
+        # A recently-promoted year can appear in both Verified and Unverified,
+        # so drop rows duplicated across eras (same station, pollutant, time).
+        combined = combined.drop_duplicates(
+            subset=["station_id", "parameter", "datetime_utc"]
+        )
         lower, upper = self._window()
         mask = (combined["datetime_utc"] >= lower) & (combined["datetime_utc"] < upper)
         return combined[mask].reset_index(drop=True)

@@ -64,7 +64,9 @@ class TestDatasetsForYears:
         [
             (2010, 2011, ["Historical"]),
             (2015, 2016, ["Verified"]),
-            (2024, 2025, ["Unverified"]),
+            # 2023+ resolves to BOTH eras: recently-promoted years may sit in
+            # Verified while the UTD stream still carries them in Unverified.
+            (2024, 2025, ["Verified", "Unverified"]),
             (2021, 2024, ["Verified", "Unverified"]),
             (2010, 2025, ["Historical", "Verified", "Unverified"]),
         ],

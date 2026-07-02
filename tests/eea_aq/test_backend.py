@@ -57,10 +57,18 @@ class TestApi:
         df = _backend(fake_client, tmp_path).download(progress_bar=False)
         assert (df["datetime_utc"].dt.year == 2023).all()
 
-    def test_request_uses_unverified_dataset(self, tmp_path, fake_client):
-        """A 2023 window requests the Unverified dataset for MT / PM2.5."""
+    def test_request_uses_both_eras_for_recent_year(self, tmp_path, fake_client):
+        """A 2023 window queries both Verified and Unverified for MT / PM2.5."""
         _backend(fake_client, tmp_path).download(progress_bar=False)
-        assert fake_client.calls == [("Unverified", ("MT",), ["PM2.5"])]
+        assert [call[0] for call in fake_client.calls] == ["Verified", "Unverified"]
+        assert all(call[1] == ("MT",) and call[2] == ["PM2.5"] for call in fake_client.calls)
+
+    def test_dedup_across_eras(self, tmp_path, fake_client):
+        """A row served by both eras (recent year) is de-duplicated."""
+        df = _backend(fake_client, tmp_path).download(progress_bar=False)
+        # The fixture's single in-window 2023 MT pm25 row is downloaded for both
+        # Verified and Unverified but must appear once.
+        assert len(df) == 1
 
     def test_multi_dataset_range(self, tmp_path, fake_client):
         """A range straddling the boundary requests two datasets."""
