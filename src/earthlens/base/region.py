@@ -148,6 +148,8 @@ def _normalize_gcp_zone(zone: str) -> str | None:
 
     Turns `projects/123/zones/us-west1-a` (or the bare `us-west1-a`) into
     `us-west1` by dropping the path prefix and the trailing zone letter.
+    Only a trailing single-letter suffix is stripped, so a bare region
+    (`us-west1`) passes through unchanged rather than being mangled.
 
     Args:
         zone: The raw zone string from the metadata endpoint.
@@ -158,8 +160,10 @@ def _normalize_gcp_zone(zone: str) -> str | None:
     tail = zone.rsplit("/", 1)[-1]
     if not tail:
         return None
-    region, _, letter = tail.rpartition("-")
-    return region if region and letter else tail
+    region, sep, letter = tail.rpartition("-")
+    if sep and region and len(letter) == 1 and letter.isalpha():
+        return region
+    return tail
 
 
 def _probe_gcp(timeout: float) -> str | None:

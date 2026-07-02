@@ -210,11 +210,12 @@ class TestNormalizeGcpZone:
             ("projects/9/zones/us-west1-a", "us-west1"),
             ("us-west1-a", "us-west1"),
             ("westus2", "westus2"),
+            ("europe-west4", "europe-west4"),
             ("", None),
         ],
     )
     def test_normalise(self, zone: str, expected: str | None):
-        """Path and trailing zone letter are stripped to the region."""
+        """Path and a trailing single zone letter are stripped to the region."""
         assert _normalize_gcp_zone(zone) == expected
 
 
