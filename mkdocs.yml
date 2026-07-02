@@ -589,6 +589,7 @@ nav:
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
+    - HTTP client (base): reference/base/http-client.md
   - About:
     - Change Log: change-log.md
     - License: LICENSE.md
