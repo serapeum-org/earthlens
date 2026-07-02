@@ -485,6 +485,19 @@ class EarthLens:
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
             "hdx": ("earthlens.hdx", "HDX", "hdx", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
+            # Ground-obs air-quality trio completing OpenAQ's coverage, all
+            # tabular (DataFrame). airnow (US/Canada EPA, /aq/data/ bbox REST)
+            # and sensor-community (crowdsourced archive CSV) are core
+            # (requests + pandas); eea-aq wraps airbase behind the [eea_aq]
+            # extra.
+            "airnow": ("earthlens.airnow", "AirNow", "", {}),
+            "eea-aq": ("earthlens.eea_aq", "EEA_AQ", "eea_aq", {}),
+            "sensor-community": (
+                "earthlens.sensor_community",
+                "SensorCommunity",
+                "",
+                {},
+            ),
             # openEO server-side processing (defaults to CDSE openEO). Builds a
             # process graph the backend executes; returns the written paths.
             "openeo": ("earthlens.openeo", "OpenEO", "openeo", {}),

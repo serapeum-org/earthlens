@@ -71,6 +71,11 @@ earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 # ASF InSAR backend reuses the EDL token already minted by `[earthdata]`, so
 # the asf extra pulls earthdata transitively rather than re-declaring its deps.
 asf = ["asf_search >=12.2.2", "earthlens[earthdata]"]
+# EEA (European Environment Agency) air-quality backend wraps the airbase
+# SDK (request().download() -> Parquet), imported lazily so the package
+# imports without it. airnow + sensor_community, the other two air-quality
+# ground-obs backends, are core (requests + pandas) and add no extra.
+eea_aq = ["airbase >=1.0"]
 hdx = ["hdx-python-api >=6,<7"]
 eumetsat = ["eumdac >=3.1"]
 # herbie/cfgrib decode GRIB through the ecCodes C library. On Linux/macOS the
@@ -140,7 +145,7 @@ osm = ["overpy >=0.7", "ohsome >=0.4.0"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 # (argo and osm are intentionally excluded — see the notes above their extras.)
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
+    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eea_aq,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
 ]
 
 [dependency-groups]
@@ -304,6 +309,9 @@ markers = [
     "sentinel_hub: tests for the Sentinel Hub server-side-render backend (requires the `sentinel-hub` extra: sentinelhub).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
+    "airnow: tests for the AirNow air-quality backend (US/Canada EPA `/aq/data/` bbox REST; no extra SDK — core `requests` + `pandas`; needs a free AIRNOW_API_KEY for live e2e).",
+    "eea: tests for the EEA (`eea_aq`) air-quality backend (requires the `eea_aq` extra: airbase; European monitor observations via Parquet; public, no auth).",
+    "sensor_community: tests for the Sensor.Community air-quality backend (crowdsourced low-cost sensors; no extra SDK — core `requests` + `pandas`; public archive + live JSON API, ODbL).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
     "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
