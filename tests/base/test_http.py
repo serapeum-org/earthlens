@@ -12,6 +12,7 @@ from earthlens.base.http import (
     HttpClient,
     _default_user_agent,
     _parse_retry_after,
+    _progress_total,
 )
 
 
@@ -117,9 +118,10 @@ class TestDefaults:
 
     def test_custom_user_agent_overrides_default(self):
         """A user_agent= argument replaces the default agent string."""
-        assert HttpClient(user_agent="osm-contact/1.0").default_headers[
-            "User-Agent"
-        ] == "osm-contact/1.0"
+        assert (
+            HttpClient(user_agent="osm-contact/1.0").default_headers["User-Agent"]
+            == "osm-contact/1.0"
+        )
 
     def test_extra_headers_merge_into_defaults(self):
         """Construction headers= merge onto the defaults (e.g. X-API-Key)."""
@@ -181,6 +183,34 @@ class TestRequest:
         client = HttpClient(session=session)
         assert client.get_json("http://x") == {"ok": 1}
         assert session.calls[0][0] == "GET"
+
+    def test_stream_requests_stream_and_returns_response(self):
+        """stream() issues a stream=True GET and returns the open response."""
+        resp = _Resp(body={})
+        session = _RecordingSession([resp])
+        assert HttpClient(session=session).stream("http://x") is resp
+        assert session.calls[0][2]["stream"] is True
+
+
+@pytest.mark.unit
+class TestProgressTotal:
+    """Progress-bar total derivation from response headers."""
+
+    def test_plain_content_length(self):
+        """A numeric Content-Length with no encoding is the total."""
+        assert _progress_total({"Content-Length": "1024"}) == 1024
+
+    def test_gzip_encoded_is_unbounded(self):
+        """A Content-Encoding body yields no total (compressed length lies)."""
+        assert (
+            _progress_total({"Content-Length": "1024", "Content-Encoding": "gzip"})
+            is None
+        )
+
+    def test_missing_or_non_numeric_is_none(self):
+        """Absent or non-numeric Content-Length yields no total."""
+        assert _progress_total({}) is None
+        assert _progress_total({"Content-Length": "big"}) is None
 
 
 @pytest.mark.unit
@@ -263,18 +293,14 @@ class TestDownload:
     def test_download_requests_stream(self, tmp_path):
         """download issues a streaming GET (stream=True)."""
         session = _RecordingSession([_Resp(blocks=[b"a"])])
-        HttpClient(session=session).download(
-            "http://x", tmp_path / "f", progress=False
-        )
+        HttpClient(session=session).download("http://x", tmp_path / "f", progress=False)
         assert session.calls[0][2]["stream"] is True
 
     def test_download_closes_response(self, tmp_path):
         """download closes the streaming response when finished."""
         response = _Resp(blocks=[b"a", b"b"])
         session = _RecordingSession([response])
-        HttpClient(session=session).download(
-            "http://x", tmp_path / "f", progress=False
-        )
+        HttpClient(session=session).download("http://x", tmp_path / "f", progress=False)
         assert response.closed is True
 
     def test_download_without_content_length(self, tmp_path):

@@ -87,6 +87,29 @@ def _parse_retry_after(value: str | None) -> float | None:
         return None
 
 
+def _progress_total(headers: Any) -> int | None:
+    """Return the download progress-bar total from response headers.
+
+    Uses `Content-Length` only for an untransformed body: it reports the
+    *compressed* size, but `iter_content` yields *decompressed* bytes, so
+    a `Content-Encoding` (e.g. gzip) response would overshoot the bar. In
+    that case (or when the length is absent / non-numeric) the total is
+    `None` and the bar runs unbounded.
+
+    Args:
+        headers: The response headers mapping.
+
+    Returns:
+        The byte total, or `None` when it cannot be trusted.
+    """
+    if headers.get("Content-Encoding"):
+        return None
+    raw_length = headers.get("Content-Length")
+    if raw_length is not None and raw_length.isdigit():
+        return int(raw_length)
+    return None
+
+
 def _default_user_agent() -> str:
     """Return the default `User-Agent`, `earthlens/{version}`.
 
@@ -323,10 +346,7 @@ class HttpClient:
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
         response = self.stream(url, headers=headers, timeout=timeout, **kwargs)
-        raw_length = response.headers.get("Content-Length")
-        total = (
-            int(raw_length) if raw_length is not None and raw_length.isdigit() else None
-        )
+        total = _progress_total(response.headers)
         bar = tqdm(
             total=total,
             unit="B",
