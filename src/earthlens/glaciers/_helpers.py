@@ -171,7 +171,7 @@ def _stream_download(
         requests.HTTPError: If every attempt fails (the last error re-raised).
     """
     http = HttpClient(
-        session=session or _RequestsGet(),
+        session=session if session is not None else _RequestsGet(),
         retry_on_exceptions=(requests.RequestException, OSError),
         status_forcelist=(429, 500, 502, 503, 504),
         raise_for_status=True,
