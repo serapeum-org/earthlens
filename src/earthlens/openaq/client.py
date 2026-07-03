@@ -95,9 +95,6 @@ class OpenaqClient:
         """
         self._api_key = api_key
         self._session = session if session is not None else requests.Session()
-        self.max_retries = max_retries
-        self.backoff_factor = backoff_factor
-        self.timeout = timeout
         self._http = HttpClient(
             session=self._session,
             headers={"X-API-Key": api_key},
@@ -107,6 +104,21 @@ class OpenaqClient:
             status_forcelist=(429,),
             sleep=sleep,
         )
+
+    @property
+    def max_retries(self) -> int:
+        """Maximum `429` retries before the last error is raised."""
+        return self._http.max_retries
+
+    @property
+    def backoff_factor(self) -> float:
+        """Base seconds for exponential back-off (no `Retry-After`)."""
+        return self._http.backoff_factor
+
+    @property
+    def timeout(self) -> float:
+        """Per-request timeout in seconds."""
+        return self._http.timeout
 
     def _request(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
         """GET one page of `path`, retrying on `429`.
