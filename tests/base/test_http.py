@@ -13,6 +13,7 @@ from earthlens.base.http import (
     _default_user_agent,
     _parse_retry_after,
     _progress_total,
+    _redact_url,
 )
 
 
@@ -149,6 +150,44 @@ class TestParseRetryAfter:
             "earthlens.base.http.parsedate_to_datetime", lambda value: None
         )
         assert _parse_retry_after("not-a-real-date") is None
+
+
+@pytest.mark.unit
+class TestRedactUrl:
+    """URL redaction for retry logs (secrets can ride in path or query)."""
+
+    @pytest.mark.parametrize(
+        "url, expected",
+        [
+            ("https://firms.example/api/SECRETKEY/area?x=1", "https://firms.example"),
+            ("https://host/p?api_key=SECRET", "https://host"),
+            ("not-a-url", "<url>"),
+            ("", "<url>"),
+        ],
+    )
+    def test_redact(self, url: str, expected: str):
+        """The path and query are stripped to scheme://host."""
+        assert _redact_url(url) == expected
+
+    def test_retry_log_omits_url_path_and_query(self):
+        """A retry warning logs only the host — never a path/query secret."""
+        from loguru import logger
+
+        messages: list[str] = []
+        sink = logger.add(lambda m: messages.append(str(m)), level="WARNING")
+        try:
+            session = _RecordingSession(
+                [_Resp(status=429, headers={"Retry-After": "0"}), _Resp(body={})]
+            )
+            HttpClient(session=session, sleep=lambda _: None).get(
+                "https://h/api/SECRETKEY/x?api_key=TOPSECRET"
+            )
+        finally:
+            logger.remove(sink)
+        joined = " ".join(messages)
+        assert "SECRETKEY" not in joined
+        assert "TOPSECRET" not in joined
+        assert "https://h" in joined
 
 
 @pytest.mark.unit

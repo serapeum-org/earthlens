@@ -30,6 +30,7 @@ from collections.abc import Callable
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import requests
 from loguru import logger
@@ -111,6 +112,36 @@ def _parse_retry_after(value: str | None) -> float | None:
         return None
     now = dt.datetime.now(tz=target.tzinfo)
     return max(0.0, (target - now).total_seconds())
+
+
+def _redact_url(url: str) -> str:
+    """Return `scheme://host` for logging, hiding any secret in the URL.
+
+    Retry warnings must never echo the full request URL: some backends
+    carry a credential in the URL itself — a path segment (FIRMS
+    `MAP_KEY`) or a query parameter (NREL `api_key`, WDPA `?token=`). The
+    path, query, and fragment are dropped so only the (non-secret) scheme
+    and host reach the log.
+
+    Args:
+        url: The request URL.
+
+    Returns:
+        `"scheme://host"`, or `"<url>"` when the input has no scheme/host.
+
+    Examples:
+        - The path and query — where secrets ride — are stripped:
+            ```python
+            >>> from earthlens.base.http import _redact_url
+            >>> _redact_url("https://firms.example/api/SECRETKEY/area?x=1")
+            'https://firms.example'
+
+            ```
+    """
+    parts = urlsplit(url)
+    if not parts.scheme or not parts.netloc:
+        return "<url>"
+    return f"{parts.scheme}://{parts.netloc}"
 
 
 def _progress_total(headers: Any) -> int | None:
@@ -491,7 +522,7 @@ class HttpClient:
                         )
                         wait = self._backoff_wait(retry_after, attempt)
                         logger.warning(
-                            f"HTTP {response.status_code} on {url!r}; retry "
+                            f"HTTP {response.status_code} on {_redact_url(url)}; retry "
                             f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                         )
                         self._sleep(wait)
@@ -509,7 +540,7 @@ class HttpClient:
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
-                    f"{type(exc).__name__} on {url!r}; retry "
+                    f"{type(exc).__name__} on {_redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 self._sleep(wait)
@@ -606,7 +637,7 @@ class HttpClient:
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
-                    f"{type(exc).__name__} on {url!r}; retry "
+                    f"{type(exc).__name__} on {_redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 self._sleep(wait)
@@ -619,7 +650,7 @@ class HttpClient:
                 retry_after = _parse_retry_after(response.headers.get("Retry-After"))
                 wait = self._backoff_wait(retry_after, attempt)
                 logger.warning(
-                    f"HTTP {response.status_code} on {url!r}; retry "
+                    f"HTTP {response.status_code} on {_redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 # Release the (possibly streamed) connection before retrying;
