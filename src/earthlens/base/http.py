@@ -61,18 +61,22 @@ def _parse_retry_after(value: str | None) -> float | None:
     """Parse a `Retry-After` header value into seconds.
 
     Handles the integer-seconds form servers commonly return (e.g.
-    `Retry-After: 5`). A missing or non-numeric value yields `None` so
-    the caller falls back to exponential back-off. The HTTP-date form is
-    not parsed (no surveyed backend emits it); it also yields `None`.
+    `Retry-After: 5`). A missing, non-numeric, or **negative** value
+    yields `None` so the caller falls back to exponential back-off (the
+    spec mandates a non-negative delay; a negative one is invalid). The
+    HTTP-date form is not parsed (no surveyed backend emits it); it also
+    yields `None`.
 
     Args:
         value: The raw `Retry-After` header value, or `None`.
 
     Returns:
-        The delay in seconds, or `None` when absent / unparseable.
+        The delay in seconds, or `None` when absent / unparseable /
+        negative.
 
     Examples:
-        - A numeric value parses to seconds; junk yields `None`:
+        - A numeric value parses to seconds; junk or a negative yields
+          `None`:
             ```python
             >>> from earthlens.base.http import _parse_retry_after
             >>> _parse_retry_after("5")
@@ -81,15 +85,18 @@ def _parse_retry_after(value: str | None) -> float | None:
             True
             >>> _parse_retry_after("soon") is None
             True
+            >>> _parse_retry_after("-1") is None
+            True
 
             ```
     """
     if value is None:
         return None
     try:
-        return float(value)
+        seconds = float(value)
     except (TypeError, ValueError):
         return None
+    return seconds if seconds >= 0 else None
 
 
 def _progress_total(headers: Any) -> int | None:
@@ -107,7 +114,8 @@ def _progress_total(headers: Any) -> int | None:
     Returns:
         The byte total, or `None` when it cannot be trusted.
     """
-    if headers.get("Content-Encoding"):
+    encoding = (headers.get("Content-Encoding") or "").strip().lower()
+    if encoding and encoding != "identity":
         return None
     raw_length = headers.get("Content-Length")
     if raw_length is not None and raw_length.isdigit():
@@ -416,6 +424,7 @@ class HttpClient:
                 )
                 if self.max_backoff is not None:
                     wait = min(wait, self.max_backoff)
+                wait = max(0.0, wait)
                 logger.warning(
                     f"HTTP {response.status_code} on {url!r}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"

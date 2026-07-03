@@ -91,10 +91,17 @@ class TestParseRetryAfter:
 
     @pytest.mark.parametrize(
         "value, expected",
-        [("5", 5.0), ("0", 0.0), (None, None), ("soon", None), ("", None)],
+        [
+            ("5", 5.0),
+            ("0", 0.0),
+            (None, None),
+            ("soon", None),
+            ("", None),
+            ("-1", None),
+        ],
     )
     def test_parse(self, value: str | None, expected: float | None):
-        """Numeric values parse to seconds; missing/junk yield None."""
+        """Numeric non-negative values parse; missing/junk/negative yield None."""
         assert _parse_retry_after(value) == expected
 
 
@@ -212,6 +219,13 @@ class TestProgressTotal:
         assert _progress_total({}) is None
         assert _progress_total({"Content-Length": "big"}) is None
 
+    def test_identity_encoding_is_treated_as_unencoded(self):
+        """Content-Encoding: identity is a no-op, so Content-Length is trusted."""
+        assert (
+            _progress_total({"Content-Length": "512", "Content-Encoding": "identity"})
+            == 512
+        )
+
 
 @pytest.mark.unit
 class TestRetry:
@@ -275,6 +289,15 @@ class TestRetry:
         )
         client.get("http://x")
         assert waits == [120.0]
+
+    def test_negative_retry_after_falls_back_to_backoff(self):
+        """A negative Retry-After is ignored and never reaches sleep(negative)."""
+        client, _, waits = _client(
+            [_Resp(status=429, headers={"Retry-After": "-1"}), _Resp(body={})],
+            backoff_factor=2.0,
+        )
+        client.get("http://x")
+        assert waits == [2.0]
 
     def test_retried_response_is_closed(self):
         """A retried response is closed before the next attempt (no leak)."""
