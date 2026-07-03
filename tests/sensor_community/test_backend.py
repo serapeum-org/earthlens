@@ -71,14 +71,25 @@ class TestFetchAndDownload:
             _backend(fake_client, tmp_path).download(progress_bar=False)
         assert any(issubclass(w.category, LicenseWarning) for w in caught)
 
-    def test_window_filter(self, tmp_path):
-        """Readings outside the date window are dropped."""
-        # archive returns a row dated 2026-06-30, request only 2026-06-29
+    def test_window_filter_drops_out_of_window_rows(self, tmp_path):
+        """A fetched reading timestamped outside the window is trimmed by the mask."""
+        csv = (
+            "sensor_id;sensor_type;location;lat;lon;timestamp;P1;durP1;ratioP1;P2;durP2;ratioP2\n"
+            "140;SDS011;65;48.778;9.160;2026-06-30T12:00:00;8.5;;;4.2;;\n"  # in window
+            "140;SDS011;65;48.778;9.160;2026-07-01T05:00:00;9.1;;;4.6;;\n"  # out of window
+        )
+        client = _FakeClient(archive={("2026-06-30", "sds011", "140"): csv})
+        df = _backend(client, tmp_path).download(progress_bar=False)
+        pm25 = df[df["parameter"] == "pm25"]
+        assert len(pm25) == 1
+        assert pm25.iloc[0]["datetime_utc"].date().isoformat() == "2026-06-30"
+
+    def test_window_filter_empty_day(self, tmp_path):
+        """A day with no archive file yields an empty frame (mask no-op)."""
         client = _FakeClient()
         backend = _backend(client, tmp_path, start="2026-06-29", end="2026-06-29")
-        # _days -> 2026-06-29 only; archive has no file for that day -> empty
-        df = backend.download(progress_bar=False)
-        assert df.empty
+        # _days -> 2026-06-29 only; the fake archive has no file for it.
+        assert backend.download(progress_bar=False).empty
 
     def test_temperature_from_dht(self, tmp_path):
         """A temperature request reads the DHT22 `temperature` column."""
