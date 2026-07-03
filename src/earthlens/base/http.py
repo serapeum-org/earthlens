@@ -24,8 +24,10 @@ module adds none. The public import is
 
 from __future__ import annotations
 
+import datetime as dt
 import time
 from collections.abc import Callable
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
 
@@ -60,12 +62,13 @@ DEFAULT_CHUNK_SIZE = 1 << 20
 def _parse_retry_after(value: str | None) -> float | None:
     """Parse a `Retry-After` header value into seconds.
 
-    Handles the integer-seconds form servers commonly return (e.g.
-    `Retry-After: 5`). A missing, non-numeric, or **negative** value
-    yields `None` so the caller falls back to exponential back-off (the
-    spec mandates a non-negative delay; a negative one is invalid). The
-    HTTP-date form is not parsed (no surveyed backend emits it); it also
-    yields `None`.
+    RFC 9110 §10.2.3 allows either an integer number of seconds (e.g.
+    `Retry-After: 5`) or an HTTP-date
+    (`Retry-After: Fri, 31 Dec 2027 23:59:59 GMT`); both forms are
+    handled. A missing, non-numeric, or **negative** numeric value yields
+    `None` so the caller falls back to exponential back-off (the spec
+    mandates a non-negative delay; a negative one is invalid). A past
+    HTTP-date clamps to `0.0` (never sleep backwards in time).
 
     Args:
         value: The raw `Retry-After` header value, or `None`.
@@ -76,7 +79,7 @@ def _parse_retry_after(value: str | None) -> float | None:
 
     Examples:
         - A numeric value parses to seconds; junk or a negative yields
-          `None`:
+          `None`, and a past HTTP-date clamps to zero:
             ```python
             >>> from earthlens.base.http import _parse_retry_after
             >>> _parse_retry_after("5")
@@ -87,16 +90,27 @@ def _parse_retry_after(value: str | None) -> float | None:
             True
             >>> _parse_retry_after("-1") is None
             True
+            >>> _parse_retry_after("Fri, 31 Dec 1999 23:59:59 GMT")
+            0.0
 
             ```
     """
-    if value is None:
+    if not value:
         return None
     try:
         seconds = float(value)
     except (TypeError, ValueError):
+        pass
+    else:
+        return seconds if seconds >= 0 else None
+    try:
+        target = parsedate_to_datetime(value)
+    except (TypeError, ValueError):
         return None
-    return seconds if seconds >= 0 else None
+    if target is None:
+        return None
+    now = dt.datetime.now(tz=target.tzinfo)
+    return max(0.0, (target - now).total_seconds())
 
 
 def _progress_total(headers: Any) -> int | None:

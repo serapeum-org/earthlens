@@ -135,6 +135,21 @@ class TestParseRetryAfter:
         """Numeric non-negative values parse; missing/junk/negative yield None."""
         assert _parse_retry_after(value) == expected
 
+    def test_future_http_date_yields_positive_delay(self):
+        """A future HTTP-date Retry-After parses to a positive delay."""
+        assert _parse_retry_after("Fri, 31 Dec 2099 23:59:59 GMT") > 0
+
+    def test_past_http_date_clamps_to_zero(self):
+        """A past HTTP-date never sleeps backwards — it clamps to zero."""
+        assert _parse_retry_after("Fri, 31 Dec 1999 23:59:59 GMT") == 0.0
+
+    def test_http_date_parsing_none_result_is_none(self, monkeypatch):
+        """A parsedate result of None yields None (defensive guard)."""
+        monkeypatch.setattr(
+            "earthlens.base.http.parsedate_to_datetime", lambda value: None
+        )
+        assert _parse_retry_after("not-a-real-date") is None
+
 
 @pytest.mark.unit
 class TestDefaults:
