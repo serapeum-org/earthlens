@@ -123,6 +123,14 @@ class TestRequest:
         client._request("locations", {})
         assert client._waits == [2.0]  # type: ignore[attr-defined]
 
+    def test_large_retry_after_is_uncapped(self):
+        """A Retry-After above the default cap is honoured (openaq is uncapped)."""
+        client, session = _client(
+            [_Resp({}, 429, {"Retry-After": "600"}), _Resp({"results": []})]
+        )
+        client._request("locations", {})
+        assert client._waits == [600.0]  # type: ignore[attr-defined]
+
     def test_raises_after_max_retries(self):
         """Exhausted 429s raise the final HTTPError."""
         client, _ = _client([_Resp({}, 429, {"Retry-After": "0"})] * 3, max_retries=2)

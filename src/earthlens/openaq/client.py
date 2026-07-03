@@ -100,6 +100,7 @@ class OpenaqClient:
             backoff_factor=backoff_factor,
             timeout=timeout,
             status_forcelist=(429,),
+            max_backoff=None,
             sleep=sleep,
         )
 
