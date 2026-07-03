@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -27303,25 +27303,25 @@ object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span>
 <span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
 <span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_canonical</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a zero-row frame with the given columns (the no-data fallback).</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        columns: The canonical column names for the product.</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        pd.DataFrame: An empty frame carrying exactly `columns`.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_canonical</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a zero-row frame with the given columns (the no-data fallback).</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        columns: The canonical column names for the product.</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        pd.DataFrame: An empty frame carrying exactly `columns`.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27472,9 +27472,7 @@ as redundant) followed by the data value columns.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/nrel/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
 <span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
@@ -27528,63 +27526,65 @@ as redundant) followed by the data value columns.</p>
 <span class="normal"><a href="#__codelineno-0-301">301</a></span>
 <span class="normal"><a href="#__codelineno-0-302">302</a></span>
 <span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_psm3_csv</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">meta_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse an NSRDB PSM v4 / TMY / WTK CSV into a long DataFrame.</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    The CSV opens with metadata rows (Source / Location / Lat / Lon / Elevation</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    for NSRDB, a single `SiteID,…` row for WTK) then the data table</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    (`Year,Month,Day,Hour,Minute,GHI,DNI,…`). The metadata header is skipped</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    and a canonical `time` column is assembled from the five date-part columns.</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    The `time` column is **timezone-naive wall-clock**: it carries whatever the</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    request&#39;s `utc=` flag asked for (local site time for `utc=&quot;false&quot;`, the NREL</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    default; UTC for `utc=&quot;true&quot;`) without attaching a tzinfo, matching the</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    naive timestamps the CSV ships. Pure `pandas` (`read_csv` / `io.StringIO`);</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    no array-library detour.</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        text: The raw CSV body.</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        meta_rows: Explicit count of leading metadata rows to skip. When `None`</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            (the default), the data-table header is auto-detected so the same</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            call handles NSRDB (2 rows) and WTK (1 row).</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        pd.DataFrame: One row per record — a leading `time` `datetime64` column</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            (assembled from `Year/Month/Day/Hour/Minute`, which are then dropped</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            as redundant) followed by the data value columns.</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        ValueError: If `meta_rows` is `None` and no data-table header is found.</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        - A tiny two-metadata-row NSRDB-shaped CSV parses to one row, `time`</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">          first and the raw date parts dropped:</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel._helpers import parse_psm3_csv</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            &gt;&gt;&gt; csv = (</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            ...     &quot;Source,Location ID,Latitude,Longitude\\n&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            ...     &quot;NSRDB,1,39.73,-105.18\\n&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            ...     &quot;Year,Month,Day,Hour,Minute,GHI,DNI\\n&quot;</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            ...     &quot;2020,1,1,0,30,0,0\\n&quot;</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            &gt;&gt;&gt; df = parse_psm3_csv(csv)</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            &gt;&gt;&gt; len(df)</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            1</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            &gt;&gt;&gt; df[&quot;time&quot;].dtype.kind</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            &#39;M&#39;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            &gt;&gt;&gt; list(df.columns)</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            [&#39;time&#39;, &#39;GHI&#39;, &#39;DNI&#39;]</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">skip</span> <span class="o">=</span> <span class="n">meta_rows</span> <span class="k">if</span> <span class="n">meta_rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_data_header_offset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">time</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">_TIME_PARTS</span><span class="p">])</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="c1"># The five raw date-part columns are now redundant with `time`; drop them</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="c1"># and lead with `time` so the frame is `[time, &lt;value columns&gt;]` — matching</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="c1"># the catalog&#39;s documented `columns` and the empty_canonical fallback schema.</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">_TIME_PARTS</span><span class="p">)</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="n">data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">return</span> <span class="n">data</span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_psm3_csv</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">meta_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse an NSRDB PSM v4 / TMY / WTK CSV into a long DataFrame.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    The CSV opens with metadata rows (Source / Location / Lat / Lon / Elevation</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    for NSRDB, a single `SiteID,…` row for WTK) then the data table</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    (`Year,Month,Day,Hour,Minute,GHI,DNI,…`). The metadata header is skipped</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    and a canonical `time` column is assembled from the five date-part columns.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    The `time` column is **timezone-naive wall-clock**: it carries whatever the</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    request&#39;s `utc=` flag asked for (local site time for `utc=&quot;false&quot;`, the NREL</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    default; UTC for `utc=&quot;true&quot;`) without attaching a tzinfo, matching the</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    naive timestamps the CSV ships. Pure `pandas` (`read_csv` / `io.StringIO`);</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    no array-library detour.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        text: The raw CSV body.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        meta_rows: Explicit count of leading metadata rows to skip. When `None`</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            (the default), the data-table header is auto-detected so the same</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            call handles NSRDB (2 rows) and WTK (1 row).</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        pd.DataFrame: One row per record — a leading `time` `datetime64` column</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            (assembled from `Year/Month/Day/Hour/Minute`, which are then dropped</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            as redundant) followed by the data value columns.</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        ValueError: If `meta_rows` is `None` and no data-table header is found.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        - A tiny two-metadata-row NSRDB-shaped CSV parses to one row, `time`</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">          first and the raw date parts dropped:</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nrel._helpers import parse_psm3_csv</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            &gt;&gt;&gt; csv = (</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            ...     &quot;Source,Location ID,Latitude,Longitude\\n&quot;</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            ...     &quot;NSRDB,1,39.73,-105.18\\n&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            ...     &quot;Year,Month,Day,Hour,Minute,GHI,DNI\\n&quot;</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            ...     &quot;2020,1,1,0,30,0,0\\n&quot;</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            &gt;&gt;&gt; df = parse_psm3_csv(csv)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            &gt;&gt;&gt; len(df)</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            1</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            &gt;&gt;&gt; df[&quot;time&quot;].dtype.kind</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            &#39;M&#39;</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">            &gt;&gt;&gt; list(df.columns)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            [&#39;time&#39;, &#39;GHI&#39;, &#39;DNI&#39;]</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">skip</span> <span class="o">=</span> <span class="n">meta_rows</span> <span class="k">if</span> <span class="n">meta_rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_data_header_offset</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skip</span><span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="n">time</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">_TIME_PARTS</span><span class="p">])</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="c1"># The five raw date-part columns are now redundant with `time`; drop them</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="c1"># and lead with `time` so the frame is `[time, &lt;value columns&gt;]` — matching</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="c1"># the catalog&#39;s documented `columns` and the empty_canonical fallback schema.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">_TIME_PARTS</span><span class="p">)</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="n">data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">return</span> <span class="n">data</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28057,7 +28057,9 @@ response's <code>raise_for_status()</code> is called).</p>
 <span class="normal"><a href="#__codelineno-0-217">217</a></span>
 <span class="normal"><a href="#__codelineno-0-218">218</a></span>
 <span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="k">def</span><span class="w"> </span><span class="nf">throttled_get</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="k">def</span><span class="w"> </span><span class="nf">throttled_get</span><span class="p">(</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a>    <span class="o">*</span><span class="p">,</span>
@@ -28100,25 +28102,27 @@ response's <code>raise_for_status()</code> is called).</p>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="n">sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="c1"># HttpClient owns only the 429 retry/back-off here: `max_retries - 1`</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="c1"># additional retries reproduce the old loop&#39;s `max_retries` total GETs with</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="c1"># `backoff_factor * 2**attempt` (= `2**attempt`) waits, `raise_for_status`</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="c1"># off so a non-429 4xx flows back to the caller unraised for inspection.</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="n">http</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>        <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>        <span class="n">status_forcelist</span><span class="o">=</span><span class="p">(</span><span class="mi">429</span><span class="p">,),</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>        <span class="n">backoff_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>        <span class="n">max_backoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>        <span class="n">raise_for_status</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="n">sleep</span><span class="o">=</span><span class="n">sleep</span><span class="p">,</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="p">)</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">http</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">raise_for_status</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="n">last_call</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">monotonic</span><span class="p">()</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">429</span><span class="p">:</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="c1"># Retries exhausted on a persistent 429 — mirror the old loop&#39;s final</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="c1"># `raise_for_status()` (an HTTPError).</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">return</span> <span class="n">resp</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="c1"># `backoff_factor * 2**attempt` (= `2**attempt`) waits — one fewer than the</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="c1"># old loop only on the all-429 exhaustion path, where it dropped a wasted</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="c1"># trailing sleep before raising. `raise_for_status` is off so a non-429 4xx</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="c1"># flows back to the caller unraised for inspection.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>    <span class="n">http</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>        <span class="n">status_forcelist</span><span class="o">=</span><span class="p">(</span><span class="mi">429</span><span class="p">,),</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a>        <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>        <span class="n">backoff_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="n">max_backoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="n">raise_for_status</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="n">sleep</span><span class="o">=</span><span class="n">sleep</span><span class="p">,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="p">)</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">http</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">raise_for_status</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="n">last_call</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">monotonic</span><span class="p">()</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">429</span><span class="p">:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="c1"># Retries exhausted on a persistent 429 — mirror the old loop&#39;s final</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="c1"># `raise_for_status()` (an HTTPError).</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="k">return</span> <span class="n">resp</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
