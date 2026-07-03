@@ -10,9 +10,9 @@ owns exactly those transport concerns so a backend keeps only the
 auth-header values, and response parsing.
 
 The retry engine is a hand-rolled loop (not `urllib3.util.retry.Retry`
-mounted on an `HTTPAdapter`) generalising the reference
-`earthlens.openaq.client.OpenaqClient._request` loop: `Retry-After`
-first, else `backoff_factor * 2**attempt`. Both the transport
+mounted on an `HTTPAdapter`) generalising the loop the REST backends
+(openaq first) previously hand-rolled: `Retry-After` first, else
+`backoff_factor * 2**attempt`. Both the transport
 (`session=`) and the wait (`sleep=`) are injectable, so the whole client
 is unit-testable with a fake transport — no live network, no real
 delays.
