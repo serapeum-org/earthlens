@@ -213,6 +213,9 @@ def shape_frame(
     out["station_id"] = keep["Samplingpoint"].astype("object")
     out["country"] = keep["Samplingpoint"].str.split("/").str[0]
     out["parameter"] = keep["Pollutant"].map(code_to_name)
+    # The EEA download service publishes the observation period in UTC, so the
+    # naive `Start` is localised (not converted) to UTC here; the date-window
+    # filter in the backend is therefore correct at day boundaries.
     out["datetime_utc"] = pd.to_datetime(keep["Start"], utc=True)
     out["value"] = pd.to_numeric(keep["Value"], errors="coerce")
     out["units"] = keep["Unit"]
@@ -239,10 +242,10 @@ def _patch_running_loop() -> None:
     airbase's `download()` calls `asyncio.run()` internally, which raises
     `RuntimeError` when a loop is already running (e.g. inside a Jupyter
     kernel). In a plain script there is no running loop and this is a no-op;
-    under a running loop it applies `nest_asyncio` (present wherever a
-    Jupyter kernel runs, via `ipykernel`) so the nested `run()` succeeds —
-    keeping the download on the calling thread (airbase's SQLite session is
-    thread-bound, so a worker thread is not an option).
+    under a running loop it applies `nest_asyncio` (a declared dependency of
+    the `[eea_aq]` extra) so the nested `run()` succeeds — keeping the
+    download on the calling thread (airbase's SQLite session is thread-bound,
+    so a worker thread is not an option).
 
     Raises:
         RuntimeError: When a loop is running but `nest_asyncio` is not

@@ -12518,7 +12518,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.9.0
-  sha256: 7a9e22df5f485207f7e3cab3efbac309ae8390342327b324705ab66871d08d09
+  sha256: f34fd9174cbc4819437aa11129211dddcdd5f79aa7ea7b77e65637bea44533af
   requires_dist:
   - pyramids-gis>=0.38.0
   - geopandas>=1.0.0
@@ -12551,6 +12551,7 @@ packages:
   - asf-search>=12.2.2 ; extra == 'asf'
   - earthlens[earthdata] ; extra == 'asf'
   - airbase>=1.0 ; extra == 'eea-aq'
+  - nest-asyncio>=1.5 ; extra == 'eea-aq'
   - hdx-python-api>=6,<7 ; extra == 'hdx'
   - eumdac>=3.1 ; extra == 'eumetsat'
   - herbie-data>=2026.3 ; extra == 'nwp'

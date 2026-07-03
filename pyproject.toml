@@ -73,9 +73,11 @@ earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 asf = ["asf_search >=12.2.2", "earthlens[earthdata]"]
 # EEA (European Environment Agency) air-quality backend wraps the airbase
 # SDK (request().download() -> Parquet), imported lazily so the package
-# imports without it. airnow + sensor_community, the other two air-quality
-# ground-obs backends, are core (requests + pandas) and add no extra.
-eea_aq = ["airbase >=1.0"]
+# imports without it. nest_asyncio lets airbase's internal asyncio.run()
+# nest under an already-running event loop (any Jupyter kernel). airnow +
+# sensor_community, the other two air-quality ground-obs backends, are core
+# (requests + pandas) and add no extra.
+eea_aq = ["airbase >=1.0", "nest_asyncio >=1.5"]
 hdx = ["hdx-python-api >=6,<7"]
 eumetsat = ["eumdac >=3.1"]
 # herbie/cfgrib decode GRIB through the ecCodes C library. On Linux/macOS the
