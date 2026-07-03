@@ -130,11 +130,18 @@ class TestOutputFrame:
         state = _FakeAirnow(rows=[_observation()])
         df = _backend(state, tmp_path).download(progress_bar=False)
         assert list(df.columns) == [
-            "station_id", "parameter", "datetime_utc", "value", "units",
-            "aqi", "category", "lat", "lon", "site_name", "provider",
+            "station_id", "parameter", "datetime_utc", "value", "raw_value",
+            "units", "aqi", "category", "lat", "lon", "site_name", "provider",
         ]
         assert str(df["datetime_utc"].dtype) == "datetime64[ns, UTC]"
         assert df.loc[0, "value"] == 12.3
+
+    def test_raw_value_from_raw_concentration(self, tmp_path, fake_airnow):
+        """The `raw_value` column carries AirNow's `RawConcentration`."""
+        row = _observation(concentration=12.3)
+        row["RawConcentration"] = 11.0
+        df = _backend(_FakeAirnow(rows=[row]), tmp_path).download(progress_bar=False)
+        assert df.loc[0, "raw_value"] == 11.0
 
     def test_reads_value_field(self, tmp_path, fake_airnow):
         """The concentration is read from AirNow's `Value` field."""

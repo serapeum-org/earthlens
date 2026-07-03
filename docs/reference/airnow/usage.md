@@ -72,7 +72,9 @@ AirNow can return the raw concentration, the AQI, or both:
 AirNow encodes "not reported" as the sentinel `-999`; the backend
 scrubs it to `NaN` in `value`, `aqi`, and `category`. Two more filters
 are exposed: `monitor_type` (`"permanent"` / `"mobile"` / `"both"`) and
-`include_raw_concentrations`.
+`include_raw_concentrations` — set the latter to `True` to populate the
+`raw_value` column with AirNow's unadjusted `RawConcentration` (it is
+`NaN` otherwise).
 
 ## 5. Output format
 

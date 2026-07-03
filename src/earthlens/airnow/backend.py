@@ -73,6 +73,7 @@ _SCHEMA: dict[str, str] = {
     "parameter": "object",
     "datetime_utc": "datetime64[ns, UTC]",
     "value": "float64",
+    "raw_value": "float64",
     "units": "object",
     "aqi": "float64",
     "category": "float64",
@@ -155,8 +156,9 @@ class AirNow(AbstractDataSource):
             monitor_type: Which monitors to include — `"permanent"`,
                 `"mobile"`, or `"both"` (default).
             include_raw_concentrations: When `True`, ask AirNow to include
-                raw (unadjusted) concentrations alongside the reported
-                values. Defaults to `False`.
+                the raw (unadjusted) concentration, which populates the
+                `raw_value` column of the returned frame. Defaults to
+                `False`, leaving `raw_value` as `NaN`.
             session: An existing `requests.Session` to reuse. Injectable
                 so tests can supply a fake transport.
             file_format: Output format — `"csv"` (default) or `"parquet"`.
@@ -459,6 +461,9 @@ def _observation_row(observation: dict[str, Any]) -> dict[str, Any]:
         "parameter": observation.get("Parameter"),
         "datetime_utc": pd.to_datetime(observation.get("UTC"), utc=True),
         "value": _scrub_sentinel(concentration),
+        # `RawConcentration` (unadjusted) is present only when the request set
+        # `include_raw_concentrations`; NaN otherwise.
+        "raw_value": _scrub_sentinel(observation.get("RawConcentration")),
         "units": observation.get("Unit"),
         "aqi": _scrub_sentinel(observation.get("AQI")),
         "category": _scrub_sentinel(observation.get("Category")),
