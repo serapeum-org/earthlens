@@ -48,9 +48,9 @@ Examples:
 from __future__ import annotations
 
 from earthlens.airnow.auth import (
-    AuthenticationError,
     AirnowAuth,
     AirnowCredentials,
+    AuthenticationError,
 )
 from earthlens.airnow.backend import AirNow
 from earthlens.airnow.catalog import CATALOG_PATH, Catalog, Pollutant

@@ -261,7 +261,7 @@ class SensorCommunity(AbstractDataSource):
         if not sensors:
             logger.warning(
                 "Sensor.Community search: no live sensor of the requested "
-                f"type(s) is currently reporting in the bbox; historical "
+                "type(s) is currently reporting in the bbox; historical "
                 "coverage is limited to sensors active now."
             )
         return [RemoteProduct(id=sensor["sensor_id"], metadata=sensor) for sensor in sensors]

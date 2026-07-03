@@ -5,11 +5,9 @@ from __future__ import annotations
 import builtins
 from pathlib import Path
 
-import pandas as pd
 import pytest
 
 from earthlens.eea_aq import EEA_AQ
-from tests.eea_aq.conftest import _FakeAirbaseClient
 
 
 def _backend(client, tmp_path: Path, **overrides) -> EEA_AQ:
