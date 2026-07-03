@@ -28,9 +28,10 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import requests
-from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import box
+
+from earthlens.base.http import HttpClient
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
@@ -121,6 +122,21 @@ def download_zip(
     return zip_path
 
 
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) when no
+    session is supplied, so an un-shared download stays a fresh connection
+    per call and tests that monkeypatch `requests.get` still drive the
+    transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
+
+
 def _stream_download(
     url: str,
     dest_path: Path,
@@ -131,6 +147,16 @@ def _stream_download(
     chunk_size: int,
 ) -> None:
     """Stream `url` to `dest_path` with retry + exponential backoff.
+
+    Delegates the streamed transfer to :meth:`HttpClient.download`, which
+    writes to a sibling `.part` file, renames it on success, and removes the
+    temp on any failure — so an interrupted download never leaves a truncated
+    file. Retries are configured to mirror the previous hand-rolled loop:
+    `retries` total attempts (`max_retries = retries - 1`), retrying both the
+    transient `429`/`5xx` statuses and any `requests.RequestException` / `OSError`
+    with `backoff * 2**attempt` back-off. When every attempt is exhausted the
+    original transport error is re-raised as a synthesized `requests.HTTPError`
+    (matching the message the glaciers callers expect).
 
     Args:
         url: The source URL.
@@ -144,30 +170,22 @@ def _stream_download(
     Raises:
         requests.HTTPError: If every attempt fails (the last error re-raised).
     """
-    get = session.get if session is not None else requests.get
-    last_exc: Exception | None = None
-    for attempt in range(1, retries + 1):
-        try:
-            with get(url, stream=True, timeout=timeout) as resp:
-                resp.raise_for_status()
-                with open(dest_path, "wb") as handle:
-                    for chunk in resp.iter_content(chunk_size=chunk_size):
-                        handle.write(chunk)
-            return
-        except (requests.RequestException, OSError) as exc:
-            last_exc = exc
-            dest_path.unlink(missing_ok=True)
-            if attempt < retries:
-                wait = backoff * (2 ** (attempt - 1))
-                logger.warning(
-                    f"glaciers: download {url} failed (attempt "
-                    f"{attempt}/{retries}): {type(exc).__name__}: {exc}; "
-                    f"retrying in {wait:.0f}s."
-                )
-                time.sleep(wait)
-    raise requests.HTTPError(
-        f"glaciers: download {url} failed after {retries} attempts: {last_exc}"
+    http = HttpClient(
+        session=session or _RequestsGet(),
+        retry_on_exceptions=(requests.RequestException, OSError),
+        status_forcelist=(429, 500, 502, 503, 504),
+        raise_for_status=True,
+        max_retries=retries - 1,
+        backoff_factor=backoff,
+        max_backoff=None,
+        sleep=time.sleep,
     )
+    try:
+        http.download(url, dest_path, chunk=chunk_size, progress=False, timeout=timeout)
+    except (requests.RequestException, OSError) as exc:
+        raise requests.HTTPError(
+            f"glaciers: download {url} failed after {retries} attempts: {exc}"
+        ) from exc
 
 
 # --------------------------------------------------------------------------
