@@ -361,9 +361,13 @@ class EEA_AQ(AbstractDataSource):
             return empty_frame()
         combined = pd.concat(non_empty, ignore_index=True)
         # A recently-promoted year can appear in both Verified and Unverified,
-        # so drop rows duplicated across eras (same station, pollutant, time).
+        # so drop rows duplicated across eras. Key on station/pollutant/time +
+        # `agg_type` so genuinely-distinct aggregations sharing a timestamp are
+        # kept; `validity`/`verification` are deliberately excluded because
+        # they legitimately differ across eras for the same measurement (the
+        # Verified copy is the more authoritative and, listed first, wins).
         combined = combined.drop_duplicates(
-            subset=["station_id", "parameter", "datetime_utc"]
+            subset=["station_id", "parameter", "datetime_utc", "agg_type"]
         )
         lower, upper = self._window()
         mask = (combined["datetime_utc"] >= lower) & (combined["datetime_utc"] < upper)
