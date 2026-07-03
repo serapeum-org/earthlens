@@ -3,11 +3,53 @@
 from __future__ import annotations
 
 import builtins
+import shutil
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from earthlens.eea_aq import EEA_AQ
+
+
+def _era_frame(verification: int) -> pd.DataFrame:
+    """One MT pm25 row dated in-window, tagged with a per-era Verification."""
+    return pd.DataFrame(
+        {
+            "Samplingpoint": ["MT/SPO-1"],
+            "Pollutant": [6001],
+            "Start": pd.to_datetime(["2023-06-15T00:00"]),
+            "End": pd.to_datetime(["2023-06-15T01:00"]),
+            "Value": ["5.0"],
+            "Unit": ["ug.m-3"],
+            "AggType": ["hour"],
+            "Validity": [1],
+            "Verification": [verification],
+        }
+    )
+
+
+class _EraRequest:
+    """Copies a per-era fixture Parquet into the download dir."""
+
+    def __init__(self, parquet: str) -> None:
+        self._parquet = parquet
+
+    def download(self, dir: str, skip_existing: bool = True, raise_for_status: bool = True) -> None:
+        shutil.copy(self._parquet, Path(dir) / "d.parquet")
+
+
+class _EraClient:
+    """Serves different Parquet for the Verified vs Unverified era."""
+
+    countries = frozenset({"MT"})
+
+    def __init__(self, verified: str, unverified: str) -> None:
+        self._verified = verified
+        self._unverified = unverified
+
+    def request(self, source, *countries, poll=None, verbose=True):
+        return _EraRequest(self._verified if source == "Verified" else self._unverified)
 
 
 def _backend(client, tmp_path: Path, **overrides) -> EEA_AQ:
@@ -67,6 +109,17 @@ class TestApi:
         # The fixture's single in-window 2023 MT pm25 row is downloaded for both
         # Verified and Unverified but must appear once.
         assert len(df) == 1
+
+    def test_dedup_keeps_verified_copy(self, tmp_path):
+        """When a row differs across eras, the Verified copy wins the dedup."""
+        verified = tmp_path / "v.parquet"
+        unverified = tmp_path / "u.parquet"
+        _era_frame(verification=3).to_parquet(verified)  # Verified: flag 3
+        _era_frame(verification=1).to_parquet(unverified)  # Unverified: flag 1
+        client = _EraClient(str(verified), str(unverified))
+        df = _backend(client, tmp_path).download(progress_bar=False)
+        assert len(df) == 1
+        assert df.loc[0, "verification"] == 3
 
     def test_multi_dataset_range(self, tmp_path, fake_client):
         """A range straddling the boundary requests two datasets."""
