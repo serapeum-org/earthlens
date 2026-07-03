@@ -262,10 +262,14 @@ def frame_from_csv(
     if raw.empty or not present:
         return empty_frame()
     frames: list[pd.DataFrame] = []
+    # Normalise the CSV's upper-case sensor type (`SDS011`) to the lower-case
+    # archive slug (`sds011`) so the output column matches the discovery
+    # metadata and the archive URL.
+    sensor_type = raw["sensor_type"].astype(str).str.lower() if "sensor_type" in raw else None
     for col, name in present.items():
         sub = pd.DataFrame(index=raw.index)
         sub["station_id"] = raw["sensor_id"].astype(str)
-        sub["sensor_type"] = raw.get("sensor_type")
+        sub["sensor_type"] = sensor_type
         sub["parameter"] = name
         sub["datetime_utc"] = pd.to_datetime(
             raw["timestamp"], utc=True, errors="coerce"

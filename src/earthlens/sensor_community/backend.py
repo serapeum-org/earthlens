@@ -295,7 +295,12 @@ class SensorCommunity(AbstractDataSource):
         return pd.concat(non_empty, ignore_index=True)
 
     def _api(self) -> list[pd.DataFrame]:
-        """Compose `_search` and `_fetch_one` into the canonical C3 shape."""
+        """Compose `_search` and `_fetch_one` into the canonical C3 shape.
+
+        Contract-only: `download` overrides the write path and calls
+        `_search_fetch_each` directly (to concat + window itself), mirroring
+        the `earthlens.openaq` sibling, so this is not on the live path.
+        """
         return self._search_fetch_each(desc="Sensor.Community sensors", unit="sensor")
 
     def _window(self) -> tuple[pd.Timestamp, pd.Timestamp]:
