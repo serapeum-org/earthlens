@@ -199,8 +199,10 @@ def throttled_get(
         sleep(wait)
     # HttpClient owns only the 429 retry/back-off here: `max_retries - 1`
     # additional retries reproduce the old loop's `max_retries` total GETs with
-    # `backoff_factor * 2**attempt` (= `2**attempt`) waits, `raise_for_status`
-    # off so a non-429 4xx flows back to the caller unraised for inspection.
+    # `backoff_factor * 2**attempt` (= `2**attempt`) waits — one fewer than the
+    # old loop only on the all-429 exhaustion path, where it dropped a wasted
+    # trailing sleep before raising. `raise_for_status` is off so a non-429 4xx
+    # flows back to the caller unraised for inspection.
     http = HttpClient(
         session=session,
         status_forcelist=(429,),
