@@ -93,10 +93,8 @@ class OpenaqClient:
                 :func:`time.sleep`; injectable so tests run without
                 real delays.
         """
-        self._api_key = api_key
-        self._session = session if session is not None else requests.Session()
         self._http = HttpClient(
-            session=self._session,
+            session=session if session is not None else requests.Session(),
             headers={"X-API-Key": api_key},
             max_retries=max_retries,
             backoff_factor=backoff_factor,
