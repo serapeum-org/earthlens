@@ -96,6 +96,13 @@ class TestRequest:
         assert user_agent.startswith("earthlens/")
         assert "mozilla" not in user_agent.lower()
 
+    def test_retry_attrs_reflect_the_http_client_config(self):
+        """max_retries/backoff_factor/timeout read back the delegated config."""
+        client = OpenaqClient("key", max_retries=3, backoff_factor=2.0, timeout=42.0)
+        assert client.max_retries == 3
+        assert client.backoff_factor == 2.0
+        assert client.timeout == 42.0
+
     def test_429_then_success(self):
         """A 429 with Retry-After is retried, then succeeds."""
         client, session = _client(
