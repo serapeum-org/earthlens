@@ -258,6 +258,24 @@ class TestRetry:
             client.get("http://x")
         assert len(session.calls) == 1
 
+    def test_retry_after_is_capped_by_max_backoff(self):
+        """A large Retry-After is clamped to max_backoff, not honoured raw."""
+        client, _, waits = _client(
+            [_Resp(status=429, headers={"Retry-After": "86400"}), _Resp(body={})],
+            max_backoff=30.0,
+        )
+        client.get("http://x")
+        assert waits == [30.0]
+
+    def test_max_backoff_none_leaves_wait_uncapped(self):
+        """max_backoff=None honours the raw Retry-After wait."""
+        client, _, waits = _client(
+            [_Resp(status=429, headers={"Retry-After": "120"}), _Resp(body={})],
+            max_backoff=None,
+        )
+        client.get("http://x")
+        assert waits == [120.0]
+
     def test_retried_response_is_closed(self):
         """A retried response is closed before the next attempt (no leak)."""
         first = _Resp(status=503, headers={"Retry-After": "0"})

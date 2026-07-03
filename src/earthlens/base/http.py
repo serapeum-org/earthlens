@@ -44,6 +44,11 @@ DEFAULT_MAX_RETRIES = 5
 #: `Retry-After` header (wait = `backoff_factor * 2**attempt`).
 DEFAULT_BACKOFF_FACTOR = 1.0
 
+#: Ceiling (seconds) on any single retry wait, so a hostile or
+#: misconfigured `Retry-After` cannot pin the calling thread for an
+#: unbounded interval. `None` disables the cap.
+DEFAULT_MAX_BACKOFF = 300.0
+
 #: HTTP statuses that trigger a retry. `429` (rate-limited) plus the
 #: transient `5xx` gateway/unavailable family.
 DEFAULT_STATUS_FORCELIST: tuple[int, ...] = (429, 500, 502, 503, 504)
@@ -152,6 +157,7 @@ class HttpClient:
         backoff_factor: Base seconds for exponential back-off when no
             `Retry-After` header is present.
         status_forcelist: HTTP statuses that trigger a retry.
+        max_backoff: Ceiling in seconds on any single retry wait.
 
     Examples:
         - The default agent is non-Mozilla and version-stamped:
@@ -173,6 +179,7 @@ class HttpClient:
         max_retries: int = DEFAULT_MAX_RETRIES,
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         status_forcelist: tuple[int, ...] = DEFAULT_STATUS_FORCELIST,
+        max_backoff: float | None = DEFAULT_MAX_BACKOFF,
         sleep: Callable[[float], None] = time.sleep,
     ) -> None:
         """Build a client with default headers, timeout, and retry policy.
@@ -193,6 +200,9 @@ class HttpClient:
             backoff_factor: Base seconds for exponential back-off when a
                 response carries no `Retry-After` header.
             status_forcelist: HTTP statuses that trigger a retry.
+            max_backoff: Ceiling in seconds on any single retry wait, so a
+                large `Retry-After` cannot pin the thread indefinitely.
+                `None` disables the cap.
             sleep: The sleep function used between retries. Defaults to
                 :func:`time.sleep`; injectable so tests run without real
                 delays.
@@ -203,6 +213,7 @@ class HttpClient:
         self.max_retries = max_retries
         self.backoff_factor = backoff_factor
         self.status_forcelist = tuple(status_forcelist)
+        self.max_backoff = max_backoff
         self._sleep = sleep
         self._default_headers: dict[str, str] = {
             "User-Agent": self._user_agent,
@@ -403,6 +414,8 @@ class HttpClient:
                     if retry_after is not None
                     else self.backoff_factor * (2**attempt)
                 )
+                if self.max_backoff is not None:
+                    wait = min(wait, self.max_backoff)
                 logger.warning(
                     f"HTTP {response.status_code} on {url!r}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
