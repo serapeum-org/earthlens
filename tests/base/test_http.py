@@ -75,6 +75,33 @@ class _RequestOnlySession:
         return self._response
 
 
+class _FlakySession:
+    """Raises `exc` on the first `fail_times` calls, then returns `response`."""
+
+    def __init__(self, fail_times: int, exc: BaseException, response: _Resp) -> None:
+        self._remaining = fail_times
+        self._exc = exc
+        self._response = response
+        self.calls = 0
+
+    def get(self, url: str, **kwargs: Any) -> _Resp:
+        self.calls += 1
+        if self._remaining > 0:
+            self._remaining -= 1
+            raise self._exc
+        return self._response
+
+
+class _Clock:
+    """Deterministic monotonic clock returning scripted values in order."""
+
+    def __init__(self, values: list[float]) -> None:
+        self._values = list(values)
+
+    def __call__(self) -> float:
+        return self._values.pop(0)
+
+
 def _client(
     responses: list[_Resp], **kwargs: Any
 ) -> tuple[HttpClient, _RecordingSession, list[float]]:
@@ -313,6 +340,145 @@ class TestRetry:
         with pytest.raises(requests.HTTPError):
             HttpClient(session=session).get("http://x")
         assert errored.closed is True
+
+
+@pytest.mark.unit
+class TestRetryOnExceptions:
+    """Retrying on configured transport exceptions."""
+
+    def test_retries_configured_exception_then_succeeds(self):
+        """A configured exception is retried with back-off, then succeeds."""
+        session = _FlakySession(
+            2, requests.ConnectionError("boom"), _Resp(body={"ok": 1})
+        )
+        waits: list[float] = []
+        client = HttpClient(
+            session=session,
+            sleep=waits.append,
+            backoff_factor=2.0,
+            retry_on_exceptions=(requests.ConnectionError,),
+        )
+        assert client.get_json("http://x") == {"ok": 1}
+        assert session.calls == 3
+        assert waits == [2.0, 4.0]
+
+    def test_unconfigured_exception_propagates_immediately(self):
+        """An exception not in retry_on_exceptions is not retried."""
+        session = _FlakySession(1, requests.ConnectionError("boom"), _Resp(body={}))
+        client = HttpClient(session=session)
+        with pytest.raises(requests.ConnectionError):
+            client.get("http://x")
+        assert session.calls == 1
+
+    def test_exhausted_exception_reraises(self):
+        """A persistent configured exception re-raises after the budget."""
+        session = _FlakySession(10, requests.Timeout("t"), _Resp(body={}))
+        waits: list[float] = []
+        client = HttpClient(
+            session=session,
+            sleep=waits.append,
+            max_retries=2,
+            retry_on_exceptions=(requests.Timeout,),
+        )
+        with pytest.raises(requests.Timeout):
+            client.get("http://x")
+        assert session.calls == 3
+        assert len(waits) == 2
+
+
+@pytest.mark.unit
+class TestRetryPredicate:
+    """Retrying a response the predicate marks retryable."""
+
+    def test_predicate_retries_a_2xx_then_returns(self):
+        """A 200 the predicate flags is retried until it clears."""
+        session = _RecordingSession(
+            [_Resp(body={"status": "quota"}), _Resp(body={"status": "ok"})]
+        )
+        waits: list[float] = []
+        client = HttpClient(
+            session=session,
+            sleep=waits.append,
+            retry_predicate=lambda r: r.json().get("status") == "quota",
+        )
+        assert client.get_json("http://x") == {"status": "ok"}
+        assert len(session.calls) == 2
+
+    def test_predicate_exhaustion_returns_last_response(self):
+        """When the predicate never clears, the last response is returned."""
+        session = _RecordingSession([_Resp(body={"status": "quota"})] * 5)
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            max_retries=2,
+            retry_predicate=lambda r: r.json().get("status") == "quota",
+        )
+        assert client.get("http://x").json() == {"status": "quota"}
+        assert len(session.calls) == 3
+
+
+@pytest.mark.unit
+class TestRaiseForStatus:
+    """The raise_for_status policy and per-request override."""
+
+    def test_disabled_returns_error_response(self):
+        """raise_for_status=False returns a 4xx response unraised."""
+        session = _RecordingSession([_Resp(status=404, body={"e": 1})])
+        assert (
+            HttpClient(session=session, raise_for_status=False)
+            .get("http://x")
+            .status_code
+            == 404
+        )
+
+    def test_default_still_raises(self):
+        """The default policy raises on an error status."""
+        session = _RecordingSession([_Resp(status=400)])
+        with pytest.raises(requests.HTTPError):
+            HttpClient(session=session).get("http://x")
+
+    def test_per_request_override_disables(self):
+        """A per-request raise_for_status=False overrides the client default."""
+        session = _RecordingSession([_Resp(status=400, body={})])
+        assert (
+            HttpClient(session=session)
+            .get("http://x", raise_for_status=False)
+            .status_code
+            == 400
+        )
+
+
+@pytest.mark.unit
+class TestThrottle:
+    """The min_interval proactive rate limit."""
+
+    def test_min_interval_sleeps_between_requests(self):
+        """A second request within the interval sleeps the remainder."""
+        session = _RecordingSession([_Resp(body={}), _Resp(body={})])
+        waits: list[float] = []
+        client = HttpClient(
+            session=session,
+            sleep=waits.append,
+            clock=_Clock([0.0, 0.4, 1.0]),
+            min_interval=1.0,
+        )
+        client.get("http://x")
+        client.get("http://x")
+        assert waits == [pytest.approx(0.6)]
+
+    def test_no_throttle_when_interval_elapsed(self):
+        """No sleep when more than the interval has already passed."""
+        session = _RecordingSession([_Resp(body={}), _Resp(body={})])
+        waits: list[float] = []
+        client = HttpClient(
+            session=session,
+            sleep=waits.append,
+            clock=_Clock([0.0, 2.0, 2.0]),
+            min_interval=1.0,
+        )
+        client.get("http://x")
+        client.get("http://x")
+        assert waits == []
 
 
 @pytest.mark.unit

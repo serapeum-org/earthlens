@@ -166,6 +166,9 @@ class HttpClient:
             `Retry-After` header is present.
         status_forcelist: HTTP statuses that trigger a retry.
         max_backoff: Ceiling in seconds on any single retry wait.
+        retry_on_exceptions: Transport exception types that trigger a retry.
+        raise_for_status: Whether the final response is `raise_for_status`-ed.
+        min_interval: Minimum seconds between consecutive requests.
 
     Examples:
         - The default agent is non-Mozilla and version-stamped:
@@ -188,6 +191,11 @@ class HttpClient:
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         status_forcelist: tuple[int, ...] = DEFAULT_STATUS_FORCELIST,
         max_backoff: float | None = DEFAULT_MAX_BACKOFF,
+        retry_on_exceptions: tuple[type[BaseException], ...] = (),
+        retry_predicate: Callable[[requests.Response], bool] | None = None,
+        raise_for_status: bool = True,
+        min_interval: float = 0.0,
+        clock: Callable[[], float] = time.monotonic,
         sleep: Callable[[float], None] = time.sleep,
     ) -> None:
         """Build a client with default headers, timeout, and retry policy.
@@ -211,9 +219,28 @@ class HttpClient:
             max_backoff: Ceiling in seconds on any single retry wait, so a
                 large `Retry-After` cannot pin the thread indefinitely.
                 `None` disables the cap.
-            sleep: The sleep function used between retries. Defaults to
-                :func:`time.sleep`; injectable so tests run without real
-                delays.
+            retry_on_exceptions: Exception types that also trigger a retry
+                when raised by the transport (e.g.
+                `(requests.ConnectionError, requests.Timeout)`). Empty
+                (the default) retries on status only, never on a raised
+                exception.
+            retry_predicate: An optional callback `(response) -> bool`
+                that, when it returns `True`, marks a response retryable
+                even if its status is not in `status_forcelist` (e.g. a
+                `200` whose body signals a rate-limit).
+            raise_for_status: Whether to call `raise_for_status` on the
+                final response. `False` returns the response unraised so
+                the caller can inspect the status itself (e.g. to redact a
+                secret-bearing URL from the error, or to branch on a
+                `4xx`). Overridable per request.
+            min_interval: Minimum seconds between consecutive requests
+                (a proactive client-side rate limit). `0.0` (default)
+                disables throttling.
+            clock: Monotonic clock used for the `min_interval` throttle.
+                Injectable so tests drive it deterministically.
+            sleep: The sleep function used between retries and for the
+                throttle. Defaults to :func:`time.sleep`; injectable so
+                tests run without real delays.
         """
         self._session = session if session is not None else requests.Session()
         self._user_agent = user_agent or _default_user_agent()
@@ -222,7 +249,13 @@ class HttpClient:
         self.backoff_factor = backoff_factor
         self.status_forcelist = tuple(status_forcelist)
         self.max_backoff = max_backoff
+        self.retry_on_exceptions = tuple(retry_on_exceptions)
+        self._retry_predicate = retry_predicate
+        self.raise_for_status = raise_for_status
+        self.min_interval = min_interval
+        self._clock = clock
         self._sleep = sleep
+        self._last_request: float | None = None
         self._default_headers: dict[str, str] = {
             "User-Agent": self._user_agent,
             "Accept-Encoding": "gzip, deflate",
@@ -254,6 +287,7 @@ class HttpClient:
         *,
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
+        raise_for_status: bool | None = None,
         **kwargs: Any,
     ) -> requests.Response:
         """Send one request with the default headers, timeout, and retry.
@@ -264,21 +298,30 @@ class HttpClient:
             headers: Per-request headers merged over the client defaults.
             timeout: Per-request timeout override (seconds). Defaults to
                 the client's `timeout`.
+            raise_for_status: Per-request override of the client's
+                `raise_for_status` policy. `None` (default) uses the
+                client setting.
             **kwargs: Extra keyword arguments forwarded to `requests`
                 (`params`, `data`, `json`, `stream`, ...).
 
         Returns:
-            requests.Response: The successful response (after
-                `raise_for_status`).
+            requests.Response: The response (after `raise_for_status`
+                unless it is disabled).
 
         Raises:
             requests.HTTPError: On a non-retryable error status, or after
-                the retryable status is exhausted.
+                the retryable status is exhausted (when `raise_for_status`
+                is on).
         """
         merged = self._merge_headers(headers)
         effective_timeout = self.timeout if timeout is None else timeout
         return self._request_with_retry(
-            method, url, headers=merged, timeout=effective_timeout, **kwargs
+            method,
+            url,
+            headers=merged,
+            timeout=effective_timeout,
+            raise_for_status=raise_for_status,
+            **kwargs,
         )
 
     def get(self, url: str, **kwargs: Any) -> requests.Response:
@@ -385,46 +428,102 @@ class HttpClient:
             response.close()
         return dest
 
-    def _request_with_retry(
-        self, method: str, url: str, **kwargs: Any
-    ) -> requests.Response:
-        """Send one request, retrying retryable statuses with back-off.
+    def _throttle(self) -> None:
+        """Sleep so consecutive requests are >= `min_interval` apart.
 
-        Retries while the response status is in `status_forcelist` and
-        the attempt budget is not spent: it waits `Retry-After` seconds
-        when the header is present and numeric, otherwise
-        `backoff_factor * 2**attempt`. Once the status is non-retryable
-        or the retries are exhausted, `raise_for_status` decides success
-        or error.
+        A no-op when `min_interval` is `0`. Uses the injected monotonic
+        `clock`, records the send time, and sleeps via the injected
+        `sleep` so tests drive the rate limit deterministically.
+        """
+        if self.min_interval <= 0:
+            return
+        if self._last_request is not None:
+            remaining = self.min_interval - (self._clock() - self._last_request)
+            if remaining > 0:
+                self._sleep(remaining)
+        self._last_request = self._clock()
+
+    def _backoff_wait(self, retry_after: float | None, attempt: int) -> float:
+        """Compute one retry wait: `Retry-After` else exponential back-off.
+
+        Applies the `max_backoff` ceiling and a non-negative floor.
+
+        Args:
+            retry_after: Parsed `Retry-After` seconds, or `None`.
+            attempt: The zero-based attempt index.
+
+        Returns:
+            The clamped wait in seconds.
+        """
+        wait = (
+            retry_after
+            if retry_after is not None
+            else self.backoff_factor * (2**attempt)
+        )
+        if self.max_backoff is not None:
+            wait = min(wait, self.max_backoff)
+        return max(0.0, wait)
+
+    def _request_with_retry(
+        self,
+        method: str,
+        url: str,
+        *,
+        raise_for_status: bool | None = None,
+        **kwargs: Any,
+    ) -> requests.Response:
+        """Send one request, retrying statuses/exceptions with back-off.
+
+        Retries while the attempt budget holds and either the response
+        status is in `status_forcelist`, the `retry_predicate` marks the
+        response retryable, or the transport raised one of
+        `retry_on_exceptions`. Waits `Retry-After` seconds when present
+        and numeric, otherwise `backoff_factor * 2**attempt` (capped by
+        `max_backoff`). Honours the `min_interval` throttle before every
+        send. Once non-retryable or exhausted, the response is
+        `raise_for_status`-ed unless that is disabled, then returned.
 
         Args:
             method: HTTP verb.
             url: Absolute request URL.
+            raise_for_status: Per-request override; `None` uses the
+                client policy.
             **kwargs: Keyword arguments forwarded to the session.
 
         Returns:
-            requests.Response: The response after `raise_for_status`.
+            requests.Response: The final response.
 
         Raises:
-            requests.HTTPError: On a non-retryable error status, or after
-                the retryable status is exhausted.
+            requests.HTTPError: On a non-retryable error status when
+                `raise_for_status` is on.
+            BaseException: The last transport exception, re-raised after
+                the `retry_on_exceptions` budget is exhausted.
         """
+        effective_raise = (
+            self.raise_for_status if raise_for_status is None else raise_for_status
+        )
         attempt = 0
         while True:
-            response = self._send(method, url, **kwargs)
-            if (
-                response.status_code in self.status_forcelist
-                and attempt < self.max_retries
-            ):
-                retry_after = _parse_retry_after(response.headers.get("Retry-After"))
-                wait = (
-                    retry_after
-                    if retry_after is not None
-                    else self.backoff_factor * (2**attempt)
+            self._throttle()
+            try:
+                response = self._send(method, url, **kwargs)
+            except self.retry_on_exceptions as exc:
+                if attempt >= self.max_retries:
+                    raise
+                wait = self._backoff_wait(None, attempt)
+                logger.warning(
+                    f"{type(exc).__name__} on {url!r}; retry "
+                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
-                if self.max_backoff is not None:
-                    wait = min(wait, self.max_backoff)
-                wait = max(0.0, wait)
+                self._sleep(wait)
+                attempt += 1
+                continue
+            retryable = response.status_code in self.status_forcelist or (
+                self._retry_predicate is not None and self._retry_predicate(response)
+            )
+            if retryable and attempt < self.max_retries:
+                retry_after = _parse_retry_after(response.headers.get("Retry-After"))
+                wait = self._backoff_wait(retry_after, attempt)
                 logger.warning(
                     f"HTTP {response.status_code} on {url!r}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
@@ -436,13 +535,14 @@ class HttpClient:
                 self._sleep(wait)
                 attempt += 1
                 continue
-            try:
-                response.raise_for_status()
-            except requests.HTTPError:
-                # Close the final errored response too — for a streamed request
-                # the caller never receives it, so nothing else would.
-                response.close()
-                raise
+            if effective_raise:
+                try:
+                    response.raise_for_status()
+                except requests.HTTPError:
+                    # Close the final errored response too — for a streamed
+                    # request the caller never receives it, so nothing else would.
+                    response.close()
+                    raise
             return response
 
     def _send(self, method: str, url: str, **kwargs: Any) -> requests.Response:
