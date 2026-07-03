@@ -119,9 +119,9 @@ def _redact_url(url: str) -> str:
 
     Retry warnings must never echo the full request URL: some backends
     carry a credential in the URL itself — a path segment (FIRMS
-    `MAP_KEY`) or a query parameter (NREL `api_key`, WDPA `?token=`). The
-    path, query, and fragment are dropped so only the (non-secret) scheme
-    and host reach the log.
+    `MAP_KEY`), a query parameter (NREL `api_key`, WDPA `?token=`), or
+    userinfo (`user:pass@host`). Everything but the (non-secret) scheme
+    and host is dropped, so only `scheme://host` reaches the log.
 
     Args:
         url: The request URL.
@@ -130,18 +130,21 @@ def _redact_url(url: str) -> str:
         `"scheme://host"`, or `"<url>"` when the input has no scheme/host.
 
     Examples:
-        - The path and query — where secrets ride — are stripped:
+        - The path, query, and userinfo — where secrets ride — are
+          stripped:
             ```python
             >>> from earthlens.base.http import _redact_url
             >>> _redact_url("https://firms.example/api/SECRETKEY/area?x=1")
             'https://firms.example'
+            >>> _redact_url("https://user:pass@host/p")
+            'https://host'
 
             ```
     """
     parts = urlsplit(url)
-    if not parts.scheme or not parts.netloc:
+    if not parts.scheme or not parts.hostname:
         return "<url>"
-    return f"{parts.scheme}://{parts.netloc}"
+    return f"{parts.scheme}://{parts.hostname}"
 
 
 def _progress_total(headers: Any) -> int | None:
@@ -490,9 +493,12 @@ class HttpClient:
             Path: The `dest` path the bytes were written to.
 
         Raises:
-            requests.HTTPError: On a non-retryable error status (when
-                `raise_for_status` is on), or the last transport exception
-                after the retry budget is exhausted.
+            requests.HTTPError: On a non-retryable error status —
+                `download` **always** raises on an error status (the
+                client's `raise_for_status` flag governs the verb methods,
+                not `download`; a file fetch never keeps an error body) —
+                or the last transport exception after the retry budget is
+                exhausted.
         """
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)

@@ -161,12 +161,13 @@ class TestRedactUrl:
         [
             ("https://firms.example/api/SECRETKEY/area?x=1", "https://firms.example"),
             ("https://host/p?api_key=SECRET", "https://host"),
+            ("https://user:SECRET@host/p", "https://host"),
             ("not-a-url", "<url>"),
             ("", "<url>"),
         ],
     )
     def test_redact(self, url: str, expected: str):
-        """The path and query are stripped to scheme://host."""
+        """Path, query, and userinfo are stripped to scheme://host."""
         assert _redact_url(url) == expected
 
     def test_retry_log_omits_url_path_and_query(self):
