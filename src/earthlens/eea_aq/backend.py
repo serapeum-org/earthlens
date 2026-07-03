@@ -22,6 +22,18 @@ export whose keys do not cleanly join), the result is **country-granular**
 columns; pass `country=` to be precise. `airbase` is imported lazily so
 the `[eea_aq]` extra stays optional.
 
+**Download volume — read this.** `airbase.request()` has **no date
+filter**: it downloads *every* Parquet the service holds for a
+(dataset-era, country, pollutant) triple, and the requested `[start, end]`
+window is applied only *after* the download, in memory. So a one-day query
+such as `country="DE", start="2015-06-01", end="2015-06-01"` still pulls
+the **whole** `Verified` era (2013–2022) of hourly German PM2.5 —
+potentially hundreds of MB to gigabytes — before trimming to one day, and a
+bbox spanning several large countries multiplies that. Keep requests
+cheap: prefer an explicit small `country=` (e.g. Malta `"MT"`), a single
+pollutant, and the tightest year range; a recent year additionally pulls
+**both** the `Verified` and `Unverified` eras (see `datasets_for_years`).
+
 Pollutant selection: `variables` is a `list[str]` of pollutant names
 (`["pm25"]`, `["pm25", "no2"]`), resolved to airbase `poll` notations via
 the bundled catalog.

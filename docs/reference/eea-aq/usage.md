@@ -69,14 +69,25 @@ frame has no `lat` / `lon` columns.
 
 `start` / `end` set the inclusive window (parsed with `fmt`, default
 `"%Y-%m-%d"`). The backend maps the requested years to the EEA
-dataset(s) that span them (`Historical` 2002–2012, `Verified`
-2013–2022, `Unverified` 2023+), downloads each, and filters the rows to
-the exact window. A range straddling a boundary downloads both eras:
+dataset(s) that span them (`Historical` 2002–2012, `Verified` 2013
+onward, `Unverified` 2023+), downloads each, and filters the rows to the
+exact window. A recent year is queried against **both** `Verified` and
+`Unverified` (a year is promoted from the near-real-time stream into the
+validated archive ~9 months after it ends), and the rows are
+de-duplicated:
 
 ```python
 from earthlens.eea_aq._helpers import datasets_for_years
 datasets_for_years(2021, 2024)     # ['Verified', 'Unverified']
+datasets_for_years(2015, 2016)     # ['Verified']
 ```
+
+> **⚠ Download volume.** `airbase` has **no date filter** — a request
+> downloads the *entire* reporting era for each country + pollutant, then
+> the window is applied in memory. A one-day query for a large country can
+> pull hundreds of MB to gigabytes. Keep it cheap: a small explicit
+> `country=`, one pollutant, and the tightest year range; a recent year
+> costs two eras.
 
 ## 5. Output format
 
