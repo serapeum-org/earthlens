@@ -79,7 +79,7 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-JaxaProtocol = Literal["jaxa-earth", "gportal"]
+JaxaProtocol = Literal["jaxa-earth", "gportal", "ptree"]
 
 
 class Dataset(BaseModel):
