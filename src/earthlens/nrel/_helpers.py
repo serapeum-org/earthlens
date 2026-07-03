@@ -22,6 +22,7 @@ from typing import Any, Callable
 from urllib.parse import urlencode
 
 import pandas as pd
+import requests
 
 from earthlens.base.http import HttpClient
 
@@ -216,9 +217,13 @@ def throttled_get(
     resp = http.get(url, raise_for_status=False)
     last_call[0] = monotonic()
     if resp.status_code == 429:
-        # Retries exhausted on a persistent 429 — mirror the old loop's final
-        # `raise_for_status()` (an HTTPError).
-        resp.raise_for_status()
+        # Retries exhausted on a persistent 429. Raise an HTTPError (as the old
+        # loop's raise_for_status() did) but WITHOUT the URL — it carries the
+        # `api_key=` query param, and requests.HTTPError echoes `resp.url`.
+        raise requests.HTTPError(
+            f"NREL returned HTTP 429 after {max_retries} attempts "
+            "(the api_key has been redacted from this error)."
+        )
     return resp
 
 
