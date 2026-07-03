@@ -143,6 +143,8 @@ class SensorCommunity(AbstractDataSource):
         self._client_obj = client
         self._file_format: FileFormat = file_format
         self._catalog = Catalog()
+        self._columns: dict[str, str] | None = None
+        self._units: dict[str, str] | None = None
         super().__init__(
             start=start,
             end=end,
@@ -234,12 +236,18 @@ class SensorCommunity(AbstractDataSource):
         return [(start + dt.timedelta(days=offset)).isoformat() for offset in range(span + 1)]
 
     def _column_map(self) -> dict[str, str]:
-        """CSV column -> pollutant name for the requested pollutants."""
-        return self._catalog.columns_for(self.vars)
+        """CSV column -> pollutant name for the requested pollutants (cached)."""
+        if self._columns is None:
+            self._columns = self._catalog.columns_for(self.vars)
+        return self._columns
 
     def _unit_map(self) -> dict[str, str]:
-        """Pollutant name -> reporting unit for the requested pollutants."""
-        return {name: self._catalog.get_pollutant(name).units for name in self.vars}
+        """Pollutant name -> reporting unit for the requested pollutants (cached)."""
+        if self._units is None:
+            self._units = {
+                name: self._catalog.get_pollutant(name).units for name in self.vars
+            }
+        return self._units
 
     def _search(self) -> list[RemoteProduct]:
         """Discover active sensors in the bbox via the live JSON API.
