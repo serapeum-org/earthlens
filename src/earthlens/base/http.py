@@ -369,45 +369,24 @@ class HttpClient:
         """
         return self.get(url, stream=True, **kwargs)
 
-    def download(
+    def _stream_to_file(
         self,
-        url: str,
-        dest: str | Path,
+        response: requests.Response,
+        dest: Path,
         *,
-        chunk: int = DEFAULT_CHUNK_SIZE,
-        progress: bool = True,
-        headers: dict[str, str] | None = None,
-        timeout: float | None = None,
-        **kwargs: Any,
-    ) -> Path:
-        """Stream `url` to `dest`, optionally showing a `tqdm` bar.
-
-        Absorbs the chunk-loop the streamed-download backends each
-        re-implement: streams with `stream=True`, sizes a progress bar
-        from `Content-Length` when present, writes 1 MiB blocks to
-        `dest` (creating parent directories), and returns the path. The
-        initial response is retry-wrapped via :meth:`stream`.
+        chunk: int,
+        progress: bool,
+        desc: str,
+    ) -> None:
+        """Write a streaming response's body to `dest` with a `tqdm` bar.
 
         Args:
-            url: Absolute request URL.
-            dest: Output file path. Parent directories are created.
-            chunk: Streaming block size in bytes (default 1 MiB).
-            progress: Show a `tqdm` progress bar. `False` (or a
-                non-interactive / test context) suppresses it.
-            headers: Per-request headers merged over the client defaults.
-            timeout: Per-request timeout override (seconds).
-            **kwargs: Extra keyword arguments forwarded to `requests`.
-
-        Returns:
-            Path: The `dest` path the bytes were written to.
-
-        Raises:
-            requests.HTTPError: On a non-retryable error status, or after
-                the retryable status is exhausted.
+            response: The open streaming response.
+            dest: The file to write (typically a temp `.part` path).
+            chunk: Streaming block size in bytes.
+            progress: Whether to show the progress bar.
+            desc: The bar label (the final file name).
         """
-        dest = Path(dest)
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        response = self.stream(url, headers=headers, timeout=timeout, **kwargs)
         total = _progress_total(response.headers)
         bar = tqdm(
             total=total,
@@ -415,7 +394,7 @@ class HttpClient:
             unit_scale=True,
             unit_divisor=1024,
             disable=not progress,
-            desc=dest.name,
+            desc=desc,
         )
         try:
             with open(dest, "wb") as handle:
@@ -425,8 +404,109 @@ class HttpClient:
                         bar.update(len(block))
         finally:
             bar.close()
-            response.close()
-        return dest
+
+    def download(
+        self,
+        url: str,
+        dest: str | Path,
+        *,
+        chunk: int = DEFAULT_CHUNK_SIZE,
+        progress: bool = True,
+        atomic: bool = True,
+        headers: dict[str, str] | None = None,
+        timeout: float | None = None,
+        **kwargs: Any,
+    ) -> Path:
+        """Stream `url` to `dest` atomically, optionally showing a `tqdm` bar.
+
+        Absorbs the chunk-loop the streamed-download backends each
+        re-implement: streams with `stream=True`, sizes a progress bar
+        from `Content-Length` when present, and writes 1 MiB blocks. When
+        `atomic` (the default) it writes to a sibling `<dest>.part` and
+        renames on success, and it removes the temp on any failure — so a
+        crashed or interrupted download never leaves a truncated `dest`.
+        The whole download is retry-wrapped: a status in `status_forcelist`
+        or an exception in `retry_on_exceptions` retries the attempt (after
+        cleaning the temp), honouring the `Retry-After`/back-off policy.
+
+        Args:
+            url: Absolute request URL.
+            dest: Output file path. Parent directories are created.
+            chunk: Streaming block size in bytes (default 1 MiB).
+            progress: Show a `tqdm` progress bar. `False` (or a
+                non-interactive / test context) suppresses it.
+            atomic: Write to `<dest>.part` then rename on success, cleaning
+                up the temp on failure. `False` writes straight to `dest`.
+            headers: Per-request headers merged over the client defaults.
+            timeout: Per-request timeout override (seconds).
+            **kwargs: Extra keyword arguments forwarded to `requests`.
+
+        Returns:
+            Path: The `dest` path the bytes were written to.
+
+        Raises:
+            requests.HTTPError: On a non-retryable error status (when
+                `raise_for_status` is on), or the last transport exception
+                after the retry budget is exhausted.
+        """
+        dest = Path(dest)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        tmp = dest.with_name(dest.name + ".part") if atomic else dest
+        merged = self._merge_headers(headers)
+        effective_timeout = self.timeout if timeout is None else timeout
+        attempt = 0
+        while True:
+            self._throttle()
+            try:
+                response = self._send(
+                    "GET",
+                    url,
+                    stream=True,
+                    headers=merged,
+                    timeout=effective_timeout,
+                    **kwargs,
+                )
+                try:
+                    retryable = response.status_code in self.status_forcelist or (
+                        self._retry_predicate is not None
+                        and self._retry_predicate(response)
+                    )
+                    if retryable and attempt < self.max_retries:
+                        retry_after = _parse_retry_after(
+                            response.headers.get("Retry-After")
+                        )
+                        wait = self._backoff_wait(retry_after, attempt)
+                        logger.warning(
+                            f"HTTP {response.status_code} on {url!r}; retry "
+                            f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
+                        )
+                        self._sleep(wait)
+                        attempt += 1
+                        continue
+                    response.raise_for_status()
+                    self._stream_to_file(
+                        response, tmp, chunk=chunk, progress=progress, desc=dest.name
+                    )
+                finally:
+                    response.close()
+            except self.retry_on_exceptions as exc:
+                tmp.unlink(missing_ok=True)
+                if attempt >= self.max_retries:
+                    raise
+                wait = self._backoff_wait(None, attempt)
+                logger.warning(
+                    f"{type(exc).__name__} on {url!r}; retry "
+                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
+                )
+                self._sleep(wait)
+                attempt += 1
+                continue
+            except BaseException:
+                tmp.unlink(missing_ok=True)
+                raise
+            if atomic:
+                tmp.replace(dest)
+            return dest
 
     def _throttle(self) -> None:
         """Sleep so consecutive requests are >= `min_interval` apart.

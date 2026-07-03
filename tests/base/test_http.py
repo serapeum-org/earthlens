@@ -26,11 +26,13 @@ class _Resp:
         headers: dict[str, str] | None = None,
         body: Any = None,
         blocks: list[bytes] | None = None,
+        stream_error: BaseException | None = None,
     ) -> None:
         self.status_code = status
         self.headers = headers or {}
         self._body = body
         self._blocks = blocks or []
+        self._stream_error = stream_error
         self.closed = False
 
     def json(self) -> Any:
@@ -42,6 +44,8 @@ class _Resp:
 
     def iter_content(self, chunk_size: int | None = None) -> Any:
         yield from self._blocks
+        if self._stream_error is not None:
+            raise self._stream_error
 
     def close(self) -> None:
         self.closed = True
@@ -534,3 +538,65 @@ class TestDownload:
         client.download("http://x", dest, progress=False)
         assert dest.read_bytes() == b"ok"
         assert len(session.calls) == 2
+
+    def test_download_is_atomic_no_part_left(self, tmp_path):
+        """A successful download renames the temp and leaves no .part."""
+        session = _RecordingSession([_Resp(blocks=[b"data"])])
+        dest = tmp_path / "out.bin"
+        HttpClient(session=session).download("http://x", dest, progress=False)
+        assert dest.read_bytes() == b"data"
+        assert not dest.with_name("out.bin.part").exists()
+
+    def test_download_cleans_partial_on_stream_failure(self, tmp_path):
+        """A mid-stream failure removes the temp and leaves no dest."""
+        session = _RecordingSession(
+            [_Resp(blocks=[b"partial"], stream_error=OSError("mid-stream"))]
+        )
+        dest = tmp_path / "out.bin"
+        with pytest.raises(OSError):
+            HttpClient(session=session).download("http://x", dest, progress=False)
+        assert not dest.exists()
+        assert not dest.with_name("out.bin.part").exists()
+
+    def test_download_retries_on_exception_then_succeeds(self, tmp_path):
+        """A configured transport exception retries the whole download."""
+        session = _FlakySession(
+            2, requests.ConnectionError("boom"), _Resp(blocks=[b"ok"])
+        )
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            retry_on_exceptions=(requests.ConnectionError,),
+        )
+        dest = tmp_path / "out.bin"
+        client.download("http://x", dest, progress=False)
+        assert dest.read_bytes() == b"ok"
+        assert session.calls == 3
+        assert not dest.with_name("out.bin.part").exists()
+
+    def test_download_exhausts_exception_retries_and_reraises(self, tmp_path):
+        """A persistent transport exception re-raises after the budget."""
+        session = _FlakySession(
+            10, requests.ConnectionError("boom"), _Resp(blocks=[b"ok"])
+        )
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            max_retries=2,
+            retry_on_exceptions=(requests.ConnectionError,),
+        )
+        dest = tmp_path / "out.bin"
+        with pytest.raises(requests.ConnectionError):
+            client.download("http://x", dest, progress=False)
+        assert session.calls == 3
+        assert not dest.with_name("out.bin.part").exists()
+
+    def test_download_non_atomic_writes_dest_directly(self, tmp_path):
+        """atomic=False streams straight to dest with no temp file."""
+        session = _RecordingSession([_Resp(blocks=[b"data"])])
+        dest = tmp_path / "out.bin"
+        HttpClient(session=session).download(
+            "http://x", dest, progress=False, atomic=False
+        )
+        assert dest.read_bytes() == b"data"
+        assert not dest.with_name("out.bin.part").exists()
