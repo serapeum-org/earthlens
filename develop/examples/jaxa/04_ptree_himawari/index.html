@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/airnow/quickstart/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/jaxa/04_ptree_himawari/">
       
       
-        <link rel="prev" href="../../openaq/multistation_comparison/">
-      
-      
-        <link rel="next" href="../../eea-aq/quickstart/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>AirNow quickstart — PM2.5 over a city - earthlens</title>
+        <title>P-Tree — Himawari-9 AHI HSD full-disk download - earthlens</title>
       
     
     
@@ -64,7 +60,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#airnow-quickstart-pm25-over-a-city" class="md-skip">
+        <a href="#p-tree-himawari-9-ahi-hsd-full-disk-download" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              AirNow quickstart — PM2.5 over a city
+              P-Tree — Himawari-9 AHI HSD full-disk download
             
           </span>
         </div>
@@ -297,12 +293,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../authentication/" class="md-tabs__link">
           
   
@@ -5012,7 +5006,7 @@
   <span class="md-ellipsis">
     
   
-    AirNow (air quality — US/Canada)
+    openEO (server-side processing)
   
 
     
@@ -5025,516 +5019,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_27_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_27">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    AirNow (air quality — US/Canada)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/airnow/introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/airnow/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/airnow/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/airnow/airnow/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_28" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_28" id="__nav_3_28_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    EEA (air quality — Europe)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_28_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_28">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    EEA (air quality — Europe)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/eea-aq/introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/eea-aq/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/eea-aq/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Install & access
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/eea-aq/eea-aq/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_29" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_29" id="__nav_3_29_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sensor.Community (air quality — crowdsourced)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_29_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_29">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Sensor.Community (air quality — crowdsourced)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/sensor-community/introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/sensor-community/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/sensor-community/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Licence & access
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/sensor-community/sensor-community/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_30" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_30" id="__nav_3_30_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    openEO (server-side processing)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_30_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_30">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5710,10 +5194,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_31" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_28" >
         
           
-          <label class="md-nav__link" for="__nav_3_31" id="__nav_3_31_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_28" id="__nav_3_28_label" tabindex="0">
             
   
   
@@ -5731,8 +5215,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_31_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_31">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_28_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_28">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5936,10 +5420,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_32" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_29" >
         
           
-          <label class="md-nav__link" for="__nav_3_32" id="__nav_3_32_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_29" id="__nav_3_29_label" tabindex="0">
             
   
   
@@ -5957,8 +5441,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_32_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_32">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_29_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_29">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6078,10 +5562,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_33" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_30" >
         
           
-          <label class="md-nav__link" for="__nav_3_33" id="__nav_3_33_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_30" id="__nav_3_30_label" tabindex="0">
             
   
   
@@ -6099,8 +5583,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_33_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_33">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_30_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_30">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6248,10 +5732,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_34" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_31" >
         
           
-          <label class="md-nav__link" for="__nav_3_34" id="__nav_3_34_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_31" id="__nav_3_31_label" tabindex="0">
             
   
   
@@ -6269,8 +5753,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_34_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_34">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_31_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_31">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6418,10 +5902,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_35" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_32" >
         
           
-          <label class="md-nav__link" for="__nav_3_35" id="__nav_3_35_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_32" id="__nav_3_32_label" tabindex="0">
             
   
   
@@ -6439,8 +5923,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_35_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_35">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_32_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_32">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6588,10 +6072,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_36" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_33" >
         
           
-          <label class="md-nav__link" for="__nav_3_36" id="__nav_3_36_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_33" id="__nav_3_33_label" tabindex="0">
             
   
   
@@ -6609,8 +6093,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_36_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_36">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_33_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_33">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6786,10 +6270,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_37" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_34" >
         
           
-          <label class="md-nav__link" for="__nav_3_37" id="__nav_3_37_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_34" id="__nav_3_34_label" tabindex="0">
             
   
   
@@ -6807,8 +6291,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_37_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_37">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_34_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_34">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6956,10 +6440,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_38" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_35" >
         
           
-          <label class="md-nav__link" for="__nav_3_38" id="__nav_3_38_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_35" id="__nav_3_35_label" tabindex="0">
             
   
   
@@ -6977,8 +6461,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_38_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_38">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_35_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_35">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7126,10 +6610,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_39" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_36" >
         
           
-          <label class="md-nav__link" for="__nav_3_39" id="__nav_3_39_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_36" id="__nav_3_36_label" tabindex="0">
             
   
   
@@ -7147,8 +6631,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_39_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_39">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_36_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_36">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7324,10 +6808,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_40" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_37" >
         
           
-          <label class="md-nav__link" for="__nav_3_40" id="__nav_3_40_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_37" id="__nav_3_37_label" tabindex="0">
             
   
   
@@ -7345,8 +6829,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_40_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_40">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_37_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_37">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7550,10 +7034,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_41" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_38" >
         
           
-          <label class="md-nav__link" for="__nav_3_41" id="__nav_3_41_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_38" id="__nav_3_38_label" tabindex="0">
             
   
   
@@ -7571,8 +7055,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_41_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_41">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_38_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_38">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7748,10 +7232,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_42" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_39" >
         
           
-          <label class="md-nav__link" for="__nav_3_42" id="__nav_3_42_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_39" id="__nav_3_39_label" tabindex="0">
             
   
   
@@ -7769,8 +7253,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_42_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_42">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_39_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_39">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7834,10 +7318,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_43" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_40" >
         
           
-          <label class="md-nav__link" for="__nav_3_43" id="__nav_3_43_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_40" id="__nav_3_40_label" tabindex="0">
             
   
   
@@ -7855,8 +7339,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_43_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_43">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_40_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_40">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7976,10 +7460,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_44" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_41" >
         
           
-          <label class="md-nav__link" for="__nav_3_44" id="__nav_3_44_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_41" id="__nav_3_41_label" tabindex="0">
             
   
   
@@ -7997,8 +7481,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_44_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_44">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_41_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_41">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8118,10 +7602,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_45" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_42" >
         
           
-          <label class="md-nav__link" for="__nav_3_45" id="__nav_3_45_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_42" id="__nav_3_42_label" tabindex="0">
             
   
   
@@ -8139,8 +7623,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_45_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_45">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8288,10 +7772,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_46" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_43" >
         
           
-          <label class="md-nav__link" for="__nav_3_46" id="__nav_3_46_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_43" id="__nav_3_43_label" tabindex="0">
             
   
   
@@ -8309,8 +7793,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_46_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_46">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_43_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_43">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8458,10 +7942,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_47" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_44" >
         
           
-          <label class="md-nav__link" for="__nav_3_47" id="__nav_3_47_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_44" id="__nav_3_44_label" tabindex="0">
             
   
   
@@ -8479,8 +7963,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_47_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_47">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_44_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_44">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8600,10 +8084,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_48" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_45" >
         
           
-          <label class="md-nav__link" for="__nav_3_48" id="__nav_3_48_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_45" id="__nav_3_45_label" tabindex="0">
             
   
   
@@ -8621,8 +8105,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_48_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_48">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_45_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_45">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8735,29 +8219,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -8775,7 +8254,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -12315,7 +11794,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jaxa/01_catalog_explorer/" class="md-nav__link">
+      <a href="../01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -12343,7 +11822,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jaxa/02_aw3d30_quickstart/" class="md-nav__link">
+      <a href="../02_aw3d30_quickstart/" class="md-nav__link">
         
   
   
@@ -12371,7 +11850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jaxa/03_gportal_search/" class="md-nav__link">
+      <a href="../03_gportal_search/" class="md-nav__link">
         
   
   
@@ -14022,8 +13501,6 @@
                 
   
   
-    
-  
   
   
     
@@ -14034,391 +13511,14 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_30" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_30" >
         
           
           <label class="md-nav__link" for="__nav_4_30" id="__nav_4_30_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Air quality (AirNow — US/Canada)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_30_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_30">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Air quality (AirNow — US/Canada)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    AirNow quickstart — PM2.5 over a city
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    AirNow quickstart — PM2.5 over a city
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Setup
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-pollutant-catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The pollutant catalog
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#request-parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Request parameters
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#build-the-request-download" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Build the request &amp; download
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Build the request &amp; download">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#inspect-the-first-rows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inspect the first rows
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#plot-hourly-pm25-by-station" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Plot hourly PM2.5 by station
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_31" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_31" id="__nav_4_31_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Air quality (EEA — Europe)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_31_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_31">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Air quality (EEA — Europe)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../eea-aq/quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    EEA quickstart — PM2.5 for a country
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_32" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_32" id="__nav_4_32_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Air quality (Sensor.Community — crowdsourced)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_32_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_32">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Air quality (Sensor.Community — crowdsourced)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../sensor-community/quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sensor.Community quickstart — PM over a city
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_33" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_33" id="__nav_4_33_label" tabindex="0">
             
   
   
@@ -14436,8 +13536,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_33_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_33">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_30_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_30">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14641,10 +13741,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_34" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_31" >
         
           
-          <label class="md-nav__link" for="__nav_4_34" id="__nav_4_34_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_31" id="__nav_4_31_label" tabindex="0">
             
   
   
@@ -14662,8 +13762,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_34_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_34">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_31_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_31">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14923,10 +14023,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_35" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_32" >
         
           
-          <label class="md-nav__link" for="__nav_4_35" id="__nav_4_35_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_32" id="__nav_4_32_label" tabindex="0">
             
   
   
@@ -14944,8 +14044,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_35_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_35">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_32_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_32">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15205,10 +14305,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_36" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_33" >
         
           
-          <label class="md-nav__link" for="__nav_4_36" id="__nav_4_36_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_33" id="__nav_4_33_label" tabindex="0">
             
   
   
@@ -15226,8 +14326,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_36_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_36">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_33_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_33">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15347,10 +14447,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_37" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_34" >
         
           
-          <label class="md-nav__link" for="__nav_4_37" id="__nav_4_37_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_34" id="__nav_4_34_label" tabindex="0">
             
   
   
@@ -15368,8 +14468,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_37_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_37">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_34_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_34">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15545,10 +14645,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_38" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_35" >
         
           
-          <label class="md-nav__link" for="__nav_4_38" id="__nav_4_38_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_35" id="__nav_4_35_label" tabindex="0">
             
   
   
@@ -15566,8 +14666,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_38_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_38">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_35_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_35">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15743,10 +14843,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_39" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_36" >
         
           
-          <label class="md-nav__link" for="__nav_4_39" id="__nav_4_39_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_36" id="__nav_4_36_label" tabindex="0">
             
   
   
@@ -15764,8 +14864,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_39_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_39">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_36_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_36">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15997,10 +15097,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_40" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_37" >
         
           
-          <label class="md-nav__link" for="__nav_4_40" id="__nav_4_40_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_37" id="__nav_4_37_label" tabindex="0">
             
   
   
@@ -16018,8 +15118,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_40_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_40">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_37_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_37">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16223,10 +15323,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_41" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_38" >
         
           
-          <label class="md-nav__link" for="__nav_4_41" id="__nav_4_41_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_38" id="__nav_4_38_label" tabindex="0">
             
   
   
@@ -16244,8 +15344,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_41_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_41">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_38_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_38">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16309,10 +15409,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_42" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_39" >
         
           
-          <label class="md-nav__link" for="__nav_4_42" id="__nav_4_42_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_39" id="__nav_4_39_label" tabindex="0">
             
   
   
@@ -16330,8 +15430,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_42_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_42">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_39_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_39">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16479,10 +15579,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_43" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_40" >
         
           
-          <label class="md-nav__link" for="__nav_4_43" id="__nav_4_43_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_40" id="__nav_4_40_label" tabindex="0">
             
   
   
@@ -16500,8 +15600,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_43_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_43">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_40_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_40">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16733,10 +15833,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_44" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_41" >
         
           
-          <label class="md-nav__link" for="__nav_4_44" id="__nav_4_44_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_41" id="__nav_4_41_label" tabindex="0">
             
   
   
@@ -16754,8 +15854,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_44_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_44">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_41_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_41">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17043,10 +16143,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_45" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_42" >
         
           
-          <label class="md-nav__link" for="__nav_4_45" id="__nav_4_45_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_42" id="__nav_4_42_label" tabindex="0">
             
   
   
@@ -17064,8 +16164,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_45_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_45">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17129,10 +16229,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_46" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_43" >
         
           
-          <label class="md-nav__link" for="__nav_4_46" id="__nav_4_46_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_43" id="__nav_4_43_label" tabindex="0">
             
   
   
@@ -17150,8 +16250,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_46_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_46">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_43_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_43">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17215,10 +16315,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_47" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_44" >
         
           
-          <label class="md-nav__link" for="__nav_4_47" id="__nav_4_47_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_44" id="__nav_4_44_label" tabindex="0">
             
   
   
@@ -17236,8 +16336,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_47_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_47">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_44_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_44">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17357,10 +16457,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_48" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_45" >
         
           
-          <label class="md-nav__link" for="__nav_4_48" id="__nav_4_48_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_45" id="__nav_4_45_label" tabindex="0">
             
   
   
@@ -17378,8 +16478,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_48_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_48">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_45_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_45">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17499,10 +16599,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_49" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_46" >
         
           
-          <label class="md-nav__link" for="__nav_4_49" id="__nav_4_49_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_46" id="__nav_4_46_label" tabindex="0">
             
   
   
@@ -17520,8 +16620,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_49_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_49">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_46_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_46">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17911,10 +17011,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
+  <a href="#inspect-the-catalog-row" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setup
+        Inspect the catalog row
       
     </span>
   </a>
@@ -17922,10 +17022,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-pollutant-catalog" class="md-nav__link">
+  <a href="#pick-a-window-inside-the-30-day-archive" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The pollutant catalog
+        Pick a window inside the 30-day archive
       
     </span>
   </a>
@@ -17933,10 +17033,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#request-parameters" class="md-nav__link">
+  <a href="#live-download-skips-when-env-vars-absent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Request parameters
+        Live download (skips when env vars absent)
       
     </span>
   </a>
@@ -17944,38 +17044,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#build-the-request-download" class="md-nav__link">
+  <a href="#confirm-the-layout-matches-the-p-tree-server-tree" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Build the request &amp; download
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Build the request &amp; download">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#inspect-the-first-rows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inspect the first rows
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#plot-hourly-pm25-by-station" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Plot hourly PM2.5 by station
+        Confirm the layout matches the P-Tree server tree
       
     </span>
   </a>
@@ -17999,7 +17071,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/airnow/quickstart.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/jaxa/04_ptree_himawari.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -18008,7 +17080,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/airnow/quickstart.ipynb" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/jaxa/04_ptree_himawari.ipynb" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -18736,49 +17808,33 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5f4ed71e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a8639c1c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="airnow-quickstart-pm25-over-a-city">AirNow quickstart — PM2.5 over a city<a class="anchor-link" href="#airnow-quickstart-pm25-over-a-city">¶</a></h1><p><a href="https://www.airnow.gov/">AirNow</a> publishes reference-grade <strong>hourly</strong> air-quality
-monitor observations for the US and Canada. This notebook pulls PM2.5 for the Los
-Angeles basin over one day and plots it by station.</p>
-<p>The <code>earthlens</code> AirNow backend is <strong>tabular</strong>: <code>download()</code> returns a long-format
-<code>pandas.DataFrame</code>, one row per measurement.</p>
+<h1 id="p-tree-himawari-9-ahi-hsd-full-disk-download">P-Tree — Himawari-9 AHI HSD full-disk download<a class="anchor-link" href="#p-tree-himawari-9-ahi-hsd-full-disk-download">¶</a></h1><p>Download one 10-minute observation of the Himawari-9 AHI <strong>B03</strong> (0.5 km visible) full-disk imagery from JAXA's P-Tree FTP archive. HSD full-disk is delivered as 10 segment files per band per 10-minute slot (<code>S0110</code>…<code>S1010</code>); the backend fetches all 10 and mirrors them under <code>out_dir/YYYYMM/DD/HH/</code> so several timeslots don't collide on filenames.</p>
+<p><strong>Needs the <code>[jaxa]</code> extra</strong>. The download step needs <code>$JAXA_PTREE_USERNAME</code> + <code>$JAXA_PTREE_PASSWORD</code> (free account at <a href="https://www.eorc.jaxa.jp/ptree/registration_top.html">https://www.eorc.jaxa.jp/ptree/registration_top.html</a> — <strong>separate registration</strong> from G-Portal); without those it falls back to a printed catalog inspection.</p>
+<p><strong>Retention</strong>: P-Tree serves only the last 30 days of HSD. This notebook always requests "yesterday 00:00 UTC" so the window is inside the archive.</p>
+<p><strong>Licence</strong>: since <strong>2026-02-01</strong> P-Tree data is available for commercial use (attribution per the <a href="https://www.eorc.jaxa.jp/ptree/terms.html">Terms of Use</a>).</p>
+<p><strong>Decode</strong>: this backend ships the raw <code>.DAT.bz2</code> granules. Decoding HSD to arrays is <code>satpy</code>'s job (tracked as pyramids <code>PY-2</code>) — do <strong>not</strong> expect a GeoTIFF here.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9cfbf4f7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3c2bdff5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<blockquote>
-<p><strong>Free API key.</strong> AirNow's <code>/aq/data/</code> endpoint needs a free <code>API_KEY</code> (register at
-<a href="https://docs.airnowapi.org/account/request/">https://docs.airnowapi.org/account/request/</a>). Set it as <code>AIRNOW_API_KEY</code>. The live
-download cell below is skipped when the key is absent, so the notebook still runs
-clean end-to-end (e.g. under <code>pytest --nbval-lax</code>).</p>
-</blockquote>
+<h2 id="inspect-the-catalog-row">Inspect the catalog row<a class="anchor-link" href="#inspect-the-catalog-row">¶</a></h2>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=60d915ac">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4d22fac1">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a81f6312">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -18796,40 +17852,66 @@ clean end-to-end (e.g. under <code>pytest --nbval-lax</code>).</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.airnow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'himawari-ahi-fldk'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'canonical key:'</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'aliases:      '</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">aliases</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'protocol:     '</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">protocol</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'default_band: '</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">default_band</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'description:  '</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'by_protocol("ptree"):'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">by_protocol</span><span class="p">(</span><span class="s1">'ptree'</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">%matplotlib inline
-import os
+<div class="clipboard-copy-txt" id="cell-1">from earthlens.jaxa import Catalog
 
-import matplotlib.pyplot as plt
+cat = Catalog()
+row = cat.get('himawari-ahi-fldk')
+print('canonical key:', row.key)
+print('aliases:      ', row.aliases)
+print('protocol:     ', row.protocol)
+print('default_band: ', row.default_band)
+print('description:  ', row.description)
+print()
+print('by_protocol("ptree"):', cat.by_protocol('ptree'))</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>canonical key: himawari-ahi-fldk
+aliases:       ['himawari', 'himawari-9', 'ahi', 'ahi-fldk', 'himawari-visible']
+protocol:      ptree
+default_band:  B03
+description:   Himawari-9 AHI HSD L1 full-disk 10-min imagery (B03 visible default; pass bands=[B01..B16])
 
-from earthlens import EarthLens
-from earthlens.airnow import Catalog</div>
+by_protocol("ptree"): ['himawari-ahi-fldk']
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5e9c6f28">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=da9ef5b8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="the-pollutant-catalog">The pollutant catalog<a class="anchor-link" href="#the-pollutant-catalog">¶</a></h2><p><code>variables</code> names pollutants, resolved to AirNow <code>parameters</code> codes via the catalog.
-This cell needs no network.</p>
+<h2 id="pick-a-window-inside-the-30-day-archive">Pick a window inside the 30-day archive<a class="anchor-link" href="#pick-a-window-inside-the-30-day-archive">¶</a></h2><p>One 10-minute slot at yesterday 00:00 UTC — inside the archive (the 30-day boundary is D-30 inclusive) and small enough to fit in a few minutes over a home connection. Expected download size for <strong>B03</strong> (0.5 km visible, <code>R05</code>): <strong>~250-300 MB per slot</strong> (10 segments, each 12-36 MB compressed). Pick an IR band such as <strong>B13</strong> (2 km, <code>R20</code>) instead for a ~10 MB per-slot download.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0991ea00">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e3126171">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -18847,9 +17929,25 @@ This cell needs no network.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">sorted</span><span class="p">(</span><span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">pollutants</span><span class="p">),</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">codes_for</span><span class="p">([</span><span class="s2">"pm25"</span><span class="p">,</span> <span class="s2">"o3"</span><span class="p">])</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+
+<span class="n">yesterday</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">UTC</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">slot</span> <span class="o">=</span> <span class="n">yesterday</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">slot</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M'</span><span class="p">)</span>
+<span class="c1"># Match the notebook's example: one 10-min slot -&gt; start == end (floored).</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">start</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'window: </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1"> .. </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s1"> (UTC)'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">sorted(Catalog().pollutants), Catalog().codes_for(["pm25", "o3"])</div>
+<div class="clipboard-copy-txt" id="cell-2">import datetime as dt
+
+yesterday = dt.datetime.now(dt.UTC) - dt.timedelta(days=1)
+slot = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+start = slot.strftime('%Y-%m-%d %H:%M')
+# Match the notebook's example: one 10-min slot -&gt; start == end (floored).
+end = start
+print(f'window: {start} .. {end} (UTC)')
+print(f'expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)')</div>
 </div>
 </div>
 </div>
@@ -18858,28 +17956,33 @@ This cell needs no network.</p>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>(['co', 'no2', 'o3', 'pm10', 'pm25', 'so2'], ['PM25', 'OZONE'])</pre>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>window: 2026-07-03 00:00 .. 2026-07-03 00:00 (UTC)
+expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6bf68ef7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8eb47324">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="request-parameters">Request parameters<a class="anchor-link" href="#request-parameters">¶</a></h2>
+<h2 id="live-download-skips-when-env-vars-absent">Live download (skips when env vars absent)<a class="anchor-link" href="#live-download-skips-when-env-vars-absent">¶</a></h2><p><code>EarthLens(data_source='jaxa', variables=['himawari-ahi-fldk'], bands=['B03'], ...)</code> picks the ptree branch on construction, connects to <code>ftp.ptree.jaxa.jp:21</code> over plain FTP (stdlib <code>ftplib</code> — no <code>paramiko</code>), and downloads each of the 10 segments into <code>path/YYYYMM/DD/HH/</code>.</p>
+<blockquote>
+<p><strong>Note</strong>: the cell below <strong>prints a SKIP line and does no work</strong> when the <code>JAXA_PTREE_USERNAME</code> / <code>JAXA_PTREE_PASSWORD</code> env vars are unset — this is a soft skip, not a hard error. If you see "SKIP:" in the output, set the credentials (see the JAXA authentication docs) and re-run.</p>
+</blockquote>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a99da0f9">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a819b032">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -18897,33 +18000,104 @@ This cell needs no network.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bbox_lat</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.3</span><span class="p">]</span>   <span class="c1"># Los Angeles basin</span>
-<span class="n">bbox_lon</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">118.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.1</span><span class="p">]</span>
-<span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s2">"2026-01-01"</span><span class="p">,</span> <span class="s2">"2026-01-01"</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'ptree_out'</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'JAXA_PTREE_USERNAME'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'JAXA_PTREE_PASSWORD'</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'SKIP: $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD not set.'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Register at https://www.eorc.jaxa.jp/ptree/registration_top.html and re-run.'</span><span class="p">)</span>
+    <span class="n">written</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+    <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s1">'jaxa'</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'himawari-ahi-fldk'</span><span class="p">],</span>
+        <span class="n">bands</span><span class="o">=</span><span class="p">[</span><span class="s1">'B03'</span><span class="p">],</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+        <span class="n">fmt</span><span class="o">=</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M'</span><span class="p">,</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">],</span>
+        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">'hourly'</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">written</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'downloaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s1"> segment(s) to </span><span class="si">{</span><span class="n">OUT_DIR</span><span class="si">}</span><span class="s1">:'</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">written</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">)</span><span class="si">}</span><span class="s1">  (</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">1024</span><span class="si">}</span><span class="s1"> KB)'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">bbox_lat = [34.0, 34.3]   # Los Angeles basin
-bbox_lon = [-118.5, -118.1]
-start, end = "2026-01-01", "2026-01-01"</div>
+<div class="clipboard-copy-txt" id="cell-3">import os
+from pathlib import Path
+
+OUT_DIR = Path('ptree_out').resolve()
+
+if not (os.environ.get('JAXA_PTREE_USERNAME') and os.environ.get('JAXA_PTREE_PASSWORD')):
+    print('SKIP: $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD not set.')
+    print('Register at https://www.eorc.jaxa.jp/ptree/registration_top.html and re-run.')
+    written = []
+else:
+    from earthlens import EarthLens
+    OUT_DIR.mkdir(exist_ok=True)
+    lens = EarthLens(
+        data_source='jaxa',
+        variables=['himawari-ahi-fldk'],
+        bands=['B03'],
+        start=start,
+        end=end,
+        fmt='%Y-%m-%d %H:%M',
+        lat_lim=[-60.0, 60.0],
+        lon_lim=[80.0, 180.0],
+        temporal_resolution='hourly',
+        path=OUT_DIR,
+    )
+    written = lens.download()
+    print(f'downloaded {len(written)} segment(s) to {OUT_DIR}:')
+    for p in written:
+        print(f'  {p.relative_to(OUT_DIR)}  ({p.stat().st_size // 1024} KB)')</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>downloaded 10 segment(s) to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\jaxa-ptree\docs\examples\jaxa\ptree_out:
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0110.DAT.bz2  (17424 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0210.DAT.bz2  (29833 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0310.DAT.bz2  (31739 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0410.DAT.bz2  (35223 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0510.DAT.bz2  (36611 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0610.DAT.bz2  (36036 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0710.DAT.bz2  (35027 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0810.DAT.bz2  (30276 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S0910.DAT.bz2  (25531 KB)
+  202607\03\00\HS_H09_20260703_0000_B03_FLDK_R05_S1010.DAT.bz2  (12234 KB)
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8be04956">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9942458d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="build-the-request-download">Build the request &amp; download<a class="anchor-link" href="#build-the-request-download">¶</a></h2><p>AirNow authenticates at construction time, so both building the client and
-downloading run inside the key check — the notebook stays runnable without a key
-(e.g. under <code>pytest --nbval-lax</code>), it just skips the live block.</p>
+<h2 id="confirm-the-layout-matches-the-p-tree-server-tree">Confirm the layout matches the P-Tree server tree<a class="anchor-link" href="#confirm-the-layout-matches-the-p-tree-server-tree">¶</a></h2><p>Each downloaded file lives under <code>YYYYMM/DD/HH/</code> and its filename encodes satellite, timestamp, band, resolution code (<code>R05</code> for B03), and segment index. That's the same layout you'd see if you FTP'd in by hand — which makes it painless to hand off to <code>satpy</code> (or any other HSD reader) later.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=49ff0c27">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5925b50b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -18941,39 +18115,55 @@ downloading run inside the key check — the notebook stays runnable without a k
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AIRNOW_API_KEY"</span><span class="p">):</span>
-    <span class="n">client</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s2">"airnow"</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"pm25"</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
-        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="n">bbox_lat</span><span class="p">,</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="n">bbox_lon</span><span class="p">,</span>
-        <span class="n">data_type</span><span class="o">=</span><span class="s2">"B"</span><span class="p">,</span>          <span class="c1"># both concentration and AQI</span>
-        <span class="n">path</span><span class="o">=</span><span class="s2">"out/airnow"</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">written</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'No file to inspect — re-run the previous cell with creds set.'</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"set AIRNOW_API_KEY to run the live build + download cell"</span><span class="p">)</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+    <span class="n">total_bytes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">written</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'total downloaded: </span><span class="si">{</span><span class="n">total_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="p">)</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s1"> files'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="c1"># Parse one filename and print its fields.</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">written</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s1">'^HS_(?P&lt;sat&gt;H\d\d)_(?P&lt;ymd&gt;\d</span><span class="si">{8}</span><span class="s1">)_(?P&lt;hhmm&gt;\d</span><span class="si">{4}</span><span class="s1">)_'</span>
+        <span class="sa">r</span><span class="s1">'(?P&lt;band&gt;B\d\d)_FLDK_(?P&lt;res&gt;R\d\d)_(?P&lt;seg&gt;S\d</span><span class="si">{4}</span><span class="s1">)\.DAT\.bz2$'</span>
+    <span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'sample: </span><span class="si">{</span><span class="n">sample</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'next step — decode with satpy (pyramids PY-2):'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'  # pip install satpy'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'  # from satpy import Scene'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'  # scn = Scene(filenames=[str(p) for p in written], reader="ahi_hsd")'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'  # scn.load(["B03"])'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">df = None
-if os.environ.get("AIRNOW_API_KEY"):
-    client = EarthLens(
-        data_source="airnow",
-        variables=["pm25"],
-        start=start,
-        end=end,
-        lat_lim=bbox_lat,
-        lon_lim=bbox_lon,
-        data_type="B",          # both concentration and AQI
-        path="out/airnow",
-    )
-    df = client.download(progress_bar=False)
-    print(df.shape)
+<div class="clipboard-copy-txt" id="cell-4">if not written:
+    print('No file to inspect — re-run the previous cell with creds set.')
 else:
-    print("set AIRNOW_API_KEY to run the live build + download cell")</div>
+    import re
+    total_bytes = sum(p.stat().st_size for p in written)
+    print(f'total downloaded: {total_bytes / (1024*1024):.1f} MB across {len(written)} files')
+    print()
+    # Parse one filename and print its fields.
+    sample = written[0]
+    pattern = re.compile(
+        r'^HS_(?P&lt;sat&gt;H\d\d)_(?P&lt;ymd&gt;\d{8})_(?P&lt;hhmm&gt;\d{4})_'
+        r'(?P&lt;band&gt;B\d\d)_FLDK_(?P&lt;res&gt;R\d\d)_(?P&lt;seg&gt;S\d{4})\.DAT\.bz2$'
+    )
+    m = pattern.match(sample.name)
+    if m:
+        print(f'sample: {sample.name}')
+        for k, v in m.groupdict().items():
+            print(f'  {k}: {v}')
+    print()
+    print('next step — decode with satpy (pyramids PY-2):')
+    print('  # pip install satpy')
+    print('  # from satpy import Scene')
+    print('  # scn = Scene(filenames=[str(p) for p in written], reader="ahi_hsd")')
+    print('  # scn.load(["B03"])')</div>
 </div>
 </div>
 </div>
@@ -18985,106 +18175,22 @@ else:
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>set AIRNOW_API_KEY to run the live build + download cell
+<pre>total downloaded: 283.1 MB across 10 files
+
+sample: HS_H09_20260703_0000_B03_FLDK_R05_S0110.DAT.bz2
+  sat: H09
+  ymd: 20260703
+  hhmm: 0000
+  band: B03
+  res: R05
+  seg: S0110
+
+next step — decode with satpy (pyramids PY-2):
+  # pip install satpy
+  # from satpy import Scene
+  # scn = Scene(filenames=[str(p) for p in written], reader="ahi_hsd")
+  # scn.load(["B03"])
 </pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2543880b">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="inspect-the-first-rows">Inspect the first rows<a class="anchor-link" href="#inspect-the-first-rows">¶</a></h3>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1bb02f63">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-5">if df is not None:
-    display(df.head())</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=86ca8021">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="plot-hourly-pm25-by-station">Plot hourly PM2.5 by station<a class="anchor-link" href="#plot-hourly-pm25-by-station">¶</a></h2>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=85398ef0">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-    <span class="n">pm25</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">"parameter"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"PM2.5"</span><span class="p">]</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">site</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">pm25</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"site_name"</span><span class="p">):</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s2">"value"</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">site</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"PM2.5 (UG/M3)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"time (UTC)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Hourly PM2.5 by AirNow site — Los Angeles"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"site"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-6">if df is not None and not df.empty:
-    pm25 = df[df["parameter"] == "PM2.5"]
-    fig, ax = plt.subplots(figsize=(10, 4))
-    for site, group in pm25.groupby("site_name"):
-        ax.plot(group["datetime_utc"], group["value"], marker=".", label=str(site))
-    ax.set_ylabel("PM2.5 (UG/M3)")
-    ax.set_xlabel("time (UTC)")
-    ax.set_title("Hourly PM2.5 by AirNow site — Los Angeles")
-    ax.legend(title="site", fontsize=7)
-    fig.autofmt_xdate()
-    plt.show()</div>
 </div>
 </div>
 </div>
@@ -19128,44 +18234,6 @@ else:
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../../openaq/multistation_comparison/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Multi-station NO2 — the traffic diurnal cycle">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Multi-station NO2 — the traffic diurnal cycle
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../../eea-aq/quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: EEA quickstart — PM2.5 for a country">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                EEA quickstart — PM2.5 for a country
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">
