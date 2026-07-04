@@ -66,7 +66,12 @@ def _block_real_cdsapi(request, monkeypatch):
     the validator itself (in `test_constraints.py`) construct
     :class:`RequestValidator` directly so this default doesn't
     interfere.
+
+    Also clears `EARTHLENS_ECMWF_MODERN` so an ambient flag in a
+    contributor shell cannot silently divert `open_client` onto the
+    modern client and break the classic endpoint tests.
     """
+    monkeypatch.delenv("EARTHLENS_ECMWF_MODERN", raising=False)
     if request.cls is not None and request.cls.__name__ in _LIVE_CDS_TEST_CLASSES:
         return
 
