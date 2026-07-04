@@ -571,6 +571,16 @@ class TestFtplibTransportBehaviour:
         with pytest.raises(ConnectionError, match="ftp.ptree.jaxa.jp"):
             FtplibTransport().login("u", "p")
 
+    def test_login_wraps_greeting_error_as_connection_error(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """A `4xx`/`5xx` greeting raises `ftplib.error_temp` / `error_perm` — not `OSError`."""
+        import ftplib
+        _FakeFTP.connect_raises = ftplib.error_temp("421 Server busy")
+        monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
+        with pytest.raises(ConnectionError, match="could not connect"):
+            FtplibTransport().login("u", "p")
+
     def test_login_wraps_bad_creds_as_authentication_error(
         self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:

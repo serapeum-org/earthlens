@@ -173,7 +173,12 @@ class FtplibTransport:
         """
         try:
             self._ftp = ftplib.FTP(self.host, timeout=self.timeout)
-        except OSError as exc:
+        except ftplib.all_errors as exc:
+            # `ftplib.FTP.__init__` reaches `getresp()` for the server
+            # greeting; a `4xx`/`5xx` greeting raises `ftplib.error_temp`
+            # / `error_perm` (not `OSError` subclasses). Broadening to
+            # `all_errors` matches the docstring's promise to wrap every
+            # transport-level failure as `ConnectionError`.
             raise ConnectionError(
                 f"could not connect to {self.host}:21 -- {exc}"
             ) from exc
