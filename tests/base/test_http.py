@@ -646,6 +646,30 @@ class TestDownload:
         assert session.calls == 3
         assert not dest.with_name("out.bin.part").exists()
 
+    def test_download_cleans_temp_when_rename_fails(self, tmp_path):
+        """A failed atomic rename still removes the .part temp."""
+        session = _RecordingSession([_Resp(blocks=[b"data"])])
+        dest = tmp_path / "out.bin"
+        dest.mkdir()  # a directory target makes tmp.replace(dest) fail
+        with pytest.raises(OSError):
+            HttpClient(session=session).download("http://x", dest, progress=False)
+        assert not dest.with_name("out.bin.part").exists()
+
+    def test_download_retries_on_predicate(self, tmp_path):
+        """download retries a response the predicate flags before streaming."""
+        session = _RecordingSession(
+            [_Resp(body={"retry": True}), _Resp(blocks=[b"ok"])]
+        )
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            retry_predicate=lambda r: r.json() == {"retry": True},
+        )
+        dest = tmp_path / "f"
+        client.download("http://x", dest, progress=False)
+        assert dest.read_bytes() == b"ok"
+        assert len(session.calls) == 2
+
     def test_download_non_atomic_writes_dest_directly(self, tmp_path):
         """atomic=False streams straight to dest with no temp file."""
         session = _RecordingSession([_Resp(blocks=[b"data"])])

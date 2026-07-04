@@ -556,7 +556,13 @@ class HttpClient:
                 tmp.unlink(missing_ok=True)
                 raise
             if atomic:
-                tmp.replace(dest)
+                # Guard the rename too, so the "removes the temp on any
+                # failure" promise holds if the final replace fails.
+                try:
+                    tmp.replace(dest)
+                except BaseException:
+                    tmp.unlink(missing_ok=True)
+                    raise
             return dest
 
     def _throttle(self) -> None:
