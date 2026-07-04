@@ -29,10 +29,12 @@ import time
 import zipfile
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
 import requests
 from loguru import logger
 
+from earthlens.base.http import HttpClient
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
 
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).
@@ -432,6 +434,20 @@ def download_and_extract(
     return [dest_dir / m for m in members]
 
 
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the module-level
+    `requests.get` (rather than a private session) when no session is supplied,
+    so an un-pooled download stays a fresh connection per call and tests that
+    monkeypatch `requests.get` still drive the transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
+
+
 def _download(
     url: str,
     zip_path: Path,
@@ -443,6 +459,17 @@ def _download(
 ) -> None:
     """Stream `url` to `zip_path` with retry + exponential backoff.
 
+    Delegates the transfer to `HttpClient.download`, which streams to a sibling
+    `<zip_path>.part` and renames it on success (removing the temp on any
+    failure) — so an interrupted download never leaves a truncated archive at
+    `zip_path`. The retry policy reproduces the historical loop: an error status
+    (`429`/`5xx`, via `raise_for_status`) or a transport `RequestException` /
+    `OSError` retries the whole download, waiting `backoff * 2**attempt` between
+    the `retries` attempts (bounded by the default back-off ceiling, which the
+    exponential wait never reaches). When every attempt is exhausted the final
+    error is wrapped in a `requests.HTTPError` carrying the same message the
+    hand-rolled loop raised.
+
     Args:
         url: The `.zip` URL.
         zip_path: Local path to write.
@@ -453,28 +480,22 @@ def _download(
         chunk_size: Streaming chunk size.
 
     Raises:
-        requests.HTTPError: If every attempt fails (the last error re-raised).
+        requests.HTTPError: If every attempt fails (the last error is wrapped).
     """
-    get = session.get if session is not None else requests.get
-    last_exc: Exception | None = None
-    for attempt in range(1, retries + 1):
-        try:
-            with get(url, stream=True, timeout=timeout) as resp:
-                resp.raise_for_status()
-                with open(zip_path, "wb") as handle:
-                    for chunk in resp.iter_content(chunk_size=chunk_size):
-                        handle.write(chunk)
-            return
-        except (requests.RequestException, OSError) as exc:
-            last_exc = exc
-            zip_path.unlink(missing_ok=True)
-            if attempt < retries:
-                wait = backoff * (2 ** (attempt - 1))
-                logger.warning(
-                    f"GHSL: download {url} failed (attempt {attempt}/{retries}): "
-                    f"{type(exc).__name__}: {exc}; retrying in {wait:.0f}s."
-                )
-                time.sleep(wait)
-    raise requests.HTTPError(
-        f"GHSL: download {url} failed after {retries} attempts: {last_exc}"
+    client = HttpClient(
+        session=session if session is not None else _RequestsGet(),
+        status_forcelist=(429, 500, 502, 503, 504),
+        retry_on_exceptions=(requests.RequestException, OSError),
+        raise_for_status=True,
+        max_retries=max(retries - 1, 0),
+        backoff_factor=backoff,
+        sleep=time.sleep,
     )
+    try:
+        client.download(
+            url, zip_path, chunk=chunk_size, progress=False, timeout=timeout
+        )
+    except (requests.RequestException, OSError) as exc:
+        raise requests.HTTPError(
+            f"GHSL: download {url} failed after {retries} attempts: {exc}"
+        ) from exc

@@ -68,6 +68,7 @@ class TestRegistry:
         assert sorted(EarthLens.DataSources) == [
             "admin",
             "admin-boundaries",
+            "airnow",
             "alaska-satellite-facility",
             "amazon-s3",
             "argo",
@@ -92,6 +93,7 @@ class TestRegistry:
             "earthdata",
             "ecmwf",
             "edo",
+            "eea-aq",
             "erddap",
             "etopo",
             "eumetsat",
@@ -150,6 +152,7 @@ class TestRegistry:
             "redlist",
             "rgi",
             "risk-indicators",
+            "sensor-community",
             "sentinel-hub",
             "sentinelhub",
             "soilgrids",

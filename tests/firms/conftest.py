@@ -37,6 +37,7 @@ class _FakeResponse:
         self.text = text
         self.status_code = status_code
         self.url = url
+        self.headers: dict[str, str] = {}
 
     def raise_for_status(self) -> None:
         import requests
@@ -45,6 +46,9 @@ class _FakeResponse:
             raise requests.HTTPError(
                 f"{self.status_code} Client Error for url: {self.url}"
             )
+
+    def close(self) -> None:
+        """No-op — the fake holds no socket (closed by HttpClient on retry)."""
 
 
 class _FakeFirms:
@@ -61,7 +65,7 @@ class _FakeFirms:
         self.status_code: int = 200
         self.responses: list[_FakeResponse] | None = None
 
-    def __call__(self, url: str, timeout: float) -> _FakeResponse:
+    def __call__(self, url: str, **kwargs: object) -> _FakeResponse:
         self.calls.append(url)
         if self.responses is not None:
             resp = self.responses.pop(0)

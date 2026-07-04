@@ -27,6 +27,8 @@ import datetime as dt
 import time
 from typing import Any, Callable, Literal
 
+from earthlens.base.http import HttpClient
+
 #: A FIRMS area request covers at most this many days (verified live
 #: against the area CSV API, which rejects >5 with "Expects [1..5]").
 MAX_DAY_RANGE = 5
@@ -143,6 +145,45 @@ def classify_body(text: str) -> BodyKind:
     return "error"
 
 
+class _RequestsGet:
+    """Session-like GET adapter routing through an injected getter.
+
+    Wraps the `get` callable handed to :func:`firms_get` in the
+    `session.get(url, **kwargs)` shape :class:`~earthlens.base.http.HttpClient`
+    expects, so the client drives the exact transport the caller supplied
+    (`requests.get` in production, a fake in tests) rather than a private
+    session.
+    """
+
+    def __init__(self, get: Callable[..., Any]) -> None:
+        self._get = get
+
+    def get(self, url: str, **kwargs: Any) -> Any:
+        """Issue a GET via the wrapped getter."""
+        return self._get(url, **kwargs)
+
+
+def _is_quota_body(response: Any) -> bool:
+    """Return `True` when a response *body* classifies as a quota signal.
+
+    The HTTP-429 case is covered by the client's `status_forcelist`; this
+    predicate handles the FIRMS wrinkle where a quota/rate-limit error
+    arrives as HTTP 200 with a plain-text body. `.text` is read
+    defensively (a non-200 response may not carry one), mirroring the
+    guard the reactive back-off loop used before it moved onto
+    :class:`~earthlens.base.http.HttpClient`.
+
+    Args:
+        response: A response object exposing `text`.
+
+    Returns:
+        bool: `True` when :func:`classify_body` flags the body as
+            `"quota"`.
+    """
+    text = getattr(response, "text", "") or ""
+    return classify_body(text) == "quota"
+
+
 def firms_get(
     url: str,
     *,
@@ -154,14 +195,23 @@ def firms_get(
 ) -> Any:
     """GET a FIRMS URL, retrying the quota case with capped back-off.
 
-    Issues `get(url, timeout=timeout)` and, when the response is a quota
-    signal — HTTP 429, or an HTTP-200 body that :func:`classify_body`
-    flags as `"quota"` — waits `backoff_factor · 2**attempt` seconds and
-    retries, up to `max_retries` times. Any other response (a real CSV,
-    a bad-key body, a generic error body, a non-quota HTTP error) is
-    returned to the caller verbatim for classification; this helper does
-    not raise on those. The `sleep` and `get` callables are injected so
-    tests run without real waits or network.
+    Delegates the retry loop to :class:`~earthlens.base.http.HttpClient`:
+    the injected `get` is wrapped as the client's session so the same
+    transport (`requests.get` in production) is used, HTTP 429 is made
+    retryable via `status_forcelist=(429,)`, and an HTTP-200 body that
+    :func:`classify_body` flags as `"quota"` is made retryable via a
+    `retry_predicate`. Each retry waits `backoff_factor · 2**attempt`
+    seconds — or the server's `Retry-After` when it sends one on a 429,
+    which the client now honours (bounded by the default back-off
+    ceiling) — up to `max_retries` times.
+
+    Crucially the client is built with `raise_for_status=False`, so any
+    other response — a real CSV, a bad-key body, a generic error body, a
+    non-quota HTTP error (including a `4xx`/`5xx`) — is returned to the
+    caller **unraised** for classification. The MAP_KEY rides in the URL,
+    so `FIRMS._fetch_one` must be the one to raise a redacted error on a
+    `>=400` status; letting the client `raise_for_status` here would leak
+    the secret-bearing URL into the traceback.
 
     Args:
         url: The fully-formed FIRMS request URL (already carries the
@@ -176,28 +226,14 @@ def firms_get(
     Returns:
         The final response object from `get`.
     """
-    response = get(url, timeout=timeout)
-    attempt = 0
-    while attempt < max_retries and _is_quota(response):
-        sleep(backoff_factor * (2**attempt))
-        attempt += 1
-        response = get(url, timeout=timeout)
-    return response
-
-
-def _is_quota(response: Any) -> bool:
-    """Return `True` when a response is a FIRMS quota signal.
-
-    A quota signal is HTTP 429, or an HTTP-200 text body that
-    :func:`classify_body` flags as `"quota"`.
-
-    Args:
-        response: A response object exposing `status_code` and `text`.
-
-    Returns:
-        bool: `True` for a quota/rate-limit response.
-    """
-    if getattr(response, "status_code", None) == 429:
-        return True
-    text = getattr(response, "text", "") or ""
-    return classify_body(text) == "quota"
+    client = HttpClient(
+        session=_RequestsGet(get),
+        timeout=timeout,
+        max_retries=max_retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=(429,),
+        retry_predicate=_is_quota_body,
+        raise_for_status=False,
+        sleep=sleep,
+    )
+    return client.get(url)

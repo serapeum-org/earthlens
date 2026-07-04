@@ -33,7 +33,6 @@ in `variables` are informational for a whole-granule fetch.
 from __future__ import annotations
 
 import datetime as dt
-import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -45,6 +44,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    region_affinity,
 )
 from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
 from earthlens.earthdata.catalog import Catalog, EarthdataDataset
@@ -455,11 +455,12 @@ class Earthdata(AbstractDataSource):
     def _in_region(self, region: str) -> bool:
         """Return whether the caller appears to run in `region`.
 
-        Resolution order: explicit `region=` kwarg → `AWS_REGION` →
-        `AWS_DEFAULT_REGION`. EC2 instance-metadata probing is
-        intentionally **not** used here — it would hang for off-cloud
-        callers; the explicit kwarg / env var is the supported signal
-        (`G4`).
+        Delegates to the shared `earthlens.base.region.region_affinity`
+        helper: the caller region is resolved from the explicit `region=`
+        kwarg, then `AWS_REGION` / `AWS_DEFAULT_REGION`. EC2
+        instance-metadata probing is intentionally **not** used here
+        (`probe=False`) — it would hang for off-cloud callers; the
+        explicit kwarg / env var is the supported signal (`G4`).
 
         Args:
             region: The region to test against (e.g. `"us-west-2"`).
@@ -468,10 +469,10 @@ class Earthdata(AbstractDataSource):
             bool: `True` when the resolved caller region equals
                 `region`.
         """
-        caller = (
-            self._region or os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION")
+        return (
+            region_affinity(region, caller_region=self._region, probe=False)
+            == "in-region"
         )
-        return caller == region
 
     def download(
         self,

@@ -91,7 +91,7 @@ def _make_zip(tif_bytes, names):
 def _patch_archive_http(monkeypatch, title, archive_url, archive_bytes):
     """Serve a global listing + `?id=` detail (archive url) + the archive bytes."""
 
-    def fake_get(url, params=None, timeout=None):
+    def fake_get(url, params=None, timeout=None, **kwargs):
         if url.endswith((".7z", ".zip")):
             return _FakeResponse(content=archive_bytes)
         if params and "id" in params:
@@ -246,7 +246,7 @@ def test_year_singular(wp_kwargs):
 def _patch_global_http(monkeypatch, tiny_tif_bytes, files):
     """Patch requests.get to serve a global listing + `?id=` detail + tiny tifs."""
 
-    def fake_get(url, params=None, timeout=None):
+    def fake_get(url, params=None, timeout=None, **kwargs):
         if url.endswith(".tif"):
             return _FakeResponse(content=tiny_tif_bytes)
         if params and "id" in params:
@@ -404,7 +404,7 @@ def test_404_propagates(wp_kwargs, monkeypatch):
     from tests.worldpop.conftest import _FakeResponse
     from tests.worldpop.conftest import pop_records as _pr
 
-    def fake_get(url, params=None, timeout=None):
+    def fake_get(url, params=None, timeout=None, **kwargs):
         if "/rest/data/" in url:
             return _FakeResponse(json_data={"data": _pr()})
         return _FakeResponse()  # 404 for the .tif
@@ -424,7 +424,7 @@ def test_http_get_retries_transient_then_succeeds(
     monkeypatch.setattr(backend_mod.time, "sleep", lambda *_: None)
     calls = {"n": 0}
 
-    def flaky_get(url, timeout=None):
+    def flaky_get(url, timeout=None, **kwargs):
         calls["n"] += 1
         if calls["n"] < 3:
             raise requests.ConnectionError("dropped")
@@ -455,7 +455,7 @@ def test_http_get_raises_after_retries_exhausted(wp_kwargs, monkeypatch):
 
     monkeypatch.setattr(backend_mod.time, "sleep", lambda *_: None)
 
-    def always_drop(url, timeout=None):
+    def always_drop(url, timeout=None, **kwargs):
         raise requests.ConnectionError("dropped")
 
     monkeypatch.setattr(requests, "get", always_drop)
@@ -487,7 +487,7 @@ def test_http_get_does_not_retry_http_error(wp_kwargs, monkeypatch):
     monkeypatch.setattr(backend_mod.time, "sleep", lambda *_: None)
     calls = {"n": 0}
 
-    def not_found(url, timeout=None):
+    def not_found(url, timeout=None, **kwargs):
         calls["n"] += 1
         return _FakeResponse()  # raise_for_status -> HTTPError
 

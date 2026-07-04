@@ -11,7 +11,7 @@ pip install earthlens[<extra>]      # e.g. earthlens[ecmwf]
 pip install earthlens[all]          # every backend's SDK
 ```
 
-Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core install — they use anonymous FTP or plain HTTP.
+Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, AirNow, Sensor.Community, GHSL) need only the core install — they use anonymous FTP or plain HTTP.
 
 ## Integrated providers
 
@@ -24,7 +24,10 @@ Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, GHSL) need only the core inst
 | Copernicus Marine (CMEMS) | `cmems` | raster | Copernicus Marine login | `cmems` | [CMEMS](cmems/introduction.md) |
 | FDSN seismic events (USGS / EMSC / INGV / …) | `fdsn` | vector | none | `fdsn` | [FDSN](fdsn/introduction.md) |
 | GDACS disaster alerts | `gdacs` | vector | none | — | [GDACS](gdacs/introduction.md) |
-| OpenAQ air quality | `openaq` | tabular | API key (`X-API-Key`) | — | [OpenAQ](openaq/introduction.md) |
+| OpenAQ air quality (global aggregator) | `openaq` | tabular | API key (`X-API-Key`) | — | [OpenAQ](openaq/introduction.md) |
+| AirNow air quality (US / Canada EPA) | `airnow` | tabular | API key (`API_KEY`) | — | [AirNow](airnow/introduction.md) |
+| EEA air quality (Europe) | `eea-aq` | tabular | none (public) | `eea_aq` | [EEA](eea-aq/introduction.md) |
+| Sensor.Community air quality (crowdsourced) | `sensor-community` | tabular | none (public) | — | [Sensor.Community](sensor-community/introduction.md) |
 | Tropycal tropical-cyclone tracks | `tropycal` | vector (tabular for SHIPS) | none | `tropycal` | [Tropycal](tropycal/introduction.md) |
 | STAC — Planetary Computer / CDSE / Earth Search | `stac`, `cdse` | raster | per-endpoint (anonymous / MPC SAS / CDSE S3) | `stac` | [STAC](stac/introduction.md) |
 | NASA Earthdata (9 EOSDIS DAACs via `earthaccess`) | `earthdata` | per-dataset (raster / vector / tabular) | EDL login or bearer token | `earthdata` | [Earthdata](earthdata/introduction.md) |
