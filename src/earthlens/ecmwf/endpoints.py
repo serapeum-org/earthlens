@@ -229,8 +229,9 @@ def open_modern_client(endpoint: str = DEFAULT_ENDPOINT) -> ModernClient:
         from ecmwf.datastores import Client as ModernClient
     except ImportError as exc:
         raise ImportError(
-            "EARTHLENS_ECMWF_MODERN is set but the modern client is not "
-            "installed. Install it with: pip install earthlens[ecmwf-modern]"
+            "The modern ECMWF client (ecmwf-datastores-client) is not "
+            "installed. Install it with: pip install earthlens[ecmwf-modern] "
+            "(and enable it with EARTHLENS_ECMWF_MODERN=1)."
         ) from exc
 
     url_default, url_env, key_env = ENDPOINTS[endpoint]
