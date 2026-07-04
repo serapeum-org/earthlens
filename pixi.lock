@@ -11890,7 +11890,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.9.0
-  sha256: adba9afef7e3211fd98767e715eedbb5ab06bc7ddb550de74863739a312e946d
+  sha256: b0fec31c4ebdc4ee726370da6f545772ef765f203ef183f59fbc6768c313ea66
   requires_dist:
   - pyramids-gis>=0.38.0
   - geopandas>=1.0.0
@@ -11910,6 +11910,7 @@ packages:
   - boto3>=1.43.0 ; extra == 's3'
   - botocore>=1.34.0 ; extra == 's3'
   - cdsapi>=0.7.7 ; extra == 'ecmwf'
+  - ecmwf-datastores-client>=0.5.1 ; extra == 'ecmwf-modern'
   - earthengine-api>=1.7.26 ; extra == 'gee'
   - google-api-python-client>=2.0 ; extra == 'gee'
   - google-cloud-storage>=2.0 ; extra == 'gee'
@@ -11947,7 +11948,7 @@ packages:
   - erddapy>=3.0 ; extra == 'erddap'
   - overpy>=0.7 ; extra == 'osm'
   - ohsome>=0.4.0 ; extra == 'osm'
-  - earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap] ; extra == 'all'
+  - earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap] ; extra == 'all'
   requires_python: '>=3.11,<4'
 - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
   name: eccodes

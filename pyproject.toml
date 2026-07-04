@@ -49,6 +49,7 @@ earthlens = "earthlens.cli:app"
 [project.optional-dependencies]
 s3 = ["boto3 >=1.43.0", "botocore >=1.34.0"]
 ecmwf = ["cdsapi >=0.7.7"]
+ecmwf-modern = ["ecmwf-datastores-client >=0.5.1"]
 gee = [
     "earthengine-api >=1.7.26",
     "google-api-python-client >=2.0",
@@ -145,7 +146,7 @@ osm = ["overpy >=0.7", "ohsome >=0.4.0"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 # (argo and osm are intentionally excluded — see the notes above their extras.)
 all = [
-    "earthlens[s3,ecmwf,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
+    "earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,fdsn,earthdata,asf,hdx,eumetsat,nwp,nwm,radar,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
 ]
 
 [dependency-groups]

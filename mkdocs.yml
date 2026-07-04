@@ -109,6 +109,7 @@ nav:
     - Command-line interface: reference/cli.md
   - Data Sources:
     - Supported providers: reference/providers.md
+    - Deferred providers: reference/deferred-providers.md
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Introduction: reference/chc/introduction.md
       - Usage: reference/chc/usage.md
@@ -597,6 +598,8 @@ nav:
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
+    - HTTP client (base): reference/base/http-client.md
+    - Region affinity (base): reference/base/region-affinity.md
   - About:
     - Change Log: change-log.md
     - License: LICENSE.md

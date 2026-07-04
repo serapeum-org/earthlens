@@ -35,6 +35,7 @@ class FakeResponse:
         self.text = text
         self.status_code = status_code
         self._payload = payload
+        self.headers: dict[str, str] = {}
 
     def json(self) -> Any:
         """Return the JSON payload, raising `ValueError` when there is none."""
@@ -47,6 +48,10 @@ class FakeResponse:
         import requests
 
         raise requests.HTTPError(f"HTTP {self.status_code}")
+
+    def close(self) -> None:
+        """Release the response (no-op; nothing to release)."""
+        return None
 
 
 class FakeSession:
@@ -64,7 +69,7 @@ class FakeSession:
         """Exit the context manager (no-op; nothing to release)."""
         return None
 
-    def get(self, url: str, timeout: int = 120) -> FakeResponse:
+    def get(self, url: str, timeout: int = 120, **kwargs: Any) -> FakeResponse:
         """Record the URL and return the next (or only) configured response."""
         self.calls.append(url)
         if isinstance(self._responses, list):

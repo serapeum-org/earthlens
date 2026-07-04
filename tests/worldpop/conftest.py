@@ -87,6 +87,9 @@ def age_records(iso3: str = "ken", years=(2020,)) -> list[dict]:
 class _FakeResponse:
     """Minimal stand-in for `requests.Response` returning canned data."""
 
+    status_code = 200
+    headers: dict[str, str] = {}
+
     def __init__(self, *, json_data: object | None = None, content: bytes = b""):
         self._json = json_data
         self.content = content
@@ -100,6 +103,9 @@ class _FakeResponse:
         if self._json is None and not self.content:
             raise requests.HTTPError("404 Not Found")
 
+    def close(self) -> None:
+        """No-op — the fake holds no socket."""
+
 
 @pytest.fixture
 def patch_http(monkeypatch, tiny_tif_bytes):
@@ -110,7 +116,7 @@ def patch_http(monkeypatch, tiny_tif_bytes):
     """
 
     def _install(records: list[dict]) -> None:
-        def fake_get(url, params=None, timeout=None):
+        def fake_get(url, params=None, timeout=None, **kwargs):
             if "/rest/data/" in url:
                 return _FakeResponse(json_data={"data": records})
             if url.endswith(".tif"):

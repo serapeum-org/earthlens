@@ -28,6 +28,9 @@ class _FakeResponse:
         """Return the canned JSON body."""
         return self._payload
 
+    def close(self) -> None:
+        """No-op close (HttpClient releases the connection between retries)."""
+
     def raise_for_status(self) -> None:
         """Mimic `requests.Response.raise_for_status` for ≥400 statuses.
 
@@ -49,7 +52,7 @@ class _FakeSession:
         """Bind the shared state holding queued responses and calls."""
         self._state = state
 
-    def get(self, url, params=None, timeout=None):
+    def get(self, url, params=None, timeout=None, **kwargs):
         """Record the call and either raise the queued exception or return the next response."""
         self._state.calls.append({"url": url, "params": params or {}})
         index = min(len(self._state.calls) - 1, len(self._state.responses) - 1)

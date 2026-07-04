@@ -18,6 +18,8 @@ from urllib.parse import urlencode
 
 import pandas as pd
 
+from earthlens.base.http import HttpClient
+
 #: Base URL of the keyless PVGIS 5.3 non-interactive REST service.
 BASE = "https://re.jrc.ec.europa.eu/api/v5_3"
 
@@ -143,15 +145,26 @@ def throttled_get(
     wait = MIN_INTERVAL - (monotonic() - last_call[0])
     if wait > 0:
         sleep(wait)
-    resp = None
-    for attempt in range(max_retries):
-        resp = session.get(url, timeout=60)
-        last_call[0] = monotonic()
-        if resp.status_code != 429:
-            return resp
-        sleep(2**attempt)
-    resp.raise_for_status()
-    return resp  # pragma: no cover - raise_for_status always raises on a 429
+    # The proactive throttle above is kept here; `HttpClient` owns only the
+    # 429 retry/back-off. `raise_for_status=False` lets a non-429 4xx flow back
+    # to the caller (which inspects the out-of-coverage error body). The
+    # `2**attempt` back-off keeps the default `max_backoff` ceiling: the old
+    # loop's exponential wait never reached it, and it now bounds a server
+    # `Retry-After` the old loop ignored.
+    http = HttpClient(
+        session=session,
+        status_forcelist=(429,),
+        max_retries=max_retries - 1,
+        backoff_factor=1.0,
+        raise_for_status=False,
+        sleep=sleep,
+        timeout=60,
+    )
+    resp = http.get(url, raise_for_status=False)
+    last_call[0] = monotonic()
+    if resp.status_code == 429:
+        resp.raise_for_status()
+    return resp
 
 
 def _records_to_frame(rows: list[dict[str, Any]], time_key: str) -> pd.DataFrame:

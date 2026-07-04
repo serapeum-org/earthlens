@@ -18,8 +18,14 @@ from earthlens.base.abstractdatasource import (
     TemporalExtent,
 )
 from earthlens.base.auth import AbstractAuth, AuthenticationError
+from earthlens.base.http import HttpClient
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
+from earthlens.base.region import (
+    clear_region_cache,
+    region_affinity,
+    warn_if_egress,
+)
 from earthlens.base.spatial import (
     METRES_PER_DEGREE,
     crop_to_aoi,
@@ -35,6 +41,7 @@ __all__ = [
     "AbstractDataSource",
     "AuthenticationError",
     "FluxableLeaf",
+    "HttpClient",
     "LazyClientMixin",
     "METRES_PER_DEGREE",
     "OutputKind",
@@ -43,12 +50,15 @@ __all__ = [
     "SpatialExtent",
     "TemporalExtent",
     "clear_providers_cache",
+    "clear_region_cache",
     "crop_to_aoi",
     "mask_to_geometry",
     "estimate_pixel_dims",
     "load_providers",
     "normalize_aoi",
+    "region_affinity",
     "resolve_aoi",
     "split_time",
     "to_datetime",
+    "warn_if_egress",
 ]
