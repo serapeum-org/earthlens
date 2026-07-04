@@ -155,6 +155,11 @@ class TestConstruction:
         assert len(goes.time.dates) == 2, "two hour buckets (12 and 13)"
         assert goes.time.resolution == "h", "hourly resolution label"
 
+    def test_inverted_window_rejected_at_construction(self, make_goes):
+        """Constructing GOES with start after end raises ValueError (via the hooks)."""
+        with pytest.raises(ValueError, match="is after end"):
+            make_goes(start="2026-07-03 13:00", end="2026-07-03 12:00")
+
 
 class TestSearch:
     """Tests for GOES._search enumeration + filtering."""
