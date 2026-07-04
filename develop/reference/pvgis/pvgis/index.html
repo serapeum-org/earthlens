@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24859,15 +24859,15 @@ response's <code>raise_for_status()</code> is called).</p>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>        <span class="n">sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="c1"># The proactive throttle above is kept here; `HttpClient` owns only the</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a>    <span class="c1"># 429 retry/back-off. `raise_for_status=False` lets a non-429 4xx flow back</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a>    <span class="c1"># to the caller (which inspects the out-of-coverage error body), and</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="c1"># `max_backoff=None` leaves the `2**attempt` back-off uncapped to match the</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="c1"># previous hand-rolled loop.</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">http</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>        <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a>        <span class="n">status_forcelist</span><span class="o">=</span><span class="p">(</span><span class="mi">429</span><span class="p">,),</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>        <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a>        <span class="n">backoff_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="n">max_backoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>    <span class="c1"># to the caller (which inspects the out-of-coverage error body). The</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="c1"># `2**attempt` back-off keeps the default `max_backoff` ceiling: the old</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="c1"># loop&#39;s exponential wait never reached it, and it now bounds a server</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="c1"># `Retry-After` the old loop ignored.</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a>    <span class="n">http</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a>        <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a>        <span class="n">status_forcelist</span><span class="o">=</span><span class="p">(</span><span class="mi">429</span><span class="p">,),</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>        <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="n">backoff_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a>        <span class="n">raise_for_status</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a>        <span class="n">sleep</span><span class="o">=</span><span class="n">sleep</span><span class="p">,</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a>        <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
