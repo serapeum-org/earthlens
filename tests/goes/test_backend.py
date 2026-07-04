@@ -8,7 +8,11 @@ from pathlib import Path
 import pytest
 
 from earthlens.goes import GOES
-from earthlens.goes.backend import enumerate_hours, normalize_channel
+from earthlens.goes.backend import (
+    enumerate_hours,
+    expand_bare_date_end,
+    normalize_channel,
+)
 
 from .conftest import FakeS3
 
@@ -45,6 +49,20 @@ class TestEnumerateHours:
         """start after end raises ValueError."""
         with pytest.raises(ValueError, match="is after end"):
             enumerate_hours(dt.datetime(2026, 7, 3, 13), dt.datetime(2026, 7, 3, 12))
+
+
+class TestExpandBareDateEnd:
+    """Tests for expand_bare_date_end."""
+
+    def test_midnight_expands_to_end_of_day(self):
+        """A bare-date (midnight) end bound expands to the last microsecond."""
+        expanded = expand_bare_date_end(dt.datetime(2026, 7, 3))
+        assert expanded == dt.datetime(2026, 7, 3, 23, 59, 59, 999999), "end of day"
+
+    def test_explicit_time_untouched(self):
+        """An end bound with an explicit time is returned unchanged."""
+        end = dt.datetime(2026, 7, 3, 12, 30)
+        assert expand_bare_date_end(end) == end, "non-midnight end left as-is"
 
 
 class TestNormalizeChannel:
@@ -180,6 +198,14 @@ class TestSearch:
         patch_client(goes, FakeS3(pages={}))
         with caplog.at_level("WARNING"):
             assert goes._search() == [], "empty listing -> no granules"
+
+    def test_bare_date_window_spans_whole_day(self, make_goes, patch_client):
+        """A bare-date request (default fmt) returns the day's granules (H1)."""
+        goes = make_goes(start="2026-07-03", end="2026-07-03", fmt="%Y-%m-%d")
+        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        planned = goes._search()
+        assert len(planned) == 1, "a noon granule is inside the whole-day window"
+        assert len(goes.time.dates) == 24, "the bare date enumerates all 24 hours"
 
     def test_two_hour_window_lists_both_prefixes(self, make_goes, patch_client):
         """A window spanning two hours lists both hour prefixes."""

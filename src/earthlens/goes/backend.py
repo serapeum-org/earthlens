@@ -106,6 +106,40 @@ def enumerate_hours(start: dt.datetime, end: dt.datetime) -> list[dt.datetime]:
     return out
 
 
+def expand_bare_date_end(end: dt.datetime) -> dt.datetime:
+    """Expand a bare-date (midnight) end bound to the end of that UTC day.
+
+    A user who passes a bare date with the default `fmt="%Y-%m-%d"` (e.g.
+    `end="2026-07-03"`) means "include the whole of 3 July" — but that
+    parses to `00:00:00`, and ABI scans never land exactly at midnight, so
+    an unexpanded inclusive filter would drop the entire day. When `end`
+    has no time-of-day component it is pushed to `23:59:59.999999` of the
+    same day; an end with an explicit time is left untouched.
+
+    Args:
+        end: The parsed end bound.
+
+    Returns:
+        datetime.datetime: `end` unchanged, or expanded to end-of-day when
+            it fell exactly on midnight.
+
+    Examples:
+        - A bare date expands to the last microsecond of the day:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.goes.backend import expand_bare_date_end
+            >>> expand_bare_date_end(dt.datetime(2026, 7, 3))
+            datetime.datetime(2026, 7, 3, 23, 59, 59, 999999)
+            >>> expand_bare_date_end(dt.datetime(2026, 7, 3, 12, 30))
+            datetime.datetime(2026, 7, 3, 12, 30)
+
+            ```
+    """
+    if (end.hour, end.minute, end.second, end.microsecond) == (0, 0, 0, 0):
+        return end + dt.timedelta(days=1) - dt.timedelta(microseconds=1)
+    return end
+
+
 def normalize_channel(token: str) -> str:
     """Normalise a channel selector to its ABI `C<nn>` token.
 
@@ -269,7 +303,7 @@ class GOES(AbstractDataSource):
                 buckets the search enumerates.
         """
         start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
+        end_dt = expand_bare_date_end(to_datetime(end, fmt))
         hours = enumerate_hours(start_dt, end_dt)
         return TemporalExtent(
             start_date=start_dt,
