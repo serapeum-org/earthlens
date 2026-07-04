@@ -160,15 +160,20 @@ class FtplibTransport:
             password: P-Tree password.
 
         Raises:
-            ConnectionError: Wraps any `OSError` from the FTP handshake.
+            ConnectionError: Wraps any transport-level failure from the
+                FTP handshake (`OSError`, `ftplib.error_temp` /
+                `error_proto`, `EOFError`, …). The connection is
+                closed before re-raising.
             AuthenticationError: Wraps `ftplib.error_perm` on bad
-                credentials — the message names the fix.
+                credentials — the message names the fix but does not
+                echo the raw server reply (which some servers
+                interpolate the attempted username into).
         """
         try:
             self._ftp = ftplib.FTP(self.host, timeout=self.timeout)
         except OSError as exc:
             raise ConnectionError(
-                f"could not connect to {self.host}:21 — {exc}"
+                f"could not connect to {self.host}:21 -- {exc}"
             ) from exc
         try:
             self._ftp.login(user=user, passwd=password)
@@ -176,12 +181,29 @@ class FtplibTransport:
             self._ftp.close()
             self._ftp = None
             raise AuthenticationError(
-                f"P-Tree FTP login rejected on {self.host}: {exc}. "
+                f"P-Tree FTP login rejected on {self.host}. "
                 "Check JAXA_PTREE_USERNAME / JAXA_PTREE_PASSWORD."
+            ) from exc
+        except ftplib.all_errors as exc:
+            # error_temp (421 too many users), error_proto, EOFError, OSError,
+            # socket.timeout — any non-auth failure. Same cleanup shape as the
+            # error_perm branch so no dangling socket to `ftp.ptree.jaxa.jp`
+            # leaks into the process; ConnectionError distinguishes "the
+            # server rejected the *handshake*" from AuthenticationError's
+            # "the server rejected the *credentials*".
+            self._ftp.close()
+            self._ftp = None
+            raise ConnectionError(
+                f"P-Tree FTP handshake failed on {self.host}: {exc}"
             ) from exc
 
     def download_file(self, remote_path: str, local_path: Path) -> None:
         """Fetch `remote_path` to `local_path` (binary transfer).
+
+        A `.part` sidecar receives the bytes and is renamed to
+        `local_path` only on a successful transfer; a mid-flight failure
+        removes the `.part` file so a subsequent read never sees a
+        truncated `.DAT.bz2`.
 
         Args:
             remote_path: Absolute path on the FTP server.
@@ -193,18 +215,28 @@ class FtplibTransport:
             FileNotFoundError: When the server rejects the path with
                 `error_perm` (550) or `error_temp` (450) — translated so
                 a caller does not have to import `ftplib` to catch it.
+            ConnectionError: For any other transport-side failure
+                (`OSError`, `socket.timeout`, EOF, …). The partial file
+                is removed before re-raising.
         """
         if self._ftp is None:
             raise RuntimeError("call login() before download_file().")
         local_path.parent.mkdir(parents=True, exist_ok=True)
+        partial = local_path.with_suffix(local_path.suffix + ".part")
         try:
-            with local_path.open("wb") as handle:
+            with partial.open("wb") as handle:
                 self._ftp.retrbinary(f"RETR {remote_path}", handle.write)
         except (ftplib.error_perm, ftplib.error_temp) as exc:
-            local_path.unlink(missing_ok=True)
+            partial.unlink(missing_ok=True)
             raise FileNotFoundError(
                 f"P-Tree rejected {remote_path}: {exc}"
             ) from exc
+        except ftplib.all_errors as exc:
+            partial.unlink(missing_ok=True)
+            raise ConnectionError(
+                f"P-Tree transfer failed for {remote_path}: {exc}"
+            ) from exc
+        partial.replace(local_path)
 
     def close(self) -> None:
         """Close the FTP connection if it is open.
@@ -411,17 +443,13 @@ def fetch_ptree(
     band_list = _resolve_bands(dataset, bands)
     factory = transport_factory or _default_transport_factory
     transport = factory()
-    transport.login(auth.username, auth.password.get_secret_value())
 
     written: list[Path] = []
     try:
+        transport.login(auth.username, auth.password.get_secret_value())
         for slot in _iter_slots(time.start_date, time.end_date):
             for band in band_list:
                 for remote in _segment_paths(slot, band, satellite):
-                    if not _HSD_FILENAME_RE.match(Path(remote).name):
-                        raise AssertionError(
-                            f"internal: built non-HSD path {remote!r}"
-                        )
                     local = _local_target(remote, out_dir)
                     transport.download_file(remote, local)
                     written.append(local)

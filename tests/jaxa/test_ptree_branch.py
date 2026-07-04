@@ -592,6 +592,75 @@ class TestFtplibTransportBehaviour:
         transport.close()
         assert transport._ftp is None
 
+    def test_login_wraps_temp_error_as_connection_error(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """A `421 too many users` (error_temp) surfaces as `ConnectionError`, no leak."""
+        import ftplib
+        _FakeFTP.login_raises = ftplib.error_temp("421 too many users")
+        monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
+        transport = FtplibTransport()
+        with pytest.raises(ConnectionError, match="handshake failed"):
+            transport.login("u", "p")
+        assert transport._ftp is None
+
+    def test_login_wraps_eof_error_as_connection_error(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """An `EOFError` mid-handshake surfaces as `ConnectionError`, no leak."""
+        import ftplib
+        _FakeFTP.login_raises = EOFError("server closed")
+        monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
+        transport = FtplibTransport()
+        with pytest.raises(ConnectionError, match="handshake failed"):
+            transport.login("u", "p")
+        assert transport._ftp is None
+
+    def test_login_error_message_omits_raw_ftp_reply(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The bad-creds error does not echo the raw server reply / username."""
+        import ftplib
+        _FakeFTP.login_raises = ftplib.error_perm(
+            "530 Login incorrect for alice@example.org.",
+        )
+        monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
+        transport = FtplibTransport()
+        with pytest.raises(AuthenticationError) as excinfo:
+            transport.login("alice@example.org", "p")
+        assert "alice@example.org" not in str(excinfo.value)
+
+    def test_download_translates_generic_oserror_to_connection_error(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+    ) -> None:
+        """`OSError` on `RETR` -> `ConnectionError`, no partial file left."""
+        import ftplib
+        monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
+        transport = FtplibTransport()
+        transport.login("u", "p")
+        _FakeFTP.retr_raises = OSError("connection reset")
+        local = tmp_path / "seg.DAT.bz2"
+        with pytest.raises(ConnectionError, match="transfer failed"):
+            transport.download_file("/some/remote/seg.DAT.bz2", local)
+        assert not local.exists()
+        partial = local.with_suffix(local.suffix + ".part")
+        assert not partial.exists()
+
+    def test_download_writes_via_part_file_rename(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+    ) -> None:
+        """A successful transfer leaves the final path, not the .part file."""
+        import ftplib
+        monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
+        transport = FtplibTransport()
+        transport.login("u", "p")
+        local = tmp_path / "seg.DAT.bz2"
+        transport.download_file("/some/remote/seg.DAT.bz2", local)
+        assert local.exists()
+        assert local.read_bytes() == b"payload"
+        partial = local.with_suffix(local.suffix + ".part")
+        assert not partial.exists()
+
 
 class TestPtreeTransportProtocol:
     """The `PtreeTransport` typing.Protocol accepts duck-typed fakes."""
