@@ -1,6 +1,6 @@
-"""JAXA backend — dispatches a request to one of two protocols.
+"""JAXA backend — dispatches a request to one of three protocols.
 
-`JAXA` reaches JAXA's Earth-observation archive via two complementary
+`JAXA` reaches JAXA's Earth-observation archive via three complementary
 SDKs, selected per-dataset by the catalog's `protocol` discriminator:
 
 * `protocol: jaxa-earth` — authless STAC/COG access through the official
@@ -9,15 +9,20 @@ SDKs, selected per-dataset by the catalog's `protocol` discriminator:
 * `protocol: gportal` — credentialed SFTP access through the community
   `gportal` SDK. The backend authenticates, searches, and downloads
   matching products into the output directory.
+* `protocol: ptree` — credentialed FTP access to `ftp.ptree.jaxa.jp`'s
+  Himawari-8/9 HSD granules (30-day rolling archive, 10 segments per
+  band per 10-minute slot). Ships raw `.DAT.bz2` files; decode is
+  `pyramids PY-2` (`satpy` reader bridge), not this backend.
 
 Each `download()` call routes every requested key to its protocol branch
-(`_jaxa_earth.fetch_jaxa_earth` or `_gportal.fetch_gportal`). The two
-branches share the request shape (bbox + dates + a list of dataset keys);
-the catalog row carries the protocol-specific identifier, default band,
-and aliases. Mixing keys from the two protocols in one call is rejected —
-the two paths emit different file types (GeoTIFFs vs raw SFTP products)
-and have different concurrency profiles, so the API forces one protocol
-per call.
+(`_jaxa_earth.fetch_jaxa_earth`, `_gportal.fetch_gportal`, or
+`_ptree.fetch_ptree`). The three branches share the request shape
+(bbox + dates + a list of dataset keys); the catalog row carries the
+protocol-specific identifier, default band, and aliases. Mixing keys
+from more than one protocol in one call is rejected — the three paths
+emit different file types (GeoTIFFs vs raw SFTP products vs raw HSD
+granules) and have different concurrency profiles, so the API forces
+one protocol per call.
 
 `OUTPUT_KIND = "raster"`; `download()` returns the list of written paths.
 The `aggregate=` argument raises `NotImplementedError` — multi-date
@@ -87,6 +92,8 @@ class JAXA(AbstractDataSource):
         bands: list[str] | None = None,
         gportal_username: str | None = None,
         gportal_password: str | None = None,
+        ptree_username: str | None = None,
+        ptree_password: str | None = None,
         catalog: Catalog | None = None,
     ):
         """Initialise a JAXA backend instance.
@@ -119,12 +126,20 @@ class JAXA(AbstractDataSource):
             gportal_password: Explicit G-Portal password. When omitted,
                 falls back to `$GPORTAL_PASSWORD`. Only used by the
                 `gportal` branch.
+            ptree_username: Explicit P-Tree username (the email
+                registered at eorc.jaxa.jp/ptree). When omitted, falls
+                back to `$JAXA_PTREE_USERNAME`. Only used by the
+                `ptree` branch. Never reuse the G-Portal credentials —
+                the two accounts are distinct.
+            ptree_password: Explicit P-Tree password. When omitted,
+                falls back to `$JAXA_PTREE_PASSWORD`. Only used by the
+                `ptree` branch.
             catalog: Optional pre-built `Catalog` (tests inject a faked
                 one); defaults to the bundled catalog.
 
         Raises:
             ValueError: If `variables` is empty, an alias is unknown, or
-                the resolved keys span both protocols.
+                the resolved keys span more than one protocol.
         """
         if not variables:
             raise ValueError(
@@ -139,12 +154,15 @@ class JAXA(AbstractDataSource):
         resolved: list[Dataset] = [self._catalog.get(v) for v in variables]
         protocols = {ds.protocol for ds in resolved}
         if len(protocols) > 1:
-            jaxa_earth_keys = [ds.key for ds in resolved if ds.protocol == "jaxa-earth"]
-            gportal_keys = [ds.key for ds in resolved if ds.protocol == "gportal"]
+            groups = {
+                p: [ds.key for ds in resolved if ds.protocol == p]
+                for p in sorted(protocols)
+            }
+            summary = ", ".join(f"{p}={ks}" for p, ks in groups.items())
             raise ValueError(
                 "one JAXA request must target a single protocol, but the "
-                f"requested variables span both: jaxa-earth={jaxa_earth_keys}, "
-                f"gportal={gportal_keys}. Issue two separate JAXA(...) calls."
+                f"requested variables span multiple: {summary}. "
+                "Issue one JAXA(...) call per protocol."
             )
         self._resolved: list[Dataset] = resolved
         self._protocol: JaxaProtocol = next(iter(protocols))
@@ -155,6 +173,10 @@ class JAXA(AbstractDataSource):
             gportal_username=gportal_username,
             gportal_password=SecretStr(gportal_password)
             if gportal_password is not None
+            else None,
+            ptree_username=ptree_username,
+            ptree_password=SecretStr(ptree_password)
+            if ptree_password is not None
             else None,
         )
         # Bind the protocol so `AbstractDataSource.authenticate()` (which
@@ -311,7 +333,7 @@ class JAXA(AbstractDataSource):
                         out_dir=out_dir,
                     )
                 )
-        else:
+        elif self._protocol == "gportal":
             from earthlens.jaxa._gportal import fetch_gportal
 
             for ds in self._resolved:
@@ -322,6 +344,20 @@ class JAXA(AbstractDataSource):
                         time=self.time,
                         auth=self._auth,
                         out_dir=out_dir,
+                    )
+                )
+        else:  # ptree
+            from earthlens.jaxa._ptree import fetch_ptree
+
+            for ds in self._resolved:
+                written.extend(
+                    fetch_ptree(
+                        dataset=ds,
+                        space=self.space,
+                        time=self.time,
+                        auth=self._auth,
+                        out_dir=out_dir,
+                        bands=self._bands_override,
                     )
                 )
         return written

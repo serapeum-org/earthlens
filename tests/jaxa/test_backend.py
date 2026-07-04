@@ -55,9 +55,54 @@ def test_gportal_request_resolves_to_protocol(base_kwargs) -> None:
 @pytest.mark.jaxa
 @pytest.mark.unit
 def test_mixed_protocol_request_rejected(base_kwargs) -> None:
-    """A request mixing the two protocols is rejected."""
+    """A request mixing two protocols is rejected."""
     with pytest.raises(ValueError, match="single protocol"):
         JAXA(variables=["aw3d30", "sgli-l380"], **base_kwargs)
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_ptree_key_resolves_to_ptree_protocol(base_kwargs) -> None:
+    """The `himawari-ahi-fldk` key pins the ptree protocol."""
+    backend = JAXA(variables=["himawari-ahi-fldk"], **base_kwargs)
+    assert backend.protocol == "ptree"
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_mixing_ptree_with_jaxa_earth_rejected(base_kwargs) -> None:
+    """A request mixing ptree with jaxa-earth is rejected with both keys named."""
+    with pytest.raises(ValueError, match="single protocol"):
+        JAXA(variables=["aw3d30", "himawari-ahi-fldk"], **base_kwargs)
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_mixing_ptree_with_gportal_rejected(base_kwargs) -> None:
+    """A request mixing ptree with gportal is rejected."""
+    with pytest.raises(ValueError, match="single protocol"):
+        JAXA(variables=["sgli-l380", "himawari-ahi-fldk"], **base_kwargs)
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_ptree_credentials_reach_the_auth_object(monkeypatch, base_kwargs) -> None:
+    """`ptree_username=` / `ptree_password=` are threaded into JaxaAuth."""
+    monkeypatch.delenv("JAXA_PTREE_USERNAME", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_PASSWORD", raising=False)
+    backend = JAXA(
+        variables=["himawari-ahi-fldk"],
+        ptree_username="alice@example.org",
+        ptree_password="pytest-fixture-not-a-real-pw",
+        **base_kwargs,
+    )
+    backend.auth.configure()
+    assert backend.auth.username == "alice@example.org"
+    assert backend.auth.password is not None
+    assert (
+        backend.auth.password.get_secret_value()
+        == "pytest-fixture-not-a-real-pw"
+    )
 
 
 @pytest.mark.jaxa
