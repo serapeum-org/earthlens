@@ -132,9 +132,12 @@ def open_client(endpoint: str = DEFAULT_ENDPOINT) -> cdsapi.Client | ModernClien
             Defaults to `"cds"`.
 
     Returns:
-        cdsapi.Client: A client pointed at the endpoint's URL. For `"cds"` with
-        no `CDSAPI_KEY` / `CDSAPI_URL` override set, this is the historic bare
-        `cdsapi.Client()` (which reads `~/.cdsapirc`).
+        cdsapi.Client | ecmwf.datastores.Client: A client pointed at the
+        endpoint's URL. By default a `cdsapi.Client` — for `"cds"` with no
+        `CDSAPI_KEY` / `CDSAPI_URL` override set, the historic bare
+        `cdsapi.Client()` (which reads `~/.cdsapirc`). When
+        `EARTHLENS_ECMWF_MODERN` is set, an `ecmwf.datastores.Client` instead
+        (see the note below).
 
     Raises:
         ValueError: If `endpoint` is not a known slug.
