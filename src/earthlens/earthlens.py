@@ -617,14 +617,17 @@ class EarthLens:
             "protected-planet": ("earthlens.wdpa", "WDPA", "", {}),
             "iucn": ("earthlens.iucn", "IUCN", "", {}),
             "redlist": ("earthlens.iucn", "IUCN", "", {}),
-            # JAXA archive over two protocols: authless `jaxa-earth` (STAC +
-            # COG via the official jaxa.earth API) and credentialed
-            # `gportal` (G-Portal SFTP via the community gportal SDK).
-            # Per-dataset routing — the catalog's `protocol:` field picks
-            # the branch. `OUTPUT_KIND="raster"`.
+            # JAXA archive over three protocols: authless `jaxa-earth`
+            # (STAC + COG via the official jaxa.earth API), credentialed
+            # `gportal` (G-Portal SFTP via the community gportal SDK), and
+            # credentialed `ptree` (Himawari-8/9 HSD via plain FTP with
+            # stdlib ftplib). Per-dataset routing — the catalog's
+            # `protocol:` field picks the branch. `OUTPUT_KIND="raster"`.
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            "ptree": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            "himawari": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             # Argo autonomous-float ocean profiles via the `argopy` SDK
             # (open data, no auth). `OUTPUT_KIND="tabular"` — a long-format
             # DataFrame of profiles. The `"argo"` key is canonical; the

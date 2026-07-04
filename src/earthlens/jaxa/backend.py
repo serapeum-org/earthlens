@@ -66,7 +66,7 @@ _FREQ_ALIAS: dict[str, str] = {
 
 
 class JAXA(AbstractDataSource):
-    """Unified JAXA backend over two protocols (`jaxa-earth` and `gportal`).
+    """Unified JAXA backend over three protocols (`jaxa-earth`, `gportal`, `ptree`).
 
     Attributes:
         OUTPUT_KIND: Fixed `"raster"`. The `jaxa-earth` branch always emits
@@ -99,8 +99,8 @@ class JAXA(AbstractDataSource):
         """Initialise a JAXA backend instance.
 
         Resolves every key against the catalog up front so that an unknown
-        key (or a request that mixes the two protocols) fails at
-        construction rather than mid-download.
+        key (or a request that mixes more than one of the three protocols)
+        fails at construction rather than mid-download.
 
         Args:
             start: Inclusive start of the date window (parsed with `fmt`).
