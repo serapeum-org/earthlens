@@ -45,7 +45,7 @@ earthlens datasets validate all                # every provider
 ```
 
 Canonical ids: `argo`, `asf`, `bathymetry`, `chc`, `climate-indices`, `cmems`, `earthdata`, `ecmwf`,
-`erddap`, `eumetsat`, `fdsn`, `firms`, `gbif`, `gdacs`, `gee`, `ghsl`, `glaciers`, `hdx`, `iucn`, `jaxa`, `nwm`, `nwp`,
+`erddap`, `eumetsat`, `fdsn`, `firms`, `gbif`, `gdacs`, `gee`, `ghsl`, `glaciers`, `goes`, `hdx`, `iucn`, `jaxa`, `nwm`, `nwp`,
 `obis`, `openaq`, `openeo`, `overture`, `pvgis`, `radar`, `risk-indicators`, `s3`, `sentinel_hub`, `soilgrids`,
 `stac`, `tropycal`, `usgs_water`, `wdpa`, `worldpop`. Common aliases include `amazon-s3`, `chirps`,
 `google-earth-engine`, `argo-floats`/`argopy`, `ioos` (erddap), `gebco`/`etopo` (bathymetry),
