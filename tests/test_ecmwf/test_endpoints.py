@@ -283,3 +283,28 @@ class TestModernClient:
         _install_fake_datastores(monkeypatch)
         with pytest.raises(AuthenticationError):
             ep.open_client("cds")
+
+    def test_open_client_delegation_threads_url_and_key(self, monkeypatch, tmp_path):
+        """`open_client` with the flag set threads the endpoint url+key to the modern client."""
+        _clear_cads_env(monkeypatch)
+        _home_without_dotfile(monkeypatch, tmp_path)
+        monkeypatch.setenv("ADS_KEY", "ads-tok")
+        monkeypatch.setenv("EARTHLENS_ECMWF_MODERN", "on")
+        _install_fake_datastores(monkeypatch)
+        client = ep.open_client("ads")
+        assert isinstance(client, _RecordingModernClient)
+        assert client.url == "https://ads.atmosphere.copernicus.eu/api"
+        assert client.key == "ads-tok"
+
+    def test_use_modern_flag_strips_whitespace(self, monkeypatch):
+        """Surrounding whitespace around the flag value is ignored."""
+        monkeypatch.setenv("EARTHLENS_ECMWF_MODERN", " 1 ")
+        assert ep._use_modern_client() is True
+
+    def test_open_client_unknown_endpoint_with_flag_raises_value_error(
+        self, monkeypatch
+    ):
+        """An unknown endpoint raises `ValueError` through `open_client` on the modern path."""
+        monkeypatch.setenv("EARTHLENS_ECMWF_MODERN", "1")
+        with pytest.raises(ValueError, match="unknown ECMWF endpoint"):
+            ep.open_client("mars")
