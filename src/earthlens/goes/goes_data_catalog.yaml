@@ -1,0 +1,207 @@
+# NOAA GOES-R series ABI (Advanced Baseline Imager) data catalog.
+#
+# GOES imagery lives on the public, anonymous AWS Open-Data buckets `noaa-goes16` /
+# `noaa-goes18` / `noaa-goes19`. A concrete S3 key is
+#   <product_group><domain_suffix>/<YYYY>/<DDD>/<HH>/OR_<...>-M6_G<sat>_s<scan_start>_e..._c....nc
+# assembled from a (satellite, product, domain, scan-start) tuple by the backend.
+#
+# * `satellites:` maps the operational role / satellite number to its bucket
+#   (East/West rotate with future GOES-U/T — kept here, never hard-coded in flow).
+# * `domains:` C (CONUS), F (Full Disk), M1 / M2 (the two Mesoscale subsectors,
+#   which share one `...M` S3 prefix and are split by the filename token).
+# * `products:` curated ABI product families (friendly key -> `product_group`).
+# * `channels:` the 16 ABI spectral bands (reference metadata for band selection).
+#
+# Facts pinned by the A1 gate against the live buckets (planning/goes/captures/).
+
+satellites:
+  east: noaa-goes19
+  west: noaa-goes18
+  '16': noaa-goes16
+  '18': noaa-goes18
+  '19': noaa-goes19
+
+domains:
+  C:
+    name: CONUS
+    prefix_suffix: C
+    subsector: ''
+    cadence_minutes: 5
+  F:
+    name: Full Disk
+    prefix_suffix: F
+    subsector: ''
+    cadence_minutes: 10
+  M1:
+    name: Mesoscale 1
+    prefix_suffix: M
+    subsector: M1
+    cadence_minutes: 1
+  M2:
+    name: Mesoscale 2
+    prefix_suffix: M
+    subsector: M2
+    cadence_minutes: 1
+
+channels:
+  C01: {wavelength_um: 0.47, name: Blue (visible)}
+  C02: {wavelength_um: 0.64, name: Red (visible)}
+  C03: {wavelength_um: 0.86, name: Veggie (near-IR)}
+  C04: {wavelength_um: 1.37, name: Cirrus (near-IR)}
+  C05: {wavelength_um: 1.6, name: Snow/Ice (near-IR)}
+  C06: {wavelength_um: 2.2, name: Cloud particle size (near-IR)}
+  C07: {wavelength_um: 3.9, name: Shortwave window (IR)}
+  C08: {wavelength_um: 6.2, name: Upper-level water vapour (IR)}
+  C09: {wavelength_um: 6.9, name: Mid-level water vapour (IR)}
+  C10: {wavelength_um: 7.3, name: Lower-level water vapour (IR)}
+  C11: {wavelength_um: 8.4, name: Cloud-top phase (IR)}
+  C12: {wavelength_um: 9.6, name: Ozone (IR)}
+  C13: {wavelength_um: 10.3, name: Clean longwave window (IR)}
+  C14: {wavelength_um: 11.2, name: Longwave window (IR)}
+  C15: {wavelength_um: 12.3, name: Dirty longwave window (IR)}
+  C16: {wavelength_um: 13.3, name: CO2 longwave (IR)}
+
+products:
+  abi-l2-mcmip:
+    product_group: ABI-L2-MCMIP
+    level: L2
+    description: Cloud & Moisture Imagery (multi-band) - one NetCDF per scan carrying
+      all 16 ABI CMI bands (CMI_C01..CMI_C16). Whole-granule download; band selection
+      is a downstream read.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: [CMI_C01, CMI_C02, CMI_C03, CMI_C04, CMI_C05, CMI_C06, CMI_C07, CMI_C08,
+      CMI_C09, CMI_C10, CMI_C11, CMI_C12, CMI_C13, CMI_C14, CMI_C15, CMI_C16]
+  abi-l2-cmip:
+    product_group: ABI-L2-CMIP
+    level: L2
+    description: Cloud & Moisture Imagery (single-band) - one NetCDF per ABI channel;
+      `variables=["C02", ...]` selects which channel files are fetched.
+    domains: [C, F, M1, M2]
+    band_split: true
+    default_domain: C
+    bands: [C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14,
+      C15, C16]
+  abi-l1b-rad:
+    product_group: ABI-L1b-Rad
+    level: L1b
+    description: ABI radiances (Level-1b) - one NetCDF per ABI channel;
+      `variables=["C01", ...]` selects which channel files are fetched.
+    domains: [C, F, M1, M2]
+    band_split: true
+    default_domain: C
+    bands: [C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14,
+      C15, C16]
+  abi-l2-aod:
+    product_group: ABI-L2-AOD
+    level: L2
+    description: Aerosol Optical Depth at 550 nm.
+    domains: [C, F]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-adp:
+    product_group: ABI-L2-ADP
+    level: L2
+    description: Aerosol Detection (smoke / dust) product.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-lst:
+    product_group: ABI-L2-LST
+    level: L2
+    description: Land Surface (skin) Temperature.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-sst:
+    product_group: ABI-L2-SST
+    level: L2
+    description: Sea Surface (skin) Temperature (Full Disk only).
+    domains: [F]
+    band_split: false
+    default_domain: F
+    bands: []
+  abi-l2-acha:
+    product_group: ABI-L2-ACHA
+    level: L2
+    description: Cloud Top Height.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-actp:
+    product_group: ABI-L2-ACTP
+    level: L2
+    description: Cloud Top Phase.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-acm:
+    product_group: ABI-L2-ACM
+    level: L2
+    description: Clear Sky Mask.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-cod:
+    product_group: ABI-L2-COD
+    level: L2
+    description: Cloud Optical Depth.
+    domains: [C, F]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-cps:
+    product_group: ABI-L2-CPS
+    level: L2
+    description: Cloud Particle Size distribution.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-dsi:
+    product_group: ABI-L2-DSI
+    level: L2
+    description: Derived Stability Indices (CAPE, lifted index, total totals, K-index).
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-fdc:
+    product_group: ABI-L2-FDC
+    level: L2
+    description: Fire / Hot Spot Characterization.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-rrqpe:
+    product_group: ABI-L2-RRQPE
+    level: L2
+    description: Rainfall Rate / Quantitative Precipitation Estimate (Full Disk only).
+    domains: [F]
+    band_split: false
+    default_domain: F
+    bands: []
+  abi-l2-tpw:
+    product_group: ABI-L2-TPW
+    level: L2
+    description: Total Precipitable Water.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
+  abi-l2-dmw:
+    product_group: ABI-L2-DMW
+    level: L2
+    description: Derived Motion Winds.
+    domains: [C, F, M1, M2]
+    band_split: false
+    default_domain: C
+    bands: []
