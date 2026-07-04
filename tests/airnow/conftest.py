@@ -2,9 +2,10 @@
 
 Drives the backend end-to-end without network: a recording fake
 `requests.Session` is injected via `session=` so the lazily-built
-`AirnowClient` picks it up, and the client's `time.sleep` is neutered so
-`429` back-off costs no wall-clock time. Builds plain dict rows shaped
-like an AirNow `/aq/data/` verbose JSON observation.
+`AirnowClient` picks it up. Builds plain dict rows shaped like an AirNow
+`/aq/data/` verbose JSON observation. The `429` back-off tests inject a
+capturing `sleep=` directly into `AirnowClient` (see `test_client.py`),
+so no monkeypatch of `time.sleep` is needed here.
 """
 
 from __future__ import annotations
@@ -104,27 +105,12 @@ class _FakeSession:
 
 
 @pytest.fixture
-def fake_airnow(monkeypatch: pytest.MonkeyPatch) -> _FakeAirnow:
-    """Recording fake AirNow transport with back-off sleep neutered."""
-    state = _FakeAirnow()
-    monkeypatch.setattr("earthlens.airnow.client.time.sleep", lambda seconds: None)
-    return state
+def fake_airnow() -> _FakeAirnow:
+    """Recording fake AirNow transport state (a default `_FakeAirnow`)."""
+    return _FakeAirnow()
 
 
 @pytest.fixture
 def make_observation():
     """Factory for an AirNow observation row (see `_observation`)."""
     return _observation
-
-
-@pytest.fixture
-def log_messages():
-    """Collect loguru log messages into a list (loguru bypasses caplog)."""
-    from loguru import logger
-
-    messages: list[str] = []
-    sink_id = logger.add(
-        lambda message: messages.append(message.record["message"]), level="WARNING"
-    )
-    yield messages
-    logger.remove(sink_id)
