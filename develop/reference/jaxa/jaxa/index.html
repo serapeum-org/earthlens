@@ -21399,7 +21399,13 @@ the output as gridded artefacts.</p>
 <span class="normal"><a href="#__codelineno-0-431">431</a></span>
 <span class="normal"><a href="#__codelineno-0-432">432</a></span>
 <span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="k">class</span><span class="w"> </span><span class="nc">JAXA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="k">class</span><span class="w"> </span><span class="nc">JAXA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Unified JAXA backend over three protocols (`jaxa-earth`, `gportal`, `ptree`).</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    Attributes:</span>
@@ -21627,144 +21633,150 @@ the output as gridded artefacts.</p>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        The frequency is advisory: `jaxa-earth` consumes a `dlim` range</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        directly, and `gportal.search` consumes `start_time` / `end_time`</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ISO strings.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            start: Inclusive start of the window.</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            end: Inclusive end of the window.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            temporal_resolution: Advisory label; defaults to `&quot;daily&quot;`.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            fmt: `strptime` format applied to `start` / `end`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            TemporalExtent: Frozen model with the parsed bounds.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ValueError: If `start` parses to a date later than `end`.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="n">freq_alias</span> <span class="o">=</span> <span class="n">_FREQ_ALIAS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;MS&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">)</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">,</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dispatch to the matching protocol branch.</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            list[Path]: One or more written paths per resolved dataset</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                (a COG for `jaxa-earth`, an HDF5/GeoTIFF/NetCDF for</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                `gportal`, depending on the mission).</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;jaxa-earth&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._jaxa_earth</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_jaxa_earth</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                    <span class="n">fetch_jaxa_earth</span><span class="p">(</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>                        <span class="n">resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="p">,</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>                        <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bands_override</span><span class="p">,</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                <span class="p">)</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;gportal&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._gportal</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_gportal</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>                    <span class="n">fetch_gportal</span><span class="p">(</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>                        <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                <span class="p">)</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;ptree&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._ptree</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_ptree</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>                    <span class="n">fetch_ptree</span><span class="p">(</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>                        <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                        <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bands_override</span><span class="p">,</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                <span class="p">)</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="c1"># Defensive: `JaxaProtocol` is a `Literal[...]` and the</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="c1"># constructor rejects anything else, so this only fires if a</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="c1"># future fourth protocol is added to the literal but not to</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="c1"># `_api`. Failing loud beats silently routing to the last</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="c1"># `else` branch (Round 2 L3).</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>                <span class="sa">f</span><span class="s2">&quot;unhandled JAXA protocol </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span><span class="si">!r}</span><span class="s2">; add a &quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>                <span class="s2">&quot;dispatch branch alongside jaxa-earth/gportal/ptree.&quot;</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="k">return</span> <span class="n">written</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested datasets and return the written paths.</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            progress_bar: Reserved for future per-download progress; the</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                two SDKs print their own progress lines today.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            aggregate: Not supported — JAXA requests return per-date</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">                rasters; reducing them across dates is a follow-on.</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            list[Path]: One or more files per resolved dataset, in</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">                request order.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            NotImplementedError: When `aggregate` is non-`None`. See `G6`</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">                in the planning doc.</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            - Passing `aggregate=` raises because per-date stacks are not</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">              reduced yet:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                &gt;&gt;&gt; import tempfile</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">                &gt;&gt;&gt; backend = JAXA(</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                ...     variables=[&quot;aw3d30&quot;],</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">                ...     path=tempfile.gettempdir(),</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">                &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">                NotImplementedError: JAXA does not yet support the aggregate=...</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="s2">&quot;JAXA does not yet support the aggregate= argument. &quot;</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                <span class="s2">&quot;The jaxa-earth branch returns per-date COGs; reducing &quot;</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                <span class="s2">&quot;them across dates is a planned follow-on (planning G6).&quot;</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="k">del</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        directly, `gportal.search` consumes `start_time` / `end_time`</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ISO strings, and `_ptree.fetch_ptree` iterates every 10-minute</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        slot in the window.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            start: Inclusive start of the window.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            end: Inclusive end of the window.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            temporal_resolution: Advisory label; defaults to `&quot;daily&quot;`.</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            fmt: `strptime` format applied to `start` / `end`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            TemporalExtent: Frozen model with the parsed bounds.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            ValueError: If `start` parses to a date later than `end`.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">freq_alias</span> <span class="o">=</span> <span class="n">_FREQ_ALIAS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;MS&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">,</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="p">)</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dispatch to the matching protocol branch.</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            list[Path]: One or more written paths per resolved dataset</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                — a COG for `jaxa-earth`, an HDF5 / GeoTIFF / NetCDF</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                product for `gportal` (depending on the mission), or</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                the 10 raw `.DAT.bz2` HSD segments per band per</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                10-minute slot for `ptree`.</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;jaxa-earth&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._jaxa_earth</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_jaxa_earth</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                    <span class="n">fetch_jaxa_earth</span><span class="p">(</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                        <span class="n">resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="p">,</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                        <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bands_override</span><span class="p">,</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="p">)</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;gportal&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._gportal</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_gportal</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>                    <span class="n">fetch_gportal</span><span class="p">(</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                        <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="p">)</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;ptree&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._ptree</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_ptree</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>                    <span class="n">fetch_ptree</span><span class="p">(</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>                        <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                        <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bands_override</span><span class="p">,</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>                <span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="c1"># Defensive: `JaxaProtocol` is a `Literal[...]` and the</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="c1"># constructor rejects anything else, so this only fires if a</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="c1"># future fourth protocol is added to the literal but not to</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="c1"># `_api`. Failing loud beats silently routing to the last</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="c1"># `else` branch (Round 2 L3).</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="sa">f</span><span class="s2">&quot;unhandled JAXA protocol </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span><span class="si">!r}</span><span class="s2">; add a &quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="s2">&quot;dispatch branch alongside jaxa-earth/gportal/ptree.&quot;</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>            <span class="p">)</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested datasets and return the written paths.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            progress_bar: Reserved for future per-download progress; the</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">                two SDKs print their own progress lines today.</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            aggregate: Not supported — JAXA requests return per-date</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">                rasters; reducing them across dates is a follow-on.</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            list[Path]: One or more files per resolved dataset, in</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">                request order.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            NotImplementedError: When `aggregate` is non-`None`. See `G6`</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                in the planning doc.</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            - Passing `aggregate=` raises because per-date stacks are not</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">              reduced yet:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                &gt;&gt;&gt; import tempfile</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">                &gt;&gt;&gt; backend = JAXA(</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">                ...     variables=[&quot;aw3d30&quot;],</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">                ...     path=tempfile.gettempdir(),</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">                &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">                NotImplementedError: JAXA does not yet support the aggregate=...</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                <span class="s2">&quot;JAXA does not yet support the aggregate= argument. &quot;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                <span class="s2">&quot;All three branches emit per-date artefacts today &quot;</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>                <span class="s2">&quot;(jaxa-earth: per-date COGs; gportal: per-product &quot;</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>                <span class="s2">&quot;SFTP downloads; ptree: per-slot HSD segments) — &quot;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>                <span class="s2">&quot;reducing them across dates is a planned follow-on &quot;</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>                <span class="s2">&quot;(planning G6).&quot;</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="k">del</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22636,10 +22648,7 @@ in the planning doc.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/jaxa/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-387">387</a></span>
-<span class="normal"><a href="#__codelineno-0-388">388</a></span>
-<span class="normal"><a href="#__codelineno-0-389">389</a></span>
-<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-390">390</a></span>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
@@ -22683,54 +22692,63 @@ in the planning doc.</p>
 <span class="normal"><a href="#__codelineno-0-431">431</a></span>
 <span class="normal"><a href="#__codelineno-0-432">432</a></span>
 <span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested datasets and return the written paths.</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        progress_bar: Reserved for future per-download progress; the</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            two SDKs print their own progress lines today.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        aggregate: Not supported — JAXA requests return per-date</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            rasters; reducing them across dates is a follow-on.</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        list[Path]: One or more files per resolved dataset, in</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            request order.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        NotImplementedError: When `aggregate` is non-`None`. See `G6`</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">            in the planning doc.</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        - Passing `aggregate=` raises because per-date stacks are not</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">          reduced yet:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            &gt;&gt;&gt; import tempfile</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            &gt;&gt;&gt; backend = JAXA(</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            ...     variables=[&quot;aw3d30&quot;],</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            ...     path=tempfile.gettempdir(),</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">            NotImplementedError: JAXA does not yet support the aggregate=...</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="s2">&quot;JAXA does not yet support the aggregate= argument. &quot;</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="s2">&quot;The jaxa-earth branch returns per-date COGs; reducing &quot;</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="s2">&quot;them across dates is a planned follow-on (planning G6).&quot;</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="k">del</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested datasets and return the written paths.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        progress_bar: Reserved for future per-download progress; the</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            two SDKs print their own progress lines today.</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        aggregate: Not supported — JAXA requests return per-date</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            rasters; reducing them across dates is a follow-on.</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        list[Path]: One or more files per resolved dataset, in</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            request order.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        NotImplementedError: When `aggregate` is non-`None`. See `G6`</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            in the planning doc.</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        - Passing `aggregate=` raises because per-date stacks are not</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">          reduced yet:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            &gt;&gt;&gt; import tempfile</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            &gt;&gt;&gt; backend = JAXA(</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            ...     variables=[&quot;aw3d30&quot;],</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            ...     path=tempfile.gettempdir(),</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">            &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">            NotImplementedError: JAXA does not yet support the aggregate=...</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="s2">&quot;JAXA does not yet support the aggregate= argument. &quot;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>            <span class="s2">&quot;All three branches emit per-date artefacts today &quot;</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="s2">&quot;(jaxa-earth: per-date COGs; gportal: per-product &quot;</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="s2">&quot;SFTP downloads; ptree: per-slot HSD segments) — &quot;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>            <span class="s2">&quot;reducing them across dates is a planned follow-on &quot;</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="s2">&quot;(planning G6).&quot;</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>    <span class="k">del</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24712,7 +24730,13 @@ the output as gridded artefacts.</p>
 <span class="normal"><a href="#__codelineno-0-431">431</a></span>
 <span class="normal"><a href="#__codelineno-0-432">432</a></span>
 <span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="k">class</span><span class="w"> </span><span class="nc">JAXA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="k">class</span><span class="w"> </span><span class="nc">JAXA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Unified JAXA backend over three protocols (`jaxa-earth`, `gportal`, `ptree`).</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    Attributes:</span>
@@ -24940,144 +24964,150 @@ the output as gridded artefacts.</p>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        The frequency is advisory: `jaxa-earth` consumes a `dlim` range</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        directly, and `gportal.search` consumes `start_time` / `end_time`</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ISO strings.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            start: Inclusive start of the window.</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            end: Inclusive end of the window.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            temporal_resolution: Advisory label; defaults to `&quot;daily&quot;`.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            fmt: `strptime` format applied to `start` / `end`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            TemporalExtent: Frozen model with the parsed bounds.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ValueError: If `start` parses to a date later than `end`.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="n">freq_alias</span> <span class="o">=</span> <span class="n">_FREQ_ALIAS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;MS&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">)</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">,</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dispatch to the matching protocol branch.</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            list[Path]: One or more written paths per resolved dataset</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                (a COG for `jaxa-earth`, an HDF5/GeoTIFF/NetCDF for</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                `gportal`, depending on the mission).</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;jaxa-earth&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._jaxa_earth</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_jaxa_earth</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                    <span class="n">fetch_jaxa_earth</span><span class="p">(</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>                        <span class="n">resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="p">,</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>                        <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bands_override</span><span class="p">,</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                <span class="p">)</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;gportal&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._gportal</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_gportal</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>                    <span class="n">fetch_gportal</span><span class="p">(</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>                        <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                <span class="p">)</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;ptree&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._ptree</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_ptree</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>                    <span class="n">fetch_ptree</span><span class="p">(</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>                        <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                        <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bands_override</span><span class="p">,</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                <span class="p">)</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="c1"># Defensive: `JaxaProtocol` is a `Literal[...]` and the</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="c1"># constructor rejects anything else, so this only fires if a</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="c1"># future fourth protocol is added to the literal but not to</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="c1"># `_api`. Failing loud beats silently routing to the last</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="c1"># `else` branch (Round 2 L3).</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>                <span class="sa">f</span><span class="s2">&quot;unhandled JAXA protocol </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span><span class="si">!r}</span><span class="s2">; add a &quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>                <span class="s2">&quot;dispatch branch alongside jaxa-earth/gportal/ptree.&quot;</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="k">return</span> <span class="n">written</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested datasets and return the written paths.</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            progress_bar: Reserved for future per-download progress; the</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                two SDKs print their own progress lines today.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            aggregate: Not supported — JAXA requests return per-date</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">                rasters; reducing them across dates is a follow-on.</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            list[Path]: One or more files per resolved dataset, in</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">                request order.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            NotImplementedError: When `aggregate` is non-`None`. See `G6`</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">                in the planning doc.</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            - Passing `aggregate=` raises because per-date stacks are not</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">              reduced yet:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                &gt;&gt;&gt; import tempfile</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">                &gt;&gt;&gt; backend = JAXA(</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                ...     variables=[&quot;aw3d30&quot;],</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">                ...     path=tempfile.gettempdir(),</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">                &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">                NotImplementedError: JAXA does not yet support the aggregate=...</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="s2">&quot;JAXA does not yet support the aggregate= argument. &quot;</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                <span class="s2">&quot;The jaxa-earth branch returns per-date COGs; reducing &quot;</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                <span class="s2">&quot;them across dates is a planned follow-on (planning G6).&quot;</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="k">del</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        directly, `gportal.search` consumes `start_time` / `end_time`</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ISO strings, and `_ptree.fetch_ptree` iterates every 10-minute</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        slot in the window.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            start: Inclusive start of the window.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            end: Inclusive end of the window.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            temporal_resolution: Advisory label; defaults to `&quot;daily&quot;`.</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            fmt: `strptime` format applied to `start` / `end`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            TemporalExtent: Frozen model with the parsed bounds.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            ValueError: If `start` parses to a date later than `end`.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">freq_alias</span> <span class="o">=</span> <span class="n">_FREQ_ALIAS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;MS&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">,</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="p">)</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dispatch to the matching protocol branch.</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            list[Path]: One or more written paths per resolved dataset</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                — a COG for `jaxa-earth`, an HDF5 / GeoTIFF / NetCDF</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                product for `gportal` (depending on the mission), or</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                the 10 raw `.DAT.bz2` HSD segments per band per</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                10-minute slot for `ptree`.</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;jaxa-earth&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._jaxa_earth</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_jaxa_earth</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                    <span class="n">fetch_jaxa_earth</span><span class="p">(</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                        <span class="n">resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="p">,</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                        <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bands_override</span><span class="p">,</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="p">)</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;gportal&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._gportal</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_gportal</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>                    <span class="n">fetch_gportal</span><span class="p">(</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                        <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="p">)</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">==</span> <span class="s2">&quot;ptree&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa._ptree</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_ptree</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="p">:</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>                <span class="n">written</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>                    <span class="n">fetch_ptree</span><span class="p">(</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>                        <span class="n">dataset</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>                        <span class="n">space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                        <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>                        <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">,</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                        <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bands_override</span><span class="p">,</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>                <span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="c1"># Defensive: `JaxaProtocol` is a `Literal[...]` and the</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="c1"># constructor rejects anything else, so this only fires if a</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="c1"># future fourth protocol is added to the literal but not to</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="c1"># `_api`. Failing loud beats silently routing to the last</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="c1"># `else` branch (Round 2 L3).</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="sa">f</span><span class="s2">&quot;unhandled JAXA protocol </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span><span class="si">!r}</span><span class="s2">; add a &quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="s2">&quot;dispatch branch alongside jaxa-earth/gportal/ptree.&quot;</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>            <span class="p">)</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested datasets and return the written paths.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            progress_bar: Reserved for future per-download progress; the</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">                two SDKs print their own progress lines today.</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            aggregate: Not supported — JAXA requests return per-date</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">                rasters; reducing them across dates is a follow-on.</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            list[Path]: One or more files per resolved dataset, in</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">                request order.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            NotImplementedError: When `aggregate` is non-`None`. See `G6`</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                in the planning doc.</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            - Passing `aggregate=` raises because per-date stacks are not</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">              reduced yet:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                &gt;&gt;&gt; import tempfile</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">                &gt;&gt;&gt; backend = JAXA(</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">                ...     variables=[&quot;aw3d30&quot;],</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">                ...     path=tempfile.gettempdir(),</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">                &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">                NotImplementedError: JAXA does not yet support the aggregate=...</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                <span class="s2">&quot;JAXA does not yet support the aggregate= argument. &quot;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                <span class="s2">&quot;All three branches emit per-date artefacts today &quot;</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>                <span class="s2">&quot;(jaxa-earth: per-date COGs; gportal: per-product &quot;</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>                <span class="s2">&quot;SFTP downloads; ptree: per-slot HSD segments) — &quot;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>                <span class="s2">&quot;reducing them across dates is a planned follow-on &quot;</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>                <span class="s2">&quot;(planning G6).&quot;</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="k">del</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25949,10 +25979,7 @@ in the planning doc.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/jaxa/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-387">387</a></span>
-<span class="normal"><a href="#__codelineno-0-388">388</a></span>
-<span class="normal"><a href="#__codelineno-0-389">389</a></span>
-<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-390">390</a></span>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
@@ -25996,54 +26023,63 @@ in the planning doc.</p>
 <span class="normal"><a href="#__codelineno-0-431">431</a></span>
 <span class="normal"><a href="#__codelineno-0-432">432</a></span>
 <span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested datasets and return the written paths.</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        progress_bar: Reserved for future per-download progress; the</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            two SDKs print their own progress lines today.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        aggregate: Not supported — JAXA requests return per-date</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            rasters; reducing them across dates is a follow-on.</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        list[Path]: One or more files per resolved dataset, in</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            request order.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        NotImplementedError: When `aggregate` is non-`None`. See `G6`</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">            in the planning doc.</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        - Passing `aggregate=` raises because per-date stacks are not</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">          reduced yet:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            &gt;&gt;&gt; import tempfile</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            &gt;&gt;&gt; backend = JAXA(</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            ...     variables=[&quot;aw3d30&quot;],</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            ...     path=tempfile.gettempdir(),</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">            NotImplementedError: JAXA does not yet support the aggregate=...</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="s2">&quot;JAXA does not yet support the aggregate= argument. &quot;</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="s2">&quot;The jaxa-earth branch returns per-date COGs; reducing &quot;</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="s2">&quot;them across dates is a planned follow-on (planning G6).&quot;</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="k">del</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested datasets and return the written paths.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        progress_bar: Reserved for future per-download progress; the</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            two SDKs print their own progress lines today.</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        aggregate: Not supported — JAXA requests return per-date</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            rasters; reducing them across dates is a follow-on.</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        list[Path]: One or more files per resolved dataset, in</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            request order.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        NotImplementedError: When `aggregate` is non-`None`. See `G6`</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            in the planning doc.</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        - Passing `aggregate=` raises because per-date stacks are not</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">          reduced yet:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            &gt;&gt;&gt; import tempfile</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            &gt;&gt;&gt; backend = JAXA(</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            ...     variables=[&quot;aw3d30&quot;],</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            ...     path=tempfile.gettempdir(),</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">            &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">            NotImplementedError: JAXA does not yet support the aggregate=...</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="s2">&quot;JAXA does not yet support the aggregate= argument. &quot;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>            <span class="s2">&quot;All three branches emit per-date artefacts today &quot;</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="s2">&quot;(jaxa-earth: per-date COGs; gportal: per-product &quot;</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="s2">&quot;SFTP downloads; ptree: per-slot HSD segments) — &quot;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>            <span class="s2">&quot;reducing them across dates is a planned follow-on &quot;</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="s2">&quot;(planning G6).&quot;</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>    <span class="k">del</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
