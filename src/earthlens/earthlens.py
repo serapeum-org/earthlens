@@ -293,13 +293,13 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['admin', 'admin-boundaries', 'alaska-satellite-facility',
+            ['admin', 'admin-boundaries', 'airnow', 'alaska-satellite-facility',
              'amazon-s3', 'argo', 'argo-floats', 'argopy', 'asf', 'bathymetry',
              'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
              'climate_indices', 'cmems', 'dea',
              'deafrica', 'digital-earth-africa', 'digital-earth-australia',
              'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo',
-             'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal',
+             'eea-aq', 'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal',
              'gbif', 'gdacs', 'gdo', 'gebco', 'gee', 'geoboundaries',
              'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
              'global-forest-watch', 'global-solar-atlas',
@@ -310,7 +310,8 @@ class EarthLens:
              'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'ohsome', 'openaq',
              'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
              'planetary-computer', 'protected-planet', 'pvgis', 'radar',
-             'redlist', 'rgi', 'risk-indicators', 'sentinel-hub',
+             'redlist', 'rgi', 'risk-indicators', 'sensor-community',
+             'sentinel-hub',
              'sentinelhub', 'soilgrids', 'solar-pv', 'solar-wind-atlas',
              'stac', 'teleconnections', 'thinkhazard', 'tiger',
              'tropycal', 'usdm', 'usgs-landsat', 'usgs-nwis',
@@ -495,6 +496,19 @@ class EarthLens:
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
             "hdx": ("earthlens.hdx", "HDX", "hdx", {}),
             "openaq": ("earthlens.openaq", "OpenAQ", "openaq", {}),
+            # Ground-obs air-quality trio completing OpenAQ's coverage, all
+            # tabular (DataFrame). airnow (US/Canada EPA, /aq/data/ bbox REST)
+            # and sensor-community (crowdsourced archive CSV) are core
+            # (requests + pandas); eea-aq wraps airbase behind the [eea_aq]
+            # extra.
+            "airnow": ("earthlens.airnow", "AirNow", "", {}),
+            "eea-aq": ("earthlens.eea_aq", "EEA_AQ", "eea_aq", {}),
+            "sensor-community": (
+                "earthlens.sensor_community",
+                "SensorCommunity",
+                "",
+                {},
+            ),
             # openEO server-side processing (defaults to CDSE openEO). Builds a
             # process graph the backend executes; returns the written paths.
             "openeo": ("earthlens.openeo", "OpenEO", "openeo", {}),

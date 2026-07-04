@@ -1,0 +1,35 @@
+# Sensor.Community pollutant dispatch table.
+#
+# Sensor.Community publishes one CSV per (sensor, day) in its archive,
+# named `<date>_<sensor_type>_sensor_<id>.csv`. Each CSV's measurement
+# columns depend on the sensor type: particulate sensors report `P0`
+# (PM1), `P1` (PM10), `P2` (PM2.5); climate sensors report `temperature`
+# / `humidity` / `pressure`. Users pass earthlens pollutant names in
+# `variables=[...]`; this table maps each name to the CSV `column` it
+# lives in and the `sensor_types` (archive slugs) whose files carry it.
+#
+# `sensor_types` is used to (a) filter the live-API discovery to relevant
+# sensors and (b) know which per-sensor archive files to fetch; the
+# actual `column`-presence check at parse time is authoritative, so an
+# over-broad list is harmless. Columns / units verified against a live
+# archive CSV (2026-07-03). `P1`=PM10 and `P2`=PM2.5 (the archive's SDS011
+# convention).
+pollutants:
+  pm25:
+    { name: pm25, column: P2, units: "µg/m³", display_name: "PM2.5", group: particulate,
+      sensor_types: [sds011, pms1003, pms3003, pms5003, pms6003, pms7003, sen5x, hpm, nextpm] }
+  pm10:
+    { name: pm10, column: P1, units: "µg/m³", display_name: "PM10", group: particulate,
+      sensor_types: [sds011, pms1003, pms3003, pms5003, pms6003, pms7003, sen5x, hpm, nextpm] }
+  pm1:
+    { name: pm1, column: P0, units: "µg/m³", display_name: "PM1", group: particulate,
+      sensor_types: [pms1003, pms3003, pms5003, pms6003, pms7003, sen5x] }
+  temperature:
+    { name: temperature, column: temperature, units: "°C", display_name: "Temperature", group: meteorological,
+      sensor_types: [dht22, bme280, bmp180, bmp280, htu21d, sht10, sht11, sht31, sht35, ds18b20, scd30, sen5x] }
+  humidity:
+    { name: humidity, column: humidity, units: "%", display_name: "Relative humidity", group: meteorological,
+      sensor_types: [dht22, bme280, htu21d, sht10, sht11, sht31, sht35, scd30, sen5x] }
+  pressure:
+    { name: pressure, column: pressure, units: "Pa", display_name: "Atmospheric pressure", group: meteorological,
+      sensor_types: [bme280, bmp180, bmp280] }

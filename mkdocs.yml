@@ -236,6 +236,21 @@ nav:
       - Usage: reference/openaq/usage.md
       - Authentication: reference/openaq/authentication.md
       - Reference: reference/openaq/openaq.md
+    - AirNow (air quality — US/Canada):
+      - Introduction: reference/airnow/introduction.md
+      - Usage: reference/airnow/usage.md
+      - Authentication: reference/airnow/authentication.md
+      - Reference: reference/airnow/airnow.md
+    - EEA (air quality — Europe):
+      - Introduction: reference/eea-aq/introduction.md
+      - Usage: reference/eea-aq/usage.md
+      - Install & access: reference/eea-aq/authentication.md
+      - Reference: reference/eea-aq/eea-aq.md
+    - Sensor.Community (air quality — crowdsourced):
+      - Introduction: reference/sensor-community/introduction.md
+      - Usage: reference/sensor-community/usage.md
+      - Licence & access: reference/sensor-community/authentication.md
+      - Reference: reference/sensor-community/sensor-community.md
     - openEO (server-side processing):
       - Introduction: reference/openeo/introduction.md
       - Usage: reference/openeo/usage.md
@@ -496,6 +511,12 @@ nav:
       - Quickstart — PM2.5 over a city: examples/openaq/quickstart.ipynb
       - PM2.5 city time-series (WHO guideline): examples/openaq/pm25_city_timeseries.ipynb
       - Multi-station NO2 diurnal comparison: examples/openaq/multistation_comparison.ipynb
+    - Air quality (AirNow — US/Canada):
+      - Quickstart — PM2.5 over a city: examples/airnow/quickstart.ipynb
+    - Air quality (EEA — Europe):
+      - Quickstart — PM2.5 for a country: examples/eea-aq/quickstart.ipynb
+    - Air quality (Sensor.Community — crowdsourced):
+      - Quickstart — PM over a city: examples/sensor-community/quickstart.ipynb
     - Server-side processing (openEO):
       - Catalog explorer (no network): examples/openeo/catalog_explorer.ipynb
       - Quickstart — Sentinel-2 NDVI monthly: examples/openeo/quickstart.ipynb

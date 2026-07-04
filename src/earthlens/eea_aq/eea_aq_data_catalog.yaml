@@ -1,0 +1,19 @@
+# EEA (European Environment Agency) pollutant dispatch table.
+#
+# The EEA download service (wrapped by `airbase`) filters by pollutant
+# *notation* (`poll=`), and the downloaded Parquet identifies each row's
+# pollutant by a numeric EEA vocabulary `code`. Users pass earthlens
+# pollutant names in `variables=[...]`; this table bridges name -> `poll`
+# notation (for the request) and code -> name (to label the Parquet rows).
+#
+# Like the OpenAQ / AirNow tables it is deliberately tiny and fixed (the
+# six criteria pollutants), so there is no refresh / probe / audit tooling
+# — adding a row is a hand-edit. `poll` and `code` verified live via
+# `airbase.AirbaseClient().search_pollutant(...)` (2026-07-03).
+pollutants:
+  pm25: { name: pm25, poll: "PM2.5", code: 6001, units: "ug.m-3", display_name: "PM2.5", group: particulate }
+  pm10: { name: pm10, poll: "PM10", code: 5, units: "ug.m-3", display_name: "PM10", group: particulate }
+  o3: { name: o3, poll: "O3", code: 7, units: "ug.m-3", display_name: "Ozone", group: criteria }
+  no2: { name: no2, poll: "NO2", code: 8, units: "ug.m-3", display_name: "Nitrogen dioxide", group: criteria }
+  so2: { name: so2, poll: "SO2", code: 1, units: "ug.m-3", display_name: "Sulphur dioxide", group: criteria }
+  co: { name: co, poll: "CO", code: 10, units: "mg.m-3", display_name: "Carbon monoxide", group: criteria }
