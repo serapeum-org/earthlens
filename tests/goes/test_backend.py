@@ -9,6 +9,7 @@ import pytest
 
 from earthlens.goes import GOES
 from earthlens.goes.backend import (
+    end_is_date_only,
     enumerate_hours,
     expand_bare_date_end,
     normalize_channel,
@@ -51,18 +52,37 @@ class TestEnumerateHours:
             enumerate_hours(dt.datetime(2026, 7, 3, 13), dt.datetime(2026, 7, 3, 12))
 
 
+class TestEndIsDateOnly:
+    """Tests for end_is_date_only."""
+
+    @pytest.mark.parametrize(
+        "end, expected",
+        [
+            ("2026-07-03", True),
+            ("2026-07-04 00:00", False),
+            ("2026-07-04 12:30", False),
+            ("2026-07-04T00:00:00", False),
+            (dt.date(2026, 7, 3), True),
+            (dt.datetime(2026, 7, 3), False),
+        ],
+    )
+    def test_detects_bare_date_from_input(self, end, expected):
+        """A bare date is date-only; an explicit time (even midnight) is not."""
+        assert end_is_date_only(end) is expected, f"{end!r} -> {expected}"
+
+
 class TestExpandBareDateEnd:
     """Tests for expand_bare_date_end."""
 
-    def test_midnight_expands_to_end_of_day(self):
-        """A bare-date (midnight) end bound expands to the last microsecond."""
-        expanded = expand_bare_date_end(dt.datetime(2026, 7, 3))
+    def test_date_only_expands_to_end_of_day(self):
+        """A date-only end bound expands to the last microsecond of the day."""
+        expanded = expand_bare_date_end(dt.datetime(2026, 7, 3), date_only=True)
         assert expanded == dt.datetime(2026, 7, 3, 23, 59, 59, 999999), "end of day"
 
-    def test_explicit_time_untouched(self):
-        """An end bound with an explicit time is returned unchanged."""
-        end = dt.datetime(2026, 7, 3, 12, 30)
-        assert expand_bare_date_end(end) == end, "non-midnight end left as-is"
+    def test_explicit_midnight_untouched(self):
+        """An explicit-midnight end bound is NOT expanded (M1 regression)."""
+        end = dt.datetime(2026, 7, 4)
+        assert expand_bare_date_end(end, date_only=False) == end, "midnight respected"
 
 
 class TestNormalizeChannel:
@@ -228,6 +248,14 @@ class TestSearch:
         planned = goes._search()
         assert len(planned) == 1, "a noon granule is inside the whole-day window"
         assert len(goes.time.dates) == 24, "the bare date enumerates all 24 hours"
+
+    def test_explicit_midnight_end_does_not_pull_next_day(self, make_goes):
+        """An explicit `HH:MM` end at midnight is a tight window, not a whole day."""
+        goes = make_goes(
+            start="2026-07-03 22:00", end="2026-07-04 00:00", fmt="%Y-%m-%d %H:%M"
+        )
+        assert goes.time.end_date == dt.datetime(2026, 7, 4, 0, 0), "midnight respected"
+        assert len(goes.time.dates) == 3, "22:00, 23:00, 00:00 — not the whole next day"
 
     def test_wide_window_warns(self, make_goes, patch_client):
         """A window wider than the threshold logs a many-round-trip warning (M2)."""
