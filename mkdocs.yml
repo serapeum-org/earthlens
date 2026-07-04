@@ -109,6 +109,7 @@ nav:
     - Command-line interface: reference/cli.md
   - Data Sources:
     - Supported providers: reference/providers.md
+    - Deferred providers: reference/deferred-providers.md
     - CHC (CHIRPS / CHIRTS / SPI / SPEI / …):
       - Introduction: reference/chc/introduction.md
       - Usage: reference/chc/usage.md
