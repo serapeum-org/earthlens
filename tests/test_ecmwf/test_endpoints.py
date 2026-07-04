@@ -258,3 +258,28 @@ class TestModernClient:
         sentinel = object()
         monkeypatch.setattr(cdsapi, "Client", lambda *a, **k: sentinel)
         assert ep.open_client("cds") is sentinel
+
+    def test_open_modern_client_missing_token_raises_auth_error(
+        self, monkeypatch, tmp_path
+    ):
+        """No resolvable token raises `AuthenticationError` (modern path)."""
+        _clear_cads_env(monkeypatch)
+        _home_without_dotfile(monkeypatch, tmp_path)
+        _install_fake_datastores(monkeypatch)
+        with pytest.raises(AuthenticationError):
+            ep.open_modern_client("ewds")
+
+    def test_open_modern_client_unknown_endpoint_raises_value_error(self, monkeypatch):
+        """An unknown endpoint slug raises `ValueError` before any import."""
+        monkeypatch.setenv("EARTHLENS_ECMWF_MODERN", "1")
+        with pytest.raises(ValueError, match="unknown ECMWF endpoint"):
+            ep.open_modern_client("mars")
+
+    def test_open_client_cds_flag_set_no_token_raises(self, monkeypatch, tmp_path):
+        """With the flag set, `open_client('cds')` resolves eagerly and raises."""
+        _clear_cads_env(monkeypatch)
+        _home_without_dotfile(monkeypatch, tmp_path)
+        monkeypatch.setenv("EARTHLENS_ECMWF_MODERN", "1")
+        _install_fake_datastores(monkeypatch)
+        with pytest.raises(AuthenticationError):
+            ep.open_client("cds")
