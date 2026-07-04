@@ -25,20 +25,27 @@ API is the [Reference](jaxa.md) page.
 * **`protocol: gportal`** — the raw G-Portal product(s) that match the
   request, fetched over SFTP into the output directory. File extensions
   are mission-dependent (HDF5 for SGLI/AMSR2, GeoTIFF for some L3, …).
+* **`protocol: ptree`** — raw Himawari-9 AHI HSD `.DAT.bz2` granules
+  from JAXA P-Tree over plain FTP. Ten segments per band per 10-minute
+  observation slot are downloaded and mirrored under
+  `out_dir/YYYYMM/DD/HH/`. Decode is deliberately out of scope
+  (`satpy` — tracked as pyramids `PY-2`).
 
-## The two protocols at a glance
+## The three protocols at a glance
 
-| Aspect | `jaxa-earth` | `gportal` |
-|---|---|---|
-| Authentication | none | free G-Portal account |
-| SDK | `jaxa.earth >=0.1.6,<0.2` | `gportal >=0.4,<0.5` |
-| Protocol | HTTPS (STAC + COG) | SFTP (`ftp.gportal.jaxa.jp:2051`) |
-| Catalog size | 118 STAC collections | 799 numeric dataset IDs |
-| Output | per-band GeoTIFFs (north-up) | raw product files |
-| `aggregate=` | not supported (deferred) | not supported |
+| Aspect | `jaxa-earth` | `gportal` | `ptree` |
+|---|---|---|---|
+| Authentication | none | free G-Portal account | free P-Tree account (separate from G-Portal) |
+| SDK | `jaxa.earth >=0.1.6,<0.2` | `gportal >=0.4,<0.5` | stdlib `ftplib` — no extra dep |
+| Protocol | HTTPS (STAC + COG) | SFTP (`ftp.gportal.jaxa.jp:2051`) | FTP (`ftp.ptree.jaxa.jp:21`) |
+| Catalog size | 118 STAC collections | 799 numeric dataset IDs | 1 curated product (Himawari HSD FLDK) |
+| Output | per-band GeoTIFFs (north-up) | raw product files | raw HSD `.DAT.bz2` segments (10 per band per 10-min slot) |
+| Cadence / window | catalog-driven | catalog-driven | 10-min, last 30 days only |
+| `aggregate=` | not supported (deferred) | not supported | not supported |
 
-Mixing keys from both protocols in **one** `JAXA(...)` call is rejected —
-the file shapes and concurrency profiles differ; issue two calls.
+Mixing keys from more than one protocol in **one** `JAXA(...)` call is
+rejected — the file shapes and concurrency profiles differ; issue one
+call per protocol.
 
 ## Catalog highlights
 

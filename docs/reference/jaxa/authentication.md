@@ -1,10 +1,14 @@
 # JAXA — authentication
 
-JAXA's archive is reached through two protocols, only one of which needs
-credentials. The `jaxa-earth` half (the official `jaxa.earth` API over
-STAC + COG) is **authless** — `JaxaAuth.configure()` is a no-op for it.
-The `gportal` half (G-Portal mission archive over SFTP) needs a free
-JAXA G-Portal account.
+JAXA's archive is reached through three protocols. The `jaxa-earth` half
+(the official `jaxa.earth` API over STAC + COG) is **authless** —
+`JaxaAuth.configure()` is a no-op for it. The other two need free JAXA
+accounts:
+
+- **G-Portal** — mission archive over SFTP (SGLI, AMSR2, ALOS, GPM, …).
+- **P-Tree** — near-real-time Himawari-8/9 HSD granules over FTP (30-day
+  rolling archive). Registration is **separate from G-Portal** — the
+  two accounts do not share credentials.
 
 ## 1. Register a free G-Portal account
 
@@ -83,11 +87,66 @@ empty auth.
 
 ## 4. CI secret pattern
 
-Store the two credentials as CI secrets (e.g. GitHub Actions
-repository secrets `GPORTAL_USERNAME` / `GPORTAL_PASSWORD`) and export
-them into the job environment. The backend picks them up via the
-env-var path with no code change. The gated live e2e tests under
-`pytest -m "jaxa and e2e"` skip cleanly when either is absent.
+Store the credentials as CI secrets (e.g. GitHub Actions repository
+secrets `GPORTAL_USERNAME` / `GPORTAL_PASSWORD` and, for P-Tree,
+`JAXA_PTREE_USERNAME` / `JAXA_PTREE_PASSWORD`) and export them into the
+job environment. The backend picks them up via the env-var path with no
+code change. The gated live e2e tests under
+`pytest -m "jaxa and e2e"` skip cleanly when either pair is absent.
+
+## 4a. Register a free P-Tree account (Himawari)
+
+- Sign up at <https://www.eorc.jaxa.jp/ptree/registration_top.html>.
+  The form asks for a name, email (**this becomes your username**),
+  organisation, country, and purpose of use.
+- JAXA emails a confirmation link; the account is not usable until you
+  click it.
+- **Registration is separate from G-Portal.** The two accounts have
+  distinct credential pairs; never reuse `GPORTAL_USERNAME` /
+  `GPORTAL_PASSWORD` for P-Tree.
+
+## 4b. Supply the P-Tree credentials
+
+`JaxaAuth.configure()` resolves them in this order for the `ptree`
+protocol:
+
+1. **Explicit kwargs** to `EarthLens(...)` / `JAXA(...)`:
+   `ptree_username=` and `ptree_password=`.
+2. **Environment variables** `JAXA_PTREE_USERNAME` and
+   `JAXA_PTREE_PASSWORD`.
+
+Missing credentials raise
+:class:`earthlens.jaxa.AuthenticationError` naming both env vars and
+the registration URL. Live probe (2026-07-04) confirmed the archive
+still serves plain FTP on `ftp.ptree.jaxa.jp:21`, so `paramiko` is
+not required.
+
+```python
+from earthlens import EarthLens
+
+EarthLens(
+    data_source="jaxa",
+    variables=["himawari-ahi-fldk"],
+    ptree_username="alice@example.org",
+    ptree_password="...",
+    start="2026-07-03", end="2026-07-03",
+    lat_lim=[0.0, 40.0], lon_lim=[120.0, 150.0],
+    path="./out",
+).download()
+```
+
+## 4c. P-Tree scope & licence
+
+- **Retention.** P-Tree ships the **last 30 days** of HSD granules only.
+  Requests further back raise :class:`earthlens.jaxa._ptree.RetentionError`
+  before the FTP call — no cryptic `450 No such file or directory`.
+- **Licence.** Since **2026-02-01** P-Tree data (including HSD) is
+  available for **commercial use**; attribution per the
+  [Terms of Use](https://www.eorc.jaxa.jp/ptree/terms.html). Before
+  that date the same data was restricted to non-profit /
+  research / education.
+- **Decode is out of scope.** The backend ships the raw `.DAT.bz2`
+  segments. HSD → arrays is `satpy`, tracked as **pyramids PY-2**.
 
 ## 5. JAXA Earth API (no credentials)
 
