@@ -119,6 +119,16 @@ class TestShapeFrame:
         out = shape_frame(self._raw(), "Verified", {123: "xx"})
         assert out.empty and "country" in out.columns
 
+    def test_no_matching_code_logs_drift_diagnostic(self):
+        """A non-empty Parquet matching no code logs a distinct drift warning."""
+        from loguru import logger
+
+        messages: list[str] = []
+        sink = logger.add(lambda m: messages.append(m.record["message"]), level="WARNING")
+        shape_frame(self._raw(), "Verified", {123: "xx"})  # no code matches
+        logger.remove(sink)
+        assert any("schema drift" in message.lower() for message in messages)
+
 
 @pytest.mark.eea
 def test_empty_frame_schema():

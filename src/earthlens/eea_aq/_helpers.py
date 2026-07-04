@@ -22,6 +22,7 @@ import asyncio
 from typing import Any
 
 import pandas as pd
+from loguru import logger
 
 #: Approximate WGS84 bounding boxes `(lon_min, lat_min, lon_max, lat_max)`
 #: for the EEA reporting countries (EU-27 + EFTA + Western Balkans + Turkey
@@ -208,6 +209,16 @@ def shape_frame(
         return empty_frame()
     keep = raw[raw["Pollutant"].isin(code_to_name)].copy()
     if keep.empty:
+        # Non-empty Parquet whose codes miss every requested pollutant is
+        # usually an upstream `Pollutant`-column type/vocabulary drift (the
+        # catalog codes are integers); surface a distinct diagnostic rather
+        # than a silent empty frame so it is not mistaken for "no data".
+        observed = sorted(set(raw["Pollutant"].tolist()))[:10]
+        logger.warning(
+            f"EEA reshape: {len(raw)} Parquet row(s) but none matched the "
+            f"requested pollutant code(s) {sorted(code_to_name)}; observed "
+            f"Pollutant value(s) {observed}. Possible airbase schema drift."
+        )
         return empty_frame()
     out = pd.DataFrame(index=keep.index)
     out["station_id"] = keep["Samplingpoint"].astype("object")
