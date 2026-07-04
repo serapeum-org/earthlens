@@ -304,12 +304,13 @@ class EarthLens:
              'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
              'global-forest-watch', 'global-solar-atlas',
              'global-wind-atlas', 'google-earth-engine', 'gsa', 'gwa',
-             'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
-             'isric', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
+             'hdx', 'himawari', 'human-settlement', 'inform', 'insar',
+             'ioos', 'isric', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
              'national-water-model', 'natural-earth', 'nexrad', 'nrel',
              'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'ohsome', 'openaq',
              'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
-             'planetary-computer', 'protected-planet', 'pvgis', 'radar',
+             'planetary-computer', 'protected-planet', 'ptree',
+             'pvgis', 'radar',
              'redlist', 'rgi', 'risk-indicators', 'sensor-community',
              'sentinel-hub',
              'sentinelhub', 'soilgrids', 'solar-pv', 'solar-wind-atlas',
@@ -631,14 +632,21 @@ class EarthLens:
             "protected-planet": ("earthlens.wdpa", "WDPA", "", {}),
             "iucn": ("earthlens.iucn", "IUCN", "", {}),
             "redlist": ("earthlens.iucn", "IUCN", "", {}),
-            # JAXA archive over two protocols: authless `jaxa-earth` (STAC +
-            # COG via the official jaxa.earth API) and credentialed
-            # `gportal` (G-Portal SFTP via the community gportal SDK).
-            # Per-dataset routing — the catalog's `protocol:` field picks
-            # the branch. `OUTPUT_KIND="raster"`.
+            # JAXA archive over three protocols: authless `jaxa-earth`
+            # (STAC + COG via the official jaxa.earth API), credentialed
+            # `gportal` (G-Portal SFTP via the community gportal SDK), and
+            # credentialed `ptree` (Himawari-8/9 HSD via plain FTP with
+            # stdlib ftplib). Per-dataset routing — the catalog's
+            # `protocol:` field picks the branch. `OUTPUT_KIND="raster"`.
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            # ptree / himawari are unambiguously the stdlib-`ftplib`
+            # branch, so their `extras` slot is empty — a failed import
+            # here won't misdirect a user to `pip install
+            # earthlens[jaxa]` for a branch that never needed it.
+            "ptree": ("earthlens.jaxa", "JAXA", "", {}),
+            "himawari": ("earthlens.jaxa", "JAXA", "", {}),
             # Argo autonomous-float ocean profiles via the `argopy` SDK
             # (open data, no auth). `OUTPUT_KIND="tabular"` — a long-format
             # DataFrame of profiles. The `"argo"` key is canonical; the

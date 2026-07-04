@@ -1,0 +1,29 @@
+# Himawari-8/9 AHI HSD granules from JAXA P-Tree (protocol: ptree).
+#
+# Hand-curated. The P-Tree archive serves a single product family — HSD
+# full-disk L1 imagery — with per-band resolution and 10 fixed segments
+# per band per 10-minute slot. That structure is baked into the
+# `_ptree` fetch branch's `_HIMAWARI_BAND_RESOLUTION` map so the catalog
+# stays small: one row per friendly preset, band selection is passed
+# through the `bands=` kwarg on `JAXA(...)`.
+#
+# Licence: since 2026-02-01 P-Tree data (including commercial use) —
+# attribution per https://www.eorc.jaxa.jp/ptree/terms.html.
+# Retention: rolling 30 days.
+# Cadence: 10 minutes (observation-start time, UTC).
+# Extent: full disk from Himawari-9 at 140.7 deg E geostationary.
+# Decode: HSD -> arrays is `satpy` (pyramids PY-2); this backend ships
+# the raw `.DAT.bz2` granules and does not decode them.
+
+datasets:
+  himawari-ahi-fldk:
+    protocol: ptree
+    short_name: himawari-ahi-fldk
+    default_band: B03
+    aliases:
+    - himawari
+    - himawari-9
+    - ahi
+    - ahi-fldk
+    - himawari-visible
+    description: Himawari-9 AHI HSD L1 full-disk 10-min imagery (B03 visible default; pass bands=[B01..B16])

@@ -1200,24 +1200,28 @@ def _chc_ftp_bases(catalog: Any) -> list[str]:
 
 
 def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every live JAXA dataset id from both protocols.
+    """List every live JAXA dataset id from all three protocols.
 
     Walks the two SDKs' authoritative listings: `jaxa.earth`'s STAC
     catalog (118 COG collections at A1 capture time) for the
     `jaxa-earth` group, and `gportal.datasets()` (799 numeric dataset
-    ids at A1 capture time) for the `gportal` group. The result feeds
-    `earthlens datasets refresh jaxa` so a curator can diff the
-    bundled YAML against the live universes.
+    ids at A1 capture time) for the `gportal` group. The `ptree` group
+    is derived **live** from the bundled JAXA catalog's `ptree` rows
+    (their `short_name` field) — P-Tree has no discoverable listing
+    endpoint, so the local catalog is the authoritative source; a
+    curator adding a new `protocol: ptree` row therefore reaches
+    `_index.yaml` automatically on the next `refresh --write`.
 
     Args:
-        catalog: The loaded JAXA `Catalog` (unused; the SDKs are the
-            authoritative sources).
+        catalog: The loaded JAXA `Catalog`. Used to derive the `ptree`
+            group; the `jaxa-earth` and `gportal` groups still come
+            from the SDKs.
 
     Returns:
-        Two-group mapping:
-        `{"jaxa-earth": [STAC collection ids], "gportal": [numeric ids]}`.
+        Three-group mapping:
+        `{"jaxa-earth": [STAC collection ids], "gportal": [numeric
+        ids], "ptree": [product tokens]}`.
     """
-    del catalog
     from jaxa.earth import je as _je  # type: ignore[import-not-found]
     import gportal as _gportal  # type: ignore[import-not-found]
 
@@ -1232,9 +1236,14 @@ def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
             stack.extend(node.values())
         elif isinstance(node, list):
             gp_ids.extend(str(x) for x in node)
+    ptree_ids = sorted({
+        row.short_name for row in catalog.datasets.values()
+        if row.protocol == "ptree" and row.short_name
+    })
     return {
         "jaxa-earth": sorted(set(str(c) for c in je_ids)),
         "gportal": sorted(set(gp_ids)),
+        "ptree": ptree_ids,
     }
 
 
@@ -1641,9 +1650,12 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "worldpop": _write_worldpop,
     "openaq": _write_openaq,
     # JAXA's catalog YAML carries an `available_datasets:` block that lists
-    # every live id across both protocols (jaxa-earth + gportal). The
-    # flatten=True path unions the two protocol groups into a single sorted
-    # list; the curated `datasets:` block stays hand-authored.
+    # every live id across all three protocols (jaxa-earth + gportal +
+    # ptree). The flatten=True path unions the three protocol groups
+    # into a single sorted list; the curated `datasets:` block stays
+    # hand-authored. The `ptree` group is derived from the catalog's
+    # ptree rows (see `_jaxa_grouped`) since P-Tree has no discoverable
+    # listing endpoint of its own.
     "jaxa": _index_writer("available_datasets"),
     # ERDDAP's `_index.yaml` carries an `available_datasets:` block listing
     # every dataset id across the curated servers; the flatten path unions

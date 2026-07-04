@@ -75,9 +75,98 @@ def test_missing_gportal_credentials_raise(monkeypatch) -> None:
 @pytest.mark.jaxa
 @pytest.mark.unit
 def test_unknown_protocol_rejected() -> None:
-    """`JaxaAuth(protocol=...)` rejects a protocol that's not one of the two."""
-    with pytest.raises(ValueError, match="must be 'jaxa-earth' or 'gportal'"):
-        JaxaAuth(JaxaCredentials(), protocol="ptree")  # type: ignore[arg-type]
+    """`JaxaAuth(protocol=...)` rejects a protocol not in the supported set."""
+    with pytest.raises(ValueError, match="'jaxa-earth', 'gportal', 'ptree'"):
+        JaxaAuth(JaxaCredentials(), protocol="nonsense")  # type: ignore[arg-type]
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_ptree_credentials_from_explicit_kwargs(monkeypatch) -> None:
+    """Explicit ptree_username/password are stored on the auth object."""
+    monkeypatch.delenv("JAXA_PTREE_USERNAME", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_PASSWORD", raising=False)
+    auth = JaxaAuth(
+        JaxaCredentials(
+            ptree_username="alice@example.org",
+            ptree_password=SecretStr("pytest-fixture-not-a-real-pw"),
+        ),
+        protocol="ptree",
+    )
+    auth.configure()
+    assert auth.username == "alice@example.org"
+    assert auth.password is not None
+    assert auth.password.get_secret_value() == "pytest-fixture-not-a-real-pw"
+    assert auth.is_authenticated()
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_ptree_credentials_from_environment(monkeypatch) -> None:
+    """The ptree protocol reads its own JAXA_PTREE_* env fallback."""
+    monkeypatch.setenv("JAXA_PTREE_USERNAME", "env-user@example.org")
+    monkeypatch.setenv("JAXA_PTREE_PASSWORD", "pytest-fixture-env-not-real")
+    auth = JaxaAuth(JaxaCredentials(), protocol="ptree")
+    auth.configure()
+    assert auth.username == "env-user@example.org"
+    assert auth.password is not None
+    assert auth.password.get_secret_value() == "pytest-fixture-env-not-real"
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_ptree_missing_credentials_raise(monkeypatch) -> None:
+    """The ptree branch raises with a P-Tree-specific message when creds are absent."""
+    monkeypatch.delenv("JAXA_PTREE_USERNAME", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_PASSWORD", raising=False)
+    auth = JaxaAuth(JaxaCredentials(), protocol="ptree")
+    with pytest.raises(AuthenticationError, match="JAXA_PTREE_USERNAME"):
+        auth.configure()
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_ptree_error_names_registration_url(monkeypatch) -> None:
+    """The ptree error message points at the P-Tree registration URL."""
+    monkeypatch.delenv("JAXA_PTREE_USERNAME", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_PASSWORD", raising=False)
+    auth = JaxaAuth(JaxaCredentials(), protocol="ptree")
+    with pytest.raises(AuthenticationError, match=r"eorc\.jaxa\.jp/ptree"):
+        auth.configure()
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_ptree_and_gportal_use_separate_credential_pairs(monkeypatch) -> None:
+    """P-Tree creds on the credentials object do not satisfy the gportal branch."""
+    monkeypatch.delenv("GPORTAL_USERNAME", raising=False)
+    monkeypatch.delenv("GPORTAL_PASSWORD", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_USERNAME", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_PASSWORD", raising=False)
+    creds = JaxaCredentials(
+        ptree_username="alice@example.org",
+        ptree_password=SecretStr("pytest-fixture-not-a-real-pw"),
+    )
+    auth = JaxaAuth(creds, protocol="gportal")
+    with pytest.raises(AuthenticationError, match="GPORTAL_USERNAME"):
+        auth.configure()
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_gportal_credentials_do_not_satisfy_ptree_branch(monkeypatch) -> None:
+    """The reverse direction — G-Portal creds on the object do not satisfy ptree."""
+    monkeypatch.delenv("GPORTAL_USERNAME", raising=False)
+    monkeypatch.delenv("GPORTAL_PASSWORD", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_USERNAME", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_PASSWORD", raising=False)
+    creds = JaxaCredentials(
+        gportal_username="alice",
+        gportal_password=SecretStr("pytest-fixture-not-a-real-pw"),
+    )
+    auth = JaxaAuth(creds, protocol="ptree")
+    with pytest.raises(AuthenticationError, match="JAXA_PTREE_USERNAME"):
+        auth.configure()
 
 
 @pytest.mark.jaxa

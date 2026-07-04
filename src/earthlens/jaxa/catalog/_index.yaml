@@ -1,8 +1,9 @@
 # Available-id index for the JAXA backend.
 # Refreshed by `earthlens datasets refresh jaxa --write`; combines
-# jaxa.earth STAC collection names with G-Portal numeric dataset ids.
-# The curated `datasets:` rows live in the sibling per-mission YAMLs;
-# this index is purely for discoverability.
+# jaxa.earth STAC collection names with G-Portal numeric dataset ids
+# and P-Tree Himawari product tokens. The curated `datasets:` rows
+# live in the sibling per-mission YAMLs; this index is purely for
+# discoverability.
 
 available_datasets:
 - '10001000'
@@ -923,3 +924,4 @@ available_datasets:
 - NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_monthly-normal
 - NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.daytime.v061_global_monthly
 - NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.nighttime.v061_global_monthly
+- himawari-ahi-fldk

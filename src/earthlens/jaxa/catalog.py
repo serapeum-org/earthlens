@@ -9,11 +9,13 @@ catalog. The catalog ships as a directory of per-mission YAML files at
 `gee` and `ecmwf` siblings.
 
 Each catalog row is a `Dataset` carrying a `protocol` discriminator
-(`"jaxa-earth"` or `"gportal"`) plus the protocol-specific identifier
-— a `jaxa.earth` STAC collection name for the former or a G-Portal
-numeric dataset id for the latter. The catalog's `by_protocol(...)`
-view + dataset-level validator together let the backend route a request
-to the right SDK branch without re-parsing the YAML at every fetch.
+(`"jaxa-earth"`, `"gportal"`, or `"ptree"`) plus the protocol-specific
+identifier — a `jaxa.earth` STAC collection name for `"jaxa-earth"`, a
+G-Portal numeric dataset id for `"gportal"`, or a P-Tree product token
+(e.g. `"himawari-ahi-fldk"`) for `"ptree"`. The catalog's
+`by_protocol(...)` view + dataset-level validator together let the
+backend route a request to the right branch without re-parsing the
+YAML at every fetch.
 
 The aliases map is a separate small index resolved by :meth:`Catalog.resolve`,
 giving every dataset a friendly key (``"elevation"`` → ``"aw3d30"``) on top
@@ -30,7 +32,7 @@ from __future__ import annotations
 import difflib
 import re
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -79,35 +81,48 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-JaxaProtocol = Literal["jaxa-earth", "gportal"]
+#: Re-exported so a reader of `catalog.py`'s `Dataset` model can import
+#: the discriminator type from the same module. The single source of
+#: truth lives in :mod:`earthlens.jaxa.auth` so a new credentialed
+#: protocol only needs to grow the Literal in one place.
+from earthlens.jaxa.auth import JaxaProtocol  # noqa: E402  (re-export)
 
 
 class Dataset(BaseModel):
     """One JAXA dataset row.
 
     The row's `protocol` field is the discriminator the backend dispatches
-    on (`_jaxa_earth.py` vs `_gportal.py`). The cross-field validator
-    enforces that the right identifier is present for each protocol:
+    on (`_jaxa_earth.py` vs `_gportal.py` vs `_ptree.py`). The cross-field
+    validator enforces that the right identifier is present for each
+    protocol:
 
     * `protocol="jaxa-earth"` requires `collection` (the STAC collection
       name the `jaxa.earth` API consumes, e.g.
       `"JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global"`).
     * `protocol="gportal"` requires `short_name` (the G-Portal numeric
       dataset id, e.g. `"10003001"`).
+    * `protocol="ptree"` requires `short_name` (the P-Tree product
+      token, e.g. `"himawari-ahi-fldk"`).
 
     Attributes:
         key: Canonical catalog key (`"aw3d30"`) — repeated on the row so it
             travels with the object outside the catalog dict.
-        protocol: One of `"jaxa-earth"` or `"gportal"`.
+        protocol: One of `"jaxa-earth"`, `"gportal"`, or `"ptree"`.
         collection: STAC collection name. Required when
-            `protocol="jaxa-earth"`; must be `None` for `gportal`.
-        short_name: G-Portal numeric dataset id (string). Required when
-            `protocol="gportal"`; must be `None` for `jaxa-earth`.
-        default_band: For `jaxa-earth`, the band selected when the user
-            does not pass `bands=`. Ignored for `gportal` (G-Portal
-            products are downloaded whole).
+            `protocol="jaxa-earth"`; must be `None` for `gportal` and
+            `ptree`.
+        short_name: Protocol-specific product identifier — a G-Portal
+            numeric dataset id (e.g. `"10003001"`) for `gportal`, or a
+            P-Tree product token (e.g. `"himawari-ahi-fldk"`) for
+            `ptree`. Required for both credentialed protocols; must be
+            `None` for `jaxa-earth`.
+        default_band: The band selected when the user does not pass
+            `bands=`. Used by `jaxa-earth` (picks the GeoTIFF band to
+            write) and `ptree` (picks which Himawari AHI band to
+            download from `B01`..`B16`). Ignored for `gportal`
+            (G-Portal products are downloaded whole).
         aliases: Friendly keys that resolve to this row's canonical key
-            (e.g. ``["elevation", "dem"]`` for ``"aw3d30"``).
+            (e.g. `["elevation", "dem"]` for `"aw3d30"`).
         description: Human-readable summary used in docs.
 
     Examples:
@@ -150,8 +165,11 @@ class Dataset(BaseModel):
 
         Raises:
             ValueError: If a `jaxa-earth` row has no `collection`, or a
-                `gportal` row has no `short_name`, or either row sets the
-                identifier belonging to the other protocol.
+                credentialed (`gportal` / `ptree`) row has no
+                `short_name`, or the row sets the identifier belonging
+                to the other side (a `jaxa-earth` row with a
+                `short_name`, or a credentialed row with a
+                `collection`).
         """
         if self.protocol == "jaxa-earth":
             if not self.collection:
@@ -162,18 +180,21 @@ class Dataset(BaseModel):
             if self.short_name is not None:
                 raise ValueError(
                     f"dataset {self.key!r} has protocol='jaxa-earth'; "
-                    "`short_name` belongs to the gportal protocol — drop it."
+                    "`short_name` belongs to a credentialed protocol "
+                    "(gportal/ptree) — drop it."
                 )
         else:
             if not self.short_name:
                 raise ValueError(
-                    f"dataset {self.key!r} has protocol='gportal' but no "
-                    "`short_name` (the G-Portal numeric dataset id) — set it."
+                    f"dataset {self.key!r} has protocol={self.protocol!r} "
+                    "but no `short_name` (the protocol's product identifier) "
+                    "— set it."
                 )
             if self.collection is not None:
                 raise ValueError(
-                    f"dataset {self.key!r} has protocol='gportal'; "
-                    "`collection` belongs to the jaxa-earth protocol — drop it."
+                    f"dataset {self.key!r} has protocol={self.protocol!r}; "
+                    "`collection` belongs to the jaxa-earth protocol "
+                    "— drop it."
                 )
         return self
 
@@ -217,9 +238,10 @@ class Catalog(AbstractCatalog):
         in tests). Either way the `aliases` map is derived from the loaded
         rows. `available_datasets` is populated from the YAML's optional
         `available_datasets:` block (the refresh CLI's `--write` target —
-        an informational index of every live SDK id across both protocols)
-        or, when that block is absent, defaults to the sorted curated keys
-        so the dict-like surface (`len(cat)` etc.) still works.
+        an informational index of every live SDK id across all three
+        protocols) or, when that block is absent, defaults to the sorted
+        curated keys so the dict-like surface (`len(cat)` etc.) still
+        works.
         """
         if not self.datasets:
             loaded = Catalog.load()
@@ -444,20 +466,23 @@ class Catalog(AbstractCatalog):
         """Return canonical keys whose `protocol` matches `protocol`.
 
         Args:
-            protocol: Either `"jaxa-earth"` or `"gportal"`.
+            protocol: One of `"jaxa-earth"`, `"gportal"`, or `"ptree"`.
 
         Returns:
             list[str]: Sorted canonical keys filtered by protocol.
 
         Examples:
-            - The bundled catalog ships both protocols; `aw3d30` is jaxa-earth
-              and `sgli-l3-nwlr` is gportal:
+            - The bundled catalog ships all three protocols; `aw3d30` is
+              jaxa-earth, `sgli-l3-nwlr` is gportal, and
+              `himawari-ahi-fldk` is ptree:
                 ```python
                 >>> from earthlens.jaxa import Catalog
                 >>> cat = Catalog()
                 >>> "aw3d30" in cat.by_protocol("jaxa-earth")
                 True
                 >>> "sgli-l3-nwlr" in cat.by_protocol("gportal")
+                True
+                >>> "himawari-ahi-fldk" in cat.by_protocol("ptree")
                 True
 
                 ```

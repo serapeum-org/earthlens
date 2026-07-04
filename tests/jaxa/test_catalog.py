@@ -29,7 +29,9 @@ def test_jaxa_earth_row_requires_collection() -> None:
 @pytest.mark.unit
 def test_jaxa_earth_row_rejects_short_name() -> None:
     """A jaxa-earth row that also sets `short_name` raises."""
-    with pytest.raises(ValidationError, match="belongs to the gportal protocol"):
+    with pytest.raises(
+        ValidationError, match="belongs to a credentialed protocol",
+    ):
         Dataset(
             key="aw3d30",
             protocol="jaxa-earth",
