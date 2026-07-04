@@ -68,6 +68,11 @@ if TYPE_CHECKING:
 #: many-round-trip surprise before the download even starts.
 WIDE_WINDOW_HOURS = 720
 
+#: Extracts the ABI channel from a band-split granule name's `-M<mode>C<nn>_`
+#: field (e.g. `OR_ABI-L1b-RadC-M6C02_G19_…` → `02`). Anchored on the mode
+#: digit so `C02` is never confused with `C12` / `C20`.
+_CHANNEL_IN_NAME = re.compile(r"-M\dC(\d{2})_")
+
 
 def enumerate_hours(start: dt.datetime, end: dt.datetime) -> list[dt.datetime]:
     """Enumerate the hour buckets spanning `[start, end]` inclusive.
@@ -348,8 +353,9 @@ class GOES(AbstractDataSource):
         * **Mesoscale subsector** — the `M1` / `M2` domains share one
           `...M` prefix, so keep only keys whose basename carries the
           product's `...M1` / `...M2` token.
-        * **Channel** — for a band-split product with `variables=`, keep
-          only keys whose ABI channel (`C02_G…`) was requested.
+        * **Channel** — for a band-split product with `variables=`, parse
+          the ABI channel out of the filename's `-M<mode>C<nn>_` field and
+          keep only keys whose channel was requested.
 
         Args:
             key: A listed S3 key.
@@ -363,7 +369,8 @@ class GOES(AbstractDataSource):
             if token not in name:
                 return False
         if self._channels:
-            if not any(f"{channel}_G" in name for channel in self._channels):
+            match = _CHANNEL_IN_NAME.search(name)
+            if match is None or f"C{match.group(1)}" not in self._channels:
                 return False
         return True
 

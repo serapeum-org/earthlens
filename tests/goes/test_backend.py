@@ -180,6 +180,19 @@ class TestSearch:
             "C01 is filtered out; only the requested C02 remains"
         )
 
+    def test_channel_filter_disambiguates_c02_from_c12(self, make_goes, patch_client):
+        """The channel filter matches C02 exactly, never C12 / C20 (L1)."""
+        goes = make_goes(dataset="abi-l1b-rad", domain="C", variables=["C02"])
+        keys = [
+            f"{HOUR_RAD}OR_ABI-L1b-RadC-M6C02_G19_s20261841201180_e1_c1.nc",
+            f"{HOUR_RAD}OR_ABI-L1b-RadC-M6C12_G19_s20261841201180_e1_c1.nc",
+        ]
+        patch_client(goes, FakeS3(pages={HOUR_RAD: keys}))
+        planned = [p.id for p in goes._search()]
+        assert planned == ["OR_ABI-L1b-RadC-M6C02_G19_s20261841201180_e1_c1.nc"], (
+            "C12 must not be matched when C02 is requested"
+        )
+
     def test_combined_product_variables_not_filtered(self, make_goes, patch_client):
         """A combined product ignores variables and keeps the whole granule."""
         goes = make_goes(dataset="abi-l2-mcmip", variables=["CMI_C13"])
