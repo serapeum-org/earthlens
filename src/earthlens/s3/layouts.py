@@ -195,15 +195,22 @@ def _payer(request_payer: bool) -> dict[str, str]:
 
 def _list_keys(
     client: Any, bucket: str, prefix: str, request_payer: bool = False
-) -> list[str]:
-    """List object keys under `prefix` (paginated)."""
-    keys: list[str] = []
+) -> list[tuple[str, int]]:
+    """List `(object key, size in bytes)` under `prefix` (paginated).
+
+    Zero-size objects (directory placeholders) are skipped. The size is
+    carried alongside the key so callers can record it on the planned
+    product for the cross-region egress warning, at no extra request.
+    """
+    keys: list[tuple[str, int]] = []
     paginator = client.get_paginator("list_objects_v2")
     for page in paginator.paginate(
         Bucket=bucket, Prefix=prefix, **_payer(request_payer)
     ):
         keys.extend(
-            obj["Key"] for obj in page.get("Contents", []) if obj.get("Size", 0)
+            (obj["Key"], obj["Size"])
+            for obj in page.get("Contents", [])
+            if obj.get("Size", 0)
         )
     return keys
 
@@ -235,7 +242,7 @@ def _era5_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
         for year, month in _year_months(dates):
             prefix = f"{stream}/{year}{month:02d}/"
             token = f".{var.native}."
-            for key in _list_keys(
+            for key, size in _list_keys(
                 client, dataset.bucket, prefix, dataset.requester_pays
             ):
                 if token in key.rsplit("/", 1)[-1] and key.endswith(".nc"):
@@ -248,6 +255,7 @@ def _era5_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
                                 "variable": var.native,
                                 "year": year,
                                 "month": month,
+                                "size_bytes": size,
                             },
                         )
                     )
@@ -316,12 +324,12 @@ def _goes_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
             continue
         # One frame per day: the first frame of the first hour. The day has many
         # frames (every ~10-15 min); the rest are intentionally not planned.
-        keys = _list_keys(
-            client, dataset.bucket, hour_prefixes[0], dataset.requester_pays
+        sizes = dict(
+            _list_keys(client, dataset.bucket, hour_prefixes[0], dataset.requester_pays)
         )
         for var in variables:
             token = f"{var.native}_G"
-            match = next((k for k in keys if token in k.rsplit("/", 1)[-1]), None)
+            match = next((k for k in sizes if token in k.rsplit("/", 1)[-1]), None)
             if match is not None:
                 logger.info(
                     f"goes: selected frame {match.rsplit('/', 1)[-1]} for "
@@ -336,6 +344,7 @@ def _goes_products(dataset, variables, bbox, dates, client) -> list[RemoteProduc
                             "variable": var.native,
                             "year": date.year,
                             "doy": doy,
+                            "size_bytes": sizes[match],
                         },
                     )
                 )

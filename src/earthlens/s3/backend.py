@@ -36,6 +36,7 @@ from earthlens.base import (
     TemporalExtent,
     crop_to_aoi,
     to_datetime,
+    warn_if_egress,
 )
 from earthlens.s3.auth import S3Auth, S3Credentials
 from earthlens.s3.catalog import Catalog, Dataset
@@ -315,6 +316,7 @@ class S3(AbstractDataSource):
         """
         client = self._auth.client()
         raw_dir = self._raw_dir()
+        self._warn_cross_region_egress(products)
         written: list[Path] = []
         missing = 0
         for product in tqdm(products, desc="amazon-s3", disable=not products):
@@ -329,6 +331,34 @@ class S3(AbstractDataSource):
                 "request; check the bbox / date window / variables."
             )
         return written
+
+    def _warn_cross_region_egress(self, products: list[RemoteProduct]) -> None:
+        """Warn once before a large cross-region pull, when sizes are known.
+
+        Sums the object sizes the listing already recorded on the planned
+        products (`size_bytes` metadata) and defers to
+        `earthlens.base.region.warn_if_egress`: it emits a single warning
+        only when the caller runs outside the bucket's region and the
+        total exceeds the default threshold. Datasets whose keys are
+        planned deterministically (no listing, no known size) contribute
+        nothing and never warn. The warning is advisory — the download
+        proceeds unchanged.
+
+        `probe=False` keeps this advisory check off the network: the
+        caller region is taken from `AWS_REGION` / `AWS_DEFAULT_REGION`
+        only, so a warning never blocks the first download on the
+        instance-metadata probe chain (matching earthdata's re-point).
+
+        Args:
+            products: The planned products about to be fetched.
+        """
+        known = [
+            product.metadata["size_bytes"]
+            for product in products
+            if "size_bytes" in product.metadata
+        ]
+        if known:
+            warn_if_egress(self._dataset.region, size_bytes=sum(known), probe=False)
 
     def _localise(self, raw: Path, product: RemoteProduct) -> Path:
         """Crop a downloaded granule to the AOI and write it.

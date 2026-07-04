@@ -134,6 +134,20 @@ class TestThrottledGet:
                 monotonic=lambda: 0.0,
             )
 
+    def test_exhausted_429_error_omits_the_api_key(self):
+        """The persistent-429 HTTPError never embeds the api_key-bearing URL."""
+        session = FakeSession(FakeResponse(status_code=429))
+        with pytest.raises(requests.HTTPError) as excinfo:
+            h.throttled_get(
+                session,
+                "https://developer.nrel.gov/api/x?api_key=SUPERSECRETKEY",
+                last_call=[0.0],
+                max_retries=2,
+                sleep=lambda s: None,
+                monotonic=lambda: 0.0,
+            )
+        assert "SUPERSECRETKEY" not in str(excinfo.value)
+
 
 class TestParseCsv:
     """Tests for `parse_psm3_csv` and the header-offset detector."""

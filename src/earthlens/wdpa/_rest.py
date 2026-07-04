@@ -28,9 +28,9 @@ from typing import Any
 import geopandas as gpd
 import pandas as pd
 import requests
-from loguru import logger
 from shapely.geometry import shape
 
+from earthlens.base.http import HttpClient
 from earthlens.biodiversity import parse_retry_after
 from earthlens.wdpa.auth import AuthenticationError
 
@@ -86,13 +86,17 @@ _parse_retry_after = parse_retry_after
 def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
     """GET a v4 endpoint and return the parsed JSON, with retries on transient failure.
 
-    Retries on `429` (honouring `Retry-After`) and on `500`/`502`/`503`/`504` using
-    capped exponential back-off (`BACKOFF_FACTOR * 2**attempt`). A 401 maps to
-    :class:`AuthenticationError` immediately (never retried). Any non-401 HTTP
-    error that exhausts retries — or any other status — is re-raised as a
-    :class:`RuntimeError` whose message names the path and status but **never**
-    the URL or query parameters, because the WDPA token rides as a `?token=`
-    query param and a raw `requests.HTTPError` would echo it.
+    Transport is the shared :class:`~earthlens.base.http.HttpClient`, configured
+    to retry `429` (honouring `Retry-After`) and `500`/`502`/`503`/`504` with
+    exponential back-off (`BACKOFF_FACTOR * 2**attempt`, uncapped) and to retry
+    transport-layer `requests.RequestException`s the same way. The client is run
+    with `raise_for_status=False` — it **never** calls `raise_for_status`, so the
+    token-bearing URL is never echoed by a `requests.HTTPError`. `_get` keeps its
+    own terminal handling: a `401` maps to :class:`AuthenticationError`
+    immediately; any other non-2xx status — or a transport error that exhausts
+    the retry budget (re-raised by the client) — becomes a :class:`RuntimeError`
+    whose message names the path and status but **never** the URL or query
+    parameters, because the WDPA token rides as a `?token=` query param.
 
     Args:
         session: The HTTP session.
@@ -109,57 +113,39 @@ def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
             or on a non-recoverable transport error. The token is never echoed.
     """
     url = f"{BASE_URL}/{path}"
-    last_status: int | None = None
-    for attempt in range(MAX_RETRIES + 1):
-        try:
-            response = session.get(url, params=params, timeout=60)
-        except requests.RequestException as exc:
-            if attempt < MAX_RETRIES:
-                wait = BACKOFF_FACTOR * (2**attempt)
-                logger.warning(
-                    f"WDPA transport error on {path!r}: {type(exc).__name__}; "
-                    f"retry {attempt + 1}/{MAX_RETRIES} after {wait:.1f}s"
-                )
-                time.sleep(wait)
-                continue
-            raise RuntimeError(
-                f"Protected Planet transport error on /{path} "
-                f"({type(exc).__name__}); the WDPA token has been redacted."
-            ) from None
-        status = getattr(response, "status_code", None)
-        if status == 401:
-            raise AuthenticationError(
-                "Protected Planet rejected the WDPA token (HTTP 401). Check "
-                "WDPA_TOKEN / the token= argument, or request one at "
-                "https://api.protectedplanet.net/request."
-            )
-        last_status = status
-        if status in _RETRY_STATUSES and attempt < MAX_RETRIES:
-            retry_after = parse_retry_after(response.headers.get("Retry-After"))
-            wait = (
-                retry_after
-                if retry_after is not None
-                else BACKOFF_FACTOR * (2**attempt)
-            )
-            logger.warning(
-                f"Protected Planet returned HTTP {status} on {path!r}; "
-                f"retry {attempt + 1}/{MAX_RETRIES} after {wait:.1f}s"
-            )
-            time.sleep(wait)
-            continue
-        if status is None or status >= 400:
-            raise RuntimeError(
-                f"Protected Planet returned HTTP {status} for /{path} "
-                "(the WDPA token has been redacted from this error)."
-            )
-        return response.json()
-    # Defensive: unreachable today (every iteration above returns or raises).
-    # Kept so a future edit that breaks the invariant fails loudly instead of
-    # silently exiting the loop.
-    raise RuntimeError(  # pragma: no cover
-        f"Protected Planet exhausted {MAX_RETRIES} retries on /{path} "
-        f"(last status {last_status}); the WDPA token has been redacted."
+    client = HttpClient(
+        session=session,
+        status_forcelist=tuple(_RETRY_STATUSES),
+        retry_on_exceptions=(requests.RequestException,),
+        backoff_factor=BACKOFF_FACTOR,
+        max_retries=MAX_RETRIES,
+        max_backoff=None,
+        raise_for_status=False,
+        sleep=lambda seconds: time.sleep(seconds),
     )
+    try:
+        response = client.get(url, params=params, timeout=60)
+    except requests.RequestException as exc:
+        # The client re-raises the original transport exception once the retry
+        # budget is exhausted; convert it to the token-redacted RuntimeError so
+        # the `?token=` in the request URL can never surface in the error.
+        raise RuntimeError(
+            f"Protected Planet transport error on /{path} "
+            f"({type(exc).__name__}); the WDPA token has been redacted."
+        ) from None
+    status = getattr(response, "status_code", None)
+    if status == 401:
+        raise AuthenticationError(
+            "Protected Planet rejected the WDPA token (HTTP 401). Check "
+            "WDPA_TOKEN / the token= argument, or request one at "
+            "https://api.protectedplanet.net/request."
+        )
+    if status is None or status >= 400:
+        raise RuntimeError(
+            f"Protected Planet returned HTTP {status} for /{path} "
+            "(the WDPA token has been redacted from this error)."
+        )
+    return response.json()
 
 
 def _row(area: dict) -> dict[str, Any] | None:

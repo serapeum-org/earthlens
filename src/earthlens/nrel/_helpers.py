@@ -22,6 +22,9 @@ from typing import Any, Callable
 from urllib.parse import urlencode
 
 import pandas as pd
+import requests
+
+from earthlens.base.http import HttpClient
 
 #: Base host of the keyed NREL/NLR Developer Network REST service. The legacy
 #: `developer.nrel.gov` host was retired 2026-05-29; keep the host here so a
@@ -189,18 +192,38 @@ def throttled_get(
         requests.HTTPError: If every attempt returned `429` (the final
             response's `raise_for_status()` is called).
     """
+    # Proactive 1 req/s throttle: kept here (not delegated to HttpClient's
+    # `min_interval`) because it draws on the shared `last_call` list so a whole
+    # batch of points throttles against one timestamp, not per-client.
     wait = MIN_INTERVAL - (monotonic() - last_call[0])
     if wait > 0:
         sleep(wait)
-    resp = None
-    for attempt in range(max_retries):
-        resp = session.get(url, timeout=120)
-        last_call[0] = monotonic()
-        if resp.status_code != 429:
-            return resp
-        sleep(2**attempt)
-    resp.raise_for_status()
-    return resp  # pragma: no cover - raise_for_status always raises on a 429
+    # HttpClient owns only the 429 retry/back-off here: `max_retries - 1`
+    # additional retries reproduce the old loop's `max_retries` total GETs with
+    # `backoff_factor * 2**attempt` (= `2**attempt`) waits — one fewer than the
+    # old loop only on the all-429 exhaustion path, where it dropped a wasted
+    # trailing sleep before raising. `raise_for_status` is off so a non-429 4xx
+    # flows back to the caller unraised for inspection.
+    http = HttpClient(
+        session=session,
+        status_forcelist=(429,),
+        max_retries=max_retries - 1,
+        backoff_factor=1.0,
+        raise_for_status=False,
+        sleep=sleep,
+        timeout=120,
+    )
+    resp = http.get(url, raise_for_status=False)
+    last_call[0] = monotonic()
+    if resp.status_code == 429:
+        # Retries exhausted on a persistent 429. Raise an HTTPError (as the old
+        # loop's raise_for_status() did) but WITHOUT the URL — it carries the
+        # `api_key=` query param, and requests.HTTPError echoes `resp.url`.
+        raise requests.HTTPError(
+            f"NREL returned HTTP 429 after {max_retries} attempts "
+            "(the api_key has been redacted from this error)."
+        )
+    return resp
 
 
 def _data_header_offset(text: str) -> int:

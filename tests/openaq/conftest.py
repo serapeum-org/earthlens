@@ -79,6 +79,9 @@ class _FakeResponse:
 
             raise requests.HTTPError(f"HTTP {self.status_code}")
 
+    def close(self) -> None:
+        return None
+
 
 class _FakeOpenaq:
     """Recording transport state shared by the patched session.
