@@ -147,6 +147,15 @@ class TestFrameFromCsv:
         out = frame_from_csv(csv, {"P2": "pm25"}, {"pm25": "µg/m³"})
         assert out.empty
 
+    def test_missing_structural_column_skipped(self):
+        """A CSV with the value column but no `lat` is skipped, not a KeyError."""
+        csv = (
+            "sensor_id;sensor_type;timestamp;P2\n"  # no lat / lon
+            "1;SDS011;2026-06-30T00:00:00;4.2\n"
+        )
+        out = frame_from_csv(csv, {"P2": "pm25"}, {"pm25": "µg/m³"})
+        assert out.empty and "lat" in out.columns
+
 
 @pytest.mark.sensor_community
 def test_empty_frame_schema():

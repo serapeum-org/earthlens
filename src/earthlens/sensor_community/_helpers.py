@@ -261,6 +261,16 @@ def frame_from_csv(
     present = {col: name for col, name in columns.items() if col in raw.columns}
     if raw.empty or not present:
         return empty_frame()
+    # A malformed CSV that has the value column but lacks a structural one must
+    # be skipped, not raise KeyError and abort the whole multi-sensor download
+    # (the "missing file is logged & skipped, never a silent gap" contract).
+    missing = {"sensor_id", "timestamp", "lat", "lon"} - set(raw.columns)
+    if missing:
+        logger.warning(
+            f"Sensor.Community: archive CSV missing structural column(s) "
+            f"{sorted(missing)}; skipping this file."
+        )
+        return empty_frame()
     frames: list[pd.DataFrame] = []
     # Normalise the CSV's upper-case sensor type (`SDS011`) to the lower-case
     # archive slug (`sds011`) so the output column matches the discovery
