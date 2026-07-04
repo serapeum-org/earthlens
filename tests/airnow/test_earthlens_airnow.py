@@ -43,11 +43,11 @@ class TestFacadeRouting:
         """The `airnow` key resolves to `earthlens.airnow.AirNow`."""
         assert EarthLens.DataSources["airnow"] is earthlens.airnow.AirNow
 
-    def test_facade_builds_backend(self, tmp_path, fake_airnow):
+    def test_facade_builds_backend(self, tmp_path):
         """The facade binds an AirNow instance as its datasource."""
         assert isinstance(_facade(_FakeAirnow(), tmp_path).datasource, earthlens.airnow.AirNow)
 
-    def test_backend_kwargs_forwarded(self, tmp_path, fake_airnow):
+    def test_backend_kwargs_forwarded(self, tmp_path):
         """Filter kwargs ride through to the backend."""
         facade = _facade(_FakeAirnow(), tmp_path, data_type="C")
         assert facade.datasource._data_type == "C"
@@ -57,12 +57,12 @@ class TestFacadeRouting:
 class TestFacadeDownload:
     """The facade returns the backend's DataFrame and guards aggregate."""
 
-    def test_download_returns_dataframe(self, tmp_path, fake_airnow):
+    def test_download_returns_dataframe(self, tmp_path):
         """A facade download returns the long-format DataFrame."""
         df = _facade(_FakeAirnow(), tmp_path).download(progress_bar=False)
         assert isinstance(df, pd.DataFrame)
 
-    def test_aggregate_rejected(self, tmp_path, fake_airnow):
+    def test_aggregate_rejected(self, tmp_path):
         """`download(aggregate=...)` on the tabular backend raises."""
         facade = _facade(_FakeAirnow(), tmp_path)
         with pytest.raises(NotImplementedError):

@@ -32,7 +32,7 @@ def _backend(state: _FakeAirnow, tmp_path: Path, **overrides) -> AirNow:
 class TestRequestShaping:
     """The `/aq/data/` query arguments derived from the request."""
 
-    def test_bbox_and_parameters(self, tmp_path, fake_airnow):
+    def test_bbox_and_parameters(self, tmp_path):
         """BBOX is `minLon,minLat,maxLon,maxLat`; parameters are the codes."""
         state = _FakeAirnow()
         _backend(state, tmp_path).download(progress_bar=False)
@@ -40,14 +40,14 @@ class TestRequestShaping:
         assert params["BBOX"] == "-119.0,33.0,-117.0,35.0"
         assert params["parameters"] == "PM25,OZONE"
 
-    def test_date_bounds_extend_to_end_of_day(self, tmp_path, fake_airnow):
+    def test_date_bounds_extend_to_end_of_day(self, tmp_path):
         """A date-granular window runs `T00` to `T23`."""
         state = _FakeAirnow()
         _backend(state, tmp_path).download(progress_bar=False)
         assert state.calls[0]["startDate"] == "2026-01-01T00"
         assert state.calls[0]["endDate"] == "2026-01-01T23"
 
-    def test_data_type_and_monitor_type(self, tmp_path, fake_airnow):
+    def test_data_type_and_monitor_type(self, tmp_path):
         """`dataType` / `monitorType` reflect the constructor arguments."""
         state = _FakeAirnow()
         _backend(state, tmp_path, data_type="C", monitor_type="mobile").download(
@@ -56,7 +56,7 @@ class TestRequestShaping:
         assert state.calls[0]["dataType"] == "C"
         assert state.calls[0]["monitorType"] == 1
 
-    def test_hour_aware_end_is_inclusive(self, tmp_path, fake_airnow):
+    def test_hour_aware_end_is_inclusive(self, tmp_path):
         """A non-midnight (hour-aware fmt) end passes through as the inclusive end hour."""
         state = _FakeAirnow()
         _backend(
@@ -65,7 +65,7 @@ class TestRequestShaping:
         assert state.calls[0]["startDate"] == "2026-01-01T06"
         assert state.calls[0]["endDate"] == "2026-01-01T15"
 
-    def test_include_raw_concentrations_toggles_param(self, tmp_path, fake_airnow):
+    def test_include_raw_concentrations_toggles_param(self, tmp_path):
         """`include_raw_concentrations` flips the `includerawconcentrations` flag."""
         off = _FakeAirnow()
         _backend(off, tmp_path).download(progress_bar=False)
@@ -133,7 +133,7 @@ class TestConstructorGuards:
                 path=str(tmp_path),
             )
 
-    def test_empty_variables_defaults_pm25(self, tmp_path, fake_airnow):
+    def test_empty_variables_defaults_pm25(self, tmp_path):
         """An empty `variables` defaults to `["pm25"]`."""
         backend = _backend(_FakeAirnow(), tmp_path, variables=[])
         assert backend.vars == ["pm25"]
@@ -143,7 +143,7 @@ class TestConstructorGuards:
 class TestOutputFrame:
     """The returned long-format DataFrame."""
 
-    def test_schema_and_values(self, tmp_path, fake_airnow):
+    def test_schema_and_values(self, tmp_path):
         """The frame carries the schema columns with tz-aware datetimes."""
         state = _FakeAirnow(rows=[_observation()])
         df = _backend(state, tmp_path).download(progress_bar=False)
@@ -154,20 +154,20 @@ class TestOutputFrame:
         assert str(df["datetime_utc"].dtype) == "datetime64[ns, UTC]"
         assert df.loc[0, "value"] == 12.3
 
-    def test_raw_value_from_raw_concentration(self, tmp_path, fake_airnow):
+    def test_raw_value_from_raw_concentration(self, tmp_path):
         """The `raw_value` column carries AirNow's `RawConcentration`."""
         row = _observation(concentration=12.3)
         row["RawConcentration"] = 11.0
         df = _backend(_FakeAirnow(rows=[row]), tmp_path).download(progress_bar=False)
         assert df.loc[0, "raw_value"] == 11.0
 
-    def test_reads_value_field(self, tmp_path, fake_airnow):
+    def test_reads_value_field(self, tmp_path):
         """The concentration is read from AirNow's `Value` field."""
         state = _FakeAirnow(rows=[_observation(concentration=9.9)])
         df = _backend(state, tmp_path).download(progress_bar=False)
         assert df.loc[0, "value"] == 9.9
 
-    def test_concentration_field_fallback(self, tmp_path, fake_airnow):
+    def test_concentration_field_fallback(self, tmp_path):
         """A row spelling the value `Concentration` is still read."""
         row = _observation(concentration=7.5)
         del row["Value"]
@@ -175,7 +175,7 @@ class TestOutputFrame:
         df = _backend(_FakeAirnow(rows=[row]), tmp_path).download(progress_bar=False)
         assert df.loc[0, "value"] == 7.5
 
-    def test_missing_sentinel_scrubbed(self, tmp_path, fake_airnow):
+    def test_missing_sentinel_scrubbed(self, tmp_path):
         """AirNow's -999 sentinel becomes NaN for value/aqi/category."""
         state = _FakeAirnow(
             rows=[_observation(concentration=-999, aqi=-999, category=-999)]
@@ -184,17 +184,17 @@ class TestOutputFrame:
         assert pd.isna(df.loc[0, "value"])
         assert pd.isna(df.loc[0, "aqi"])
 
-    def test_empty_result_is_schema_only(self, tmp_path, fake_airnow):
+    def test_empty_result_is_schema_only(self, tmp_path):
         """No rows returns a zero-row frame with the full schema."""
         df = _backend(_FakeAirnow(rows=[]), tmp_path).download(progress_bar=False)
         assert df.empty and "station_id" in df.columns
 
-    def test_writes_csv(self, tmp_path, fake_airnow):
+    def test_writes_csv(self, tmp_path):
         """The default download writes a CSV under the output dir."""
         _backend(_FakeAirnow(), tmp_path).download(progress_bar=False)
         assert list(tmp_path.glob("airnow_*.csv"))
 
-    def test_writes_parquet(self, tmp_path, fake_airnow):
+    def test_writes_parquet(self, tmp_path):
         """`file_format='parquet'` writes a Parquet file."""
         _backend(_FakeAirnow(), tmp_path, file_format="parquet").download(
             progress_bar=False
@@ -206,7 +206,7 @@ class TestOutputFrame:
 class TestAggregateRejection:
     """A tabular backend rejects `aggregate=`."""
 
-    def test_aggregate_raises(self, tmp_path, fake_airnow):
+    def test_aggregate_raises(self, tmp_path):
         """`download(aggregate=...)` raises `NotImplementedError`."""
         backend = _backend(_FakeAirnow(), tmp_path)
         with pytest.raises(NotImplementedError, match="tabular"):

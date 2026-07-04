@@ -12,8 +12,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import pytest
-
 
 def _observation(
     *,
@@ -104,13 +102,3 @@ class _FakeSession:
         return self._state.respond(dict(params or {}))
 
 
-@pytest.fixture
-def fake_airnow() -> _FakeAirnow:
-    """Recording fake AirNow transport state (a default `_FakeAirnow`)."""
-    return _FakeAirnow()
-
-
-@pytest.fixture
-def make_observation():
-    """Factory for an AirNow observation row (see `_observation`)."""
-    return _observation
