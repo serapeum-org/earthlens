@@ -885,6 +885,10 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/deferred-providers/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/earthlens/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -938,14 +942,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/asf/usage/</loc>
-         <lastmod>2026-07-04</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/http-client/</loc>
-         <lastmod>2026-07-04</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/region-affinity/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>

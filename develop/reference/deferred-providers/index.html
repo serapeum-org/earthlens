@@ -10,31 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/base/region-affinity/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/deferred-providers/">
       
       
-        <link rel="prev" href="../http-client/">
+        <link rel="prev" href="../providers/">
       
       
-        <link rel="next" href="../../../change-log/">
+        <link rel="next" href="../chc/introduction/">
       
       
         
       
       
-      <link rel="icon" href="../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Region affinity (base) - earthlens</title>
+        <title>Deferred providers - earthlens</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,11 +53,11 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/panzoom.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/panzoom.css">
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cloud-region-affinity-earthlensbaseregion" class="md-skip">
+        <a href="#deferred-providers" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +103,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="earthlens" class="md-header__button md-logo" aria-label="earthlens" data-md-component="logo">
+    <a href="../.." title="earthlens" class="md-header__button md-logo" aria-label="earthlens" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Region affinity (base)
+              Deferred providers
             
           </span>
         </div>
@@ -240,7 +240,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -261,7 +261,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../installation/" class="md-tabs__link">
+        <a href="../../installation/" class="md-tabs__link">
           
   
   
@@ -277,11 +277,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../providers/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../providers/" class="md-tabs__link">
           
   
   
@@ -301,7 +303,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../examples/authentication/" class="md-tabs__link">
+        <a href="../../examples/authentication/" class="md-tabs__link">
           
   
   
@@ -317,13 +319,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../earthlens/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../earthlens/" class="md-tabs__link">
           
   
   
@@ -343,7 +343,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../change-log/" class="md-tabs__link">
+        <a href="../../change-log/" class="md-tabs__link">
           
   
   
@@ -383,7 +383,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="earthlens" class="md-nav__button md-logo" aria-label="earthlens" data-md-component="logo">
+    <a href="../.." title="earthlens" class="md-nav__button md-logo" aria-label="earthlens" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -413,7 +413,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -490,7 +490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../installation/" class="md-nav__link">
+      <a href="../../installation/" class="md-nav__link">
         
   
   
@@ -518,7 +518,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -546,7 +546,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../overview/architecture/" class="md-nav__link">
+      <a href="../../overview/architecture/" class="md-nav__link">
         
   
   
@@ -574,7 +574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../aggregation/" class="md-nav__link">
+      <a href="../../aggregation/" class="md-nav__link">
         
   
   
@@ -602,7 +602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/" class="md-nav__link">
+      <a href="../cli/" class="md-nav__link">
         
   
   
@@ -634,24 +634,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -669,7 +674,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -687,7 +692,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../providers/" class="md-nav__link">
+      <a href="../providers/" class="md-nav__link">
         
   
   
@@ -712,31 +717,26 @@
                 
   
   
+    
   
   
-    
-    
-    
-    
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
+        
       
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
-        
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
           
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
-            
   
   
   <span class="md-ellipsis">
     
   
-    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
+    Deferred providers
   
 
     
@@ -744,35 +744,17 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../chc/introduction/" class="md-nav__link">
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    Introduction
+    Deferred providers
   
 
     
@@ -781,97 +763,47 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../chc/usage/" class="md-nav__link">
+      
         
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
-  <span class="md-ellipsis">
+  
     
   
-    Usage
   
-
-    
-  </span>
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
   
-
-      </a>
-    </li>
+</li>
+      
+    </ul>
   
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../chc/catalog/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog & tooling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../chc/chc/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
+</nav>
       
     </li>
   
@@ -906,7 +838,7 @@
   <span class="md-ellipsis">
     
   
-    Amazon S3 (AWS Open Data)
+    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
   
 
     
@@ -922,7 +854,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Amazon S3 (AWS Open Data)
+    CHC (CHIRPS / CHIRTS / SPI / SPEI / …)
   
 
           </label>
@@ -935,7 +867,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/introduction/" class="md-nav__link">
+      <a href="../chc/introduction/" class="md-nav__link">
         
   
   
@@ -963,35 +895,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../s3/usage/" class="md-nav__link">
+      <a href="../chc/usage/" class="md-nav__link">
         
   
   
@@ -1019,14 +923,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/datasets/" class="md-nav__link">
+      <a href="../chc/catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available datasets
+    Catalog & tooling
   
 
     
@@ -1047,7 +951,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../s3/reference/" class="md-nav__link">
+      <a href="../chc/chc/" class="md-nav__link">
         
   
   
@@ -1104,7 +1008,7 @@
   <span class="md-ellipsis">
     
   
-    ASF (InSAR / SAR)
+    Amazon S3 (AWS Open Data)
   
 
     
@@ -1120,7 +1024,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    ASF (InSAR / SAR)
+    Amazon S3 (AWS Open Data)
   
 
           </label>
@@ -1133,7 +1037,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/introduction/" class="md-nav__link">
+      <a href="../s3/introduction/" class="md-nav__link">
         
   
   
@@ -1161,7 +1065,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/authentication/" class="md-nav__link">
+      <a href="../s3/authentication/" class="md-nav__link">
         
   
   
@@ -1189,7 +1093,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/usage/" class="md-nav__link">
+      <a href="../s3/usage/" class="md-nav__link">
         
   
   
@@ -1217,14 +1121,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/datasets/" class="md-nav__link">
+      <a href="../s3/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available products
+    Available datasets
   
 
     
@@ -1245,7 +1149,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../asf/asf/" class="md-nav__link">
+      <a href="../s3/reference/" class="md-nav__link">
         
   
   
@@ -1302,7 +1206,7 @@
   <span class="md-ellipsis">
     
   
-    CMEMS (Copernicus Marine)
+    ASF (InSAR / SAR)
   
 
     
@@ -1318,7 +1222,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    CMEMS (Copernicus Marine)
+    ASF (InSAR / SAR)
   
 
           </label>
@@ -1331,7 +1235,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cmems/introduction/" class="md-nav__link">
+      <a href="../asf/introduction/" class="md-nav__link">
         
   
   
@@ -1359,35 +1263,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cmems/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cmems/authentication/" class="md-nav__link">
+      <a href="../asf/authentication/" class="md-nav__link">
         
   
   
@@ -1415,7 +1291,63 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cmems/cmems/" class="md-nav__link">
+      <a href="../asf/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../asf/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available products
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../asf/asf/" class="md-nav__link">
         
   
   
@@ -1472,7 +1404,7 @@
   <span class="md-ellipsis">
     
   
-    Earthdata (NASA EOSDIS)
+    CMEMS (Copernicus Marine)
   
 
     
@@ -1488,7 +1420,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Earthdata (NASA EOSDIS)
+    CMEMS (Copernicus Marine)
   
 
           </label>
@@ -1501,7 +1433,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/introduction/" class="md-nav__link">
+      <a href="../cmems/introduction/" class="md-nav__link">
         
   
   
@@ -1529,7 +1461,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/usage/" class="md-nav__link">
+      <a href="../cmems/usage/" class="md-nav__link">
         
   
   
@@ -1557,7 +1489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/authentication/" class="md-nav__link">
+      <a href="../cmems/authentication/" class="md-nav__link">
         
   
   
@@ -1585,35 +1517,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthdata/catalog/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog & tooling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../earthdata/earthdata/" class="md-nav__link">
+      <a href="../cmems/cmems/" class="md-nav__link">
         
   
   
@@ -1670,7 +1574,7 @@
   <span class="md-ellipsis">
     
   
-    ECMWF
+    Earthdata (NASA EOSDIS)
   
 
     
@@ -1686,7 +1590,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    ECMWF
+    Earthdata (NASA EOSDIS)
   
 
           </label>
@@ -1699,7 +1603,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/introduction/" class="md-nav__link">
+      <a href="../earthdata/introduction/" class="md-nav__link">
         
   
   
@@ -1727,7 +1631,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/usage/" class="md-nav__link">
+      <a href="../earthdata/usage/" class="md-nav__link">
         
   
   
@@ -1755,14 +1659,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/ewds/" class="md-nav__link">
+      <a href="../earthdata/authentication/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    EWDS (GloFAS / floods)
+    Authentication
   
 
     
@@ -1783,7 +1687,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/catalog/" class="md-nav__link">
+      <a href="../earthdata/catalog/" class="md-nav__link">
         
   
   
@@ -1811,7 +1715,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ecmwf/ecmwf/" class="md-nav__link">
+      <a href="../earthdata/earthdata/" class="md-nav__link">
         
   
   
@@ -1868,7 +1772,7 @@
   <span class="md-ellipsis">
     
   
-    EUMETSAT (Data Store)
+    ECMWF
   
 
     
@@ -1884,7 +1788,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    EUMETSAT (Data Store)
+    ECMWF
   
 
           </label>
@@ -1897,7 +1801,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/introduction/" class="md-nav__link">
+      <a href="../ecmwf/introduction/" class="md-nav__link">
         
   
   
@@ -1925,7 +1829,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/usage/" class="md-nav__link">
+      <a href="../ecmwf/usage/" class="md-nav__link">
         
   
   
@@ -1953,14 +1857,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/authentication/" class="md-nav__link">
+      <a href="../ecmwf/ewds/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Authentication
+    EWDS (GloFAS / floods)
   
 
     
@@ -1981,7 +1885,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/catalog/" class="md-nav__link">
+      <a href="../ecmwf/catalog/" class="md-nav__link">
         
   
   
@@ -2009,35 +1913,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../eumetsat/data-tailor/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Data Tailor
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../eumetsat/eumetsat/" class="md-nav__link">
+      <a href="../ecmwf/ecmwf/" class="md-nav__link">
         
   
   
@@ -2094,7 +1970,7 @@
   <span class="md-ellipsis">
     
   
-    FDSN (earthquakes)
+    EUMETSAT (Data Store)
   
 
     
@@ -2110,7 +1986,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    FDSN (earthquakes)
+    EUMETSAT (Data Store)
   
 
           </label>
@@ -2123,7 +1999,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fdsn/introduction/" class="md-nav__link">
+      <a href="../eumetsat/introduction/" class="md-nav__link">
         
   
   
@@ -2151,7 +2027,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fdsn/usage/" class="md-nav__link">
+      <a href="../eumetsat/usage/" class="md-nav__link">
         
   
   
@@ -2179,7 +2055,91 @@
   
   
     <li class="md-nav__item">
-      <a href="../../fdsn/fdsn/" class="md-nav__link">
+      <a href="../eumetsat/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eumetsat/catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog & tooling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eumetsat/data-tailor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Tailor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eumetsat/eumetsat/" class="md-nav__link">
         
   
   
@@ -2236,7 +2196,7 @@
   <span class="md-ellipsis">
     
   
-    GEE
+    FDSN (earthquakes)
   
 
     
@@ -2252,7 +2212,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GEE
+    FDSN (earthquakes)
   
 
           </label>
@@ -2265,7 +2225,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gee/introduction/" class="md-nav__link">
+      <a href="../fdsn/introduction/" class="md-nav__link">
         
   
   
@@ -2293,63 +2253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gee/registering-a-project/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Registering a project
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../gee/service-account-setup/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Service account setup
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../gee/usage/" class="md-nav__link">
+      <a href="../fdsn/usage/" class="md-nav__link">
         
   
   
@@ -2377,7 +2281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gee/gee/" class="md-nav__link">
+      <a href="../fdsn/fdsn/" class="md-nav__link">
         
   
   
@@ -2434,7 +2338,7 @@
   <span class="md-ellipsis">
     
   
-    STAC (Sentinel / Landsat / cloud platforms)
+    GEE
   
 
     
@@ -2450,7 +2354,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    STAC (Sentinel / Landsat / cloud platforms)
+    GEE
   
 
           </label>
@@ -2463,7 +2367,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/introduction/" class="md-nav__link">
+      <a href="../gee/introduction/" class="md-nav__link">
         
   
   
@@ -2491,7 +2395,63 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/usage/" class="md-nav__link">
+      <a href="../gee/registering-a-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Registering a project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gee/service-account-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service account setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gee/usage/" class="md-nav__link">
         
   
   
@@ -2519,63 +2479,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stac/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../stac/migration-from-gee/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Migration from GEE
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../stac/stac/" class="md-nav__link">
+      <a href="../gee/gee/" class="md-nav__link">
         
   
   
@@ -2632,7 +2536,7 @@
   <span class="md-ellipsis">
     
   
-    GDACS (disaster alerts)
+    STAC (Sentinel / Landsat / cloud platforms)
   
 
     
@@ -2648,7 +2552,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GDACS (disaster alerts)
+    STAC (Sentinel / Landsat / cloud platforms)
   
 
           </label>
@@ -2661,7 +2565,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gdacs/introduction/" class="md-nav__link">
+      <a href="../stac/introduction/" class="md-nav__link">
         
   
   
@@ -2689,7 +2593,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gdacs/usage/" class="md-nav__link">
+      <a href="../stac/usage/" class="md-nav__link">
         
   
   
@@ -2717,7 +2621,63 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gdacs/gdacs/" class="md-nav__link">
+      <a href="../stac/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stac/migration-from-gee/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration from GEE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stac/stac/" class="md-nav__link">
         
   
   
@@ -2774,7 +2734,7 @@
   <span class="md-ellipsis">
     
   
-    JAXA (Earth-observation archive)
+    GDACS (disaster alerts)
   
 
     
@@ -2790,7 +2750,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    JAXA (Earth-observation archive)
+    GDACS (disaster alerts)
   
 
           </label>
@@ -2803,7 +2763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jaxa/introduction/" class="md-nav__link">
+      <a href="../gdacs/introduction/" class="md-nav__link">
         
   
   
@@ -2831,7 +2791,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jaxa/usage/" class="md-nav__link">
+      <a href="../gdacs/usage/" class="md-nav__link">
         
   
   
@@ -2859,63 +2819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jaxa/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../jaxa/datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../jaxa/jaxa/" class="md-nav__link">
+      <a href="../gdacs/gdacs/" class="md-nav__link">
         
   
   
@@ -2972,7 +2876,7 @@
   <span class="md-ellipsis">
     
   
-    ERDDAP (multi-server client)
+    JAXA (Earth-observation archive)
   
 
     
@@ -2988,7 +2892,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    ERDDAP (multi-server client)
+    JAXA (Earth-observation archive)
   
 
           </label>
@@ -3001,7 +2905,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../erddap/introduction/" class="md-nav__link">
+      <a href="../jaxa/introduction/" class="md-nav__link">
         
   
   
@@ -3029,7 +2933,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../erddap/usage/" class="md-nav__link">
+      <a href="../jaxa/usage/" class="md-nav__link">
         
   
   
@@ -3057,7 +2961,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../erddap/datasets/" class="md-nav__link">
+      <a href="../jaxa/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jaxa/datasets/" class="md-nav__link">
         
   
   
@@ -3085,7 +3017,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../erddap/erddap/" class="md-nav__link">
+      <a href="../jaxa/jaxa/" class="md-nav__link">
         
   
   
@@ -3142,7 +3074,7 @@
   <span class="md-ellipsis">
     
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
     
@@ -3158,7 +3090,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Bathymetry (topography / bathymetry DEMs)
+    ERDDAP (multi-server client)
   
 
           </label>
@@ -3171,7 +3103,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/introduction/" class="md-nav__link">
+      <a href="../erddap/introduction/" class="md-nav__link">
         
   
   
@@ -3199,7 +3131,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/usage/" class="md-nav__link">
+      <a href="../erddap/usage/" class="md-nav__link">
         
   
   
@@ -3227,7 +3159,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/datasets/" class="md-nav__link">
+      <a href="../erddap/datasets/" class="md-nav__link">
         
   
   
@@ -3255,7 +3187,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/bathymetry/" class="md-nav__link">
+      <a href="../erddap/erddap/" class="md-nav__link">
         
   
   
@@ -3312,7 +3244,7 @@
   <span class="md-ellipsis">
     
   
-    Solar & Wind Atlas (solar / wind climatology)
+    Bathymetry (topography / bathymetry DEMs)
   
 
     
@@ -3328,7 +3260,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Solar & Wind Atlas (solar / wind climatology)
+    Bathymetry (topography / bathymetry DEMs)
   
 
           </label>
@@ -3341,7 +3273,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../solar_wind_atlas/introduction/" class="md-nav__link">
+      <a href="../bathymetry/introduction/" class="md-nav__link">
         
   
   
@@ -3369,7 +3301,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../solar_wind_atlas/usage/" class="md-nav__link">
+      <a href="../bathymetry/usage/" class="md-nav__link">
         
   
   
@@ -3397,14 +3329,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../solar_wind_atlas/datasets/" class="md-nav__link">
+      <a href="../bathymetry/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available layers
+    Available datasets
   
 
     
@@ -3425,7 +3357,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../solar_wind_atlas/solar_wind_atlas/" class="md-nav__link">
+      <a href="../bathymetry/bathymetry/" class="md-nav__link">
         
   
   
@@ -3482,7 +3414,7 @@
   <span class="md-ellipsis">
     
   
-    PVGIS (solar radiation / PV)
+    Solar & Wind Atlas (solar / wind climatology)
   
 
     
@@ -3498,7 +3430,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    PVGIS (solar radiation / PV)
+    Solar & Wind Atlas (solar / wind climatology)
   
 
           </label>
@@ -3511,7 +3443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pvgis/introduction/" class="md-nav__link">
+      <a href="../solar_wind_atlas/introduction/" class="md-nav__link">
         
   
   
@@ -3539,7 +3471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pvgis/usage/" class="md-nav__link">
+      <a href="../solar_wind_atlas/usage/" class="md-nav__link">
         
   
   
@@ -3567,14 +3499,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pvgis/datasets/" class="md-nav__link">
+      <a href="../solar_wind_atlas/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available products
+    Available layers
   
 
     
@@ -3595,7 +3527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pvgis/pvgis/" class="md-nav__link">
+      <a href="../solar_wind_atlas/solar_wind_atlas/" class="md-nav__link">
         
   
   
@@ -3652,7 +3584,7 @@
   <span class="md-ellipsis">
     
   
-    NREL (solar / wind resource)
+    PVGIS (solar radiation / PV)
   
 
     
@@ -3668,7 +3600,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    NREL (solar / wind resource)
+    PVGIS (solar radiation / PV)
   
 
           </label>
@@ -3681,7 +3613,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nrel/introduction/" class="md-nav__link">
+      <a href="../pvgis/introduction/" class="md-nav__link">
         
   
   
@@ -3709,7 +3641,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nrel/usage/" class="md-nav__link">
+      <a href="../pvgis/usage/" class="md-nav__link">
         
   
   
@@ -3737,7 +3669,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nrel/datasets/" class="md-nav__link">
+      <a href="../pvgis/datasets/" class="md-nav__link">
         
   
   
@@ -3765,7 +3697,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nrel/nrel/" class="md-nav__link">
+      <a href="../pvgis/pvgis/" class="md-nav__link">
         
   
   
@@ -3822,7 +3754,7 @@
   <span class="md-ellipsis">
     
   
-    Climate indices (teleconnections)
+    NREL (solar / wind resource)
   
 
     
@@ -3838,7 +3770,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Climate indices (teleconnections)
+    NREL (solar / wind resource)
   
 
           </label>
@@ -3851,7 +3783,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../climate_indices/introduction/" class="md-nav__link">
+      <a href="../nrel/introduction/" class="md-nav__link">
         
   
   
@@ -3879,7 +3811,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../climate_indices/usage/" class="md-nav__link">
+      <a href="../nrel/usage/" class="md-nav__link">
         
   
   
@@ -3907,14 +3839,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../climate_indices/datasets/" class="md-nav__link">
+      <a href="../nrel/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available indices
+    Available products
   
 
     
@@ -3935,7 +3867,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../climate_indices/climate_indices/" class="md-nav__link">
+      <a href="../nrel/nrel/" class="md-nav__link">
         
   
   
@@ -3992,7 +3924,7 @@
   <span class="md-ellipsis">
     
   
-    Risk indicators (ThinkHazard / INFORM / GFW)
+    Climate indices (teleconnections)
   
 
     
@@ -4008,7 +3940,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Risk indicators (ThinkHazard / INFORM / GFW)
+    Climate indices (teleconnections)
   
 
           </label>
@@ -4021,7 +3953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../risk_indicators/introduction/" class="md-nav__link">
+      <a href="../climate_indices/introduction/" class="md-nav__link">
         
   
   
@@ -4049,7 +3981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../risk_indicators/usage/" class="md-nav__link">
+      <a href="../climate_indices/usage/" class="md-nav__link">
         
   
   
@@ -4077,14 +4009,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../risk_indicators/datasets/" class="md-nav__link">
+      <a href="../climate_indices/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available datasets
+    Available indices
   
 
     
@@ -4105,7 +4037,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../risk_indicators/risk_indicators/" class="md-nav__link">
+      <a href="../climate_indices/climate_indices/" class="md-nav__link">
         
   
   
@@ -4162,7 +4094,7 @@
   <span class="md-ellipsis">
     
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Risk indicators (ThinkHazard / INFORM / GFW)
   
 
     
@@ -4178,7 +4110,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Glaciers (RGI / GLIMS / WGMS)
+    Risk indicators (ThinkHazard / INFORM / GFW)
   
 
           </label>
@@ -4191,7 +4123,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../glaciers/introduction/" class="md-nav__link">
+      <a href="../risk_indicators/introduction/" class="md-nav__link">
         
   
   
@@ -4219,7 +4151,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../glaciers/usage/" class="md-nav__link">
+      <a href="../risk_indicators/usage/" class="md-nav__link">
         
   
   
@@ -4247,7 +4179,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../glaciers/datasets/" class="md-nav__link">
+      <a href="../risk_indicators/datasets/" class="md-nav__link">
         
   
   
@@ -4275,7 +4207,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../glaciers/glaciers/" class="md-nav__link">
+      <a href="../risk_indicators/risk_indicators/" class="md-nav__link">
         
   
   
@@ -4332,7 +4264,7 @@
   <span class="md-ellipsis">
     
   
-    SoilGrids (soil properties)
+    Glaciers (RGI / GLIMS / WGMS)
   
 
     
@@ -4348,7 +4280,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    SoilGrids (soil properties)
+    Glaciers (RGI / GLIMS / WGMS)
   
 
           </label>
@@ -4361,7 +4293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../soilgrids/introduction/" class="md-nav__link">
+      <a href="../glaciers/introduction/" class="md-nav__link">
         
   
   
@@ -4389,7 +4321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../soilgrids/usage/" class="md-nav__link">
+      <a href="../glaciers/usage/" class="md-nav__link">
         
   
   
@@ -4417,14 +4349,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../soilgrids/datasets/" class="md-nav__link">
+      <a href="../glaciers/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Available properties
+    Available datasets
   
 
     
@@ -4445,7 +4377,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../soilgrids/soilgrids/" class="md-nav__link">
+      <a href="../glaciers/glaciers/" class="md-nav__link">
         
   
   
@@ -4502,7 +4434,7 @@
   <span class="md-ellipsis">
     
   
-    OpenStreetMap (Overpass / ohsome)
+    SoilGrids (soil properties)
   
 
     
@@ -4518,7 +4450,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    OpenStreetMap (Overpass / ohsome)
+    SoilGrids (soil properties)
   
 
           </label>
@@ -4531,7 +4463,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../osm/introduction/" class="md-nav__link">
+      <a href="../soilgrids/introduction/" class="md-nav__link">
         
   
   
@@ -4559,7 +4491,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../osm/usage/" class="md-nav__link">
+      <a href="../soilgrids/usage/" class="md-nav__link">
         
   
   
@@ -4587,7 +4519,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../osm/osm/" class="md-nav__link">
+      <a href="../soilgrids/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available properties
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../soilgrids/soilgrids/" class="md-nav__link">
         
   
   
@@ -4644,7 +4604,7 @@
   <span class="md-ellipsis">
     
   
-    Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER)
+    OpenStreetMap (Overpass / ohsome)
   
 
     
@@ -4660,7 +4620,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER)
+    OpenStreetMap (Overpass / ohsome)
   
 
           </label>
@@ -4673,7 +4633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../admin/introduction/" class="md-nav__link">
+      <a href="../osm/introduction/" class="md-nav__link">
         
   
   
@@ -4701,7 +4661,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../admin/usage/" class="md-nav__link">
+      <a href="../osm/usage/" class="md-nav__link">
         
   
   
@@ -4729,35 +4689,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../admin/datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../admin/admin/" class="md-nav__link">
+      <a href="../osm/osm/" class="md-nav__link">
         
   
   
@@ -4814,7 +4746,7 @@
   <span class="md-ellipsis">
     
   
-    OpenAQ (air quality)
+    Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER)
   
 
     
@@ -4830,7 +4762,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    OpenAQ (air quality)
+    Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER)
   
 
           </label>
@@ -4843,7 +4775,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openaq/introduction/" class="md-nav__link">
+      <a href="../admin/introduction/" class="md-nav__link">
         
   
   
@@ -4871,7 +4803,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openaq/usage/" class="md-nav__link">
+      <a href="../admin/usage/" class="md-nav__link">
         
   
   
@@ -4899,14 +4831,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openaq/authentication/" class="md-nav__link">
+      <a href="../admin/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Authentication
+    Available datasets
   
 
     
@@ -4927,7 +4859,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openaq/openaq/" class="md-nav__link">
+      <a href="../admin/admin/" class="md-nav__link">
         
   
   
@@ -4984,7 +4916,7 @@
   <span class="md-ellipsis">
     
   
-    openEO (server-side processing)
+    OpenAQ (air quality)
   
 
     
@@ -5000,7 +4932,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    openEO (server-side processing)
+    OpenAQ (air quality)
   
 
           </label>
@@ -5013,7 +4945,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/introduction/" class="md-nav__link">
+      <a href="../openaq/introduction/" class="md-nav__link">
         
   
   
@@ -5041,7 +4973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/usage/" class="md-nav__link">
+      <a href="../openaq/usage/" class="md-nav__link">
         
   
   
@@ -5069,7 +5001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/authentication/" class="md-nav__link">
+      <a href="../openaq/authentication/" class="md-nav__link">
         
   
   
@@ -5097,35 +5029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../openeo/datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Collections & recipes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../openeo/openeo/" class="md-nav__link">
+      <a href="../openaq/openaq/" class="md-nav__link">
         
   
   
@@ -5182,7 +5086,7 @@
   <span class="md-ellipsis">
     
   
-    Sentinel Hub (server-side render)
+    openEO (server-side processing)
   
 
     
@@ -5198,7 +5102,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Sentinel Hub (server-side render)
+    openEO (server-side processing)
   
 
           </label>
@@ -5211,7 +5115,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../sentinel-hub/introduction/" class="md-nav__link">
+      <a href="../openeo/introduction/" class="md-nav__link">
         
   
   
@@ -5239,7 +5143,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../sentinel-hub/usage/" class="md-nav__link">
+      <a href="../openeo/usage/" class="md-nav__link">
         
   
   
@@ -5267,7 +5171,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../sentinel-hub/authentication/" class="md-nav__link">
+      <a href="../openeo/authentication/" class="md-nav__link">
         
   
   
@@ -5295,7 +5199,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../sentinel-hub/datasets/" class="md-nav__link">
+      <a href="../openeo/datasets/" class="md-nav__link">
         
   
   
@@ -5323,35 +5227,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../sentinel-hub/statistical-batch/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Statistical & Batch
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../sentinel-hub/sentinel_hub/" class="md-nav__link">
+      <a href="../openeo/openeo/" class="md-nav__link">
         
   
   
@@ -5408,7 +5284,7 @@
   <span class="md-ellipsis">
     
   
-    Tropycal (cyclone tracks)
+    Sentinel Hub (server-side render)
   
 
     
@@ -5424,7 +5300,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Tropycal (cyclone tracks)
+    Sentinel Hub (server-side render)
   
 
           </label>
@@ -5437,7 +5313,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tropycal/introduction/" class="md-nav__link">
+      <a href="../sentinel-hub/introduction/" class="md-nav__link">
         
   
   
@@ -5465,7 +5341,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tropycal/usage/" class="md-nav__link">
+      <a href="../sentinel-hub/usage/" class="md-nav__link">
         
   
   
@@ -5493,7 +5369,91 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tropycal/tropycal/" class="md-nav__link">
+      <a href="../sentinel-hub/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sentinel-hub/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collections & recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sentinel-hub/statistical-batch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistical & Batch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sentinel-hub/sentinel_hub/" class="md-nav__link">
         
   
   
@@ -5550,7 +5510,7 @@
   <span class="md-ellipsis">
     
   
-    FIRMS (active fires)
+    Tropycal (cyclone tracks)
   
 
     
@@ -5566,7 +5526,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    FIRMS (active fires)
+    Tropycal (cyclone tracks)
   
 
           </label>
@@ -5579,7 +5539,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../firms/introduction/" class="md-nav__link">
+      <a href="../tropycal/introduction/" class="md-nav__link">
         
   
   
@@ -5607,7 +5567,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../firms/usage/" class="md-nav__link">
+      <a href="../tropycal/usage/" class="md-nav__link">
         
   
   
@@ -5635,35 +5595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../firms/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../firms/firms/" class="md-nav__link">
+      <a href="../tropycal/tropycal/" class="md-nav__link">
         
   
   
@@ -5720,7 +5652,7 @@
   <span class="md-ellipsis">
     
   
-    National Water Model
+    FIRMS (active fires)
   
 
     
@@ -5736,7 +5668,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    National Water Model
+    FIRMS (active fires)
   
 
           </label>
@@ -5749,7 +5681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwm/introduction/" class="md-nav__link">
+      <a href="../firms/introduction/" class="md-nav__link">
         
   
   
@@ -5777,7 +5709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwm/usage/" class="md-nav__link">
+      <a href="../firms/usage/" class="md-nav__link">
         
   
   
@@ -5805,14 +5737,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwm/datasets/" class="md-nav__link">
+      <a href="../firms/authentication/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Products & configurations
+    Authentication
   
 
     
@@ -5833,7 +5765,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwm/nwm/" class="md-nav__link">
+      <a href="../firms/firms/" class="md-nav__link">
         
   
   
@@ -5890,7 +5822,7 @@
   <span class="md-ellipsis">
     
   
-    HDX (humanitarian data)
+    National Water Model
   
 
     
@@ -5906,7 +5838,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    HDX (humanitarian data)
+    National Water Model
   
 
           </label>
@@ -5919,7 +5851,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../hdx/introduction/" class="md-nav__link">
+      <a href="../nwm/introduction/" class="md-nav__link">
         
   
   
@@ -5947,7 +5879,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../hdx/usage/" class="md-nav__link">
+      <a href="../nwm/usage/" class="md-nav__link">
         
   
   
@@ -5975,14 +5907,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../hdx/catalog/" class="md-nav__link">
+      <a href="../nwm/datasets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog & tooling
+    Products & configurations
   
 
     
@@ -6003,7 +5935,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../hdx/hdx/" class="md-nav__link">
+      <a href="../nwm/nwm/" class="md-nav__link">
         
   
   
@@ -6060,7 +5992,7 @@
   <span class="md-ellipsis">
     
   
-    Overture Maps (vector basemap)
+    HDX (humanitarian data)
   
 
     
@@ -6076,7 +6008,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Overture Maps (vector basemap)
+    HDX (humanitarian data)
   
 
           </label>
@@ -6089,7 +6021,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/introduction/" class="md-nav__link">
+      <a href="../hdx/introduction/" class="md-nav__link">
         
   
   
@@ -6117,7 +6049,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/usage/" class="md-nav__link">
+      <a href="../hdx/usage/" class="md-nav__link">
         
   
   
@@ -6145,14 +6077,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/licensing/" class="md-nav__link">
+      <a href="../hdx/catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Licensing
+    Catalog & tooling
   
 
     
@@ -6173,35 +6105,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overture/datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../overture/overture/" class="md-nav__link">
+      <a href="../hdx/hdx/" class="md-nav__link">
         
   
   
@@ -6258,7 +6162,7 @@
   <span class="md-ellipsis">
     
   
-    NWP (weather forecasts)
+    Overture Maps (vector basemap)
   
 
     
@@ -6274,7 +6178,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    NWP (weather forecasts)
+    Overture Maps (vector basemap)
   
 
           </label>
@@ -6287,7 +6191,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/introduction/" class="md-nav__link">
+      <a href="../overture/introduction/" class="md-nav__link">
         
   
   
@@ -6315,7 +6219,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/usage/" class="md-nav__link">
+      <a href="../overture/usage/" class="md-nav__link">
         
   
   
@@ -6343,14 +6247,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/catalog/" class="md-nav__link">
+      <a href="../overture/licensing/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog & tooling
+    Licensing
   
 
     
@@ -6371,7 +6275,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nwp/nwp/" class="md-nav__link">
+      <a href="../overture/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overture/overture/" class="md-nav__link">
         
   
   
@@ -6428,7 +6360,7 @@
   <span class="md-ellipsis">
     
   
-    NEXRAD radar
+    NWP (weather forecasts)
   
 
     
@@ -6444,7 +6376,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    NEXRAD radar
+    NWP (weather forecasts)
   
 
           </label>
@@ -6457,7 +6389,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../radar/introduction/" class="md-nav__link">
+      <a href="../nwp/introduction/" class="md-nav__link">
         
   
   
@@ -6485,7 +6417,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../radar/usage/" class="md-nav__link">
+      <a href="../nwp/usage/" class="md-nav__link">
         
   
   
@@ -6513,7 +6445,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../radar/catalog/" class="md-nav__link">
+      <a href="../nwp/catalog/" class="md-nav__link">
         
   
   
@@ -6541,7 +6473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../radar/radar/" class="md-nav__link">
+      <a href="../nwp/nwp/" class="md-nav__link">
         
   
   
@@ -6598,7 +6530,7 @@
   <span class="md-ellipsis">
     
   
-    USGS Water (NWIS)
+    NEXRAD radar
   
 
     
@@ -6614,7 +6546,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    USGS Water (NWIS)
+    NEXRAD radar
   
 
           </label>
@@ -6627,7 +6559,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/introduction/" class="md-nav__link">
+      <a href="../radar/introduction/" class="md-nav__link">
         
   
   
@@ -6655,7 +6587,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/usage/" class="md-nav__link">
+      <a href="../radar/usage/" class="md-nav__link">
         
   
   
@@ -6683,14 +6615,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/authentication/" class="md-nav__link">
+      <a href="../radar/catalog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Authentication
+    Catalog & tooling
   
 
     
@@ -6711,35 +6643,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usgs-water/datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../usgs-water/usgs_water/" class="md-nav__link">
+      <a href="../radar/radar/" class="md-nav__link">
         
   
   
@@ -6796,7 +6700,7 @@
   <span class="md-ellipsis">
     
   
-    GHSL (human settlement)
+    USGS Water (NWIS)
   
 
     
@@ -6812,7 +6716,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GHSL (human settlement)
+    USGS Water (NWIS)
   
 
           </label>
@@ -6825,7 +6729,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/introduction/" class="md-nav__link">
+      <a href="../usgs-water/introduction/" class="md-nav__link">
         
   
   
@@ -6853,35 +6757,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../ghsl/usage/" class="md-nav__link">
+      <a href="../usgs-water/usage/" class="md-nav__link">
         
   
   
@@ -6909,7 +6785,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/products/" class="md-nav__link">
+      <a href="../usgs-water/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usgs-water/datasets/" class="md-nav__link">
         
   
   
@@ -6937,35 +6841,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ghsl/projections/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Projections & tiling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../ghsl/ghsl/" class="md-nav__link">
+      <a href="../usgs-water/usgs_water/" class="md-nav__link">
         
   
   
@@ -7022,7 +6898,7 @@
   <span class="md-ellipsis">
     
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
     
@@ -7038,7 +6914,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    WorldPop (population)
+    GHSL (human settlement)
   
 
           </label>
@@ -7051,7 +6927,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/introduction/" class="md-nav__link">
+      <a href="../ghsl/introduction/" class="md-nav__link">
         
   
   
@@ -7079,7 +6955,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/usage/" class="md-nav__link">
+      <a href="../ghsl/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ghsl/usage/" class="md-nav__link">
         
   
   
@@ -7107,7 +7011,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/datasets/" class="md-nav__link">
+      <a href="../ghsl/products/" class="md-nav__link">
         
   
   
@@ -7135,14 +7039,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/worldpoppy/" class="md-nav__link">
+      <a href="../ghsl/projections/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    WorldPopPy & no-xarray
+    Projections & tiling
   
 
     
@@ -7163,7 +7067,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../worldpop/worldpop/" class="md-nav__link">
+      <a href="../ghsl/ghsl/" class="md-nav__link">
         
   
   
@@ -7220,7 +7124,7 @@
   <span class="md-ellipsis">
     
   
-    Biodiversity (overview)
+    WorldPop (population)
   
 
     
@@ -7236,7 +7140,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Biodiversity (overview)
+    WorldPop (population)
   
 
           </label>
@@ -7249,7 +7153,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../biodiversity/introduction/" class="md-nav__link">
+      <a href="../worldpop/introduction/" class="md-nav__link">
         
   
   
@@ -7257,6 +7161,118 @@
     
   
     Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../worldpop/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../worldpop/datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../worldpop/worldpoppy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WorldPopPy & no-xarray
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../worldpop/worldpop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
   
 
     
@@ -7306,7 +7322,7 @@
   <span class="md-ellipsis">
     
   
-    GBIF (species occurrences)
+    Biodiversity (overview)
   
 
     
@@ -7322,7 +7338,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    GBIF (species occurrences)
+    Biodiversity (overview)
   
 
           </label>
@@ -7335,7 +7351,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../gbif/introduction/" class="md-nav__link">
+      <a href="../biodiversity/introduction/" class="md-nav__link">
         
   
   
@@ -7343,62 +7359,6 @@
     
   
     Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../gbif/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../gbif/gbif/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
   
 
     
@@ -7448,7 +7408,7 @@
   <span class="md-ellipsis">
     
   
-    OBIS (marine occurrences)
+    GBIF (species occurrences)
   
 
     
@@ -7464,7 +7424,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    OBIS (marine occurrences)
+    GBIF (species occurrences)
   
 
           </label>
@@ -7477,7 +7437,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../obis/introduction/" class="md-nav__link">
+      <a href="../gbif/introduction/" class="md-nav__link">
         
   
   
@@ -7505,7 +7465,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../obis/usage/" class="md-nav__link">
+      <a href="../gbif/usage/" class="md-nav__link">
         
   
   
@@ -7533,7 +7493,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../obis/obis/" class="md-nav__link">
+      <a href="../gbif/gbif/" class="md-nav__link">
         
   
   
@@ -7590,7 +7550,7 @@
   <span class="md-ellipsis">
     
   
-    Protected Planet (WDPA)
+    OBIS (marine occurrences)
   
 
     
@@ -7606,7 +7566,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Protected Planet (WDPA)
+    OBIS (marine occurrences)
   
 
           </label>
@@ -7619,7 +7579,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../wdpa/introduction/" class="md-nav__link">
+      <a href="../obis/introduction/" class="md-nav__link">
         
   
   
@@ -7647,7 +7607,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../wdpa/usage/" class="md-nav__link">
+      <a href="../obis/usage/" class="md-nav__link">
         
   
   
@@ -7675,35 +7635,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../wdpa/authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../wdpa/wdpa/" class="md-nav__link">
+      <a href="../obis/obis/" class="md-nav__link">
         
   
   
@@ -7760,7 +7692,7 @@
   <span class="md-ellipsis">
     
   
-    IUCN Red List (assessments)
+    Protected Planet (WDPA)
   
 
     
@@ -7776,7 +7708,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    IUCN Red List (assessments)
+    Protected Planet (WDPA)
   
 
           </label>
@@ -7789,7 +7721,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../iucn/introduction/" class="md-nav__link">
+      <a href="../wdpa/introduction/" class="md-nav__link">
         
   
   
@@ -7817,7 +7749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../iucn/usage/" class="md-nav__link">
+      <a href="../wdpa/usage/" class="md-nav__link">
         
   
   
@@ -7845,7 +7777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../iucn/authentication/" class="md-nav__link">
+      <a href="../wdpa/authentication/" class="md-nav__link">
         
   
   
@@ -7873,7 +7805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../iucn/iucn/" class="md-nav__link">
+      <a href="../wdpa/wdpa/" class="md-nav__link">
         
   
   
@@ -7930,7 +7862,7 @@
   <span class="md-ellipsis">
     
   
-    Argo (float profiles)
+    IUCN Red List (assessments)
   
 
     
@@ -7946,7 +7878,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Argo (float profiles)
+    IUCN Red List (assessments)
   
 
           </label>
@@ -7959,7 +7891,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../argo/introduction/" class="md-nav__link">
+      <a href="../iucn/introduction/" class="md-nav__link">
         
   
   
@@ -7987,7 +7919,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../argo/usage/" class="md-nav__link">
+      <a href="../iucn/usage/" class="md-nav__link">
         
   
   
@@ -8015,7 +7947,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../argo/argo/" class="md-nav__link">
+      <a href="../iucn/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iucn/iucn/" class="md-nav__link">
         
   
   
@@ -8072,7 +8032,7 @@
   <span class="md-ellipsis">
     
   
-    Drought indicators (USDM / EDO / GDO / SPEIbase)
+    Argo (float profiles)
   
 
     
@@ -8088,7 +8048,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Drought indicators (USDM / EDO / GDO / SPEIbase)
+    Argo (float profiles)
   
 
           </label>
@@ -8101,7 +8061,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../drought/introduction/" class="md-nav__link">
+      <a href="../argo/introduction/" class="md-nav__link">
         
   
   
@@ -8129,7 +8089,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../drought/usage/" class="md-nav__link">
+      <a href="../argo/usage/" class="md-nav__link">
         
   
   
@@ -8157,7 +8117,149 @@
   
   
     <li class="md-nav__item">
-      <a href="../../drought/drought/" class="md-nav__link">
+      <a href="../argo/argo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_45" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_45" id="__nav_3_45_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drought indicators (USDM / EDO / GDO / SPEIbase)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_45_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_45">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Drought indicators (USDM / EDO / GDO / SPEIbase)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drought/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drought/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drought/drought/" class="md-nav__link">
         
   
   
@@ -8250,7 +8352,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/authentication/" class="md-nav__link">
+      <a href="../../examples/authentication/" class="md-nav__link">
         
   
   
@@ -8278,7 +8380,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/data-sources/" class="md-nav__link">
+      <a href="../../examples/data-sources/" class="md-nav__link">
         
   
   
@@ -8306,7 +8408,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/catalog/" class="md-nav__link">
+      <a href="../../examples/catalog/" class="md-nav__link">
         
   
   
@@ -8384,7 +8486,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/suez_canal_ever_given/" class="md-nav__link">
+      <a href="../../examples/showcase/suez_canal_ever_given/" class="md-nav__link">
         
   
   
@@ -8412,7 +8514,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/tonga_eruption/" class="md-nav__link">
+      <a href="../../examples/showcase/tonga_eruption/" class="md-nav__link">
         
   
   
@@ -8440,7 +8542,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/pakistan_floods_2022/" class="md-nav__link">
+      <a href="../../examples/showcase/pakistan_floods_2022/" class="md-nav__link">
         
   
   
@@ -8468,7 +8570,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/gerd_reservoir_filling/" class="md-nav__link">
+      <a href="../../examples/showcase/gerd_reservoir_filling/" class="md-nav__link">
         
   
   
@@ -8496,7 +8598,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/gaza_damage_assessment/" class="md-nav__link">
+      <a href="../../examples/showcase/gaza_damage_assessment/" class="md-nav__link">
         
   
   
@@ -8524,7 +8626,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/horn_of_africa_drought/" class="md-nav__link">
+      <a href="../../examples/showcase/horn_of_africa_drought/" class="md-nav__link">
         
   
   
@@ -8552,7 +8654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/canada_wildfires_2023/" class="md-nav__link">
+      <a href="../../examples/showcase/canada_wildfires_2023/" class="md-nav__link">
         
   
   
@@ -8580,7 +8682,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/turkey_syria_earthquake/" class="md-nav__link">
+      <a href="../../examples/showcase/turkey_syria_earthquake/" class="md-nav__link">
         
   
   
@@ -8608,7 +8710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/hurricane_ian/" class="md-nav__link">
+      <a href="../../examples/showcase/hurricane_ian/" class="md-nav__link">
         
   
   
@@ -8636,7 +8738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/strait_of_hormuz_ships/" class="md-nav__link">
+      <a href="../../examples/showcase/strait_of_hormuz_ships/" class="md-nav__link">
         
   
   
@@ -8664,7 +8766,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/no2_covid_lockdown/" class="md-nav__link">
+      <a href="../../examples/showcase/no2_covid_lockdown/" class="md-nav__link">
         
   
   
@@ -8692,7 +8794,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/marine_heatwave_mediterranean/" class="md-nav__link">
+      <a href="../../examples/showcase/marine_heatwave_mediterranean/" class="md-nav__link">
         
   
   
@@ -8720,7 +8822,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/wildfire_smoke_air_quality/" class="md-nav__link">
+      <a href="../../examples/showcase/wildfire_smoke_air_quality/" class="md-nav__link">
         
   
   
@@ -8748,7 +8850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/hurricane_harvey_rainfall/" class="md-nav__link">
+      <a href="../../examples/showcase/hurricane_harvey_rainfall/" class="md-nav__link">
         
   
   
@@ -8776,7 +8878,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/goes_hurricane_ian/" class="md-nav__link">
+      <a href="../../examples/showcase/goes_hurricane_ian/" class="md-nav__link">
         
   
   
@@ -8804,7 +8906,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/species_occurrences_gbif_obis/" class="md-nav__link">
+      <a href="../../examples/showcase/species_occurrences_gbif_obis/" class="md-nav__link">
         
   
   
@@ -8890,7 +8992,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/drought/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/drought/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -8918,7 +9020,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/drought/quickstart/" class="md-nav__link">
+      <a href="../../examples/drought/quickstart/" class="md-nav__link">
         
   
   
@@ -8946,7 +9048,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/drought/edo_gdo_raster/" class="md-nav__link">
+      <a href="../../examples/drought/edo_gdo_raster/" class="md-nav__link">
         
   
   
@@ -9032,7 +9134,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/chc/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/chc/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -9060,7 +9162,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/chc/quickstart/" class="md-nav__link">
+      <a href="../../examples/chc/quickstart/" class="md-nav__link">
         
   
   
@@ -9146,7 +9248,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/s3/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/s3/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -9174,7 +9276,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/s3/02_copernicus_dem/" class="md-nav__link">
+      <a href="../../examples/s3/02_copernicus_dem/" class="md-nav__link">
         
   
   
@@ -9202,7 +9304,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/s3/03_esa_worldcover/" class="md-nav__link">
+      <a href="../../examples/s3/03_esa_worldcover/" class="md-nav__link">
         
   
   
@@ -9230,7 +9332,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/s3/04_passthrough/" class="md-nav__link">
+      <a href="../../examples/s3/04_passthrough/" class="md-nav__link">
         
   
   
@@ -9316,7 +9418,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/cmems/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -9344,7 +9446,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/quickstart/" class="md-nav__link">
+      <a href="../../examples/cmems/quickstart/" class="md-nav__link">
         
   
   
@@ -9372,7 +9474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/glorys_thermocline_timeseries/" class="md-nav__link">
+      <a href="../../examples/cmems/glorys_thermocline_timeseries/" class="md-nav__link">
         
   
   
@@ -9400,7 +9502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/pisces_chlorophyll_seasonal_cycle/" class="md-nav__link">
+      <a href="../../examples/cmems/pisces_chlorophyll_seasonal_cycle/" class="md-nav__link">
         
   
   
@@ -9428,7 +9530,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/altimetry_sla_coastal_signal/" class="md-nav__link">
+      <a href="../../examples/cmems/altimetry_sla_coastal_signal/" class="md-nav__link">
         
   
   
@@ -9456,7 +9558,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/seaice_arctic_thickness/" class="md-nav__link">
+      <a href="../../examples/cmems/seaice_arctic_thickness/" class="md-nav__link">
         
   
   
@@ -9484,7 +9586,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/global_wave_significant_height/" class="md-nav__link">
+      <a href="../../examples/cmems/global_wave_significant_height/" class="md-nav__link">
         
   
   
@@ -9512,7 +9614,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/cmems/mediterranean_sst_map/" class="md-nav__link">
+      <a href="../../examples/cmems/mediterranean_sst_map/" class="md-nav__link">
         
   
   
@@ -9598,7 +9700,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/asf/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/asf/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -9626,7 +9728,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/asf/quickstart_search/" class="md-nav__link">
+      <a href="../../examples/asf/quickstart_search/" class="md-nav__link">
         
   
   
@@ -9654,7 +9756,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/asf/sentinel1_insar_stack/" class="md-nav__link">
+      <a href="../../examples/asf/sentinel1_insar_stack/" class="md-nav__link">
         
   
   
@@ -9682,7 +9784,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/asf/opera_rtc_workflow/" class="md-nav__link">
+      <a href="../../examples/asf/opera_rtc_workflow/" class="md-nav__link">
         
   
   
@@ -9710,7 +9812,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/asf/opera_rtc_backscatter/" class="md-nav__link">
+      <a href="../../examples/asf/opera_rtc_backscatter/" class="md-nav__link">
         
   
   
@@ -9796,7 +9898,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/earthdata/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -9824,7 +9926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/output_kinds/" class="md-nav__link">
+      <a href="../../examples/earthdata/output_kinds/" class="md-nav__link">
         
   
   
@@ -9852,7 +9954,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/imerg_precipitation/" class="md-nav__link">
+      <a href="../../examples/earthdata/imerg_precipitation/" class="md-nav__link">
         
   
   
@@ -9880,7 +9982,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/gedi_l4a_footprints/" class="md-nav__link">
+      <a href="../../examples/earthdata/gedi_l4a_footprints/" class="md-nav__link">
         
   
   
@@ -9908,7 +10010,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/pace_ocean_colour/" class="md-nav__link">
+      <a href="../../examples/earthdata/pace_ocean_colour/" class="md-nav__link">
         
   
   
@@ -9936,7 +10038,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/smap_soil_moisture/" class="md-nav__link">
+      <a href="../../examples/earthdata/smap_soil_moisture/" class="md-nav__link">
         
   
   
@@ -9964,7 +10066,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/earthdata/opera_s1_backscatter/" class="md-nav__link">
+      <a href="../../examples/earthdata/opera_s1_backscatter/" class="md-nav__link">
         
   
   
@@ -10050,7 +10152,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/cds_quickstart/" class="md-nav__link">
+      <a href="../../examples/ecmwf/cds_quickstart/" class="md-nav__link">
         
   
   
@@ -10078,7 +10180,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/floods_glofas_forecast/" class="md-nav__link">
+      <a href="../../examples/ecmwf/floods_glofas_forecast/" class="md-nav__link">
         
   
   
@@ -10106,7 +10208,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/hydrology_water_balance/" class="md-nav__link">
+      <a href="../../examples/ecmwf/hydrology_water_balance/" class="md-nav__link">
         
   
   
@@ -10134,7 +10236,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/oceanography_sst_sea_ice/" class="md-nav__link">
+      <a href="../../examples/ecmwf/oceanography_sst_sea_ice/" class="md-nav__link">
         
   
   
@@ -10162,7 +10264,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/atmosphere_pressure_levels/" class="md-nav__link">
+      <a href="../../examples/ecmwf/atmosphere_pressure_levels/" class="md-nav__link">
         
   
   
@@ -10190,7 +10292,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/agriculture_crop_water/" class="md-nav__link">
+      <a href="../../examples/ecmwf/agriculture_crop_water/" class="md-nav__link">
         
   
   
@@ -10218,7 +10320,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/solar_resource_assessment/" class="md-nav__link">
+      <a href="../../examples/ecmwf/solar_resource_assessment/" class="md-nav__link">
         
   
   
@@ -10246,7 +10348,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/wind_energy_resource/" class="md-nav__link">
+      <a href="../../examples/ecmwf/wind_energy_resource/" class="md-nav__link">
         
   
   
@@ -10274,7 +10376,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/snow_cryosphere_winter/" class="md-nav__link">
+      <a href="../../examples/ecmwf/snow_cryosphere_winter/" class="md-nav__link">
         
   
   
@@ -10302,7 +10404,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/heat_waves_public_health/" class="md-nav__link">
+      <a href="../../examples/ecmwf/heat_waves_public_health/" class="md-nav__link">
         
   
   
@@ -10330,7 +10432,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/climate_change_anomalies/" class="md-nav__link">
+      <a href="../../examples/ecmwf/climate_change_anomalies/" class="md-nav__link">
         
   
   
@@ -10358,7 +10460,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/drought_precipitation_deficit/" class="md-nav__link">
+      <a href="../../examples/ecmwf/drought_precipitation_deficit/" class="md-nav__link">
         
   
   
@@ -10444,7 +10546,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/eumetsat/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -10472,7 +10574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/output_kinds_and_formats/" class="md-nav__link">
+      <a href="../../examples/eumetsat/output_kinds_and_formats/" class="md-nav__link">
         
   
   
@@ -10500,7 +10602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/data_tailor_config/" class="md-nav__link">
+      <a href="../../examples/eumetsat/data_tailor_config/" class="md-nav__link">
         
   
   
@@ -10528,7 +10630,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
+      <a href="../../examples/eumetsat/msg_hrseviri_fetch/" class="md-nav__link">
         
   
   
@@ -10556,7 +10658,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/sentinel3_olci_ocean_colour/" class="md-nav__link">
+      <a href="../../examples/eumetsat/sentinel3_olci_ocean_colour/" class="md-nav__link">
         
   
   
@@ -10584,7 +10686,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/sentinel5p_no2/" class="md-nav__link">
+      <a href="../../examples/eumetsat/sentinel5p_no2/" class="md-nav__link">
         
   
   
@@ -10612,7 +10714,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/eumetsat/metop_ascat_soil_moisture/" class="md-nav__link">
+      <a href="../../examples/eumetsat/metop_ascat_soil_moisture/" class="md-nav__link">
         
   
   
@@ -10698,7 +10800,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/fdsn/quickstart/" class="md-nav__link">
+      <a href="../../examples/fdsn/quickstart/" class="md-nav__link">
         
   
   
@@ -10726,7 +10828,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/fdsn/global_seismicity_map/" class="md-nav__link">
+      <a href="../../examples/fdsn/global_seismicity_map/" class="md-nav__link">
         
   
   
@@ -10754,7 +10856,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/fdsn/regional_sequence/" class="md-nav__link">
+      <a href="../../examples/fdsn/regional_sequence/" class="md-nav__link">
         
   
   
@@ -10840,7 +10942,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/quickstart/" class="md-nav__link">
+      <a href="../../examples/gee/quickstart/" class="md-nav__link">
         
   
   
@@ -10868,7 +10970,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/atmosphere-chemistry/" class="md-nav__link">
+      <a href="../../examples/gee/atmosphere-chemistry/" class="md-nav__link">
         
   
   
@@ -10896,7 +10998,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/climate-reanalysis/" class="md-nav__link">
+      <a href="../../examples/gee/climate-reanalysis/" class="md-nav__link">
         
   
   
@@ -10924,7 +11026,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/community/" class="md-nav__link">
+      <a href="../../examples/gee/community/" class="md-nav__link">
         
   
   
@@ -10952,7 +11054,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/elevation-terrain/" class="md-nav__link">
+      <a href="../../examples/gee/elevation-terrain/" class="md-nav__link">
         
   
   
@@ -10980,7 +11082,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/hydrology-water/" class="md-nav__link">
+      <a href="../../examples/gee/hydrology-water/" class="md-nav__link">
         
   
   
@@ -11008,7 +11110,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/land-cover-change/" class="md-nav__link">
+      <a href="../../examples/gee/land-cover-change/" class="md-nav__link">
         
   
   
@@ -11036,7 +11138,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/optical-multispectral/" class="md-nav__link">
+      <a href="../../examples/gee/optical-multispectral/" class="md-nav__link">
         
   
   
@@ -11064,7 +11166,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/other/" class="md-nav__link">
+      <a href="../../examples/gee/other/" class="md-nav__link">
         
   
   
@@ -11092,7 +11194,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/precipitation/" class="md-nav__link">
+      <a href="../../examples/gee/precipitation/" class="md-nav__link">
         
   
   
@@ -11120,7 +11222,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/sar-radar/" class="md-nav__link">
+      <a href="../../examples/gee/sar-radar/" class="md-nav__link">
         
   
   
@@ -11148,7 +11250,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gee/track-batch-exports/" class="md-nav__link">
+      <a href="../../examples/gee/track-batch-exports/" class="md-nav__link">
         
   
   
@@ -11234,7 +11336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/quickstart/" class="md-nav__link">
+      <a href="../../examples/stac/quickstart/" class="md-nav__link">
         
   
   
@@ -11262,7 +11364,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
+      <a href="../../examples/stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
         
   
   
@@ -11290,7 +11392,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
+      <a href="../../examples/stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
         
   
   
@@ -11318,7 +11420,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/regional_data_cubes/" class="md-nav__link">
+      <a href="../../examples/stac/regional_data_cubes/" class="md-nav__link">
         
   
   
@@ -11346,7 +11448,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/bdc_cbers_amazonia/" class="md-nav__link">
+      <a href="../../examples/stac/bdc_cbers_amazonia/" class="md-nav__link">
         
   
   
@@ -11374,7 +11476,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/veda_nasa_derived/" class="md-nav__link">
+      <a href="../../examples/stac/veda_nasa_derived/" class="md-nav__link">
         
   
   
@@ -11402,7 +11504,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/stac/usgs_landsat_requester_pays/" class="md-nav__link">
+      <a href="../../examples/stac/usgs_landsat_requester_pays/" class="md-nav__link">
         
   
   
@@ -11488,7 +11590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gdacs/quickstart/" class="md-nav__link">
+      <a href="../../examples/gdacs/quickstart/" class="md-nav__link">
         
   
   
@@ -11516,7 +11618,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gdacs/global_hazard_dashboard/" class="md-nav__link">
+      <a href="../../examples/gdacs/global_hazard_dashboard/" class="md-nav__link">
         
   
   
@@ -11544,7 +11646,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gdacs/eq_tc_overlay/" class="md-nav__link">
+      <a href="../../examples/gdacs/eq_tc_overlay/" class="md-nav__link">
         
   
   
@@ -11572,7 +11674,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gdacs/country_hazard_profile/" class="md-nav__link">
+      <a href="../../examples/gdacs/country_hazard_profile/" class="md-nav__link">
         
   
   
@@ -11658,7 +11760,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/osm/quickstart/" class="md-nav__link">
+      <a href="../../examples/osm/quickstart/" class="md-nav__link">
         
   
   
@@ -11686,7 +11788,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/osm/ohsome_history/" class="md-nav__link">
+      <a href="../../examples/osm/ohsome_history/" class="md-nav__link">
         
   
   
@@ -11772,7 +11874,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jaxa/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/jaxa/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -11800,7 +11902,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jaxa/02_aw3d30_quickstart/" class="md-nav__link">
+      <a href="../../examples/jaxa/02_aw3d30_quickstart/" class="md-nav__link">
         
   
   
@@ -11828,7 +11930,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jaxa/03_gportal_search/" class="md-nav__link">
+      <a href="../../examples/jaxa/03_gportal_search/" class="md-nav__link">
         
   
   
@@ -11914,7 +12016,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/erddap/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/erddap/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -11942,7 +12044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/erddap/02_griddap_sst_anomaly/" class="md-nav__link">
+      <a href="../../examples/erddap/02_griddap_sst_anomaly/" class="md-nav__link">
         
   
   
@@ -11970,7 +12072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/erddap/03_tabledap_buoys/" class="md-nav__link">
+      <a href="../../examples/erddap/03_tabledap_buoys/" class="md-nav__link">
         
   
   
@@ -11998,7 +12100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/erddap/04_catalog_tooling/" class="md-nav__link">
+      <a href="../../examples/erddap/04_catalog_tooling/" class="md-nav__link">
         
   
   
@@ -12084,7 +12186,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
+      <a href="../../examples/bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
         
   
   
@@ -12112,7 +12214,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/bathymetry/02_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/bathymetry/02_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -12140,7 +12242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/bathymetry/03_coastal_depth_profile/" class="md-nav__link">
+      <a href="../../examples/bathymetry/03_coastal_depth_profile/" class="md-nav__link">
         
   
   
@@ -12168,7 +12270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/bathymetry/04_gebco_vs_etopo_resolution/" class="md-nav__link">
+      <a href="../../examples/bathymetry/04_gebco_vs_etopo_resolution/" class="md-nav__link">
         
   
   
@@ -12196,7 +12298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/bathymetry/05_shaded_relief/" class="md-nav__link">
+      <a href="../../examples/bathymetry/05_shaded_relief/" class="md-nav__link">
         
   
   
@@ -12224,7 +12326,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/bathymetry/06_depth_histogram/" class="md-nav__link">
+      <a href="../../examples/bathymetry/06_depth_histogram/" class="md-nav__link">
         
   
   
@@ -12310,7 +12412,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/pvgis/01_pvgis_quickstart/" class="md-nav__link">
+      <a href="../../examples/pvgis/01_pvgis_quickstart/" class="md-nav__link">
         
   
   
@@ -12338,7 +12440,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/pvgis/02_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/pvgis/02_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -12366,7 +12468,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/pvgis/03_pv_power_and_tmy/" class="md-nav__link">
+      <a href="../../examples/pvgis/03_pv_power_and_tmy/" class="md-nav__link">
         
   
   
@@ -12452,7 +12554,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nrel/01_nrel_quickstart/" class="md-nav__link">
+      <a href="../../examples/nrel/01_nrel_quickstart/" class="md-nav__link">
         
   
   
@@ -12480,7 +12582,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nrel/02_nrel_products_and_behavior/" class="md-nav__link">
+      <a href="../../examples/nrel/02_nrel_products_and_behavior/" class="md-nav__link">
         
   
   
@@ -12566,7 +12668,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/climate_indices/01_climate_indices_quickstart/" class="md-nav__link">
+      <a href="../../examples/climate_indices/01_climate_indices_quickstart/" class="md-nav__link">
         
   
   
@@ -12594,7 +12696,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/climate_indices/02_catalog_and_behavior/" class="md-nav__link">
+      <a href="../../examples/climate_indices/02_catalog_and_behavior/" class="md-nav__link">
         
   
   
@@ -12680,7 +12782,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/solar_wind_atlas/01_wind_quickstart/" class="md-nav__link">
+      <a href="../../examples/solar_wind_atlas/01_wind_quickstart/" class="md-nav__link">
         
   
   
@@ -12708,7 +12810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/solar_wind_atlas/02_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/solar_wind_atlas/02_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -12736,7 +12838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/solar_wind_atlas/03_wind_resource_layers/" class="md-nav__link">
+      <a href="../../examples/solar_wind_atlas/03_wind_resource_layers/" class="md-nav__link">
         
   
   
@@ -12822,7 +12924,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/risk_indicators/01_risk_indicators_quickstart/" class="md-nav__link">
+      <a href="../../examples/risk_indicators/01_risk_indicators_quickstart/" class="md-nav__link">
         
   
   
@@ -12850,7 +12952,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/risk_indicators/02_catalog_and_behavior/" class="md-nav__link">
+      <a href="../../examples/risk_indicators/02_catalog_and_behavior/" class="md-nav__link">
         
   
   
@@ -12878,7 +12980,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/risk_indicators/03_global_forest_watch/" class="md-nav__link">
+      <a href="../../examples/risk_indicators/03_global_forest_watch/" class="md-nav__link">
         
   
   
@@ -12964,7 +13066,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/glaciers/01_glaciers_quickstart/" class="md-nav__link">
+      <a href="../../examples/glaciers/01_glaciers_quickstart/" class="md-nav__link">
         
   
   
@@ -12992,7 +13094,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/glaciers/02_catalog_and_behavior/" class="md-nav__link">
+      <a href="../../examples/glaciers/02_catalog_and_behavior/" class="md-nav__link">
         
   
   
@@ -13020,7 +13122,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/glaciers/03_glims_and_wgms/" class="md-nav__link">
+      <a href="../../examples/glaciers/03_glims_and_wgms/" class="md-nav__link">
         
   
   
@@ -13106,7 +13208,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/admin/01_admin_quickstart/" class="md-nav__link">
+      <a href="../../examples/admin/01_admin_quickstart/" class="md-nav__link">
         
   
   
@@ -13134,7 +13236,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/admin/02_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/admin/02_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -13162,7 +13264,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/admin/03_natural_earth_and_tiger/" class="md-nav__link">
+      <a href="../../examples/admin/03_natural_earth_and_tiger/" class="md-nav__link">
         
   
   
@@ -13248,7 +13350,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/soilgrids/01_soilgrids_quickstart/" class="md-nav__link">
+      <a href="../../examples/soilgrids/01_soilgrids_quickstart/" class="md-nav__link">
         
   
   
@@ -13276,7 +13378,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/soilgrids/02_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/soilgrids/02_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -13304,7 +13406,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/soilgrids/03_depth_profile/" class="md-nav__link">
+      <a href="../../examples/soilgrids/03_depth_profile/" class="md-nav__link">
         
   
   
@@ -13390,7 +13492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openaq/quickstart/" class="md-nav__link">
+      <a href="../../examples/openaq/quickstart/" class="md-nav__link">
         
   
   
@@ -13418,7 +13520,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openaq/pm25_city_timeseries/" class="md-nav__link">
+      <a href="../../examples/openaq/pm25_city_timeseries/" class="md-nav__link">
         
   
   
@@ -13446,7 +13548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openaq/multistation_comparison/" class="md-nav__link">
+      <a href="../../examples/openaq/multistation_comparison/" class="md-nav__link">
         
   
   
@@ -13532,7 +13634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/openeo/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -13560,7 +13662,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/quickstart/" class="md-nav__link">
+      <a href="../../examples/openeo/quickstart/" class="md-nav__link">
         
   
   
@@ -13588,7 +13690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/cloud_masked_composite/" class="md-nav__link">
+      <a href="../../examples/openeo/cloud_masked_composite/" class="md-nav__link">
         
   
   
@@ -13616,7 +13718,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/server_side_aggregate/" class="md-nav__link">
+      <a href="../../examples/openeo/server_side_aggregate/" class="md-nav__link">
         
   
   
@@ -13644,7 +13746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/air_quality_no2_monthly/" class="md-nav__link">
+      <a href="../../examples/openeo/air_quality_no2_monthly/" class="md-nav__link">
         
   
   
@@ -13672,7 +13774,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
+      <a href="../../examples/openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
         
   
   
@@ -13758,7 +13860,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -13786,7 +13888,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/quickstart_ndvi/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/quickstart_ndvi/" class="md-nav__link">
         
   
   
@@ -13814,7 +13916,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/true_colour/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/true_colour/" class="md-nav__link">
         
   
   
@@ -13842,7 +13944,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/custom_evalscript/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/custom_evalscript/" class="md-nav__link">
         
   
   
@@ -13870,7 +13972,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/local_tiling/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/local_tiling/" class="md-nav__link">
         
   
   
@@ -13898,7 +14000,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/statistical_zonal_stats/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/statistical_zonal_stats/" class="md-nav__link">
         
   
   
@@ -13926,7 +14028,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/aggregate_monthly/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/aggregate_monthly/" class="md-nav__link">
         
   
   
@@ -13954,7 +14056,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/sentinel-hub/batch_walkthrough/" class="md-nav__link">
+      <a href="../../examples/sentinel-hub/batch_walkthrough/" class="md-nav__link">
         
   
   
@@ -14040,7 +14142,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/quickstart/" class="md-nav__link">
+      <a href="../../examples/tropycal/quickstart/" class="md-nav__link">
         
   
   
@@ -14068,7 +14170,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/season_track_map/" class="md-nav__link">
+      <a href="../../examples/tropycal/season_track_map/" class="md-nav__link">
         
   
   
@@ -14096,7 +14198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/landfall_density/" class="md-nav__link">
+      <a href="../../examples/tropycal/landfall_density/" class="md-nav__link">
         
   
   
@@ -14124,7 +14226,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/recon_katrina/" class="md-nav__link">
+      <a href="../../examples/tropycal/recon_katrina/" class="md-nav__link">
         
   
   
@@ -14152,7 +14254,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/ships_intensity_forecast/" class="md-nav__link">
+      <a href="../../examples/tropycal/ships_intensity_forecast/" class="md-nav__link">
         
   
   
@@ -14180,7 +14282,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/katrina_intensity_timeline/" class="md-nav__link">
+      <a href="../../examples/tropycal/katrina_intensity_timeline/" class="md-nav__link">
         
   
   
@@ -14208,7 +14310,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/source_comparison/" class="md-nav__link">
+      <a href="../../examples/tropycal/source_comparison/" class="md-nav__link">
         
   
   
@@ -14236,7 +14338,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/tropycal/multibasin_ace/" class="md-nav__link">
+      <a href="../../examples/tropycal/multibasin_ace/" class="md-nav__link">
         
   
   
@@ -14322,7 +14424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/firms/quickstart/" class="md-nav__link">
+      <a href="../../examples/firms/quickstart/" class="md-nav__link">
         
   
   
@@ -14350,7 +14452,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/firms/fire_season_timeseries/" class="md-nav__link">
+      <a href="../../examples/firms/fire_season_timeseries/" class="md-nav__link">
         
   
   
@@ -14378,7 +14480,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/firms/modis_vs_viirs_comparison/" class="md-nav__link">
+      <a href="../../examples/firms/modis_vs_viirs_comparison/" class="md-nav__link">
         
   
   
@@ -14464,7 +14566,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/nwm/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -14492,7 +14594,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/streamflow_short_range/" class="md-nav__link">
+      <a href="../../examples/nwm/streamflow_short_range/" class="md-nav__link">
         
   
   
@@ -14520,7 +14622,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/land_surface_short_range/" class="md-nav__link">
+      <a href="../../examples/nwm/land_surface_short_range/" class="md-nav__link">
         
   
   
@@ -14548,7 +14650,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/regional_ensemble_coastal/" class="md-nav__link">
+      <a href="../../examples/nwm/regional_ensemble_coastal/" class="md-nav__link">
         
   
   
@@ -14576,7 +14678,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwm/deferred_and_subsetting/" class="md-nav__link">
+      <a href="../../examples/nwm/deferred_and_subsetting/" class="md-nav__link">
         
   
   
@@ -14662,7 +14764,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/hdx/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -14690,7 +14792,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/wfp_food_security_table/" class="md-nav__link">
+      <a href="../../examples/hdx/wfp_food_security_table/" class="md-nav__link">
         
   
   
@@ -14718,7 +14820,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/cod_admin_boundaries/" class="md-nav__link">
+      <a href="../../examples/hdx/cod_admin_boundaries/" class="md-nav__link">
         
   
   
@@ -14746,7 +14848,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/hotosm_building_export/" class="md-nav__link">
+      <a href="../../examples/hdx/hotosm_building_export/" class="md-nav__link">
         
   
   
@@ -14774,7 +14876,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/hdx/arbitrary_hdx_id/" class="md-nav__link">
+      <a href="../../examples/hdx/arbitrary_hdx_id/" class="md-nav__link">
         
   
   
@@ -14860,7 +14962,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/overture/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -14888,7 +14990,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/02_places_quickstart/" class="md-nav__link">
+      <a href="../../examples/overture/02_places_quickstart/" class="md-nav__link">
         
   
   
@@ -14916,7 +15018,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/03_buildings_footprints/" class="md-nav__link">
+      <a href="../../examples/overture/03_buildings_footprints/" class="md-nav__link">
         
   
   
@@ -14944,7 +15046,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/04_per_row_licensing/" class="md-nav__link">
+      <a href="../../examples/overture/04_per_row_licensing/" class="md-nav__link">
         
   
   
@@ -14972,7 +15074,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/05_transportation_network/" class="md-nav__link">
+      <a href="../../examples/overture/05_transportation_network/" class="md-nav__link">
         
   
   
@@ -15000,7 +15102,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/06_multi_theme_download/" class="md-nav__link">
+      <a href="../../examples/overture/06_multi_theme_download/" class="md-nav__link">
         
   
   
@@ -15028,7 +15130,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/overture/07_attribute_pushdown/" class="md-nav__link">
+      <a href="../../examples/overture/07_attribute_pushdown/" class="md-nav__link">
         
   
   
@@ -15114,7 +15216,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/nwp/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -15142,7 +15244,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/nwp_polish_features/" class="md-nav__link">
+      <a href="../../examples/nwp/nwp_polish_features/" class="md-nav__link">
         
   
   
@@ -15170,7 +15272,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/download_mode/" class="md-nav__link">
+      <a href="../../examples/nwp/download_mode/" class="md-nav__link">
         
   
   
@@ -15198,7 +15300,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/gfs_temperature/" class="md-nav__link">
+      <a href="../../examples/nwp/gfs_temperature/" class="md-nav__link">
         
   
   
@@ -15226,7 +15328,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/icon_precipitation/" class="md-nav__link">
+      <a href="../../examples/nwp/icon_precipitation/" class="md-nav__link">
         
   
   
@@ -15254,7 +15356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/nwp/eccc_gdps/" class="md-nav__link">
+      <a href="../../examples/nwp/eccc_gdps/" class="md-nav__link">
         
   
   
@@ -15340,7 +15442,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/radar/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/radar/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -15426,7 +15528,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/usgs-water/quickstart_daily_discharge/" class="md-nav__link">
+      <a href="../../examples/usgs-water/quickstart_daily_discharge/" class="md-nav__link">
         
   
   
@@ -15454,7 +15556,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/usgs-water/multi_parameter_and_instantaneous/" class="md-nav__link">
+      <a href="../../examples/usgs-water/multi_parameter_and_instantaneous/" class="md-nav__link">
         
   
   
@@ -15482,7 +15584,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/usgs-water/site_discovery_and_statistics/" class="md-nav__link">
+      <a href="../../examples/usgs-water/site_discovery_and_statistics/" class="md-nav__link">
         
   
   
@@ -15510,7 +15612,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/usgs-water/peaks_and_ratings/" class="md-nav__link">
+      <a href="../../examples/usgs-water/peaks_and_ratings/" class="md-nav__link">
         
   
   
@@ -15596,7 +15698,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/ghsl/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -15624,7 +15726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
+      <a href="../../examples/ghsl/02_population_quickstart/" class="md-nav__link">
         
   
   
@@ -15652,7 +15754,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
+      <a href="../../examples/ghsl/03_builtup_surface/" class="md-nav__link">
         
   
   
@@ -15680,7 +15782,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
+      <a href="../../examples/ghsl/04_builtup_growth/" class="md-nav__link">
         
   
   
@@ -15708,7 +15810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/05_building_height/" class="md-nav__link">
+      <a href="../../examples/ghsl/05_building_height/" class="md-nav__link">
         
   
   
@@ -15736,7 +15838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/06_settlement_classes/" class="md-nav__link">
+      <a href="../../examples/ghsl/06_settlement_classes/" class="md-nav__link">
         
   
   
@@ -15764,7 +15866,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ghsl/07_wup_projection/" class="md-nav__link">
+      <a href="../../examples/ghsl/07_wup_projection/" class="md-nav__link">
         
   
   
@@ -15850,7 +15952,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/worldpop/01_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -15878,7 +15980,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
+      <a href="../../examples/worldpop/02_population_quickstart/" class="md-nav__link">
         
   
   
@@ -15906,7 +16008,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
+      <a href="../../examples/worldpop/03_constrained_vs_unconstrained/" class="md-nav__link">
         
   
   
@@ -15934,7 +16036,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
+      <a href="../../examples/worldpop/04_age_sex_pyramid/" class="md-nav__link">
         
   
   
@@ -15962,7 +16064,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
+      <a href="../../examples/worldpop/05_multicountry_mosaic/" class="md-nav__link">
         
   
   
@@ -15990,7 +16092,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
+      <a href="../../examples/worldpop/06_multiyear_aggregate/" class="md-nav__link">
         
   
   
@@ -16018,7 +16120,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/07_covariates_nightlights/" class="md-nav__link">
+      <a href="../../examples/worldpop/07_covariates_nightlights/" class="md-nav__link">
         
   
   
@@ -16046,7 +16148,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/08_dependency_ratios/" class="md-nav__link">
+      <a href="../../examples/worldpop/08_dependency_ratios/" class="md-nav__link">
         
   
   
@@ -16074,7 +16176,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/worldpop/09_global_mosaic/" class="md-nav__link">
+      <a href="../../examples/worldpop/09_global_mosaic/" class="md-nav__link">
         
   
   
@@ -16160,7 +16262,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/gbif/quickstart/" class="md-nav__link">
+      <a href="../../examples/gbif/quickstart/" class="md-nav__link">
         
   
   
@@ -16246,7 +16348,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/obis/quickstart/" class="md-nav__link">
+      <a href="../../examples/obis/quickstart/" class="md-nav__link">
         
   
   
@@ -16332,7 +16434,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/wdpa/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/wdpa/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -16360,7 +16462,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/wdpa/quickstart/" class="md-nav__link">
+      <a href="../../examples/wdpa/quickstart/" class="md-nav__link">
         
   
   
@@ -16388,7 +16490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/wdpa/regional_comparison/" class="md-nav__link">
+      <a href="../../examples/wdpa/regional_comparison/" class="md-nav__link">
         
   
   
@@ -16474,7 +16576,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/iucn/catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/iucn/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -16502,7 +16604,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/iucn/quickstart/" class="md-nav__link">
+      <a href="../../examples/iucn/quickstart/" class="md-nav__link">
         
   
   
@@ -16530,7 +16632,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/iucn/country_redlist_breakdown/" class="md-nav__link">
+      <a href="../../examples/iucn/country_redlist_breakdown/" class="md-nav__link">
         
   
   
@@ -16616,7 +16718,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/argo/quickstart/" class="md-nav__link">
+      <a href="../../examples/argo/quickstart/" class="md-nav__link">
         
   
   
@@ -16644,7 +16746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/argo/catalog_and_selectors/" class="md-nav__link">
+      <a href="../../examples/argo/catalog_and_selectors/" class="md-nav__link">
         
   
   
@@ -16684,29 +16786,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -16724,7 +16821,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -16742,7 +16839,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../earthlens/" class="md-nav__link">
+      <a href="../earthlens/" class="md-nav__link">
         
   
   
@@ -16770,7 +16867,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../abstract-datasource/" class="md-nav__link">
+      <a href="../abstract-datasource/" class="md-nav__link">
         
   
   
@@ -16786,164 +16883,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../http-client/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    HTTP client (base)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Region affinity (base)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Region affinity (base)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#how-the-caller-region-is-resolved" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How the caller region is resolved
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#warning-before-large-egress" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Warning before large egress
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        API
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#earthlens.base.region.region_affinity" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        region_affinity
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#earthlens.base.region.warn_if_egress" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        warn_if_egress
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -17013,7 +16952,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../change-log/" class="md-nav__link">
+      <a href="../../change-log/" class="md-nav__link">
         
   
   
@@ -17041,7 +16980,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../LICENSE/" class="md-nav__link">
+      <a href="../../LICENSE/" class="md-nav__link">
         
   
   
@@ -17096,10 +17035,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-the-caller-region-is-resolved" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How the caller region is resolved
+        Summary
       
     </span>
   </a>
@@ -17107,43 +17046,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#warning-before-large-egress" class="md-nav__link">
+  <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Warning before large egress
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        API
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#earthlens.base.region.region_affinity" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        region_affinity
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#earthlens.base.region.warn_if_egress" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        warn_if_egress
+        Notes
       
     </span>
   </a>
@@ -17167,7 +17073,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/base/region-affinity.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/deferred-providers.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -17176,546 +17082,84 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/base/region-affinity.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/deferred-providers.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="cloud-region-affinity-earthlensbaseregion"><a class="toclink" href="#cloud-region-affinity-earthlensbaseregion">Cloud region affinity (<code>earthlens.base.region</code>)</a><a class="headerlink" href="#cloud-region-affinity-earthlensbaseregion" title="Permanent link">#</a></h1>
-<p><code>region_affinity(bucket_region)</code> answers one question: <strong>is this process running in the same cloud region as the
-target bucket?</strong> A backend uses the answer to choose between a cheap <strong>in-region</strong> streaming read and a slow,
-billed <strong>cross-region egress</strong> download.</p>
-<p>It returns one of three verdicts:</p>
+<h1 id="deferred-providers"><a class="toclink" href="#deferred-providers">Deferred providers</a><a class="headerlink" href="#deferred-providers" title="Permanent link">#</a></h1>
+<p>Some data sources were <strong>evaluated and deliberately not integrated</strong> into earthlens. They are listed here so the
+project surface stays honest: these are <em>known and considered</em>, not overlooked. The usual reasons are a <strong>licence
+trap</strong> (non-commercial / restricted redistribution), <strong>no stable programmatic access</strong> (no API or no maintained
+Python client), or <strong>commercial-only</strong> access.</p>
+<p>If you need one of these datasets, follow the manual route in its row. Always <strong>confirm the current licence and
+terms</strong> on the provider's own site before use — terms change, and the notes below reflect the state at evaluation
+time, not a legal guarantee.</p>
+<h2 id="summary"><a class="toclink" href="#summary">Summary</a><a class="headerlink" href="#summary" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Verdict</th>
-<th>Meaning</th>
+<th>Provider</th>
+<th>Domain</th>
+<th>Why deferred</th>
+<th>How to get the data</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>"in-region"</code></td>
-<td>the caller region equals <code>bucket_region</code> — stream directly</td>
+<td><strong>GVP</strong> (Smithsonian Global Volcanism Program)</td>
+<td>Volcanoes / eruptions</td>
+<td>Reference database, no stable bulk API / maintained Python client; reuse is attribution-bound</td>
+<td>Browse or export from the <a href="https://volcano.si.edu/">Volcanoes of the World</a> site; a WFS/GeoServer endpoint exists for one-off pulls</td>
 </tr>
 <tr>
-<td><code>"egress"</code></td>
-<td>caller and bucket are in different (known) regions — expect billed, slower transfer</td>
+<td><strong>GRDC</strong> (Global Runoff Data Centre)</td>
+<td>River discharge (in-situ)</td>
+<td><strong>Restricted access</strong> — data requires a formal request/agreement; no anonymous bulk download; redistribution limited</td>
+<td>Submit a data request via the <a href="https://grdc.bafg.de/">GRDC portal</a> and download the granted station files manually</td>
 </tr>
 <tr>
-<td><code>"unknown"</code></td>
-<td>the caller region could not be determined — fall back to the safe (HTTPS) path</td>
+<td><strong>IBAT</strong> (Integrated Biodiversity Assessment Tool)</td>
+<td>Protected areas / KBA / Red List</td>
+<td><strong>Commercial / subscription</strong> for most access tiers; free tier is limited and NC</td>
+<td>Use an <a href="https://www.ibat-alliance.org/">IBAT</a> subscription; for the underlying open layers use <code>earthlens.wdpa</code> (Protected Planet) and <code>earthlens.iucn</code> instead</td>
+</tr>
+<tr>
+<td><strong>Map of Life</strong> (MoL)</td>
+<td>Species range maps</td>
+<td>Per-dataset licensing; many layers are <strong>NC / research-only</strong></td>
+<td>Use the <a href="https://mol.org/">Map of Life</a> portal / its API under the specific dataset's terms; for open occurrences use <code>earthlens.gbif</code> / <code>earthlens.obis</code></td>
+</tr>
+<tr>
+<td><strong>IQAir</strong> (AirVisual)</td>
+<td>Air quality (ground)</td>
+<td><strong>Commercial API</strong> with paid tiers; free tier heavily rate-limited; redistribution restricted</td>
+<td>Use the paid <a href="https://www.iqair.com/air-pollution-data-api">IQAir/AirVisual API</a>; for open AQ use <code>earthlens.openaq</code> / <code>earthlens.airnow</code> / <code>earthlens.eea_aq</code></td>
+</tr>
+<tr>
+<td><strong>Renewables.ninja</strong></td>
+<td>Solar / wind power time series</td>
+<td><strong>CC-BY-NC</strong> (non-commercial) + rate-limited; academic use</td>
+<td>Register at <a href="https://www.renewables.ninja/">renewables.ninja</a> and pull per-site series under the NC licence; for open solar/wind resource use <code>earthlens.pvgis</code> / <code>earthlens.nrel</code> / <code>earthlens.solar_wind_atlas</code></td>
 </tr>
 </tbody>
 </table>
-<h2 id="how-the-caller-region-is-resolved"><a class="toclink" href="#how-the-caller-region-is-resolved">How the caller region is resolved</a><a class="headerlink" href="#how-the-caller-region-is-resolved" title="Permanent link">#</a></h2>
-<p>Resolution is <strong>env-first</strong>, then an optional metadata probe:</p>
-<ol>
-<li>an explicit <code>caller_region=</code> argument, then</li>
-<li><code>AWS_REGION</code> / <code>AWS_DEFAULT_REGION</code>, then</li>
-<li>(only when <code>probe=True</code>) an instance-metadata probe — <strong>AWS</strong> IMDSv2, <strong>GCP</strong>
-   <code>metadata.google.internal</code>, or <strong>Azure</strong> IMDS — each behind a hard 1 s timeout and cached per process.</li>
-</ol>
-<p>Detection <strong>never raises and never blocks</strong>: any failure yields <code>"unknown"</code>. Pass <code>probe=False</code> to skip all
-network access entirely (tests, air-gapped runs). The earthdata backend deliberately uses <code>probe=False</code> so its
-in-region decision never risks hanging an off-cloud caller.</p>
-<h2 id="warning-before-large-egress"><a class="toclink" href="#warning-before-large-egress">Warning before large egress</a><a class="headerlink" href="#warning-before-large-egress" title="Permanent link">#</a></h2>
-<p><code>warn_if_egress(bucket_region, *, size_bytes, threshold_bytes=1&lt;&lt;30)</code> emits a single <code>loguru</code> warning when the
-hint is <code>"egress"</code> and the transfer exceeds the threshold (default 1 GiB), and returns the hint. The <code>s3</code>
-backend calls it before a bulk pull (using the object sizes the listing already reported), so a cross-region
-transfer is never a silent cost surprise.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.region</span><span class="w"> </span><span class="kn">import</span> <span class="n">region_affinity</span><span class="p">,</span> <span class="n">warn_if_egress</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">if</span> <span class="n">region_affinity</span><span class="p">(</span><span class="s2">&quot;us-west-2&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;in-region&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">...</span>  <span class="c1"># stream from S3 in-region</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">warn_if_egress</span><span class="p">(</span><span class="s2">&quot;us-west-2&quot;</span><span class="p">,</span> <span class="n">size_bytes</span><span class="o">=</span><span class="n">total_bytes</span><span class="p">)</span>  <span class="c1"># advise, then HTTPS download</span>
-</code></pre></div>
-<h2 id="api"><a class="toclink" href="#api">API</a><a class="headerlink" href="#api" title="Permanent link">#</a></h2>
-
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="earthlens.base.region.region_affinity" class="doc doc-heading"><a href="#earthlens.base.region.region_affinity" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">region_affinity</span><span class="p">(</span><span class="n">bucket_region</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">caller_region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">probe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
-
-</a><a href="#earthlens.base.region.region_affinity" class="headerlink" title="Permanent link">#</a></h2>
-
-
-    <div class="doc doc-contents first">
-
-        <p>Classify the caller's region relative to a target bucket.</p>
-<p>Resolves the caller region in order — explicit <code>caller_region</code>, then
-<code>AWS_REGION</code> / <code>AWS_DEFAULT_REGION</code>, then (when <code>probe</code>) an
-instance-metadata probe — and compares it to <code>bucket_region</code>. The
-result guides a backend's choice between an in-region streaming read
-and a cross-region egress download.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>bucket_region</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The region the target bucket lives in (e.g.
-<code>"us-west-2"</code>). <code>None</code> or empty yields <code>"unknown"</code>.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>caller_region</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An explicit override for the caller's region. When
-given, the environment and probe are not consulted.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>probe</code>
-            </td>
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether to fall back to the instance-metadata probe when
-the environment carries no region. <code>False</code> skips all network
-access (tests, air-gapped runs, and the earthdata re-point).</p>
-              </div>
-            </td>
-            <td>
-                  <code>True</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>"in-region"</code> when the caller region equals <code>bucket_region</code>,</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>"egress"</code> when both are known and differ, or <code>"unknown"</code> when</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>the caller region cannot be determined (or <code>bucket_region</code> is</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>empty).</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <ul>
-<li>An explicit caller region drives the verdict without touching
-  the environment:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.region</span><span class="w"> </span><span class="kn">import</span> <span class="n">region_affinity</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">region_affinity</span><span class="p">(</span><span class="s2">&quot;us-west-2&quot;</span><span class="p">,</span> <span class="n">caller_region</span><span class="o">=</span><span class="s2">&quot;us-west-2&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">&#39;in-region&#39;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">region_affinity</span><span class="p">(</span><span class="s2">&quot;us-west-2&quot;</span><span class="p">,</span> <span class="n">caller_region</span><span class="o">=</span><span class="s2">&quot;eu-central-1&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="s1">&#39;egress&#39;</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">region_affinity</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">caller_region</span><span class="o">=</span><span class="s2">&quot;us-west-2&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="s1">&#39;unknown&#39;</span>
-</code></pre></div></li>
+<h2 id="notes"><a class="toclink" href="#notes">Notes</a><a class="headerlink" href="#notes" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>NC (non-commercial) sources</strong> — MoL (many layers), Renewables.ninja, and IBAT's free tier — are excluded from
+  the default integration path because earthlens makes no assumption about a user's commercial status. Where an
+  <strong>open-licensed</strong> alternative covers the same need, it is named in the table (e.g. WDPA/IUCN for protected areas,
+  GBIF/OBIS for occurrences, OpenAQ/AirNow/EEA for air quality, PVGIS/NREL for renewables).</li>
+<li><strong>Restricted-access sources</strong> — GRDC — cannot be wrapped behind an anonymous <code>download()</code> because access is
+  gated by an individual agreement; a backend would only ever hold a per-user credential with redistribution
+  constraints, which does not fit earthlens's "fetch and hand back the data" contract.</li>
+<li><strong>No-stable-client sources</strong> — GVP — could be revisited if a maintained API/Python client and clear bulk-reuse
+  terms appear.</li>
 </ul>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>src/earthlens/base/region.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-206">206</a></span>
-<span class="normal"><a href="#__codelineno-0-207">207</a></span>
-<span class="normal"><a href="#__codelineno-0-208">208</a></span>
-<span class="normal"><a href="#__codelineno-0-209">209</a></span>
-<span class="normal"><a href="#__codelineno-0-210">210</a></span>
-<span class="normal"><a href="#__codelineno-0-211">211</a></span>
-<span class="normal"><a href="#__codelineno-0-212">212</a></span>
-<span class="normal"><a href="#__codelineno-0-213">213</a></span>
-<span class="normal"><a href="#__codelineno-0-214">214</a></span>
-<span class="normal"><a href="#__codelineno-0-215">215</a></span>
-<span class="normal"><a href="#__codelineno-0-216">216</a></span>
-<span class="normal"><a href="#__codelineno-0-217">217</a></span>
-<span class="normal"><a href="#__codelineno-0-218">218</a></span>
-<span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span>
-<span class="normal"><a href="#__codelineno-0-221">221</a></span>
-<span class="normal"><a href="#__codelineno-0-222">222</a></span>
-<span class="normal"><a href="#__codelineno-0-223">223</a></span>
-<span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span>
-<span class="normal"><a href="#__codelineno-0-226">226</a></span>
-<span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span>
-<span class="normal"><a href="#__codelineno-0-230">230</a></span>
-<span class="normal"><a href="#__codelineno-0-231">231</a></span>
-<span class="normal"><a href="#__codelineno-0-232">232</a></span>
-<span class="normal"><a href="#__codelineno-0-233">233</a></span>
-<span class="normal"><a href="#__codelineno-0-234">234</a></span>
-<span class="normal"><a href="#__codelineno-0-235">235</a></span>
-<span class="normal"><a href="#__codelineno-0-236">236</a></span>
-<span class="normal"><a href="#__codelineno-0-237">237</a></span>
-<span class="normal"><a href="#__codelineno-0-238">238</a></span>
-<span class="normal"><a href="#__codelineno-0-239">239</a></span>
-<span class="normal"><a href="#__codelineno-0-240">240</a></span>
-<span class="normal"><a href="#__codelineno-0-241">241</a></span>
-<span class="normal"><a href="#__codelineno-0-242">242</a></span>
-<span class="normal"><a href="#__codelineno-0-243">243</a></span>
-<span class="normal"><a href="#__codelineno-0-244">244</a></span>
-<span class="normal"><a href="#__codelineno-0-245">245</a></span>
-<span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span>
-<span class="normal"><a href="#__codelineno-0-253">253</a></span>
-<span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span>
-<span class="normal"><a href="#__codelineno-0-256">256</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_affinity</span><span class="p">(</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>    <span class="n">bucket_region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="n">caller_region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="n">probe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Classify the caller&#39;s region relative to a target bucket.</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    Resolves the caller region in order — explicit `caller_region`, then</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    `AWS_REGION` / `AWS_DEFAULT_REGION`, then (when `probe`) an</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    instance-metadata probe — and compares it to `bucket_region`. The</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    result guides a backend&#39;s choice between an in-region streaming read</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    and a cross-region egress download.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        bucket_region: The region the target bucket lives in (e.g.</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            `&quot;us-west-2&quot;`). `None` or empty yields `&quot;unknown&quot;`.</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        caller_region: An explicit override for the caller&#39;s region. When</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            given, the environment and probe are not consulted.</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        probe: Whether to fall back to the instance-metadata probe when</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">            the environment carries no region. `False` skips all network</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            access (tests, air-gapped runs, and the earthdata re-point).</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        `&quot;in-region&quot;` when the caller region equals `bucket_region`,</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        `&quot;egress&quot;` when both are known and differ, or `&quot;unknown&quot;` when</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        the caller region cannot be determined (or `bucket_region` is</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        empty).</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        - An explicit caller region drives the verdict without touching</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">          the environment:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">            &gt;&gt;&gt; from earthlens.base.region import region_affinity</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            &gt;&gt;&gt; region_affinity(&quot;us-west-2&quot;, caller_region=&quot;us-west-2&quot;)</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            &#39;in-region&#39;</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            &gt;&gt;&gt; region_affinity(&quot;us-west-2&quot;, caller_region=&quot;eu-central-1&quot;)</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            &#39;egress&#39;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            &gt;&gt;&gt; region_affinity(&quot;&quot;, caller_region=&quot;us-west-2&quot;)</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            &#39;unknown&#39;</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">bucket_region</span><span class="p">:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="k">return</span> <span class="n">UNKNOWN</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">caller</span> <span class="o">=</span> <span class="n">caller_region</span> <span class="ow">or</span> <span class="n">_caller_region_from_env</span><span class="p">()</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">if</span> <span class="n">caller</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">probe</span><span class="p">:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">caller</span> <span class="o">=</span> <span class="n">_detect_caller_region</span><span class="p">()</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">if</span> <span class="n">caller</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="n">UNKNOWN</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">return</span> <span class="n">IN_REGION</span> <span class="k">if</span> <span class="n">caller</span> <span class="o">==</span> <span class="n">bucket_region</span> <span class="k">else</span> <span class="n">EGRESS</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="earthlens.base.region.warn_if_egress" class="doc doc-heading"><a href="#earthlens.base.region.warn_if_egress" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">warn_if_egress</span><span class="p">(</span><span class="n">bucket_region</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size_bytes</span><span class="p">,</span> <span class="n">threshold_bytes</span><span class="o">=</span><span class="n">DEFAULT_EGRESS_THRESHOLD_BYTES</span><span class="p">,</span> <span class="n">caller_region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">probe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
-
-</a><a href="#earthlens.base.region.warn_if_egress" class="headerlink" title="Permanent link">#</a></h2>
-
-
-    <div class="doc doc-contents first">
-
-        <p>Warn once before a large cross-region pull, returning the hint.</p>
-<p>Computes the region affinity and, when the caller is in a different
-region than the bucket (<code>"egress"</code>) and the transfer exceeds
-<code>threshold_bytes</code>, emits a single <code>loguru</code> warning so the user learns
-about the cross-region cost and latency up front. The hint is
-returned so a caller can branch on it too.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>bucket_region</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The region the target bucket lives in.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>size_bytes</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The size of the pending transfer in bytes.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>threshold_bytes</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The size above which the warning fires (default
-1 GiB). A parameter, never hard-coded at the call site.</p>
-              </div>
-            </td>
-            <td>
-                  <code><span title="earthlens.base.region.DEFAULT_EGRESS_THRESHOLD_BYTES">DEFAULT_EGRESS_THRESHOLD_BYTES</span></code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>caller_region</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An explicit override for the caller's region.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>probe</code>
-            </td>
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether to allow the instance-metadata probe (see
-:func:<code>region_affinity</code>).</p>
-              </div>
-            </td>
-            <td>
-                  <code>True</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The affinity hint — <code>"in-region"</code>, <code>"egress"</code>, or <code>"unknown"</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>src/earthlens/base/region.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span>
-<span class="normal"><a href="#__codelineno-0-261">261</a></span>
-<span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
-<span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span>
-<span class="normal"><a href="#__codelineno-0-273">273</a></span>
-<span class="normal"><a href="#__codelineno-0-274">274</a></span>
-<span class="normal"><a href="#__codelineno-0-275">275</a></span>
-<span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span>
-<span class="normal"><a href="#__codelineno-0-282">282</a></span>
-<span class="normal"><a href="#__codelineno-0-283">283</a></span>
-<span class="normal"><a href="#__codelineno-0-284">284</a></span>
-<span class="normal"><a href="#__codelineno-0-285">285</a></span>
-<span class="normal"><a href="#__codelineno-0-286">286</a></span>
-<span class="normal"><a href="#__codelineno-0-287">287</a></span>
-<span class="normal"><a href="#__codelineno-0-288">288</a></span>
-<span class="normal"><a href="#__codelineno-0-289">289</a></span>
-<span class="normal"><a href="#__codelineno-0-290">290</a></span>
-<span class="normal"><a href="#__codelineno-0-291">291</a></span>
-<span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="k">def</span><span class="w"> </span><span class="nf">warn_if_egress</span><span class="p">(</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">bucket_region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">size_bytes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">threshold_bytes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_EGRESS_THRESHOLD_BYTES</span><span class="p">,</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="n">caller_region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">probe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Warn once before a large cross-region pull, returning the hint.</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Computes the region affinity and, when the caller is in a different</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    region than the bucket (`&quot;egress&quot;`) and the transfer exceeds</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    `threshold_bytes`, emits a single `loguru` warning so the user learns</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    about the cross-region cost and latency up front. The hint is</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">    returned so a caller can branch on it too.</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        bucket_region: The region the target bucket lives in.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        size_bytes: The size of the pending transfer in bytes.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        threshold_bytes: The size above which the warning fires (default</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            1 GiB). A parameter, never hard-coded at the call site.</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        caller_region: An explicit override for the caller&#39;s region.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        probe: Whether to allow the instance-metadata probe (see</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            :func:`region_affinity`).</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        The affinity hint — `&quot;in-region&quot;`, `&quot;egress&quot;`, or `&quot;unknown&quot;`.</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="n">region_affinity</span><span class="p">(</span><span class="n">bucket_region</span><span class="p">,</span> <span class="n">caller_region</span><span class="o">=</span><span class="n">caller_region</span><span class="p">,</span> <span class="n">probe</span><span class="o">=</span><span class="n">probe</span><span class="p">)</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">if</span> <span class="n">hint</span> <span class="o">==</span> <span class="n">EGRESS</span> <span class="ow">and</span> <span class="n">size_bytes</span> <span class="o">&gt;</span> <span class="n">threshold_bytes</span><span class="p">:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="sa">f</span><span class="s2">&quot;Cross-region egress: pulling </span><span class="si">{</span><span class="n">size_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">30</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GiB &quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>            <span class="sa">f</span><span class="s2">&quot;from </span><span class="si">{</span><span class="n">bucket_region</span><span class="si">!r}</span><span class="s2"> while running elsewhere — expect slower, &quot;</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="sa">f</span><span class="s2">&quot;billed transfer. Run in </span><span class="si">{</span><span class="n">bucket_region</span><span class="si">!r}</span><span class="s2"> to stream in-region.&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="k">return</span> <span class="n">hint</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
+<p>These deferrals are tracked as <code>L15</code> in the low-tier roadmap. Re-evaluate a row if its licence or access model
+changes.</p>
 
 
 
@@ -17751,7 +17195,7 @@ returned so a caller can branch on it too.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../http-client/" class="md-footer__link md-footer__link--prev" aria-label="Previous: HTTP client (base)">
+          <a href="../providers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Supported providers">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -17761,20 +17205,20 @@ returned so a caller can branch on it too.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                HTTP client (base)
+                Supported providers
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../../change-log/" class="md-footer__link md-footer__link--next" aria-label="Next: Change Log">
+          <a href="../chc/introduction/" class="md-footer__link md-footer__link--next" aria-label="Next: Introduction">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Change Log
+                Introduction
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -17827,14 +17271,14 @@ returned so a caller can branch on it too.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.footer", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "content.tooltips", "search.highlight", "search.suggest", "toc.follow", "announce.dismiss"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.footer", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "content.tooltips", "search.highlight", "search.suggest", "toc.follow", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../assets/javascripts/panzoom.min.js"></script>
+        <script src="../../assets/javascripts/panzoom.min.js"></script>
       
-        <script src="../../../assets/javascripts/zoompan.js"></script>
+        <script src="../../assets/javascripts/zoompan.js"></script>
       
     
   </body>
