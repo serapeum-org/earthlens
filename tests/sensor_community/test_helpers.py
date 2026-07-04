@@ -57,6 +57,15 @@ def test_license_warning_is_user_warning():
 class TestClient:
     """The two-host client with back-off."""
 
+    def test_exposes_retry_config(self):
+        """The client surfaces its retry config from the underlying HttpClient."""
+        client = SensorCommunityClient(max_retries=4, backoff_factor=2.0, timeout=30.0)
+        assert (client.max_retries, client.backoff_factor, client.timeout) == (
+            4,
+            2.0,
+            30.0,
+        )
+
     def test_live_snapshot(self):
         """`live_snapshot` returns the JSON array."""
         client = SensorCommunityClient(session=_Session([_Resp(json_body=[{"a": 1}])]))

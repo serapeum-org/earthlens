@@ -10,6 +10,13 @@ from tests.airnow.conftest import _FakeAirnow, _FakeResponse, _FakeSession
 
 
 @pytest.mark.airnow
+def test_client_exposes_retry_config():
+    """The client surfaces its retry config from the underlying HttpClient."""
+    client = AirnowClient("k", max_retries=7, backoff_factor=2.0, timeout=30.0)
+    assert (client.max_retries, client.backoff_factor, client.timeout) == (7, 2.0, 30.0)
+
+
+@pytest.mark.airnow
 class TestGetData:
     """The single `get_data` call."""
 
