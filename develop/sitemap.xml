@@ -49,6 +49,10 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/airnow/quickstart/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/argo/catalog_and_selectors/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -234,6 +238,10 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/ecmwf/wind_energy_resource/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/eea-aq/quickstart/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
@@ -629,6 +637,10 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/sensor-community/quickstart/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/sentinel-hub/aggregate_monthly/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -909,6 +921,22 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/airnow/airnow/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/airnow/authentication/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/airnow/introduction/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/airnow/usage/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/argo/argo/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -938,14 +966,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/asf/usage/</loc>
-         <lastmod>2026-07-04</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/http-client/</loc>
-         <lastmod>2026-07-04</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/region-affinity/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
@@ -1066,6 +1086,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/usage/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eea-aq/authentication/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eea-aq/eea-aq/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eea-aq/introduction/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/eea-aq/usage/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
@@ -1466,6 +1502,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/s3/usage/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sensor-community/authentication/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sensor-community/introduction/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sensor-community/sensor-community/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/sensor-community/usage/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
