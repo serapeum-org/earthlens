@@ -27,7 +27,7 @@ as `data_source=`.
 | **Ocean & marine** | Copernicus Marine — CMEMS (`cmems`) |
 | **Cloud-hosted archives** | AWS Open Data — ERA5 / Sentinel-2 / Copernicus DEM / ESA WorldCover (`amazon-s3`) |
 | **Natural hazards & events** | GDACS disaster alerts (`gdacs`) · FDSN earthquakes (`fdsn`) · FIRMS active fires (`firms`) · Tropycal cyclone tracks (`tropycal`) · NEXRAD radar (`radar`) |
-| **Air quality** | OpenAQ (`openaq`) |
+| **Air quality** | OpenAQ — global aggregator (`openaq`) · AirNow — US/Canada EPA (`airnow`) · EEA — Europe (`eea-aq`) · Sensor.Community — crowdsourced (`sensor-community`) |
 | **Population & settlement** | JRC Global Human Settlement Layer (`ghsl`) · WorldPop (`worldpop`) |
 | **Hydrology** | USGS Water — NWIS (`usgs-water`) · NOAA National Water Model (`nwm`) |
 | **Vector & humanitarian** | Overture Maps basemap (`overture`) · Humanitarian Data Exchange — HDX (`hdx`) |
@@ -38,7 +38,7 @@ graph LR
     EarthLens --> Imagery["Satellite imagery<br/>gee · stac · sentinel-hub<br/>openeo · eumetsat · earthdata"]
     EarthLens --> Ocean["Ocean & archives<br/>cmems · amazon-s3"]
     EarthLens --> Hazards["Hazards & events<br/>gdacs · fdsn · firms<br/>tropycal · radar"]
-    EarthLens --> People["Air, population & water<br/>openaq · ghsl · worldpop<br/>usgs-water · nwm"]
+    EarthLens --> People["Air, population & water<br/>openaq · airnow · eea-aq · sensor-community<br/>ghsl · worldpop · usgs-water · nwm"]
     EarthLens --> Vector["Vector & humanitarian<br/>overture · hdx"]
 ```
 
