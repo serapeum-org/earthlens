@@ -71,8 +71,10 @@ class JAXA(AbstractDataSource):
     Attributes:
         OUTPUT_KIND: Fixed `"raster"`. The `jaxa-earth` branch always emits
             GeoTIFFs; the `gportal` branch writes raw products (HDF5,
-            GeoTIFF, NetCDF — mission-dependent) which downstream readers
-            still treat as gridded artefacts.
+            GeoTIFF, NetCDF — mission-dependent); the `ptree` branch
+            writes raw Himawari HSD `.DAT.bz2` segments (10 per band per
+            10-minute slot) — all three downstream readers still treat
+            the output as gridded artefacts.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -116,10 +118,15 @@ class JAXA(AbstractDataSource):
             fmt: `strptime` format for `start` / `end`.
             resolution: `ppu` (pixels per degree) for the `jaxa-earth`
                 branch. `None` lets the API pick its native resolution.
-                Ignored for `gportal`.
-            bands: Override the catalog's `default_band` for the
-                `jaxa-earth` branch. `None` uses each dataset's default
-                band. Ignored for `gportal`.
+                Ignored for `gportal` and `ptree`.
+            bands: Override the catalog's `default_band`. For
+                `jaxa-earth`, picks the band(s) whose GeoTIFF the
+                backend writes. For `ptree`, selects which Himawari
+                AHI band(s) to download from the full 10-segment set
+                — `"B01"`..`"B16"` are valid, with `"B03"` (0.5 km
+                visible) and `"B13"` (2 km IR) as the two common
+                defaults. `None` uses the row's `default_band`.
+                Ignored for `gportal` (products are downloaded whole).
             gportal_username: Explicit G-Portal username. When omitted,
                 `JaxaAuth.configure()` reads `$GPORTAL_USERNAME` at
                 authentication time. Only used by the `gportal` branch.
@@ -181,7 +188,8 @@ class JAXA(AbstractDataSource):
         )
         # Bind the protocol so `AbstractDataSource.authenticate()` (which
         # calls `self._auth.configure()` with no args) fails fast on
-        # missing G-Portal credentials.
+        # missing credentials for whichever credentialed branch this
+        # request pins (`gportal` or `ptree`); jaxa-earth is authless.
         self._auth = JaxaAuth(creds, protocol=self._protocol)
 
         super().__init__(
@@ -201,8 +209,9 @@ class JAXA(AbstractDataSource):
 
         Returns:
             JaxaAuth: The optional-credentials auth object. `configure()`
-            is a no-op for the `jaxa-earth` protocol and resolves
-            G-Portal credentials for the `gportal` protocol.
+            is a no-op for the `jaxa-earth` protocol, resolves
+            G-Portal credentials for `gportal`, and resolves P-Tree
+            credentials for `ptree`.
 
         Examples:
             - The auth object's protocol always matches the backend's:
@@ -227,7 +236,8 @@ class JAXA(AbstractDataSource):
         """The single protocol this request resolved to.
 
         Returns:
-            JaxaProtocol: Either `"jaxa-earth"` or `"gportal"`.
+            JaxaProtocol: One of `"jaxa-earth"`, `"gportal"`, or
+                `"ptree"`.
 
         Examples:
             - Resolving an alias pins the protocol on construction:
@@ -249,11 +259,14 @@ class JAXA(AbstractDataSource):
     def _initialize(self) -> None:
         """No eager connection setup.
 
-        Both SDKs (`jaxa.earth`, `gportal`) are imported lazily in their
-        branch modules, and `jaxa-earth` is authless. The optional
-        `gportal` credentials are resolved lazily — `download()` calls
-        `self._auth.configure()` before dispatching, and so does the
-        explicit `EarthLens(...).authenticate()` entry point.
+        All three branches import their transport clients lazily:
+        `jaxa.earth` and `gportal` inside their branch modules (needing
+        the `[jaxa]` extra), and the `ptree` branch uses only stdlib
+        `ftplib` on demand. `jaxa-earth` is authless; the optional
+        `gportal` / `ptree` credentials are resolved lazily —
+        `download()` calls `self._auth.configure()` before dispatching,
+        and so does the explicit `EarthLens(...).authenticate()`
+        entry point.
 
         Returns:
             None: No backend client to attach.
