@@ -147,6 +147,14 @@ class TestFrameFromCsv:
         out = frame_from_csv(csv, {"P2": "pm25"}, {"pm25": "µg/m³"})
         assert out.empty
 
+    def test_default_sensor_type_fallback(self):
+        """`default_sensor_type` fills the column when the CSV omits it."""
+        csv = "sensor_id;lat;lon;timestamp;P2\n1;1.0;2.0;2026-06-30T00:00:00;4.2\n"
+        out = frame_from_csv(
+            csv, {"P2": "pm25"}, {"pm25": "µg/m³"}, default_sensor_type="sds011"
+        )
+        assert (out["sensor_type"] == "sds011").all()
+
     def test_missing_structural_column_skipped(self):
         """A CSV with the value column but no `lat` is skipped, not a KeyError."""
         csv = (

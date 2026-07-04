@@ -239,6 +239,7 @@ def frame_from_csv(
     text: str,
     columns: dict[str, str],
     units: dict[str, str],
+    default_sensor_type: str | None = None,
 ) -> pd.DataFrame:
     """Reshape one per-sensor archive CSV into the backend's long schema.
 
@@ -252,6 +253,10 @@ def frame_from_csv(
         columns: CSV column -> pollutant name for the requested pollutants
             (`{"P2": "pm25", "P1": "pm10"}`).
         units: Pollutant name -> reporting unit string.
+        default_sensor_type: The archive sensor-type slug known from
+            discovery, used for the `sensor_type` column when the CSV omits
+            its own `sensor_type` column. `None` leaves it null in that
+            (degenerate) case.
 
     Returns:
         pd.DataFrame: The readings in the `SCHEMA` columns / dtypes; empty
@@ -275,7 +280,11 @@ def frame_from_csv(
     # Normalise the CSV's upper-case sensor type (`SDS011`) to the lower-case
     # archive slug (`sds011`) so the output column matches the discovery
     # metadata and the archive URL.
-    sensor_type = raw["sensor_type"].astype(str).str.lower() if "sensor_type" in raw else None
+    sensor_type = (
+        raw["sensor_type"].astype(str).str.lower()
+        if "sensor_type" in raw
+        else default_sensor_type
+    )
     for col, name in present.items():
         sub = pd.DataFrame(index=raw.index)
         sub["station_id"] = raw["sensor_id"].astype(str)

@@ -296,7 +296,9 @@ class SensorCommunity(AbstractDataSource):
                     f"{product.id} ({sensor_type}) on {day}; skipped."
                 )
                 continue
-            frames.append(frame_from_csv(text, columns, units))
+            frames.append(
+                frame_from_csv(text, columns, units, default_sensor_type=sensor_type)
+            )
         non_empty = [frame for frame in frames if not frame.empty]
         if not non_empty:
             return empty_frame()
