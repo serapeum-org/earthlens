@@ -1413,6 +1413,10 @@ datasets:
     license: CC-BY-4.0
     model_family: aifs-ens
     resolution: 0.25deg
+    # Dissemination verified against ECMWF (2026-07-03): AIFS-ENS is produced 00/06/12/18
+    # UTC, 6-hourly steps to 360 h (15 days), 0.25deg, 51 members. Band set mirrors the IFS
+    # `ens` row's full param list; a band the ensemble does not publish 404s per-request
+    # (same behaviour as `ens`).
     cycles_utc: [0, 6, 12, 18]
     cadence_h: 6
     step_cadence_h: 6
