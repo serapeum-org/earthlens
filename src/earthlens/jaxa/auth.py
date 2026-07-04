@@ -37,7 +37,7 @@ as kwargs — no module-level mutation of the SDK is required.
 from __future__ import annotations
 
 import os
-from typing import Literal
+from typing import Literal, NamedTuple
 
 from pydantic import BaseModel, ConfigDict, SecretStr
 
@@ -132,28 +132,40 @@ class JaxaCredentials(BaseModel):
     ptree_password: SecretStr | None = None
 
 
-#: Per-protocol resolver spec: `(cred_username_attr, cred_password_attr,
-#: env_username, env_password, register_url, human_name)`. Consumed by
-#: :meth:`JaxaAuth.configure` so the two credentialed branches share one
-#: code path — adding a fourth credentialed protocol only needs a new row.
-_PROTOCOL_SPECS: dict[
-    JaxaProtocol, tuple[str, str, str, str, str, str]
-] = {
-    "gportal": (
-        "gportal_username",
-        "gportal_password",
-        "GPORTAL_USERNAME",
-        "GPORTAL_PASSWORD",
-        _GPORTAL_REGISTER_URL,
-        "G-Portal",
+class _ProtocolSpec(NamedTuple):
+    """Per-protocol resolver spec consumed by :meth:`JaxaAuth.configure`.
+
+    Named-tuple access (`spec.cred_user`) keeps `configure()` readable
+    and gives static type-checkers a chance to catch a typo when a new
+    credentialed protocol is added.
+    """
+
+    cred_user: str
+    cred_pass: str
+    env_user: str
+    env_pass: str
+    register_url: str
+    human_name: str
+
+
+#: Two credentialed branches share one resolver path via this map;
+#: adding a fourth credentialed protocol only needs a new row.
+_PROTOCOL_SPECS: dict[JaxaProtocol, _ProtocolSpec] = {
+    "gportal": _ProtocolSpec(
+        cred_user="gportal_username",
+        cred_pass="gportal_password",
+        env_user="GPORTAL_USERNAME",
+        env_pass="GPORTAL_PASSWORD",
+        register_url=_GPORTAL_REGISTER_URL,
+        human_name="G-Portal",
     ),
-    "ptree": (
-        "ptree_username",
-        "ptree_password",
-        "JAXA_PTREE_USERNAME",
-        "JAXA_PTREE_PASSWORD",
-        _PTREE_REGISTER_URL,
-        "P-Tree",
+    "ptree": _ProtocolSpec(
+        cred_user="ptree_username",
+        cred_pass="ptree_password",
+        env_user="JAXA_PTREE_USERNAME",
+        env_pass="JAXA_PTREE_PASSWORD",
+        register_url=_PTREE_REGISTER_URL,
+        human_name="P-Tree",
     ),
 }
 
@@ -310,28 +322,22 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
         if self._protocol == "jaxa-earth":
             self._configured = True
             return
-        (
-            cred_user_attr,
-            cred_pass_attr,
-            env_user,
-            env_pass,
-            register_url,
-            human_name,
-        ) = _PROTOCOL_SPECS[self._protocol]
-        cred_username = getattr(self._creds, cred_user_attr)
-        cred_password: SecretStr | None = getattr(self._creds, cred_pass_attr)
-        username = cred_username or os.environ.get(env_user)
+        spec = _PROTOCOL_SPECS[self._protocol]
+        cred_username = getattr(self._creds, spec.cred_user)
+        cred_password: SecretStr | None = getattr(self._creds, spec.cred_pass)
+        username = cred_username or os.environ.get(spec.env_user)
         password_raw = (
             cred_password.get_secret_value()
             if cred_password is not None
-            else os.environ.get(env_pass)
+            else os.environ.get(spec.env_pass)
         )
         if not username or not password_raw:
             raise AuthenticationError(
-                f"no {human_name} credentials available: pass "
-                f"{cred_user_attr}= and {cred_pass_attr}= to JAXA(...), "
-                f"or set both {env_user} and {env_pass} environment "
-                f"variables. Register a free account at {register_url}."
+                f"no {spec.human_name} credentials available: pass "
+                f"{spec.cred_user}= and {spec.cred_pass}= to JAXA(...), "
+                f"or set both {spec.env_user} and {spec.env_pass} "
+                f"environment variables. Register a free account at "
+                f"{spec.register_url}."
             )
         self._username = username
         self._password = SecretStr(password_raw)

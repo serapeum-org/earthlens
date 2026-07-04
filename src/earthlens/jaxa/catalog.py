@@ -30,7 +30,7 @@ from __future__ import annotations
 import difflib
 import re
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -79,7 +79,11 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-JaxaProtocol = Literal["jaxa-earth", "gportal", "ptree"]
+#: Re-exported so a reader of `catalog.py`'s `Dataset` model can import
+#: the discriminator type from the same module. The single source of
+#: truth lives in :mod:`earthlens.jaxa.auth` so a new credentialed
+#: protocol only needs to grow the Literal in one place.
+from earthlens.jaxa.auth import JaxaProtocol  # noqa: E402  (re-export)
 
 
 class Dataset(BaseModel):
