@@ -7,7 +7,8 @@ from typing import Any
 import pytest
 import requests
 
-from earthlens.openaq.client import BASE_URL, OpenaqClient, _parse_retry_after
+from earthlens.base.http import _parse_retry_after
+from earthlens.openaq.client import BASE_URL, OpenaqClient
 
 
 class _Resp:
@@ -29,6 +30,9 @@ class _Resp:
     def raise_for_status(self) -> None:
         if self.status_code >= 400:
             raise requests.HTTPError(f"HTTP {self.status_code}")
+
+    def close(self) -> None:
+        return None
 
 
 class _SeqSession:
@@ -84,6 +88,21 @@ class TestRequest:
         assert session.calls[0]["headers"]["X-API-Key"] == "key"
         assert session.calls[0]["url"] == f"{BASE_URL}/locations"
 
+    def test_sends_earthlens_user_agent(self):
+        """The HttpClient migration sends the non-Mozilla earthlens UA (G4)."""
+        client, session = _client([_Resp({"results": []})])
+        client._request("locations", {"limit": 10})
+        user_agent = session.calls[0]["headers"]["User-Agent"]
+        assert user_agent.startswith("earthlens/")
+        assert "mozilla" not in user_agent.lower()
+
+    def test_retry_attrs_reflect_the_http_client_config(self):
+        """max_retries/backoff_factor/timeout read back the delegated config."""
+        client = OpenaqClient("key", max_retries=3, backoff_factor=2.0, timeout=42.0)
+        assert client.max_retries == 3
+        assert client.backoff_factor == 2.0
+        assert client.timeout == 42.0
+
     def test_429_then_success(self):
         """A 429 with Retry-After is retried, then succeeds."""
         client, session = _client(
@@ -103,6 +122,14 @@ class TestRequest:
         )
         client._request("locations", {})
         assert client._waits == [2.0]  # type: ignore[attr-defined]
+
+    def test_large_retry_after_is_uncapped(self):
+        """A Retry-After above the default cap is honoured (openaq is uncapped)."""
+        client, session = _client(
+            [_Resp({}, 429, {"Retry-After": "600"}), _Resp({"results": []})]
+        )
+        client._request("locations", {})
+        assert client._waits == [600.0]  # type: ignore[attr-defined]
 
     def test_raises_after_max_retries(self):
         """Exhausted 429s raise the final HTTPError."""

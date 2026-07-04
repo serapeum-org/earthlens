@@ -41,6 +41,7 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base._dates import to_datetime
+from earthlens.base.http import HttpClient
 from earthlens.drought._helpers import (
     attribution_for,
     bbox_from_extent,
@@ -780,36 +781,43 @@ def _http_get_json(url: str) -> dict[str, Any]:
     return response.json()
 
 
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps `HttpClient` pointed at the module-level `requests.get` (rather
+    than a private session) so this single-shot download stays a fresh
+    connection per call and the tests that monkeypatch `requests.get` still
+    drive the transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
+
+
 def _http_download(url: str, target: Path) -> None:
     """Stream a binary payload to `target` over HTTP.
 
+    Delegates the transfer to `HttpClient.download`, which streams to a
+    sibling `<target>.part` file and atomically renames it on success,
+    removing the temp on any failure — so an interrupted download never
+    leaves a truncated file (nor a stale temp) behind. Error statuses are
+    raised immediately, not retried (`status_forcelist=()`), matching the
+    previous single-shot behaviour.
+
     Args:
         url: The source URL.
-        target: The destination path. Parent directory must exist.
+        target: The destination path. Parent directory is created.
 
     Raises:
         requests.HTTPError: For non-2xx responses.
     """
-    target.parent.mkdir(parents=True, exist_ok=True)
-    tmp = target.with_suffix(target.suffix + ".partial")
-    try:
-        with requests.get(
-            url,
-            timeout=_HTTP_TIMEOUT,
-            stream=True,
-            headers={"User-Agent": _USER_AGENT},
-        ) as response:
-            response.raise_for_status()
-            with tmp.open("wb") as fh:
-                for chunk in response.iter_content(chunk_size=1 << 16):
-                    if chunk:
-                        fh.write(chunk)
-        tmp.replace(target)
-    except BaseException:
-        # A dropped connection (or interrupt) mid-stream would otherwise
-        # leave a stale `.partial` on disk; remove it before re-raising.
-        tmp.unlink(missing_ok=True)
-        raise
+    HttpClient(
+        session=_RequestsGet(),
+        user_agent=_USER_AGENT,
+        status_forcelist=(),
+        max_backoff=None,
+    ).download(url, target, chunk=1 << 16, progress=False, timeout=_HTTP_TIMEOUT)
 
 
 def _http_download_raster(url: str, target: Path, *, label: str) -> None:

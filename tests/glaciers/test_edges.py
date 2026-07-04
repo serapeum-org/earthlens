@@ -25,6 +25,9 @@ DATA = Path(__file__).parent / "data"
 class _StreamResp:
     """A streaming response stand-in over fixed bytes."""
 
+    status_code = 200
+    headers: dict[str, str] = {}
+
     def __init__(self, payload: bytes) -> None:
         self._payload = payload
 
@@ -39,6 +42,9 @@ class _StreamResp:
 
     def iter_content(self, chunk_size: int = 1 << 20):
         yield self._payload
+
+    def close(self):
+        return None
 
 
 class _TextResp:
@@ -59,7 +65,7 @@ class _FlakySession:
         self._fails = fails
         self.attempts = 0
 
-    def get(self, url, stream=False, timeout=None):
+    def get(self, url, **kwargs):
         self.attempts += 1
         if self.attempts <= self._fails:
             raise requests.ConnectionError("boom")

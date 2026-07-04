@@ -19,9 +19,12 @@ import math
 import os
 import zipfile
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlsplit
 
 import requests
+
+from earthlens.base.http import HttpClient
 
 #: GDAL `/vsicurl` HTTP settings applied (via `setdefault`) before the first
 #: remote read. `GDAL_DISABLE_READDIR_ON_OPEN` stops GDAL listing the "directory"
@@ -204,11 +207,29 @@ def zip_cache_path(url: str, cache_dir: Path) -> Path:
     return cache_dir / name
 
 
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so this
+    single-shot download stays a fresh connection per call and tests that
+    monkeypatch `requests.get` still drive the transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
+
+
 def download_zip(url: str, cache_dir: Path, *, timeout: float = 600.0) -> Path:
     """Download a ZIP archive into the cache once, reusing it if present.
 
     A present, non-empty cached file is returned without a network call, so the
-    multi-GB Global Solar Atlas archives are fetched at most once.
+    multi-GB Global Solar Atlas archives are fetched at most once. The transfer
+    is delegated to `HttpClient.download`, which streams to a sibling `.part`
+    file and renames it on success (removing the temp on any failure), so an
+    interrupted download never leaves a truncated archive. An error status
+    raises immediately — these single-file archives are not retried.
 
     Args:
         url: The `*.zip` download URL.
@@ -225,20 +246,10 @@ def download_zip(url: str, cache_dir: Path, *, timeout: float = 600.0) -> Path:
     target = zip_cache_path(url, cache_dir)
     if target.exists() and target.stat().st_size > 0:
         return target
-    partial = target.with_suffix(target.suffix + ".part")
-    try:
-        with requests.get(url, stream=True, timeout=timeout) as response:
-            response.raise_for_status()
-            with partial.open("wb") as handle:
-                for chunk in response.iter_content(chunk_size=_DOWNLOAD_CHUNK):
-                    if chunk:
-                        handle.write(chunk)
-    except BaseException:
-        # Don't leave a truncated .part behind for a failed / interrupted fetch.
-        partial.unlink(missing_ok=True)
-        raise
-    partial.replace(target)
-    return target
+    client = HttpClient(session=_RequestsGet(), status_forcelist=(), max_backoff=None)
+    return client.download(
+        url, target, chunk=_DOWNLOAD_CHUNK, progress=False, timeout=timeout
+    )
 
 
 def inner_tif(zip_path: Path) -> str:

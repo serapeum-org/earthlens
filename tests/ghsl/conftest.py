@@ -56,6 +56,8 @@ class _FakeResponse:
         self._content = content
         self.text = text
         self._status = status
+        self.status_code = status
+        self.headers: dict[str, str] = {}
 
     def raise_for_status(self) -> None:
         """Raise `HTTPError` when the route is marked as a 4xx/5xx."""
@@ -66,6 +68,9 @@ class _FakeResponse:
         """Yield the payload in `chunk_size` slices."""
         for start in range(0, len(self._content), max(chunk_size, 1)):
             yield self._content[start : start + chunk_size]
+
+    def close(self) -> None:
+        """No-op close (parity with `requests.Response`)."""
 
     def __enter__(self) -> _FakeResponse:
         return self
@@ -81,7 +86,7 @@ class FakeSession:
         self.routes: dict[str, _FakeResponse] = routes or {}
         self.requested: list[str] = []
 
-    def get(self, url: str, stream: bool = False, timeout: float | None = None):
+    def get(self, url: str, **kwargs: Any):
         """Return the canned response for `url` (404 when unrouted)."""
         self.requested.append(url)
         return self.routes.get(url, _FakeResponse(status=404))

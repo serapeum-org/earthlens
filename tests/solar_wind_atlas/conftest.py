@@ -103,16 +103,13 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
 
 
 class FakeResponse:
-    """Context-manager stand-in for a streaming requests response."""
+    """Stand-in for a streaming requests response (HttpClient shape)."""
+
+    status_code = 200
+    headers: dict[str, str] = {}
 
     def __init__(self, body: bytes) -> None:
         self._body = body
-
-    def __enter__(self) -> FakeResponse:
-        return self
-
-    def __exit__(self, *exc: object) -> None:
-        return None
 
     def raise_for_status(self) -> None:
         """No-op — the fake always succeeds."""
@@ -121,15 +118,15 @@ class FakeResponse:
         """Yield the body, plus an empty chunk to exercise the skip guard."""
         return [self._body, b""]
 
+    def close(self) -> None:
+        """No-op — the fake holds no socket."""
+
 
 class FailingResponse:
     """A streaming response whose body iteration raises mid-download."""
 
-    def __enter__(self) -> FailingResponse:
-        return self
-
-    def __exit__(self, *exc: object) -> None:
-        return None
+    status_code = 200
+    headers: dict[str, str] = {}
 
     def raise_for_status(self) -> None:
         """No-op — the failure happens during streaming, not at the status."""
@@ -138,13 +135,14 @@ class FailingResponse:
         """Raise to simulate a dropped connection mid-stream."""
         raise OSError("connection dropped mid-stream")
 
+    def close(self) -> None:
+        """No-op — the fake holds no socket."""
+
 
 class FailingGet:
     """Callable `requests.get` stand-in that fails partway through the body."""
 
-    def __call__(
-        self, url: str, *, stream: bool = False, timeout: float = 0.0
-    ) -> FailingResponse:
+    def __call__(self, url: str, **kwargs: object) -> FailingResponse:
         return FailingResponse()
 
 
@@ -154,9 +152,7 @@ class FakeGet:
     def __init__(self) -> None:
         self.calls = 0
 
-    def __call__(
-        self, url: str, *, stream: bool = False, timeout: float = 0.0
-    ) -> FakeResponse:
+    def __call__(self, url: str, **kwargs: object) -> FakeResponse:
         self.calls += 1
         return FakeResponse(zip_bytes("World_GHI.tif"))
 

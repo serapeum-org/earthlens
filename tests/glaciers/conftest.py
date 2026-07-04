@@ -21,6 +21,9 @@ DATA = Path(__file__).parent / "data"
 class _FakeStreamResponse:
     """A streaming `requests.Response` stand-in backed by local bytes."""
 
+    status_code = 200
+    headers: dict[str, str] = {}
+
     def __init__(self, payload: bytes) -> None:
         self._payload = payload
 
@@ -38,6 +41,9 @@ class _FakeStreamResponse:
         """Yield the payload in `chunk_size` chunks."""
         for start in range(0, len(self._payload), chunk_size):
             yield self._payload[start : start + chunk_size]
+
+    def close(self) -> None:
+        """No-op: the fake holds no socket."""
 
 
 class _FakeTextResponse:
@@ -65,6 +71,7 @@ class FakeHttp:
         params: dict | None = None,
         stream: bool = False,
         timeout: float | None = None,
+        **kwargs: Any,
     ) -> Any:
         """Route a GET to the streaming zip or the WFS text fixture.
 
@@ -73,6 +80,7 @@ class FakeHttp:
             params: Query parameters (recorded so tests can assert the bbox).
             stream: `True` for a download (zip), `False` for the WFS query.
             timeout: Ignored.
+            **kwargs: Extra transport kwargs (e.g. `HttpClient`'s `headers=`).
 
         Returns:
             A fake streaming or text response.

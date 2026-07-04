@@ -898,6 +898,9 @@ class _FakeResponse:
         for offset in range(0, len(view), chunk_size):
             yield bytes(view[offset : offset + chunk_size])
 
+    def close(self) -> None:
+        """No-op — the fake holds no socket (HttpClient closes the stream)."""
+
     def __enter__(self) -> _FakeResponse:
         return self
 

@@ -39,6 +39,7 @@ from earthlens.base.abstractdatasource import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.http import HttpClient
 from earthlens.base.spatial import crop_to_aoi, resolve_aoi
 from earthlens.worldpop._helpers import (
     cohort_of,
@@ -81,6 +82,20 @@ _RESOLUTIONS: frozenset[str] = frozenset({"100m", "1km"})
 _SCOPES: frozenset[str] = frozenset({"countries", "global"})
 #: Allowed values for the `level=` selector (only `pwd` offers both).
 _LEVELS: frozenset[str] = frozenset({"national", "subnational"})
+
+
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so each
+    per-file download stays a fresh connection and the transport can be
+    driven by swapping `requests.get`.
+    """
+
+    def get(self, url: str, **kwargs: object) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
 
 
 class WorldPop(AbstractDataSource):
@@ -513,17 +528,19 @@ class WorldPop(AbstractDataSource):
         """
         if dest.exists() and dest.stat().st_size > 0:
             return dest
-        for attempt in range(_MAX_RETRIES):
-            try:
-                resp = requests.get(url, timeout=_HTTP_TIMEOUT)
-                resp.raise_for_status()
-                dest.write_bytes(resp.content)
-                return dest
-            except (requests.ConnectionError, requests.Timeout):
-                if attempt == _MAX_RETRIES - 1:
-                    raise
-                time.sleep(_BACKOFF_BASE * (2**attempt))
-        return dest  # unreachable; the loop returns or raises
+        http = HttpClient(
+            session=_RequestsGet(),
+            retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
+            status_forcelist=(),
+            max_retries=_MAX_RETRIES - 1,
+            backoff_factor=_BACKOFF_BASE,
+            max_backoff=None,
+            timeout=_HTTP_TIMEOUT,
+            sleep=lambda seconds: time.sleep(seconds),
+        )
+        resp = http.get(url)
+        dest.write_bytes(resp.content)
+        return dest
 
     def _group_for_mosaic(
         self, products: list[RemoteProduct]

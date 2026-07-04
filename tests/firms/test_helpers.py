@@ -16,11 +16,15 @@ pytestmark = pytest.mark.firms
 
 
 class _Resp:
-    """Minimal fake response exposing status_code and text."""
+    """Minimal fake response with the HttpClient-driven shape."""
 
     def __init__(self, text: str = "", status_code: int = 200):
         self.text = text
         self.status_code = status_code
+        self.headers: dict[str, str] = {}
+
+    def close(self) -> None:
+        """No-op — the fake holds no socket."""
 
 
 def test_single_day_window_is_day_range_one():
@@ -87,7 +91,7 @@ def test_firms_get_returns_csv_without_retry():
     waits: list[float] = []
     calls = {"n": 0}
 
-    def _get(url, timeout):
+    def _get(url, **kwargs):
         calls["n"] += 1
         return _Resp("latitude,longitude\n1,2")
 
@@ -102,7 +106,7 @@ def test_firms_get_retries_on_429_then_succeeds():
     waits: list[float] = []
     responses = [_Resp("rate limit", 429), _Resp("latitude,longitude\n1,2")]
 
-    def _get(url, timeout):
+    def _get(url, **kwargs):
         return responses.pop(0)
 
     resp = firms_get("u", timeout=1, get=_get, sleep=waits.append, backoff_factor=2.0)
@@ -118,7 +122,7 @@ def test_firms_get_retries_on_quota_body_200():
         _Resp("latitude,longitude\n1,2"),
     ]
 
-    def _get(url, timeout):
+    def _get(url, **kwargs):
         return responses.pop(0)
 
     resp = firms_get("u", timeout=1, get=_get, sleep=waits.append)
@@ -130,7 +134,7 @@ def test_firms_get_gives_up_after_max_retries():
     """A persistent quota body returns the last response after the cap."""
     waits: list[float] = []
 
-    def _get(url, timeout):
+    def _get(url, **kwargs):
         return _Resp("transaction limit reached", 200)
 
     resp = firms_get("u", timeout=1, get=_get, sleep=waits.append, max_retries=3)
