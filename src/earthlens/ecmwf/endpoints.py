@@ -145,8 +145,13 @@ def open_client(endpoint: str = DEFAULT_ENDPOINT) -> cdsapi.Client | ModernClien
         Opt-in modern client: when `EARTHLENS_ECMWF_MODERN` is truthy
         (`1`/`true`/`yes`/`on`), this delegates to `open_modern_client`, which
         returns an `ecmwf.datastores.Client` (the `cdsapi` successor) instead —
-        requires the `earthlens[ecmwf-modern]` extra. Unset (the default), the
-        behaviour below is byte-identical to before.
+        requires the `earthlens[ecmwf-modern]` extra. The flag is **process-wide**
+        (an environment variable, not a per-call argument). Unset (the default),
+        the behaviour below is byte-identical to before. When it *is* set, even
+        the `"cds"` path changes: `open_modern_client("cds")` resolves the URL +
+        token up front and raises `AuthenticationError` if none is found, rather
+        than returning a bare `cdsapi.Client()` that does cdsapi's own lazy
+        config discovery.
     """
     if _use_modern_client():
         return open_modern_client(endpoint)
