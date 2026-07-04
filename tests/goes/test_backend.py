@@ -192,12 +192,21 @@ class TestSearch:
         patch_client(goes, FakeS3(pages={HOUR_C: [f"{HOUR_C}junk.nc"]}))
         assert goes._search() == [], "no parseable scan-start -> dropped"
 
-    def test_missing_hour_logged(self, make_goes, patch_client, caplog):
-        """An hour prefix that lists nothing logs a warning and is skipped."""
+    def test_missing_hour_logged(self, make_goes, patch_client):
+        """An hour prefix that lists nothing emits a loguru warning (G6)."""
+        from loguru import logger
+
         goes = make_goes()
         patch_client(goes, FakeS3(pages={}))
-        with caplog.at_level("WARNING"):
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
             assert goes._search() == [], "empty listing -> no granules"
+        finally:
+            logger.remove(sink_id)
+        assert any("no granules under" in m for m in messages), (
+            "the missing hour must be logged, not silently skipped"
+        )
 
     def test_bare_date_window_spans_whole_day(self, make_goes, patch_client):
         """A bare-date request (default fmt) returns the day's granules (H1)."""
