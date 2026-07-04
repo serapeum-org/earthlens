@@ -218,6 +218,21 @@ class TestSearch:
             "C12 must not be matched when C02 is requested"
         )
 
+    def test_mesoscale_and_channel_filters_together(self, make_goes, patch_client):
+        """A band-split M1 request keeps only the M1-subsector + requested-channel key."""
+        goes = make_goes(dataset="abi-l1b-rad", domain="M1", variables=["C13"])
+        hour = "ABI-L1b-RadM/2026/184/12/"
+        keys = [
+            f"{hour}OR_ABI-L1b-RadM1-M6C13_G19_s20261841205000_e1_c1.nc",  # keep
+            f"{hour}OR_ABI-L1b-RadM2-M6C13_G19_s20261841205300_e1_c1.nc",  # wrong subsector
+            f"{hour}OR_ABI-L1b-RadM1-M6C07_G19_s20261841206000_e1_c1.nc",  # wrong channel
+        ]
+        patch_client(goes, FakeS3(pages={hour: keys}))
+        planned = [p.id for p in goes._search()]
+        assert planned == ["OR_ABI-L1b-RadM1-M6C13_G19_s20261841205000_e1_c1.nc"], (
+            "both the subsector and the channel filter must apply on one key"
+        )
+
     def test_combined_product_variables_not_filtered(self, make_goes, patch_client):
         """A combined product ignores variables and keeps the whole granule."""
         goes = make_goes(dataset="abi-l2-mcmip", variables=["CMI_C13"])
