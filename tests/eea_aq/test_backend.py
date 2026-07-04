@@ -10,6 +10,24 @@ import pandas as pd
 import pytest
 
 from earthlens.eea_aq import EEA_AQ
+from tests.eea_aq.conftest import _FakeAirbaseClient
+
+
+def _hourly_frame() -> pd.DataFrame:
+    """Two MT pm25 rows an hour apart (11:00 and 12:00) on 2023-06-15."""
+    return pd.DataFrame(
+        {
+            "Samplingpoint": ["MT/SPO-1", "MT/SPO-1"],
+            "Pollutant": [6001, 6001],
+            "Start": pd.to_datetime(["2023-06-15T11:00", "2023-06-15T12:00"]),
+            "End": pd.to_datetime(["2023-06-15T12:00", "2023-06-15T13:00"]),
+            "Value": ["5.0", "6.0"],
+            "Unit": ["ug.m-3"] * 2,
+            "AggType": ["hour"] * 2,
+            "Validity": [1, 1],
+            "Verification": [3, 3],
+        }
+    )
 
 
 def _era_frame(verification: int) -> pd.DataFrame:
@@ -128,6 +146,17 @@ class TestApi:
         ).download(progress_bar=False)
         sources = [call[0] for call in fake_client.calls]
         assert sources == ["Verified", "Unverified"]
+
+    def test_hour_aware_end_is_half_open(self, tmp_path):
+        """A non-midnight (hour-aware fmt) end drops a reading exactly at `end`."""
+        parquet = tmp_path / "hourly.parquet"
+        _hourly_frame().to_parquet(parquet)
+        client = _FakeAirbaseClient(str(parquet))
+        df = _backend(
+            client, tmp_path, start="2023-06-15T00", end="2023-06-15T12", fmt="%Y-%m-%dT%H"
+        ).download(progress_bar=False)
+        assert len(df) == 1
+        assert df.iloc[0]["datetime_utc"].hour == 11
 
     def test_no_country_returns_empty(self, tmp_path, fake_client):
         """A bbox intersecting no country returns a schema-only frame."""

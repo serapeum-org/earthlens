@@ -56,6 +56,24 @@ class TestRequestShaping:
         assert state.calls[0]["dataType"] == "C"
         assert state.calls[0]["monitorType"] == 1
 
+    def test_hour_aware_end_is_inclusive(self, tmp_path, fake_airnow):
+        """A non-midnight (hour-aware fmt) end passes through as the inclusive end hour."""
+        state = _FakeAirnow()
+        _backend(
+            state, tmp_path, start="2026-01-01T06", end="2026-01-01T15", fmt="%Y-%m-%dT%H"
+        ).download(progress_bar=False)
+        assert state.calls[0]["startDate"] == "2026-01-01T06"
+        assert state.calls[0]["endDate"] == "2026-01-01T15"
+
+    def test_include_raw_concentrations_toggles_param(self, tmp_path, fake_airnow):
+        """`include_raw_concentrations` flips the `includerawconcentrations` flag."""
+        off = _FakeAirnow()
+        _backend(off, tmp_path).download(progress_bar=False)
+        assert off.calls[0]["includerawconcentrations"] == 0
+        on = _FakeAirnow()
+        _backend(on, tmp_path, include_raw_concentrations=True).download(progress_bar=False)
+        assert on.calls[0]["includerawconcentrations"] == 1
+
 
 @pytest.mark.airnow
 class TestConstructorGuards:

@@ -84,6 +84,21 @@ class TestFetchAndDownload:
         assert len(pm25) == 1
         assert pm25.iloc[0]["datetime_utc"].date().isoformat() == "2026-06-30"
 
+    def test_hour_aware_end_is_half_open(self, tmp_path):
+        """A non-midnight (hour-aware fmt) end drops a reading exactly at `end`."""
+        csv = (
+            "sensor_id;sensor_type;location;lat;lon;timestamp;P1;durP1;ratioP1;P2;durP2;ratioP2\n"
+            "140;SDS011;65;48.778;9.160;2026-06-30T11:00:00;8.5;;;4.2;;\n"  # before end
+            "140;SDS011;65;48.778;9.160;2026-06-30T12:00:00;9.1;;;4.6;;\n"  # exactly at end
+        )
+        client = _FakeClient(archive={("2026-06-30", "sds011", "140"): csv})
+        df = _backend(
+            client, tmp_path, start="2026-06-30T00", end="2026-06-30T12", fmt="%Y-%m-%dT%H"
+        ).download(progress_bar=False)
+        pm25 = df[df["parameter"] == "pm25"]
+        assert len(pm25) == 1
+        assert pm25.iloc[0]["datetime_utc"].hour == 11
+
     def test_window_filter_empty_day(self, tmp_path):
         """A day with no archive file yields an empty frame (mask no-op)."""
         client = _FakeClient()
