@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2991,6 +2991,39 @@
     <span class="md-ellipsis">
       
         4. CI secret pattern
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4a-register-a-free-p-tree-account-himawari" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4a. Register a free P-Tree account (Himawari)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4b-supply-the-p-tree-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Supply the P-Tree credentials
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4c-p-tree-scope-licence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4c. P-Tree scope &amp; licence
       
     </span>
   </a>
@@ -17949,6 +17982,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#4a-register-a-free-p-tree-account-himawari" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4a. Register a free P-Tree account (Himawari)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4b-supply-the-p-tree-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Supply the P-Tree credentials
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4c-p-tree-scope-licence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4c. P-Tree scope &amp; licence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#5-jaxa-earth-api-no-credentials" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -18004,11 +18070,16 @@
 
 
 <h1 id="jaxa-authentication"><a class="toclink" href="#jaxa-authentication">JAXA — authentication</a><a class="headerlink" href="#jaxa-authentication" title="Permanent link">#</a></h1>
-<p>JAXA's archive is reached through two protocols, only one of which needs
-credentials. The <code>jaxa-earth</code> half (the official <code>jaxa.earth</code> API over
-STAC + COG) is <strong>authless</strong> — <code>JaxaAuth.configure()</code> is a no-op for it.
-The <code>gportal</code> half (G-Portal mission archive over SFTP) needs a free
-JAXA G-Portal account.</p>
+<p>JAXA's archive is reached through three protocols. The <code>jaxa-earth</code> half
+(the official <code>jaxa.earth</code> API over STAC + COG) is <strong>authless</strong> —
+<code>JaxaAuth.configure()</code> is a no-op for it. The other two need free JAXA
+accounts:</p>
+<ul>
+<li><strong>G-Portal</strong> — mission archive over SFTP (SGLI, AMSR2, ALOS, GPM, …).</li>
+<li><strong>P-Tree</strong> — near-real-time Himawari-8/9 HSD granules over FTP (30-day
+  rolling archive). Registration is <strong>separate from G-Portal</strong> — the
+  two accounts do not share credentials.</li>
+</ul>
 <h2 id="1-register-a-free-g-portal-account"><a class="toclink" href="#1-register-a-free-g-portal-account">1. Register a free G-Portal account</a><a class="headerlink" href="#1-register-a-free-g-portal-account" title="Permanent link">#</a></h2>
 <ul>
 <li>Sign up at <a href="https://gportal.jaxa.jp/gpr/user/regist1">https://gportal.jaxa.jp/gpr/user/regist1</a>. The form asks
@@ -18070,18 +18141,73 @@ calls) act on the right side:</p>
 <ul>
 <li><code>JaxaAuth(creds, protocol="jaxa-earth").configure()</code> is a no-op.</li>
 <li><code>JaxaAuth(creds, protocol="gportal").configure()</code> resolves and caches
-  the credentials, raising :class:<code>earthlens.jaxa.AuthenticationError</code>
-  on miss.</li>
+  the G-Portal credentials, raising
+  :class:<code>earthlens.jaxa.AuthenticationError</code> on miss.</li>
+<li><code>JaxaAuth(creds, protocol="ptree").configure()</code> resolves and caches
+  the P-Tree credentials (from <code>ptree_username</code> / <code>ptree_password</code> or
+  <code>$JAXA_PTREE_USERNAME</code> / <code>$JAXA_PTREE_PASSWORD</code>), raising
+  :class:<code>earthlens.jaxa.AuthenticationError</code> on miss.</li>
 </ul>
 <p><code>EarthLens(...).authenticate()</code> therefore fails-fast on a <code>gportal</code>
-request without credentials — the SFTP download is not attempted with
-empty auth.</p>
+or <code>ptree</code> request without credentials — the SFTP download or FTP
+handshake is not attempted with empty auth.</p>
 <h2 id="4-ci-secret-pattern"><a class="toclink" href="#4-ci-secret-pattern">4. CI secret pattern</a><a class="headerlink" href="#4-ci-secret-pattern" title="Permanent link">#</a></h2>
-<p>Store the two credentials as CI secrets (e.g. GitHub Actions
-repository secrets <code>GPORTAL_USERNAME</code> / <code>GPORTAL_PASSWORD</code>) and export
-them into the job environment. The backend picks them up via the
-env-var path with no code change. The gated live e2e tests under
-<code>pytest -m "jaxa and e2e"</code> skip cleanly when either is absent.</p>
+<p>Store the credentials as CI secrets (e.g. GitHub Actions repository
+secrets <code>GPORTAL_USERNAME</code> / <code>GPORTAL_PASSWORD</code> and, for P-Tree,
+<code>JAXA_PTREE_USERNAME</code> / <code>JAXA_PTREE_PASSWORD</code>) and export them into the
+job environment. The backend picks them up via the env-var path with no
+code change. The gated live e2e tests under
+<code>pytest -m "jaxa and e2e"</code> skip cleanly when either pair is absent.</p>
+<h2 id="4a-register-a-free-p-tree-account-himawari"><a class="toclink" href="#4a-register-a-free-p-tree-account-himawari">4a. Register a free P-Tree account (Himawari)</a><a class="headerlink" href="#4a-register-a-free-p-tree-account-himawari" title="Permanent link">#</a></h2>
+<ul>
+<li>Sign up at <a href="https://www.eorc.jaxa.jp/ptree/registration_top.html">https://www.eorc.jaxa.jp/ptree/registration_top.html</a>.
+  The form asks for a name, email (<strong>this becomes your username</strong>),
+  organisation, country, and purpose of use.</li>
+<li>JAXA emails a confirmation link; the account is not usable until you
+  click it.</li>
+<li><strong>Registration is separate from G-Portal.</strong> The two accounts have
+  distinct credential pairs; never reuse <code>GPORTAL_USERNAME</code> /
+  <code>GPORTAL_PASSWORD</code> for P-Tree.</li>
+</ul>
+<h2 id="4b-supply-the-p-tree-credentials"><a class="toclink" href="#4b-supply-the-p-tree-credentials">4b. Supply the P-Tree credentials</a><a class="headerlink" href="#4b-supply-the-p-tree-credentials" title="Permanent link">#</a></h2>
+<p><code>JaxaAuth.configure()</code> resolves them in this order for the <code>ptree</code>
+protocol:</p>
+<ol>
+<li><strong>Explicit kwargs</strong> to <code>EarthLens(...)</code> / <code>JAXA(...)</code>:
+   <code>ptree_username=</code> and <code>ptree_password=</code>.</li>
+<li><strong>Environment variables</strong> <code>JAXA_PTREE_USERNAME</code> and
+   <code>JAXA_PTREE_PASSWORD</code>.</li>
+</ol>
+<p>Missing credentials raise
+:class:<code>earthlens.jaxa.AuthenticationError</code> naming both env vars and
+the registration URL. Live probe (2026-07-04) confirmed the archive
+still serves plain FTP on <code>ftp.ptree.jaxa.jp:21</code>, so <code>paramiko</code> is
+not required.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jaxa&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;himawari-ahi-fldk&quot;</span><span class="p">],</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">ptree_username</span><span class="o">=</span><span class="s2">&quot;alice@example.org&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">ptree_password</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2026-07-03&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2026-07-03&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">120.0</span><span class="p">,</span> <span class="mf">150.0</span><span class="p">],</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="4c-p-tree-scope-licence"><a class="toclink" href="#4c-p-tree-scope-licence">4c. P-Tree scope &amp; licence</a><a class="headerlink" href="#4c-p-tree-scope-licence" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Retention.</strong> P-Tree ships the <strong>last 30 days</strong> of HSD granules only.
+  Requests further back raise :class:<code>earthlens.jaxa.RetentionError</code>
+  before the FTP call — no cryptic <code>450 No such file or directory</code>.</li>
+<li><strong>Licence.</strong> Since <strong>2026-02-01</strong> P-Tree data (including HSD) is
+  available for <strong>commercial use</strong>; attribution per the
+  <a href="https://www.eorc.jaxa.jp/ptree/terms.html">Terms of Use</a>. Before
+  that date the same data was restricted to non-profit /
+  research / education.</li>
+<li><strong>Decode is out of scope.</strong> The backend ships the raw <code>.DAT.bz2</code>
+  segments. HSD → arrays is <code>satpy</code>, tracked as <strong>pyramids PY-2</strong>.</li>
+</ul>
 <h2 id="5-jaxa-earth-api-no-credentials"><a class="toclink" href="#5-jaxa-earth-api-no-credentials">5. JAXA Earth API (no credentials)</a><a class="headerlink" href="#5-jaxa-earth-api-no-credentials" title="Permanent link">#</a></h2>
 <p>The <code>jaxa.earth</code> SDK that drives the <code>jaxa-earth</code> protocol does <strong>not</strong>
 require any registration. The STAC catalogue and the COG assets are
