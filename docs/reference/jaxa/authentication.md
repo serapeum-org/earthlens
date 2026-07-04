@@ -142,7 +142,7 @@ EarthLens(
 ## 4c. P-Tree scope & licence
 
 - **Retention.** P-Tree ships the **last 30 days** of HSD granules only.
-  Requests further back raise :class:`earthlens.jaxa._ptree.RetentionError`
+  Requests further back raise :class:`earthlens.jaxa.RetentionError`
   before the FTP call — no cryptic `450 No such file or directory`.
 - **Licence.** Since **2026-02-01** P-Tree data (including HSD) is
   available for **commercial use**; attribution per the

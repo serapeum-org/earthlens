@@ -627,8 +627,12 @@ class EarthLens:
             "jaxa": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "jaxa-earth": ("earthlens.jaxa", "JAXA", "jaxa", {}),
             "g-portal": ("earthlens.jaxa", "JAXA", "jaxa", {}),
-            "ptree": ("earthlens.jaxa", "JAXA", "jaxa", {}),
-            "himawari": ("earthlens.jaxa", "JAXA", "jaxa", {}),
+            # ptree / himawari are unambiguously the stdlib-`ftplib`
+            # branch, so their `extras` slot is empty — a failed import
+            # here won't misdirect a user to `pip install
+            # earthlens[jaxa]` for a branch that never needed it.
+            "ptree": ("earthlens.jaxa", "JAXA", "", {}),
+            "himawari": ("earthlens.jaxa", "JAXA", "", {}),
             # Argo autonomous-float ocean profiles via the `argopy` SDK
             # (open data, no auth). `OUTPUT_KIND="tabular"` — a long-format
             # DataFrame of profiles. The `"argo"` key is canonical; the

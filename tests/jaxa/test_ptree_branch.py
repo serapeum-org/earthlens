@@ -449,7 +449,7 @@ class TestLocalTargetFallback:
     def test_flat_remote_path_falls_back_to_out_dir_root(
         self, tmp_path: Path,
     ) -> None:
-        """A remote with fewer than 5 segments lands at `out_dir / filename`."""
+        """A non-HSD remote (fewer than 6 segments) lands at `out_dir / filename`."""
         assert _local_target("/pub/README.txt", tmp_path) == tmp_path / "README.txt"
 
 
@@ -475,8 +475,12 @@ class _FakeFTP:
     """Duck-type replacement for `ftplib.FTP` covering the calls used."""
 
     #: Class-level knob so a test can force `FTP(host, timeout=...)` to
-    #: raise before returning an instance.
-    connect_raises: OSError | None = None
+    #: raise before returning an instance. Widened to `BaseException`
+    #: so a test can assign an `ftplib.error_temp` / `error_perm` /
+    #: `EOFError` (none of which are `OSError` subclasses) — the
+    #: `test_login_wraps_greeting_error_as_connection_error` test does
+    #: exactly this.
+    connect_raises: BaseException | None = None
     login_raises: BaseException | None = None
     retr_raises: BaseException | None = None
     quit_raises: BaseException | None = None

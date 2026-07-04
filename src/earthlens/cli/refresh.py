@@ -1650,9 +1650,12 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "worldpop": _write_worldpop,
     "openaq": _write_openaq,
     # JAXA's catalog YAML carries an `available_datasets:` block that lists
-    # every live id across both protocols (jaxa-earth + gportal). The
-    # flatten=True path unions the two protocol groups into a single sorted
-    # list; the curated `datasets:` block stays hand-authored.
+    # every live id across all three protocols (jaxa-earth + gportal +
+    # ptree). The flatten=True path unions the three protocol groups
+    # into a single sorted list; the curated `datasets:` block stays
+    # hand-authored. The `ptree` group is derived from the catalog's
+    # ptree rows (see `_jaxa_grouped`) since P-Tree has no discoverable
+    # listing endpoint of its own.
     "jaxa": _index_writer("available_datasets"),
     # ERDDAP's `_index.yaml` carries an `available_datasets:` block listing
     # every dataset id across the curated servers; the flatten path unions
