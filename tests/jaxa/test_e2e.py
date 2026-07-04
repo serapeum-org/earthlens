@@ -144,8 +144,12 @@ def test_ptree_ftp_download_lives(tmp_path: Path) -> None:
 
     from earthlens import EarthLens
 
-    yesterday = dt.datetime.now(dt.UTC) - dt.timedelta(days=1)
-    slot = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+    # 3 days back at 12:00 UTC: safely inside the 30-day retention
+    # boundary in either direction and well past upload latency (near-
+    # real-time slots can lag by 10-15 min). Yesterday 00:00 UTC was
+    # fragile at the retention edge on late-in-the-day CI slots.
+    reference = dt.datetime.now(dt.UTC) - dt.timedelta(days=3)
+    slot = reference.replace(hour=12, minute=0, second=0, microsecond=0)
     stamp = slot.strftime("%Y-%m-%d %H:%M")
 
     lens = EarthLens(
