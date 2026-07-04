@@ -303,7 +303,7 @@ class EarthLens:
              'gbif', 'gdacs', 'gdo', 'gebco', 'gee', 'geoboundaries',
              'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
              'global-forest-watch', 'global-solar-atlas',
-             'global-wind-atlas', 'google-earth-engine', 'gsa', 'gwa',
+             'global-wind-atlas', 'goes', 'google-earth-engine', 'gsa', 'gwa',
              'hdx', 'human-settlement', 'inform', 'insar', 'ioos',
              'isric', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
              'national-water-model', 'natural-earth', 'nexrad', 'nrel',
@@ -380,6 +380,12 @@ class EarthLens:
             from the anonymous `noaa-nwm-pds` bucket; tabular subsetting +
             the retrospective Zarr read via pyramids `LabeledDataset`. Keys
             `"nwm"` / `"national-water-model"`.
+        :class:`earthlens.goes.GOES`: NOAA GOES-R ABI geostationary imagery
+            fetched whole (raw NetCDF granules, `raster`) from the anonymous
+            `noaa-goes19` / `noaa-goes18` / `noaa-goes16` buckets by
+            satellite / product / domain / scan-time window; rides the `[s3]`
+            extra (unsigned boto3), no auth, decode is downstream
+            (pyramids / satpy); key `"goes"`.
         :class:`earthlens.hdx.HDX`: Humanitarian Data Exchange resources
             via CKAN (`hdx-python-api`); the first `mixed`-output
             backend (downloads CSV / GeoTIFF / GeoPackage / … files
@@ -481,6 +487,10 @@ class EarthLens:
             "fdsn": ("earthlens.fdsn", "FDSN", "fdsn", {}),
             "gee": ("earthlens.gee", "GEE", "gee", {}),
             "google-earth-engine": ("earthlens.gee", "GEE", "gee", {}),
+            # NOAA GOES-R ABI imagery (anonymous noaa-goes19/18/16 buckets);
+            # rides the [s3] extra (unsigned boto3). Raw NetCDF granules out
+            # (raster); decode is downstream (pyramids / satpy).
+            "goes": ("earthlens.goes", "GOES", "s3", {}),
             # GDACS is a public feed (requests only), so no extra to hint.
             "gdacs": ("earthlens.gdacs", "GDACS", "", {}),
             "hdx": ("earthlens.hdx", "HDX", "hdx", {}),
