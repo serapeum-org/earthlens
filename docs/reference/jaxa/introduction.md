@@ -5,11 +5,11 @@ authless **JAXA Earth API** (a STAC + COG view of ~118 ARCO-style
 collections), the credentialed **G-Portal** mission archive (raw L1 / L2
 swaths over SFTP), and the dedicated **P-Tree** Himawari FTP.
 
-The `earthlens` JAXA backend wraps the first two as a single backend with
+The `earthlens` JAXA backend wraps **all three** as a single backend with
 a `protocol:` discriminator on each catalog row, so one `EarthLens("jaxa",
-…)` call writes a north-up GeoTIFF for an AW3D30 elevation tile or
-downloads a PALSAR-2 L1.1 product depending on which dataset key you ask
-for. The P-Tree branch (Himawari AHI HSD `.bz2`) is a deferred follow-on.
+…)` call writes a north-up GeoTIFF for an AW3D30 elevation tile, downloads
+a PALSAR-2 L1.1 product over SFTP, or pulls a Himawari AHI HSD 10-minute
+observation over FTP — depending on which dataset key you ask for.
 
 For the hands-on download walkthrough see [Usage](usage.md); the rendered
 API is the [Reference](jaxa.md) page.
@@ -114,7 +114,9 @@ pip install 'earthlens[jaxa]'
 This pulls both SDKs: the official `jaxa.earth` for the COG path and the
 community `gportal` for the SFTP path. Both are optional — importing
 `earthlens.jaxa` works without the extra, but the branches fail with a
-friendly `ImportError` pointing at `earthlens[jaxa]` when invoked.
+friendly `ImportError` pointing at `earthlens[jaxa]` when invoked. The
+`ptree` branch needs **no extra**: it uses stdlib `ftplib` only, so a
+plain `pip install earthlens` is enough to reach Himawari HSD.
 
 Do **not** install `gportal[gcomc]` — that extra pins `numpy<2`, which
 conflicts with this repo's numpy 2.x line. The base `gportal` is enough;
@@ -143,13 +145,35 @@ HDF5 readers for SGLI products are downstream of earthlens.
         ...,
     )
     ```
+- `ptree` — a **separate** free P-Tree account from
+  <https://www.eorc.jaxa.jp/ptree/registration_top.html> (never reuse the
+  G-Portal credentials). Env vars mirror the G-Portal pattern:
 
-The SDK does **not** auto-read either env var — earthlens reads them
-inside `JaxaAuth.configure()` and threads them straight to
+    ```bash
+    export JAXA_PTREE_USERNAME="your_registered_email"
+    export JAXA_PTREE_PASSWORD="your_password"
+    ```
+
+  or as kwargs to `EarthLens(...)`:
+
+    ```python
+    EarthLens(
+        data_source="jaxa",
+        variables=["himawari-ahi-fldk"],
+        bands=["B13"],
+        ptree_username="...",
+        ptree_password="...",
+        ...,
+    )
+    ```
+
+For `gportal`, the SDK does **not** auto-read either env var — earthlens
+reads them inside `JaxaAuth.configure()` and threads them straight to
 `gportal.download(username=, password=)` as call-site kwargs, so the
 SDK's module-level credential globals stay untouched between requests.
 Search is anonymous; only the actual SFTP `download` step uses the
-credentials.
+credentials. The `ptree` branch resolves its pair the same way and
+passes them straight to `ftplib.FTP.login(...)`.
 
 ## Things to know up front
 
@@ -169,4 +193,8 @@ credentials.
 - **G-Portal `download` is sequential.** The upstream SDK has no
   parallelism. Bulk SGLI / PALSAR-2 pulls are slow.
 - **No `aggregate=`** — the per-date reducer is deferred (planning G6).
-- **P-Tree (Himawari)** is a separate, deferred protocol (planning G8).
+- **P-Tree (Himawari) window is a rolling 30 days** — requests older
+  than that raise `earthlens.jaxa.RetentionError` before any FTP call
+  (the server itself returns an opaque `450 No such file or directory`
+  past that horizon). Decoding HSD `.DAT.bz2` to arrays is deliberately
+  out of scope: that's `satpy`, tracked as `pyramids PY-2`.

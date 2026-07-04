@@ -78,12 +78,16 @@ calls) act on the right side:
 
 * `JaxaAuth(creds, protocol="jaxa-earth").configure()` is a no-op.
 * `JaxaAuth(creds, protocol="gportal").configure()` resolves and caches
-  the credentials, raising :class:`earthlens.jaxa.AuthenticationError`
-  on miss.
+  the G-Portal credentials, raising
+  :class:`earthlens.jaxa.AuthenticationError` on miss.
+* `JaxaAuth(creds, protocol="ptree").configure()` resolves and caches
+  the P-Tree credentials (from `ptree_username` / `ptree_password` or
+  `$JAXA_PTREE_USERNAME` / `$JAXA_PTREE_PASSWORD`), raising
+  :class:`earthlens.jaxa.AuthenticationError` on miss.
 
 `EarthLens(...).authenticate()` therefore fails-fast on a `gportal`
-request without credentials — the SFTP download is not attempted with
-empty auth.
+or `ptree` request without credentials — the SFTP download or FTP
+handshake is not attempted with empty auth.
 
 ## 4. CI secret pattern
 
