@@ -1,6 +1,6 @@
-"""JAXA backend — Earth-observation archive over two protocols.
+"""JAXA backend — Earth-observation archive over three protocols.
 
-`earthlens.jaxa` reaches JAXA's Earth-observation catalogue via two
+`earthlens.jaxa` reaches JAXA's Earth-observation catalogue via three
 complementary SDKs, selected per-dataset by a `protocol` discriminator:
 
 * `protocol: jaxa-earth` — authless STAC + COG access through the official
@@ -14,18 +14,25 @@ complementary SDKs, selected per-dataset by a `protocol` discriminator:
   account; `JaxaAuth(creds, protocol="gportal").configure()` resolves
   the credentials from explicit kwargs or `$GPORTAL_USERNAME` /
   `$GPORTAL_PASSWORD`.
+* `protocol: ptree` — credentialed plain-FTP access to
+  `ftp.ptree.jaxa.jp` for near-real-time Himawari-8/9 AHI HSD granules
+  (30-day rolling archive, 10-min cadence, 10 segments per band per
+  slot). Uses **stdlib `ftplib` only** — no additional dependency.
+  Requires a free P-Tree account (separate from G-Portal);
+  `JaxaAuth(creds, protocol="ptree").configure()` resolves the
+  credentials from explicit kwargs or `$JAXA_PTREE_USERNAME` /
+  `$JAXA_PTREE_PASSWORD`. Ships raw `.DAT.bz2` granules only — decoding
+  HSD to arrays is `satpy`'s job (tracked as pyramids `PY-2`).
 
-The third JAXA archive, **P-Tree** (Himawari geostationary AHI, FTP +
-HSD `.bz2`), is a deferred follow-on (planning `G8`).
-
-Importing this subpackage does **not** require the `[jaxa]` extra — the
-two SDK imports happen inside the branch modules and are skipped when
-the request resolves to the other protocol. Install
-`pip install 'earthlens[jaxa]'` to enable both branches.
+Importing this subpackage does **not** require the `[jaxa]` extra —
+`jaxa.earth` and `gportal` are imported inside their branch modules
+lazily, and the `ptree` branch uses only stdlib. Install
+`pip install 'earthlens[jaxa]'` to enable the two SDK-backed branches.
 """
 
 from __future__ import annotations
 
+from earthlens.jaxa._ptree import RetentionError
 from earthlens.jaxa.auth import (
     AuthenticationError,
     JaxaAuth,
@@ -41,6 +48,7 @@ __all__ = [
     "JaxaCredentials",
     "JaxaProtocol",
     "AuthenticationError",
+    "RetentionError",
     "Catalog",
     "Dataset",
     "CATALOG_PATH",

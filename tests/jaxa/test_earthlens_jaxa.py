@@ -9,9 +9,11 @@ from earthlens.earthlens import EarthLens
 
 @pytest.mark.jaxa
 @pytest.mark.unit
-@pytest.mark.parametrize("key", ["jaxa", "jaxa-earth", "g-portal"])
+@pytest.mark.parametrize(
+    "key", ["jaxa", "jaxa-earth", "g-portal", "ptree", "himawari"],
+)
 def test_jaxa_keys_registered(key) -> None:
-    """All three JAXA keys appear in the facade's registry."""
+    """Every registered JAXA facade key resolves through `EarthLens.DataSources`."""
     assert key in EarthLens.DataSources
 
 
