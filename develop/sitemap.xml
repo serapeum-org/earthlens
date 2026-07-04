@@ -413,6 +413,14 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/goes/catalog_explorer/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/goes/conus_granule_download/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/hdx/arbitrary_hdx_id/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -885,10 +893,6 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/deferred-providers/</loc>
-         <lastmod>2026-07-04</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/earthlens/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -942,6 +946,14 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/asf/usage/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/http-client/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/region-affinity/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
@@ -1214,6 +1226,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/glaciers/usage/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/goes/datasets/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/goes/goes/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/goes/introduction/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/goes/usage/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
