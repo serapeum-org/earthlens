@@ -62,6 +62,10 @@ class TestEndIsDateOnly:
             ("2026-07-04 00:00", False),
             ("2026-07-04 12:30", False),
             ("2026-07-04T00:00:00", False),
+            # A month-name format still reads as a bare date — the 't' in
+            # "Oct"/"September" must not be taken for an ISO time separator.
+            ("2026-Oct-03", True),
+            ("03-September-2026", True),
             (dt.date(2026, 7, 3), True),
             (dt.datetime(2026, 7, 3), False),
             (1234567890, False),

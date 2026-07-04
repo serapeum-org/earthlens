@@ -73,6 +73,11 @@ WIDE_WINDOW_HOURS = 720
 #: digit so `C02` is never confused with `C12` / `C20`.
 _CHANNEL_IN_NAME = re.compile(r"-M\dC(\d{2})_")
 
+#: Matches an ISO date/time `T` (or `t`) separator sitting **between two
+#: digits** (`2026-07-03T00`), so a bare date in a month-name format
+#: (`2026-Oct-03`) is not mistaken for a timed value.
+_ISO_T_SEP = re.compile(r"\d[Tt]\d")
+
 
 def enumerate_hours(start: dt.datetime, end: dt.datetime) -> list[dt.datetime]:
     """Enumerate the hour buckets spanning `[start, end]` inclusive.
@@ -123,7 +128,9 @@ def end_is_date_only(end: str | dt.date | dt.datetime) -> bool:
     end the user typed with an explicit midnight time (`"2026-07-04 00:00"`)
     is *not* treated as a bare date. A `datetime.date` (but not a
     `datetime.datetime`) is bare; a string is bare when it carries no time
-    separator (`:` or `T`).
+    separator — a `:` (any `HH:MM`) or an ISO `T`/`t` *between two digits*
+    (`2026-07-03T00`). The digit-anchored `T` check avoids false-positives
+    on month-name formats whose name contains a `t` (`Oct` / `September`).
 
     Args:
         end: The raw end bound as passed to the backend (string, `date`,
@@ -148,7 +155,7 @@ def end_is_date_only(end: str | dt.date | dt.datetime) -> bool:
     if isinstance(end, dt.date):
         return True
     if isinstance(end, str):
-        return ":" not in end and "t" not in end.lower()
+        return ":" not in end and _ISO_T_SEP.search(end) is None
     return False
 
 
