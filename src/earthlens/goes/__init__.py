@@ -48,6 +48,7 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.goes.backend import GOES
 from earthlens.goes.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -59,6 +60,7 @@ from earthlens.goes.catalog import (
 __all__ = [
     "CATALOG_PATH",
     "Catalog",
+    "GOES",
     "GOESChannel",
     "GOESDomain",
     "GOESProduct",
