@@ -165,8 +165,11 @@ class Dataset(BaseModel):
 
         Raises:
             ValueError: If a `jaxa-earth` row has no `collection`, or a
-                `gportal` row has no `short_name`, or either row sets the
-                identifier belonging to the other protocol.
+                credentialed (`gportal` / `ptree`) row has no
+                `short_name`, or the row sets the identifier belonging
+                to the other side (a `jaxa-earth` row with a
+                `short_name`, or a credentialed row with a
+                `collection`).
         """
         if self.protocol == "jaxa-earth":
             if not self.collection:
