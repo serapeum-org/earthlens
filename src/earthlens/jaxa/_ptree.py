@@ -207,12 +207,18 @@ class FtplibTransport:
             ) from exc
 
     def close(self) -> None:
-        """Close the FTP connection if it is open."""
+        """Close the FTP connection if it is open.
+
+        Prefers `QUIT` (which flushes buffers), but falls back to a bare
+        socket close if the quit exchange fails — `ftplib.all_errors`
+        already covers `OSError`, `EOFError`, and every `ftplib.Error`
+        subclass, so listing it once is enough.
+        """
         if self._ftp is None:
             return
         try:
             self._ftp.quit()
-        except (OSError, ftplib.all_errors):
+        except ftplib.all_errors:
             self._ftp.close()
         finally:
             self._ftp = None
