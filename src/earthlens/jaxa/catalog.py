@@ -162,18 +162,21 @@ class Dataset(BaseModel):
             if self.short_name is not None:
                 raise ValueError(
                     f"dataset {self.key!r} has protocol='jaxa-earth'; "
-                    "`short_name` belongs to the gportal protocol — drop it."
+                    "`short_name` belongs to a credentialed protocol "
+                    "(gportal/ptree) — drop it."
                 )
         else:
             if not self.short_name:
                 raise ValueError(
-                    f"dataset {self.key!r} has protocol='gportal' but no "
-                    "`short_name` (the G-Portal numeric dataset id) — set it."
+                    f"dataset {self.key!r} has protocol={self.protocol!r} "
+                    "but no `short_name` (the protocol's product identifier) "
+                    "— set it."
                 )
             if self.collection is not None:
                 raise ValueError(
-                    f"dataset {self.key!r} has protocol='gportal'; "
-                    "`collection` belongs to the jaxa-earth protocol — drop it."
+                    f"dataset {self.key!r} has protocol={self.protocol!r}; "
+                    "`collection` belongs to the jaxa-earth protocol "
+                    "— drop it."
                 )
         return self
 
