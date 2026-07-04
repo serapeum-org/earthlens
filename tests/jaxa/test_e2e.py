@@ -1,6 +1,6 @@
 """Live end-to-end tests for the JAXA backend.
 
-Two tracks:
+Three tracks:
 
 * **`jaxa-earth` (authless)** — pulls a tiny AW3D30 tile around Mt. Fuji
   through the official `jaxa.earth` API and writes a real COG via
@@ -8,8 +8,13 @@ Two tracks:
 * **`gportal` (credentialed)** — issues a 1-product search against a
   GCOM-C/SGLI dataset and, when credentials are available, SFTP-downloads
   it. Skipped without `$GPORTAL_USERNAME` + `$GPORTAL_PASSWORD`.
+* **`ptree` (credentialed)** — downloads one recent 10-minute Himawari-9
+  AHI B13 IR observation (10 full-disk segments, ~10 MB total) from
+  `ftp.ptree.jaxa.jp` via stdlib `ftplib`. Selected under
+  `pytest -m "jaxa and ptree and e2e"`; the test itself runtime-skips
+  when `$JAXA_PTREE_USERNAME` + `$JAXA_PTREE_PASSWORD` are unset.
 
-Both tests are marked `e2e` and skipped by default (the suite runs with
+Tests are marked `e2e` and skipped by default (the suite runs with
 `-m "not e2e"`); they only run under `pytest -m "jaxa and e2e"`.
 """
 
@@ -111,3 +116,60 @@ def test_gportal_sftp_download_lives(tmp_path: Path) -> None:
     assert all(p.exists() for p in written)
     assert all(p.stat().st_size > 0 for p in written)
     assert all(p.suffix == ".h5" for p in written)
+
+
+@pytest.mark.slow
+@pytest.mark.ptree
+def test_ptree_ftp_download_lives(tmp_path: Path) -> None:
+    """A live P-Tree fetch downloads all 10 HSD segments for one B13 slot.
+
+    Drives the full backend chain through the `ptree` protocol: resolves
+    `himawari-ahi-fldk`, authenticates against `$JAXA_PTREE_USERNAME` /
+    `$JAXA_PTREE_PASSWORD`, connects over plain FTP to
+    `ftp.ptree.jaxa.jp`, and downloads all 10 full-disk segments of the
+    Himawari-9 AHI **B13** IR band for a recent 10-minute slot into
+    `tmp_path`. B13 is R20 (2 km), so 10 segments run ~10 MB total —
+    small enough for CI. The test asserts every filename matches the
+    A1-pinned HSD pattern and lands non-empty on disk. Runtime-skips
+    when the credentials are absent (the `ptree` marker still controls
+    selection).
+    """
+    if not (
+        os.environ.get("JAXA_PTREE_USERNAME")
+        and os.environ.get("JAXA_PTREE_PASSWORD")
+    ):
+        pytest.skip("needs $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD")
+    import datetime as dt
+    import re
+
+    from earthlens import EarthLens
+
+    yesterday = dt.datetime.now(dt.UTC) - dt.timedelta(days=1)
+    slot = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+    stamp = slot.strftime("%Y-%m-%d %H:%M")
+
+    lens = EarthLens(
+        data_source="jaxa",
+        variables=["himawari-ahi-fldk"],
+        bands=["B13"],
+        start=stamp,
+        end=stamp,
+        fmt="%Y-%m-%d %H:%M",
+        lat_lim=[-60.0, 60.0],
+        lon_lim=[80.0, 180.0],
+        temporal_resolution="hourly",
+        path=tmp_path,
+    )
+    written = lens.download()
+    assert len(written) == 10, f"expected 10 segments, got {len(written)}"
+    assert all(p.exists() for p in written)
+    assert all(p.stat().st_size > 0 for p in written)
+    pattern = re.compile(
+        r"^HS_H\d\d_\d{8}_\d{4}_B13_FLDK_R20_S\d{2}10\.DAT\.bz2$"
+    )
+    for path in written:
+        assert pattern.match(path.name), f"unexpected filename: {path.name}"
+    segments = sorted(int(p.name.split("_S")[-1][:2]) for p in written)
+    assert segments == list(range(1, 11)), (
+        f"expected segments 1..10, got {segments}"
+    )
