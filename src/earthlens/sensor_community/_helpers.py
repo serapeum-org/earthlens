@@ -26,6 +26,8 @@ import pandas as pd
 import requests
 from loguru import logger
 
+from earthlens.base.http import HttpClient
+
 #: Live JSON API: the last ~5 minutes of every sensor, globally.
 LIVE_URL = "https://data.sensor.community/static/v2/data.json"
 
@@ -62,25 +64,13 @@ class LicenseWarning(UserWarning):
     """
 
 
-def _parse_retry_after(value: str | None) -> float | None:
-    """Parse a `Retry-After` header value into seconds.
-
-    Args:
-        value: The raw `Retry-After` header value, or `None`.
-
-    Returns:
-        The delay in seconds, or `None` when absent / unparseable.
-    """
-    if value is None:
-        return None
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
-
-
 class SensorCommunityClient:
     """Injectable client over the Sensor.Community live + archive hosts.
+
+    Delegates the transport (session, `429`/`Retry-After` back-off) to
+    the shared `earthlens.base.http.HttpClient`, keeping only the
+    two-host request shaping: the live JSON snapshot and one per-sensor
+    archive CSV (`404`-tolerant).
 
     Attributes:
         max_retries: Maximum number of `429` retries before raising.
@@ -109,44 +99,30 @@ class SensorCommunityClient:
             sleep: The sleep function used between retries. Defaults to
                 `time.sleep`; injectable so tests run without real delays.
         """
-        self._session = session if session is not None else requests.Session()
-        self.max_retries = max_retries
-        self.backoff_factor = backoff_factor
-        self.timeout = timeout
-        self._sleep = sleep
+        self._http = HttpClient(
+            session=session if session is not None else requests.Session(),
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            timeout=timeout,
+            status_forcelist=(429,),
+            max_backoff=None,
+            sleep=sleep,
+        )
 
-    def _get(self, url: str) -> requests.Response:
-        """GET `url`, retrying on `429` with `Retry-After`-aware back-off.
+    @property
+    def max_retries(self) -> int:
+        """Maximum `429` retries before the last error is raised."""
+        return self._http.max_retries
 
-        Args:
-            url: The absolute URL to fetch.
+    @property
+    def backoff_factor(self) -> float:
+        """Base seconds for exponential back-off (no `Retry-After`)."""
+        return self._http.backoff_factor
 
-        Returns:
-            requests.Response: The final response (caller inspects the
-                status).
-
-        Raises:
-            requests.HTTPError: Only via the caller's `raise_for_status`;
-                this method does not raise on status by itself.
-        """
-        attempt = 0
-        while True:
-            response = self._session.get(url, timeout=self.timeout)
-            if response.status_code == 429 and attempt < self.max_retries:
-                retry_after = _parse_retry_after(response.headers.get("Retry-After"))
-                wait = (
-                    retry_after
-                    if retry_after is not None
-                    else self.backoff_factor * (2**attempt)
-                )
-                logger.warning(
-                    "Sensor.Community rate-limited (429); retry "
-                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
-                )
-                self._sleep(wait)
-                attempt += 1
-                continue
-            return response
+    @property
+    def timeout(self) -> float:
+        """Per-request timeout in seconds."""
+        return self._http.timeout
 
     def live_snapshot(self) -> list[dict[str, Any]]:
         """Fetch the live JSON API's last-~5-minute global sensor snapshot.
@@ -158,9 +134,7 @@ class SensorCommunityClient:
         Raises:
             requests.HTTPError: On a non-`429` error status.
         """
-        response = self._get(LIVE_URL)
-        response.raise_for_status()
-        payload = response.json()
+        payload = self._http.get_json(LIVE_URL)
         return payload if isinstance(payload, list) else []
 
     def archive_csv(
@@ -181,7 +155,7 @@ class SensorCommunityClient:
             requests.HTTPError: On a non-`404`, non-`429` error status.
         """
         url = f"{ARCHIVE_URL}/{date}/{date}_{sensor_type}_sensor_{sensor_id}.csv"
-        response = self._get(url)
+        response = self._http.get(url, raise_for_status=False)
         if response.status_code == 404:
             return None
         response.raise_for_status()

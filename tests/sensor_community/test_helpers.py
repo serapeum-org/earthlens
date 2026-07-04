@@ -8,7 +8,6 @@ import requests
 from earthlens.sensor_community._helpers import (
     LicenseWarning,
     SensorCommunityClient,
-    _parse_retry_after,
     empty_frame,
     frame_from_csv,
     sensors_in_bbox,
@@ -32,6 +31,9 @@ class _Resp:
         if self.status_code >= 400:
             raise requests.HTTPError(f"HTTP {self.status_code}")
 
+    def close(self):
+        """No-op close so `HttpClient` can release the response on retry."""
+
 
 class _Session:
     """Session returning a scripted sequence of responses."""
@@ -40,7 +42,7 @@ class _Session:
         self._responses = list(responses)
         self.urls: list[str] = []
 
-    def get(self, url, timeout=None):
+    def get(self, url, **kwargs):
         self.urls.append(url)
         return self._responses.pop(0)
 
@@ -49,13 +51,6 @@ class _Session:
 def test_license_warning_is_user_warning():
     """`LicenseWarning` is a `UserWarning` subclass."""
     assert issubclass(LicenseWarning, UserWarning)
-
-
-@pytest.mark.sensor_community
-@pytest.mark.parametrize("value, expected", [("5", 5.0), (None, None), ("x", None)])
-def test_parse_retry_after(value, expected):
-    """Retry-After parses numeric values, else `None`."""
-    assert _parse_retry_after(value) == expected
 
 
 @pytest.mark.sensor_community
