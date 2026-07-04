@@ -294,8 +294,9 @@ class JAXA(AbstractDataSource):
         """Parse the date window into a `TemporalExtent`.
 
         The frequency is advisory: `jaxa-earth` consumes a `dlim` range
-        directly, and `gportal.search` consumes `start_time` / `end_time`
-        ISO strings.
+        directly, `gportal.search` consumes `start_time` / `end_time`
+        ISO strings, and `_ptree.fetch_ptree` iterates every 10-minute
+        slot in the window.
 
         Args:
             start: Inclusive start of the window.
@@ -325,8 +326,10 @@ class JAXA(AbstractDataSource):
 
         Returns:
             list[Path]: One or more written paths per resolved dataset
-                (a COG for `jaxa-earth`, an HDF5/GeoTIFF/NetCDF for
-                `gportal`, depending on the mission).
+                — a COG for `jaxa-earth`, an HDF5 / GeoTIFF / NetCDF
+                product for `gportal` (depending on the mission), or
+                the 10 raw `.DAT.bz2` HSD segments per band per
+                10-minute slot for `ptree`.
         """
         out_dir = Path(self.path)
         self._auth.configure()
@@ -427,8 +430,11 @@ class JAXA(AbstractDataSource):
         if aggregate is not None:
             raise NotImplementedError(
                 "JAXA does not yet support the aggregate= argument. "
-                "The jaxa-earth branch returns per-date COGs; reducing "
-                "them across dates is a planned follow-on (planning G6)."
+                "All three branches emit per-date artefacts today "
+                "(jaxa-earth: per-date COGs; gportal: per-product "
+                "SFTP downloads; ptree: per-slot HSD segments) — "
+                "reducing them across dates is a planned follow-on "
+                "(planning G6)."
             )
         del progress_bar
         return self._api()
