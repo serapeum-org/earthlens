@@ -20,8 +20,12 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import cdsapi
+
+if TYPE_CHECKING:
+    from ecmwf.datastores import Client as ModernClient
 
 __all__ = [
     "DEFAULT_ENDPOINT",
@@ -120,7 +124,7 @@ def _resolve_key(key_env: str) -> str | None:
     )
 
 
-def open_client(endpoint: str = DEFAULT_ENDPOINT) -> cdsapi.Client:
+def open_client(endpoint: str = DEFAULT_ENDPOINT) -> cdsapi.Client | ModernClient:
     """Build a `cdsapi.Client` bound to the named CADS endpoint.
 
     Args:
@@ -193,7 +197,7 @@ def _use_modern_client() -> bool:
     }
 
 
-def open_modern_client(endpoint: str = DEFAULT_ENDPOINT):
+def open_modern_client(endpoint: str = DEFAULT_ENDPOINT) -> ModernClient:
     """Build an `ecmwf.datastores.Client` for the named CADS endpoint.
 
     The `ecmwf-datastores-client` package (installed via the
