@@ -253,7 +253,14 @@ class FtplibTransport:
         try:
             self._ftp.quit()
         except ftplib.all_errors:
-            self._ftp.close()
+            # QUIT-time failures are common when the network flapped
+            # or the server had already dropped us; fall back to a bare
+            # socket close, but do not let a bare-close raise leak
+            # either — the caller expects `close()` to be terminal.
+            try:
+                self._ftp.close()
+            except ftplib.all_errors:
+                pass
         finally:
             self._ftp = None
 
@@ -481,7 +488,11 @@ def fetch_ptree(
             handshake or a transfer mid-flight (any non-auth
             `ftplib.all_errors` variant on login / retr).
     """
-    del space  # accepted for API uniformity; FLDK is always full-disk.
+    # `space` is intentionally unused: HSD FLDK is always the full
+    # visible hemisphere from geostationary orbit, so there is no
+    # bbox to crop. The parameter is kept for API uniformity with
+    # the other JAXA fetch functions.
+    del space
     _guard_retention(time, now=now)
 
     if auth.username is None or auth.password is None:
