@@ -64,6 +64,7 @@ class TestEndIsDateOnly:
             ("2026-07-04T00:00:00", False),
             (dt.date(2026, 7, 3), True),
             (dt.datetime(2026, 7, 3), False),
+            (1234567890, False),
         ],
     )
     def test_detects_bare_date_from_input(self, end, expected):
@@ -226,7 +227,7 @@ class TestSearch:
         assert goes._search() == [], "no parseable scan-start -> dropped"
 
     def test_missing_hour_logged(self, make_goes, patch_client):
-        """An hour prefix that lists nothing emits a loguru warning (G6)."""
+        """Empty hour prefixes are surfaced in a single summary warning (G6)."""
         from loguru import logger
 
         goes = make_goes()
@@ -237,9 +238,26 @@ class TestSearch:
             assert goes._search() == [], "empty listing -> no granules"
         finally:
             logger.remove(sink_id)
-        assert any("no granules under" in m for m in messages), (
+        assert any("had no granules" in m for m in messages), (
             "the missing hour must be logged, not silently skipped"
         )
+
+    def test_missing_hours_do_not_flood_warnings(self, make_goes, patch_client):
+        """A wide all-empty window emits ONE summary warning, not one per hour (R2-L1)."""
+        from loguru import logger
+
+        goes = make_goes(start="2026-01-01", end="2026-02-01", fmt="%Y-%m-%d")
+        patch_client(goes, FakeS3(pages={}))
+        empties = []
+        sink_id = logger.add(
+            lambda m: empties.append(m), level="WARNING", format="{message}"
+        )
+        try:
+            goes._search()
+        finally:
+            logger.remove(sink_id)
+        summary = [m for m in empties if "had no granules" in m]
+        assert len(summary) == 1, "one summary warning regardless of window width"
 
     def test_bare_date_window_spans_whole_day(self, make_goes, patch_client):
         """A bare-date request (default fmt) returns the day's granules (H1)."""

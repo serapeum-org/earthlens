@@ -439,13 +439,16 @@ class GOES(AbstractDataSource):
                 "Narrow the window if this is unintended."
             )
         products: list[RemoteProduct] = []
+        empty_hours = 0
         for hour in self.time.dates:
             hour_prefix = f"{prefix}/{hour:%Y}/{hour:%j}/{hour:%H}/"
             keys = list_prefix_keys(self._client(), self._bucket, hour_prefix)
             if not keys:
-                logger.warning(
-                    f"goes: no granules under s3://{self._bucket}/{hour_prefix} "
-                    "(hour has no data yet or an outage) — skipping."
+                # Per-hour at DEBUG so a wide/backfill window does not flood the
+                # WARNING channel; a single summary warning fires after the loop.
+                empty_hours += 1
+                logger.debug(
+                    f"goes: no granules under s3://{self._bucket}/{hour_prefix}"
                 )
                 continue
             for key in keys:
@@ -466,6 +469,11 @@ class GOES(AbstractDataSource):
                         },
                     )
                 )
+        if empty_hours:
+            logger.warning(
+                f"goes: {empty_hours} of {n_hours} hour prefix(es) had no granules "
+                f"for {prefix} on {self._bucket} (not yet published or an outage)."
+            )
         logger.info(
             f"goes: planned {len(products)} granule(s) for {prefix} on "
             f"{self._bucket}"
