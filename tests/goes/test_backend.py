@@ -1,0 +1,269 @@
+"""Unit tests for the GOES backend (no network — stubbed unsigned S3)."""
+
+from __future__ import annotations
+
+import datetime as dt
+from pathlib import Path
+
+import pytest
+
+from earthlens.goes import GOES
+from earthlens.goes.backend import enumerate_hours, normalize_channel
+
+from .conftest import FakeS3
+
+pytestmark = pytest.mark.goes
+
+HOUR_C = "ABI-L2-MCMIPC/2026/184/12/"
+HOUR_M = "ABI-L2-MCMIPM/2026/184/12/"
+HOUR_RAD = "ABI-L1b-RadC/2026/184/12/"
+
+
+def _mcmipc(scan: str) -> str:
+    """Build a CONUS MCMIP key with the given 14-digit scan-start token."""
+    return f"{HOUR_C}OR_ABI-L2-MCMIPC-M6_G19_s{scan}_e1_c1.nc"
+
+
+class TestEnumerateHours:
+    """Tests for enumerate_hours."""
+
+    def test_floors_and_spans_inclusive(self):
+        """The window is floored to the hour and spans start..end inclusive."""
+        hours = enumerate_hours(
+            dt.datetime(2026, 7, 3, 12, 5), dt.datetime(2026, 7, 3, 14, 1)
+        )
+        assert [h.hour for h in hours] == [12, 13, 14], "three hour buckets"
+
+    def test_single_hour(self):
+        """A sub-hour window yields exactly one hour bucket."""
+        hours = enumerate_hours(
+            dt.datetime(2026, 7, 3, 12, 3), dt.datetime(2026, 7, 3, 12, 47)
+        )
+        assert hours == [dt.datetime(2026, 7, 3, 12, 0)], "one floored hour"
+
+    def test_inverted_window_raises(self):
+        """start after end raises ValueError."""
+        with pytest.raises(ValueError, match="is after end"):
+            enumerate_hours(dt.datetime(2026, 7, 3, 13), dt.datetime(2026, 7, 3, 12))
+
+
+class TestNormalizeChannel:
+    """Tests for normalize_channel."""
+
+    @pytest.mark.parametrize(
+        "token, expected",
+        [("C2", "C02"), ("2", "C02"), ("02", "C02"), ("cmi_c13", "C13"), ("C16", "C16")],
+    )
+    def test_normalises_spellings(self, token, expected):
+        """Several channel spellings collapse to the canonical C<nn> token."""
+        assert normalize_channel(token) == expected, f"{token} -> {expected}"
+
+    def test_no_digit_returns_upper(self):
+        """A selector with no channel number is upper-cased (matches nothing)."""
+        assert normalize_channel("rgb") == "RGB", "no digit -> upper-cased input"
+
+
+class TestConstruction:
+    """Tests for GOES.__init__ and the abstract hooks."""
+
+    def test_defaults_resolve_bucket_and_prefix(self, make_goes):
+        """The default request resolves the east bucket and CONUS prefix."""
+        goes = make_goes()
+        assert goes._bucket == "noaa-goes19", "east -> noaa-goes19"
+        assert goes._prefix() == "ABI-L2-MCMIPC", "product group + C suffix"
+
+    def test_default_domain_used_when_omitted(self, make_goes):
+        """Omitting domain uses the product's default_domain (SST -> F)."""
+        goes = make_goes(dataset="abi-l2-sst", domain=None)
+        assert goes._domain_key == "F", "SST publishes only the Full Disk domain"
+
+    def test_unknown_dataset_raises(self, make_goes):
+        """An unknown dataset raises ValueError from the catalog."""
+        with pytest.raises(ValueError, match="not in the GOES catalog"):
+            make_goes(dataset="abi-l2-nope")
+
+    def test_unknown_satellite_raises(self, make_goes):
+        """An unknown satellite raises ValueError from the catalog."""
+        with pytest.raises(ValueError, match="not a known GOES satellite"):
+            make_goes(satellite="mars")
+
+    def test_domain_not_published_raises(self, make_goes):
+        """Requesting a domain the product does not publish raises ValueError."""
+        with pytest.raises(ValueError, match="is not published by product"):
+            make_goes(dataset="abi-l2-sst", domain="C")
+
+    def test_str_variable_coerced_to_list(self, make_goes):
+        """A single string variable is coerced to a one-element list."""
+        goes = make_goes(dataset="abi-l1b-rad", variables="C02")
+        assert goes._channels == ["C02"], "string channel normalised into a list"
+
+    def test_channels_only_for_band_split(self, make_goes):
+        """A combined product ignores variables for channel filtering."""
+        goes = make_goes(dataset="abi-l2-mcmip", variables=["CMI_C13"])
+        assert goes._channels == [], "mcmip is combined -> no channel filter"
+
+    def test_initialize_is_noop(self, make_goes):
+        """_initialize returns None (the buckets are anonymous)."""
+        assert make_goes()._initialize() is None, "no auth handshake"
+
+    def test_check_input_dates_builds_hour_index(self, make_goes):
+        """_check_input_dates captures the window and its hour buckets."""
+        goes = make_goes(start="2026-07-03 12:00", end="2026-07-03 13:30")
+        assert len(goes.time.dates) == 2, "two hour buckets (12 and 13)"
+        assert goes.time.resolution == "h", "hourly resolution label"
+
+
+class TestSearch:
+    """Tests for GOES._search enumeration + filtering."""
+
+    def test_plans_in_window_granules(self, make_goes, patch_client):
+        """Only granules whose scan-start lands in the window are planned."""
+        goes = make_goes()
+        patch_client(
+            goes,
+            FakeS3(pages={HOUR_C: [_mcmipc("20261841201180"), _mcmipc("20261841240000")]}),
+        )
+        products = goes._search()
+        assert [p.id for p in products] == [
+            "OR_ABI-L2-MCMIPC-M6_G19_s20261841201180_e1_c1.nc"
+        ], "the 12:40 granule is outside the 12:00-12:30 window"
+
+    def test_metadata_carries_bucket_and_scan_start(self, make_goes, patch_client):
+        """Each planned product carries its bucket, product key and scan-start."""
+        goes = make_goes()
+        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        meta = goes._search()[0].metadata
+        assert meta["bucket"] == "noaa-goes19", "bucket recorded"
+        assert meta["scan_start"] == dt.datetime(2026, 7, 3, 12, 1, 18), "parsed time"
+
+    def test_mesoscale_subsector_filter(self, make_goes, patch_client):
+        """Domain M1 keeps only the M1 subsector granules (M2 is filtered out)."""
+        goes = make_goes(dataset="abi-l2-mcmip", domain="M1")
+        keys = [
+            f"{HOUR_M}OR_ABI-L2-MCMIPM1-M6_G19_s20261841205000_e1_c1.nc",
+            f"{HOUR_M}OR_ABI-L2-MCMIPM2-M6_G19_s20261841205300_e1_c1.nc",
+        ]
+        patch_client(goes, FakeS3(pages={HOUR_M: keys}))
+        planned = [p.id for p in goes._search()]
+        assert planned == ["OR_ABI-L2-MCMIPM1-M6_G19_s20261841205000_e1_c1.nc"], (
+            "only the M1 subsector is kept"
+        )
+
+    def test_channel_filter_for_band_split(self, make_goes, patch_client):
+        """A band-split product with variables keeps only the requested channels."""
+        goes = make_goes(dataset="abi-l1b-rad", domain="C", variables=["C02"])
+        keys = [
+            f"{HOUR_RAD}OR_ABI-L1b-RadC-M6C01_G19_s20261841201180_e1_c1.nc",
+            f"{HOUR_RAD}OR_ABI-L1b-RadC-M6C02_G19_s20261841201180_e1_c1.nc",
+        ]
+        patch_client(goes, FakeS3(pages={HOUR_RAD: keys}))
+        planned = [p.id for p in goes._search()]
+        assert planned == ["OR_ABI-L1b-RadC-M6C02_G19_s20261841201180_e1_c1.nc"], (
+            "C01 is filtered out; only the requested C02 remains"
+        )
+
+    def test_combined_product_variables_not_filtered(self, make_goes, patch_client):
+        """A combined product ignores variables and keeps the whole granule."""
+        goes = make_goes(dataset="abi-l2-mcmip", variables=["CMI_C13"])
+        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        assert len(goes._search()) == 1, "the single multi-band granule is kept"
+
+    def test_unparseable_key_skipped(self, make_goes, patch_client):
+        """A listed key with no scan-start token is skipped, not planned."""
+        goes = make_goes()
+        patch_client(goes, FakeS3(pages={HOUR_C: [f"{HOUR_C}junk.nc"]}))
+        assert goes._search() == [], "no parseable scan-start -> dropped"
+
+    def test_missing_hour_logged(self, make_goes, patch_client, caplog):
+        """An hour prefix that lists nothing logs a warning and is skipped."""
+        goes = make_goes()
+        patch_client(goes, FakeS3(pages={}))
+        with caplog.at_level("WARNING"):
+            assert goes._search() == [], "empty listing -> no granules"
+
+    def test_two_hour_window_lists_both_prefixes(self, make_goes, patch_client):
+        """A window spanning two hours lists both hour prefixes."""
+        goes = make_goes(start="2026-07-03 12:00", end="2026-07-03 13:30")
+        pages = {
+            HOUR_C: [_mcmipc("20261841205000")],
+            "ABI-L2-MCMIPC/2026/184/13/": [
+                "ABI-L2-MCMIPC/2026/184/13/OR_ABI-L2-MCMIPC-M6_G19_s20261841305000_e1_c1.nc"
+            ],
+        }
+        fake = patch_client(goes, FakeS3(pages=pages))
+        assert len(goes._search()) == 2, "one granule from each hour"
+        assert len(fake.listed) == 2, "both hour prefixes were listed"
+
+
+class TestFetchAndDownload:
+    """Tests for GOES._fetch and GOES.download."""
+
+    def test_download_writes_granules(self, make_goes, patch_client):
+        """download returns the written NetCDF paths under the output dir."""
+        goes = make_goes()
+        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        paths = goes.download(progress_bar=False)
+        assert [Path(p).name for p in paths] == [
+            "OR_ABI-L2-MCMIPC-M6_G19_s20261841201180_e1_c1.nc"
+        ], "one granule written"
+        assert paths[0].read_bytes().startswith(b"netcdf:"), "streamed the fake body"
+
+    def test_download_empty_window_returns_empty_list(self, make_goes, patch_client):
+        """A window matching nothing returns an empty list without fetching."""
+        goes = make_goes()
+        patch_client(goes, FakeS3(pages={}))
+        assert goes.download(progress_bar=False) == [], "no granules -> []"
+
+    def test_download_rejects_aggregate(self, make_goes):
+        """download(aggregate=...) raises NotImplementedError (raw granules)."""
+        goes = make_goes()
+        with pytest.raises(NotImplementedError, match="raw, undecoded"):
+            goes.download(aggregate=object())
+
+    def test_api_composes_search_fetch(self, make_goes, patch_client):
+        """_api returns the fetched paths via the search/fetch composition."""
+        goes = make_goes()
+        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        assert len(goes._api()) == 1, "one granule fetched through _api"
+
+
+class TestClient:
+    """Tests for GOES._client caching."""
+
+    def test_client_built_once(self, make_goes, monkeypatch):
+        """_client builds the unsigned client once and caches it."""
+        calls = {"n": 0}
+
+        def _fake_builder(region):
+            calls["n"] += 1
+            return FakeS3()
+
+        monkeypatch.setattr(
+            "earthlens.goes.backend.unsigned_s3_client", _fake_builder
+        )
+        goes = make_goes()
+        first = goes._client()
+        second = goes._client()
+        assert first is second, "same client returned"
+        assert calls["n"] == 1, "the unsigned client is built exactly once"
+
+
+class TestNoForbiddenImports:
+    """Tests that the package never imports a decoding SDK (G2 / G5)."""
+
+    @pytest.mark.parametrize("module", ["backend", "catalog", "_helpers", "__init__"])
+    def test_no_decode_imports(self, module):
+        """No goes source file imports xarray / netCDF4 / goes2go."""
+        import earthlens.goes as pkg
+
+        text = (Path(pkg.__file__).parent / f"{module}.py").read_text(encoding="utf-8")
+        banned = [
+            "import xarray",
+            "from xarray",
+            "import netCDF4",
+            "from netCDF4",
+            "import goes2go",
+            "from goes2go",
+        ]
+        for statement in banned:
+            assert statement not in text, f"{module}.py must not use `{statement}`"
