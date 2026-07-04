@@ -215,8 +215,11 @@ def open_modern_client(endpoint: str = DEFAULT_ENDPOINT) -> ModernClient:
     async `submit()` / `download()` API is available to callers who want it.
 
     Token resolution mirrors `open_client` (`<ENDPOINT>_KEY`, else `CDSAPI_KEY`,
-    else `~/.cdsapirc`), so the same Personal Access Token authenticates. This
-    is opt-in — reached only when `EARTHLENS_ECMWF_MODERN` is truthy.
+    else `~/.cdsapirc`), so the same Personal Access Token authenticates. The
+    URL, however, is resolved from `<ENDPOINT>_URL` (env) or the built-in
+    default **only** — unlike `key`, it does not fall back to the `url:` line in
+    `~/.cdsapirc` (a no-op for the shipped default CDS URL). This is opt-in —
+    reached only when `EARTHLENS_ECMWF_MODERN` is truthy.
 
     Args:
         endpoint: One of the slugs in `ENDPOINTS`. Defaults to `"cds"`.
