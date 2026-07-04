@@ -45,6 +45,7 @@ _CURATED_ENUM = (
     "firms",
     "asf",
     "radar",
+    "goes",
     "tropycal",
     "gdacs",
     "drought",
@@ -392,6 +393,21 @@ class TestStructuralLints:
         )
         checked, issues = _validate_goes(catalog)
         assert (checked, issues) == (1, []), "a clean product lints clean"
+
+    def test_goes_flags_missing_product_group(self):
+        """A GOES product missing product_group / domains is flagged (_require branch)."""
+        catalog = SimpleNamespace(
+            domains={"C": None, "F": None},
+            datasets={
+                "bare": SimpleNamespace(
+                    product_group="", domains=[], default_domain="C",
+                    band_split=False, bands=[],
+                ),
+            },
+        )
+        _checked, issues = _validate_goes(catalog)
+        assert any("product_group" in i for i in issues), "missing product_group flagged"
+        assert any("domains" in i for i in issues), "empty domains flagged"
 
     def test_goes_flags_unknown_domain_and_empty_bands(self):
         """An unknown domain, a stray default, and empty band-split bands are flagged."""
