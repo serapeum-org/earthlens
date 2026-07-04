@@ -465,7 +465,8 @@ def _download(
     `zip_path`. The retry policy reproduces the historical loop: an error status
     (`429`/`5xx`, via `raise_for_status`) or a transport `RequestException` /
     `OSError` retries the whole download, waiting `backoff * 2**attempt` between
-    the `retries` attempts (uncapped). When every attempt is exhausted the final
+    the `retries` attempts (bounded by the default back-off ceiling, which the
+    exponential wait never reaches). When every attempt is exhausted the final
     error is wrapped in a `requests.HTTPError` carrying the same message the
     hand-rolled loop raised.
 

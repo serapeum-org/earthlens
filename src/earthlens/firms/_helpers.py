@@ -202,8 +202,8 @@ def firms_get(
     :func:`classify_body` flags as `"quota"` is made retryable via a
     `retry_predicate`. Each retry waits `backoff_factor · 2**attempt`
     seconds — or the server's `Retry-After` when it sends one on a 429,
-    which the client now honours — with no ceiling, up to `max_retries`
-    times.
+    which the client now honours (bounded by the default back-off
+    ceiling) — up to `max_retries` times.
 
     Crucially the client is built with `raise_for_status=False`, so any
     other response — a real CSV, a bad-key body, a generic error body, a
