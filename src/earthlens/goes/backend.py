@@ -334,10 +334,10 @@ class GOES(AbstractDataSource):
             ImportError: When `boto3` is not installed (names
                 `earthlens[s3]`).
         """
-        client = self.__dict__.get("_client_obj")
+        client = self.__dict__.get("_s3_client")
         if client is None:
             client = unsigned_s3_client(self._region)
-            self.__dict__["_client_obj"] = client
+            self.__dict__["_s3_client"] = client
         return client
 
     def _prefix(self) -> str:
