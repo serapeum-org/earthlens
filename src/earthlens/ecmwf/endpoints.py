@@ -221,6 +221,13 @@ def open_modern_client(endpoint: str = DEFAULT_ENDPOINT) -> ModernClient:
     `~/.cdsapirc` (a no-op for the shipped default CDS URL). This is opt-in —
     reached only when `EARTHLENS_ECMWF_MODERN` is truthy.
 
+    Known limitation: the backend's friendly error classification (e.g. the
+    "licence not accepted" → `PermissionError`-with-hint mapping) is tuned to
+    `cdsapi`'s exception shapes, so a failure raised by `ecmwf.datastores.Client`
+    may fall through to a generic error instead. This opt-in path is not yet
+    exercised end-to-end; harden the classification before promoting it to the
+    default.
+
     Args:
         endpoint: One of the slugs in `ENDPOINTS`. Defaults to `"cds"`.
 
