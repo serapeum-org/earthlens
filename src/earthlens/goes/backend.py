@@ -63,6 +63,11 @@ from earthlens.goes.catalog import Catalog, GOESDomain, GOESProduct
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
 
+#: `_search` lists one S3 prefix per hour of the window; beyond this many
+#: hours (30 days) it logs a warning so a wide window is not a silent
+#: many-round-trip surprise before the download even starts.
+WIDE_WINDOW_HOURS = 720
+
 
 def enumerate_hours(start: dt.datetime, end: dt.datetime) -> list[dt.datetime]:
     """Enumerate the hour buckets spanning `[start, end]` inclusive.
@@ -379,6 +384,13 @@ class GOES(AbstractDataSource):
         prefix = self._prefix()
         start_dt = self.time.start_date
         end_dt = self.time.end_date
+        n_hours = len(self.time.dates)
+        if n_hours > WIDE_WINDOW_HOURS:
+            logger.warning(
+                f"goes: the request spans {n_hours} hours — _search issues one "
+                f"S3 LIST per hour (~{n_hours} round-trips) before any download. "
+                "Narrow the window if this is unintended."
+            )
         products: list[RemoteProduct] = []
         for hour in self.time.dates:
             hour_prefix = f"{prefix}/{hour:%Y}/{hour:%j}/{hour:%H}/"

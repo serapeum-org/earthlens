@@ -216,6 +216,20 @@ class TestSearch:
         assert len(planned) == 1, "a noon granule is inside the whole-day window"
         assert len(goes.time.dates) == 24, "the bare date enumerates all 24 hours"
 
+    def test_wide_window_warns(self, make_goes, patch_client):
+        """A window wider than the threshold logs a many-round-trip warning (M2)."""
+        from loguru import logger
+
+        goes = make_goes(start="2026-01-01", end="2026-03-01", fmt="%Y-%m-%d")
+        patch_client(goes, FakeS3(pages={}))
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            goes._search()
+        finally:
+            logger.remove(sink_id)
+        assert any("S3 LIST per hour" in m for m in messages), "wide-window warning"
+
     def test_two_hour_window_lists_both_prefixes(self, make_goes, patch_client):
         """A window spanning two hours lists both hour prefixes."""
         goes = make_goes(start="2026-07-03 12:00", end="2026-07-03 13:30")
