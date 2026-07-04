@@ -52,11 +52,12 @@ from earthlens.jaxa.auth import JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Catalog, Dataset, JaxaProtocol
 
 #: Maps an `EarthLens(temporal_resolution=...)` value to the pandas
-#: frequency alias used for `self.time.dates`. JAXA's two SDK paths only
-#: read `start_date` / `end_date` directly, so the `dates` index is
-#: informational — but it should still report a frequency that matches
-#: the cadence the user asked for instead of silently snapping every
-#: non-`daily` value to month-start.
+#: frequency alias used for `self.time.dates`. JAXA's three branches
+#: only read `start_date` / `end_date` directly (jaxa-earth via `dlim`,
+#: gportal via `start_time` / `end_time`, ptree via a slot iterator),
+#: so the `dates` index is informational — but it should still report
+#: a frequency that matches the cadence the user asked for instead of
+#: silently snapping every non-`daily` value to month-start.
 _FREQ_ALIAS: dict[str, str] = {
     "raw": "D",
     "hourly": "h",
@@ -109,12 +110,16 @@ class JAXA(AbstractDataSource):
             start: Inclusive start of the date window (parsed with `fmt`).
             end: Inclusive end of the date window.
             variables: Catalog dataset keys, canonical or alias. Every key
-                must resolve to the **same** protocol — mixing
-                `jaxa-earth` keys with `gportal` keys raises.
+                must resolve to the **same** protocol — mixing keys from
+                more than one of `jaxa-earth`, `gportal`, and `ptree`
+                raises with a diagnostic message that names each violated
+                protocol and its offending keys.
             lat_lim: `[lat_min, lat_max]` in degrees.
             lon_lim: `[lon_min, lon_max]` in degrees.
-            temporal_resolution: Advisory label only — JAXA Earth uses the
-                full date range, G-Portal queries on `(start, end)`.
+            temporal_resolution: Advisory label only — JAXA Earth uses
+                the full date range, G-Portal queries on
+                `(start, end)`, and `_ptree.fetch_ptree` iterates every
+                10-minute slot in the window.
             path: Output directory (created if missing).
             fmt: `strptime` format for `start` / `end`.
             resolution: `ppu` (pixels per degree) for the `jaxa-earth`
@@ -395,8 +400,10 @@ class JAXA(AbstractDataSource):
         """Fetch the requested datasets and return the written paths.
 
         Args:
-            progress_bar: Reserved for future per-download progress; the
-                two SDKs print their own progress lines today.
+            progress_bar: Reserved for future per-download progress;
+                each branch prints its own progress lines today
+                (jaxa-earth via `jaxa.earth`, gportal via the `gportal`
+                SDK, ptree via one segment-path write per FTP transfer).
             aggregate: Not supported — JAXA requests return per-date
                 rasters; reducing them across dates is a follow-on.
 
