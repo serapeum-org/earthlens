@@ -49,6 +49,10 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/airnow/quickstart/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/argo/catalog_and_selectors/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -234,6 +238,10 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/ecmwf/wind_energy_resource/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/eea-aq/quickstart/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
@@ -629,6 +637,10 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/sensor-community/quickstart/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/sentinel-hub/aggregate_monthly/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -913,6 +925,22 @@
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/airnow/airnow/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/airnow/authentication/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/airnow/introduction/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/airnow/usage/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/argo/argo/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
@@ -1070,6 +1098,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/ecmwf/usage/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/eea-aq/authentication/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/eea-aq/eea-aq/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/eea-aq/introduction/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/eea-aq/usage/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
@@ -1470,6 +1514,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/s3/usage/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sensor-community/authentication/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sensor-community/introduction/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sensor-community/sensor-community/</loc>
+         <lastmod>2026-07-04</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/sensor-community/usage/</loc>
          <lastmod>2026-07-04</lastmod>
     </url>
     <url>
