@@ -284,22 +284,37 @@ def _iter_slots(
         cursor = cursor + step
 
 
+def _as_utc(when: dt.datetime) -> dt.datetime:
+    """Return `when` in UTC, treating a naive input as UTC.
+
+    Backend construction produces naive `datetime`s from
+    `strptime(fmt)` on the user's ISO strings — those strings are
+    documented as UTC in the P-Tree docs. A tz-aware input is
+    converted to UTC via `astimezone`.
+    """
+    if when.tzinfo is None:
+        return when.replace(tzinfo=dt.UTC)
+    return when.astimezone(dt.UTC)
+
+
 def _guard_retention(
     time: TemporalExtent, *, now: dt.datetime | None = None,
 ) -> None:
-    """Raise :class:`RetentionError` if the window predates the archive.
+    """Raise :class:`RetentionError` if the window is outside the archive.
 
-    Uses `time.start_date` as the earliest requested moment; anything
-    more than `_RETENTION_DAYS` before "now" is unreachable on P-Tree.
-    A configurable `now` keeps the check testable without freezing the
-    system clock.
+    Guards **both bounds** so a long window that begins inside
+    retention but extends past `now` (a `start_date` in the past,
+    `end_date` in the future) is rejected up-front instead of failing
+    mid-download when the loop reaches a slot the archive has not
+    populated yet. A configurable `now` keeps the check testable
+    without freezing the system clock. Both bounds are compared in
+    UTC — a tz-naive `datetime` is treated as UTC (mirrors the
+    backend's own `_check_input_dates` convention).
     """
     if now is None:
         now = dt.datetime.now(dt.UTC)
-    if time.start_date.tzinfo is None:
-        request_start = time.start_date.replace(tzinfo=dt.UTC)
-    else:
-        request_start = time.start_date.astimezone(dt.UTC)
+    request_start = _as_utc(time.start_date)
+    request_end = _as_utc(time.end_date)
     horizon = now - dt.timedelta(days=_RETENTION_DAYS)
     if request_start < horizon:
         raise RetentionError(
@@ -309,23 +324,40 @@ def _guard_retention(
             f"window (>= {horizon.date()}). Shorten the window or use a "
             "different archive for older dates."
         )
+    if request_end > now:
+        raise RetentionError(
+            f"the requested end {request_end.date()} is in the future "
+            f"({now.date()}); P-Tree only serves already-observed slots. "
+            "Move `end` to now-or-earlier before retrying."
+        )
 
 
 def _resolve_bands(dataset: Dataset, bands_override: list[str] | None) -> list[str]:
     """Return the bands to fetch, validated against the Himawari band set.
 
     Falls back to the dataset row's `default_band` when the caller did
-    not pass an override.
+    not pass an override (`bands_override is None`). An empty
+    `bands_override=[]` is a caller error and is rejected — it is
+    distinct from "no override" so a downstream mis-computed empty
+    list surfaces here instead of silently masking as the
+    `default_band` recovery.
     """
-    if bands_override:
-        bands = list(bands_override)
-    elif dataset.default_band:
+    if bands_override is None:
+        if not dataset.default_band:
+            raise ValueError(
+                f"dataset {dataset.key!r} has no default_band and no "
+                "bands= override was supplied; pass at least one of "
+                "B01..B16."
+            )
         bands = [dataset.default_band]
     else:
-        raise ValueError(
-            f"dataset {dataset.key!r} has no default_band and no bands= "
-            "override was supplied; pass at least one of B01…B16."
-        )
+        if not bands_override:
+            raise ValueError(
+                "bands= was passed as an empty list; supply at least "
+                "one of B01..B16, or drop the argument to use the "
+                f"dataset's default_band ({dataset.default_band!r})."
+            )
+        bands = list(bands_override)
     unknown = [b for b in bands if b not in _HIMAWARI_BAND_RESOLUTION]
     if unknown:
         raise ValueError(

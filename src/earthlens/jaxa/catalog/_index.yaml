@@ -6,7 +6,6 @@
 # discoverability.
 
 available_datasets:
-- himawari-ahi-fldk
 - '10001000'
 - '10001001'
 - '10001002'
@@ -925,3 +924,4 @@ available_datasets:
 - NASA.EOSDIS_Terra.MODIS_MOD11C1-LST.nighttime.v061_global_monthly-normal
 - NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.daytime.v061_global_monthly
 - NASA.EOSDIS_Terra.MODIS_MOD11C3-LST.nighttime.v061_global_monthly
+- himawari-ahi-fldk

@@ -210,6 +210,14 @@ class TestResolveBands:
         with pytest.raises(ValueError, match="B99"):
             _resolve_bands(row, ["B99"])
 
+    def test_empty_bands_override_rejected(self) -> None:
+        """An explicit empty `bands=[]` list is a caller error, not a default recovery."""
+        row = Dataset(
+            key="k", protocol="ptree", short_name="s", default_band="B03",
+        )
+        with pytest.raises(ValueError, match="empty list"):
+            _resolve_bands(row, [])
+
 
 class TestRetentionGuard:
     """Tests for `_guard_retention` — the 30-day archive window enforcement."""
@@ -244,6 +252,21 @@ class TestRetentionGuard:
         )
         with pytest.raises(RetentionError):
             _guard_retention(te, now=now)
+
+    def test_end_date_in_future_rejected(self) -> None:
+        """A window that extends past `now` is rejected up-front."""
+        now = dt.datetime(2026, 7, 4, tzinfo=dt.UTC)
+        te = _make_extent(
+            now - dt.timedelta(days=1), now + dt.timedelta(days=3),
+        )
+        with pytest.raises(RetentionError, match="in the future"):
+            _guard_retention(te, now=now)
+
+    def test_end_date_exactly_now_allowed(self) -> None:
+        """`end == now` is within the window; no error."""
+        now = dt.datetime(2026, 7, 4, 12, 0, tzinfo=dt.UTC)
+        te = _make_extent(now - dt.timedelta(days=1), now)
+        _guard_retention(te, now=now)
 
 
 class TestFetchPtree:

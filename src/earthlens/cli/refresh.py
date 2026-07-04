@@ -1199,23 +1199,35 @@ def _chc_ftp_bases(catalog: Any) -> list[str]:
     )
 
 
+#: P-Tree Himawari product tokens the refresher seeds unconditionally.
+#: P-Tree has no discoverable "listing" endpoint (the archive serves one
+#: fixed HSD product family), so the refresh writer would otherwise drop
+#: these ids from `_index.yaml` on every regenerate. Names match the
+#: `short_name` field of the `ptree` catalog rows under
+#: `src/earthlens/jaxa/catalog/himawari.yaml`.
+_PTREE_STATIC_IDS: tuple[str, ...] = ("himawari-ahi-fldk",)
+
+
 def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every live JAXA dataset id from both protocols.
+    """List every live JAXA dataset id from all three protocols.
 
     Walks the two SDKs' authoritative listings: `jaxa.earth`'s STAC
     catalog (118 COG collections at A1 capture time) for the
     `jaxa-earth` group, and `gportal.datasets()` (799 numeric dataset
-    ids at A1 capture time) for the `gportal` group. The result feeds
-    `earthlens datasets refresh jaxa` so a curator can diff the
-    bundled YAML against the live universes.
+    ids at A1 capture time) for the `gportal` group. The `ptree` group
+    is a static seed drawn from :data:`_PTREE_STATIC_IDS` — P-Tree has
+    no discoverable listing endpoint (one fixed HSD product), so this
+    keeps the entries stable across refreshes rather than losing them
+    on the next `--write`.
 
     Args:
-        catalog: The loaded JAXA `Catalog` (unused; the SDKs are the
-            authoritative sources).
+        catalog: The loaded JAXA `Catalog` (unused; the SDKs and the
+            static P-Tree seed list are the authoritative sources).
 
     Returns:
-        Two-group mapping:
-        `{"jaxa-earth": [STAC collection ids], "gportal": [numeric ids]}`.
+        Three-group mapping:
+        `{"jaxa-earth": [STAC collection ids], "gportal": [numeric
+        ids], "ptree": [product tokens]}`.
     """
     del catalog
     from jaxa.earth import je as _je  # type: ignore[import-not-found]
@@ -1235,6 +1247,7 @@ def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
     return {
         "jaxa-earth": sorted(set(str(c) for c in je_ids)),
         "gportal": sorted(set(gp_ids)),
+        "ptree": sorted(_PTREE_STATIC_IDS),
     }
 
 
