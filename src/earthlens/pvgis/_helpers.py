@@ -147,15 +147,15 @@ def throttled_get(
         sleep(wait)
     # The proactive throttle above is kept here; `HttpClient` owns only the
     # 429 retry/back-off. `raise_for_status=False` lets a non-429 4xx flow back
-    # to the caller (which inspects the out-of-coverage error body), and
-    # `max_backoff=None` leaves the `2**attempt` back-off uncapped to match the
-    # previous hand-rolled loop.
+    # to the caller (which inspects the out-of-coverage error body). The
+    # `2**attempt` back-off keeps the default `max_backoff` ceiling: the old
+    # loop's exponential wait never reached it, and it now bounds a server
+    # `Retry-After` the old loop ignored.
     http = HttpClient(
         session=session,
         status_forcelist=(429,),
         max_retries=max_retries - 1,
         backoff_factor=1.0,
-        max_backoff=None,
         raise_for_status=False,
         sleep=sleep,
         timeout=60,

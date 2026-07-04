@@ -209,7 +209,6 @@ def throttled_get(
         status_forcelist=(429,),
         max_retries=max_retries - 1,
         backoff_factor=1.0,
-        max_backoff=None,
         raise_for_status=False,
         sleep=sleep,
         timeout=120,

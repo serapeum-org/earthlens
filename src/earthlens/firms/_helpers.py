@@ -234,7 +234,6 @@ def firms_get(
         status_forcelist=(429,),
         retry_predicate=_is_quota_body,
         raise_for_status=False,
-        max_backoff=None,
         sleep=sleep,
     )
     return client.get(url)

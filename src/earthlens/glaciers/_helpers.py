@@ -175,9 +175,8 @@ def _stream_download(
         retry_on_exceptions=(requests.RequestException, OSError),
         status_forcelist=(429, 500, 502, 503, 504),
         raise_for_status=True,
-        max_retries=retries - 1,
+        max_retries=max(retries - 1, 0),
         backoff_factor=backoff,
-        max_backoff=None,
         sleep=time.sleep,
     )
     try:

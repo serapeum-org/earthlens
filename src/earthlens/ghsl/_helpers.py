@@ -488,7 +488,6 @@ def _download(
         raise_for_status=True,
         max_retries=max(retries - 1, 0),
         backoff_factor=backoff,
-        max_backoff=None,
         sleep=time.sleep,
     )
     try:
