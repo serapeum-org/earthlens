@@ -302,8 +302,12 @@ class AirNow(AbstractDataSource):
         inclusive hour range. For the common date-granular request (both
         endpoints parse to midnight) the end is extended to the end day's
         final hour (`T23`) so a single-day `[d, d]` window returns all 24
-        hours rather than only hour 0. An explicit non-midnight hour (from
-        an hour-aware `fmt`) is passed through unchanged.
+        hours rather than only hour 0 — identical to the EEA / Sensor.Community
+        full-end-day inclusion. An explicit non-midnight hour (from an
+        hour-aware `fmt`) is passed through as an **inclusive** end hour here;
+        the EEA / Sensor.Community client-side filters instead treat a
+        non-midnight `end` as a half-open `[start, end)` bound, so
+        hour-granular callers should account for that one-endpoint difference.
 
         Returns:
             tuple[str, str]: `(start_date, end_date)` for the query.

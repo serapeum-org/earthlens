@@ -315,7 +315,12 @@ class SensorCommunity(AbstractDataSource):
         """Return the `[lower, upper)` UTC filter bounds for the request.
 
         A date-granular end (midnight) is extended by one day so the whole
-        end day is inclusive.
+        end day is inclusive — the common path, and identical to AirNow /
+        EEA. A non-midnight `end` (only reachable via an hour-aware `fmt`)
+        yields a **half-open** `[start, end)` window here; AirNow instead
+        treats its end hour as inclusive (its API takes an hourly range), so
+        hour-granular callers should account for that one-endpoint
+        difference.
 
         Returns:
             tuple[pd.Timestamp, pd.Timestamp]: `(lower, upper)`, tz-aware
