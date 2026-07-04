@@ -152,7 +152,12 @@ class AirNow(AbstractDataSource):
             api_key: AirNow `API_KEY`. Falls back to the `AIRNOW_API_KEY`
                 environment variable.
             data_type: AirNow `dataType` — `"A"` (AQI only), `"C"`
-                (concentration only), or `"B"` (both, the default).
+                (concentration only), or `"B"` (both, the default). The
+                `value` column mirrors AirNow's `Value` field verbatim, so
+                its meaning follows `data_type`: for `"C"` / `"B"` it is the
+                reported concentration (with the AQI in `aqi`); for `"A"`
+                (AQI-only) AirNow's `Value` holds the AQI, so prefer `"B"`
+                unless you specifically want AQI in `value`.
             monitor_type: Which monitors to include — `"permanent"`,
                 `"mobile"`, or `"both"` (default).
             include_raw_concentrations: When `True`, ask AirNow to include

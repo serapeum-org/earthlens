@@ -23,7 +23,7 @@ per measurement — not a gridded raster:
 | `station_id` | AirNow `FullAQSCode` of the monitoring site |
 | `parameter` | pollutant as AirNow reports it (`PM2.5`, `OZONE`, …) |
 | `datetime_utc` | observation timestamp (tz-aware UTC) |
-| `value` | measured concentration (AirNow's `Value`) |
+| `value` | AirNow's `Value` field — the concentration for `data_type` `"C"`/`"B"` (default); the AQI when `data_type="A"` |
 | `raw_value` | unadjusted concentration (`RawConcentration`; `NaN` unless `include_raw_concentrations=True`) |
 | `units` | reporting units (`UG/M3`, `PPB`, `PPM`) |
 | `aqi` | the reported Air Quality Index (NaN when not reported) |
