@@ -37,6 +37,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from pydantic import SecretStr
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -173,8 +174,6 @@ class JAXA(AbstractDataSource):
             )
         self._resolved: list[Dataset] = resolved
         self._protocol: JaxaProtocol = next(iter(protocols))
-
-        from pydantic import SecretStr
 
         creds = JaxaCredentials(
             gportal_username=gportal_username,
@@ -359,7 +358,7 @@ class JAXA(AbstractDataSource):
                         out_dir=out_dir,
                     )
                 )
-        else:  # ptree
+        elif self._protocol == "ptree":
             from earthlens.jaxa._ptree import fetch_ptree
 
             for ds in self._resolved:
@@ -373,6 +372,16 @@ class JAXA(AbstractDataSource):
                         bands=self._bands_override,
                     )
                 )
+        else:
+            # Defensive: `JaxaProtocol` is a `Literal[...]` and the
+            # constructor rejects anything else, so this only fires if a
+            # future fourth protocol is added to the literal but not to
+            # `_api`. Failing loud beats silently routing to the last
+            # `else` branch (Round 2 L3).
+            raise ValueError(
+                f"unhandled JAXA protocol {self._protocol!r}; add a "
+                "dispatch branch alongside jaxa-earth/gportal/ptree."
+            )
         return written
 
     def download(

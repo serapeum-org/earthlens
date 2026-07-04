@@ -167,9 +167,12 @@ class FtplibTransport:
                 `error_proto`, `EOFError`, …). The connection is
                 closed before re-raising.
             AuthenticationError: Wraps `ftplib.error_perm` on bad
-                credentials — the message names the fix but does not
-                echo the raw server reply (which some servers
-                interpolate the attempted username into).
+                credentials — the wrapped message does not echo the
+                raw server reply (which some servers interpolate the
+                attempted username into). Note the chained cause
+                (`__cause__`) still carries the original `error_perm`
+                for callers that print the full traceback; scrub the
+                traceback at the application boundary if that matters.
         """
         try:
             self._ftp = ftplib.FTP(self.host, timeout=self.timeout)
@@ -415,7 +418,13 @@ def _local_target(remote_path: str, out_dir: Path) -> Path:
     """
     filename = Path(remote_path).name
     parts = remote_path.strip("/").split("/")
-    if len(parts) >= 5:
+    # An HSD path splits into exactly 6 parts:
+    # ["jma", "hsd", "YYYYMM", "DD", "HH", "<filename>"]. Anything
+    # shorter is not a real HSD path — return the flat fallback so a
+    # direct caller that hands in `/pub/README.txt` still gets a
+    # sensible `out_dir / "README.txt"` instead of a nested garbage
+    # tree named after the file.
+    if len(parts) >= 6:
         yyyymm, dd, hh = parts[2], parts[3], parts[4]
         return out_dir / yyyymm / dd / hh / filename
     return out_dir / filename
@@ -506,6 +515,14 @@ def fetch_ptree(
         )
 
     band_list = _resolve_bands(dataset, bands)
+    # Normalize both bounds to UTC once up-front so `_iter_slots` and
+    # the downstream `_segment_paths` `strftime` calls always see UTC
+    # timestamps. `_guard_retention` above already applied the same
+    # rule; keeping the whole pipeline on one clock avoids a direct
+    # caller passing tz-aware non-UTC bounds and getting local-time
+    # HSD paths back.
+    start_utc = _as_utc(time.start_date)
+    end_utc = _as_utc(time.end_date)
     # `FtplibTransport` (a class) is itself a callable that returns a
     # fresh instance, so no factory helper is needed.
     factory = transport_factory or FtplibTransport
@@ -514,7 +531,7 @@ def fetch_ptree(
     written: list[Path] = []
     try:
         transport.login(auth.username, auth.password.get_secret_value())
-        for slot in _iter_slots(time.start_date, time.end_date):
+        for slot in _iter_slots(start_utc, end_utc):
             for band in band_list:
                 for remote in _segment_paths(slot, band, satellite):
                     local = _local_target(remote, out_dir)
