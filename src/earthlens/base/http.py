@@ -493,12 +493,17 @@ class HttpClient:
             Path: The `dest` path the bytes were written to.
 
         Raises:
-            requests.HTTPError: On a non-retryable error status —
-                `download` **always** raises on an error status (the
-                client's `raise_for_status` flag governs the verb methods,
-                not `download`; a file fetch never keeps an error body) —
-                or the last transport exception after the retry budget is
-                exhausted.
+            requests.HTTPError: On an error status — `download` always
+                calls `raise_for_status` (the client's `raise_for_status`
+                flag governs the verb methods, not `download`; a file
+                fetch never keeps an error body). Note the resulting
+                `HTTPError` is itself subject to `retry_on_exceptions`:
+                a client whose `retry_on_exceptions` includes a supertype
+                of `requests.HTTPError` (e.g. `requests.RequestException`,
+                as ghsl/glaciers pass) will **retry** an error status
+                before raising it, mirroring their old download loops.
+                Also the last transport exception after the retry budget
+                is exhausted.
         """
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
