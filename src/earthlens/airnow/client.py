@@ -7,11 +7,12 @@ returns every matching monitor observation in one JSON array (no
 pagination envelope), so unlike `earthlens.openaq.client` there is no
 page loop — just one authenticated GET with retry.
 
-This is the local back-off substrate the plan's `G7` decision settled
-on: the shared `earthlens.base.http.HttpClient` (the planned foundation
-task) does not exist yet, so the client owns its own retry loop,
-mirroring `earthlens.openaq.client`. If that primitive lands later, this
-client can be re-pointed at it without changing the backend.
+The transport — session and the `Retry-After`-aware `429` back-off loop
+— is delegated to the shared `earthlens.base.http.HttpClient`; this
+module keeps only the `API`-shaped concerns (the `/aq/data/` endpoint,
+the `API_KEY` + `format` query arguments, and the JSON-array response).
+The `429`-only retry policy is preserved exactly by constructing the
+client with `status_forcelist=(429,)`.
 
 `requests` is already a core earthlens dependency, so this client adds
 none. The session is injectable (`session=`) so tests drive it with a
@@ -26,52 +27,19 @@ from collections.abc import Callable
 from typing import Any
 
 import requests
-from loguru import logger
+
+from earthlens.base.http import HttpClient
 
 #: AirNow bounding-box observations endpoint.
 BASE_URL = "https://www.airnowapi.org/aq/data/"
 
 
-def _parse_retry_after(value: str | None) -> float | None:
-    """Parse a `Retry-After` header value into seconds.
-
-    AirNow returns `Retry-After` as an integer number of seconds. A
-    missing or non-numeric value yields `None` so the caller falls back
-    to exponential back-off.
-
-    Args:
-        value: The raw `Retry-After` header value, or `None`.
-
-    Returns:
-        The delay in seconds, or `None` when absent / unparseable.
-
-    Examples:
-        - A numeric value parses to seconds; junk yields `None`:
-            ```python
-            >>> from earthlens.airnow.client import _parse_retry_after
-            >>> _parse_retry_after("5")
-            5.0
-            >>> _parse_retry_after(None) is None
-            True
-            >>> _parse_retry_after("soon") is None
-            True
-
-            ```
-    """
-    if value is None:
-        return None
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
-
-
 class AirnowClient:
     """Minimal AirNow `/aq/data/` client: auth argument + back-off.
 
-    Wraps a `requests.Session`, attaching the `API_KEY` query argument to
-    every request and retrying on `429` with a `Retry-After`-aware
-    exponential back-off. Exposes one method, `get_data`, that returns the
+    Delegates the transport (session, `429`/`Retry-After` back-off) to
+    `earthlens.base.http.HttpClient`, keeping only the AirNow-specific
+    request shaping. Exposes one method, `get_data`, that returns the
     endpoint's JSON array of monitor observations.
 
     Attributes:
@@ -107,21 +75,37 @@ class AirnowClient:
                 `time.sleep`; injectable so tests run without real delays.
         """
         self._api_key = api_key
-        self._session = session if session is not None else requests.Session()
-        self.max_retries = max_retries
-        self.backoff_factor = backoff_factor
-        self.timeout = timeout
-        self._sleep = sleep
+        self._http = HttpClient(
+            session=session if session is not None else requests.Session(),
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            timeout=timeout,
+            status_forcelist=(429,),
+            max_backoff=None,
+            sleep=sleep,
+        )
+
+    @property
+    def max_retries(self) -> int:
+        """Maximum `429` retries before the last error is raised."""
+        return self._http.max_retries
+
+    @property
+    def backoff_factor(self) -> float:
+        """Base seconds for exponential back-off (no `Retry-After`)."""
+        return self._http.backoff_factor
+
+    @property
+    def timeout(self) -> float:
+        """Per-request timeout in seconds."""
+        return self._http.timeout
 
     def get_data(self, params: dict[str, Any]) -> list[dict[str, Any]]:
         """GET the observations array for `params`, retrying on `429`.
 
-        Honours a `Retry-After` header when present, otherwise backs off
-        exponentially (`backoff_factor * 2**attempt`). After `max_retries`
-        exhausted `429`s, the final response's `raise_for_status`
-        propagates. Any non-`429` HTTP error raises immediately. The
-        `API_KEY` and a JSON `format` are added to `params` here so the
-        caller never has to.
+        The `API_KEY` and a JSON `format` are added to `params` here so
+        the caller never has to; the retry/back-off is handled by the
+        shared `HttpClient`.
 
         Args:
             params: Query parameters (`BBOX`, `parameters`, `startDate`,
@@ -140,25 +124,5 @@ class AirnowClient:
         query = dict(params)
         query["API_KEY"] = self._api_key
         query["format"] = "application/json"
-        attempt = 0
-        while True:
-            response = self._session.get(
-                BASE_URL, params=query, timeout=self.timeout
-            )
-            if response.status_code == 429 and attempt < self.max_retries:
-                retry_after = _parse_retry_after(response.headers.get("Retry-After"))
-                wait = (
-                    retry_after
-                    if retry_after is not None
-                    else self.backoff_factor * (2**attempt)
-                )
-                logger.warning(
-                    "AirNow rate-limited (429); retry "
-                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
-                )
-                self._sleep(wait)
-                attempt += 1
-                continue
-            response.raise_for_status()
-            payload = response.json()
-            return payload if isinstance(payload, list) else []
+        payload = self._http.get_json(BASE_URL, params=query)
+        return payload if isinstance(payload, list) else []

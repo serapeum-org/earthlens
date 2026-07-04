@@ -67,6 +67,9 @@ class _FakeResponse:
 
             raise requests.HTTPError(f"HTTP {self.status_code}")
 
+    def close(self) -> None:
+        """No-op close so `HttpClient` can release the response on retry."""
+
 
 class _FakeAirnow:
     """Recording transport: returns `rows` after emitting `n_429` retries."""

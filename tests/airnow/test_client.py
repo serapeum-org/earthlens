@@ -5,21 +5,8 @@ from __future__ import annotations
 import pytest
 import requests
 
-from earthlens.airnow.client import AirnowClient, _parse_retry_after
+from earthlens.airnow.client import AirnowClient
 from tests.airnow.conftest import _FakeAirnow, _FakeResponse, _FakeSession
-
-
-@pytest.mark.airnow
-class TestRetryAfter:
-    """Parsing the `Retry-After` header."""
-
-    @pytest.mark.parametrize(
-        "value, expected",
-        [("5", 5.0), (None, None), ("soon", None)],
-    )
-    def test_parse(self, value, expected):
-        """Numeric values parse to seconds; junk / missing yield `None`."""
-        assert _parse_retry_after(value) == expected
 
 
 @pytest.mark.airnow
