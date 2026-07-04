@@ -154,6 +154,23 @@ def test_ptree_and_gportal_use_separate_credential_pairs(monkeypatch) -> None:
 
 @pytest.mark.jaxa
 @pytest.mark.unit
+def test_gportal_credentials_do_not_satisfy_ptree_branch(monkeypatch) -> None:
+    """The reverse direction — G-Portal creds on the object do not satisfy ptree."""
+    monkeypatch.delenv("GPORTAL_USERNAME", raising=False)
+    monkeypatch.delenv("GPORTAL_PASSWORD", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_USERNAME", raising=False)
+    monkeypatch.delenv("JAXA_PTREE_PASSWORD", raising=False)
+    creds = JaxaCredentials(
+        gportal_username="alice",
+        gportal_password=SecretStr("pytest-fixture-not-a-real-pw"),
+    )
+    auth = JaxaAuth(creds, protocol="ptree")
+    with pytest.raises(AuthenticationError, match="JAXA_PTREE_USERNAME"):
+        auth.configure()
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
 def test_auth_does_not_mutate_sdk_globals(monkeypatch) -> None:
     """`configure("gportal")` no longer writes to `gportal.username` / `.password`.
 

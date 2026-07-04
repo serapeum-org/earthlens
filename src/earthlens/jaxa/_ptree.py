@@ -83,11 +83,13 @@ _HOST: str = "ftp.ptree.jaxa.jp"
 #: FTP command timeout for connect / login / list / download.
 _TIMEOUT_SECONDS: int = 60
 
-#: HSD granule filename pattern used to sanity-check a listing before
-#: downloading. Groups: satellite, YYYYMMDD, HHMM, band, resolution,
-#: segment.
+#: HSD granule filename pattern used to sanity-check a listing.
+#: Segment codes are strictly `S0110`..`S1010` per the HSD README
+#: (the 10-of-10 full-disk set), so the segment group rejects
+#: nonsense values like `S9910`.
 _HSD_FILENAME_RE: re.Pattern[str] = re.compile(
-    r"^HS_(H\d\d)_(\d{8})_(\d{4})_(B\d\d)_FLDK_(R\d\d)_(S\d{2}10)\.DAT\.bz2$"
+    r"^HS_(H\d\d)_(\d{8})_(\d{4})_(B\d\d)_FLDK_(R\d\d)_"
+    r"(S(?:0[1-9]|10)10)\.DAT\.bz2$"
 )
 
 
@@ -256,11 +258,6 @@ class FtplibTransport:
             self._ftp = None
 
 
-def _default_transport_factory() -> PtreeTransport:
-    """Return a fresh :class:`FtplibTransport` — the production default."""
-    return FtplibTransport()
-
-
 def _floor_to_slot(when: dt.datetime) -> dt.datetime:
     """Round `when` down to the nearest HSD 10-minute observation mark."""
     minute = (when.minute // _CADENCE_MINUTES) * _CADENCE_MINUTES
@@ -274,14 +271,17 @@ def _iter_slots(
 
     Both bounds are inclusive; both are floored to the previous
     10-minute mark so a `start` of `10:04` yields the `10:00` slot and
-    so on. If `start > end` the iterator yields nothing.
+    so on. Yields nothing when `start`'s floored slot exceeds `end`'s
+    floored slot — in practice `TemporalExtent` enforces
+    `start_date <= end_date` so this case is unreachable via the
+    backend, but the guard keeps the helper safe for direct callers.
     """
     cursor = _floor_to_slot(start)
     stop = _floor_to_slot(end)
     step = dt.timedelta(minutes=_CADENCE_MINUTES)
     while cursor <= stop:
         yield cursor
-        cursor = cursor + step
+        cursor += step
 
 
 def _as_utc(when: dt.datetime) -> dt.datetime:
@@ -391,7 +391,16 @@ def _segment_paths(
 
 
 def _local_target(remote_path: str, out_dir: Path) -> Path:
-    """Map a remote HSD path onto a mirrored local layout under `out_dir`."""
+    """Map a remote HSD path onto a mirrored local layout under `out_dir`.
+
+    HSD paths built by `_segment_paths` always have shape
+    `/jma/hsd/YYYYMM/DD/HH/<filename>` (6 parts after `strip("/")`),
+    so the mirrored branch is the only one that fires via the fetch
+    flow. The short-path fallback exists purely so a direct caller who
+    hands in a non-HSD `remote_path` (e.g. a README under `/pub/`)
+    still gets a sensible `out_dir / <filename>` back — dead code from
+    the fetch loop's perspective.
+    """
     filename = Path(remote_path).name
     parts = remote_path.strip("/").split("/")
     if len(parts) >= 5:
@@ -430,15 +439,18 @@ def fetch_ptree(
             HSD covers the entire hemisphere the satellite sees).
         time: The requested date/time window; timestamps are floored to
             the 10-minute HSD cadence and expanded to every slot in the
-            inclusive range.
+            inclusive range. Naive `datetime`s on either bound are
+            interpreted as UTC (matches the backend's own strptime
+            output).
         auth: A configured :class:`JaxaAuth` bound to `protocol="ptree"`.
             The resolved username / password are passed straight to the
             transport's `login()`.
         out_dir: Output directory (created if missing). Written files
             live under `out_dir / YYYYMM / DD / HH /` to keep several
             timeslots from colliding on filenames.
-        bands: Optional list of Himawari bands (`B01`…`B16`) to fetch.
-            When omitted, falls back to `dataset.default_band`.
+        bands: Optional list of Himawari bands (`B01`..`B16`) to fetch.
+            When omitted, falls back to `dataset.default_band`; an
+            explicit empty list is a caller error.
         satellite: Himawari satellite id (`H09` today; `H10` if/when
             JAXA swaps).
         transport_factory: Injectable transport factory — tests supply a
@@ -449,20 +461,25 @@ def fetch_ptree(
 
     Returns:
         list[Path]: One local path per downloaded segment file, in
-            `(slot, band, segment)` order. An empty window yields an
-            empty list (not an error).
+            `(slot, band, segment)` order. `TemporalExtent` enforces
+            `start <= end`, so the returned list is never empty on a
+            valid input.
 
     Raises:
         RetentionError: When `time.start_date` predates the 30-day
-            P-Tree archive window.
+            P-Tree archive window, or `time.end_date` is in the future.
         AuthenticationError: When `auth` has not been configured or the
             transport's login is refused.
         ValueError: When the resolved bands include a code that is not
             a known Himawari band, or the dataset row has no
-            `default_band` and the caller passed no `bands=` override.
+            `default_band` and the caller passed no `bands=` override,
+            or `bands=` was passed as an empty list.
         FileNotFoundError: When the P-Tree host rejects an expected
             segment path (translated from `ftplib.error_perm` /
             `error_temp`).
+        ConnectionError: When a transport-side failure aborts the
+            handshake or a transfer mid-flight (any non-auth
+            `ftplib.all_errors` variant on login / retr).
     """
     del space  # accepted for API uniformity; FLDK is always full-disk.
     _guard_retention(time, now=now)
@@ -473,7 +490,9 @@ def fetch_ptree(
         )
 
     band_list = _resolve_bands(dataset, bands)
-    factory = transport_factory or _default_transport_factory
+    # `FtplibTransport` (a class) is itself a callable that returns a
+    # fresh instance, so no factory helper is needed.
+    factory = transport_factory or FtplibTransport
     transport = factory()
 
     written: list[Path] = []

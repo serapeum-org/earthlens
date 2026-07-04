@@ -13,7 +13,6 @@ from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa import AuthenticationError, JaxaAuth, JaxaCredentials
 from earthlens.jaxa._ptree import (
     RetentionError,
-    _default_transport_factory,
     _floor_to_slot,
     _guard_retention,
     _HIMAWARI_BAND_RESOLUTION,
@@ -301,7 +300,7 @@ class TestFetchPtree:
         configured_auth: JaxaAuth,
         tmp_path: Path,
     ) -> None:
-        """3 slots × 2 bands → 60 files (3 × 2 × 10 segments each)."""
+        """3 slots × 2 bands → 60 files in `(slot, band, segment)` order."""
         transport = _RecordingTransport()
         now = dt.datetime(2026, 7, 4, tzinfo=dt.UTC)
         start = now - dt.timedelta(hours=1)
@@ -314,6 +313,16 @@ class TestFetchPtree:
             transport_factory=lambda: transport, now=now,
         )
         assert len(paths) == 3 * 2 * 10
+        # Confirm ordering matches the docstring claim.
+        remotes = transport.remote_paths
+        # First 20 paths should be slot-0's B03 (10) then B13 (10).
+        slot0_hhmm = start.replace(minute=(start.minute // 10) * 10).strftime("%H%M")
+        assert all(f"_{slot0_hhmm}_B03_" in r for r in remotes[:10])
+        assert all(f"_{slot0_hhmm}_B13_" in r for r in remotes[10:20])
+        # Segment codes cycle S0110..S1010 within each (slot, band) block.
+        for group_start in (0, 10, 20, 30, 40, 50):
+            codes = [remotes[group_start + i].split("_S")[-1][:4] for i in range(10)]
+            assert codes == [f"{i:02d}10" for i in range(1, 11)]
 
     def test_transport_login_receives_configured_credentials(
         self,
@@ -459,9 +468,7 @@ class TestNoSatpyImport:
             if re.match(
                 r"^\s*(from|import)\s+(satpy|xarray|cfgrib)\b", stripped,
             ):
-                raise AssertionError(
-                    f"banned import in _ptree.py: {stripped!r}",
-                )
+                pytest.fail(f"banned import in _ptree.py: {stripped!r}")
 
 
 class _FakeFTP:
@@ -514,11 +521,11 @@ def _reset_fake_ftp() -> None:
 
 
 class TestDefaultFactory:
-    """The default factory returns the concrete FtplibTransport."""
+    """The default factory falls back to the concrete FtplibTransport class."""
 
-    def test_returns_ftplib_transport(self) -> None:
-        """`_default_transport_factory()` produces an `FtplibTransport`."""
-        transport = _default_transport_factory()
+    def test_ftplib_transport_class_is_a_callable_factory(self) -> None:
+        """`FtplibTransport()` (the class itself) produces a fresh transport."""
+        transport = FtplibTransport()
         assert isinstance(transport, FtplibTransport)
         assert transport.host == "ftp.ptree.jaxa.jp"
 
