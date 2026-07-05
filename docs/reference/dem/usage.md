@@ -61,10 +61,11 @@ cropped = dem.crop([31.2, 30.2, 31.8, 30.8])  # [west, south, east, north]
 ## Mosaicking neighbouring tiles
 
 A wider bbox returns several files — one per intersected tile.
-`pyramids.dataset.mosaic` stitches them:
+`pyramids.dataset.merge.merge_rasters` stitches them into a single COG:
 
 ```python
 from pyramids.dataset import Dataset
+from pyramids.dataset.merge import merge_rasters
 
 paths = EarthLens(
     data_source="dem",
@@ -73,8 +74,9 @@ paths = EarthLens(
     path="alps_out",
 ).download()
 
-tiles = [Dataset.read_file(str(p)) for p in paths]
-mosaic = Dataset.mosaic(tiles)   # single continuous WGS84 raster
+mosaic_path = "alps_out/alps_mosaic.tif"
+merge_rasters([str(p) for p in paths], mosaic_path)
+mosaic = Dataset.read_file(mosaic_path)  # single continuous WGS84 raster
 ```
 
 ## Coastal bbox — some tiles do not exist
@@ -118,7 +120,7 @@ continental-scale surveys where the finer resolution is not needed.
 - **No server-side spatial subset.** The buckets serve whole 1° COGs —
   a bbox smaller than a tile still downloads the whole tile.
 - **No decode.** earthlens hands the file back; reading, reprojection,
-  and mosaicking are pyramids' job (see the [notebook](../../examples/dem/dem_quickstart.ipynb)).
+  and mosaicking are pyramids' job (see the [quickstart notebook](../../examples/dem/01_dem_quickstart.ipynb)).
 - **No `aggregate=`.** DEM has no time axis to reduce over — passing a
   non-`None` `aggregate=` raises `NotImplementedError`.
 - **No sea-floor bathymetry.** Use the separate `bathymetry` backend
