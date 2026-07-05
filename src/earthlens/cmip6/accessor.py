@@ -281,16 +281,22 @@ def _close_quietly(handle: Any) -> None:
 def store_output_stem(store: ResolvedStore, start: Any, end: Any) -> str:
     """Compose a unique output-file stem for one resolved store + window.
 
+    The store `version` is folded in so two calls that pin different explicit
+    `version=` values for the same identity (or a CSV carrying duplicate
+    `(identity, version)` rows) write to distinct files instead of the second
+    silently overwriting the first.
+
     Args:
-        store: The resolved store (supplies the facet slug).
+        store: The resolved store (supplies the facet slug + version).
         start: Window start (its `%Y%m%d` is appended when it has one).
         end: Window end.
 
     Returns:
-        str: `<facet-slug>_<startYYYYMMDD>_<endYYYYMMDD>` (dates omitted when
-            unavailable).
+        str: `<facet-slug>[_v<version>]_<startYYYYMMDD>_<endYYYYMMDD>` (the
+            version tag is added when the store carries one; dates are omitted
+            when unavailable).
     """
-    stem = store.slug
+    stem = f"{store.slug}_v{store.version}" if store.version else store.slug
     fragment = "_".join(_date_token(value) for value in (start, end) if _date_token(value))
     return f"{stem}_{fragment}" if fragment else stem
 

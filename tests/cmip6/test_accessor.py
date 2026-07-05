@@ -154,14 +154,23 @@ def test_store_output_stem_with_dates():
         version="1",
     )
     stem = store_output_stem(store, dt.datetime(2050, 1, 1), dt.datetime(2050, 12, 31))
-    assert stem == "CanESM5_ssp585_tas_Amon_r1i1p1f1_gn_20500101_20501231"
+    assert stem == "CanESM5_ssp585_tas_Amon_r1i1p1f1_gn_v1_20500101_20501231"
 
 
 def test_store_output_stem_without_dates():
-    """A window with no date objects yields the bare facet slug."""
+    """A window with no date objects yields the facet slug plus the version."""
     store = ResolvedStore(
         zstore="gs://cmip6/x/", source_id="M", experiment_id="e", variable_id="v",
         table_id="Amon", member_id="r1i1p1f1", grid_label="gn", version="1",
+    )
+    assert store_output_stem(store, None, None) == f"{store.slug}_v1"
+
+
+def test_store_output_stem_no_version():
+    """A store with no version tag falls back to the bare facet slug."""
+    store = ResolvedStore(
+        zstore="gs://cmip6/x/", source_id="M", experiment_id="e", variable_id="v",
+        table_id="Amon", member_id="r1i1p1f1", grid_label="gn", version="",
     )
     assert store_output_stem(store, None, None) == store.slug
 
