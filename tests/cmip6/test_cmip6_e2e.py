@@ -31,20 +31,26 @@ _FACETS = dict(
 )
 
 
-def _csv_available() -> bool:
-    """Return whether the consolidated-stores CSV is reachable."""
+def _require_csv() -> None:
+    """Skip the calling test when the consolidated-stores CSV is unreachable.
+
+    The reachability probe runs **inside** the test (not in a `skipif`
+    condition), so collecting this module under `-m "not e2e"` never touches the
+    network.
+    """
     try:
         import requests
 
         resp = requests.head(Catalog().csv_url, timeout=15, allow_redirects=True)
-        return resp.status_code == 200
+        if resp.status_code != 200:
+            pytest.skip("gs://cmip6 CSV unreachable")
     except Exception:
-        return False
+        pytest.skip("gs://cmip6 CSV unreachable")
 
 
-@pytest.mark.skipif(not _csv_available(), reason="gs://cmip6 CSV unreachable")
 def test_resolve_live_store(tmp_path):
     """Anonymously resolve the CanESM5 ssp585 tas facet tuple to a gs:// store."""
+    _require_csv()
     catalog = Catalog()
     resolver = StoreResolver(
         catalog.csv_url, catalog.facet_columns, cache_path=tmp_path / "stores.csv"
@@ -55,9 +61,9 @@ def test_resolve_live_store(tmp_path):
     assert stores[0].variable_id == "tas"
 
 
-@pytest.mark.skipif(not _csv_available(), reason="gs://cmip6 CSV unreachable")
 def test_download_small_subset(tmp_path):
     """Live-download a small Europe / one-quarter tas subset and reopen it."""
+    _require_csv()
     paths = EarthLens(
         "cmip6",
         start="2050-01-01",
