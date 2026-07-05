@@ -153,11 +153,7 @@
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/dem/01_dem_quickstart/</loc>
-         <lastmod>2026-07-05</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/dem/02_catalog_and_tile_math/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/cmip6/quickstart/</loc>
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
@@ -1069,19 +1065,15 @@
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/dem/datasets/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/cmip6/cmip6/</loc>
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/dem/dem/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/cmip6/introduction/</loc>
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/dem/introduction/</loc>
-         <lastmod>2026-07-05</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/dem/usage/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/cmip6/usage/</loc>
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>

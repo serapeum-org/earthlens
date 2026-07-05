@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/dem/02_catalog_and_tile_math/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/cmip6/quickstart/">
       
       
-        <link rel="prev" href="../01_dem_quickstart/">
+        <link rel="prev" href="../../s3/04_passthrough/">
       
       
-        <link rel="next" href="../../pvgis/01_pvgis_quickstart/">
+        <link rel="next" href="../../cmems/catalog_explorer/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Copernicus DEM — catalog + tile-math explorer (offline) - earthlens</title>
+        <title>CMIP6 quickstart — a bbox/time subset from the raw archive - earthlens</title>
       
     
     
@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#copernicus-dem-catalog-tile-math-explorer-offline" class="md-skip">
+        <a href="#cmip6-quickstart-a-bboxtime-subset-from-the-raw-archive" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Copernicus DEM — catalog + tile-math explorer (offline)
+              CMIP6 quickstart — a bbox/time subset from the raw archive
             
           </span>
         </div>
@@ -1330,7 +1330,7 @@
   <span class="md-ellipsis">
     
   
-    CMEMS (Copernicus Marine)
+    CMIP6 (climate projections)
   
 
     
@@ -1343,6 +1343,148 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CMIP6 (climate projections)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/cmip6/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/cmip6/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/cmip6/cmip6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CMEMS (Copernicus Marine)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1490,10 +1632,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
         
           
-          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
             
   
   
@@ -1511,8 +1653,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1688,10 +1830,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
         
           
-          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
             
   
   
@@ -1709,8 +1851,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1886,10 +2028,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
         
           
-          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
             
   
   
@@ -1907,8 +2049,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2112,10 +2254,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
         
           
-          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
             
   
   
@@ -2133,8 +2275,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2254,10 +2396,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
         
           
-          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
             
   
   
@@ -2275,8 +2417,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2452,10 +2594,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_13" >
         
           
-          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_13" id="__nav_3_13_label" tabindex="0">
             
   
   
@@ -2473,8 +2615,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2650,10 +2792,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_14" >
         
           
-          <label class="md-nav__link" for="__nav_3_13" id="__nav_3_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_14" id="__nav_3_14_label" tabindex="0">
             
   
   
@@ -2671,8 +2813,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2792,10 +2934,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_15" >
         
           
-          <label class="md-nav__link" for="__nav_3_14" id="__nav_3_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_15" id="__nav_3_15_label" tabindex="0">
             
   
   
@@ -2813,8 +2955,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2990,10 +3132,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_16" >
         
           
-          <label class="md-nav__link" for="__nav_3_15" id="__nav_3_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_16" id="__nav_3_16_label" tabindex="0">
             
   
   
@@ -3011,8 +3153,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3160,10 +3302,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_16" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_17" >
         
           
-          <label class="md-nav__link" for="__nav_3_16" id="__nav_3_16_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_17" id="__nav_3_17_label" tabindex="0">
             
   
   
@@ -3181,8 +3323,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_16_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_16">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3284,176 +3426,6 @@
   
     <li class="md-nav__item">
       <a href="../../../reference/bathymetry/bathymetry/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_17" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_17" id="__nav_3_17_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Copernicus DEM (global land elevation)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_17">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Copernicus DEM (global land elevation)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/dem/introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/dem/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/dem/datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/dem/dem/" class="md-nav__link">
         
   
   
@@ -10146,6 +10118,207 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CMIP6 (climate projections)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CMIP6 (climate projections)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CMIP6 quickstart — a bbox/time subset from the raw archive
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CMIP6 quickstart — a bbox/time subset from the raw archive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explore-the-catalog-no-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explore the catalog (no network)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-and-run-the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build and run the request
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspect-the-written-netcdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspect the written NetCDF
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-the-first-month-with-pyramids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot the first month with pyramids
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -10160,10 +10333,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
@@ -10181,8 +10354,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -10442,10 +10615,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -10463,8 +10636,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -10640,10 +10813,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
             
   
   
@@ -10661,8 +10834,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -10894,10 +11067,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
         
           
-          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
             
   
   
@@ -10915,8 +11088,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11288,10 +11461,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
         
           
-          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
             
   
   
@@ -11309,8 +11482,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11542,10 +11715,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
@@ -11563,8 +11736,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -11684,10 +11857,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
         
           
-          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
             
   
   
@@ -11705,8 +11878,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12078,10 +12251,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
         
           
-          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
             
   
   
@@ -12099,8 +12272,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12332,10 +12505,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
         
           
-          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
             
   
   
@@ -12353,8 +12526,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_16">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12502,10 +12675,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
         
           
-          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
             
   
   
@@ -12523,8 +12696,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12616,10 +12789,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
         
           
-          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
             
   
   
@@ -12637,8 +12810,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12758,10 +12931,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
         
           
-          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
             
   
   
@@ -12779,8 +12952,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_19">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12928,10 +13101,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
         
           
-          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
             
   
   
@@ -12949,8 +13122,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_20">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13123,263 +13296,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Copernicus DEM (global land elevation)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_21">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Copernicus DEM (global land elevation)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../01_dem_quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Copernicus DEM — quickstart (anonymous, no account)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Copernicus DEM — catalog + tile-math explorer (offline)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Copernicus DEM — catalog + tile-math explorer (offline)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Setup
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#1-the-catalog-two-datasets-side-by-side" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. The catalog — two datasets, side by side
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-the-1-tile-name-convention" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. The 1° tile-name convention
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-from-bbox-to-tiles-the-arithmetic" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. From bbox to tiles — the arithmetic
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-pre-flight-how-big-is-my-request" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Pre-flight: how big is my request?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4. Pre-flight: how big is my request?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#what-the-numbers-say" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What the numbers say
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-did-you-mean-on-typos" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Did-you-mean on typos
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#takeaway" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Takeaway
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -18512,10 +18428,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#1-the-catalog-two-datasets-side-by-side" class="md-nav__link">
+  <a href="#explore-the-catalog-no-network" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. The catalog — two datasets, side by side
+        Explore the catalog (no network)
       
     </span>
   </a>
@@ -18523,10 +18439,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-the-1-tile-name-convention" class="md-nav__link">
+  <a href="#build-and-run-the-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. The 1° tile-name convention
+        Build and run the request
       
     </span>
   </a>
@@ -18534,10 +18450,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-from-bbox-to-tiles-the-arithmetic" class="md-nav__link">
+  <a href="#inspect-the-written-netcdf" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. From bbox to tiles — the arithmetic
+        Inspect the written NetCDF
       
     </span>
   </a>
@@ -18545,38 +18461,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-pre-flight-how-big-is-my-request" class="md-nav__link">
+  <a href="#plot-the-first-month-with-pyramids" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Pre-flight: how big is my request?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4. Pre-flight: how big is my request?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#what-the-numbers-say" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What the numbers say
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-did-you-mean-on-typos" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Did-you-mean on typos
+        Plot the first month with pyramids
       
     </span>
   </a>
@@ -18584,10 +18472,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#takeaway" class="md-nav__link">
+  <a href="#attribution" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Takeaway
+        Attribution
       
     </span>
   </a>
@@ -18611,7 +18499,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/dem/02_catalog_and_tile_math.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/cmip6/quickstart.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -18620,7 +18508,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/dem/02_catalog_and_tile_math.ipynb" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/cmip6/quickstart.ipynb" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -19348,39 +19236,38 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=95ef16a7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dceaa10a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="copernicus-dem-catalog-tile-math-explorer-offline">Copernicus DEM — catalog + tile-math explorer (offline)<a class="anchor-link" href="#copernicus-dem-catalog-tile-math-explorer-offline">¶</a></h1><p>The quickstart notebook (<code>01_dem_quickstart.ipynb</code>) showed the end-to-end
-download path against real buckets. This notebook is the <strong>offline companion</strong>:
-it walks through the two curated datasets, the 1° tile convention (<code>N##</code>/<code>S##</code></p>
-<ul>
-<li><code>E###</code>/<code>W###</code>) that names every COG in the bucket, and the pure-arithmetic
-helper (<code>bbox_to_tiles</code>) that resolves a bbox to the exact tile keys the backend
-will fetch — no network calls at all.</li>
-</ul>
-<p>By the end you will be able to answer: <em>"how many tiles does my bbox cost, and
-which ones?"</em> before you hit <code>.download()</code>.</p>
+<h1 id="cmip6-quickstart-a-bboxtime-tas-subset-from-the-raw-archive">CMIP6 quickstart — a bbox/time <code>tas</code> subset from the raw archive<a class="anchor-link" href="#cmip6-quickstart-a-bboxtime-tas-subset-from-the-raw-archive">¶</a></h1><p><code>earthlens.cmip6</code> exposes the <strong>full raw CMIP6 archive</strong> — the whole
+<code>model × scenario × variable × member</code> matrix — as analysis-ready Zarr on the
+open Pangeo <code>gs://cmip6</code> bucket. Unlike the <code>gee</code> backend's single
+pre-downscaled <code>NASA/GDDP-CMIP6</code> product, or the CHC-CMIP6 precipitation
+deltas, this reaches every ESM on its native grid.</p>
+<p>This is a <strong>live, anonymous</strong> pull — no credentials. We resolve one store
+(model <code>CanESM5</code>, scenario <code>ssp585</code>, variable <code>tas</code>, monthly table <code>Amon</code>) and
+have <strong>pyramids</strong> write a small Europe / half-year NetCDF subset, then plot it.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=99c9ac2b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b73b3d24">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Everything here is offline — the catalog ships with the package and the tile
-math is pure arithmetic.</p>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p><code>EarthLens</code> is the unified entry point; <code>earthlens.cmip6.Catalog</code> is the
+config + curated-vocabulary catalog. <code>tempfile</code> / <code>pathlib</code> give us a scratch
+directory for the written NetCDF.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1e44d072">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e5f9019c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19398,65 +19285,38 @@ math is pure arithmetic.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.dem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.dem._helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tile</span><span class="p">,</span> <span class="n">bbox_to_tiles</span><span class="p">,</span> <span class="n">tile_key</span><span class="p">,</span> <span class="n">tile_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmip6</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import pandas as pd
+<div class="clipboard-copy-txt" id="cell-1">import tempfile
+from pathlib import Path
 
-from earthlens.dem import Catalog
-from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key, tile_name</div>
+from earthlens import EarthLens
+from earthlens.cmip6 import Catalog</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16d98695">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8f9487e0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1-the-catalog-two-datasets-side-by-side">1. The catalog — two datasets, side by side<a class="anchor-link" href="#1-the-catalog-two-datasets-side-by-side">¶</a></h2><p>The DEM catalog is small on purpose: Copernicus DEM ships two globally-
-consistent grids and this backend curates both. <code>Catalog()</code> loads the bundled
-YAML with a strict duplicate-key-rejecting loader.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>key</code></td>
-<td>Value passed to <code>EarthLens(dataset=...)</code></td>
-</tr>
-<tr>
-<td><code>bucket</code></td>
-<td>Anonymous AWS Open Data bucket</td>
-</tr>
-<tr>
-<td><code>resolution_token</code></td>
-<td>Fragment embedded in every tile name (<code>_10_</code> / <code>_30_</code>)</td>
-</tr>
-<tr>
-<td><code>native_resolution_m</code></td>
-<td>Approximate pixel size</td>
-</tr>
-<tr>
-<td><code>vertical_datum</code></td>
-<td>Elevation reference (EGM2008 geoid)</td>
-</tr>
-</tbody>
-</table>
+<h2 id="explore-the-catalog-no-network">Explore the catalog (no network)<a class="anchor-link" href="#explore-the-catalog-no-network">¶</a></h2><p>The bundled catalog carries the consolidated-stores CSV URL plus a curated
+vocabulary of common variables, experiments, and tables. Resolution runs
+against the full CSV, so uncurated facets still download — the curated rows
+just enrich metadata and error messages.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7dfa76eb">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fd9a56f6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19474,31 +19334,17 @@ YAML with a strict duplicate-key-rejecting loader.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span>
-        <span class="s1">'key'</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
-        <span class="s1">'bucket'</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
-        <span class="s1">'token'</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">resolution_token</span><span class="p">,</span>
-        <span class="s1">'native_res_m'</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">native_resolution_m</span><span class="p">,</span>
-        <span class="s1">'vertical_datum'</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">vertical_datum</span><span class="p">,</span>
-    <span class="p">}</span>
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-<span class="p">]</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'key'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'variable :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'tas'</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span> <span class="s1">'('</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'tas'</span><span class="p">)</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="s1">')'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'scenario :'</span><span class="p">,</span> <span class="s1">'ssp585 -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_experiment</span><span class="p">(</span><span class="s1">'ssp585'</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'table    :'</span><span class="p">,</span> <span class="s1">'Amon -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">'Amon'</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'CSV index:'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">csv_url</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">catalog = Catalog()
-rows = [
-    {
-        'key': key,
-        'bucket': row.bucket,
-        'token': row.resolution_token,
-        'native_res_m': row.native_resolution_m,
-        'vertical_datum': row.vertical_datum,
-    }
-    for key, row in catalog.datasets.items()
-]
-pd.DataFrame(rows).set_index('key')</div>
+<div class="clipboard-copy-txt" id="cell-2">cat = Catalog()
+print('variable :', cat.get_dataset('tas').long_name, '(', cat.get_dataset('tas').units, ')')
+print('scenario :', 'ssp585 -&gt;', cat.get_experiment('ssp585').description)
+print('table    :', 'Amon -&gt;', cat.get_table('Amon').description)
+print('CSV index:', cat.csv_url)</div>
 </div>
 </div>
 </div>
@@ -19507,84 +19353,35 @@ pd.DataFrame(rows).set_index('key')</div>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>bucket</th>
-<th>token</th>
-<th>native_res_m</th>
-<th>vertical_datum</th>
-</tr>
-<tr>
-<th>key</th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>cop-dem-glo-30</th>
-<td>copernicus-dem-30m</td>
-<td>10</td>
-<td>30</td>
-<td>EGM2008</td>
-</tr>
-<tr>
-<th>cop-dem-glo-90</th>
-<td>copernicus-dem-90m</td>
-<td>30</td>
-<td>90</td>
-<td>EGM2008</td>
-</tr>
-</tbody>
-</table>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>variable : Near-surface (2 m) air temperature ( K )
+scenario : ssp585 -&gt; SSP5-8.5 — very high emissions, fossil-fuelled growth.
+table    : Amon -&gt; Monthly-mean atmospheric fields.
+CSV index: https://storage.googleapis.com/cmip6/pangeo-cmip6.csv
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=64546455">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fd5cce16">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2-the-1-tile-name-convention">2. The 1° tile-name convention<a class="anchor-link" href="#2-the-1-tile-name-convention">¶</a></h2><p>Copernicus DEM COGs live on a fixed integer-degree grid — one tile per 1° x 1°
-square, addressed by its <strong>SW corner</strong>. The name encodes:</p>
-<ul>
-<li>the resolution token: <code>10</code> for GLO-30, <code>30</code> for GLO-90,</li>
-<li>latitude as <code>N##</code> / <code>S##</code> (two digits, zero-padded),</li>
-<li>longitude as <code>E###</code> / <code>W###</code> (three digits, zero-padded).</li>
-</ul>
-<p>The <code>_00_</code> markers between the coordinates are the arc-minute portion, always
-<code>00</code> on the 1° grid. <code>tile_name()</code> and <code>tile_key()</code> build the pieces.</p>
+<h2 id="build-and-run-the-request">Build and run the request<a class="anchor-link" href="#build-and-run-the-request">¶</a></h2><p>The request is a CMIP6 <strong>facet tuple</strong> plus a date window and a bounding box.
+We crop the native grid to Europe and the window to the first half of 2050, so
+pyramids fetches only those cells. <code>download()</code> returns the <code>list[Path]</code> of
+written NetCDF subsets — one per resolved store.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cb12b51d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8fca9d56">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19602,41 +19399,37 @@ square, addressed by its <strong>SW corner</strong>. The name encodes:</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">examples</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s1">'Nile Delta (Egypt)'</span><span class="p">,</span> <span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mi">31</span><span class="p">),</span> <span class="s1">'10'</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">'Amazon rainforest (Brazil)'</span><span class="p">,</span> <span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span> <span class="n">lon</span><span class="o">=-</span><span class="mi">60</span><span class="p">),</span> <span class="s1">'10'</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">'Prime meridian + equator'</span><span class="p">,</span> <span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">'10'</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">'New Zealand South Island'</span><span class="p">,</span> <span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mi">170</span><span class="p">),</span> <span class="s1">'30'</span><span class="p">),</span>
-<span class="p">]</span>
-<span class="n">explained</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span>
-        <span class="s1">'region'</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
-        <span class="s1">'sw_corner'</span><span class="p">:</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">tile</span><span class="o">.</span><span class="n">lat</span><span class="si">:</span><span class="s1">&gt;3d</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">tile</span><span class="o">.</span><span class="n">lon</span><span class="si">:</span><span class="s1">&gt;4d</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-        <span class="s1">'grid'</span><span class="p">:</span> <span class="s1">'GLO-30'</span> <span class="k">if</span> <span class="n">token</span> <span class="o">==</span> <span class="s1">'10'</span> <span class="k">else</span> <span class="s1">'GLO-90'</span><span class="p">,</span>
-        <span class="s1">'tile_identifier'</span><span class="p">:</span> <span class="n">tile_name</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">token</span><span class="p">),</span>
-        <span class="s1">'bucket_key'</span><span class="p">:</span> <span class="n">tile_key</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">token</span><span class="p">),</span>
-    <span class="p">}</span>
-    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">tile</span><span class="p">,</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">examples</span>
-<span class="p">]</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">explained</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'region'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'cmip6_'</span><span class="p">))</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="s1">'cmip6'</span><span class="p">,</span>
+    <span class="n">source_id</span><span class="o">=</span><span class="s1">'CanESM5'</span><span class="p">,</span>
+    <span class="n">experiment_id</span><span class="o">=</span><span class="s1">'ssp585'</span><span class="p">,</span>
+    <span class="n">variable_id</span><span class="o">=</span><span class="s1">'tas'</span><span class="p">,</span>
+    <span class="n">table_id</span><span class="o">=</span><span class="s1">'Amon'</span><span class="p">,</span>
+    <span class="n">member_id</span><span class="o">=</span><span class="s1">'r1i1p1f1'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2050-01-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2050-06-30'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">paths</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">examples = [
-    ('Nile Delta (Egypt)', Tile(lat=30, lon=31), '10'),
-    ('Amazon rainforest (Brazil)', Tile(lat=-3, lon=-60), '10'),
-    ('Prime meridian + equator', Tile(lat=0, lon=0), '10'),
-    ('New Zealand South Island', Tile(lat=-45, lon=170), '30'),
-]
-explained = [
-    {
-        'region': label,
-        'sw_corner': f'{tile.lat:&gt;3d}, {tile.lon:&gt;4d}',
-        'grid': 'GLO-30' if token == '10' else 'GLO-90',
-        'tile_identifier': tile_name(tile, token),
-        'bucket_key': tile_key(tile, token),
-    }
-    for label, tile, token in examples
-]
-pd.DataFrame(explained).set_index('region')</div>
+<div class="clipboard-copy-txt" id="cell-3">out_dir = Path(tempfile.mkdtemp(prefix='cmip6_'))
+paths = EarthLens(
+    'cmip6',
+    source_id='CanESM5',
+    experiment_id='ssp585',
+    variable_id='tas',
+    table_id='Amon',
+    member_id='r1i1p1f1',
+    start='2050-01-01',
+    end='2050-06-30',
+    lat_lim=[35.0, 60.0],
+    lon_lim=[-10.0, 30.0],
+    path=str(out_dir),
+).download(progress_bar=False)
+paths</div>
 </div>
 </div>
 </div>
@@ -19645,93 +19438,37 @@ pd.DataFrame(explained).set_index('region')</div>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>2026-07-05 13:43:47 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
+</pre>
+</div>
+</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>sw_corner</th>
-<th>grid</th>
-<th>tile_identifier</th>
-<th>bucket_key</th>
-</tr>
-<tr>
-<th>region</th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>Nile Delta (Egypt)</th>
-<td>30,   31</td>
-<td>GLO-30</td>
-<td>Copernicus_DSM_COG_10_N30_00_E031_00_DEM</td>
-<td>Copernicus_DSM_COG_10_N30_00_E031_00_DEM/Coper...</td>
-</tr>
-<tr>
-<th>Amazon rainforest (Brazil)</th>
-<td>-3,  -60</td>
-<td>GLO-30</td>
-<td>Copernicus_DSM_COG_10_S03_00_W060_00_DEM</td>
-<td>Copernicus_DSM_COG_10_S03_00_W060_00_DEM/Coper...</td>
-</tr>
-<tr>
-<th>Prime meridian + equator</th>
-<td>0,    0</td>
-<td>GLO-30</td>
-<td>Copernicus_DSM_COG_10_N00_00_E000_00_DEM</td>
-<td>Copernicus_DSM_COG_10_N00_00_E000_00_DEM/Coper...</td>
-</tr>
-<tr>
-<th>New Zealand South Island</th>
-<td>-45,  170</td>
-<td>GLO-90</td>
-<td>Copernicus_DSM_COG_30_S45_00_E170_00_DEM</td>
-<td>Copernicus_DSM_COG_30_S45_00_E170_00_DEM/Coper...</td>
-</tr>
-</tbody>
-</table>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[WindowsPath('C:/Users/main/AppData/Local/Temp/cmip6_vdj4q1mf/CanESM5_ssp585_tas_Amon_r1i1p1f1_gn_v20190429_20500101_20500630.nc')]</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=06ad04d0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=acd768bd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3-from-bbox-to-tiles-the-arithmetic">3. From bbox to tiles — the arithmetic<a class="anchor-link" href="#3-from-bbox-to-tiles-the-arithmetic">¶</a></h2><p><code>bbox_to_tiles(lat_min, lat_max, lon_min, lon_max)</code> snaps a bbox to the
-integer-degree grid and returns every 1° tile it intersects. <strong>Pure arithmetic
-— no network, no listing call.</strong></p>
-<p>A small bbox lying inside a single square returns one tile:</p>
+<h2 id="inspect-the-written-netcdf">Inspect the written NetCDF<a class="anchor-link" href="#inspect-the-written-netcdf">¶</a></h2><p>The read is entirely <strong>pyramids'</strong> (GDAL <code>/vsigs/</code>) — earthlens never imports
+<code>xarray</code> / <code>zarr</code> / <code>gcsfs</code>. The output carries one band per monthly timestep
+in the window (six bands for January–June 2050).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c7dc0ecd">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9f81ff31">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19749,11 +19486,17 @@ integer-degree grid and returns every 1° tile it intersects. <strong>Pure arith
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">single</span> <span class="o">=</span> <span class="n">bbox_to_tiles</span><span class="p">(</span><span class="n">lat_min</span><span class="o">=</span><span class="mf">30.2</span><span class="p">,</span> <span class="n">lat_max</span><span class="o">=</span><span class="mf">30.8</span><span class="p">,</span> <span class="n">lon_min</span><span class="o">=</span><span class="mf">31.2</span><span class="p">,</span> <span class="n">lon_max</span><span class="o">=</span><span class="mf">31.8</span><span class="p">)</span>
-<span class="p">[(</span><span class="n">t</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">single</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+
+<span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'bands (monthly steps):'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">single = bbox_to_tiles(lat_min=30.2, lat_max=30.8, lon_min=31.2, lon_max=31.8)
-[(t.lat, t.lon) for t in single]</div>
+<div class="clipboard-copy-txt" id="cell-4">from pyramids.netcdf import NetCDF
+
+nc = NetCDF.read_file(str(paths[0]))
+print('bands (monthly steps):', len(nc.variable_names))
+print(nc.variable_names)</div>
 </div>
 </div>
 </div>
@@ -19762,29 +19505,31 @@ integer-degree grid and returns every 1° tile it intersects. <strong>Pure arith
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>[(30, 31)]</pre>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>bands (monthly steps): 6
+['Band1', 'Band2', 'Band3', 'Band4', 'Band5', 'Band6']
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8dfd30de">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7a70f084">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>A bbox that crosses tile boundaries pulls in every neighbour. Here a small
-Alpine bbox reaches into four tiles in a 2x2 pattern:</p>
+<h2 id="plot-the-first-month-with-pyramids">Plot the first month with pyramids<a class="anchor-link" href="#plot-the-first-month-with-pyramids">¶</a></h2><p>Each band is a georeferenced grid on CanESM5's native resolution. We pull the
+first month and plot it with pyramids (via cleopatra).</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4e9d02c7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2baa293e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19802,11 +19547,11 @@ Alpine bbox reaches into four tiles in a 2x2 pattern:</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alps</span> <span class="o">=</span> <span class="n">bbox_to_tiles</span><span class="p">(</span><span class="n">lat_min</span><span class="o">=</span><span class="mf">45.4</span><span class="p">,</span> <span class="n">lat_max</span><span class="o">=</span><span class="mf">46.6</span><span class="p">,</span> <span class="n">lon_min</span><span class="o">=</span><span class="mf">7.4</span><span class="p">,</span> <span class="n">lon_max</span><span class="o">=</span><span class="mf">8.6</span><span class="p">)</span>
-<span class="nb">sorted</span><span class="p">((</span><span class="n">t</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">alps</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">tas_jan</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">'Band1'</span><span class="p">)</span>
+<span class="n">tas_jan</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">alps = bbox_to_tiles(lat_min=45.4, lat_max=46.6, lon_min=7.4, lon_max=8.6)
-sorted((t.lat, t.lon) for t in alps)</div>
+<div class="clipboard-copy-txt" id="cell-5">tas_jan = NetCDF.read_file(str(paths[0])).get_variable('Band1')
+tas_jan.plot()</div>
 </div>
 </div>
 </div>
@@ -19818,27 +19563,33 @@ sorted((t.lat, t.lon) for t in alps)</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>[(45, 7), (45, 8), (46, 7), (46, 8)]</pre>
+<pre>&lt;cleopatra.array_glyph.ArrayGlyph at 0x2a3a0639be0&gt;</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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E6HIQAIAAMARMpAAAMAzWMowdxBAAgAAz/D5/WZzu02nkpOT5Y8//pCyZctK8eLFQ47Fx8fL1q1bM3zehRdeKMWKFQs8TklJke3bt0tMTIyUL1/+jK+d1q5du2T//v1SvXp1KVKkiNhFFzYAAIBL/vzzT7n11lulVKlS0rlzZzn33HPl6quvln379gXOWbt2rdx0000hW5cuXaRhw4by22+/Bc578803pXTp0tKhQwepW7eutGzZUvbs2XNG1057fuPGjc11161b5+jnJIAEAACeK+Pj9mbXhg0bpGnTpiZo02Bwx44dsnPnThk0aFDgnFatWsmaNWtCtksuuUTq1Kljgjm1dOlSGTJkiLz99tuybds22bt3r1SqVEl69+59Rte2pKamSt++fbNsLysEkAAAAC5p37693HLLLabLWWkG8cYbb5RFixZl+hwN+ObMmRMS6C1cuFAqV64sPXr0MI+joqLkrrvuMoHl+vXrz/jao0aNkqJFi5og9XQwBhIAAHhsDKS7ZXfOdEzlunXrTPYwM1OmTJHIyEjp379/YF+JEiXkyJEjcvLkSYmOjjb7/v77b/P1xx9/lFq1ap32tZctWybjxo2T1atXy8GDB0/rZyIDCQAAYINOfgnekpKSsn3OF198IZMmTZLhw4dnes748eOle/fuctZZZwX2XX/99aabuV+/frJkyRKZNWuWPPDAA1KoUCEz6cWOjK596NAh6dOnj+kaL1OmjJwuAkgAAOAZOTkGsmLFihIXFxfYxowZk+W9/PDDD6YL+v777zcBYUa+++470yWddpxihQoVzPP1OhoATpgwQd566y3x+XxSuHDhbF+HzK599913S+3ataVcuXJm7OXGjRvNfh0zqTO37aILGwAAwAadkKJdyxZrrGFGVq5cKZdffrkJDJ9++ukss49aQqdNmzbpjlWrVs1kCoO7o7VET82aNTNtL7trR0REmJncOvNbWVnUJ598Uq655hp57rnnxA4CSAAA4Bm6jKHrYyD/t5ShBo/BAWRmVq1aJZ06dZIBAwbI888/n+l5CQkJ8sEHH8ijjz6a4fHg8Y9KM5Dnn3++tG7dOrDv559/Nl3RWrLHzrUnTpwY8lgzkBqQTp48WZo3by52EUACAADPcFp2x26bdv36668mgLv00kvNpBjtJrbUq1fPZAAtGjxqBlBnSmdEazkOHDjQ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"/>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1b503a8b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=473790a0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="4-pre-flight-how-big-is-my-request">4. Pre-flight: how big is my request?<a class="anchor-link" href="#4-pre-flight-how-big-is-my-request">¶</a></h2><p>Each Copernicus DEM GLO-30 tile is roughly <strong>50 MB</strong> and each GLO-90 tile
-roughly <strong>5 MB</strong>. Combine <code>bbox_to_tiles</code> with the catalog to estimate a
-download's size before you commit to it:</p>
+<h2 id="attribution">Attribution<a class="anchor-link" href="#attribution">¶</a></h2><p>CMIP6 output is provided for research under each source model's terms (most are
+CC BY 4.0). Always <strong>cite the source GCM</strong>; the backend surfaces the per-model
+note.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2b1b07c4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=48fe1151">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19856,191 +19607,19 @@ download's size before you commit to it:</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">APPROX_SIZE_MB</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'10'</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span> <span class="s1">'30'</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">}</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">estimate_download</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_key</span><span class="p">)</span>
-    <span class="n">tiles</span> <span class="o">=</span> <span class="n">bbox_to_tiles</span><span class="p">(</span><span class="o">*</span><span class="n">bbox</span><span class="p">)</span>
-    <span class="n">per_tile_mb</span> <span class="o">=</span> <span class="n">APPROX_SIZE_MB</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">resolution_token</span><span class="p">]</span>
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="s1">'dataset'</span><span class="p">:</span> <span class="n">dataset_key</span><span class="p">,</span>
-        <span class="s1">'tiles'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">tiles</span><span class="p">),</span>
-        <span class="s1">'approx_MB'</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tiles</span><span class="p">)</span> <span class="o">*</span> <span class="n">per_tile_mb</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="p">}</span>
-
-<span class="n">queries</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s1">'France (bounding box)'</span><span class="p">,</span> <span class="p">(</span><span class="mf">41.3</span><span class="p">,</span> <span class="mf">51.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s1">'Egypt (bounding box)'</span><span class="p">,</span>  <span class="p">(</span><span class="mf">22.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s1">'Iceland (bounding box)'</span><span class="p">,</span> <span class="p">(</span><span class="mf">63.3</span><span class="p">,</span> <span class="mf">66.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">24.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">13.4</span><span class="p">)),</span>
-<span class="p">]</span>
-<span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'cop-dem-glo-30'</span><span class="p">,</span> <span class="s1">'cop-dem-glo-90'</span><span class="p">):</span>
-        <span class="n">est</span> <span class="o">=</span> <span class="n">estimate_download</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
-        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">'region'</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">est</span><span class="p">})</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">'region'</span><span class="p">,</span> <span class="s1">'dataset'</span><span class="p">])</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="s1">'cmip6'</span><span class="p">,</span> <span class="n">source_id</span><span class="o">=</span><span class="s1">'CanESM5'</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="s1">'ssp585'</span><span class="p">,</span> <span class="n">variable_id</span><span class="o">=</span><span class="s1">'tas'</span><span class="p">,</span>
+    <span class="n">table_id</span><span class="o">=</span><span class="s1">'Amon'</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2050-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2050-06-30'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">datasource</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">terms_note</span><span class="p">())</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">APPROX_SIZE_MB = {'10': 50.0, '30': 5.0}
-
-def estimate_download(bbox, dataset_key: str):
-    row = catalog.get_dataset(dataset_key)
-    tiles = bbox_to_tiles(*bbox)
-    per_tile_mb = APPROX_SIZE_MB[row.resolution_token]
-    return {
-        'dataset': dataset_key,
-        'tiles': len(tiles),
-        'approx_MB': round(len(tiles) * per_tile_mb, 1),
-    }
-
-queries = [
-    ('France (bounding box)', (41.3, 51.1, -5.2, 9.7)),
-    ('Egypt (bounding box)',  (22.0, 32.0, 24.0, 37.0)),
-    ('Iceland (bounding box)', (63.3, 66.6, -24.6, -13.4)),
-]
-rows = []
-for label, bbox in queries:
-    for dataset in ('cop-dem-glo-30', 'cop-dem-glo-90'):
-        est = estimate_download(bbox, dataset)
-        rows.append({'region': label, **est})
-pd.DataFrame(rows).set_index(['region', 'dataset'])</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th></th>
-<th>tiles</th>
-<th>approx_MB</th>
-</tr>
-<tr>
-<th>region</th>
-<th>dataset</th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th rowspan="2" valign="top">France (bounding box)</th>
-<th>cop-dem-glo-30</th>
-<td>176</td>
-<td>8800.0</td>
-</tr>
-<tr>
-<th>cop-dem-glo-90</th>
-<td>176</td>
-<td>880.0</td>
-</tr>
-<tr>
-<th rowspan="2" valign="top">Egypt (bounding box)</th>
-<th>cop-dem-glo-30</th>
-<td>130</td>
-<td>6500.0</td>
-</tr>
-<tr>
-<th>cop-dem-glo-90</th>
-<td>130</td>
-<td>650.0</td>
-</tr>
-<tr>
-<th rowspan="2" valign="top">Iceland (bounding box)</th>
-<th>cop-dem-glo-30</th>
-<td>48</td>
-<td>2400.0</td>
-</tr>
-<tr>
-<th>cop-dem-glo-90</th>
-<td>48</td>
-<td>240.0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dfede800">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="what-the-numbers-say">What the numbers say<a class="anchor-link" href="#what-the-numbers-say">¶</a></h3><p>The <code>approx_MB</code> column is an <strong>upper bound</strong> — ocean tiles in the bbox will
-come back 404 (Copernicus DEM ships no data over open ocean) and are logged
-and skipped by the backend. So an Iceland bbox that intersects, say, 40 tiles
-will typically download closer to 10-15 tiles once the surrounding North
-Atlantic squares fall away. The <em>real</em> file count only lands once you call
-<code>.download()</code>.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=49a07f73">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5-did-you-mean-on-typos">5. Did-you-mean on typos<a class="anchor-link" href="#5-did-you-mean-on-typos">¶</a></h2><p>The catalog inherits the shared did-you-mean helper — a near-miss key surfaces
-a hint pointing at the closest curated dataset.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4c8d312c">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">catalog</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'cop-dem-glo-3'</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-7">try:
-    catalog.get_dataset('cop-dem-glo-3')
-except ValueError as exc:
-    print(exc)</div>
+<div class="clipboard-copy-txt" id="cell-6">backend = EarthLens(
+    'cmip6', source_id='CanESM5', experiment_id='ssp585', variable_id='tas',
+    table_id='Amon', start='2050-01-01', end='2050-06-30',
+    lat_lim=[35.0, 60.0], lon_lim=[-10.0, 30.0], path=str(out_dir),
+).datasource
+print(backend.terms_note())</div>
 </div>
 </div>
 </div>
@@ -20052,32 +19631,10 @@ except ValueError as exc:
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>'cop-dem-glo-3' is not in the DEM catalog. Known datasets: ['cop-dem-glo-30', 'cop-dem-glo-90']. Did you mean 'cop-dem-glo-30'?
+<pre>CC BY 4.0 — cite CanESM5 (Swart et al., 2019).
 </pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8aafce89">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="takeaway">Takeaway<a class="anchor-link" href="#takeaway">¶</a></h2><ul>
-<li><strong>Two curated datasets</strong> — GLO-30 and GLO-90 — cover the whole Copernicus
-DEM addressable universe. Both are anonymous.</li>
-<li><strong>Tile identifiers are deterministic.</strong> Given a bbox, <code>bbox_to_tiles</code>
-returns the exact tile keys the backend will fetch, before any network
-activity.</li>
-<li><strong>Antimeridian bboxes are rejected</strong> with a clear <code>ValueError</code> — pass the
-two halves in separate calls if you need to span the 180th meridian.</li>
-<li><strong>Ocean tiles are absent, not fatal.</strong> Estimates from <code>bbox_to_tiles * ~size</code>
-are upper bounds; the real cost is lower once ocean cells drop out.</li>
-</ul>
-<p>The live end-to-end path is in <code>01_dem_quickstart.ipynb</code>.</p>
 </div>
 </div>
 </div>
@@ -20124,7 +19681,7 @@ are upper bounds; the real cost is lower once ocean cells drop out.</li>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../01_dem_quickstart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Copernicus DEM — quickstart (anonymous, no account)">
+          <a href="../../s3/04_passthrough/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Passthrough — any public bucket">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -20134,20 +19691,20 @@ are upper bounds; the real cost is lower once ocean cells drop out.</li>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Copernicus DEM — quickstart (anonymous, no account)
+                Passthrough — any public bucket
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../pvgis/01_pvgis_quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: PVGIS quickstart — hourly solar radiation (live)">
+          <a href="../../cmems/catalog_explorer/" class="md-footer__link md-footer__link--next" aria-label="Next: Catalog explorer — browse CMEMS without downloading anything">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                PVGIS quickstart — hourly solar radiation (live)
+                Catalog explorer — browse CMEMS without downloading anything
               </div>
             </div>
             <div class="md-footer__button md-icon">
