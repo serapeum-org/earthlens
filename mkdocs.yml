@@ -127,6 +127,10 @@ nav:
       - Usage: reference/asf/usage.md
       - Available products: reference/asf/datasets.md
       - Reference: reference/asf/asf.md
+    - CMIP6 (climate projections):
+      - Introduction: reference/cmip6/introduction.md
+      - Usage: reference/cmip6/usage.md
+      - Reference: reference/cmip6/cmip6.md
     - CMEMS (Copernicus Marine):
       - Introduction: reference/cmems/introduction.md
       - Usage: reference/cmems/usage.md
@@ -379,6 +383,8 @@ nav:
       - Copernicus DEM — download & crop: examples/s3/02_copernicus_dem.ipynb
       - ESA WorldCover — land cover: examples/s3/03_esa_worldcover.ipynb
       - Passthrough — any public bucket: examples/s3/04_passthrough.ipynb
+    - CMIP6 (climate projections):
+      - Quickstart — tas ssp585 subset (live): examples/cmip6/quickstart.ipynb
     - Copernicus Marine:
       - Catalog explorer (no network): examples/cmems/catalog_explorer.ipynb
       - Quickstart — OSTIA SST: examples/cmems/quickstart.ipynb
