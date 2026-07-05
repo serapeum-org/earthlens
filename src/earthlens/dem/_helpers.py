@@ -193,6 +193,12 @@ def _axis_origins(
     an epsilon — Copernicus DEM has no data above the tile's upper
     edge, so this asymmetry never drops real pixels.
 
+    At the grid extremes both `start` and `stop` are clamped to
+    `[min_index, max_index]`, so `low = high = 90.0` (or `180.0`)
+    resolves to the last valid tile (`89` / `179`) rather than an
+    off-grid `[90]` / `[180]`. The `high = N` "exclude tile `N`" rule
+    still holds for interior `N`.
+
     Args:
         low: Lower edge in degrees.
         high: Upper edge in degrees.
@@ -200,10 +206,13 @@ def _axis_origins(
         max_index: Inclusive upper bound on the returned indices.
 
     Returns:
-        list[int]: Integer origins spanning the axis, clamped to the
-            grid range. A zero-width bbox on an integer boundary
-            (`low == high == N`) still returns `[N]` — the tile that
-            boundary lies inside.
+        list[int]: Integer origins spanning the axis, clamped to
+            `[min_index, max_index]`. A zero-width bbox on an interior
+            integer boundary (`low == high == N`, `min_index <= N <=
+            max_index`) returns `[N]` — the tile that boundary lies
+            inside; at the grid extremes the clamp snaps `N` to the
+            nearest valid index (`90` → `max_index`, `-90` /`-180` →
+            `min_index`).
     """
     start = max(min(math.floor(low), max_index), min_index)
     stop = min(max(math.ceil(high) - 1, min_index), max_index)
