@@ -21386,7 +21386,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-543" name="__codelineno-0-543"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_normalise_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Shift a 0–360° global grid to −180..180 when the bbox needs it.</span>
 <a id="__codelineno-0-545" name="__codelineno-0-545"></a>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        `pyramids` `convert_longitude` only applies to a whole-globe</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        `pyramids` `wrap_longitude` only applies to a whole-globe</span>
 <a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">        0–360 raster (it raises otherwise). A regional model (HRRR) or a</span>
 <a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        bbox entirely in the eastern hemisphere needs no shift, so this</span>
 <a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        is a no-op unless the request bbox reaches a negative longitude.</span>
@@ -21405,7 +21405,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a>            <span class="k">return</span> <span class="n">dataset</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">convert_longitude</span><span class="p">()</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">wrap_longitude</span><span class="p">()</span>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a>            <span class="c1"># Not a 0–360 global raster (e.g. a regional model already in</span>
 <a id="__codelineno-0-568" name="__codelineno-0-568"></a>            <span class="c1"># −180..180); the bbox is already in the dataset&#39;s CRS.</span>
@@ -24292,7 +24292,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-543" name="__codelineno-0-543"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_normalise_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Shift a 0–360° global grid to −180..180 when the bbox needs it.</span>
 <a id="__codelineno-0-545" name="__codelineno-0-545"></a>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        `pyramids` `convert_longitude` only applies to a whole-globe</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        `pyramids` `wrap_longitude` only applies to a whole-globe</span>
 <a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">        0–360 raster (it raises otherwise). A regional model (HRRR) or a</span>
 <a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        bbox entirely in the eastern hemisphere needs no shift, so this</span>
 <a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        is a no-op unless the request bbox reaches a negative longitude.</span>
@@ -24311,7 +24311,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a>            <span class="k">return</span> <span class="n">dataset</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">convert_longitude</span><span class="p">()</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">wrap_longitude</span><span class="p">()</span>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a>            <span class="c1"># Not a 0–360 global raster (e.g. a regional model already in</span>
 <a id="__codelineno-0-568" name="__codelineno-0-568"></a>            <span class="c1"># −180..180); the bbox is already in the dataset&#39;s CRS.</span>
