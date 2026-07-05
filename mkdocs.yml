@@ -187,6 +187,11 @@ nav:
       - Usage: reference/bathymetry/usage.md
       - Available datasets: reference/bathymetry/datasets.md
       - Reference: reference/bathymetry/bathymetry.md
+    - Copernicus DEM (global land elevation):
+      - Introduction: reference/dem/introduction.md
+      - Usage: reference/dem/usage.md
+      - Available datasets: reference/dem/datasets.md
+      - Reference: reference/dem/dem.md
     - Solar & Wind Atlas (solar / wind climatology):
       - Introduction: reference/solar_wind_atlas/introduction.md
       - Usage: reference/solar_wind_atlas/usage.md
@@ -472,6 +477,8 @@ nav:
       - GEBCO vs ETOPO1 resolution (live): examples/bathymetry/04_gebco_vs_etopo_resolution.ipynb
       - Shaded relief (live): examples/bathymetry/05_shaded_relief.ipynb
       - Depth distribution (live): examples/bathymetry/06_depth_histogram.ipynb
+    - Copernicus DEM (global land elevation):
+      - DEM quickstart (live): examples/dem/01_dem_quickstart.ipynb
     - PVGIS (solar radiation / PV):
       - Quickstart — hourly radiation (live): examples/pvgis/01_pvgis_quickstart.ipynb
       - Catalog explorer (no network): examples/pvgis/02_catalog_explorer.ipynb
