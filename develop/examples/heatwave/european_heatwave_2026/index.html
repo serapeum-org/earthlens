@@ -19482,7 +19482,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2fd30cd6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=85b47b3c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19508,7 +19508,7 @@ arguments change.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=96ca63bf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=79de7b5e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19563,7 +19563,7 @@ keys that matter here:</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=03f0aaa9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0de95911">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19577,7 +19577,7 @@ raster into a unit-scaled <code>Dataset</code>, one to sample it at a point. Eve
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3ef513d9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=945b6296">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19623,7 +19623,7 @@ from earthlens import EarthLens</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>2026-07-05 20:01:35 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
+<pre>2026-07-05 20:21:05 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
 </pre>
 </div>
 </div>
@@ -19631,7 +19631,7 @@ from earthlens import EarthLens</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff26c70f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fe82e0f1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19642,7 +19642,7 @@ from earthlens import EarthLens</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f85ab336">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d3b884b8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19666,7 +19666,8 @@ from earthlens import EarthLens</div>
         <span class="k">if</span> <span class="n">valid_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cells</span> <span class="o">&lt;</span> <span class="n">valid_min</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cells</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
-    <span class="k">return</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">rescale</span><span class="p">)</span>
+    <span class="n">raster</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">raster</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">rescale</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">def field_dataset(path, scale=1.0, offset=0.0, valid_min=None):
     def rescale(cells):
@@ -19674,14 +19675,15 @@ from earthlens import EarthLens</div>
         if valid_min is not None:
             cells = np.where(cells &lt; valid_min, np.nan, cells)
         return cells * scale + offset
-    return Dataset.read_file(str(path)).apply(rescale)</div>
+    raster = Dataset.read_file(path)
+    return raster.apply(rescale)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=65d1c94f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=959a6a55">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19692,7 +19694,7 @@ from earthlens import EarthLens</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9d80233d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=da53d8d1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19729,7 +19731,7 @@ from earthlens import EarthLens</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=65d1c1c3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2871aac6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19742,7 +19744,7 @@ cities — so the whole notebook is deterministic.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c0cdc1d4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7efaa0c6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19827,7 +19829,7 @@ START, END</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=65019e9d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=84f69ffb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19839,7 +19841,7 @@ the heat-wave providers from the table above are all registered.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2e954338">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=00dadae6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19889,7 +19891,7 @@ Name: registered, dtype: bool</pre>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=03b90ef6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0cd6a3fc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19900,7 +19902,7 @@ Name: registered, dtype: bool</pre>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a731ddaf">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a1a06fc9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19948,7 +19950,7 @@ Name: registered, dtype: bool</pre>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fdabb1b2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=843f48cd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19959,7 +19961,7 @@ Name: registered, dtype: bool</pre>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=61a7e5f6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=442ee045">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20068,7 +20070,7 @@ pd.DataFrame(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df2a1eb6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1cd3e32d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20082,7 +20084,7 @@ from <code>OPENAQ_API_KEY</code>. (<code>drought</code> needs no credentials.)</
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=369b1de1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=72719c2c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20115,7 +20117,7 @@ SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4a71a10d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=39a0b5e4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20128,7 +20130,7 @@ Engine, so we fetch it through the same <code>gee</code> key and sidestep the Co
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=dc7d25ae">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=173076e1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20152,7 +20154,7 @@ Engine, so we fetch it through the same <code>gee</code> key and sidestep the Co
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"temperature_2m"</span><span class="p">],</span>
     <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
     <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
-    <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"europe"</span><span class="p">),</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"europe"</span><span class="p">,</span>
     <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
     <span class="o">**</span><span class="n">EUROPE</span><span class="p">,</span>
 <span class="p">)</span>
@@ -20166,7 +20168,7 @@ Engine, so we fetch it through the same <code>gee</code> key and sidestep the Co
     variables=["temperature_2m"],
     start=START, end=END,
     temporal_resolution="daily",
-    path=str(OUT / "europe"),
+    path=OUT / "europe",
     export_via="url",
     **EUROPE,
 )
@@ -20184,70 +20186,70 @@ print(f"{len(eu_paths)} daily continental tiles")</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:44.672</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260617.tif (165966 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:14.168</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260617.tif (165966 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:46.195</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260618.tif (167487 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:15.862</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260618.tif (167487 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:48.108</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260619.tif (167268 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:17.576</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260619.tif (167268 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:50.021</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260620.tif (167297 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:19.317</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260620.tif (167297 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:51.250</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260621.tif (167039 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:21.188</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260621.tif (167039 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:53.012</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260622.tif (166895 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:22.852</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260622.tif (166895 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:54.891</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260623.tif (167567 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:24.508</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260623.tif (167567 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:56.020</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260624.tif (167867 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:26.445</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260624.tif (167867 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:57.553</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260625.tif (167462 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:28.062</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260625.tif (167462 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:01:59.836</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260626.tif (167447 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:21:29.262</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\europe\ECMWF_ERA5_LAND_DAILY_AGGR_temperature_2m_20260626.tif (167447 bytes)</span>
 </pre>
 </div>
 </div>
@@ -20262,7 +20264,7 @@ print(f"{len(eu_paths)} daily continental tiles")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ce7c37b2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13b2bc3d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20273,7 +20275,7 @@ print(f"{len(eu_paths)} daily continental tiles")</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=757ff124">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f307229b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20293,16 +20295,16 @@ print(f"{len(eu_paths)} daily continental tiles")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">peak_path</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">eu_paths</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">PEAK</span><span class="p">))</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">field_dataset</span><span class="p">(</span><span class="n">peak_path</span><span class="p">,</span> <span class="n">offset</span><span class="o">=-</span><span class="mf">273.15</span><span class="p">,</span> <span class="n">valid_min</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exclude_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"T2m (°C)"</span><span class="p">)</span>
+<span class="n">dome</span> <span class="o">=</span> <span class="n">field_dataset</span><span class="p">(</span><span class="n">peak_path</span><span class="p">,</span> <span class="n">offset</span><span class="o">=-</span><span class="mf">273.15</span><span class="p">,</span> <span class="n">valid_min</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">dome</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exclude_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"T2m (°C)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"ERA5-Land daily-mean 2 m air temperature — 22 Jun 2026"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10">peak_path = next(p for p in eu_paths if p.stem.endswith(PEAK))
 fig, ax = plt.subplots(figsize=(8, 6))
-field_dataset(peak_path, offset=-273.15, valid_min=1.0).plot(
-    band=0, exclude_value=np.nan, ax=ax, fig=fig, cmap="inferno", cbar_label="T2m (°C)")
+dome = field_dataset(peak_path, offset=-273.15, valid_min=1.0)
+dome.plot(band=0, exclude_value=np.nan, ax=ax, fig=fig, cmap="inferno", cbar_label="T2m (°C)")
 ax.set_title("ERA5-Land daily-mean 2 m air temperature — 22 Jun 2026")
 ax.set_xlabel("lon"); ax.set_ylabel("lat")
 plt.tight_layout(); plt.show()</div>
@@ -20324,7 +20326,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cf842310">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f471581e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20337,7 +20339,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=20b094e0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=360bf4dc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20349,7 +20351,7 @@ take each city's hottest day in the window. The ranking picks the focus cities f
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d4c194f7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cf43fd54">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20422,7 +20424,7 @@ Name: t2m_C, dtype: float64</pre>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=671957f1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ff50736a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20469,7 +20471,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1ef73f97">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=92b38f74">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20481,7 +20483,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=32ca9dda">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7a2de2fc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20496,7 +20498,7 @@ air.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8cc303fb">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=116d9082">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20524,7 +20526,7 @@ air.</p>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
         <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
         <span class="n">scale</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"rgb"</span> <span class="o">/</span> <span class="n">name</span><span class="p">),</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"rgb"</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span>
         <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
         <span class="o">**</span><span class="n">box</span><span class="p">,</span>
     <span class="p">)</span>
@@ -20542,7 +20544,7 @@ for name, box in CITY_BOXES.items():
         temporal_resolution="raw",
         reducer="median",
         scale=50.0,
-        path=str(OUT / "rgb" / name),
+        path=OUT / "rgb" / name,
         export_via="url",
         **box,
     )
@@ -20560,21 +20562,21 @@ for name, box in CITY_BOXES.items():
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:03:01.735</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\rgb\Madrid\COPERNICUS_S2_SR_HARMONIZED_B4-B3-B2_20260617.tif (11935214 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:22:13.294</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\rgb\Madrid\COPERNICUS_S2_SR_HARMONIZED_B4-B3-B2_20260617.tif (11935214 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:03:57.845</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\rgb\Paris\COPERNICUS_S2_SR_HARMONIZED_B4-B3-B2_20260617.tif (10186180 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:22:54.792</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\rgb\Paris\COPERNICUS_S2_SR_HARMONIZED_B4-B3-B2_20260617.tif (10186180 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:26.719</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\rgb\Milan\COPERNICUS_S2_SR_HARMONIZED_B4-B3-B2_20260617.tif (7518869 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:32.241</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\rgb\Milan\COPERNICUS_S2_SR_HARMONIZED_B4-B3-B2_20260617.tif (7518869 bytes)</span>
 </pre>
 </div>
 </div>
@@ -20590,7 +20592,7 @@ for name, box in CITY_BOXES.items():
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=878c6ec0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f15bb028">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20616,7 +20618,7 @@ for name, box in CITY_BOXES.items():
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"LST_Day_1km"</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s2">"2026-06-20"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2026-06-25"</span><span class="p">,</span>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"lst"</span> <span class="o">/</span> <span class="n">name</span><span class="p">),</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"lst"</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span>
         <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
         <span class="o">**</span><span class="n">box</span><span class="p">,</span>
     <span class="p">)</span>
@@ -20632,7 +20634,7 @@ for name, box in CITY_BOXES.items():
         variables=["LST_Day_1km"],
         start="2026-06-20", end="2026-06-25",
         temporal_resolution="daily",
-        path=str(OUT / "lst" / name),
+        path=OUT / "lst" / name,
         export_via="url",
         **box,
     )
@@ -20650,126 +20652,126 @@ for name, box in CITY_BOXES.items():
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:28.505</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260620.tif (10196 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:34.529</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260620.tif (10196 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:29.908</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260621.tif (9816 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:36.565</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260621.tif (9816 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:31.124</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260622.tif (5206 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:38.294</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260622.tif (5206 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:32.906</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260623.tif (10149 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:39.581</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260623.tif (10149 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:33.709</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (9233 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:40.364</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (9233 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:34.490</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (2424 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:41.665</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Madrid\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (2424 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:37.333</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260620.tif (9202 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:44.964</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260620.tif (9202 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:38.116</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260621.tif (8881 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:46.686</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260621.tif (8881 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:39.367</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260622.tif (9051 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:47.880</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260622.tif (9051 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:39.945</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260623.tif (3692 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:49.044</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260623.tif (3692 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:41.117</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (8601 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:50.214</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (8601 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:42.417</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (9078 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:50.924</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Paris\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (9078 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:44.605</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260620.tif (6969 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:53.181</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260620.tif (6969 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:46.459</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260621.tif (7195 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:53.978</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260621.tif (7195 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:48.328</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260622.tif (7301 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:55.788</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260622.tif (7301 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:49.957</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260623.tif (6419 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:56.560</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260623.tif (6419 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:51.140</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (7265 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:57.850</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (7265 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:51.824</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (6617 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:23:59.000</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst\Milan\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (6617 bytes)</span>
 </pre>
 </div>
 </div>
@@ -20783,7 +20785,7 @@ for name, box in CITY_BOXES.items():
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7f283c7c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0f61c518">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20794,7 +20796,7 @@ for name, box in CITY_BOXES.items():
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8fceb82d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ef942b4c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20814,7 +20816,8 @@ for name, box in CITY_BOXES.items():
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">CITY_BOXES</span><span class="p">):</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">city_rgb</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">true_colour</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">city_rgb</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+    <span class="n">true_colour</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
         <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3000</span><span class="p">},</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">)</span>
     <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> — true colour"</span><span class="p">)</span>
@@ -20829,7 +20832,8 @@ for name, box in CITY_BOXES.items():
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-15">fig, axes = plt.subplots(2, 3, figsize=(15, 9), constrained_layout=True)
 for col, name in enumerate(CITY_BOXES):
-    Dataset.read_file(str(city_rgb[name])).plot(
+    true_colour = Dataset.read_file(city_rgb[name])
+    true_colour.plot(
         rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3000},
         ax=axes[0, col], fig=fig)
     axes[0, col].set_title(f"{name} — true colour")
@@ -20859,7 +20863,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fda22abe">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4c73a106">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20873,7 +20877,7 @@ irrigated land beside them stay markedly cooler.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=27f11444">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1918aa2d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20886,7 +20890,7 @@ poleward.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0f373d32">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=95e82931">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20935,7 +20939,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=62e115a0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=663feb35">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20949,7 +20953,7 @@ northern edge, is worth a closer look next.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6d5260ad">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8abd012f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20961,7 +20965,7 @@ and Utrecht</strong> with the same MODIS LST call, over the 24–27 June tail of
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2dea35ce">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=091d47de">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20987,7 +20991,7 @@ and Utrecht</strong> with the same MODIS LST call, over the 24–27 June tail of
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"LST_Day_1km"</span><span class="p">],</span>
         <span class="n">start</span><span class="o">=</span><span class="s2">"2026-06-24"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2026-06-27"</span><span class="p">,</span>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"lst_nl"</span> <span class="o">/</span> <span class="n">name</span><span class="p">),</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"lst_nl"</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span>
         <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
         <span class="o">**</span><span class="n">box</span><span class="p">,</span>
     <span class="p">)</span>
@@ -21003,7 +21007,7 @@ for name, box in DUTCH_BOXES.items():
         variables=["LST_Day_1km"],
         start="2026-06-24", end="2026-06-27",
         temporal_resolution="daily",
-        path=str(OUT / "lst_nl" / name),
+        path=OUT / "lst_nl" / name,
         export_via="url",
         **box,
     )
@@ -21021,84 +21025,84 @@ for name, box in DUTCH_BOXES.items():
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:57.369</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Amsterdam\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (1542 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:02.860</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Amsterdam\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (1542 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:58.514</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Amsterdam\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (1555 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:04.291</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Amsterdam\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (1555 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:04:59.718</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Amsterdam\MODIS_061_MOD11A1_LST_Day_1km_20260626.tif (1496 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:05.706</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Amsterdam\MODIS_061_MOD11A1_LST_Day_1km_20260626.tif (1496 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:01.059</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Amsterdam\MODIS_061_MOD11A1_LST_Day_1km_20260627.tif (915 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:06.455</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Amsterdam\MODIS_061_MOD11A1_LST_Day_1km_20260627.tif (915 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:03.751</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Rotterdam\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (1344 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:08.084</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Rotterdam\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (1344 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:04.840</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Rotterdam\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (1355 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:08.782</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Rotterdam\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (1355 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:06.520</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Rotterdam\MODIS_061_MOD11A1_LST_Day_1km_20260626.tif (1294 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:09.987</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Rotterdam\MODIS_061_MOD11A1_LST_Day_1km_20260626.tif (1294 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:08.347</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Rotterdam\MODIS_061_MOD11A1_LST_Day_1km_20260627.tif (915 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:11.185</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Rotterdam\MODIS_061_MOD11A1_LST_Day_1km_20260627.tif (915 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:11.388</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Utrecht\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (1352 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:13.447</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Utrecht\MODIS_061_MOD11A1_LST_Day_1km_20260624.tif (1352 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:12.711</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Utrecht\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (1387 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:14.043</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Utrecht\MODIS_061_MOD11A1_LST_Day_1km_20260625.tif (1387 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:13.923</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Utrecht\MODIS_061_MOD11A1_LST_Day_1km_20260626.tif (1345 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:15.104</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Utrecht\MODIS_061_MOD11A1_LST_Day_1km_20260626.tif (1345 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:15.776</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Utrecht\MODIS_061_MOD11A1_LST_Day_1km_20260627.tif (915 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:16.226</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\lst_nl\Utrecht\MODIS_061_MOD11A1_LST_Day_1km_20260627.tif (915 bytes)</span>
 </pre>
 </div>
 </div>
@@ -21112,7 +21116,7 @@ for name, box in DUTCH_BOXES.items():
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d864cd01">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=92ab1cc2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21156,11 +21160,11 @@ plt.show()</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>C:\Users\main\AppData\Local\Temp\ipykernel_58168\3553569517.py:4: RuntimeWarning: Mean of empty slice
+<pre>C:\Users\main\AppData\Local\Temp\ipykernel_40460\3553569517.py:4: RuntimeWarning: Mean of empty slice
   hottest = max(lst, key=lambda d: np.nanmean(d.read_array()))
-C:\Users\main\AppData\Local\Temp\ipykernel_58168\3553569517.py:4: RuntimeWarning: Mean of empty slice
+C:\Users\main\AppData\Local\Temp\ipykernel_40460\3553569517.py:4: RuntimeWarning: Mean of empty slice
   hottest = max(lst, key=lambda d: np.nanmean(d.read_array()))
-C:\Users\main\AppData\Local\Temp\ipykernel_58168\3553569517.py:4: RuntimeWarning: Mean of empty slice
+C:\Users\main\AppData\Local\Temp\ipykernel_40460\3553569517.py:4: RuntimeWarning: Mean of empty slice
   hottest = max(lst, key=lambda d: np.nanmean(d.read_array()))
 </pre>
 </div>
@@ -21175,7 +21179,7 @@ C:\Users\main\AppData\Local\Temp\ipykernel_58168\3553569517.py:4: RuntimeWarning
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8af3258f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8430aab3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21189,7 +21193,7 @@ cooler.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=eaa16835">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f4e716b8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21205,7 +21209,7 @@ free key, read from the <code>OPENAQ_API_KEY</code> environment variable.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=275857ff">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f4d18618">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21223,26 +21227,28 @@ free key, read from the <code>OPENAQ_API_KEY</code> environment variable.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ozone</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ozone_request</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"openaq"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"o3"</span><span class="p">],</span>
     <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.5</span><span class="p">,</span> <span class="mf">52.6</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"ozone"</span><span class="p">),</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"ozone"</span><span class="p">,</span>
     <span class="n">max_locations</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">ozone</span> <span class="o">=</span> <span class="n">ozone_request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ozone</span><span class="o">.</span><span class="n">station_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> stations, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ozone</span><span class="p">)</span><span class="si">}</span><span class="s2"> daily ozone readings"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">ozone = EarthLens(
+<div class="clipboard-copy-txt" id="cell-19">ozone_request = EarthLens(
     data_source="openaq",
     variables=["o3"],
     temporal_resolution="daily",
     start=START, end=END,
     lat_lim=[51.5, 52.6], lon_lim=[4.0, 5.5],
-    path=str(OUT / "ozone"),
+    path=OUT / "ozone",
     max_locations=25,
-).download(progress_bar=False)
+)
+ozone = ozone_request.download(progress_bar=False)
 print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings")</div>
 </div>
 </div>
@@ -21255,14 +21261,14 @@ print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:17.873</span> | <span class="ansi-yellow-intense-fg ansi-bold">WARNING </span> | <span class="ansi-cyan-fg">earthlens.openaq.backend</span>:<span class="ansi-cyan-fg">_search</span>:<span class="ansi-cyan-fg">350</span> - <span class="ansi-yellow-intense-fg ansi-bold">OpenAQ search hit the max_locations=25 cap; the result may be partial. Raise max_locations= or shrink the bbox / date window to capture every station.</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:17.511</span> | <span class="ansi-yellow-intense-fg ansi-bold">WARNING </span> | <span class="ansi-cyan-fg">earthlens.openaq.backend</span>:<span class="ansi-cyan-fg">_search</span>:<span class="ansi-cyan-fg">350</span> - <span class="ansi-yellow-intense-fg ansi-bold">OpenAQ search hit the max_locations=25 cap; the result may be partial. Raise max_locations= or shrink the bbox / date window to capture every station.</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:25.193</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.openaq.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">487</span> - <span class="ansi-bold">OpenAQ download summary: 170 measurement(s) across 17 sensor(s) written to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\ozone\openaq_o3_20260617_20260626.csv</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:24.812</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.openaq.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">487</span> - <span class="ansi-bold">OpenAQ download summary: 170 measurement(s) across 17 sensor(s) written to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\heatwave\ozone\openaq_o3_20260617_20260626.csv</span>
 </pre>
 </div>
 </div>
@@ -21277,7 +21283,7 @@ print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d9b7f990">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fa123a66">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21288,7 +21294,7 @@ print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5b514fad">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=aaa11fc0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21346,7 +21352,7 @@ Name: value, dtype: float64</pre>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ef9c8607">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=43a04652">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21405,7 +21411,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fd2da34b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f7c62e68">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21421,7 +21427,7 @@ wildfires, the other heat consequence, see the <code>firms</code> backend.)</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e4c38c17">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d6eba1ab">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21436,7 +21442,7 @@ over Iberia for two windows: the <strong>winter before</strong> the event and th
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6810d4a8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7c20812b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21457,28 +21463,30 @@ over Iberia for two windows: the <strong>winter before</strong> the event and th
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">spi</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"Feb 2026"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2026-02-01"</span><span class="p">,</span> <span class="s2">"2026-02-12"</span><span class="p">),</span>
                     <span class="s2">"Jun 2026"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2026-06-01"</span><span class="p">,</span> <span class="s2">"2026-06-12"</span><span class="p">)}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"edo"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="s2">"edo-spaST"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
         <span class="n">start</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
         <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span>
-        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"spi"</span><span class="p">),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"spi"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">spi</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spi</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-22">spi = {}
 for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
                     "Jun 2026": ("2026-06-01", "2026-06-12")}.items():
-    paths = EarthLens(
+    request = EarthLens(
         data_source="edo",
         dataset="edo-spaST",
         variables=[],
         start=s, end=e,
         lat_lim=[36.0, 48.0], lon_lim=[-10.0, 6.0],
-        path=str(OUT / "spi"),
-    ).download(progress_bar=False)
+        path=OUT / "spi",
+    )
+    paths = request.download(progress_bar=False)
     spi[tag] = paths[-1]
 {k: v.name for k, v in spi.items()}</div>
 </div>
@@ -21492,14 +21500,14 @@ for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:37.569</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.drought.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">791</span> - <span class="ansi-bold">EDO/GDO: Copernicus European/Global Drought Observatory (EMS) — free reuse with attribution to Copernicus EMS.</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:35.839</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.drought.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">791</span> - <span class="ansi-bold">EDO/GDO: Copernicus European/Global Drought Observatory (EMS) — free reuse with attribution to Copernicus EMS.</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:05:48.863</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.drought.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">791</span> - <span class="ansi-bold">EDO/GDO: Copernicus European/Global Drought Observatory (EMS) — free reuse with attribution to Copernicus EMS.</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:24:46.474</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.drought.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">791</span> - <span class="ansi-bold">EDO/GDO: Copernicus European/Global Drought Observatory (EMS) — free reuse with attribution to Copernicus EMS.</span>
 </pre>
 </div>
 </div>
@@ -21513,7 +21521,7 @@ for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=757fd729">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df74127b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21524,7 +21532,7 @@ for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=de709729">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3acd6666">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21545,7 +21553,8 @@ for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">spi</span><span class="o">.</span><span class="n">items</span><span class="p">())):</span>
     <span class="c1"># SPI is already in class units (no conversion), so plot the raster straight.</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">spi_map</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">spi_map</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
         <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"cividis"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
         <span class="n">add_colorbar</span><span class="o">=</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">spi</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># one shared bar (both panels share the 0–4 scale)</span>
         <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"SPI class (0 = near-normal)"</span><span class="p">)</span>
@@ -21555,7 +21564,8 @@ for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
 <div class="clipboard-copy-txt" id="cell-23">fig, axes = plt.subplots(1, 2, figsize=(11, 5))
 for i, (ax, (tag, path)) in enumerate(zip(axes, spi.items())):
     # SPI is already in class units (no conversion), so plot the raster straight.
-    Dataset.read_file(str(path)).plot(
+    spi_map = Dataset.read_file(path)
+    spi_map.plot(
         band=0, ax=ax, fig=fig, cmap="cividis", vmin=0, vmax=4,
         add_colorbar=(i == len(spi) - 1),  # one shared bar (both panels share the 0–4 scale)
         cbar_label="SPI class (0 = near-normal)")
@@ -21572,7 +21582,7 @@ plt.tight_layout(); plt.show()</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>C:\Users\main\AppData\Local\Temp\ipykernel_58168\3151508393.py:9: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+<pre>C:\Users\main\AppData\Local\Temp\ipykernel_40460\3333385269.py:10: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(); plt.show()
 </pre>
 </div>
@@ -21587,7 +21597,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=180b2206">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fadd9d05">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21603,7 +21613,7 @@ lag by weeks and weren't yet published for mid-2026.)</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6f6a8ebf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3162c2af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21617,7 +21627,7 @@ temperature maps.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=63471f84">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b47666cd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21661,7 +21671,7 @@ Name: backend_class, dtype: str</pre>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=556983c0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1b9399a3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
