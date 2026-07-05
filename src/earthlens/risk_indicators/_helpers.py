@@ -128,7 +128,6 @@ def _request_json(
         max_retries=_HTTP_RETRIES,
         backoff_factor=_HTTP_RETRY_BACKOFF,
         status_forcelist=tuple(range(500, 600)),
-        max_backoff=None,
         retry_on_exceptions=_TRANSIENT_ERRORS,
         raise_for_status=True,
         sleep=lambda seconds: time.sleep(seconds),

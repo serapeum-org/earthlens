@@ -350,7 +350,6 @@ class ClimateIndices(AbstractDataSource):
             status_forcelist=tuple(range(500, 600)),
             retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
             raise_for_status=True,
-            max_backoff=None,
             sleep=lambda seconds: time.sleep(seconds),
         )
         try:
