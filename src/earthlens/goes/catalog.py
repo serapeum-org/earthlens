@@ -1,0 +1,369 @@
+"""Product / domain / satellite catalog for the GOES ABI backend.
+
+Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+`goes_data_catalog.yaml`. A GOES request is three-axis: a **satellite**
+(which bucket — `east`/`west` resolve to the current operational
+`noaa-goes19` / `noaa-goes18`), a **product** (which ABI product family,
+e.g. `abi-l2-mcmip`), and a **domain** (`C` CONUS, `F` Full Disk, `M1` /
+`M2` Mesoscale). A concrete S3 prefix is `{product_group}{domain_suffix}`
+(e.g. `ABI-L2-MCMIPC`); the two mesoscale subsectors share one `...M`
+prefix and are split by the filename token.
+
+The product is the "dataset" role (the key the user names in
+`dataset=` / `variables={product: [...]}`), so it lives under the
+inherited :attr:`~earthlens.base.AbstractCatalog.datasets` field — which
+gives the catalog its `cat["abi-l2-mcmip"]` / `"abi-l2-mcmip" in cat` /
+`len(cat)` dict-like surface and the did-you-mean error for free.
+Domains, satellites, and the 16 ABI channels hang off parallel maps.
+
+:data:`CATALOG_PATH` is the path to the bundled YAML;
+:func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
+"""
+
+from __future__ import annotations
+
+import difflib
+from pathlib import Path
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+
+from earthlens.base import AbstractCatalog
+from earthlens.base.yaml_loader import load_yaml_strict
+
+CATALOG_PATH: Path = Path(__file__).parent / "goes_data_catalog.yaml"
+
+_CATALOG_CACHE: dict[tuple[str, int], Catalog] = {}
+
+
+def clear_catalog_cache() -> None:
+    """Empty the module-level GOES catalog parse cache."""
+    _CATALOG_CACHE.clear()
+
+
+class GOESChannel(BaseModel):
+    """One of the 16 ABI spectral bands (reference metadata).
+
+    Attributes:
+        wavelength_um: Central wavelength in micrometres.
+        name: Human-readable band name (`"Red (visible)"`).
+
+    Examples:
+        - Read a channel's wavelength:
+            ```python
+            >>> from earthlens.goes import Catalog
+            >>> Catalog().channels["C02"].wavelength_um
+            0.64
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    wavelength_um: float
+    name: str = ""
+
+
+class GOESDomain(BaseModel):
+    """One ABI scan domain (CONUS / Full Disk / Mesoscale).
+
+    Attributes:
+        name: Human-readable domain name.
+        prefix_suffix: The letter appended to a product's `product_group`
+            to form the S3 prefix — `"C"`, `"F"`, or `"M"` (both
+            mesoscale subsectors share the `"M"` prefix).
+        subsector: Filename token that distinguishes a shared-prefix
+            subsector (`"M1"` / `"M2"`); empty for `C` / `F`.
+        cadence_minutes: Nominal minutes between scans — informational
+            only (enumeration is listing-driven, not cadence-computed).
+
+    Examples:
+        - The two mesoscale domains share one `...M` prefix:
+            ```python
+            >>> from earthlens.goes import Catalog
+            >>> cat = Catalog()
+            >>> cat.domains["M1"].prefix_suffix, cat.domains["M1"].subsector
+            ('M', 'M1')
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    name: str = ""
+    prefix_suffix: str
+    subsector: str = ""
+    cadence_minutes: float = 0.0
+
+
+class GOESProduct(BaseModel):
+    """One curated ABI product family (the "dataset" analog).
+
+    The product key (`"abi-l2-mcmip"`) is the parent key in
+    :attr:`Catalog.datasets` and is repeated here as :attr:`product` so a
+    row carries its own identity when passed around outside the catalog.
+
+    Attributes:
+        product: Friendly product key (`"abi-l2-mcmip"`) — the value used
+            in `dataset=` / `variables={product: [...]}`.
+        product_group: The S3 prefix stem before the domain suffix
+            (`"ABI-L2-MCMIP"`, `"ABI-L1b-Rad"`).
+        level: Processing level (`"L1b"` / `"L2"`).
+        description: Human-readable summary.
+        domains: The domain keys this product publishes (a subset of
+            :attr:`Catalog.domains`), e.g. `["C", "F", "M1", "M2"]`.
+        band_split: `True` when each ABI channel is a **separate** file
+            (`ABI-L1b-Rad`, `ABI-L2-CMIP`) so `variables=` picks which
+            granule files are fetched; `False` when one file carries all
+            bands (`ABI-L2-MCMIP`) so `variables=` is informational.
+        default_domain: Domain used when the request names none.
+        bands: For a `band_split` product, the channel tokens
+            (`["C01", ..., "C16"]`) `variables=` may select; for a
+            combined product, the in-file band-variable names
+            (informational).
+
+    Examples:
+        - Inspect a product's group and domains:
+            ```python
+            >>> from earthlens.goes import Catalog
+            >>> p = Catalog().get_product("abi-l2-mcmip")
+            >>> p.product_group
+            'ABI-L2-MCMIP'
+            >>> p.band_split
+            False
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    product: str
+    product_group: str
+    level: str = "L2"
+    description: str = ""
+    domains: list[str] = Field(default_factory=list)
+    band_split: bool = False
+    default_domain: str = "C"
+    bands: list[str] = Field(default_factory=list)
+
+
+class Catalog(AbstractCatalog):
+    """Product / domain / satellite catalog for the GOES ABI backend.
+
+    Reads the bundled `goes_data_catalog.yaml` (shipped as package data)
+    and exposes its `products:` block as a map of :class:`GOESProduct`
+    rows keyed by product key under the inherited :attr:`datasets` field,
+    plus parallel :attr:`domains`, :attr:`satellites`, and
+    :attr:`channels` maps. Instantiate with no arguments (`Catalog()`);
+    :func:`model_post_init` loads and validates the YAML in one pass and
+    caches it by `(path, mtime)`.
+
+    Resolve a product with :meth:`get_product` (a thin alias over
+    :meth:`~earthlens.base.AbstractCatalog.get_dataset`), a domain with
+    :meth:`get_domain`, and a satellite/role to its bucket with
+    :meth:`bucket_for`.
+
+    Attributes:
+        datasets: Map from product key to its :class:`GOESProduct` row.
+        domains: Map from domain key (`"C"`, `"F"`, `"M1"`, `"M2"`) to
+            its :class:`GOESDomain` row.
+        satellites: Map from role / satellite number (`"east"`, `"19"`)
+            to its unsigned bucket name.
+        channels: Map from ABI channel token (`"C01"`) to its
+            :class:`GOESChannel` metadata.
+        available_datasets: Sorted product keys.
+
+    Examples:
+        - List products and resolve a satellite:
+            ```python
+            >>> from earthlens.goes import Catalog
+            >>> cat = Catalog()
+            >>> "abi-l2-mcmip" in cat
+            True
+            >>> cat.bucket_for("east")
+            'noaa-goes19'
+
+            ```
+        - An unknown product raises with a did-you-mean hint:
+            ```python
+            >>> from earthlens.goes import Catalog
+            >>> Catalog().get_product("abi-l2-mcmi")  # doctest: +ELLIPSIS
+            Traceback (most recent call last):
+                ...
+            ValueError: 'abi-l2-mcmi' is not in the GOES catalog. Known datasets: [...]. Did you mean 'abi-l2-mcmip'?
+
+            ```
+    """
+
+    _catalog_kind: str = "GOES catalog"
+
+    datasets: dict[str, GOESProduct] = Field(default_factory=dict)
+    domains: dict[str, GOESDomain] = Field(default_factory=dict)
+    satellites: dict[str, str] = Field(default_factory=dict)
+    channels: dict[str, GOESChannel] = Field(default_factory=dict)
+
+    def model_post_init(self, __context: Any) -> None:
+        """Auto-load the bundled catalog when no products were supplied.
+
+        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `(path, mtime)`); passing `datasets=...` skips the disk read
+        (used in tests). Either way the `available_datasets` index is
+        derived from the loaded map.
+
+        Raises:
+            ValueError: Propagated from :meth:`load` when the YAML is
+                missing, empty, or has a malformed row.
+        """
+        if not self.datasets:
+            loaded = Catalog.load()
+            self.datasets = loaded.datasets
+            self.domains = loaded.domains
+            self.satellites = loaded.satellites
+            self.channels = loaded.channels
+        self.available_datasets = sorted(self.datasets)
+
+    @classmethod
+    def load(cls, catalog_path: Path | None = None) -> Catalog:
+        """Read and validate the GOES catalog from disk (cached).
+
+        Args:
+            catalog_path: Path to the catalog YAML. Defaults to the
+                module-level :data:`CATALOG_PATH`.
+
+        Returns:
+            A fully-populated :class:`Catalog`.
+
+        Raises:
+            ValueError: If the file has no `products:` block, or any
+                product / domain / satellite / channel row fails
+                validation.
+        """
+        path = catalog_path if catalog_path is not None else CATALOG_PATH
+        try:
+            mtime = path.stat().st_mtime_ns
+        except FileNotFoundError:
+            mtime = 0
+        cache_key = (str(path.resolve()), mtime)
+        cached = _CATALOG_CACHE.get(cache_key)
+        if cached is not None:
+            return cached
+
+        data = load_yaml_strict(path) or {}
+        products_yaml = data.get("products") or {}
+        if not products_yaml:
+            raise ValueError(
+                f"{path} is missing or has an empty 'products:' block. "
+                "The GOES catalog must list at least one product."
+            )
+        products: dict[str, GOESProduct] = {}
+        for key, body in products_yaml.items():
+            try:
+                products[key] = GOESProduct(product=key, **dict(body or {}))
+            except ValidationError as exc:
+                raise ValueError(
+                    f"{path} product {key!r} failed validation:\n{exc}"
+                ) from exc
+        domains: dict[str, GOESDomain] = {}
+        for key, body in (data.get("domains") or {}).items():
+            try:
+                domains[key] = GOESDomain(**dict(body or {}))
+            except ValidationError as exc:
+                raise ValueError(
+                    f"{path} domain {key!r} failed validation:\n{exc}"
+                ) from exc
+        channels: dict[str, GOESChannel] = {}
+        for key, body in (data.get("channels") or {}).items():
+            try:
+                channels[key] = GOESChannel(**dict(body or {}))
+            except ValidationError as exc:
+                raise ValueError(
+                    f"{path} channel {key!r} failed validation:\n{exc}"
+                ) from exc
+        satellites = {str(k): str(v) for k, v in (data.get("satellites") or {}).items()}
+        catalog = cls(
+            datasets=products,
+            domains=domains,
+            satellites=satellites,
+            channels=channels,
+        )
+        _CATALOG_CACHE[cache_key] = catalog
+        return catalog
+
+    def get_catalog(self) -> dict[str, GOESProduct]:
+        """Return the product map (satisfies the abstract contract).
+
+        Returns:
+            dict[str, GOESProduct]: Same object as :attr:`datasets`.
+        """
+        return self.datasets
+
+    def get_product(self, key: str) -> GOESProduct:
+        """Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.
+
+        Thin alias over
+        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+
+        Args:
+            key: A product key (`"abi-l2-mcmip"`, `"abi-l1b-rad"`).
+
+        Returns:
+            GOESProduct: The matching product row.
+
+        Raises:
+            ValueError: If `key` is not a registered GOES product.
+        """
+        return self.get_dataset(key)
+
+    def get_domain(self, key: str) -> GOESDomain:
+        """Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.
+
+        Args:
+            key: A domain key (`"C"`, `"F"`, `"M1"`, `"M2"`).
+
+        Returns:
+            GOESDomain: The matching domain row.
+
+        Raises:
+            ValueError: If `key` is not a registered GOES domain.
+        """
+        try:
+            return self.domains[key]
+        except KeyError:
+            close = difflib.get_close_matches(key, self.domains, n=1)
+            hint = f" Did you mean {close[0]!r}?" if close else ""
+            raise ValueError(
+                f"{key!r} is not a GOES domain. "
+                f"Known domains: {sorted(self.domains)}.{hint}"
+            ) from None
+
+    def bucket_for(self, satellite: str) -> str:
+        """Resolve a satellite role / number to its unsigned bucket name.
+
+        Args:
+            satellite: A role (`"east"` / `"west"`) or satellite number
+                (`"16"` / `"18"` / `"19"`). Case-insensitive for roles.
+
+        Returns:
+            str: The bucket name (`"noaa-goes19"`).
+
+        Raises:
+            ValueError: If `satellite` maps to no known bucket.
+        """
+        key = str(satellite).lower()
+        try:
+            return self.satellites[key]
+        except KeyError:
+            close = difflib.get_close_matches(key, self.satellites, n=1)
+            hint = f" Did you mean {close[0]!r}?" if close else ""
+            raise ValueError(
+                f"{satellite!r} is not a known GOES satellite. "
+                f"Known: {sorted(self.satellites)}.{hint}"
+            ) from None
+
+    def products(self) -> list[str]:
+        """Return the registered product keys, sorted.
+
+        Returns:
+            list[str]: The product keys.
+        """
+        return sorted(self.datasets)

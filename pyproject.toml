@@ -95,6 +95,11 @@ radar = ["earthlens[s3]"]
 # Copernicus DEM (GLO-30 / GLO-90) over the anonymous AWS Open Data buckets;
 # reuses the [s3] unsigned-boto3 substrate. No new SDK, no auth, no account.
 dem = ["earthlens[s3]"]
+# NOAA GOES-R ABI imagery (anonymous noaa-goes19/18/16 buckets). Re-spells the
+# [s3] extra (unsigned boto3, imported lazily); no new SDK, no auth. Raw NetCDF
+# granules out — decode is downstream (pyramids / satpy), so earthlens never
+# imports xarray/netCDF4/goes2go.
+goes = ["earthlens[s3]"]
 stac = ["pyramids-gis[stac] >=0.38.0"]
 openeo = ["openeo >=0.47,<0.48"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
@@ -151,7 +156,7 @@ osm = ["overpy >=0.7", "ohsome >=0.4.0"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 # (argo and osm are intentionally excluded — see the notes above their extras.)
 all = [
-    "earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,fdsn,earthdata,asf,hdx,eea_aq,eumetsat,nwp,nwm,radar,dem,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
+    "earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,fdsn,earthdata,asf,hdx,eea_aq,eumetsat,nwp,nwm,radar,dem,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
 ]
 
 [dependency-groups]
@@ -325,6 +330,7 @@ markers = [
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
     "dem: tests for the Copernicus DEM backend (GLO-30 / GLO-90; requires the `dem` extra: boto3; anonymous copernicus-dem-30m / -90m buckets; raw COG tiles — no decode, mosaic/crop is pyramids downstream).",
+    "goes: tests for the NOAA GOES-R ABI backend (requires the `goes` extra: boto3; unsigned noaa-goes19/18/16 buckets).",
     "usgs_water: tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",
     "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
     "worldpop: tests for the WorldPop population data hub backend (open CC-BY-4.0; default REST path needs only core requests + pyramids, optional `worldpop` extra adds worldpoppy).",

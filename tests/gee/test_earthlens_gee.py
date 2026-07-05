@@ -118,6 +118,7 @@ class TestRegistry:
             "global-forest-watch",
             "global-solar-atlas",
             "global-wind-atlas",
+            "goes",
             "google-earth-engine",
             "gsa",
             "gwa",
