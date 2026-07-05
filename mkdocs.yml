@@ -303,6 +303,11 @@ nav:
       - Usage: reference/radar/usage.md
       - Catalog & tooling: reference/radar/catalog.md
       - Reference: reference/radar/radar.md
+    - GOES-R ABI (geostationary):
+      - Introduction: reference/goes/introduction.md
+      - Usage: reference/goes/usage.md
+      - Products & domains: reference/goes/datasets.md
+      - Reference: reference/goes/goes.md
     - USGS Water (NWIS):
       - Introduction: reference/usgs-water/introduction.md
       - Usage: reference/usgs-water/usage.md
@@ -574,6 +579,9 @@ nav:
       - GFS 2 m temperature (live): examples/nwp/gfs_temperature.ipynb
       - DWD ICON precipitation (live): examples/nwp/icon_precipitation.ipynb
       - ECCC GDPS 2 m temperature (live): examples/nwp/eccc_gdps.ipynb
+    - GOES-R ABI (geostationary):
+      - Catalog explorer (no network): examples/goes/catalog_explorer.ipynb
+      - CONUS granule download (live): examples/goes/conus_granule_download.ipynb
     - NEXRAD radar:
       - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
     - USGS Water (NWIS):
