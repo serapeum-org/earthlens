@@ -28,8 +28,11 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     import pandas as pd
 
-#: The request facets the resolver filters on, in precedence order. `version`
-#: is handled specially (`latest` picks the newest), so it is not listed here.
+#: The request facets the resolver filters on, in precedence order. This — not
+#: the catalog's `facet_columns:` block (which merely documents the CSV schema) —
+#: is the single source of truth for *which* facets `resolve()` filters and in
+#: *what* order. `version` is handled specially (`latest` picks the newest), so
+#: it is not listed here.
 _FILTER_FACETS = (
     "activity_id",
     "source_id",
@@ -142,7 +145,9 @@ class StoreResolver:
 
     Args:
         csv_url: URL of the consolidated-stores CSV.
-        facet_columns: The CSV facet column names (from the catalog).
+        facet_columns: The CSV facet column names (from the catalog), kept as
+            schema documentation; `resolve()` filters on :data:`_FILTER_FACETS`,
+            not on this list.
         cache_path: Where to cache the downloaded CSV. Defaults to
             :func:`default_cache_path`.
         frame: A pre-loaded `DataFrame` to use verbatim, skipping all I/O.
