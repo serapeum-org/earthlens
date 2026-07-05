@@ -23,6 +23,8 @@ Public surface (re-exported from this package):
   — one curated variable / experiment / table / source row.
 * :data:`CATALOG_PATH` — path to the bundled YAML; monkey-patchable in tests.
 * :func:`clear_catalog_cache` — empty the catalog parse cache.
+* :class:`StoreResolver` / :class:`ResolvedStore` — facet -> `zstore` resolution
+  over the consolidated-stores CSV.
 
 Examples:
     - Resolve a curated variable's metadata:
@@ -45,13 +47,16 @@ from earthlens.cmip6.catalog import (
     Table,
     clear_catalog_cache,
 )
+from earthlens.cmip6.resolver import ResolvedStore, StoreResolver
 
 __all__ = [
     "CATALOG_PATH",
     "Catalog",
     "Cmip6Variable",
     "Experiment",
+    "ResolvedStore",
     "Source",
+    "StoreResolver",
     "Table",
     "clear_catalog_cache",
 ]
