@@ -151,11 +151,8 @@ def test_ensure_csv_downloads_when_absent(monkeypatch, tmp_path, store_frame):
     payload = store_frame.to_csv(index=False).encode()
 
     class _Resp:
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *exc):
-            return False
+        status_code = 200
+        headers: dict[str, str] = {}
 
         def raise_for_status(self):
             return None
@@ -163,9 +160,10 @@ def test_ensure_csv_downloads_when_absent(monkeypatch, tmp_path, store_frame):
         def iter_content(self, chunk_size):
             yield payload
 
-    monkeypatch.setattr(
-        "requests.get", lambda url, stream, timeout: _Resp()
-    )
+        def close(self):
+            return None
+
+    monkeypatch.setattr("requests.get", lambda url, **kwargs: _Resp())
     resolver = StoreResolver("http://x/y.csv", list(store_frame.columns), cache_path=cache)
     assert len(resolver.frame) == len(store_frame)
     assert cache.exists()
@@ -207,11 +205,8 @@ def test_ensure_csv_empty_download_raises(monkeypatch, tmp_path):
     cache = tmp_path / "stores.csv"
 
     class _Resp:
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *exc):
-            return False
+        status_code = 200
+        headers: dict[str, str] = {}
 
         def raise_for_status(self):
             return None
@@ -219,7 +214,10 @@ def test_ensure_csv_empty_download_raises(monkeypatch, tmp_path):
         def iter_content(self, chunk_size):
             return iter(())
 
-    monkeypatch.setattr("requests.get", lambda url, stream, timeout: _Resp())
+        def close(self):
+            return None
+
+    monkeypatch.setattr("requests.get", lambda url, **kwargs: _Resp())
     resolver = StoreResolver("http://x/y.csv", ["source_id"], cache_path=cache)
     with pytest.raises(RuntimeError, match="empty CSV"):
         _ = resolver.frame
