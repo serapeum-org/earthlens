@@ -233,7 +233,7 @@ class TestRefresh:
         )
         result = runner.invoke(app, ["datasets", "refresh", "all", "--json"])
         payload = json.loads(result.output)
-        assert len(payload) == 45, "one outcome per backend"
+        assert len(payload) == 46, "one outcome per backend"
         assert any(o["provider"] == "stac" for o in payload), "stac included"
 
     def test_stac_json_reports_new_ids(self, monkeypatch):

@@ -12518,7 +12518,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.9.0
-  sha256: 830f367df1a3e74b8c86708083129e6d4ef60f64d60a95190a2453812c38aefa
+  sha256: ed2725957048bb4c33b799bdb8e896c5f581ff34eb8ceb3145a32dead12b9bc8
   requires_dist:
   - pyramids-gis>=0.38.0
   - geopandas>=1.0.0
@@ -12559,6 +12559,7 @@ packages:
   - ecmwf-opendata>=0.3 ; extra == 'nwp'
   - ecmwflibs ; sys_platform == 'win32' and extra == 'nwp'
   - earthlens[s3] ; extra == 'radar'
+  - earthlens[s3] ; extra == 'goes'
   - pyramids-gis[stac]>=0.38.0 ; extra == 'stac'
   - openeo>=0.47,<0.48 ; extra == 'openeo'
   - sentinelhub>=3.11.5 ; extra == 'sentinel-hub'
@@ -12577,7 +12578,7 @@ packages:
   - erddapy>=3.0 ; extra == 'erddap'
   - overpy>=0.7 ; extra == 'osm'
   - ohsome>=0.4.0 ; extra == 'osm'
-  - earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,fdsn,earthdata,asf,hdx,eea-aq,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap] ; extra == 'all'
+  - earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,fdsn,earthdata,asf,hdx,eea-aq,eumetsat,nwp,nwm,radar,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap] ; extra == 'all'
   requires_python: '>=3.11,<4'
 - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
   name: eccodes
