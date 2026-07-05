@@ -161,19 +161,21 @@ _LEVEL_TITLE_TO_MNEMONIC: dict[str, str] = {
 
 
 def _headers(api_key: str | None = None) -> dict[str, str]:
-    """Build request headers, adding the GFW key header when given.
+    """Build the per-call GFW `x-api-key` header, when given.
+
+    The descriptive `User-Agent` rides on every request via `HttpClient`'s
+    client-level default (set in :func:`_request_json`), so it does not need
+    to be re-set here — a per-call `User-Agent` header would only shadow the
+    identical default.
 
     Args:
         api_key: The GFW `x-api-key`, or `None` for the keyless public sources.
 
     Returns:
-        dict[str, str]: Headers carrying the `User-Agent` (always) and the
-            `x-api-key` (only when `api_key` is not `None`).
+        dict[str, str]: `{GFW_KEY_HEADER: api_key}` when a key is given, else
+            an empty dict.
     """
-    headers = {"User-Agent": _USER_AGENT}
-    if api_key is not None:
-        headers[GFW_KEY_HEADER] = api_key
-    return headers
+    return {GFW_KEY_HEADER: api_key} if api_key is not None else {}
 
 
 def thinkhazard_query(
