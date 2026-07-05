@@ -16,6 +16,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pytest
 
 from earthlens.drought import Drought
@@ -464,10 +465,19 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
     read_calls: list[str] = []
 
     class _FakeDataset:
+        # A full-width -180..180 strip, latitude-cropped like the real
+        # Copernicus server returns — so the backend's `_clip_wcs_raster`
+        # windows it down to the requested lon_lim.
+        bbox = [-180.0, 40.0, 180.0, 50.0]
+        no_data_value = (None,)
+
         @classmethod
         def read_file(cls, path):
             read_calls.append(path)
             return _FakeDataset()
+
+        def read_array(self):
+            return np.zeros((10, 360), dtype="uint8")
 
         def close(self):
             pass
@@ -507,9 +517,15 @@ def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
         Path(target).write_bytes(b"MM\x00*FAKE")
 
     class _FakeDataset:
+        bbox = [-180.0, 40.0, 180.0, 50.0]
+        no_data_value = (None,)
+
         @classmethod
         def read_file(cls, path):
             return _FakeDataset()
+
+        def read_array(self):
+            return np.zeros((10, 360), dtype="uint8")
 
         def close(self):
             pass
@@ -530,6 +546,39 @@ def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
     backend.download(progress_bar=False)
     assert seen and all("map=DO_WCS" in u for u in seen)
     assert all("GDO_WCS" not in u for u in seen)
+
+
+def test_clip_wcs_raster_trims_full_width_strip_to_bbox():
+    """`_clip_wcs_raster` windows a global-width WCS strip down to the bbox.
+
+    Regression: the Copernicus EDO/GDO server honours the `Lat` subset but
+    ignores `Long`, returning a full -180..180 strip with no embedded SRS, so
+    the backend must clip longitude locally rather than trust the server.
+    """
+    from pyramids.dataset import Dataset
+
+    # 64 rows over lat 36..52, 1440 cols over lon -180..180 (0.25 deg cells).
+    arr = np.arange(64 * 1440, dtype="float32").reshape(64, 1440)
+    geo = (-180.0, 0.25, 0.0, 52.0, 0.0, -0.25)
+    strip = Dataset.create_from_array(arr=arr, geo=geo, epsg=4326, no_data_value=None)
+
+    clipped = Drought._clip_wcs_raster(strip, (-10.0, 36.0, 12.0, 52.0))
+
+    assert clipped is not None
+    assert [round(b, 2) for b in clipped.bbox] == [-10.0, 36.0, 12.0, 52.0]
+    assert clipped.columns < strip.columns  # longitude trimmed
+    assert clipped.rows == strip.rows  # latitude already full-height
+
+
+def test_clip_wcs_raster_returns_none_when_bbox_outside_coverage():
+    """A bbox entirely outside the raster yields `None` (original untouched)."""
+    from pyramids.dataset import Dataset
+
+    arr = np.zeros((4, 8), dtype="uint8")  # covers lon 0..8, lat 0..4
+    geo = (0.0, 1.0, 0.0, 4.0, 0.0, -1.0)
+    ds = Dataset.create_from_array(arr=arr, geo=geo, epsg=4326, no_data_value=None)
+
+    assert Drought._clip_wcs_raster(ds, (20.0, 20.0, 30.0, 30.0)) is None
 
 
 def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
