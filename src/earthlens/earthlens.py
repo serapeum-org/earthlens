@@ -1084,9 +1084,16 @@ class EarthLens:
         # currently only CMIP6 — address their data purely by facet keywords
         # (`variable_id=`, `source_id=`, ...) and declare no `variables`
         # parameter; those neither require nor accept `variables=`/`dataset=`.
+        # A backend is treated as facet-only *only* when its constructor
+        # explicitly declares neither `variables` nor a catch-all `**kwargs`
+        # (a `MagicMock` test double, or any pass-through signature, keeps the
+        # historical variables-required behaviour).
         backend_cls = self.DataSources[data_source]
         backend_params = inspect.signature(backend_cls.__init__).parameters
-        requires_variables = "variables" in backend_params
+        has_var_keyword = any(
+            p.kind is inspect.Parameter.VAR_KEYWORD for p in backend_params.values()
+        )
+        requires_variables = "variables" in backend_params or has_var_keyword
         if requires_variables:
             if variables is None and dataset is None:
                 raise ValueError(
