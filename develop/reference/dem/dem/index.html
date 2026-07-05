@@ -23954,11 +23954,10 @@ integer arithmetic.</p>
 <p>Snaps the bbox to the integer-degree tile grid: for each axis the
 minimum corner is floored and the maximum corner is included up to
 (and excluding) the ceiling. A bbox that lies entirely inside a
-single tile still returns that tile. Latitude values are clamped to
-the grid range <code>[-90, 89]</code>; longitude is normalised into
-<code>[-180, 179]</code> so a value on the antimeridian (<code>180</code>) maps to
-<code>-180</code> and a bbox that straddles it is split into a west and east
-slice.</p>
+single tile still returns that tile. Latitude and longitude values
+are clamped to the WGS84 grid range.</p>
+<p>Antimeridian-straddling bboxes (<code>lon_min &gt; lon_max</code>) are not
+supported in this first cut — pass the two halves in separate calls.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -24101,11 +24100,6 @@ axis value is outside the WGS84 range.</p>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="p">[(</span><span class="n">t</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">bbox_to_tiles</span><span class="p">(</span><span class="mf">30.2</span><span class="p">,</span> <span class="mf">30.8</span><span class="p">,</span> <span class="mf">31.2</span><span class="p">,</span> <span class="mf">31.8</span><span class="p">)]</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">[(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">)]</span>
 </code></pre></div></li>
-<li>A bbox straddling the antimeridian returns tiles on both sides:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.dem._helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">bbox_to_tiles</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">t</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">bbox_to_tiles</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">179.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">179.6</span><span class="p">))</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">180</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">179</span><span class="p">)]</span>
-</code></pre></div></li>
 </ul>
 
 
@@ -24170,17 +24164,7 @@ axis value is outside the WGS84 range.</p>
 <span class="normal"><a href="#__codelineno-0-173">173</a></span>
 <span class="normal"><a href="#__codelineno-0-174">174</a></span>
 <span class="normal"><a href="#__codelineno-0-175">175</a></span>
-<span class="normal"><a href="#__codelineno-0-176">176</a></span>
-<span class="normal"><a href="#__codelineno-0-177">177</a></span>
-<span class="normal"><a href="#__codelineno-0-178">178</a></span>
-<span class="normal"><a href="#__codelineno-0-179">179</a></span>
-<span class="normal"><a href="#__codelineno-0-180">180</a></span>
-<span class="normal"><a href="#__codelineno-0-181">181</a></span>
-<span class="normal"><a href="#__codelineno-0-182">182</a></span>
-<span class="normal"><a href="#__codelineno-0-183">183</a></span>
-<span class="normal"><a href="#__codelineno-0-184">184</a></span>
-<span class="normal"><a href="#__codelineno-0-185">185</a></span>
-<span class="normal"><a href="#__codelineno-0-186">186</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="k">def</span><span class="w"> </span><span class="nf">bbox_to_tiles</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-176">176</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="k">def</span><span class="w"> </span><span class="nf">bbox_to_tiles</span><span class="p">(</span>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a>    <span class="n">lat_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a>    <span class="n">lat_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a>    <span class="n">lon_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -24191,11 +24175,11 @@ axis value is outside the WGS84 range.</p>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    Snaps the bbox to the integer-degree tile grid: for each axis the</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    minimum corner is floored and the maximum corner is included up to</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    (and excluding) the ceiling. A bbox that lies entirely inside a</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    single tile still returns that tile. Latitude values are clamped to</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    the grid range `[-90, 89]`; longitude is normalised into</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    `[-180, 179]` so a value on the antimeridian (`180`) maps to</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    `-180` and a bbox that straddles it is split into a west and east</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    slice.</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    single tile still returns that tile. Latitude and longitude values</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    are clamped to the WGS84 grid range.</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    Antimeridian-straddling bboxes (`lon_min &gt; lon_max`) are not</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    supported in this first cut — pass the two halves in separate calls.</span>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        lat_min: Southern edge of the bbox in degrees.</span>
@@ -24220,36 +24204,26 @@ axis value is outside the WGS84 range.</p>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">            [(30, 31)]</span>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        - A bbox straddling the antimeridian returns tiles on both sides:</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            &gt;&gt;&gt; from earthlens.dem._helpers import bbox_to_tiles</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            &gt;&gt;&gt; sorted((t.lat, t.lon) for t in bbox_to_tiles(0.4, 0.6, 179.6, -179.6))</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            [(0, -180), (0, 179)]</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>    <span class="k">if</span> <span class="n">lat_min</span> <span class="o">&gt;</span> <span class="n">lat_max</span><span class="p">:</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lat_min </span><span class="si">{</span><span class="n">lat_min</span><span class="si">}</span><span class="s2"> &gt; lat_max </span><span class="si">{</span><span class="n">lat_max</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mf">90.0</span> <span class="o">&lt;=</span> <span class="n">lat_min</span> <span class="o">&lt;=</span> <span class="mf">90.0</span> <span class="ow">and</span> <span class="o">-</span><span class="mf">90.0</span> <span class="o">&lt;=</span> <span class="n">lat_max</span> <span class="o">&lt;=</span> <span class="mf">90.0</span><span class="p">):</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a>            <span class="sa">f</span><span class="s2">&quot;latitude out of [-90, 90]: lat_min=</span><span class="si">{</span><span class="n">lat_min</span><span class="si">}</span><span class="s2">, lat_max=</span><span class="si">{</span><span class="n">lat_max</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>        <span class="p">)</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mf">180.0</span> <span class="o">&lt;=</span> <span class="n">lon_min</span> <span class="o">&lt;=</span> <span class="mf">180.0</span> <span class="ow">and</span> <span class="o">-</span><span class="mf">180.0</span> <span class="o">&lt;=</span> <span class="n">lon_max</span> <span class="o">&lt;=</span> <span class="mf">180.0</span><span class="p">):</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>            <span class="sa">f</span><span class="s2">&quot;longitude out of [-180, 180]: lon_min=</span><span class="si">{</span><span class="n">lon_min</span><span class="si">}</span><span class="s2">, lon_max=</span><span class="si">{</span><span class="n">lon_max</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a>        <span class="p">)</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="c1"># A `lon_min &gt; lon_max` bbox is read as an antimeridian straddle: the</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="c1"># covered range is `[lon_min, 180)` unioned with `[-180, lon_max]`.</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>    <span class="n">lat_origins</span> <span class="o">=</span> <span class="n">_axis_origins</span><span class="p">(</span><span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">,</span> <span class="n">min_index</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">max_index</span><span class="o">=</span><span class="mi">89</span><span class="p">)</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>    <span class="k">if</span> <span class="n">lon_min</span> <span class="o">&lt;=</span> <span class="n">lon_max</span><span class="p">:</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>        <span class="n">lon_origins</span> <span class="o">=</span> <span class="n">_axis_origins</span><span class="p">(</span><span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">,</span> <span class="n">min_index</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="n">max_index</span><span class="o">=</span><span class="mi">179</span><span class="p">)</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>        <span class="c1"># Antimeridian split: `[lon_min, 180)` unioned with `[-180, lon_max]`.</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>        <span class="n">west</span> <span class="o">=</span> <span class="n">_axis_origins</span><span class="p">(</span><span class="n">lon_min</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="n">min_index</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="n">max_index</span><span class="o">=</span><span class="mi">179</span><span class="p">)</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="n">east</span> <span class="o">=</span> <span class="n">_axis_origins</span><span class="p">(</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">,</span> <span class="n">min_index</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="n">max_index</span><span class="o">=</span><span class="mi">179</span><span class="p">)</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="n">lon_origins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">west</span> <span class="o">+</span> <span class="n">east</span><span class="p">))</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">lat</span> <span class="ow">in</span> <span class="n">lat_origins</span> <span class="k">for</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">lon_origins</span><span class="p">]</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>    <span class="k">if</span> <span class="n">lat_min</span> <span class="o">&gt;</span> <span class="n">lat_max</span><span class="p">:</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lat_min </span><span class="si">{</span><span class="n">lat_min</span><span class="si">}</span><span class="s2"> &gt; lat_max </span><span class="si">{</span><span class="n">lat_max</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a>    <span class="k">if</span> <span class="n">lon_min</span> <span class="o">&gt;</span> <span class="n">lon_max</span><span class="p">:</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a>            <span class="sa">f</span><span class="s2">&quot;lon_min </span><span class="si">{</span><span class="n">lon_min</span><span class="si">}</span><span class="s2"> &gt; lon_max </span><span class="si">{</span><span class="n">lon_max</span><span class="si">}</span><span class="s2"> — antimeridian-straddling &quot;</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a>            <span class="s2">&quot;bboxes are not supported; pass the two halves in separate calls.&quot;</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a>        <span class="p">)</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mf">90.0</span> <span class="o">&lt;=</span> <span class="n">lat_min</span> <span class="o">&lt;=</span> <span class="mf">90.0</span> <span class="ow">and</span> <span class="o">-</span><span class="mf">90.0</span> <span class="o">&lt;=</span> <span class="n">lat_max</span> <span class="o">&lt;=</span> <span class="mf">90.0</span><span class="p">):</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a>            <span class="sa">f</span><span class="s2">&quot;latitude out of [-90, 90]: lat_min=</span><span class="si">{</span><span class="n">lat_min</span><span class="si">}</span><span class="s2">, lat_max=</span><span class="si">{</span><span class="n">lat_max</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a>        <span class="p">)</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mf">180.0</span> <span class="o">&lt;=</span> <span class="n">lon_min</span> <span class="o">&lt;=</span> <span class="mf">180.0</span> <span class="ow">and</span> <span class="o">-</span><span class="mf">180.0</span> <span class="o">&lt;=</span> <span class="n">lon_max</span> <span class="o">&lt;=</span> <span class="mf">180.0</span><span class="p">):</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>            <span class="sa">f</span><span class="s2">&quot;longitude out of [-180, 180]: lon_min=</span><span class="si">{</span><span class="n">lon_min</span><span class="si">}</span><span class="s2">, lon_max=</span><span class="si">{</span><span class="n">lon_max</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>        <span class="p">)</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="n">lat_origins</span> <span class="o">=</span> <span class="n">_axis_origins</span><span class="p">(</span><span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">,</span> <span class="n">min_index</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">max_index</span><span class="o">=</span><span class="mi">89</span><span class="p">)</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="n">lon_origins</span> <span class="o">=</span> <span class="n">_axis_origins</span><span class="p">(</span><span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">,</span> <span class="n">min_index</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="n">max_index</span><span class="o">=</span><span class="mi">179</span><span class="p">)</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">lat</span> <span class="ow">in</span> <span class="n">lat_origins</span> <span class="k">for</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">lon_origins</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

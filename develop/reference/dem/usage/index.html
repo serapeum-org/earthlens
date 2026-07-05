@@ -3530,17 +3530,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#antimeridian-bboxes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Antimeridian bboxes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-the-backend-doesnt-do" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -18561,17 +18550,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#antimeridian-bboxes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Antimeridian bboxes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-the-backend-doesnt-do" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -18701,17 +18679,6 @@ token, so files from the two datasets never collide:</p>
 </code></pre></div>
 <p>GLO-90 files are ~10 x smaller than GLO-30 files, which is helpful for
 continental-scale surveys where the finer resolution is not needed.</p>
-<h2 id="antimeridian-bboxes"><a class="toclink" href="#antimeridian-bboxes">Antimeridian bboxes</a><a class="headerlink" href="#antimeridian-bboxes" title="Permanent link">#</a></h2>
-<p>A bbox that straddles the antimeridian is expressed with <code>lon_min &gt;
-lon_max</code>. The backend splits it into a west and east slice and fetches
-tiles from both:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;dem&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">179.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">179.6</span><span class="p">],</span>   <span class="c1"># crosses the antimeridian</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;antimeridian_out&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
 <h2 id="what-the-backend-doesnt-do"><a class="toclink" href="#what-the-backend-doesnt-do">What the backend doesn't do</a><a class="headerlink" href="#what-the-backend-doesnt-do" title="Permanent link">#</a></h2>
 <ul>
 <li><strong>No server-side spatial subset.</strong> The buckets serve whole 1° COGs —
