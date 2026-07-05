@@ -270,7 +270,7 @@ class TestGriddap:
         """An out-of-coverage griddap response surfaces as a clear ValueError."""
         from tests.erddap.conftest import FakeResponse
 
-        def _get(url, timeout=None):
+        def _get(url, **kwargs):
             return FakeResponse(
                 error=requests.exceptions.HTTPError("Error 404: out of range")
             )
@@ -283,7 +283,7 @@ class TestGriddap:
         """A 200 response with an HTML error body is rejected, not written."""
         from tests.erddap.conftest import FakeResponse
 
-        def _get(url, timeout=None):
+        def _get(url, **kwargs):
             return FakeResponse(content=b"<html><body>Resource not found</body></html>")
 
         monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)

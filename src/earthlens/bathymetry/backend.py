@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import difflib
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import requests
@@ -35,6 +35,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.http import HttpClient
 from earthlens.bathymetry._helpers import (
     bbox_from_extent,
     estimate_grid_pixels,
@@ -55,6 +56,20 @@ _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HD
 #: (≈ a 0.25-gigapixel grid). The server enforces the hard cap; this is an
 #: early heads-up for the user.
 _LARGE_PIXEL_THRESHOLD = 250_000_000
+
+
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so this
+    single-shot download stays a fresh connection per call and tests that
+    monkeypatch `requests.get` still drive the transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
 
 
 class Bathymetry(AbstractDataSource):
@@ -304,9 +319,15 @@ class Bathymetry(AbstractDataSource):
                 error page, sometimes served with a 200) — typically an
                 out-of-coverage or oversize bbox.
         """
+        http = HttpClient(
+            session=_RequestsGet(),
+            timeout=self._timeout,
+            max_retries=0,
+            status_forcelist=(),
+            raise_for_status=True,
+        )
         try:
-            response = requests.get(url, timeout=self._timeout)
-            response.raise_for_status()
+            response = http.get(url)
         except requests.exceptions.RequestException as exc:
             raise ValueError(
                 f"bathymetry request for {row.id!r} failed over "

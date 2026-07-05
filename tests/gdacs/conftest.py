@@ -86,6 +86,8 @@ class _FakeResponse:
     def __init__(self, payload: dict[str, Any], status_error: Exception | None):
         self._payload = payload
         self._status_error = status_error
+        self.status_code = 200
+        self.headers: dict[str, str] = {}
 
     def raise_for_status(self) -> None:
         if self._status_error is not None:
@@ -93,6 +95,10 @@ class _FakeResponse:
 
     def json(self) -> dict[str, Any]:
         return self._payload
+
+    def close(self) -> None:
+        """Match the `requests.Response.close` shape (no-op)."""
+        return None
 
 
 class _FakeGdacs:
@@ -103,10 +109,10 @@ class _FakeGdacs:
         self.payload: dict[str, Any] = _make_payload()
         self.status_error: Exception | None = None
 
-    def __call__(
-        self, url: str, params: dict[str, Any], timeout: float
-    ) -> _FakeResponse:
-        self.calls.append({"url": url, "params": params, "timeout": timeout})
+    def __call__(self, url: str, **kwargs: Any) -> _FakeResponse:
+        entry: dict[str, Any] = {"url": url}
+        entry.update(kwargs)
+        self.calls.append(entry)
         return _FakeResponse(self.payload, self.status_error)
 
     def set_payload(self, payload: dict[str, Any]) -> None:

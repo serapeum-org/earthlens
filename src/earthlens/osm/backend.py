@@ -37,7 +37,7 @@ from __future__ import annotations
 import datetime as dt
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import requests
@@ -50,6 +50,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.http import HttpClient
 from earthlens.osm._helpers import (
     LicenseWarning,
     bbox_swne,
@@ -102,6 +103,26 @@ _DEFAULT_MAX_BBOX_DEG2 = 100.0
 #: degenerate thin-but-globe-spanning box (e.g. `0.1° x 360°`, ~36 square
 #: degrees) is still rejected — the area cap alone would let it through.
 _MAX_BBOX_SPAN_DEG = 90.0
+
+
+class _RequestsHttp:
+    """Session-like adapter routing GET/POST through the module `requests`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the module-level
+    `requests.get` / `requests.post` (rather than a private session) so this
+    single-shot Overpass POST stays a fresh connection per call, and so tests
+    that monkeypatch `earthlens.osm.backend.requests.post` still drive the
+    transport (`HttpClient._send` calls `getattr(session, "post")` first, so
+    a shim with both `get` and `post` works for either verb).
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
+
+    def post(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a POST via the module-level `requests.post`."""
+        return requests.post(url, **kwargs)
 
 
 class OSM(AbstractDataSource):
@@ -385,11 +406,15 @@ class OSM(AbstractDataSource):
     def _fetch_overpass(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one Overpass query: POST the QL (with UA), parse, build geometry.
 
-        POSTs the resolved Overpass QL to `self._endpoint` with core
-        `requests` (a descriptive `User-Agent` — required to avoid the
-        overpass-api.de 406 — and `self._timeout`), parses the JSON with
-        `overpy.Overpass().parse_json(...)`, and converts the parsed
-        elements to a `FeatureCollection` via `overpy_to_gdf` / `to_fc`.
+        POSTs the resolved Overpass QL to `self._endpoint` through the shared
+        :class:`~earthlens.base.http.HttpClient` (a descriptive
+        `User-Agent` — required to avoid the overpass-api.de 406 — applied at
+        the client level via `default_headers`, and `self._timeout`), parses
+        the JSON with `overpy.Overpass().parse_json(...)`, and converts the
+        parsed elements to a `FeatureCollection` via `overpy_to_gdf` / `to_fc`.
+        The client is single-shot (`max_retries=0`, empty
+        `status_forcelist`), so behaviour matches the previous bare
+        `requests.post`: no retry, non-2xx statuses propagate immediately.
 
         Args:
             query_id: The named-query id (for logging).
@@ -422,13 +447,15 @@ class OSM(AbstractDataSource):
             "{timeout}", str(int(self._timeout))
         )
         logger.info(f"Querying Overpass for {query_id!r} over bbox ({bbox_str})")
-        response = requests.post(
-            self._endpoint,
-            data={"data": ql},
-            headers={"User-Agent": self._user_agent},
+        http = HttpClient(
+            session=_RequestsHttp(),
+            user_agent=self._user_agent,
             timeout=self._timeout,
+            max_retries=0,
+            status_forcelist=(),
+            raise_for_status=True,
         )
-        response.raise_for_status()
+        response = http.post(self._endpoint, data={"data": ql})
         result = overpy.Overpass().parse_json(response.text)
         return to_fc(overpy_to_gdf(result))
 

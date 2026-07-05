@@ -25,6 +25,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import requests
+
+from earthlens.base.http import HttpClient
+
 if TYPE_CHECKING:
     import pandas as pd
 
@@ -136,6 +140,20 @@ class ResolvedStore:
         return "_".join(str(p).replace("/", "-") for p in parts if p)
 
 
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so this
+    single-shot download stays a fresh connection per call and tests that
+    monkeypatch `requests.get` still drive the transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
+
+
 class StoreResolver:
     """Resolve CMIP6 facet tuples to `zstore` URIs over the consolidated CSV.
 
@@ -196,30 +214,44 @@ class StoreResolver:
     def _ensure_csv(self) -> Path:
         """Return the cached CSV path, downloading it once if absent.
 
+        Streams through :class:`~earthlens.base.http.HttpClient`'s atomic
+        `download` (temp `.part` file + rename, cleanup on failure), then
+        enforces the non-empty invariant: a zero-byte transfer unlinks the
+        cache and raises rather than caching a useless file.
+
         Returns:
             Path: The local cache path (guaranteed to exist and be non-empty).
 
         Raises:
-            RuntimeError: If the download fails or yields an empty file.
+            requests.RequestException: On a transport error or a non-2xx
+                status from the download (`HttpClient.download` calls
+                `raise_for_status` — this covers `HTTPError` for a 4xx/5xx
+                on the CSV, `ConnectionError` for a network failure, and
+                `Timeout` if the transfer stalls past `self.timeout`).
+            OSError: If the atomic rename of the `.part` temp to
+                `cache_path` fails.
+            RuntimeError: When the download succeeds but yields a
+                zero-byte CSV (the cache is unlinked before raising).
         """
         if self.cache_path.exists() and self.cache_path.stat().st_size > 0:
             return self.cache_path
-        import requests
-
-        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = self.cache_path.with_name(self.cache_path.name + ".part")
-        try:
-            with requests.get(self.csv_url, stream=True, timeout=self.timeout) as resp:
-                resp.raise_for_status()
-                with open(tmp, "wb") as handle:
-                    for chunk in resp.iter_content(chunk_size=1 << 20):
-                        handle.write(chunk)
-            if tmp.stat().st_size == 0:
-                raise RuntimeError(f"downloaded an empty CSV from {self.csv_url}")
-            tmp.replace(self.cache_path)
-        except BaseException:
-            tmp.unlink(missing_ok=True)
-            raise
+        client = HttpClient(
+            session=_RequestsGet(),
+            timeout=self.timeout,
+            max_retries=0,
+            status_forcelist=(),
+            raise_for_status=True,
+        )
+        client.download(
+            self.csv_url,
+            self.cache_path,
+            chunk=1 << 20,
+            atomic=True,
+            progress=False,
+        )
+        if self.cache_path.stat().st_size == 0:
+            self.cache_path.unlink(missing_ok=True)
+            raise RuntimeError(f"downloaded an empty CSV from {self.csv_url}")
         return self.cache_path
 
     def resolve(
