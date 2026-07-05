@@ -296,10 +296,11 @@ class EarthLens:
             ['admin', 'admin-boundaries', 'airnow', 'alaska-satellite-facility',
              'amazon-s3', 'argo', 'argo-floats', 'argopy', 'asf', 'bathymetry',
              'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
-             'climate-projections', 'climate_indices', 'cmems', 'cmip6', 'dea',
-             'deafrica', 'digital-earth-africa', 'digital-earth-australia',
+             'climate-projections', 'climate_indices', 'cmems', 'cmip6',
+             'cop-dem', 'copernicus-dem', 'dea',
+             'deafrica', 'dem', 'digital-earth-africa', 'digital-earth-australia',
              'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo',
-             'eea-aq', 'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal',
+             'eea-aq', 'elevation', 'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal',
              'gbif', 'gdacs', 'gdo', 'gebco', 'gee', 'geoboundaries',
              'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
              'global-forest-watch', 'global-solar-atlas',
@@ -812,6 +813,14 @@ class EarthLens:
             # open, CC-BY 4.0, no auth. Alias "isric".
             "soilgrids": ("earthlens.soilgrids", "SoilGrids", "", {}),
             "isric": ("earthlens.soilgrids", "SoilGrids", "", {}),
+            # Copernicus DEM (GLO-30 / GLO-90) over the anonymous AWS Open
+            # Data buckets — the account-free path to a global DEM. Reuses
+            # the [s3] unsigned-boto3 substrate; no new SDK. Aliases
+            # "copernicus-dem" / "cop-dem" / "elevation".
+            "dem": ("earthlens.dem", "DEM", "s3", {}),
+            "copernicus-dem": ("earthlens.dem", "DEM", "s3", {}),
+            "cop-dem": ("earthlens.dem", "DEM", "s3", {}),
+            "elevation": ("earthlens.dem", "DEM", "s3", {}),
             # Drought-indicator backend over three live public services:
             # USDM (vector GeoJSON polygon classes), Copernicus EDO/GDO (raster
             # via the Copernicus drought GetCoverage REST endpoint —
