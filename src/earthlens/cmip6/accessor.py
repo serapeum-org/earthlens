@@ -172,7 +172,13 @@ def resolve_time_window(
         return None
     labeled = _labeled_reader()
     with anonymous_gcs():
-        dataset = labeled.read_file(zstore, variables=[variable], anon=True)
+        # engine="zarr" forces the Zarr driver explicitly: a CMIP6 store URI ends
+        # in /v<YYYYMMDD>/ (never `.zarr`), so pyramids' suffix-based auto-detect
+        # would otherwise open it down the NetCDF branch — asymmetric with
+        # write_subset, which opens the same store through the ZARR: /vsigs/ path.
+        dataset = labeled.read_file(
+            zstore, variables=[variable], anon=True, engine="zarr"
+        )
         try:
             total = int(dataset.sizes.get(time_dim, 0))
             if total == 0:

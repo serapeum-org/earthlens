@@ -79,7 +79,7 @@ def test_resolve_time_window_empty_store_is_none(monkeypatch):
 
     class _EmptyReader:
         @staticmethod
-        def read_file(store, *, variables=None, anon=False):
+        def read_file(store, *, variables=None, anon=False, engine=None):
             return FakeLabeled(kept=[])
 
     monkeypatch.setattr(accessor, "_labeled_reader", lambda: _EmptyReader)
@@ -199,7 +199,7 @@ class _FakeLabeledReader:
     """Reader whose read_file returns a fixed-axis FakeLabeled."""
 
     @staticmethod
-    def read_file(store, *, variables=None, anon=False):
+    def read_file(store, *, variables=None, anon=False, engine=None):
         """Return a fake labelled dataset (ignoring the store)."""
         return FakeLabeled()
 
@@ -208,7 +208,7 @@ class _RaisingLabeledReader:
     """Reader whose select_time raises to exercise the wrap branch."""
 
     @staticmethod
-    def read_file(store, *, variables=None, anon=False):
+    def read_file(store, *, variables=None, anon=False, engine=None):
         """Return a fake dataset whose select_time always raises."""
         return _RaisingLabeled()
 
