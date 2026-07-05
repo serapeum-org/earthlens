@@ -123,6 +123,61 @@ class TestRequestJsonRetry:
             _helpers.inform_query(505, "INFORM")
         assert returns_404.calls == 1
 
+    def test_timeout_is_retried(self, monkeypatch):
+        """A Timeout is transient and retried, then the next attempt succeeds."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet([_helpers.requests.Timeout("slow")], {"data": [1]})
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        assert _helpers.thinkhazard_query("133") is not None
+        assert flaky.attempts == 2
+
+    def test_chunked_encoding_error_is_retried(self, monkeypatch):
+        """A mid-body ChunkedEncodingError (the GFW case) is retried."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet(
+            [_helpers.requests.exceptions.ChunkedEncodingError("mid-body")],
+            {"data": [1]},
+        )
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        assert _helpers.gfw_query("d", "v", "SELECT 1", api_key="k") == {"data": [1]}
+        assert flaky.attempts == 2
+
+    def test_content_decoding_error_is_retried(self, monkeypatch):
+        """A ContentDecodingError is transient and retried."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet(
+            [_helpers.requests.exceptions.ContentDecodingError("gzip")],
+            {"data": [1]},
+        )
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        assert _helpers.gfw_query("d", "v", "SELECT 1", api_key="k") == {"data": [1]}
+        assert flaky.attempts == 2
+
+    def test_5xx_is_retried(self, monkeypatch):
+        """A 5xx status is retried via the 500-599 forcelist."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        first_503 = _HttpError(503)
+        second_ok = _Resp({"data": [1]})
+        responses = iter([first_503, second_ok])
+        calls = {"n": 0}
+
+        def fake_get(url, **kwargs):
+            calls["n"] += 1
+            return next(responses)
+
+        monkeypatch.setattr(_helpers.requests, "get", fake_get)
+        assert _helpers.gfw_query("d", "v", "SELECT 1", api_key="k") == {"data": [1]}
+        assert calls["n"] == 2
+
+    def test_bare_request_exception_fails_fast(self, monkeypatch):
+        """A bare RequestException (not in retry_on_exceptions) is not retried."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet([_helpers.requests.RequestException("weird")], {"data": [1]})
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        with pytest.raises(_helpers.requests.RequestException):
+            _helpers.thinkhazard_query("133")
+        assert flaky.attempts == 1
+
 
 class TestThinkhazardQuery:
     """thinkhazard_query builds the public report URL, no key header."""
