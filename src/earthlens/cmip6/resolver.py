@@ -279,8 +279,8 @@ class StoreResolver:
                 available = sorted(frame[facet].dropna().astype(str).unique())
                 raise ValueError(
                     f"no CMIP6 store matches {facet}={value!r} for the requested "
-                    f"facets so far ({self._describe(requested, facet)}). "
-                    f"Available {facet}: {available}."
+                    f"facets so far ({self._describe(requested, facet)}); "
+                    f"{self._available_hint(facet, value, available)}"
                 )
             frame = narrowed
         frame = self._select_version(frame, version)
@@ -360,3 +360,29 @@ class StoreResolver:
             if value is not None:
                 applied.append(f"{facet}={value}")
         return ", ".join(applied) if applied else "no prior facets"
+
+    @staticmethod
+    def _available_hint(facet: str, value: str, available: list[str], limit: int = 20) -> str:
+        """Build a concise "available values" hint with a did-you-mean.
+
+        Keeps the miss message readable on a high-cardinality facet (a
+        `source_id` / `variable_id` miss can leave 100s of candidates) by
+        capping the listed values and adding the closest match as a
+        did-you-mean, mirroring the catalog's `difflib` lookups.
+
+        Args:
+            facet: The facet that eliminated every row.
+            value: The requested (unmatched) value.
+            available: The sorted values that were still available.
+            limit: Maximum number of values to list before truncating.
+
+        Returns:
+            str: `available {facet}: [v1, …][, +K more]. Did you mean 'x'?`.
+        """
+        import difflib
+
+        close = difflib.get_close_matches(str(value), available, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        shown = available[:limit]
+        tail = f", +{len(available) - limit} more" if len(available) > limit else ""
+        return f"available {facet}: {shown}{tail}.{hint}"

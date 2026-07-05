@@ -67,6 +67,29 @@ def test_resolve_miss_describes_prior_facets(resolver):
         )
 
 
+def test_resolve_miss_did_you_mean(resolver):
+    """A near-miss facet value gets a concise did-you-mean suggestion."""
+    with pytest.raises(ValueError, match="Did you mean 'CanESM5'"):
+        resolver.resolve(
+            source_id="CanESM", experiment_id="ssp585", variable_id="tas", table_id="Amon",
+        )
+
+
+def test_resolve_miss_caps_long_value_list():
+    """A miss on a high-cardinality facet truncates the listed values."""
+    rows = [
+        {"source_id": f"MODEL-{i:03d}", "experiment_id": "ssp585", "variable_id": "tas",
+         "table_id": "Amon", "grid_label": "gn", "version": 1,
+         "zstore": f"gs://cmip6/{i}/"}
+        for i in range(40)
+    ]
+    resolver = StoreResolver("http://x/y.csv", ["source_id"], frame=pd.DataFrame(rows))
+    with pytest.raises(ValueError, match=r"\+20 more"):
+        resolver.resolve(
+            source_id="NOPE", experiment_id="ssp585", variable_id="tas", table_id="Amon",
+        )
+
+
 def test_resolve_explicit_version_miss(resolver):
     """An explicit version with no match lists the available versions."""
     with pytest.raises(ValueError, match="available versions"):
