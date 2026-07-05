@@ -128,6 +128,21 @@ class TestBboxToTiles:
         tiles = bbox_to_tiles(0.0, 0.0, -180.0, -180.0)
         assert [(t.lat, t.lon) for t in tiles] == [(0, -180)]
 
+    def test_non_degenerate_touching_pole_bbox(self):
+        """A bbox with only its upper edge on the pole still resolves inside the grid."""
+        # `[88.0, 90.0]` covers tiles 88 and 89; tile 90 does not exist.
+        tiles = bbox_to_tiles(88.0, 90.0, 0.0, 0.0)
+        assert sorted((t.lat, t.lon) for t in tiles) == [(88, 0), (89, 0)]
+        # `[89.5, 90.0]` covers tile 89 only.
+        tiles = bbox_to_tiles(89.5, 90.0, 0.0, 0.0)
+        assert [(t.lat, t.lon) for t in tiles] == [(89, 0)]
+        # `[-90.0, -89.5]` covers tile -90 only (its northern edge open at -89).
+        tiles = bbox_to_tiles(-90.0, -89.5, 0.0, 0.0)
+        assert [(t.lat, t.lon) for t in tiles] == [(-90, 0)]
+        # Longitude touching the antimeridian: `[179.5, 180.0]` = tile 179.
+        tiles = bbox_to_tiles(0.0, 0.0, 179.5, 180.0)
+        assert [(t.lat, t.lon) for t in tiles] == [(0, 179)]
+
     def test_whole_earth_row_major(self):
         """A whole-Earth bbox yields 180 x 360 tiles in row-major order."""
         tiles = bbox_to_tiles(-90.0, 90.0, -180.0, 180.0)
