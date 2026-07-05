@@ -113,6 +113,21 @@ class TestBboxToTiles:
         tiles = bbox_to_tiles(0.0, 0.0, 0.0, 0.0)
         assert [(t.lat, t.lon) for t in tiles] == [(0, 0)]
 
+    def test_grid_extremes_stay_within_range(self):
+        """A bbox at the pole / antimeridian edge does not emit off-grid tiles."""
+        # North pole — the last valid tile is `N89`, not `N90`.
+        tiles = bbox_to_tiles(90.0, 90.0, 0.0, 0.0)
+        assert [(t.lat, t.lon) for t in tiles] == [(89, 0)]
+        # South pole — the first valid tile is `S90`.
+        tiles = bbox_to_tiles(-90.0, -90.0, 0.0, 0.0)
+        assert [(t.lat, t.lon) for t in tiles] == [(-90, 0)]
+        # Antimeridian edge — the last valid tile is `E179`, not `E180`.
+        tiles = bbox_to_tiles(0.0, 0.0, 180.0, 180.0)
+        assert [(t.lat, t.lon) for t in tiles] == [(0, 179)]
+        # Western edge — `W180` is the first valid tile.
+        tiles = bbox_to_tiles(0.0, 0.0, -180.0, -180.0)
+        assert [(t.lat, t.lon) for t in tiles] == [(0, -180)]
+
     def test_whole_earth_row_major(self):
         """A whole-Earth bbox yields 180 x 360 tiles in row-major order."""
         tiles = bbox_to_tiles(-90.0, 90.0, -180.0, 180.0)

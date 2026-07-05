@@ -205,8 +205,8 @@ def _axis_origins(
             (`low == high == N`) still returns `[N]` — the tile that
             boundary lies inside.
     """
-    start = max(math.floor(low), min_index)
-    stop = min(math.ceil(high) - 1, max_index)
+    start = max(min(math.floor(low), max_index), min_index)
+    stop = min(max(math.ceil(high) - 1, min_index), max_index)
     if stop < start:
         # Zero-width bbox on an exact degree boundary (`low == high == N`).
         stop = start
