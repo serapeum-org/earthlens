@@ -13,7 +13,6 @@ from earthlens.cmip6.accessor import (
     anonymous_gcs,
     resolve_time_window,
     store_output_stem,
-    variable_names,
     write_subset,
     zstore_to_vsi,
 )
@@ -136,14 +135,6 @@ def test_write_subset_anonymous_during_read(monkeypatch, tmp_path):
     monkeypatch.setattr(accessor, "_netcdf_reader", lambda: _reader_returning(_Recorder()))
     write_subset("gs://cmip6/x/", "tas", bbox=None, time=0, out_path=tmp_path / "o.nc")
     assert seen["flag"] == "YES"
-
-
-def test_variable_names(monkeypatch):
-    """variable_names lists the store's data variables anonymously."""
-    monkeypatch.setattr(
-        accessor, "_netcdf_reader", lambda: _reader_returning(FakeContainer(["tas", "pr"]))
-    )
-    assert variable_names("gs://cmip6/x/") == ["tas", "pr"]
 
 
 def test_store_output_stem_with_dates():

@@ -250,25 +250,6 @@ def write_subset(
     return out
 
 
-def variable_names(zstore: str) -> list[str]:
-    """List the data-variable names in a store (anonymous open).
-
-    Args:
-        zstore: The `gs://cmip6/...` store URI.
-
-    Returns:
-        list[str]: The store's data-variable names.
-    """
-    netcdf = _netcdf_reader()
-    vsi = zstore_to_vsi(zstore)
-    with anonymous_gcs():
-        container = netcdf.read_file(vsi)
-        try:
-            return list(getattr(container, "variable_names", []) or [])
-        finally:
-            _close_quietly(container)
-
-
 def _close_quietly(handle: Any) -> None:
     """Close a pyramids reader handle, ignoring any error.
 
@@ -303,7 +284,8 @@ def store_output_stem(store: ResolvedStore, start: Any, end: Any) -> str:
             when unavailable).
     """
     stem = f"{store.slug}_v{store.version}" if store.version else store.slug
-    fragment = "_".join(_date_token(value) for value in (start, end) if _date_token(value))
+    tokens = [token for token in (_date_token(start), _date_token(end)) if token]
+    fragment = "_".join(tokens)
     return f"{stem}_{fragment}" if fragment else stem
 
 
