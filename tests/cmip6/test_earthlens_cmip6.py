@@ -85,6 +85,15 @@ def test_facade_forwards_optional_facets():
     assert el.datasource._whole_time is True
 
 
+def test_facade_missing_facet_friendly_error():
+    """Omitting a required facet entirely raises a friendly ValueError."""
+    with pytest.raises(ValueError, match="requires a non-empty variable_id"):
+        EarthLens(
+            "cmip6", source_id="CanESM5", experiment_id="ssp585", table_id="Amon",
+            start="2050-01-01", end="2050-12-31",
+        )
+
+
 def test_variables_backend_still_requires_variables():
     """A normal (variables-based) backend still requires variables=."""
     with pytest.raises(ValueError, match="variables= is required"):

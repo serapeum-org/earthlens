@@ -69,10 +69,10 @@ class CMIP6(AbstractDataSource):
         start: str,
         end: str,
         *,
-        source_id: str,
-        experiment_id: str,
-        variable_id: str,
-        table_id: str,
+        source_id: str | None = None,
+        experiment_id: str | None = None,
+        variable_id: str | None = None,
+        table_id: str | None = None,
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         member_id: str | None = None,
@@ -119,7 +119,8 @@ class CMIP6(AbstractDataSource):
                 built from the catalog's CSV URL and facet columns.
 
         Raises:
-            ValueError: If a required facet is empty.
+            ValueError: If a required facet (`source_id` / `experiment_id` /
+                `variable_id` / `table_id`) or a date bound is omitted or empty.
         """
         for name, value in (
             ("source_id", source_id),
