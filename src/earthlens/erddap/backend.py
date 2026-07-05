@@ -36,7 +36,7 @@ import datetime as dt
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import requests
@@ -49,6 +49,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.http import HttpClient
 from earthlens.erddap._helpers import (
     build_constraints,
     build_griddap_url,
@@ -76,6 +77,20 @@ _NO_MATCH_MARKER = "produced no matching results"
 #: body that does not start with one of these is an error page (ERDDAP serves
 #: those as HTML, sometimes with a 200), not data.
 _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HDF")
+
+
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so the
+    single-shot griddap download stays a fresh connection per call and
+    tests that monkeypatch `requests.get` still drive the transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
 
 
 @dataclass(frozen=True)
@@ -401,9 +416,15 @@ class ERDDAP(AbstractDataSource):
         )
         dest = self.root_dir / f"{row.dataset_id}.nc"
         logger.info(f"ERDDAP griddap {row.dataset_id}: GET {url}")
+        http = HttpClient(
+            session=_RequestsGet(),
+            timeout=self._timeout,
+            max_retries=0,
+            status_forcelist=(),
+            raise_for_status=True,
+        )
         try:
-            response = requests.get(url, timeout=self._timeout)
-            response.raise_for_status()
+            response = http.get(url)
         except requests.exceptions.HTTPError as exc:
             raise ValueError(
                 f"ERDDAP griddap request for {row.dataset_id!r} failed over "
