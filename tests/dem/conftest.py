@@ -42,12 +42,6 @@ class FakeS3Client:
 
 
 @pytest.fixture
-def fake_client_all_present():
-    """Fake client that says every key requested is present."""
-    return FakeS3Client(keys=set())  # populated by tests via .keys.add(...)
-
-
-@pytest.fixture
 def make_fake_client():
     """Factory: build a `FakeS3Client` from an iterable of present keys."""
 
