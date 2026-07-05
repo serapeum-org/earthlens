@@ -252,7 +252,9 @@ class StoreResolver:
             activity_id: MIP; `None` leaves it unconstrained.
 
         Returns:
-            list[ResolvedStore]: One entry per matching store, ordered by slug.
+            list[ResolvedStore]: One entry per matching store. For
+                `version="latest"` the entries are ordered by their identity
+                facets; for an explicit version they follow CSV row order.
 
         Raises:
             ValueError: If no store matches; the message names the facet that
