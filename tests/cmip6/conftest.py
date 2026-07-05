@@ -112,7 +112,8 @@ class FakeLabeled:
 
     `select_time(start=...)` keeps steps at/after `start`; `select_time(end=...)`
     keeps steps at/before `end`, over a fixed monthly axis, so the backend's
-    date-window -> index math can be checked without a real store.
+    date-window -> index math can be checked without a real store. Like the real
+    reader, an empty single-sided selection **raises** `ValueError`.
     """
 
     _AXIS = pd.date_range("2015-01-01", periods=24, freq="MS")
@@ -126,12 +127,14 @@ class FakeLabeled:
         return {"time": len(self._kept)}
 
     def select_time(self, start: Any = None, end: Any = None, *, time_dim: str = "time") -> FakeLabeled:
-        """Return a view restricted to the in-range steps."""
+        """Return a view restricted to the in-range steps (raising when empty)."""
         kept = self._kept
         if start is not None:
             kept = kept[kept >= pd.Timestamp(start)]
         if end is not None:
             kept = kept[kept <= pd.Timestamp(end)]
+        if len(kept) == 0:
+            raise ValueError(f"no timesteps in window [{start}, {end}]")
         return FakeLabeled(kept)
 
     def close(self) -> None:

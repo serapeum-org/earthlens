@@ -93,11 +93,11 @@ def test_resolve_time_window_computes_index_range(monkeypatch):
     assert window == (0, 6)
 
 
-def test_resolve_time_window_empty_raises(monkeypatch):
-    """A window that selects no steps raises a clear ValueError."""
+def test_resolve_time_window_between_steps_raises(monkeypatch):
+    """A window falling between two steps (i1 <= i0) raises a clear ValueError."""
     monkeypatch.setattr(accessor, "_labeled_reader", lambda: _FakeLabeledReader)
     with pytest.raises(ValueError, match="no CMIP6 timesteps"):
-        resolve_time_window("gs://cmip6/x/", "tas", "2099-01-01", "2099-06-30")
+        resolve_time_window("gs://cmip6/x/", "tas", "2015-01-15", "2015-01-20")
 
 
 def test_resolve_time_window_wraps_select_error(monkeypatch):
