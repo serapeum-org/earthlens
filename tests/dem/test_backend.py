@@ -112,8 +112,10 @@ class TestFetch:
         assert client.download_calls == []
         assert any("tile absent, skipping" in message for message in caplog.messages)
 
-    def test_multi_tile_partial_coverage(self, tmp_path: Path, make_fake_client):
-        """A ragged coastline yields only the land tiles."""
+    def test_multi_tile_partial_coverage(
+        self, tmp_path: Path, make_fake_client, caplog: pytest.LogCaptureFixture
+    ):
+        """A ragged coastline yields exactly the land tiles; ocean tiles are logged."""
         src = DEM(
             variables=[],
             lat_lim=[0.5, 0.5],
@@ -122,12 +124,27 @@ class TestFetch:
         )
         products = src._search()
         assert len(products) == 3
-        # Say only the first two tiles are present.
+        # Say only the first two tiles are present — the third surfaces
+        # as a real anonymous 404 ClientError, matching the live path.
         present = [products[0].href, products[1].href]
         client = make_fake_client(present)
         _install_fake_client(src, client)
-        written = src._fetch(products)
+        from loguru import logger
+
+        handler_id = logger.add(caplog.handler, format="{message}")
+        try:
+            written = src._fetch(products)
+        finally:
+            logger.remove(handler_id)
         assert len(written) == 2
+        # The written list is the two land tiles, in bbox row-major order.
+        assert [p.name for p in written] == [
+            Path(products[0].href).name,
+            Path(products[1].href).name,
+        ]
+        # And the ocean tile's absence surfaces as a WARNING naming its S3 URI.
+        expected_uri = f"s3://{products[2].metadata['bucket']}/{products[2].href}"
+        assert any(expected_uri in message for message in caplog.messages)
 
     def test_idempotent_second_call(self, tmp_path: Path, make_fake_client):
         """A second `_fetch` after a completed download re-uses the file."""
@@ -143,8 +160,9 @@ class TestFetch:
         first = src._fetch(products)
         second = src._fetch(products)
         assert first == second
-        # Second call must not download again.
+        # Second call must not re-HEAD or re-download an existing tile.
         assert len(client.download_calls) == 1
+        assert len(client.head_calls) == 1
 
 
 class TestAggregateRejected:
@@ -221,6 +239,44 @@ class TestErrorPaths:
         _install_fake_client(src, BadClient())
         with pytest.raises(ClientError):
             src._fetch(products)
+
+    def test_not_found_substring_no_longer_swallows_endpoint_error(
+        self, tmp_path: Path
+    ):
+        """A network error carrying `Not Found` in its message must propagate.
+
+        Copernicus DEM's ocean-tile behaviour is `Error.Code == "404"`;
+        classifier must NOT match on a `"Not Found"` substring, or a DNS
+        `"Host Not Found"` / `"Endpoint Not Found"` outage would be
+        silently reported as a missing ocean tile.
+        """
+        from botocore.exceptions import ClientError
+
+        class NoisyClient:
+            def head_object(self, **_kwargs):
+                raise ClientError(
+                    {
+                        "Error": {
+                            "Code": "EndpointConnectionError",
+                            "Message": "Could not connect to the endpoint URL "
+                            "(address Not Found)",
+                        }
+                    },
+                    "HeadObject",
+                )
+
+            def download_file(self, **_kwargs):  # pragma: no cover - not reached
+                raise AssertionError("download must not run")
+
+        src = DEM(
+            variables=[],
+            lat_lim=[30.2, 30.8],
+            lon_lim=[31.2, 31.8],
+            path=tmp_path,
+        )
+        _install_fake_client(src, NoisyClient())
+        with pytest.raises(ClientError):
+            src._fetch(src._search())
 
     def test_download_error_cleans_partfile(self, tmp_path: Path):
         """A download failure removes the `.part` before propagating."""

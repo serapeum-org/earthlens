@@ -354,16 +354,18 @@ def _is_missing_object(exc: BaseException) -> bool:
     """Return whether `exc` classifies as a genuinely-absent S3 object.
 
     Anonymous `HeadObject` on a missing key raises `ClientError` with
-    `Error.Code == "404"`; the string message also carries `"Not Found"`.
-    Auth (`403` / `AccessDenied`) and bucket-level (`NoSuchBucket`)
-    errors are deliberately excluded — the caller must not report those
-    as "no data".
+    `Error.Code == "404"`, so the classifier only accepts that code (or
+    the equivalent `"NoSuchKey"`). Auth (`403` / `AccessDenied`),
+    bucket-level (`NoSuchBucket`), and network / DNS / endpoint errors
+    all carry different codes and must surface to the caller — a
+    string-substring `"Not Found"` fallback would silently misclassify
+    "Host Not Found" / "Endpoint Not Found" as ocean tiles.
 
     Args:
         exc: The exception raised by `head_object` / `download_file`.
 
     Returns:
-        bool: `True` for a 404 / NoSuchKey style error, `False` for any
-            other error class.
+        bool: `True` for a 404 / NoSuchKey error, `False` for any other
+            error class.
     """
-    return _error_code(exc) in {"404", "NoSuchKey"} or "Not Found" in str(exc)
+    return _error_code(exc) in {"404", "NoSuchKey"}
