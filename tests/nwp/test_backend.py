@@ -29,13 +29,13 @@ def _make(mini_catalog, tmp_path, **kwargs):
 
 
 class _LonDS:
-    """Minimal Dataset stand-in tracking convert_longitude behaviour."""
+    """Minimal Dataset stand-in tracking wrap_longitude behaviour."""
 
     def __init__(self, global_360: bool):
         self.global_360 = global_360
         self.converted = False
 
-    def convert_longitude(self):
+    def wrap_longitude(self):
         """Convert only when global; mirror pyramids' ValueError otherwise."""
         if not self.global_360:
             raise ValueError("The raster should cover the whole globe")
