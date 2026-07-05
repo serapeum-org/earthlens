@@ -12518,7 +12518,7 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.9.0
-  sha256: ed2725957048bb4c33b799bdb8e896c5f581ff34eb8ceb3145a32dead12b9bc8
+  sha256: 97ce90d881ec9cf4600cdce52078aa97d7fea2e380e887b53ba090e80a44d7a5
   requires_dist:
   - pyramids-gis>=0.38.0
   - geopandas>=1.0.0
@@ -12578,7 +12578,7 @@ packages:
   - erddapy>=3.0 ; extra == 'erddap'
   - overpy>=0.7 ; extra == 'osm'
   - ohsome>=0.4.0 ; extra == 'osm'
-  - earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,fdsn,earthdata,asf,hdx,eea-aq,eumetsat,nwp,nwm,radar,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap] ; extra == 'all'
+  - earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,cmip6,fdsn,earthdata,asf,hdx,eea-aq,eumetsat,nwp,nwm,radar,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap] ; extra == 'all'
   requires_python: '>=3.11,<4'
 - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
   name: eccodes
