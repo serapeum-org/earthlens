@@ -93,6 +93,21 @@ class TestBboxToTiles:
             (1, 1),
         ]
 
+    @pytest.mark.parametrize(
+        "low, high, expected",
+        [
+            (0.0, 1.0, [0]),          # both integer → closed-open drops tile 1
+            (0.5, 1.0, [0]),          # low fractional, high integer → same
+            (0.0, 1.5, [0, 1]),       # low integer, high fractional
+            (0.5, 1.5, [0, 1]),       # both fractional
+        ],
+    )
+    def test_closed_open_boundary_semantics(self, low, high, expected):
+        """Closed on the low edge, open on the high edge (tile N = `[N, N+1)`)."""
+        tiles = bbox_to_tiles(low, high, low, high)
+        assert sorted({t.lat for t in tiles}) == expected
+        assert sorted({t.lon for t in tiles}) == expected
+
     def test_zero_width_bbox_returns_single_tile(self):
         """A zero-width bbox on an integer boundary still returns that tile."""
         tiles = bbox_to_tiles(0.0, 0.0, 0.0, 0.0)

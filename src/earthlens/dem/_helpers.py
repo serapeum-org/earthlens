@@ -179,13 +179,19 @@ def bbox_to_tiles(
 def _axis_origins(
     low: float, high: float, *, min_index: int, max_index: int
 ) -> list[int]:
-    """Integer tile-origin coordinates covering `[low, high]` on one axis.
+    """Integer tile-origin coordinates covering `[low, high)` on one axis.
 
-    A tile at index `N` covers the half-open interval `[N, N+1)`, so a
-    bbox whose upper edge sits exactly on an integer degree does NOT
-    require the tile starting at that degree (nothing above the edge
-    lies inside the bbox). The `stop = math.ceil(high) - 1` computation
-    below excludes that boundary tile.
+    The bbox is treated as **closed on the low edge, open on the high
+    edge** — the same convention Copernicus DEM tiles themselves use
+    (tile `N` covers `[N, N+1)`). Consequences:
+
+    * `low = 1.0` includes tile `1` (`floor(1.0) = 1`).
+    * `high = 1.0` excludes tile `1` (`ceil(1.0) - 1 = 0`); nothing at
+      or above the upper edge is requested.
+
+    A caller who wants tile `1` at `high = 1.0` must widen the bbox by
+    an epsilon — Copernicus DEM has no data above the tile's upper
+    edge, so this asymmetry never drops real pixels.
 
     Args:
         low: Lower edge in degrees.
@@ -195,12 +201,13 @@ def _axis_origins(
 
     Returns:
         list[int]: Integer origins spanning the axis, clamped to the
-            grid range.
+            grid range. A zero-width bbox on an integer boundary
+            (`low == high == N`) still returns `[N]` — the tile that
+            boundary lies inside.
     """
     start = max(math.floor(low), min_index)
     stop = min(math.ceil(high) - 1, max_index)
     if stop < start:
-        # A zero-width bbox on an exact degree boundary (e.g. `[3.0, 3.0]`)
-        # still needs the tile that boundary lies inside.
+        # Zero-width bbox on an exact degree boundary (`low == high == N`).
         stop = start
     return list(range(start, stop + 1))
