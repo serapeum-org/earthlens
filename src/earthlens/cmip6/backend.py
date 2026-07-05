@@ -341,8 +341,9 @@ class CMIP6(AbstractDataSource):
                 :func:`earthlens.aggregate.aggregate_netcdf`.
 
         Returns:
-            list[Path]: The written NetCDF paths, one per resolved store. Empty
-                only if the facet tuple resolved to no stores.
+            list[Path]: The written NetCDF paths, one per resolved store (never
+                empty — a facet tuple that matches no store raises rather than
+                returning an empty list).
 
         Raises:
             NotImplementedError: If `aggregate` is not `None`.
