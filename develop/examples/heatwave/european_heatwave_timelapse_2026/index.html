@@ -60,7 +60,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19361,7 +19361,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5c48ee61">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=477f9796">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19379,7 +19379,7 @@ pulled through the <code>earthlens</code> <code>gee</code> backend.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1f1c6d66">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0ecf2e44">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19392,7 +19392,7 @@ embeds it as an in-browser player. Earth Engine needs a service account, read fr
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=853d6100">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=236fd7b9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19415,7 +19415,6 @@ embeds it as an in-browser player. Earth Engine needs a service account, read fr
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">animation</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
@@ -19431,7 +19430,6 @@ from pathlib import Path
 
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
-import numpy as np
 from IPython.display import HTML
 from pyramids.dataset import Dataset
 
@@ -19452,7 +19450,7 @@ OUT.mkdir(parents=True, exist_ok=True)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>2026-07-05 18:49:46 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
+<pre>2026-07-05 19:07:11 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
 </pre>
 </div>
 </div>
@@ -19460,49 +19458,7 @@ OUT.mkdir(parents=True, exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5ba2388f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>MODIS stores reflectance as scaled integers; this helper stacks the red/green/blue bands (<code>b01</code> / <code>b04</code> / <code>b03</code>) into a display-ready true-colour array.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=91c3b5bd">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">read_rgb</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="mf">3200.0</span><span class="p">):</span>
-    <span class="n">bands</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>  <span class="c1"># (3, rows, cols)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">stretch</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-2">def read_rgb(path, stretch=3200.0):
-    bands = Dataset.read_file(str(path)).read_array().astype("float32")  # (3, rows, cols)
-    return np.clip(np.moveaxis(bands, 0, -1) / stretch, 0, 1)</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=94c4400c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=756c1367">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19515,15 +19471,15 @@ are part of the picture: they <em>are</em> the weather moving.)</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d37a84be">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=246aadf8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -19548,7 +19504,7 @@ are part of the picture: they <em>are</em> the weather moving.)</p>
 <span class="n">frame_paths</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">len</span><span class="p">(</span><span class="n">frame_paths</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">job = EarthLens(
+<div class="clipboard-copy-txt" id="cell-2">job = EarthLens(
     data_source="gee",
     dataset="MODIS/061/MOD09GA",
     variables=["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"],
@@ -19573,82 +19529,82 @@ len(frame_paths)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:50:04.887</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260617.tif (2118959 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:07:32.779</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260617.tif (2118959 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:50:13.913</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260618.tif (2035696 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:07:42.197</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260618.tif (2035696 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:50:27.211</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260619.tif (2058292 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:07:53.147</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260619.tif (2058292 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:50:37.006</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260620.tif (2048901 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:08:02.422</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260620.tif (2048901 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:50:45.167</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260621.tif (1977294 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:08:11.427</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260621.tif (1977294 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:50:56.612</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260622.tif (2016853 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:08:22.883</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260622.tif (2016853 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:51:09.881</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260623.tif (1915573 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:08:34.204</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260623.tif (1915573 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:51:19.210</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260624.tif (1929754 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:08:43.359</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260624.tif (1929754 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:51:29.628</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260625.tif (2016649 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:08:52.679</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260625.tif (2016649 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:51:41.956</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260626.tif (2012605 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:09:03.587</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260626.tif (2012605 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 18:51:50.833</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260627.tif (2084924 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 19:09:14.280</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\timelapse\MODIS_061_MOD09GA_sur_refl_b01-sur_refl_b04-sur_refl_b03_20260627.tif (2084924 bytes)</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
 <pre>11</pre>
 </div>
@@ -19657,28 +19613,30 @@ len(frame_paths)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f4ef24db">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=95c3f093">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="build-the-animation">Build the animation<a class="anchor-link" href="#build-the-animation">¶</a></h2><p>Read every frame, then drive a <code>matplotlib</code> animation that swaps the image each tick and stamps the
-date. <code>to_jshtml()</code> embeds it as a self-contained player with play / pause / speed controls — no video
-codec required, and it travels inside the notebook.</p>
+<h2 id="build-the-animation">Build the animation<a class="anchor-link" href="#build-the-animation">¶</a></h2><p><code>pyramids</code> renders the true colour for us: <code>Dataset.plot(rgb=[0, 1, 2], surface_reflectance=...)</code>
+composites the red/green/blue bands and stretches the reflectance — no hand-rolled band maths. We drive
+a <code>matplotlib</code> animation that re-plots each daily <code>Dataset</code> into the same axis and stamps the date.
+<code>to_jshtml()</code> embeds the result as a self-contained player (play / pause / speed) that travels inside
+the notebook — no video codec required.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5636bb0e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=bebfa3ed">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -19688,37 +19646,33 @@ codec required, and it travels inside the notebook.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">read_rgb</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">frame_paths</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">frame_paths</span><span class="p">]</span>
 <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">frame_paths</span><span class="p">]</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mf">4.3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
-<span class="n">image</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">)</span>
-<span class="n">title</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-    <span class="n">image</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="n">title</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">"MODIS true colour — </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">title</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">datasets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3200</span><span class="p">},</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"MODIS true colour — </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
 
-<span class="n">anim</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">),</span> <span class="n">interval</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">anim</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">interval</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="n">HTML</span><span class="p">(</span><span class="n">anim</span><span class="o">.</span><span class="n">to_jshtml</span><span class="p">())</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">frames = [read_rgb(p) for p in frame_paths]
+<div class="clipboard-copy-txt" id="cell-3">datasets = [Dataset.read_file(str(p)) for p in frame_paths]
 dates = [p.stem.split("_")[-1] for p in frame_paths]
 
 fig, ax = plt.subplots(figsize=(6, 4.3), dpi=64)
-ax.axis("off")
-image = ax.imshow(frames[0], origin="upper")
-title = ax.set_title(dates[0])
 
 def update(i):
-    image.set_data(frames[i])
-    title.set_text(f"MODIS true colour — {dates[i]}")
-    return image, title
+    ax.clear()
+    datasets[i].plot(rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3200}, ax=ax, fig=fig)
+    ax.set_title(f"MODIS true colour — {dates[i]}")
+    ax.axis("off")
 
-anim = animation.FuncAnimation(fig, update, frames=len(frames), interval=450, blit=False)
+anim = animation.FuncAnimation(fig, update, frames=len(datasets), interval=450, blit=False)
 plt.close(fig)
 HTML(anim.to_jshtml())</div>
 </div>
@@ -19730,7 +19684,7 @@ HTML(anim.to_jshtml())</div>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet"/>
 <script language="javascript">
@@ -19913,36 +19867,36 @@ input[type=range].anim-slider {
 }
 </style>
 <div class="animation">
-<img alt="No description has been provided for this image" id="_anim_img72d355a4078f4606891973eb2b6e7265"/>
+<img alt="No description has been provided for this image" id="_anim_imgdce21eb95fcf45e8a812389935d57a71"/>
 <div class="anim-controls">
-<input class="anim-slider" id="_anim_slider72d355a4078f4606891973eb2b6e7265" max="1" min="0" name="points" oninput="anim72d355a4078f4606891973eb2b6e7265.set_frame(parseInt(this.value));" step="1" type="range" value="0"/>
+<input class="anim-slider" id="_anim_sliderdce21eb95fcf45e8a812389935d57a71" max="1" min="0" name="points" oninput="animdce21eb95fcf45e8a812389935d57a71.set_frame(parseInt(this.value));" step="1" type="range" value="0"/>
 <div class="anim-buttons">
-<button aria-label="Decrease speed" onclick="anim72d355a4078f4606891973eb2b6e7265.slower()" title="Decrease speed">
+<button aria-label="Decrease speed" onclick="animdce21eb95fcf45e8a812389935d57a71.slower()" title="Decrease speed">
 <i class="fa fa-minus"></i></button>
-<button aria-label="First frame" onclick="anim72d355a4078f4606891973eb2b6e7265.first_frame()" title="First frame">
+<button aria-label="First frame" onclick="animdce21eb95fcf45e8a812389935d57a71.first_frame()" title="First frame">
 <i class="fa fa-fast-backward"></i></button>
-<button aria-label="Previous frame" onclick="anim72d355a4078f4606891973eb2b6e7265.previous_frame()" title="Previous frame">
+<button aria-label="Previous frame" onclick="animdce21eb95fcf45e8a812389935d57a71.previous_frame()" title="Previous frame">
 <i class="fa fa-step-backward"></i></button>
-<button aria-label="Play backwards" onclick="anim72d355a4078f4606891973eb2b6e7265.reverse_animation()" title="Play backwards">
+<button aria-label="Play backwards" onclick="animdce21eb95fcf45e8a812389935d57a71.reverse_animation()" title="Play backwards">
 <i class="fa fa-play fa-flip-horizontal"></i></button>
-<button aria-label="Pause" onclick="anim72d355a4078f4606891973eb2b6e7265.pause_animation()" title="Pause">
+<button aria-label="Pause" onclick="animdce21eb95fcf45e8a812389935d57a71.pause_animation()" title="Pause">
 <i class="fa fa-pause"></i></button>
-<button aria-label="Play" onclick="anim72d355a4078f4606891973eb2b6e7265.play_animation()" title="Play">
+<button aria-label="Play" onclick="animdce21eb95fcf45e8a812389935d57a71.play_animation()" title="Play">
 <i class="fa fa-play"></i></button>
-<button aria-label="Next frame" onclick="anim72d355a4078f4606891973eb2b6e7265.next_frame()" title="Next frame">
+<button aria-label="Next frame" onclick="animdce21eb95fcf45e8a812389935d57a71.next_frame()" title="Next frame">
 <i class="fa fa-step-forward"></i></button>
-<button aria-label="Last frame" onclick="anim72d355a4078f4606891973eb2b6e7265.last_frame()" title="Last frame">
+<button aria-label="Last frame" onclick="animdce21eb95fcf45e8a812389935d57a71.last_frame()" title="Last frame">
 <i class="fa fa-fast-forward"></i></button>
-<button aria-label="Increase speed" onclick="anim72d355a4078f4606891973eb2b6e7265.faster()" title="Increase speed">
+<button aria-label="Increase speed" onclick="animdce21eb95fcf45e8a812389935d57a71.faster()" title="Increase speed">
 <i class="fa fa-plus"></i></button>
 </div>
-<form action="#n" aria-label="Repetition mode" class="anim-state" name="_anim_loop_select72d355a4078f4606891973eb2b6e7265" title="Repetition mode">
-<input id="_anim_radio1_72d355a4078f4606891973eb2b6e7265" name="state" type="radio" value="once"/>
-<label for="_anim_radio1_72d355a4078f4606891973eb2b6e7265">Once</label>
-<input checked="" id="_anim_radio2_72d355a4078f4606891973eb2b6e7265" name="state" type="radio" value="loop"/>
-<label for="_anim_radio2_72d355a4078f4606891973eb2b6e7265">Loop</label>
-<input id="_anim_radio3_72d355a4078f4606891973eb2b6e7265" name="state" type="radio" value="reflect"/>
-<label for="_anim_radio3_72d355a4078f4606891973eb2b6e7265">Reflect</label>
+<form action="#n" aria-label="Repetition mode" class="anim-state" name="_anim_loop_selectdce21eb95fcf45e8a812389935d57a71" title="Repetition mode">
+<input id="_anim_radio1_dce21eb95fcf45e8a812389935d57a71" name="state" type="radio" value="once"/>
+<label for="_anim_radio1_dce21eb95fcf45e8a812389935d57a71">Once</label>
+<input checked="" id="_anim_radio2_dce21eb95fcf45e8a812389935d57a71" name="state" type="radio" value="loop"/>
+<label for="_anim_radio2_dce21eb95fcf45e8a812389935d57a71">Loop</label>
+<input id="_anim_radio3_dce21eb95fcf45e8a812389935d57a71" name="state" type="radio" value="reflect"/>
+<label for="_anim_radio3_dce21eb95fcf45e8a812389935d57a71">Reflect</label>
 </form>
 </div>
 </div>
@@ -19950,9 +19904,9 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_img72d355a4078f4606891973eb2b6e7265";
-    var slider_id = "_anim_slider72d355a4078f4606891973eb2b6e7265";
-    var loop_select_id = "_anim_loop_select72d355a4078f4606891973eb2b6e7265";
+    var img_id = "_anim_imgdce21eb95fcf45e8a812389935d57a71";
+    var slider_id = "_anim_sliderdce21eb95fcf45e8a812389935d57a71";
+    var loop_select_id = "_anim_loop_selectdce21eb95fcf45e8a812389935d57a71";
     var frames = new Array(11);
     
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYAAAAESCAYAAAD0aQL3AAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
@@ -47815,7 +47769,7 @@ AUzXdE3XdH1C13QDmK7pmq7p+oSu6QYwXdM1XdOFT+b6/wIfFLkIdbBhIgAAAABJRU5ErkJggg==\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        anim72d355a4078f4606891973eb2b6e7265 = new Animation(frames, img_id, slider_id, 449.0,
+        animdce21eb95fcf45e8a812389935d57a71 = new Animation(frames, img_id, slider_id, 449.0,
                                  loop_select_id);
     }, 0);
   })()
@@ -47826,7 +47780,7 @@ AUzXdE3XdH1C13QDmK7pmq7p+oSu6QYwXdM1XdOFT+b6/wIfFLkIdbBhIgAAAABJRU5ErkJggg==\
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=91288a05">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=67553ea3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
