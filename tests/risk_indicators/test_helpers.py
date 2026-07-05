@@ -35,6 +35,8 @@ class _Resp:
 
     def __init__(self, payload):
         self._payload = payload
+        self.status_code = 200
+        self.headers = {}
 
     def raise_for_status(self):
         """No-op for the 200 fixtures."""
@@ -42,6 +44,9 @@ class _Resp:
     def json(self):
         """Return the canned payload."""
         return self._payload
+
+    def close(self):
+        """No-op close hook (HttpClient calls it on retry/errored responses)."""
 
 
 def _load(name):

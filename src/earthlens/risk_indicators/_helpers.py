@@ -25,12 +25,14 @@ Endpoints / response shapes were live-verified 2026-06-27 (see
 from __future__ import annotations
 
 import time
+from typing import Any
 
 import geopandas as gpd
 import pandas as pd
 import requests
-from loguru import logger
 from pyramids.feature.collection import FeatureCollection
+
+from earthlens.base.http import HttpClient
 
 #: ThinkHazard! public REST base (no auth). Hazard reports live under
 #: `/report/{division_code}.json` and `/report/{division_code}/{hazard}.json`.
@@ -96,6 +98,19 @@ def _is_transient(exc: requests.RequestException) -> bool:
     return False
 
 
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the module-level
+    `requests.get` (rather than a private session) so tests that monkeypatch
+    `_helpers.requests.get` still drive the transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
+
+
 def _request_json(
     url: str,
     *,
@@ -104,6 +119,12 @@ def _request_json(
     timeout: float,
 ) -> dict | list:
     """GET `url` and return parsed JSON, retrying transient failures.
+
+    Retries are delegated to :class:`~earthlens.base.http.HttpClient`: a 5xx
+    response or a transient transport error (see :data:`_TRANSIENT_ERRORS`)
+    is retried up to :data:`_HTTP_RETRIES` times with exponential back-off
+    (`1s`, `2s`); a 4xx (including 429) fails fast — the classification
+    matches :func:`_is_transient`.
 
     Args:
         url: The request URL.
@@ -118,24 +139,19 @@ def _request_json(
         requests.RequestException: When the GET still fails after the retries
             (the last error is re-raised; a 4xx fails fast without retrying).
     """
-    last_exc: requests.RequestException | None = None
-    for attempt in range(_HTTP_RETRIES + 1):
-        try:
-            response = requests.get(
-                url, params=params, headers=headers, timeout=timeout
-            )
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as exc:
-            last_exc = exc
-            if not _is_transient(exc) or attempt == _HTTP_RETRIES:
-                raise
-            logger.warning(
-                f"risk-indicators: transient fetch error from {url} ({exc}); "
-                f"retry {attempt + 1}/{_HTTP_RETRIES}."
-            )
-            time.sleep(_HTTP_RETRY_BACKOFF * (attempt + 1))
-    raise last_exc  # pragma: no cover - loop always returns or raises above
+    client = HttpClient(
+        session=_RequestsGet(),
+        user_agent=_USER_AGENT,
+        timeout=timeout,
+        max_retries=_HTTP_RETRIES,
+        backoff_factor=_HTTP_RETRY_BACKOFF,
+        status_forcelist=tuple(range(500, 600)),
+        max_backoff=None,
+        retry_on_exceptions=_TRANSIENT_ERRORS,
+        raise_for_status=True,
+        sleep=lambda seconds: time.sleep(seconds),
+    )
+    return client.get_json(url, params=params, headers=headers)
 
 
 #: Canonical column order for a ThinkHazard hazard-level table.
