@@ -154,7 +154,7 @@ osm = ["overpy >=0.7", "ohsome >=0.4.0"]
 # Self-referential: the union of every backend extra, without re-listing deps.
 # (argo and osm are intentionally excluded — see the notes above their extras.)
 all = [
-    "earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,fdsn,earthdata,asf,hdx,eea_aq,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
+    "earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,cmip6,fdsn,earthdata,asf,hdx,eea_aq,eumetsat,nwp,nwm,radar,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
 ]
 
 [dependency-groups]
