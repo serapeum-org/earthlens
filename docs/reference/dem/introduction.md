@@ -53,14 +53,15 @@ paths = EarthLens(
   from the bucket. Cropping the bbox down to the exact AOI, mosaicking
   neighbouring tiles into a single raster, reprojecting to a UTM zone,
   and rendering a hillshade are all pyramids' job — its COG reader
-  (`pyramids.Dataset.read_file`) plus `.crop` / `.mosaic` / `.to_crs`
+  (`pyramids.Dataset.read_file`) plus `.crop` / `.to_crs` and
+  `pyramids.dataset.merge.merge_rasters` (for a multi-tile mosaic)
   already do this. earthlens does **not** import `rasterio`, `gdal`,
   `osgeo`, or `xarray`.
 
 - **1° tile granularity.** The buckets serve one COG per 1° x 1° tile,
   so a coastal bbox spanning several tiles yields one file per tile. To
   merge them, hand the list of paths to
-  `pyramids.dataset.mosaic(...)`.
+  `pyramids.dataset.merge.merge_rasters(paths, out_path)`.
 
 - **Ocean tiles are absent — logged and skipped.** Copernicus DEM ships
   **no tile over open ocean**. A bbox that crosses a coast produces a

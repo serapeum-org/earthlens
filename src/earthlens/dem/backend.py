@@ -166,8 +166,9 @@ class DEM(AbstractDataSource):
         """Return the 1° tiles the request bbox intersects.
 
         Pure arithmetic on the integer-degree grid — no network access.
-        A bbox straddling the antimeridian is split into a western and
-        eastern slice.
+        Antimeridian-straddling bboxes (`lon_min > lon_max`) are
+        rejected at construction; pass the two halves in separate calls
+        if you need to span the 180th meridian.
 
         Returns:
             list[Tile]: One tile per SW-corner integer degree pair in
@@ -321,7 +322,8 @@ class DEM(AbstractDataSource):
                 "DEM.download(aggregate=...) is not supported — a DEM tile is "
                 "time-invariant. Mosaic / crop the downloaded tiles with "
                 "pyramids downstream (`pyramids.Dataset.read_file` + "
-                "`.mosaic` / `.crop`)."
+                "`.crop`, `pyramids.dataset.merge.merge_rasters` for a "
+                "multi-tile mosaic)."
             )
         self._show_progress = progress_bar
         return self._api_via_search_fetch()
