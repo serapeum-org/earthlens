@@ -58,6 +58,12 @@ gee = [
     "urllib3 >=1.26",
 ]
 cmems = ["copernicusmarine >=2.0.0,<3"]
+# CMIP6 (raw archive on the open Pangeo gs://cmip6 bucket). The catalog is the
+# consolidated-stores CSV read with pandas (core) over requests (core), and the
+# Zarr read is pyramids' (already core, via GDAL /vsigs/ — no gcsfs). There is
+# no per-backend SDK, so the extra is empty; it exists only for API symmetry so
+# `pip install earthlens[cmip6]` works.
+cmip6 = []
 fdsn = ["obspy >=1.5.0"]
 # NOAA National Water Model (unsigned noaa-nwm-pds bucket). The NWM backend
 # reads Zarr / feature_id NetCDF subsets through pyramids' LabeledDataset (now a
@@ -318,6 +324,7 @@ markers = [
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
     "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
+    "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
