@@ -31,7 +31,12 @@ products:
     releases:
       R2023A:
         - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
-          resolutions: ["1km", "30ss"]
+          resolutions: ["1km"]
+        # JRC dropped V1-0 of the SMOD 30ss (WGS84) release in 2025-01; only
+        # V2-0 remains upstream. The 1km Mollweide release still ships V1-0.
+        - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+          resolutions: ["30ss"]
+          version: ["2", "0"]
       R2022A:
         # R2022A SMOD is 1 km / 54009 only (the 30ss WGS84 variant arrived in R2023A).
         - epochs: [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
