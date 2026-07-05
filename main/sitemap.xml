@@ -153,6 +153,10 @@
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/cmip6/quickstart/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/drought/catalog_explorer/</loc>
          <lastmod>2026-07-05</lastmod>
     </url>
@@ -1058,6 +1062,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/cmems/usage/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/cmip6/cmip6/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/cmip6/introduction/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/cmip6/usage/</loc>
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
