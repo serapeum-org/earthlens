@@ -177,6 +177,7 @@ docs/examples/usgs-water/_nb_out/
 docs/examples/sentinel-hub/data/
 docs/examples/jaxa/ptree_out/
 docs/examples/heatwave/out/
+docs/examples/showcases/out/
 
 # Ad-hoc agent / verification scratch dropped in the repo root (notebook
 # compile checks, result dumps). Anchored to root so src/ `_helpers.py`-style
