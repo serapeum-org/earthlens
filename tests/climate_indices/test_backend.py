@@ -30,6 +30,7 @@ class _FakeResponse:
     def __init__(self, text: str, status_code: int = 200) -> None:
         self.text = text
         self.status_code = status_code
+        self.headers: dict[str, str] = {}
 
     def raise_for_status(self) -> None:
         """Raise `HTTPError` (carrying this response) for a >=400 status."""
@@ -38,8 +39,11 @@ class _FakeResponse:
             error.response = self
             raise error
 
+    def close(self) -> None:
+        """No-op close — the fake owns no socket."""
 
-def _fake_get(url: str, timeout: float | None = None) -> _FakeResponse:
+
+def _fake_get(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
     """Return the captured fixture body for a known index URL, else a 404."""
     name = url.rsplit("/", 1)[-1]
     if name in _FIXTURES:
@@ -47,7 +51,7 @@ def _fake_get(url: str, timeout: float | None = None) -> _FakeResponse:
     return _FakeResponse("Not found", status_code=404)
 
 
-def _always_404(url: str, timeout: float | None = None) -> _FakeResponse:
+def _always_404(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
     """Return a 404 for every URL."""
     return _FakeResponse("Not found", status_code=404)
 
@@ -60,7 +64,9 @@ class _Flaky5xxGet:
         self.fails = fails
         self.calls = 0
 
-    def __call__(self, url: str, timeout: float | None = None) -> _FakeResponse:
+    def __call__(
+        self, url: str, timeout: float | None = None, **_kwargs
+    ) -> _FakeResponse:
         """Return a 503 for the first `fails` calls, then a 200 with the body."""
         self.calls += 1
         if self.calls <= self.fails:
@@ -74,7 +80,9 @@ class _CountingGet404:
     def __init__(self) -> None:
         self.calls = 0
 
-    def __call__(self, url: str, timeout: float | None = None) -> _FakeResponse:
+    def __call__(
+        self, url: str, timeout: float | None = None, **_kwargs
+    ) -> _FakeResponse:
         """Count the call and return a 404 response."""
         self.calls += 1
         return _FakeResponse("Not found", status_code=404)
@@ -86,23 +94,27 @@ class _AlwaysConnError:
     def __init__(self) -> None:
         self.calls = 0
 
-    def __call__(self, url: str, timeout: float | None = None) -> _FakeResponse:
+    def __call__(
+        self, url: str, timeout: float | None = None, **_kwargs
+    ) -> _FakeResponse:
         """Count the call and raise a transient connection error."""
         self.calls += 1
         raise requests.ConnectionError("down")
 
 
-def _generic_request_error(url: str, timeout: float | None = None) -> _FakeResponse:
+def _generic_request_error(
+    url: str, timeout: float | None = None, **_kwargs
+) -> _FakeResponse:
     """Raise a bare (non-connection, non-HTTP) RequestException — not transient."""
     raise requests.RequestException("weird")
 
 
-def _html_200(url: str, timeout: float | None = None) -> _FakeResponse:
+def _html_200(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
     """Return a 200 response whose body is an HTML error page."""
     return _FakeResponse("<!DOCTYPE HTML><html>error</html>")
 
 
-def _any_psl_get(url: str, timeout: float | None = None) -> _FakeResponse:
+def _any_psl_get(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
     """Serve the ONI (psl-dialect) fixture for any URL (for multi-PSL-index tests)."""
     return _FakeResponse((DATA / "psl" / "oni.data").read_text())
 
@@ -115,7 +127,9 @@ class _FlakyGet:
         self.fails = fails
         self.calls = 0
 
-    def __call__(self, url: str, timeout: float | None = None) -> _FakeResponse:
+    def __call__(
+        self, url: str, timeout: float | None = None, **_kwargs
+    ) -> _FakeResponse:
         """Fail transiently for the first `fails` calls, then return the body."""
         self.calls += 1
         if self.calls <= self.fails:

@@ -25,7 +25,7 @@ from __future__ import annotations
 import datetime as dt
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import requests
@@ -38,6 +38,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.http import HttpClient
 from earthlens.climate_indices import _helpers
 from earthlens.climate_indices.catalog import Catalog
 
@@ -70,24 +71,17 @@ _GLOBAL_LAT: list[float] = [-90.0, 90.0]
 _GLOBAL_LON: list[float] = [-180.0, 180.0]
 
 
-def _is_transient(exc: requests.RequestException) -> bool:
-    """Return whether a fetch error is worth retrying.
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
 
-    Connection errors and timeouts are transient; an HTTP error is
-    transient only for a 5xx status (a 4xx such as 404 is a real miss
-    and fails fast). Anything else is treated as non-transient.
-
-    Args:
-        exc: The exception raised by `requests.get` / `raise_for_status`.
-
-    Returns:
-        bool: `True` to retry, `False` to fail fast.
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so tests
+    that monkeypatch `backend.requests.get` still drive the transport.
     """
-    if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
-        return True
-    if isinstance(exc, requests.HTTPError) and exc.response is not None:
-        return exc.response.status_code >= 500
-    return False
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
 
 
 class ClimateIndices(AbstractDataSource):
@@ -328,9 +322,12 @@ class ClimateIndices(AbstractDataSource):
         """GET an index file's body, retrying transient failures.
 
         A transient failure (connection error, timeout, or a 5xx status)
-        is retried up to :data:`_HTTP_RETRIES` times with a linear
-        back-off; a 4xx (e.g. 404) fails fast since retrying a real miss
-        is pointless.
+        is retried up to :data:`_HTTP_RETRIES` times with an exponential
+        back-off (`1s`, `2s`); a 4xx (e.g. 404) fails fast since retrying
+        a real miss is pointless. The retry engine is
+        :class:`~earthlens.base.http.HttpClient`, configured to match the
+        old hand-rolled loop byte-for-byte on wait sequence and attempt
+        count.
 
         Args:
             url: The index file URL.
@@ -343,25 +340,23 @@ class ClimateIndices(AbstractDataSource):
             ValueError: When the GET still fails after the retries, naming
                 the index and URL (`G8`).
         """
-        last_exc: Exception | None = None
-        for attempt in range(_HTTP_RETRIES + 1):
-            try:
-                response = requests.get(url, timeout=_HTTP_TIMEOUT)
-                response.raise_for_status()
-                return response.text
-            except requests.RequestException as exc:
-                last_exc = exc
-                if not _is_transient(exc):
-                    break
-                if attempt < _HTTP_RETRIES:
-                    logger.warning(
-                        f"climate index {index_id!r}: transient fetch error from "
-                        f"{url} ({exc}); retry {attempt + 1}/{_HTTP_RETRIES}."
-                    )
-                    time.sleep(_HTTP_RETRY_BACKOFF * (attempt + 1))
-        raise ValueError(
-            f"climate index {index_id!r}: failed to fetch {url} ({last_exc})."
-        ) from last_exc
+        http = HttpClient(
+            session=_RequestsGet(),
+            timeout=_HTTP_TIMEOUT,
+            max_retries=_HTTP_RETRIES,
+            backoff_factor=_HTTP_RETRY_BACKOFF,
+            status_forcelist=tuple(range(500, 600)),
+            retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
+            raise_for_status=True,
+            max_backoff=None,
+            sleep=lambda seconds: time.sleep(seconds),
+        )
+        try:
+            return http.get(url).text
+        except requests.RequestException as exc:
+            raise ValueError(
+                f"climate index {index_id!r}: failed to fetch {url} ({exc})."
+            ) from exc
 
     def download(
         self,
