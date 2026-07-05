@@ -22,14 +22,19 @@ _NETCDF_BODY = b"CDF\x01" + b"\x00" * 64
 class _FakeResponse:
     """Stand-in for a `requests.Response` carrying canned bytes / status."""
 
+    headers: dict[str, str] = {}
+
     def __init__(self, content: bytes = _NETCDF_BODY, status: int = 200):
         self.content = content
-        self._status = status
+        self.status_code = status
 
     def raise_for_status(self) -> None:
         """Raise an `HTTPError` for a 4xx/5xx status, like requests does."""
-        if self._status >= 400:
-            raise requests.exceptions.HTTPError(f"HTTP {self._status}")
+        if self.status_code >= 400:
+            raise requests.exceptions.HTTPError(f"HTTP {self.status_code}")
+
+    def close(self) -> None:
+        """No-op — the fake holds no socket."""
 
 
 class _FakeBand:
@@ -83,7 +88,7 @@ def captured_get(monkeypatch: pytest.MonkeyPatch) -> dict:
     """Capture the griddap URL and return a fixture NetCDF body."""
     captured: dict = {}
 
-    def _fake_get(url: str, timeout: float = 0.0) -> _FakeResponse:
+    def _fake_get(url: str, timeout: float = 0.0, **kwargs) -> _FakeResponse:
         captured["url"] = url
         captured["timeout"] = timeout
         return _FakeResponse()
@@ -152,7 +157,7 @@ def test_oversize_non_netcdf_body_raises_valueerror(
     monkeypatch.setattr(
         backend_module.requests,
         "get",
-        lambda url, timeout=0.0: _FakeResponse(content=b"<html>error</html>"),
+        lambda url, timeout=0.0, **kwargs: _FakeResponse(content=b"<html>error</html>"),
     )
     with pytest.raises(ValueError, match="non-NetCDF"):
         _make("gebco_2020", tmp_path).download()
@@ -165,7 +170,7 @@ def test_http_error_raises_valueerror(
     monkeypatch.setattr(
         backend_module.requests,
         "get",
-        lambda url, timeout=0.0: _FakeResponse(status=413),
+        lambda url, timeout=0.0, **kwargs: _FakeResponse(status=413),
     )
     with pytest.raises(ValueError, match="coverage|too large"):
         _make("gebco_2020", tmp_path).download()
