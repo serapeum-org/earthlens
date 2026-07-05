@@ -60,7 +60,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19405,7 +19405,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2e101dbd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=86aac947">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19422,7 +19422,7 @@ continental weather pattern.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f8429ca6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=47e60ed0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19469,7 +19469,7 @@ fingerprint. We test exactly that.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fc82b6cc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e9b4519a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19483,7 +19483,7 @@ environment.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9bf97e22">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=69e87167">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19539,7 +19539,7 @@ OUT.mkdir(parents=True, exist_ok=True)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>2026-07-05 20:17:10 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
+<pre>2026-07-05 20:37:01 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
 </pre>
 </div>
 </div>
@@ -19547,7 +19547,7 @@ OUT.mkdir(parents=True, exist_ok=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d4ac0001">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=53c54419">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19561,7 +19561,7 @@ polders around. This is the human landscape a night of fireworks and crowds play
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3aff10fd">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e6f35c08">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19592,7 +19592,8 @@ polders around. This is the human landscape a night of fireworks and crowds play
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.85</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
-<span class="n">scene_path</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">scene_path</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">scene_path</span><span class="o">.</span><span class="n">name</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">scene = EarthLens(
@@ -19608,7 +19609,8 @@ polders around. This is the human landscape a night of fireworks and crowds play
     lat_lim=[51.85, 52.0], lon_lim=[4.0, 4.6],
 )
 scene.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
-scene_path = scene.download(progress_bar=False)[0]
+paths = scene.download(progress_bar=False)
+scene_path = paths[0]
 scene_path.name</div>
 </div>
 </div>
@@ -19621,7 +19623,7 @@ scene_path.name</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:17:58.984</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\celebration\truecolor\COPERNICUS_S2_SR_HARMONIZED_B4-B3-B2_20260617.tif (7591300 bytes)</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:37:55.293</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.gee.backend</span>:<span class="ansi-cyan-fg">_download_one_url_tile</span>:<span class="ansi-cyan-fg">910</span> - <span class="ansi-bold">Wrote C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\celebration\truecolor\COPERNICUS_S2_SR_HARMONIZED_B4-B3-B2_20260617.tif (7591300 bytes)</span>
 </pre>
 </div>
 </div>
@@ -19635,7 +19637,7 @@ scene_path.name</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3f964860">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=18236735">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19684,7 +19686,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2c718546">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=658a85c3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19697,7 +19699,7 @@ daily) resolution is essential — a fireworks spike lives in a two-to-three-hou
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c32ea6d2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3187eee9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19753,14 +19755,14 @@ for pollutant in ["pm10", "pm25"]:
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:18:07.437</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.openaq.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">487</span> - <span class="ansi-bold">OpenAQ download summary: 810 measurement(s) across 8 sensor(s) written to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\celebration\openaq_pm10_20260701_20260706.csv</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:38:04.143</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.openaq.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">487</span> - <span class="ansi-bold">OpenAQ download summary: 810 measurement(s) across 8 sensor(s) written to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\celebration\openaq_pm10_20260701_20260706.csv</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-07-05 20:18:15.128</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.openaq.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">487</span> - <span class="ansi-bold">OpenAQ download summary: 947 measurement(s) across 9 sensor(s) written to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\celebration\openaq_pm25_20260701_20260706.csv</span>
+<pre><span class="ansi-green-fg">2026-07-05 20:38:11.308</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.openaq.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">487</span> - <span class="ansi-bold">OpenAQ download summary: 947 measurement(s) across 9 sensor(s) written to C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\heatwave\docs\examples\heatwave\out\celebration\openaq_pm25_20260701_20260706.csv</span>
 </pre>
 </div>
 </div>
@@ -19774,7 +19776,7 @@ for pollutant in ["pm10", "pm25"]:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=33741ccf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7ca398f9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19785,7 +19787,7 @@ for pollutant in ["pm10", "pm25"]:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7ed18649">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=65c37c15">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19842,7 +19844,7 @@ Name: value, dtype: float64</pre>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=01971a97">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d7b5797a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19855,7 +19857,7 @@ night that the <em>previous</em> night does not show?</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4fb3b1a8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0cd1aed2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19914,7 +19916,7 @@ fig.autofmt_xdate(); plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0396e40d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff4b9b66">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19928,7 +19930,7 @@ exactly the fireworks-and-crowds fingerprint the literature describes.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0ac08dfc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d6fdee94">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19955,7 +19957,7 @@ a tremor would need raw data pulled with <code>obspy</code> from ORFEUS/EIDA —
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7a5c6a0b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f23ed659">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
