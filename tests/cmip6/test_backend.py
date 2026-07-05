@@ -159,8 +159,8 @@ def test_download_rejects_aggregate(backend):
         backend.download(aggregate=object())
 
 
-def test_download_returns_empty_on_no_stores(resolver, tmp_path, stub_accessor):
-    """A facet tuple that resolves to nothing surfaces as a resolver error."""
+def test_download_raises_on_facet_miss(resolver, tmp_path, stub_accessor):
+    """A facet tuple that resolves to no store surfaces as a resolver error."""
     b = _make(resolver, tmp_path, experiment_id="ssp585", table_id="Amon")
     b._experiment_id = "ssp999"
     with pytest.raises(ValueError, match="ssp999"):
