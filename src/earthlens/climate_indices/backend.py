@@ -58,7 +58,9 @@ _HTTP_TIMEOUT: float = 60.0
 _HTTP_RETRIES: int = 2
 
 #: Base back-off (seconds) between retry attempts; the nth retry waits
-#: `n * _HTTP_RETRY_BACKOFF`.
+#: `_HTTP_RETRY_BACKOFF * 2**(n-1)` (HttpClient's exponential back-off).
+#: Identical to the previous hand-rolled linear back-off at `_HTTP_RETRIES=2`
+#: (both yield `[1s, 2s]`) — bump either constant and the schedules diverge.
 _HTTP_RETRY_BACKOFF: float = 1.0
 
 #: Max index ids spelled out in the written-table filename before it is

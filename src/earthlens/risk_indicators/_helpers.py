@@ -61,7 +61,10 @@ _HTTP_TIMEOUT: float = 120.0
 #: timeout / 5xx). The GFW host in particular resets connections intermittently.
 _HTTP_RETRIES: int = 2
 
-#: Base back-off (seconds) between retries; the nth retry waits n * this.
+#: Base back-off (seconds) between retries; the nth retry waits
+#: `_HTTP_RETRY_BACKOFF * 2**(n-1)` (HttpClient's exponential back-off).
+#: Identical to the previous hand-rolled linear back-off at `_HTTP_RETRIES=2`
+#: (both yield `[1s, 2s]`) — bump either constant and the schedules diverge.
 _HTTP_RETRY_BACKOFF: float = 1.0
 
 
