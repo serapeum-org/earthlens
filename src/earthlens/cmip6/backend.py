@@ -129,6 +129,11 @@ class CMIP6(AbstractDataSource):
         ):
             if not value:
                 raise ValueError(f"CMIP6 requires a non-empty {name}.")
+        if not start or not end:
+            raise ValueError(
+                "CMIP6 requires a start and end date, e.g. "
+                "start='2050-01-01', end='2050-12-31'."
+            )
 
         self._catalog = catalog if catalog is not None else Catalog()
         self._resolver = (

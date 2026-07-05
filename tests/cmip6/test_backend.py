@@ -64,6 +64,17 @@ def test_required_facets(resolver, tmp_path, missing):
         _make(resolver, tmp_path, **{missing: ""})
 
 
+@pytest.mark.parametrize("start, end", [(None, "2050-12-31"), ("2050-01-01", None)])
+def test_missing_dates_raise_friendly(resolver, tmp_path, start, end):
+    """Omitting start or end raises a clear ValueError, not a strptime error."""
+    with pytest.raises(ValueError, match="requires a start and end date"):
+        CMIP6(
+            start, end, source_id="CanESM5", experiment_id="ssp585",
+            variable_id="tas", table_id="Amon", lat_lim=[35, 60], lon_lim=[-10, 30],
+            path=tmp_path, resolver=resolver,
+        )
+
+
 def test_output_kind_is_raster(backend):
     """The backend declares raster output."""
     assert backend.OUTPUT_KIND == "raster"
