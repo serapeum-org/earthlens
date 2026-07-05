@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20369,7 +20369,9 @@ one); defaults to the bundled catalog.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">DEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">DEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Anonymous Copernicus DEM backend (raw COG tiles).</span>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    Args:</span>
@@ -20491,165 +20493,167 @@ one); defaults to the bundled catalog.</p>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the 1° tiles the request bbox intersects.</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        Pure arithmetic on the integer-degree grid — no network access.</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        A bbox straddling the antimeridian is split into a western and</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        eastern slice.</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            list[Tile]: One tile per SW-corner integer degree pair in</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">                the bbox, in row-major (south → north, west → east)</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                order.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>        <span class="k">return</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>            <span class="n">lat_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>            <span class="n">lat_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>            <span class="n">lon_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>            <span class="n">lon_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>        <span class="p">)</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Enumerate one candidate product per 1° tile in the bbox.</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        The key is deterministic (no `list_objects_v2` call), so a</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        request with a wide bbox does not walk the bucket. Ocean /</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        outside-coverage tiles are only discovered as missing when</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        `_fetch` calls `head_object` on each candidate.</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            list[RemoteProduct]: One :class:`RemoteProduct` per tile;</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">                `href` carries the S3 key and `metadata` carries the</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">                bucket, the tile identifier, and the SW corner.</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">resolution_token</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>        <span class="n">bucket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">bucket</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="k">for</span> <span class="n">tile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tiles</span><span class="p">():</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>            <span class="n">key</span> <span class="o">=</span> <span class="n">tile_key</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>                <span class="n">RemoteProduct</span><span class="p">(</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>                    <span class="nb">id</span><span class="o">=</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>                    <span class="n">href</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>                        <span class="s2">&quot;bucket&quot;</span><span class="p">:</span> <span class="n">bucket</span><span class="p">,</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>                        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="p">,</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>                        <span class="s2">&quot;tile_lat&quot;</span><span class="p">:</span> <span class="n">tile</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>                        <span class="s2">&quot;tile_lon&quot;</span><span class="p">:</span> <span class="n">tile</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>                    <span class="p">},</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>                <span class="p">)</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="p">)</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="k">return</span> <span class="n">products</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download every present tile; log and skip ocean / missing ones.</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        The bucket carries one COG per land tile; a candidate key for an</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        ocean tile (or outside coverage) simply returns a 404 on</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        `head_object`. Those are warned about and skipped rather than</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        propagated, so a coastal bbox returns a ragged but non-empty</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        result — never a crash.</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">            products: The candidate products from :meth:`_search`.</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">            list[Path]: One local path per tile that existed and was</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">                downloaded, in `products` order.</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">missing</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>            <span class="n">products</span><span class="p">,</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="ow">and</span> <span class="n">products</span><span class="p">),</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dem/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="p">):</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>            <span class="n">fetched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="k">if</span> <span class="n">fetched</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>                <span class="n">missing</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fetched</span><span class="p">)</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>                <span class="sa">f</span><span class="s2">&quot;dem: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> tile(s) downloaded; &quot;</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> absent (ocean / outside coverage).&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>            <span class="p">)</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="k">return</span> <span class="n">written</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Head + download one candidate tile; return `None` if absent.</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            client: The unsigned `boto3` S3 client.</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            product: The candidate :class:`RemoteProduct` to fetch.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            Path | None: The written local path, or `None` when the key</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                is absent (ocean tile, outside coverage).</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="n">client</span><span class="o">.</span><span class="n">head_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - classify below</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="k">if</span> <span class="n">_is_missing_object</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>                    <span class="sa">f</span><span class="s2">&quot;dem: tile absent, skipping: s3://</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>                <span class="p">)</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>                <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="n">client</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the unsigned `boto3` client (built lazily by `S3Auth`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">client</span><span class="p">()</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` + `_fetch` (the canonical post-C3 body).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            progress_bar: Show a per-tile progress bar. Defaults to</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            aggregate: Must be `None`. DEM is a raw-COG whole-tile</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                backend (`G4` — no server-side subset, `G5` — no</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                decode), so a time-window reduce has nothing to reduce.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                Cropping / mosaicking the tiles is pyramids&#39; job, not</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">                the backend&#39;s.</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            list[Path]: The local paths of the downloaded COG tiles, in</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                bbox row-major order. Empty when every candidate tile is</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                absent from the bucket.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="s2">&quot;DEM.download(aggregate=...) is not supported — a DEM tile is &quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="s2">&quot;time-invariant. Mosaic / crop the downloaded tiles with &quot;</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="s2">&quot;pyramids downstream (`pyramids.Dataset.read_file` + &quot;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>                <span class="s2">&quot;`.mosaic` / `.crop`).&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="p">)</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        Antimeridian-straddling bboxes (`lon_min &gt; lon_max`) are</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        rejected at construction; pass the two halves in separate calls</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        if you need to span the 180th meridian.</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            list[Tile]: One tile per SW-corner integer degree pair in</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                the bbox, in row-major (south → north, west → east)</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">                order.</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>        <span class="k">return</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>            <span class="n">lat_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>            <span class="n">lat_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>            <span class="n">lon_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>            <span class="n">lon_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>        <span class="p">)</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Enumerate one candidate product per 1° tile in the bbox.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        The key is deterministic (no `list_objects_v2` call), so a</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        request with a wide bbox does not walk the bucket. Ocean /</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        outside-coverage tiles are only discovered as missing when</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        `_fetch` calls `head_object` on each candidate.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            list[RemoteProduct]: One :class:`RemoteProduct` per tile;</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">                `href` carries the S3 key and `metadata` carries the</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">                bucket, the tile identifier, and the SW corner.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">resolution_token</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="n">bucket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">bucket</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="k">for</span> <span class="n">tile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tiles</span><span class="p">():</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="n">key</span> <span class="o">=</span> <span class="n">tile_key</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>            <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>                <span class="n">RemoteProduct</span><span class="p">(</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>                    <span class="nb">id</span><span class="o">=</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>                    <span class="n">href</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>                        <span class="s2">&quot;bucket&quot;</span><span class="p">:</span> <span class="n">bucket</span><span class="p">,</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a>                        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="p">,</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>                        <span class="s2">&quot;tile_lat&quot;</span><span class="p">:</span> <span class="n">tile</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>                        <span class="s2">&quot;tile_lon&quot;</span><span class="p">:</span> <span class="n">tile</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>                    <span class="p">},</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>                <span class="p">)</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="p">)</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">return</span> <span class="n">products</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download every present tile; log and skip ocean / missing ones.</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        The bucket carries one COG per land tile; a candidate key for an</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        ocean tile (or outside coverage) simply returns a 404 on</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        `head_object`. Those are warned about and skipped rather than</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        propagated, so a coastal bbox returns a ragged but non-empty</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        result — never a crash.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            products: The candidate products from :meth:`_search`.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">            list[Path]: One local path per tile that existed and was</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">                downloaded, in `products` order.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="n">missing</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>            <span class="n">products</span><span class="p">,</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="ow">and</span> <span class="n">products</span><span class="p">),</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dem/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="p">):</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="n">fetched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>            <span class="k">if</span> <span class="n">fetched</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                <span class="n">missing</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fetched</span><span class="p">)</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>                <span class="sa">f</span><span class="s2">&quot;dem: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> tile(s) downloaded; &quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> absent (ocean / outside coverage).&quot;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>            <span class="p">)</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Head + download one candidate tile; return `None` if absent.</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            client: The unsigned `boto3` S3 client.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            product: The candidate :class:`RemoteProduct` to fetch.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            Path | None: The written local path, or `None` when the key</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">                is absent (ocean tile, outside coverage).</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="n">client</span><span class="o">.</span><span class="n">head_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - classify below</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="k">if</span> <span class="n">_is_missing_object</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>                    <span class="sa">f</span><span class="s2">&quot;dem: tile absent, skipping: s3://</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>                <span class="p">)</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>                <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>            <span class="n">client</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the unsigned `boto3` client (built lazily by `S3Auth`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">client</span><span class="p">()</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` + `_fetch` (the canonical post-C3 body).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            progress_bar: Show a per-tile progress bar. Defaults to</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            aggregate: Must be `None`. DEM is a raw-COG whole-tile</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                backend (`G4` — no server-side subset, `G5` — no</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                decode), so a time-window reduce has nothing to reduce.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">                Cropping / mosaicking the tiles is pyramids&#39; job, not</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                the backend&#39;s.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            list[Path]: The local paths of the downloaded COG tiles, in</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                bbox row-major order. Empty when every candidate tile is</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                absent from the bucket.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="s2">&quot;DEM.download(aggregate=...) is not supported — a DEM tile is &quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="s2">&quot;time-invariant. Mosaic / crop the downloaded tiles with &quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>                <span class="s2">&quot;pyramids downstream (`pyramids.Dataset.read_file` + &quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                <span class="s2">&quot;`.crop`, `pyramids.dataset.merge.merge_rasters` for a &quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                <span class="s2">&quot;multi-tile mosaic).&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="p">)</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -20896,8 +20900,7 @@ absent from the bucket.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/dem/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-296">296</a></span>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
@@ -20928,39 +20931,42 @@ absent from the bucket.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        progress_bar: Show a per-tile progress bar. Defaults to</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        aggregate: Must be `None`. DEM is a raw-COG whole-tile</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            backend (`G4` — no server-side subset, `G5` — no</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            decode), so a time-window reduce has nothing to reduce.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            Cropping / mosaicking the tiles is pyramids&#39; job, not</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            the backend&#39;s.</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        list[Path]: The local paths of the downloaded COG tiles, in</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            bbox row-major order. Empty when every candidate tile is</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            absent from the bucket.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="s2">&quot;DEM.download(aggregate=...) is not supported — a DEM tile is &quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="s2">&quot;time-invariant. Mosaic / crop the downloaded tiles with &quot;</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="s2">&quot;pyramids downstream (`pyramids.Dataset.read_file` + &quot;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="s2">&quot;`.mosaic` / `.crop`).&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="p">)</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        progress_bar: Show a per-tile progress bar. Defaults to</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        aggregate: Must be `None`. DEM is a raw-COG whole-tile</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            backend (`G4` — no server-side subset, `G5` — no</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            decode), so a time-window reduce has nothing to reduce.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            Cropping / mosaicking the tiles is pyramids&#39; job, not</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            the backend&#39;s.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        list[Path]: The local paths of the downloaded COG tiles, in</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            bbox row-major order. Empty when every candidate tile is</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            absent from the bucket.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="s2">&quot;DEM.download(aggregate=...) is not supported — a DEM tile is &quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="s2">&quot;time-invariant. Mosaic / crop the downloaded tiles with &quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="s2">&quot;pyramids downstream (`pyramids.Dataset.read_file` + &quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="s2">&quot;`.crop`, `pyramids.dataset.merge.merge_rasters` for a &quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="s2">&quot;multi-tile mosaic).&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="p">)</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20980,8 +20986,9 @@ absent from the bucket.</p>
 
         <p>Return the 1° tiles the request bbox intersects.</p>
 <p>Pure arithmetic on the integer-degree grid — no network access.
-A bbox straddling the antimeridian is split into a western and
-eastern slice.</p>
+Antimeridian-straddling bboxes (<code>lon_min &gt; lon_max</code>) are
+rejected at construction; pass the two halves in separate calls
+if you need to span the 180th meridian.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -21033,24 +21040,26 @@ order.</p>
 <span class="normal"><a href="#__codelineno-0-179">179</a></span>
 <span class="normal"><a href="#__codelineno-0-180">180</a></span>
 <span class="normal"><a href="#__codelineno-0-181">181</a></span>
-<span class="normal"><a href="#__codelineno-0-182">182</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="k">def</span><span class="w"> </span><span class="nf">tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tile</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-182">182</a></span>
+<span class="normal"><a href="#__codelineno-0-183">183</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="k">def</span><span class="w"> </span><span class="nf">tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tile</span><span class="p">]:</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the 1° tiles the request bbox intersects.</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    Pure arithmetic on the integer-degree grid — no network access.</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    A bbox straddling the antimeridian is split into a western and</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    eastern slice.</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        list[Tile]: One tile per SW-corner integer degree pair in</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            the bbox, in row-major (south → north, west → east)</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            order.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>    <span class="k">return</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>        <span class="n">lat_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>        <span class="n">lat_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>        <span class="n">lon_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="n">lon_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>    <span class="p">)</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    Antimeridian-straddling bboxes (`lon_min &gt; lon_max`) are</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    rejected at construction; pass the two halves in separate calls</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    if you need to span the 180th meridian.</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        list[Tile]: One tile per SW-corner integer degree pair in</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            the bbox, in row-major (south → north, west → east)</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            order.</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>    <span class="k">return</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>        <span class="n">lat_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>        <span class="n">lat_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="n">lon_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>        <span class="n">lon_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21961,7 +21970,9 @@ one); defaults to the bundled catalog.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">DEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">DEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Anonymous Copernicus DEM backend (raw COG tiles).</span>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    Args:</span>
@@ -22083,165 +22094,167 @@ one); defaults to the bundled catalog.</p>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the 1° tiles the request bbox intersects.</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        Pure arithmetic on the integer-degree grid — no network access.</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        A bbox straddling the antimeridian is split into a western and</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        eastern slice.</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            list[Tile]: One tile per SW-corner integer degree pair in</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">                the bbox, in row-major (south → north, west → east)</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                order.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>        <span class="k">return</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>            <span class="n">lat_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>            <span class="n">lat_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>            <span class="n">lon_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>            <span class="n">lon_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>        <span class="p">)</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Enumerate one candidate product per 1° tile in the bbox.</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        The key is deterministic (no `list_objects_v2` call), so a</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        request with a wide bbox does not walk the bucket. Ocean /</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        outside-coverage tiles are only discovered as missing when</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        `_fetch` calls `head_object` on each candidate.</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            list[RemoteProduct]: One :class:`RemoteProduct` per tile;</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">                `href` carries the S3 key and `metadata` carries the</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">                bucket, the tile identifier, and the SW corner.</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">resolution_token</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>        <span class="n">bucket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">bucket</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="k">for</span> <span class="n">tile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tiles</span><span class="p">():</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>            <span class="n">key</span> <span class="o">=</span> <span class="n">tile_key</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>                <span class="n">RemoteProduct</span><span class="p">(</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>                    <span class="nb">id</span><span class="o">=</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>                    <span class="n">href</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>                        <span class="s2">&quot;bucket&quot;</span><span class="p">:</span> <span class="n">bucket</span><span class="p">,</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>                        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="p">,</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>                        <span class="s2">&quot;tile_lat&quot;</span><span class="p">:</span> <span class="n">tile</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>                        <span class="s2">&quot;tile_lon&quot;</span><span class="p">:</span> <span class="n">tile</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>                    <span class="p">},</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>                <span class="p">)</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="p">)</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="k">return</span> <span class="n">products</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download every present tile; log and skip ocean / missing ones.</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        The bucket carries one COG per land tile; a candidate key for an</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        ocean tile (or outside coverage) simply returns a 404 on</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        `head_object`. Those are warned about and skipped rather than</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        propagated, so a coastal bbox returns a ragged but non-empty</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        result — never a crash.</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">            products: The candidate products from :meth:`_search`.</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">            list[Path]: One local path per tile that existed and was</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">                downloaded, in `products` order.</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">missing</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>            <span class="n">products</span><span class="p">,</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="ow">and</span> <span class="n">products</span><span class="p">),</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dem/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="p">):</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>            <span class="n">fetched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="k">if</span> <span class="n">fetched</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>                <span class="n">missing</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fetched</span><span class="p">)</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>                <span class="sa">f</span><span class="s2">&quot;dem: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> tile(s) downloaded; &quot;</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> absent (ocean / outside coverage).&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>            <span class="p">)</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="k">return</span> <span class="n">written</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Head + download one candidate tile; return `None` if absent.</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            client: The unsigned `boto3` S3 client.</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            product: The candidate :class:`RemoteProduct` to fetch.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            Path | None: The written local path, or `None` when the key</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                is absent (ocean tile, outside coverage).</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>            <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="n">client</span><span class="o">.</span><span class="n">head_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - classify below</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="k">if</span> <span class="n">_is_missing_object</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>                    <span class="sa">f</span><span class="s2">&quot;dem: tile absent, skipping: s3://</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>                <span class="p">)</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>                <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="n">client</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the unsigned `boto3` client (built lazily by `S3Auth`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">client</span><span class="p">()</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` + `_fetch` (the canonical post-C3 body).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            progress_bar: Show a per-tile progress bar. Defaults to</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            aggregate: Must be `None`. DEM is a raw-COG whole-tile</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                backend (`G4` — no server-side subset, `G5` — no</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                decode), so a time-window reduce has nothing to reduce.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                Cropping / mosaicking the tiles is pyramids&#39; job, not</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">                the backend&#39;s.</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            list[Path]: The local paths of the downloaded COG tiles, in</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                bbox row-major order. Empty when every candidate tile is</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                absent from the bucket.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="s2">&quot;DEM.download(aggregate=...) is not supported — a DEM tile is &quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="s2">&quot;time-invariant. Mosaic / crop the downloaded tiles with &quot;</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="s2">&quot;pyramids downstream (`pyramids.Dataset.read_file` + &quot;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>                <span class="s2">&quot;`.mosaic` / `.crop`).&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="p">)</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        Antimeridian-straddling bboxes (`lon_min &gt; lon_max`) are</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        rejected at construction; pass the two halves in separate calls</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        if you need to span the 180th meridian.</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            list[Tile]: One tile per SW-corner integer degree pair in</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                the bbox, in row-major (south → north, west → east)</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">                order.</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>        <span class="k">return</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>            <span class="n">lat_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>            <span class="n">lat_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>            <span class="n">lon_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>            <span class="n">lon_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>        <span class="p">)</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Enumerate one candidate product per 1° tile in the bbox.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        The key is deterministic (no `list_objects_v2` call), so a</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        request with a wide bbox does not walk the bucket. Ocean /</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        outside-coverage tiles are only discovered as missing when</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        `_fetch` calls `head_object` on each candidate.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            list[RemoteProduct]: One :class:`RemoteProduct` per tile;</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">                `href` carries the S3 key and `metadata` carries the</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">                bucket, the tile identifier, and the SW corner.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">resolution_token</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="n">bucket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">bucket</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="k">for</span> <span class="n">tile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tiles</span><span class="p">():</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="n">key</span> <span class="o">=</span> <span class="n">tile_key</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>            <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>                <span class="n">RemoteProduct</span><span class="p">(</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>                    <span class="nb">id</span><span class="o">=</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>                    <span class="n">href</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>                        <span class="s2">&quot;bucket&quot;</span><span class="p">:</span> <span class="n">bucket</span><span class="p">,</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a>                        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="p">,</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>                        <span class="s2">&quot;tile_lat&quot;</span><span class="p">:</span> <span class="n">tile</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>                        <span class="s2">&quot;tile_lon&quot;</span><span class="p">:</span> <span class="n">tile</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>                    <span class="p">},</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>                <span class="p">)</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="p">)</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">return</span> <span class="n">products</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download every present tile; log and skip ocean / missing ones.</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        The bucket carries one COG per land tile; a candidate key for an</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        ocean tile (or outside coverage) simply returns a 404 on</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        `head_object`. Those are warned about and skipped rather than</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        propagated, so a coastal bbox returns a ragged but non-empty</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        result — never a crash.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            products: The candidate products from :meth:`_search`.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">            list[Path]: One local path per tile that existed and was</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">                downloaded, in `products` order.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="n">missing</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>            <span class="n">products</span><span class="p">,</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="ow">and</span> <span class="n">products</span><span class="p">),</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dem/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="p">):</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="n">fetched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>            <span class="k">if</span> <span class="n">fetched</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                <span class="n">missing</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fetched</span><span class="p">)</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>                <span class="sa">f</span><span class="s2">&quot;dem: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> tile(s) downloaded; &quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> absent (ocean / outside coverage).&quot;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>            <span class="p">)</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Head + download one candidate tile; return `None` if absent.</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            client: The unsigned `boto3` S3 client.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            product: The candidate :class:`RemoteProduct` to fetch.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            Path | None: The written local path, or `None` when the key</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">                is absent (ocean tile, outside coverage).</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="n">client</span><span class="o">.</span><span class="n">head_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - classify below</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="k">if</span> <span class="n">_is_missing_object</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>                    <span class="sa">f</span><span class="s2">&quot;dem: tile absent, skipping: s3://</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>                <span class="p">)</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>                <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>            <span class="n">client</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the unsigned `boto3` client (built lazily by `S3Auth`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">client</span><span class="p">()</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` + `_fetch` (the canonical post-C3 body).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            progress_bar: Show a per-tile progress bar. Defaults to</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            aggregate: Must be `None`. DEM is a raw-COG whole-tile</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                backend (`G4` — no server-side subset, `G5` — no</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                decode), so a time-window reduce has nothing to reduce.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">                Cropping / mosaicking the tiles is pyramids&#39; job, not</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                the backend&#39;s.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            list[Path]: The local paths of the downloaded COG tiles, in</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                bbox row-major order. Empty when every candidate tile is</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                absent from the bucket.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="s2">&quot;DEM.download(aggregate=...) is not supported — a DEM tile is &quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="s2">&quot;time-invariant. Mosaic / crop the downloaded tiles with &quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>                <span class="s2">&quot;pyramids downstream (`pyramids.Dataset.read_file` + &quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                <span class="s2">&quot;`.crop`, `pyramids.dataset.merge.merge_rasters` for a &quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                <span class="s2">&quot;multi-tile mosaic).&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="p">)</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22488,8 +22501,7 @@ absent from the bucket.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/dem/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-296">296</a></span>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
@@ -22520,39 +22532,42 @@ absent from the bucket.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        progress_bar: Show a per-tile progress bar. Defaults to</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        aggregate: Must be `None`. DEM is a raw-COG whole-tile</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            backend (`G4` — no server-side subset, `G5` — no</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            decode), so a time-window reduce has nothing to reduce.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            Cropping / mosaicking the tiles is pyramids&#39; job, not</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            the backend&#39;s.</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        list[Path]: The local paths of the downloaded COG tiles, in</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            bbox row-major order. Empty when every candidate tile is</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            absent from the bucket.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="s2">&quot;DEM.download(aggregate=...) is not supported — a DEM tile is &quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="s2">&quot;time-invariant. Mosaic / crop the downloaded tiles with &quot;</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="s2">&quot;pyramids downstream (`pyramids.Dataset.read_file` + &quot;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="s2">&quot;`.mosaic` / `.crop`).&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="p">)</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        progress_bar: Show a per-tile progress bar. Defaults to</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        aggregate: Must be `None`. DEM is a raw-COG whole-tile</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            backend (`G4` — no server-side subset, `G5` — no</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            decode), so a time-window reduce has nothing to reduce.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            Cropping / mosaicking the tiles is pyramids&#39; job, not</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            the backend&#39;s.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        list[Path]: The local paths of the downloaded COG tiles, in</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            bbox row-major order. Empty when every candidate tile is</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            absent from the bucket.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="s2">&quot;DEM.download(aggregate=...) is not supported — a DEM tile is &quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="s2">&quot;time-invariant. Mosaic / crop the downloaded tiles with &quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="s2">&quot;pyramids downstream (`pyramids.Dataset.read_file` + &quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="s2">&quot;`.crop`, `pyramids.dataset.merge.merge_rasters` for a &quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="s2">&quot;multi-tile mosaic).&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="p">)</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22572,8 +22587,9 @@ absent from the bucket.</p>
 
         <p>Return the 1° tiles the request bbox intersects.</p>
 <p>Pure arithmetic on the integer-degree grid — no network access.
-A bbox straddling the antimeridian is split into a western and
-eastern slice.</p>
+Antimeridian-straddling bboxes (<code>lon_min &gt; lon_max</code>) are
+rejected at construction; pass the two halves in separate calls
+if you need to span the 180th meridian.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -22625,24 +22641,26 @@ order.</p>
 <span class="normal"><a href="#__codelineno-0-179">179</a></span>
 <span class="normal"><a href="#__codelineno-0-180">180</a></span>
 <span class="normal"><a href="#__codelineno-0-181">181</a></span>
-<span class="normal"><a href="#__codelineno-0-182">182</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="k">def</span><span class="w"> </span><span class="nf">tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tile</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-182">182</a></span>
+<span class="normal"><a href="#__codelineno-0-183">183</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="k">def</span><span class="w"> </span><span class="nf">tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tile</span><span class="p">]:</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the 1° tiles the request bbox intersects.</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    Pure arithmetic on the integer-degree grid — no network access.</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    A bbox straddling the antimeridian is split into a western and</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    eastern slice.</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        list[Tile]: One tile per SW-corner integer degree pair in</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            the bbox, in row-major (south → north, west → east)</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            order.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>    <span class="k">return</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>        <span class="n">lat_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>        <span class="n">lat_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>        <span class="n">lon_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="n">lon_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>    <span class="p">)</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    Antimeridian-straddling bboxes (`lon_min &gt; lon_max`) are</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    rejected at construction; pass the two halves in separate calls</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    if you need to span the 180th meridian.</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        list[Tile]: One tile per SW-corner integer degree pair in</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            the bbox, in row-major (south → north, west → east)</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            order.</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>    <span class="k">return</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>        <span class="n">lat_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>        <span class="n">lat_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="n">lon_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>        <span class="n">lon_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

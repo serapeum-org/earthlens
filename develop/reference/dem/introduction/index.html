@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -18595,7 +18595,8 @@ file <code>download_file</code> per tile that exists. <code>download()</code> re
   from the bucket. Cropping the bbox down to the exact AOI, mosaicking
   neighbouring tiles into a single raster, reprojecting to a UTM zone,
   and rendering a hillshade are all pyramids' job — its COG reader
-  (<code>pyramids.Dataset.read_file</code>) plus <code>.crop</code> / <code>.mosaic</code> / <code>.to_crs</code>
+  (<code>pyramids.Dataset.read_file</code>) plus <code>.crop</code> / <code>.to_crs</code> and
+  <code>pyramids.dataset.merge.merge_rasters</code> (for a multi-tile mosaic)
   already do this. earthlens does <strong>not</strong> import <code>rasterio</code>, <code>gdal</code>,
   <code>osgeo</code>, or <code>xarray</code>.</p>
 </li>
@@ -18603,7 +18604,7 @@ file <code>download_file</code> per tile that exists. <code>download()</code> re
 <p><strong>1° tile granularity.</strong> The buckets serve one COG per 1° x 1° tile,
   so a coastal bbox spanning several tiles yields one file per tile. To
   merge them, hand the list of paths to
-  <code>pyramids.dataset.mosaic(...)</code>.</p>
+  <code>pyramids.dataset.merge.merge_rasters(paths, out_path)</code>.</p>
 </li>
 <li>
 <p><strong>Ocean tiles are absent — logged and skipped.</strong> Copernicus DEM ships
