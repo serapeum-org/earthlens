@@ -157,6 +157,14 @@
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/dem/01_dem_quickstart/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/dem/02_catalog_and_tile_math/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/drought/catalog_explorer/</loc>
          <lastmod>2026-07-05</lastmod>
     </url>
@@ -1074,6 +1082,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/cmip6/usage/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/dem/datasets/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/dem/dem/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/dem/introduction/</loc>
+         <lastmod>2026-07-05</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/dem/usage/</loc>
          <lastmod>2026-07-05</lastmod>
     </url>
     <url>
