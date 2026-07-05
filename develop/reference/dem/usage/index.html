@@ -18639,18 +18639,20 @@ want; if you need ellipsoidal heights, add the geoid separation.</p>
 </code></pre></div>
 <h2 id="mosaicking-neighbouring-tiles"><a class="toclink" href="#mosaicking-neighbouring-tiles">Mosaicking neighbouring tiles</a><a class="headerlink" href="#mosaicking-neighbouring-tiles" title="Permanent link">#</a></h2>
 <p>A wider bbox returns several files — one per intersected tile.
-<code>pyramids.dataset.mosaic</code> stitches them:</p>
+<code>pyramids.dataset.merge.merge_rasters</code> stitches them into a single COG:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;dem&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">45.2</span><span class="p">,</span> <span class="mf">46.8</span><span class="p">],</span>   <span class="c1"># spans two lat tiles</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">7.2</span><span class="p">,</span> <span class="mf">8.8</span><span class="p">],</span>     <span class="c1"># spans two lon tiles</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;alps_out&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">mosaic</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">mosaic</span><span class="p">(</span><span class="n">tiles</span><span class="p">)</span>   <span class="c1"># single continuous WGS84 raster</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;dem&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">45.2</span><span class="p">,</span> <span class="mf">46.8</span><span class="p">],</span>   <span class="c1"># spans two lat tiles</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">7.2</span><span class="p">,</span> <span class="mf">8.8</span><span class="p">],</span>     <span class="c1"># spans two lon tiles</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;alps_out&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">mosaic_path</span> <span class="o">=</span> <span class="s2">&quot;alps_out/alps_mosaic.tif&quot;</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">merge_rasters</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">],</span> <span class="n">mosaic_path</span><span class="p">)</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">mosaic</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">mosaic_path</span><span class="p">)</span>  <span class="c1"># single continuous WGS84 raster</span>
 </code></pre></div>
 <h2 id="coastal-bbox-some-tiles-do-not-exist"><a class="toclink" href="#coastal-bbox-some-tiles-do-not-exist">Coastal bbox — some tiles do not exist</a><a class="headerlink" href="#coastal-bbox-some-tiles-do-not-exist" title="Permanent link">#</a></h2>
 <p>Copernicus DEM ships <strong>no tile over open ocean</strong>. A bbox that spans the
@@ -18684,7 +18686,7 @@ continental-scale surveys where the finer resolution is not needed.</p>
 <li><strong>No server-side spatial subset.</strong> The buckets serve whole 1° COGs —
   a bbox smaller than a tile still downloads the whole tile.</li>
 <li><strong>No decode.</strong> earthlens hands the file back; reading, reprojection,
-  and mosaicking are pyramids' job (see the <a href="../../examples/dem/dem_quickstart.ipynb">notebook</a>).</li>
+  and mosaicking are pyramids' job (see the <a href="../../../examples/dem/01_dem_quickstart/">quickstart notebook</a>).</li>
 <li><strong>No <code>aggregate=</code>.</strong> DEM has no time axis to reduce over — passing a
   non-<code>None</code> <code>aggregate=</code> raises <code>NotImplementedError</code>.</li>
 <li><strong>No sea-floor bathymetry.</strong> Use the separate <code>bathymetry</code> backend
