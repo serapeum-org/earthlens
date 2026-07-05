@@ -127,15 +127,15 @@ nav:
       - Usage: reference/asf/usage.md
       - Available products: reference/asf/datasets.md
       - Reference: reference/asf/asf.md
-    - CMIP6 (climate projections):
-      - Introduction: reference/cmip6/introduction.md
-      - Usage: reference/cmip6/usage.md
-      - Reference: reference/cmip6/cmip6.md
     - CMEMS (Copernicus Marine):
       - Introduction: reference/cmems/introduction.md
       - Usage: reference/cmems/usage.md
       - Authentication: reference/cmems/authentication.md
       - Reference: reference/cmems/cmems.md
+    - CMIP6 (climate projections):
+      - Introduction: reference/cmip6/introduction.md
+      - Usage: reference/cmip6/usage.md
+      - Reference: reference/cmip6/cmip6.md
     - Earthdata (NASA EOSDIS):
       - Introduction: reference/earthdata/introduction.md
       - Usage: reference/earthdata/usage.md
@@ -388,8 +388,6 @@ nav:
       - Copernicus DEM — download & crop: examples/s3/02_copernicus_dem.ipynb
       - ESA WorldCover — land cover: examples/s3/03_esa_worldcover.ipynb
       - Passthrough — any public bucket: examples/s3/04_passthrough.ipynb
-    - CMIP6 (climate projections):
-      - Quickstart — tas ssp585 subset (live): examples/cmip6/quickstart.ipynb
     - Copernicus Marine:
       - Catalog explorer (no network): examples/cmems/catalog_explorer.ipynb
       - Quickstart — OSTIA SST: examples/cmems/quickstart.ipynb
@@ -399,6 +397,8 @@ nav:
       - Sea ice — Arctic thickness map: examples/cmems/seaice_arctic_thickness.ipynb
       - Waves — significant wave height: examples/cmems/global_wave_significant_height.ipynb
       - Mediterranean — surface temperature map: examples/cmems/mediterranean_sst_map.ipynb
+    - CMIP6 (climate projections):
+      - Quickstart — tas ssp585 subset (live): examples/cmip6/quickstart.ipynb
     - ASF (InSAR / SAR):
       - Catalog explorer (no network): examples/asf/catalog_explorer.ipynb
       - Quickstart — anonymous search: examples/asf/quickstart_search.ipynb
