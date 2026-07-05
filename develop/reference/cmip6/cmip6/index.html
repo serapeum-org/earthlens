@@ -24081,7 +24081,33 @@ not on this list.</p>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
-<span class="normal"><a href="#__codelineno-0-362">362</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="k">class</span><span class="w"> </span><span class="nc">StoreResolver</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
+<span class="normal"><a href="#__codelineno-0-368">368</a></span>
+<span class="normal"><a href="#__codelineno-0-369">369</a></span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span>
+<span class="normal"><a href="#__codelineno-0-373">373</a></span>
+<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span>
+<span class="normal"><a href="#__codelineno-0-376">376</a></span>
+<span class="normal"><a href="#__codelineno-0-377">377</a></span>
+<span class="normal"><a href="#__codelineno-0-378">378</a></span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span>
+<span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="k">class</span><span class="w"> </span><span class="nc">StoreResolver</span><span class="p">:</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve CMIP6 facet tuples to `zstore` URIs over the consolidated CSV.</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    Fetches + caches the CSV once, then filters it per request. Construct with</span>
@@ -24224,8 +24250,8 @@ not on this list.</p>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a>                <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">facet</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>                    <span class="sa">f</span><span class="s2">&quot;no CMIP6 store matches </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> for the requested &quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                    <span class="sa">f</span><span class="s2">&quot;facets so far (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_describe</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">facet</span><span class="p">)</span><span class="si">}</span><span class="s2">). &quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                    <span class="sa">f</span><span class="s2">&quot;Available </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                    <span class="sa">f</span><span class="s2">&quot;facets so far (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_describe</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">facet</span><span class="p">)</span><span class="si">}</span><span class="s2">); &quot;</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_hint</span><span class="p">(</span><span class="n">facet</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">available</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>                <span class="p">)</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="n">narrowed</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_version</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
@@ -24305,6 +24331,32 @@ not on this list.</p>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a>                <span class="n">applied</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">applied</span><span class="p">)</span> <span class="k">if</span> <span class="n">applied</span> <span class="k">else</span> <span class="s2">&quot;no prior facets&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_available_hint</span><span class="p">(</span><span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">available</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a concise &quot;available values&quot; hint with a did-you-mean.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        Keeps the miss message readable on a high-cardinality facet (a</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        `source_id` / `variable_id` miss can leave 100s of candidates) by</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        capping the listed values and adding the closest match as a</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        did-you-mean, mirroring the catalog&#39;s `difflib` lookups.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            facet: The facet that eliminated every row.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            value: The requested (unmatched) value.</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            available: The sorted values that were still available.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            limit: Maximum number of values to list before truncating.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            str: `available {facet}: [v1, …][, +K more]. Did you mean &#39;x&#39;?`.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">available</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">shown</span> <span class="o">=</span> <span class="n">available</span><span class="p">[:</span><span class="n">limit</span><span class="p">]</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">tail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;, +</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">available</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">limit</span><span class="si">}</span><span class="s2"> more&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">limit</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;available </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">shown</span><span class="si">}{</span><span class="n">tail</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24702,8 +24754,8 @@ eliminated every row and lists the values that were available.</p>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a>            <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">facet</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>                <span class="sa">f</span><span class="s2">&quot;no CMIP6 store matches </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> for the requested &quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                <span class="sa">f</span><span class="s2">&quot;facets so far (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_describe</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">facet</span><span class="p">)</span><span class="si">}</span><span class="s2">). &quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="sa">f</span><span class="s2">&quot;Available </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                <span class="sa">f</span><span class="s2">&quot;facets so far (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_describe</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">facet</span><span class="p">)</span><span class="si">}</span><span class="s2">); &quot;</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_hint</span><span class="p">(</span><span class="n">facet</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">available</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="p">)</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">narrowed</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_version</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
@@ -29524,7 +29576,33 @@ not on this list.</p>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
-<span class="normal"><a href="#__codelineno-0-362">362</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="k">class</span><span class="w"> </span><span class="nc">StoreResolver</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
+<span class="normal"><a href="#__codelineno-0-368">368</a></span>
+<span class="normal"><a href="#__codelineno-0-369">369</a></span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span>
+<span class="normal"><a href="#__codelineno-0-373">373</a></span>
+<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span>
+<span class="normal"><a href="#__codelineno-0-376">376</a></span>
+<span class="normal"><a href="#__codelineno-0-377">377</a></span>
+<span class="normal"><a href="#__codelineno-0-378">378</a></span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span>
+<span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="k">class</span><span class="w"> </span><span class="nc">StoreResolver</span><span class="p">:</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve CMIP6 facet tuples to `zstore` URIs over the consolidated CSV.</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    Fetches + caches the CSV once, then filters it per request. Construct with</span>
@@ -29667,8 +29745,8 @@ not on this list.</p>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a>                <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">facet</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>                    <span class="sa">f</span><span class="s2">&quot;no CMIP6 store matches </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> for the requested &quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                    <span class="sa">f</span><span class="s2">&quot;facets so far (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_describe</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">facet</span><span class="p">)</span><span class="si">}</span><span class="s2">). &quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                    <span class="sa">f</span><span class="s2">&quot;Available </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                    <span class="sa">f</span><span class="s2">&quot;facets so far (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_describe</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">facet</span><span class="p">)</span><span class="si">}</span><span class="s2">); &quot;</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_hint</span><span class="p">(</span><span class="n">facet</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">available</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>                <span class="p">)</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="n">narrowed</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_version</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
@@ -29748,6 +29826,32 @@ not on this list.</p>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a>                <span class="n">applied</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">applied</span><span class="p">)</span> <span class="k">if</span> <span class="n">applied</span> <span class="k">else</span> <span class="s2">&quot;no prior facets&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_available_hint</span><span class="p">(</span><span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">available</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a concise &quot;available values&quot; hint with a did-you-mean.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        Keeps the miss message readable on a high-cardinality facet (a</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        `source_id` / `variable_id` miss can leave 100s of candidates) by</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        capping the listed values and adding the closest match as a</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        did-you-mean, mirroring the catalog&#39;s `difflib` lookups.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            facet: The facet that eliminated every row.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            value: The requested (unmatched) value.</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            available: The sorted values that were still available.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            limit: Maximum number of values to list before truncating.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            str: `available {facet}: [v1, …][, +K more]. Did you mean &#39;x&#39;?`.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">available</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">shown</span> <span class="o">=</span> <span class="n">available</span><span class="p">[:</span><span class="n">limit</span><span class="p">]</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">tail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;, +</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">available</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">limit</span><span class="si">}</span><span class="s2"> more&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">limit</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;available </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">shown</span><span class="si">}{</span><span class="n">tail</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -30145,8 +30249,8 @@ eliminated every row and lists the values that were available.</p>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a>            <span class="n">available</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">facet</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>                <span class="sa">f</span><span class="s2">&quot;no CMIP6 store matches </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> for the requested &quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                <span class="sa">f</span><span class="s2">&quot;facets so far (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_describe</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">facet</span><span class="p">)</span><span class="si">}</span><span class="s2">). &quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="sa">f</span><span class="s2">&quot;Available </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>                <span class="sa">f</span><span class="s2">&quot;facets so far (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_describe</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">facet</span><span class="p">)</span><span class="si">}</span><span class="s2">); &quot;</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_hint</span><span class="p">(</span><span class="n">facet</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">available</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="p">)</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">narrowed</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_version</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
