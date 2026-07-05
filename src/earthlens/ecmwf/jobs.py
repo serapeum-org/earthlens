@@ -14,11 +14,26 @@ free functions here for back-compat.
 from __future__ import annotations
 
 import datetime
-import urllib.request
 from pathlib import Path
 from typing import Any
 
 import requests
+
+from earthlens.base.http import HttpClient
+
+
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so tests
+    that monkeypatch `requests.get` still drive the transport, and each
+    call remains a fresh connection.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
 
 
 def read_cdsapirc() -> dict[str, str]:
@@ -67,16 +82,21 @@ def list_recent_jobs(
     params: dict[str, Any] = {"limit": limit}
     if status:
         params["status"] = status
-    resp = requests.get(
+    client = HttpClient(
+        session=_RequestsGet(),
+        timeout=30,
+        max_retries=0,
+        status_forcelist=(),
+        raise_for_status=True,
+    )
+    body = client.get_json(
         url,
         headers={"PRIVATE-TOKEN": cfg["key"]},
         params=params,
-        timeout=30,
     )
-    resp.raise_for_status()
     now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
     out: list[dict[str, Any]] = []
-    for job in resp.json().get("jobs", []):
+    for job in body.get("jobs", []):
         created = job.get("created", "")
         if not created:
             continue
@@ -120,9 +140,15 @@ def download_job(
     if target_path.exists() and target_path.stat().st_size > 0:
         return target_path
     rurl = cfg["url"].rstrip("/") + f"/retrieve/v1/jobs/{job_id}/results"
-    resp = requests.get(rurl, headers={"PRIVATE-TOKEN": cfg["key"]}, timeout=30)
-    resp.raise_for_status()
-    href = resp.json().get("asset", {}).get("value", {}).get("href")
+    results_client = HttpClient(
+        session=_RequestsGet(),
+        timeout=30,
+        max_retries=0,
+        status_forcelist=(),
+        raise_for_status=True,
+    )
+    body = results_client.get_json(rurl, headers={"PRIVATE-TOKEN": cfg["key"]})
+    href = body.get("asset", {}).get("value", {}).get("href")
     if not href:
         raise ValueError(
             f"job {job_id!r} has no downloadable asset href in its " "results record"
@@ -133,11 +159,14 @@ def download_job(
     # reading a local file via `file://`.
     if not href.startswith(("https://", "http://")):
         raise ValueError(f"refusing to download from non-http(s) href: {href!r}")
-    with (
-        # Scheme validated above — bandit B310 does not apply.
-        urllib.request.urlopen(href, timeout=60) as src,  # nosec B310
-        open(target_path, "wb") as out,
-    ):
-        while chunk := src.read(chunk_size):
-            out.write(chunk)
+    asset_client = HttpClient(
+        session=_RequestsGet(),
+        timeout=60,
+        max_retries=0,
+        status_forcelist=(),
+        raise_for_status=True,
+    )
+    asset_client.download(
+        href, target_path, chunk=chunk_size, progress=False, atomic=True
+    )
     return target_path
