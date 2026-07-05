@@ -296,7 +296,8 @@ class EarthLens:
             ['admin', 'admin-boundaries', 'airnow', 'alaska-satellite-facility',
              'amazon-s3', 'argo', 'argo-floats', 'argopy', 'asf', 'bathymetry',
              'bdc', 'brazil-data-cube', 'cdse', 'chc', 'chirps', 'climate-indices',
-             'climate_indices', 'cmems', 'cop-dem', 'copernicus-dem', 'dea',
+             'climate-projections', 'climate_indices', 'cmems', 'cmip6',
+             'cop-dem', 'copernicus-dem', 'dea',
              'deafrica', 'dem', 'digital-earth-africa', 'digital-earth-australia',
              'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo',
              'eea-aq', 'elevation', 'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal',
@@ -309,7 +310,7 @@ class EarthLens:
              'national-water-model', 'natural-earth', 'nexrad', 'nrel',
              'nsrdb', 'nwis', 'nwm', 'nwp', 'obis', 'ohsome', 'openaq',
              'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
-             'planetary-computer', 'protected-planet', 'ptree',
+             'pangeo-cmip6', 'planetary-computer', 'protected-planet', 'ptree',
              'pvgis', 'radar',
              'redlist', 'rgi', 'risk-indicators', 'sensor-community',
              'sentinel-hub',
@@ -382,6 +383,13 @@ class EarthLens:
             from the anonymous `noaa-nwm-pds` bucket; tabular subsetting +
             the retrospective Zarr read via pyramids `LabeledDataset`. Keys
             `"nwm"` / `"national-water-model"`.
+        :class:`earthlens.cmip6.CMIP6`: Raw CMIP6 climate projections — the
+            full `model x scenario x variable x member` archive as
+            analysis-ready Zarr on the open Pangeo `gs://cmip6` bucket. A
+            facet tuple (`source_id` / `experiment_id` / `variable_id` /
+            `table_id`) resolves to the store(s) and pyramids writes a
+            bbox/time NetCDF subset (`raster`); anonymous, no extra. Keys
+            `"cmip6"` / `"pangeo-cmip6"` / `"climate-projections"`.
         :class:`earthlens.goes.GOES`: NOAA GOES-R ABI geostationary imagery
             fetched whole (raw NetCDF granules, `raster`) from the anonymous
             `noaa-goes19` / `noaa-goes18` / `noaa-goes16` buckets by
@@ -483,6 +491,14 @@ class EarthLens:
             "alaska-satellite-facility": ("earthlens.asf", "ASF", "asf", {}),
             "insar": ("earthlens.asf", "ASF", "asf", {}),
             "cmems": ("earthlens.cmems", "CMEMS", "cmems", {}),
+            # Raw CMIP6 archive (full model x scenario x variable x member
+            # matrix) as analysis-ready Zarr on the open Pangeo `gs://cmip6`
+            # bucket. Anonymous (no auth); reads via pyramids (GDAL /vsigs/),
+            # so no per-backend SDK — the `cmip6` extra is empty. Aliases
+            # `"pangeo-cmip6"` / `"climate-projections"`.
+            "cmip6": ("earthlens.cmip6", "CMIP6", "", {}),
+            "pangeo-cmip6": ("earthlens.cmip6", "CMIP6", "", {}),
+            "climate-projections": ("earthlens.cmip6", "CMIP6", "", {}),
             "earthdata": ("earthlens.earthdata", "Earthdata", "earthdata", {}),
             "ecmwf": ("earthlens.ecmwf", "ECMWF", "ecmwf", {}),
             "eumetsat": ("earthlens.eumetsat", "EUMETSAT", "eumetsat", {}),
@@ -1081,14 +1097,35 @@ class EarthLens:
                 variables if isinstance(variables, str) else "chc",
                 data_source,
             )
-        if variables is None and dataset is None:
-            raise ValueError(
-                "variables= is required (or pass dataset= for a "
-                "dataset-keyed backend), e.g. "
-                "EarthLens('chc', variables=['precipitation'])."
-            )
-
         self._check_source(data_source)
+
+        # Most backends take a `variables` (or `dataset`) request axis. A few —
+        # currently only CMIP6 — address their data purely by facet keywords
+        # (`variable_id=`, `source_id=`, ...) and declare no `variables`
+        # parameter; those neither require nor accept `variables=`/`dataset=`.
+        # A backend is treated as facet-only *only* when its constructor
+        # explicitly declares neither `variables` nor a catch-all `**kwargs`
+        # (a `MagicMock` test double, or any pass-through signature, keeps the
+        # historical variables-required behaviour).
+        backend_cls = self.DataSources[data_source]
+        backend_params = inspect.signature(backend_cls.__init__).parameters
+        has_var_keyword = any(
+            p.kind is inspect.Parameter.VAR_KEYWORD for p in backend_params.values()
+        )
+        requires_variables = "variables" in backend_params or has_var_keyword
+        if requires_variables:
+            if variables is None and dataset is None:
+                raise ValueError(
+                    "variables= is required (or pass dataset= for a "
+                    "dataset-keyed backend), e.g. "
+                    "EarthLens('chc', variables=['precipitation'])."
+                )
+        elif variables is not None or dataset is not None:
+            raise ValueError(
+                f"the {data_source!r} backend addresses its data by facet "
+                "keyword arguments (e.g. variable_id=, source_id=), not "
+                "variables=/dataset=."
+            )
 
         # `cadence=` is the clearer alias for the download-cadence role of
         # `temporal_resolution`; when given it simply overrides it.
@@ -1111,9 +1148,6 @@ class EarthLens:
                     "Pass an explicit start and end (e.g. "
                     "time='2020-01-01/2020-01-31')."
                 )
-
-        backend_cls = self.DataSources[data_source]
-        backend_params = inspect.signature(backend_cls.__init__).parameters
 
         # A single `aoi=` supersedes the legacy `lat_lim` / `lon_lim`
         # pair. It accepts a bbox, a point (+ `buffer`), a shapely /
@@ -1177,7 +1211,11 @@ class EarthLens:
         # dataset-keyed backends. With `dataset=None` this is a no-op.
         from earthlens.base._requests import normalize_dataset_variables
 
-        request_kwargs = normalize_dataset_variables(backend_cls, dataset, variables)
+        request_kwargs = (
+            normalize_dataset_variables(backend_cls, dataset, variables)
+            if requires_variables
+            else {}
+        )
 
         self.datasource = backend_cls(
             start=start,
