@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/openeo/cloud_masked_composite/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/dem/02_catalog_and_tile_math/">
       
       
-        <link rel="prev" href="../quickstart/">
+        <link rel="prev" href="../01_dem_quickstart/">
       
       
-        <link rel="next" href="../server_side_aggregate/">
+        <link rel="next" href="../../pvgis/01_pvgis_quickstart/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Sentinel-2 cloud-masked median composite via openEO - earthlens</title>
+        <title>Copernicus DEM — catalog + tile-math explorer (offline) - earthlens</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sentinel-2-cloud-masked-median-composite-via-openeo" class="md-skip">
+        <a href="#copernicus-dem-catalog-tile-math-explorer-offline" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Sentinel-2 cloud-masked median composite via openEO
+              Copernicus DEM — catalog + tile-math explorer (offline)
             
           </span>
         </div>
@@ -13140,6 +13140,8 @@
                 
   
   
+    
+  
   
   
     
@@ -13150,11 +13152,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" checked>
         
           
           <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
@@ -13175,7 +13177,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_21">
             <span class="md-nav__icon md-icon"></span>
             
@@ -13193,7 +13195,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../dem/01_dem_quickstart/" class="md-nav__link">
+      <a href="../01_dem_quickstart/" class="md-nav__link">
         
   
   
@@ -13218,10 +13220,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../dem/02_catalog_and_tile_math/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copernicus DEM — catalog + tile-math explorer (offline)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -13237,6 +13266,137 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-the-catalog-two-datasets-side-by-side" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. The catalog — two datasets, side by side
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-1-tile-name-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The 1° tile-name convention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-from-bbox-to-tiles-the-arithmetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. From bbox to tiles — the arithmetic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. From bbox to tiles — the arithmetic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#antimeridian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antimeridian:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-pre-flight-how-big-is-my-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Pre-flight: how big is my request?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Pre-flight: how big is my request?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-the-numbers-say" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the numbers say
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-did-you-mean-on-typos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Did-you-mean on typos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Takeaway
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -14734,8 +14894,6 @@
                 
   
   
-    
-  
   
   
     
@@ -14746,11 +14904,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_34" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_34" >
         
           
           <label class="md-nav__link" for="__nav_4_34" id="__nav_4_34_label" tabindex="0">
@@ -14771,7 +14929,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_34_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_34_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_34">
             <span class="md-nav__icon md-icon"></span>
             
@@ -14789,7 +14947,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../catalog_explorer/" class="md-nav__link">
+      <a href="../../openeo/catalog_explorer/" class="md-nav__link">
         
   
   
@@ -14817,7 +14975,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
+      <a href="../../openeo/quickstart/" class="md-nav__link">
         
   
   
@@ -14842,37 +15000,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sentinel-2 cloud-masked median composite via openEO
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../openeo/cloud_masked_composite/" class="md-nav__link">
         
   
   
@@ -14888,98 +15019,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Setup
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#credentials" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Credentials
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Credentials">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detecting-a-credential-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Detecting a credential source
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#a-graceful-skip-download-wrapper" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A graceful-skip download wrapper
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#build-the-request" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Build the request
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#download-server-side-execution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Download (server-side execution)
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -14992,7 +15031,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../server_side_aggregate/" class="md-nav__link">
+      <a href="../../openeo/server_side_aggregate/" class="md-nav__link">
         
   
   
@@ -15020,7 +15059,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../air_quality_no2_monthly/" class="md-nav__link">
+      <a href="../../openeo/air_quality_no2_monthly/" class="md-nav__link">
         
   
   
@@ -15048,7 +15087,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ocean_chlorophyll_monthly/" class="md-nav__link">
+      <a href="../../openeo/ocean_chlorophyll_monthly/" class="md-nav__link">
         
   
   
@@ -18490,33 +18529,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#credentials" class="md-nav__link">
+  <a href="#1-the-catalog-two-datasets-side-by-side" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Credentials
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Credentials">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detecting-a-credential-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Detecting a credential source
+        1. The catalog — two datasets, side by side
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#a-graceful-skip-download-wrapper" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#2-the-1-tile-name-convention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A graceful-skip download wrapper
+        2. The 1° tile-name convention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-from-bbox-to-tiles-the-arithmetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. From bbox to tiles — the arithmetic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. From bbox to tiles — the arithmetic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#antimeridian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antimeridian:
       
     </span>
   </a>
@@ -18529,10 +18579,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#build-the-request" class="md-nav__link">
+  <a href="#4-pre-flight-how-big-is-my-request" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Build the request
+        4. Pre-flight: how big is my request?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Pre-flight: how big is my request?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-the-numbers-say" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the numbers say
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-did-you-mean-on-typos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Did-you-mean on typos
       
     </span>
   </a>
@@ -18540,10 +18618,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-server-side-execution" class="md-nav__link">
+  <a href="#takeaway" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download (server-side execution)
+        Takeaway
       
     </span>
   </a>
@@ -18567,7 +18645,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/openeo/cloud_masked_composite.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/dem/02_catalog_and_tile_math.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -18576,7 +18654,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/openeo/cloud_masked_composite.ipynb" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/dem/02_catalog_and_tile_math.ipynb" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -19304,37 +19382,44 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7bd7c906">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=95ef16a7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="sentinel-2-cloud-masked-median-composite-via-openeo">Sentinel-2 cloud-masked median composite via openEO<a class="anchor-link" href="#sentinel-2-cloud-masked-median-composite-via-openeo">¶</a></h1><p>The <code>sentinel-2-l2a-cloud-masked-composite</code> recipe masks clouds (<code>mask_scl_dilation</code>) and reduces the time axis to a <strong>median composite</strong> (<code>reduce_dimension(t, median)</code>), returning a single multi-band GeoTIFF. We use a small bbox and a one-month window so the synchronous download stays small and fast.</p>
-<p>For a large AOI or a long window the synchronous endpoint is size-capped - pass <code>execute="batch"</code> to run it as a polled batch job instead (a batch job queues server-side and can take many minutes; see the Usage page).</p>
-<div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>openeo<span class="o">]</span>
-</pre></div>
+<h1 id="copernicus-dem-catalog-tile-math-explorer-offline">Copernicus DEM — catalog + tile-math explorer (offline)<a class="anchor-link" href="#copernicus-dem-catalog-tile-math-explorer-offline">¶</a></h1><p>The quickstart notebook (<code>01_dem_quickstart.ipynb</code>) showed the end-to-end
+download path against real buckets. This notebook is the <strong>offline companion</strong>:
+it walks through the two curated datasets, the 1° tile convention (<code>N##</code>/<code>S##</code></p>
+<ul>
+<li><code>E###</code>/<code>W###</code>) that names every COG in the bucket, and the pure-arithmetic
+helper (<code>bbox_to_tiles</code>) that resolves a bbox to the exact tile keys the backend
+will fetch — no network calls at all.</li>
+</ul>
+<p>By the end you will be able to answer: <em>"how many tiles does my bbox cost, and
+which ones?"</em> before you hit <code>.download()</code>.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4d475a90">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=99c9ac2b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>A single cell for the imports: <code>os</code> / <code>pathlib.Path</code> for the credential check, and the unified <code>EarthLens</code> entry point.</p>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Everything here is offline — the catalog ships with the package and the tile
+math is pure arithmetic.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a46166b7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1e44d072">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -19347,49 +19432,70 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.dem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.dem._helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tile</span><span class="p">,</span> <span class="n">bbox_to_tiles</span><span class="p">,</span> <span class="n">tile_key</span><span class="p">,</span> <span class="n">tile_name</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os
-from pathlib import Path
+<div class="clipboard-copy-txt" id="cell-1">import pandas as pd
 
-from earthlens import EarthLens</div>
+from earthlens.dem import Catalog
+from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key, tile_name</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1e820ba1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16d98695">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h2><p>openEO authenticates with CDSE via OIDC. The download cell below runs for real when credentials are present (env <code>OPENEO_CLIENT_ID</code> / <code>OPENEO_CLIENT_SECRET</code>, or a cached refresh token from a prior interactive login) and prints a skip note otherwise - so this notebook executes cleanly with or without secrets. See the Authentication page.</p>
+<h2 id="1-the-catalog-two-datasets-side-by-side">1. The catalog — two datasets, side by side<a class="anchor-link" href="#1-the-catalog-two-datasets-side-by-side">¶</a></h2><p>The DEM catalog is small on purpose: Copernicus DEM ships two globally-
+consistent grids and this backend curates both. <code>Catalog()</code> loads the bundled
+YAML with a strict duplicate-key-rejecting loader.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>key</code></td>
+<td>Value passed to <code>EarthLens(dataset=...)</code></td>
+</tr>
+<tr>
+<td><code>bucket</code></td>
+<td>Anonymous AWS Open Data bucket</td>
+</tr>
+<tr>
+<td><code>resolution_token</code></td>
+<td>Fragment embedded in every tile name (<code>_10_</code> / <code>_30_</code>)</td>
+</tr>
+<tr>
+<td><code>native_resolution_m</code></td>
+<td>Approximate pixel size</td>
+</tr>
+<tr>
+<td><code>vertical_datum</code></td>
+<td>Elevation reference (EGM2008 geoid)</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c7b37c11">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="detecting-a-credential-source">Detecting a credential source<a class="anchor-link" href="#detecting-a-credential-source">¶</a></h3><p><code>has_openeo_credentials()</code> reports whether any OIDC credential source is available: headless client env vars, a refresh-token env var, or a cached <code>~/.openeo</code> login.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f716d71a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7dfa76eb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -19402,44 +19508,122 @@ from earthlens import EarthLens</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">has_openeo_credentials</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Whether some openEO OIDC credential source is available."""</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENEO_CLIENT_ID"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENEO_CLIENT_SECRET"</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OPENEO_REFRESH_TOKEN"</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">".openeo"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s1">'key'</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
+        <span class="s1">'bucket'</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+        <span class="s1">'token'</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">resolution_token</span><span class="p">,</span>
+        <span class="s1">'native_res_m'</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">native_resolution_m</span><span class="p">,</span>
+        <span class="s1">'vertical_datum'</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">vertical_datum</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="p">]</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'key'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">def has_openeo_credentials() -&gt; bool:
-    """Whether some openEO OIDC credential source is available."""
-    if os.environ.get("OPENEO_CLIENT_ID") and os.environ.get("OPENEO_CLIENT_SECRET"):
-        return True
-    if os.environ.get("OPENEO_REFRESH_TOKEN"):
-        return True
-    return (Path.home() / ".openeo").exists()</div>
+<div class="clipboard-copy-txt" id="cell-2">catalog = Catalog()
+rows = [
+    {
+        'key': key,
+        'bucket': row.bucket,
+        'token': row.resolution_token,
+        'native_res_m': row.native_resolution_m,
+        'vertical_datum': row.vertical_datum,
+    }
+    for key, row in catalog.datasets.items()
+]
+pd.DataFrame(rows).set_index('key')</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>bucket</th>
+<th>token</th>
+<th>native_res_m</th>
+<th>vertical_datum</th>
+</tr>
+<tr>
+<th>key</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>cop-dem-glo-30</th>
+<td>copernicus-dem-30m</td>
+<td>10</td>
+<td>30</td>
+<td>EGM2008</td>
+</tr>
+<tr>
+<th>cop-dem-glo-90</th>
+<td>copernicus-dem-90m</td>
+<td>30</td>
+<td>90</td>
+<td>EGM2008</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1e97df95">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=64546455">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="a-graceful-skip-download-wrapper">A graceful-skip download wrapper<a class="anchor-link" href="#a-graceful-skip-download-wrapper">¶</a></h3><p><code>run_or_skip()</code> runs the live <code>download()</code> when credentials exist and otherwise prints a skip note, so the notebook executes top-to-bottom with no errors whether or not CDSE OIDC credentials are configured (the docs build never needs secrets).</p>
+<h2 id="2-the-1-tile-name-convention">2. The 1° tile-name convention<a class="anchor-link" href="#2-the-1-tile-name-convention">¶</a></h2><p>Copernicus DEM COGs live on a fixed integer-degree grid — one tile per 1° x 1°
+square, addressed by its <strong>SW corner</strong>. The name encodes:</p>
+<ul>
+<li>the resolution token: <code>10</code> for GLO-30, <code>30</code> for GLO-90,</li>
+<li>latitude as <code>N##</code> / <code>S##</code> (two digits, zero-padded),</li>
+<li>longitude as <code>E###</code> / <code>W###</code> (three digits, zero-padded).</li>
+</ul>
+<p>The <code>_00_</code> markers between the coordinates are the arc-minute portion, always
+<code>00</code> on the 1° grid. <code>tile_name()</code> and <code>tile_key()</code> build the pieces.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b26a3486">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cb12b51d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -19452,64 +19636,141 @@ from earthlens import EarthLens</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">,</span> <span class="o">**</span><span class="n">download_kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Run the live download when credentials exist, else print a skip note.</span>
-
-<span class="sd">    Keeps the notebook executing top-to-bottom with no errors whether or not</span>
-<span class="sd">    CDSE OIDC credentials are configured (so the docs build never needs secrets).</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_openeo_credentials</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="s2">"No openEO OIDC credentials found - skipping the live download.</span><span class="se">\n</span><span class="s2">"</span>
-            <span class="s2">"Set OPENEO_CLIENT_ID / OPENEO_CLIENT_SECRET (headless) or sign in once</span><span class="se">\n</span><span class="s2">"</span>
-            <span class="s2">"interactively (see the Authentication page) to run this cell for real."</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">[]</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="n">facade</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">**</span><span class="n">download_kwargs</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">paths</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">examples</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">'Nile Delta (Egypt)'</span><span class="p">,</span> <span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mi">31</span><span class="p">),</span> <span class="s1">'10'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">'Amazon rainforest (Brazil)'</span><span class="p">,</span> <span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span> <span class="n">lon</span><span class="o">=-</span><span class="mi">60</span><span class="p">),</span> <span class="s1">'10'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">'Prime meridian + equator'</span><span class="p">,</span> <span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">'10'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">'New Zealand South Island'</span><span class="p">,</span> <span class="n">Tile</span><span class="p">(</span><span class="n">lat</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mi">170</span><span class="p">),</span> <span class="s1">'30'</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="n">explained</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s1">'region'</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+        <span class="s1">'sw_corner'</span><span class="p">:</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">tile</span><span class="o">.</span><span class="n">lat</span><span class="si">:</span><span class="s1">&gt;3d</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">tile</span><span class="o">.</span><span class="n">lon</span><span class="si">:</span><span class="s1">&gt;4d</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+        <span class="s1">'grid'</span><span class="p">:</span> <span class="s1">'GLO-30'</span> <span class="k">if</span> <span class="n">token</span> <span class="o">==</span> <span class="s1">'10'</span> <span class="k">else</span> <span class="s1">'GLO-90'</span><span class="p">,</span>
+        <span class="s1">'tile_identifier'</span><span class="p">:</span> <span class="n">tile_name</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">token</span><span class="p">),</span>
+        <span class="s1">'bucket_key'</span><span class="p">:</span> <span class="n">tile_key</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">token</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">tile</span><span class="p">,</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">examples</span>
+<span class="p">]</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">explained</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'region'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">def run_or_skip(facade, **download_kwargs):
-    """Run the live download when credentials exist, else print a skip note.
+<div class="clipboard-copy-txt" id="cell-3">examples = [
+    ('Nile Delta (Egypt)', Tile(lat=30, lon=31), '10'),
+    ('Amazon rainforest (Brazil)', Tile(lat=-3, lon=-60), '10'),
+    ('Prime meridian + equator', Tile(lat=0, lon=0), '10'),
+    ('New Zealand South Island', Tile(lat=-45, lon=170), '30'),
+]
+explained = [
+    {
+        'region': label,
+        'sw_corner': f'{tile.lat:&gt;3d}, {tile.lon:&gt;4d}',
+        'grid': 'GLO-30' if token == '10' else 'GLO-90',
+        'tile_identifier': tile_name(tile, token),
+        'bucket_key': tile_key(tile, token),
+    }
+    for label, tile, token in examples
+]
+pd.DataFrame(explained).set_index('region')</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-    Keeps the notebook executing top-to-bottom with no errors whether or not
-    CDSE OIDC credentials are configured (so the docs build never needs secrets).
-    """
-    if not has_openeo_credentials():
-        print(
-            "No openEO OIDC credentials found - skipping the live download.\n"
-            "Set OPENEO_CLIENT_ID / OPENEO_CLIENT_SECRET (headless) or sign in once\n"
-            "interactively (see the Authentication page) to run this cell for real."
-        )
-        return []
-    paths = facade.download(**download_kwargs)
-    for path in paths:
-        print(path)
-    return paths</div>
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>sw_corner</th>
+<th>grid</th>
+<th>tile_identifier</th>
+<th>bucket_key</th>
+</tr>
+<tr>
+<th>region</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>Nile Delta (Egypt)</th>
+<td>30,   31</td>
+<td>GLO-30</td>
+<td>Copernicus_DSM_COG_10_N30_00_E031_00_DEM</td>
+<td>Copernicus_DSM_COG_10_N30_00_E031_00_DEM/Coper...</td>
+</tr>
+<tr>
+<th>Amazon rainforest (Brazil)</th>
+<td>-3,  -60</td>
+<td>GLO-30</td>
+<td>Copernicus_DSM_COG_10_S03_00_W060_00_DEM</td>
+<td>Copernicus_DSM_COG_10_S03_00_W060_00_DEM/Coper...</td>
+</tr>
+<tr>
+<th>Prime meridian + equator</th>
+<td>0,    0</td>
+<td>GLO-30</td>
+<td>Copernicus_DSM_COG_10_N00_00_E000_00_DEM</td>
+<td>Copernicus_DSM_COG_10_N00_00_E000_00_DEM/Coper...</td>
+</tr>
+<tr>
+<th>New Zealand South Island</th>
+<td>-45,  170</td>
+<td>GLO-90</td>
+<td>Copernicus_DSM_COG_30_S45_00_E170_00_DEM</td>
+<td>Copernicus_DSM_COG_30_S45_00_E170_00_DEM/Coper...</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e5f9cf02">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=06ad04d0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="build-the-request">Build the request<a class="anchor-link" href="#build-the-request">¶</a></h2><p>Describe the composite once: the openEO backend, the cloud-masked-composite <code>dataset</code>, a small bbox over the Balearic Sea, and a one-month July window. <code>max_cloud_cover</code> filters the input scenes before compositing.</p>
+<h2 id="3-from-bbox-to-tiles-the-arithmetic">3. From bbox to tiles — the arithmetic<a class="anchor-link" href="#3-from-bbox-to-tiles-the-arithmetic">¶</a></h2><p><code>bbox_to_tiles(lat_min, lat_max, lon_min, lon_max)</code> snaps a bbox to the
+integer-degree grid and returns every 1° tile it intersects. <strong>Pure arithmetic
+— no network, no listing call.</strong></p>
+<p>A small bbox lying inside a single square returns one tile:</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eb0b40bd">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c7dc0ecd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -19522,50 +19783,47 @@ from earthlens import EarthLens</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s1">'openeo'</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s1">'sentinel-2-l2a-cloud-masked-composite'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2023-07-01'</span><span class="p">,</span>
-    <span class="n">end</span><span class="o">=</span><span class="s1">'2023-07-31'</span><span class="p">,</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">3.67</span><span class="p">,</span> <span class="mf">40.40</span><span class="p">,</span> <span class="mf">3.72</span><span class="p">,</span> <span class="mf">40.45</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="s1">'data/openeo-composite'</span><span class="p">,</span>
-    <span class="n">max_cloud_cover</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">single</span> <span class="o">=</span> <span class="n">bbox_to_tiles</span><span class="p">(</span><span class="n">lat_min</span><span class="o">=</span><span class="mf">30.2</span><span class="p">,</span> <span class="n">lat_max</span><span class="o">=</span><span class="mf">30.8</span><span class="p">,</span> <span class="n">lon_min</span><span class="o">=</span><span class="mf">31.2</span><span class="p">,</span> <span class="n">lon_max</span><span class="o">=</span><span class="mf">31.8</span><span class="p">)</span>
+<span class="p">[(</span><span class="n">t</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">single</span><span class="p">]</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">facade = EarthLens(
-    data_source='openeo',
-    dataset='sentinel-2-l2a-cloud-masked-composite',
-    variables=[],
-    start='2023-07-01',
-    end='2023-07-31',
-    aoi=[3.67, 40.40, 3.72, 40.45],
-    path='data/openeo-composite',
-    max_cloud_cover=60,
-)</div>
+<div class="clipboard-copy-txt" id="cell-4">single = bbox_to_tiles(lat_min=30.2, lat_max=30.8, lon_min=31.2, lon_max=31.8)
+[(t.lat, t.lon) for t in single]</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[(30, 31)]</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=87c2614c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8dfd30de">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Inspect the output format the recipe will produce - a single multi-band GeoTIFF.</p>
+<p>A bbox that crosses tile boundaries pulls in every neighbour. Here a small
+Alpine bbox reaches into four tiles in a 2x2 pattern:</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e5f66415">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4e9d02c7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -19578,32 +19836,48 @@ from earthlens import EarthLens</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">facade</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_output_format</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">alps</span> <span class="o">=</span> <span class="n">bbox_to_tiles</span><span class="p">(</span><span class="n">lat_min</span><span class="o">=</span><span class="mf">45.4</span><span class="p">,</span> <span class="n">lat_max</span><span class="o">=</span><span class="mf">46.6</span><span class="p">,</span> <span class="n">lon_min</span><span class="o">=</span><span class="mf">7.4</span><span class="p">,</span> <span class="n">lon_max</span><span class="o">=</span><span class="mf">8.6</span><span class="p">)</span>
+<span class="nb">sorted</span><span class="p">((</span><span class="n">t</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">alps</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">facade.datasource._output_format</div>
+<div class="clipboard-copy-txt" id="cell-5">alps = bbox_to_tiles(lat_min=45.4, lat_max=46.6, lon_min=7.4, lon_max=8.6)
+sorted((t.lat, t.lon) for t in alps)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[(45, 7), (45, 8), (46, 7), (46, 8)]</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ac3f732">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=70104da9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="download-server-side-execution">Download (server-side execution)<a class="anchor-link" href="#download-server-side-execution">¶</a></h2><p>openEO builds and runs the process graph on CDSE, then earthlens streams the resulting GeoTIFF down to <code>path</code>. <code>run_or_skip()</code> returns the written paths (or an empty list when credentials are absent).</p>
+<h3 id="antimeridian-lon_min-lon_max">Antimeridian: <code>lon_min &gt; lon_max</code><a class="anchor-link" href="#antimeridian-lon_min-lon_max">¶</a></h3><p>A bbox that straddles the antimeridian is signalled by <code>lon_min &gt; lon_max</code>.
+The helper splits it into a western slice (<code>[lon_min, 180)</code>) and an eastern
+slice (<code>[-180, lon_max]</code>) and returns tiles from both sides.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=50642e71">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=574462ae">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -19616,13 +19890,288 @@ from earthlens import EarthLens</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">)</span>
-<span class="n">paths</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">straddle</span> <span class="o">=</span> <span class="n">bbox_to_tiles</span><span class="p">(</span>
+    <span class="n">lat_min</span><span class="o">=-</span><span class="mf">18.0</span><span class="p">,</span> <span class="n">lat_max</span><span class="o">=-</span><span class="mf">17.0</span><span class="p">,</span>     <span class="c1"># Fiji latitude band</span>
+    <span class="n">lon_min</span><span class="o">=</span><span class="mf">179.5</span><span class="p">,</span> <span class="n">lon_max</span><span class="o">=-</span><span class="mf">179.5</span><span class="p">,</span>    <span class="c1"># crosses the antimeridian</span>
+<span class="p">)</span>
+<span class="nb">sorted</span><span class="p">((</span><span class="n">t</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">straddle</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">paths = run_or_skip(facade)
-paths</div>
+<div class="clipboard-copy-txt" id="cell-6">straddle = bbox_to_tiles(
+    lat_min=-18.0, lat_max=-17.0,     # Fiji latitude band
+    lon_min=179.5, lon_max=-179.5,    # crosses the antimeridian
+)
+sorted((t.lat, t.lon) for t in straddle)</div>
 </div>
 </div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[(-18, -180), (-18, 179), (-17, -180), (-17, 179)]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1b503a8b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="4-pre-flight-how-big-is-my-request">4. Pre-flight: how big is my request?<a class="anchor-link" href="#4-pre-flight-how-big-is-my-request">¶</a></h2><p>Each Copernicus DEM GLO-30 tile is roughly <strong>50 MB</strong> and each GLO-90 tile
+roughly <strong>5 MB</strong>. Combine <code>bbox_to_tiles</code> with the catalog to estimate a
+download's size before you commit to it:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2b1b07c4">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">APPROX_SIZE_MB</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'10'</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span> <span class="s1">'30'</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">estimate_download</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_key</span><span class="p">)</span>
+    <span class="n">tiles</span> <span class="o">=</span> <span class="n">bbox_to_tiles</span><span class="p">(</span><span class="o">*</span><span class="n">bbox</span><span class="p">)</span>
+    <span class="n">per_tile_mb</span> <span class="o">=</span> <span class="n">APPROX_SIZE_MB</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">resolution_token</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">'dataset'</span><span class="p">:</span> <span class="n">dataset_key</span><span class="p">,</span>
+        <span class="s1">'tiles'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">tiles</span><span class="p">),</span>
+        <span class="s1">'approx_MB'</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tiles</span><span class="p">)</span> <span class="o">*</span> <span class="n">per_tile_mb</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">}</span>
+
+<span class="n">queries</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">'France (bounding box)'</span><span class="p">,</span> <span class="p">(</span><span class="mf">41.3</span><span class="p">,</span> <span class="mf">51.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">'Egypt (bounding box)'</span><span class="p">,</span>  <span class="p">(</span><span class="mf">22.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">37.0</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">'Iceland (bounding box)'</span><span class="p">,</span> <span class="p">(</span><span class="mf">63.3</span><span class="p">,</span> <span class="mf">66.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">24.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">13.4</span><span class="p">)),</span>
+<span class="p">]</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'cop-dem-glo-30'</span><span class="p">,</span> <span class="s1">'cop-dem-glo-90'</span><span class="p">):</span>
+        <span class="n">est</span> <span class="o">=</span> <span class="n">estimate_download</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">'region'</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">est</span><span class="p">})</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">'region'</span><span class="p">,</span> <span class="s1">'dataset'</span><span class="p">])</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-7">APPROX_SIZE_MB = {'10': 50.0, '30': 5.0}
+
+def estimate_download(bbox, dataset_key: str):
+    row = catalog.get_dataset(dataset_key)
+    tiles = bbox_to_tiles(*bbox)
+    per_tile_mb = APPROX_SIZE_MB[row.resolution_token]
+    return {
+        'dataset': dataset_key,
+        'tiles': len(tiles),
+        'approx_MB': round(len(tiles) * per_tile_mb, 1),
+    }
+
+queries = [
+    ('France (bounding box)', (41.3, 51.1, -5.2, 9.7)),
+    ('Egypt (bounding box)',  (22.0, 32.0, 24.0, 37.0)),
+    ('Iceland (bounding box)', (63.3, 66.6, -24.6, -13.4)),
+]
+rows = []
+for label, bbox in queries:
+    for dataset in ('cop-dem-glo-30', 'cop-dem-glo-90'):
+        est = estimate_download(bbox, dataset)
+        rows.append({'region': label, **est})
+pd.DataFrame(rows).set_index(['region', 'dataset'])</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th></th>
+<th>tiles</th>
+<th>approx_MB</th>
+</tr>
+<tr>
+<th>region</th>
+<th>dataset</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th rowspan="2" valign="top">France (bounding box)</th>
+<th>cop-dem-glo-30</th>
+<td>176</td>
+<td>8800.0</td>
+</tr>
+<tr>
+<th>cop-dem-glo-90</th>
+<td>176</td>
+<td>880.0</td>
+</tr>
+<tr>
+<th rowspan="2" valign="top">Egypt (bounding box)</th>
+<th>cop-dem-glo-30</th>
+<td>154</td>
+<td>7700.0</td>
+</tr>
+<tr>
+<th>cop-dem-glo-90</th>
+<td>154</td>
+<td>770.0</td>
+</tr>
+<tr>
+<th rowspan="2" valign="top">Iceland (bounding box)</th>
+<th>cop-dem-glo-30</th>
+<td>48</td>
+<td>2400.0</td>
+</tr>
+<tr>
+<th>cop-dem-glo-90</th>
+<td>48</td>
+<td>240.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dfede800">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="what-the-numbers-say">What the numbers say<a class="anchor-link" href="#what-the-numbers-say">¶</a></h3><p>The <code>approx_MB</code> column is an <strong>upper bound</strong> — ocean tiles in the bbox will
+come back 404 (Copernicus DEM ships no data over open ocean) and are logged
+and skipped by the backend. So an Iceland bbox that intersects, say, 40 tiles
+will typically download closer to 10-15 tiles once the surrounding North
+Atlantic squares fall away. The <em>real</em> file count only lands once you call
+<code>.download()</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=49a07f73">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="5-did-you-mean-on-typos">5. Did-you-mean on typos<a class="anchor-link" href="#5-did-you-mean-on-typos">¶</a></h2><p>The catalog inherits the shared did-you-mean helper — a near-miss key surfaces
+a hint pointing at the closest curated dataset.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4c8d312c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">catalog</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'cop-dem-glo-3'</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-8">try:
+    catalog.get_dataset('cop-dem-glo-3')
+except ValueError as exc:
+    print(exc)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>'cop-dem-glo-3' is not in the DEM catalog. Known datasets: ['cop-dem-glo-30', 'cop-dem-glo-90']. Did you mean 'cop-dem-glo-30'?
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8aafce89">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="takeaway">Takeaway<a class="anchor-link" href="#takeaway">¶</a></h2><ul>
+<li><strong>Two curated datasets</strong> — GLO-30 and GLO-90 — cover the whole Copernicus
+DEM addressable universe. Both are anonymous.</li>
+<li><strong>Tile identifiers are deterministic.</strong> Given a bbox, <code>bbox_to_tiles</code>
+returns the exact tile keys the backend will fetch, before any network
+activity.</li>
+<li><strong>Antimeridian bboxes are supported</strong> via <code>lon_min &gt; lon_max</code> and split into
+two slices under the hood.</li>
+<li><strong>Ocean tiles are absent, not fatal.</strong> Estimates from <code>bbox_to_tiles * ~size</code>
+are upper bounds; the real cost is lower once ocean cells drop out.</li>
+</ul>
+<p>The live end-to-end path is in <code>01_dem_quickstart.ipynb</code>.</p>
 </div>
 </div>
 </div>
@@ -19669,7 +20218,7 @@ paths</div>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../quickstart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Quick start - Sentinel-2 NDVI monthly via openEO">
+          <a href="../01_dem_quickstart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Copernicus DEM — quickstart (anonymous, no account)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -19679,20 +20228,20 @@ paths</div>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Quick start - Sentinel-2 NDVI monthly via openEO
+                Copernicus DEM — quickstart (anonymous, no account)
               </div>
             </div>
           </a>
         
         
           
-          <a href="../server_side_aggregate/" class="md-footer__link md-footer__link--next" aria-label="Next: Server-side temporal aggregation with">
+          <a href="../../pvgis/01_pvgis_quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: PVGIS quickstart — hourly solar radiation (live)">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Server-side temporal aggregation with
+                PVGIS quickstart — hourly solar radiation (live)
               </div>
             </div>
             <div class="md-footer__button md-icon">
