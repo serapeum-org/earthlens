@@ -95,33 +95,6 @@ class _HttpError(_Resp):
         raise err
 
 
-class TestIsTransient:
-    """_is_transient classifies which request errors are retryable."""
-
-    @pytest.mark.parametrize(
-        "exc, expected",
-        [
-            (_helpers.requests.ConnectionError("reset"), True),
-            (_helpers.requests.Timeout("slow"), True),
-            (_helpers.requests.exceptions.ChunkedEncodingError("mid-body"), True),
-            (_helpers.requests.exceptions.ContentDecodingError("gzip"), True),
-            (_helpers.requests.RequestException("other"), False),
-        ],
-    )
-    def test_connection_and_timeout(self, exc, expected):
-        """Connection resets (handshake or mid-body) and timeouts are transient."""
-        assert _helpers._is_transient(exc) is expected
-
-    def test_5xx_transient_4xx_not(self):
-        """A 5xx HTTPError is transient; a 4xx is not."""
-        err5 = _helpers.requests.HTTPError("boom")
-        err5.response = _HttpError(503)
-        err4 = _helpers.requests.HTTPError("nope")
-        err4.response = _HttpError(404)
-        assert _helpers._is_transient(err5) is True
-        assert _helpers._is_transient(err4) is False
-
-
 class TestRequestJsonRetry:
     """_request_json retries transient failures and fails fast on 4xx."""
 

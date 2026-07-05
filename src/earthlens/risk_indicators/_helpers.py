@@ -80,27 +80,6 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
 )
 
 
-def _is_transient(exc: requests.RequestException) -> bool:
-    """Return whether a request error is worth retrying.
-
-    Connection errors (including the GFW host's intermittent resets, whether
-    they land during the handshake or mid-body) and timeouts are transient; an
-    HTTP error is transient only for a 5xx status (a 4xx such as 404 is a real
-    miss and fails fast).
-
-    Args:
-        exc: The exception raised by `requests.get` / `raise_for_status`.
-
-    Returns:
-        bool: `True` to retry, `False` to fail fast.
-    """
-    if isinstance(exc, _TRANSIENT_ERRORS):
-        return True
-    if isinstance(exc, requests.HTTPError) and exc.response is not None:
-        return exc.response.status_code >= 500
-    return False
-
-
 class _RequestsGet:
     """Session-like GET adapter routing through the module `requests.get`.
 
@@ -126,13 +105,13 @@ def _request_json(
     Retries are delegated to :class:`~earthlens.base.http.HttpClient`: a 5xx
     response or a transient transport error (see :data:`_TRANSIENT_ERRORS`)
     is retried up to :data:`_HTTP_RETRIES` times with exponential back-off
-    (`1s`, `2s`); a 4xx (including 429) fails fast — the classification
-    matches :func:`_is_transient`.
+    (`1s`, `2s`); a 4xx (including 429) fails fast.
 
     Args:
         url: The request URL.
         params: Query parameters, or `None`.
-        headers: Request headers (carries the `User-Agent` and any key).
+        headers: Extra request headers (e.g. the GFW `x-api-key` on the
+            keyed sources; the `User-Agent` is a client-level default).
         timeout: Per-request timeout in seconds.
 
     Returns:
