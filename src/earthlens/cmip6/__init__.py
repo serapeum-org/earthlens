@@ -17,6 +17,9 @@ multidim driver, read anonymously; no gcsfs needed).
 
 Public surface (re-exported from this package):
 
+* :class:`CMIP6` — the backend; instantiate with a date window, a bbox, and a
+  facet tuple (`source_id` / `experiment_id` / `variable_id` / `table_id`), then
+  call :meth:`CMIP6.download`.
 * :class:`Catalog` — loader for the bundled `cmip6_data_catalog.yaml` (config +
   curated vocabulary).
 * :class:`Cmip6Variable` / :class:`Experiment` / :class:`Table` / :class:`Source`
@@ -38,6 +41,7 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.cmip6.backend import CMIP6
 from earthlens.cmip6.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -51,6 +55,7 @@ from earthlens.cmip6.resolver import ResolvedStore, StoreResolver
 
 __all__ = [
     "CATALOG_PATH",
+    "CMIP6",
     "Catalog",
     "Cmip6Variable",
     "Experiment",
