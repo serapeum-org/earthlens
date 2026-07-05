@@ -105,7 +105,7 @@ class DEM(AbstractDataSource):
         self._dataset_key = dataset
         self._dataset: DEMDataset = self._catalog.get_dataset(dataset)
         self._show_progress = True
-        self._auth: S3Auth | None = None
+        # `_initialize` (called by `super().__init__` below) builds `self._auth`.
 
         super().__init__(
             start=start or "1970-01-01",
@@ -285,17 +285,7 @@ class DEM(AbstractDataSource):
         return target
 
     def _client(self) -> Any:
-        """Return the unsigned `boto3` client (built lazily by `S3Auth`).
-
-        Raises:
-            RuntimeError: When `_initialize` has not run — the base class
-                calls it in `__init__`, so this is guardrail only.
-        """
-        if self._auth is None:
-            raise RuntimeError(
-                "DEM backend not initialised; construct through EarthLens or "
-                "call `_initialize` before fetching."
-            )
+        """Return the unsigned `boto3` client (built lazily by `S3Auth`)."""
         return self._auth.client()
 
     def _api(self, *args: Any, **kwargs: Any) -> list[Path]:

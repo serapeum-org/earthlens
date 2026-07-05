@@ -304,22 +304,6 @@ class TestErrorPaths:
         assert not any(p.name.endswith(".part") for p in tmp_path.iterdir())
 
 
-class TestClientGuardrail:
-    """The `_client()` guardrail flags a not-initialised backend."""
-
-    def test_client_guardrail_when_auth_missing(self, tmp_path: Path):
-        """A backend whose `_auth` is None reports the misuse."""
-        src = DEM(
-            variables=[],
-            lat_lim=[30.2, 30.8],
-            lon_lim=[31.2, 31.8],
-            path=tmp_path,
-        )
-        src._auth = None
-        with pytest.raises(RuntimeError, match="not initialised"):
-            src._client()
-
-
 class TestNoDecodeImports:
     """`G5` — no rasterio/gdal/xarray/osgeo/cfgrib import anywhere in `earthlens.dem`."""
 
