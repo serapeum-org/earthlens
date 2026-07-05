@@ -8,10 +8,10 @@ keyed by the CMIP6 facets (`source_id`, `experiment_id`, `variable_id`,
 facet tuple to the matching `zstore` URI(s).
 
 The resolver is deliberately stateless and injectable: pass a pre-loaded
-`frame=` (a tiny fixture `DataFrame`) or a local `cache_path=` so unit tests run
-with **no network**. On a miss it raises a `ValueError` that names the facet
-which eliminated every row and lists the values that *were* available — so a
-typo in a model or scenario name is easy to fix.
+`frame=` or a local `cache_path=` to run with **no network**. On a miss it raises
+a `ValueError` that names the facet which eliminated every row and lists the
+values that *were* available — so a typo in a model or scenario name is easy to
+fix.
 
 No `intake-esm` (it would drag in `xarray`); no `xarray` / `zarr` / `gcsfs`
 here — this module only resolves URIs. Opening the store is
@@ -145,8 +145,7 @@ class StoreResolver:
         facet_columns: The CSV facet column names (from the catalog).
         cache_path: Where to cache the downloaded CSV. Defaults to
             :func:`default_cache_path`.
-        frame: A pre-loaded `DataFrame` to use verbatim (tests inject a
-            fixture); skips all I/O.
+        frame: A pre-loaded `DataFrame` to use verbatim, skipping all I/O.
         timeout: Per-request network timeout, in seconds.
     """
 

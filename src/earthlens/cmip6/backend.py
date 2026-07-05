@@ -112,10 +112,11 @@ class CMIP6(AbstractDataSource):
             temporal_resolution: Advisory cadence label (fixed by `table_id`).
             path: Output directory for the written NetCDFs.
             fmt: `strptime` format for `start` / `end`.
-            catalog: Optional pre-built :class:`Catalog` (tests inject one).
+            catalog: Optional pre-built :class:`Catalog`; defaults to the
+                bundled catalog.
             resolver: Optional pre-built
-                :class:`~earthlens.cmip6.resolver.StoreResolver` (tests inject a
-                fixture-backed one).
+                :class:`~earthlens.cmip6.resolver.StoreResolver`; defaults to one
+                built from the catalog's CSV URL and facet columns.
 
         Raises:
             ValueError: If a required facet is empty.
