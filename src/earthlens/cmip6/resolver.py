@@ -223,7 +223,15 @@ class StoreResolver:
             Path: The local cache path (guaranteed to exist and be non-empty).
 
         Raises:
-            RuntimeError: If the download fails or yields an empty file.
+            requests.RequestException: On a transport error or a non-2xx
+                status from the download (`HttpClient.download` calls
+                `raise_for_status` — this covers `HTTPError` for a 4xx/5xx
+                on the CSV, `ConnectionError` for a network failure, and
+                `Timeout` if the transfer stalls past `self.timeout`).
+            OSError: If the atomic rename of the `.part` temp to
+                `cache_path` fails.
+            RuntimeError: When the download succeeds but yields a
+                zero-byte CSV (the cache is unlinked before raising).
         """
         if self.cache_path.exists() and self.cache_path.stat().st_size > 0:
             return self.cache_path
