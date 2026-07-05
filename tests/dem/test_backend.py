@@ -265,26 +265,62 @@ class TestClientGuardrail:
 
 
 class TestNoDecodeImports:
-    """`G5` — no rasterio/gdal/xarray/osgeo import anywhere in `earthlens.dem`."""
+    """`G5` — no rasterio/gdal/xarray/osgeo/cfgrib import anywhere in `earthlens.dem`."""
 
     def test_source_tree_has_no_decode_imports(self):
-        """Grep the shipped package source for banned imports."""
+        """AST-walk the shipped package source for any banned decode import.
+
+        Uses `ast.parse` so `from rasterio.merge import Merger`,
+        `import rasterio.io`, `from osgeo.gdal import Translate`, and
+        multi-line `from … import (…)` continuations are all caught — a
+        naive `line.split()` grep misses them. Also flags dynamic
+        `importlib.import_module("rasterio")` / `__import__("rasterio")`
+        calls whose argument is a string literal.
+        """
+        import ast
         import earthlens.dem
 
         root = Path(earthlens.dem.__file__).parent
-        banned = ("rasterio", "gdal", "osgeo", "xarray")
-        offending: list[tuple[str, str]] = []
+        banned = frozenset({"rasterio", "gdal", "osgeo", "xarray", "cfgrib"})
+        offending: list[tuple[str, int, str]] = []
         for python_file in root.rglob("*.py"):
             source = python_file.read_text(encoding="utf-8")
-            for line in source.splitlines():
-                stripped = line.strip()
-                if not stripped.startswith("import ") and not stripped.startswith(
-                    "from "
-                ):
-                    continue
-                for token in banned:
-                    if token in stripped.split():
-                        offending.append((python_file.name, stripped))
+            tree = ast.parse(source, filename=str(python_file))
+            relative = python_file.relative_to(root).as_posix()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        head = alias.name.split(".", 1)[0]
+                        if head in banned:
+                            offending.append((relative, node.lineno, alias.name))
+                elif isinstance(node, ast.ImportFrom):
+                    head = (node.module or "").split(".", 1)[0]
+                    if head in banned:
+                        offending.append(
+                            (relative, node.lineno, f"from {node.module}")
+                        )
+                elif isinstance(node, ast.Call):
+                    target = None
+                    if (
+                        isinstance(node.func, ast.Attribute)
+                        and node.func.attr == "import_module"
+                        and node.args
+                        and isinstance(node.args[0], ast.Constant)
+                        and isinstance(node.args[0].value, str)
+                    ):
+                        target = node.args[0].value
+                    elif (
+                        isinstance(node.func, ast.Name)
+                        and node.func.id == "__import__"
+                        and node.args
+                        and isinstance(node.args[0], ast.Constant)
+                        and isinstance(node.args[0].value, str)
+                    ):
+                        target = node.args[0].value
+                    if target and target.split(".", 1)[0] in banned:
+                        offending.append(
+                            (relative, node.lineno, f"dynamic:{target}")
+                        )
         assert offending == [], (
             f"earthlens.dem must not import decode libraries: {offending}"
         )
