@@ -75,10 +75,10 @@ class TestBboxToTiles:
             (-15, -47),
         ]
 
-    def test_antimeridian_split(self):
-        """A `lon_min > lon_max` bbox is read as an antimeridian straddle."""
-        tiles = bbox_to_tiles(0.4, 0.6, 179.6, -179.6)
-        assert sorted((t.lat, t.lon) for t in tiles) == [(0, -180), (0, 179)]
+    def test_antimeridian_bbox_rejected(self):
+        """A `lon_min > lon_max` bbox is rejected — antimeridian split is out of scope."""
+        with pytest.raises(ValueError, match="antimeridian-straddling"):
+            bbox_to_tiles(0.4, 0.6, 179.6, -179.6)
 
     def test_whole_earth_row_major(self):
         """A whole-Earth bbox yields 180 x 360 tiles in row-major order."""

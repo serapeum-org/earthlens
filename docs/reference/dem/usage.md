@@ -113,21 +113,6 @@ paths_90 = EarthLens(data_source="dem", dataset="cop-dem-glo-90", ...).download(
 GLO-90 files are ~10 x smaller than GLO-30 files, which is helpful for
 continental-scale surveys where the finer resolution is not needed.
 
-## Antimeridian bboxes
-
-A bbox that straddles the antimeridian is expressed with `lon_min >
-lon_max`. The backend splits it into a west and east slice and fetches
-tiles from both:
-
-```python
-paths = EarthLens(
-    data_source="dem",
-    lat_lim=[0.4, 0.6],
-    lon_lim=[179.6, -179.6],   # crosses the antimeridian
-    path="antimeridian_out",
-).download()
-```
-
 ## What the backend doesn't do
 
 - **No server-side spatial subset.** The buckets serve whole 1° COGs —

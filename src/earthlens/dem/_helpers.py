@@ -125,11 +125,11 @@ def bbox_to_tiles(
     Snaps the bbox to the integer-degree tile grid: for each axis the
     minimum corner is floored and the maximum corner is included up to
     (and excluding) the ceiling. A bbox that lies entirely inside a
-    single tile still returns that tile. Latitude values are clamped to
-    the grid range `[-90, 89]`; longitude is normalised into
-    `[-180, 179]` so a value on the antimeridian (`180`) maps to
-    `-180` and a bbox that straddles it is split into a west and east
-    slice.
+    single tile still returns that tile. Latitude and longitude values
+    are clamped to the WGS84 grid range.
+
+    Antimeridian-straddling bboxes (`lon_min > lon_max`) are not
+    supported in this first cut — pass the two halves in separate calls.
 
     Args:
         lat_min: Southern edge of the bbox in degrees.
@@ -154,16 +154,14 @@ def bbox_to_tiles(
             [(30, 31)]
 
             ```
-        - A bbox straddling the antimeridian returns tiles on both sides:
-            ```python
-            >>> from earthlens.dem._helpers import bbox_to_tiles
-            >>> sorted((t.lat, t.lon) for t in bbox_to_tiles(0.4, 0.6, 179.6, -179.6))
-            [(0, -180), (0, 179)]
-
-            ```
     """
     if lat_min > lat_max:
         raise ValueError(f"lat_min {lat_min} > lat_max {lat_max}")
+    if lon_min > lon_max:
+        raise ValueError(
+            f"lon_min {lon_min} > lon_max {lon_max} — antimeridian-straddling "
+            "bboxes are not supported; pass the two halves in separate calls."
+        )
     if not (-90.0 <= lat_min <= 90.0 and -90.0 <= lat_max <= 90.0):
         raise ValueError(
             f"latitude out of [-90, 90]: lat_min={lat_min}, lat_max={lat_max}"
@@ -172,17 +170,9 @@ def bbox_to_tiles(
         raise ValueError(
             f"longitude out of [-180, 180]: lon_min={lon_min}, lon_max={lon_max}"
         )
-    # A `lon_min > lon_max` bbox is read as an antimeridian straddle: the
-    # covered range is `[lon_min, 180)` unioned with `[-180, lon_max]`.
 
     lat_origins = _axis_origins(lat_min, lat_max, min_index=-90, max_index=89)
-    if lon_min <= lon_max:
-        lon_origins = _axis_origins(lon_min, lon_max, min_index=-180, max_index=179)
-    else:
-        # Antimeridian split: `[lon_min, 180)` unioned with `[-180, lon_max]`.
-        west = _axis_origins(lon_min, 180.0, min_index=-180, max_index=179)
-        east = _axis_origins(-180.0, lon_max, min_index=-180, max_index=179)
-        lon_origins = list(dict.fromkeys(west + east))
+    lon_origins = _axis_origins(lon_min, lon_max, min_index=-180, max_index=179)
     return [Tile(lat=lat, lon=lon) for lat in lat_origins for lon in lon_origins]
 
 
