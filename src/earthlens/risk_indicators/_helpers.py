@@ -63,8 +63,10 @@ _HTTP_RETRIES: int = 2
 
 #: Base back-off (seconds) between retries; the nth retry waits
 #: `_HTTP_RETRY_BACKOFF * 2**(n-1)` (HttpClient's exponential back-off).
-#: Identical to the previous hand-rolled linear back-off at `_HTTP_RETRIES=2`
-#: (both yield `[1s, 2s]`) — bump either constant and the schedules diverge.
+#: Coincides with the previous hand-rolled linear back-off at
+#: `_HTTP_RETRIES=2` (both yield `[1s, 2s]`); bumping `_HTTP_RETRIES` diverges
+#: the two (linear grows as `n`, exponential as `2**(n-1)`), whereas scaling
+#: `_HTTP_RETRY_BACKOFF` rescales both by the same factor.
 _HTTP_RETRY_BACKOFF: float = 1.0
 
 
