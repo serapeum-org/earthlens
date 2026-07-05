@@ -181,6 +181,12 @@ def _axis_origins(
 ) -> list[int]:
     """Integer tile-origin coordinates covering `[low, high]` on one axis.
 
+    A tile at index `N` covers the half-open interval `[N, N+1)`, so a
+    bbox whose upper edge sits exactly on an integer degree does NOT
+    require the tile starting at that degree (nothing above the edge
+    lies inside the bbox). The `stop = math.ceil(high) - 1` computation
+    below excludes that boundary tile.
+
     Args:
         low: Lower edge in degrees.
         high: Upper edge in degrees.
@@ -192,5 +198,9 @@ def _axis_origins(
             grid range.
     """
     start = max(math.floor(low), min_index)
-    stop = min(math.floor(high), max_index)
+    stop = min(math.ceil(high) - 1, max_index)
+    if stop < start:
+        # A zero-width bbox on an exact degree boundary (e.g. `[3.0, 3.0]`)
+        # still needs the tile that boundary lies inside.
+        stop = start
     return list(range(start, stop + 1))

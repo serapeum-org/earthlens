@@ -80,6 +80,24 @@ class TestBboxToTiles:
         with pytest.raises(ValueError, match="antimeridian-straddling"):
             bbox_to_tiles(0.4, 0.6, 179.6, -179.6)
 
+    def test_exact_degree_upper_boundary_excludes_next_tile(self):
+        """A bbox whose upper edge lands on an integer degree stops there."""
+        # bbox `[0.0, 2.0] x [0.0, 2.0]` covers the 2x2 tiles at
+        # `[0, 1] x [0, 1]`; tile 2 covers `[2, 3)`, which the bbox does
+        # not reach, so 3x3 = 9 tiles would be one too many per axis.
+        tiles = bbox_to_tiles(0.0, 2.0, 0.0, 2.0)
+        assert sorted((t.lat, t.lon) for t in tiles) == [
+            (0, 0),
+            (0, 1),
+            (1, 0),
+            (1, 1),
+        ]
+
+    def test_zero_width_bbox_returns_single_tile(self):
+        """A zero-width bbox on an integer boundary still returns that tile."""
+        tiles = bbox_to_tiles(0.0, 0.0, 0.0, 0.0)
+        assert [(t.lat, t.lon) for t in tiles] == [(0, 0)]
+
     def test_whole_earth_row_major(self):
         """A whole-Earth bbox yields 180 x 360 tiles in row-major order."""
         tiles = bbox_to_tiles(-90.0, 90.0, -180.0, 180.0)
