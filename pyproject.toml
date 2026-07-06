@@ -368,6 +368,17 @@ markers = [
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-arm64"]
 
+# ecmwflibs (the Windows GRIB binary for the nwp extra) only ships an
+# osx-arm64 wheel tagged macosx_15; pixi defaults osx-arm64 to macOS 13, so
+# without this floor the multi-platform lock cannot place it. Raising the
+# target to 15 matches that wheel; every other package's older-macOS wheels
+# stay valid (a lower macOS floor is always compatible with a higher target).
+# pyramids-gis 0.40.0 wheels are manylinux_2_28 (down from manylinux_2_39 in
+# 0.38/0.39), which sits at/below pixi's default linux-64 __glibc floor, so no
+# explicit `libc = "…"` pin is needed to select the wheel over the sdist.
+[tool.pixi.system-requirements]
+macos = "15.0"
+
 [tool.pixi.pypi-dependencies]
 # Dev/test env pulls every backend's SDK (`[all]`) so the full suite runs.
 earthlens = { path = ".", editable = true, extras = ["all"] }
