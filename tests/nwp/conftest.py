@@ -76,7 +76,7 @@ class _FakeDataset:
         self.cropped: tuple[Any, Any] | None = None
         self.converted = False
 
-    def convert_longitude(self) -> _FakeDataset:
+    def wrap_longitude(self) -> _FakeDataset:
         """Mimic pyramids: only a whole-globe 0–360 grid can be converted."""
         if not self.global_360:
             raise ValueError("The raster should cover the whole globe")

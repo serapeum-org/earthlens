@@ -114,7 +114,9 @@ class TestS3Backend:
         number_downloaded_files: int,
     ):
         test_s3_data_source_instantiate_object.download()
-        filelist = glob.glob(os.path.join(f"{s3_era5_data_source_output_dir}", f"*.nc"))
+        # ERA5 (`format: netcdf` in the s3 catalog) is rewritten to a WGS84
+        # GeoTIFF on the way out — see s3/backend.py's `_localise`.
+        filelist = glob.glob(os.path.join(f"{s3_era5_data_source_output_dir}", "*.tif"))
         assert len(filelist) == number_downloaded_files
         # delete the files
         try:

@@ -84,7 +84,10 @@ def ecmwf_variables() -> List[str]:
 
 @pytest.fixture(scope="session")
 def s3_era5_variables() -> List[str]:
-    return ["precipitation"]
+    # NSF NCAR ERA5 surface-analysis stream ("e5.oper.an.sfc") ships 2m
+    # temperature but not total precipitation (that lives in the forecast
+    # stream); `t2m` is the catalog default and always downloadable.
+    return ["t2m"]
 
 
 @pytest.fixture(scope="session")
