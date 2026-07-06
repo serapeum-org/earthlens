@@ -187,6 +187,18 @@ class TestUrlsForAndSearch:
         urls = g._urls_for("GHS_SMOD", 2020)
         assert len(urls) == 1 and "/tiles/" not in urls[0]
 
+    def test_smod_1km_pins_version_v1(self, tmp_path):
+        """SMOD 1 km (Mollweide) still resolves to the V1-0 release."""
+        g = _build(tmp_path, ["GHS_SMOD"])
+        (url,) = g._urls_for("GHS_SMOD", 2020)
+        assert "/V1-0/" in url and url.endswith("_V1_0.zip")
+
+    def test_smod_30ss_pins_version_v2(self, tmp_path):
+        """SMOD 30ss (WGS84) follows the V2-0 release JRC dropped V1-0 for."""
+        g = _build(tmp_path, ["GHS_SMOD"], resolution="30ss")
+        (url,) = g._urls_for("GHS_SMOD", 2020)
+        assert "/V2-0/" in url and url.endswith("_V2_0.zip")
+
     def test_ocean_aoi_raises(self, tmp_path):
         """A tiled product over an ocean AOI raises a clear error."""
         g = _build(tmp_path, ["GHS_POP"], lat_lim=[-40, -39.8], lon_lim=[-140, -139.8])
