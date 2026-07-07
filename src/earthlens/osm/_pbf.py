@@ -4,12 +4,13 @@ Two concerns are factored here so `osm/backend.py` only routes:
 
 * `download_extract` — fetch a Geofabrik regional `.osm.pbf` extract over
   anonymous HTTPS (`https://download.geofabrik.de/<path>-latest.osm.pbf`) and
-  **cache it to disk** (`G13`): a repeat request for the same region reuses the
-  cached file. The download is atomic (the shared
-  :class:`~earthlens.base.http.HttpClient` writes a sibling `.part` and renames
-  on success) and, by default, integrity-checked against Geofabrik's
-  `.osm.pbf.md5` sidecar. A multi-GB extract logs a large-file warning before
-  it is fetched.
+  **cache it to disk** (`G13`). Caching is presence-based: a repeat request for
+  the same region reuses the existing cached file as-is (delete it to pick up a
+  newer Geofabrik `*-latest` extract). A **fresh** download is atomic (the
+  shared :class:`~earthlens.base.http.HttpClient` writes a sibling `.part` and
+  renames on success) and, by default, integrity-checked against Geofabrik's
+  `.osm.pbf.md5` sidecar; a cache hit is trusted and not re-verified. A multi-GB
+  extract logs a large-file warning before it is fetched.
 * `read_pbf` — read one layer (buildings / roads / pois / …) from a local
   `.osm.pbf` into a pyramids `~pyramids.feature.collection.FeatureCollection`
   (`G14`), wrapping the **OSM-domain SDK** (`G9`): `pyrosm` for the regional
