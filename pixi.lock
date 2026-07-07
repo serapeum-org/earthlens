@@ -12502,8 +12502,8 @@ packages:
   requires_python: '>=3.10'
 - pypi: ./
   name: earthlens
-  version: 0.9.0
-  sha256: 2310c2346d2ad84ab5455a30736bafeda65cf1f04dfaa973f2f4d1f06df0005c
+  version: 0.10.0
+  sha256: dab86d322cce7b0b408161f2925dbaeaa89dbc213f679776c68099ef94cc3d71
   requires_dist:
   - pyramids-gis>=0.41.0
   - geopandas>=1.0.0
