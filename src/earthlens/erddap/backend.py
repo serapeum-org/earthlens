@@ -56,6 +56,7 @@ from earthlens.erddap._helpers import (
     empty_canonical,
 )
 from earthlens.erddap.catalog import Catalog, Dataset
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -77,22 +78,6 @@ _NO_MATCH_MARKER = "produced no matching results"
 #: body that does not start with one of these is an error page (ERDDAP serves
 #: those as HTML, sometimes with a 200), not data.
 _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HDF")
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so the
-    single-shot griddap download stays a fresh connection per call and
-    tests that monkeypatch `requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 @dataclass(frozen=True)
 class _GridVarInfo:
     """Minimal `var_info` adapter for :func:`earthlens.aggregate.aggregate_netcdf`.

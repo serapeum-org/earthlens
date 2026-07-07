@@ -59,6 +59,7 @@ from earthlens.worldpop.rest import (
     record_archive_files,
     rest_records,
 )
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: Sub-directory under the output path where raw per-country GeoTIFFs land.
 _RAW_DIRNAME: str = ".worldpop_raw"
@@ -82,22 +83,6 @@ _RESOLUTIONS: frozenset[str] = frozenset({"100m", "1km"})
 _SCOPES: frozenset[str] = frozenset({"countries", "global"})
 #: Allowed values for the `level=` selector (only `pwd` offers both).
 _LEVELS: frozenset[str] = frozenset({"national", "subnational"})
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so each
-    per-file download stays a fresh connection and the transport can be
-    driven by swapping `requests.get`.
-    """
-
-    def get(self, url: str, **kwargs: object) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 class WorldPop(AbstractDataSource):
     """Download WorldPop population + demographic products, localised via pyramids.
 

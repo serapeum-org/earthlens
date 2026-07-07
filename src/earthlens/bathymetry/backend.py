@@ -42,6 +42,7 @@ from earthlens.bathymetry._helpers import (
     griddap_subset_url,
 )
 from earthlens.bathymetry.catalog import Catalog, Dataset
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -56,22 +57,6 @@ _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HD
 #: (≈ a 0.25-gigapixel grid). The server enforces the hard cap; this is an
 #: early heads-up for the user.
 _LARGE_PIXEL_THRESHOLD = 250_000_000
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so this
-    single-shot download stays a fresh connection per call and tests that
-    monkeypatch `requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 class Bathymetry(AbstractDataSource):
     """Global topography / bathymetry DEM backend (raster GeoTIFF output).
 

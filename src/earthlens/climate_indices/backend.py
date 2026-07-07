@@ -42,6 +42,7 @@ from earthlens.base import (
 from earthlens.base.http import HttpClient
 from earthlens.climate_indices import _helpers
 from earthlens.climate_indices.catalog import Catalog
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -74,21 +75,6 @@ _MAX_STEM_IDS: int = 6
 #: spatial extent is the whole globe (`G4`).
 _GLOBAL_LAT: list[float] = [-90.0, 90.0]
 _GLOBAL_LON: list[float] = [-180.0, 180.0]
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so tests
-    that monkeypatch `backend.requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 class ClimateIndices(AbstractDataSource):
     """Climate / teleconnection index backend (long-format tabular output).
 

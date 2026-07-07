@@ -190,6 +190,27 @@ def _default_user_agent() -> str:
     return f"earthlens/{__version__}"
 
 
+class RequestsGet:
+    """Session-like adapter routing every call through the `requests` module.
+
+    Passed as `HttpClient(session=RequestsGet())` by the backends that want a
+    fresh connection per call (no pooled `requests.Session`) rather than
+    connection reuse. Because it dispatches through the module-level
+    `requests.get` / `requests.post` — resolved at call time — a test that
+    monkeypatches `requests.get` (under any import alias; they all reference
+    the one `requests` module) still drives the transport. One shared class
+    instead of the shim re-declared verbatim in a dozen backends.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a `GET` via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
+
+    def post(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a `POST` via the module-level `requests.post`."""
+        return requests.post(url, **kwargs)
+
+
 class HttpClient:
     """Reusable HTTP transport: session, headers, timeout, retry, download.
 

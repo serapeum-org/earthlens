@@ -48,6 +48,7 @@ from earthlens.drought._helpers import (
     snap_to_cadence,
 )
 from earthlens.drought.catalog import Catalog, Dataset
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -775,22 +776,6 @@ def _http_get_json(url: str) -> dict[str, Any]:
         requests.HTTPError: For non-2xx responses.
     """
     return _http_client().get_json(url, timeout=_HTTP_TIMEOUT)
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps `HttpClient` pointed at the module-level `requests.get` (rather
-    than a private session) so this single-shot download stays a fresh
-    connection per call and the tests that monkeypatch `requests.get` still
-    drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 def _http_client() -> HttpClient:
     """Build the drought `HttpClient`: fresh-connection GETs, no status retry.
 

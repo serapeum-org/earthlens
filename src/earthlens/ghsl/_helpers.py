@@ -38,6 +38,7 @@ from earthlens.base.archive import extract_members
 
 from earthlens.base.http import HttpClient
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).
 BASE_URL: str = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
@@ -420,22 +421,6 @@ def download_and_extract(
         zf.extractall(dest_dir)
     zip_path.unlink(missing_ok=True)
     return [dest_dir / m for m in members]
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the module-level
-    `requests.get` (rather than a private session) when no session is supplied,
-    so an un-pooled download stays a fresh connection per call and tests that
-    monkeypatch `requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 def _download(
     url: str,
     zip_path: Path,
