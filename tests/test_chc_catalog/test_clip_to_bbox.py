@@ -1,4 +1,4 @@
-"""Lock-in for M2: `_clip_to_bbox` raises when the requested bbox doesn't overlap the raster."""
+"""Lock-in for M2: `_check_bbox_overlaps` raises when the request bbox misses the raster."""
 
 from __future__ import annotations
 
@@ -34,23 +34,20 @@ _FAKE_GEO: list[float] = [-180.0, 1.0, 0.0, 50.0, 0.0, -1.0]
 
 
 class TestClipToBboxOverlap:
-    """`_clip_to_bbox` refuses non-overlapping bboxes (M2)."""
+    """`_check_bbox_overlaps` refuses non-overlapping bboxes (M2)."""
 
-    def test_overlapping_bbox_returns_a_non_empty_slice(self):
-        """A normal bbox inside the raster extent returns a populated slice."""
+    def test_overlapping_bbox_does_not_raise(self):
+        """A normal bbox inside the raster extent passes the overlap guard."""
         chirps = _chirps_with_bbox(lat_lim=[0.0, 10.0], lon_lim=[0.0, 10.0])
         data = np.zeros((100, 360), dtype=np.float32)
-        clipped, new_geo = chirps._clip_to_bbox(data, _FAKE_GEO)
-        assert clipped.shape == (10, 10)
-        assert new_geo[0] == 0.0  # origin_x shifted to lon=0
-        assert new_geo[3] == 10.0  # origin_y shifted to lat=10 (top edge)
+        chirps._check_bbox_overlaps(data, _FAKE_GEO)  # no exception
 
     def test_bbox_entirely_north_of_raster_raises(self):
         """A bbox north of the raster's extent raises ValueError naming both extents."""
         chirps = _chirps_with_bbox(lat_lim=[60.0, 70.0], lon_lim=[0.0, 10.0])
         data = np.zeros((100, 360), dtype=np.float32)
         with pytest.raises(ValueError, match=r"does not overlap") as exc:
-            chirps._clip_to_bbox(data, _FAKE_GEO)
+            chirps._check_bbox_overlaps(data, _FAKE_GEO)
         message = str(exc.value)
         assert "60.0" in message and "70.0" in message
         assert "raster" in message.lower()
@@ -60,7 +57,7 @@ class TestClipToBboxOverlap:
         chirps = _chirps_with_bbox(lat_lim=[-80.0, -70.0], lon_lim=[0.0, 10.0])
         data = np.zeros((100, 360), dtype=np.float32)
         with pytest.raises(ValueError, match=r"does not overlap"):
-            chirps._clip_to_bbox(data, _FAKE_GEO)
+            chirps._check_bbox_overlaps(data, _FAKE_GEO)
 
     def test_bbox_east_of_narrow_raster_raises(self):
         """A bbox east of a *narrow* raster (lon [-180, -100]) raises ValueError."""
@@ -70,14 +67,14 @@ class TestClipToBboxOverlap:
         narrow_geo = [-180.0, 1.0, 0.0, 50.0, 0.0, -1.0]
         data = np.zeros((100, 80), dtype=np.float32)  # cols=80 -> east edge at lon=-100
         with pytest.raises(ValueError, match=r"does not overlap"):
-            chirps._clip_to_bbox(data, narrow_geo)
+            chirps._check_bbox_overlaps(data, narrow_geo)
 
     def test_message_names_both_bbox_and_raster_extent(self):
         """The error message must surface the user bbox AND the raster extent."""
         chirps = _chirps_with_bbox(lat_lim=[60.0, 70.0], lon_lim=[0.0, 10.0])
         data = np.zeros((100, 360), dtype=np.float32)
         with pytest.raises(ValueError) as exc:
-            chirps._clip_to_bbox(data, _FAKE_GEO)
+            chirps._check_bbox_overlaps(data, _FAKE_GEO)
         message = str(exc.value)
         # User bbox
         assert "60.0" in message and "70.0" in message
