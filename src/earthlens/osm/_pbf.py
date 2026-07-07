@@ -69,11 +69,15 @@ _PYOSMIUM_LAYERS: dict[str, tuple[str, str]] = {
     "get_boundaries": ("boundary", "area"),
 }
 
-#: `highway=*` values kept for the `network_type="driving"` road subset, so the
-#: streaming `pyosmium` engine honours the same "drivable" filter the catalog's
-#: `pbf:roads` row and the default `pyrosm` engine promise (rather than silently
-#: returning every footway / cycleway / path). A superset of the drivable
-#: classes; `network_type`s other than `"driving"` are not value-filtered here.
+#: `highway=*` values the streaming `pyosmium` engine keeps for a
+#: `network_type="driving"` request — an **approximation** of the drivable road
+#: network, not a reproduction of `pyrosm`'s filter. `pyrosm.driving_filter()`
+#: is exclude-based (keep every `highway` except a footway/path/track blacklist,
+#: then drop `motor_vehicle=no` / `service=parking_aisle` / … ways); this
+#: inclusion allow-list covers the common drivable classes but neither contains
+#: nor is contained by pyrosm's kept set (e.g. it does not apply the
+#: `motor_vehicle`/`service` exclusions). Use `engine="pyrosm"` for the exact
+#: subset. `network_type`s other than `"driving"` are not value-filtered here.
 _DRIVING_HIGHWAY_VALUES: frozenset[str] = frozenset(
     {
         "motorway",
@@ -85,7 +89,11 @@ _DRIVING_HIGHWAY_VALUES: frozenset[str] = frozenset(
         "residential",
         "living_street",
         "service",
+        "services",
         "road",
+        "busway",
+        "bus_guideway",
+        "escape",
         "motorway_link",
         "trunk_link",
         "primary_link",
@@ -377,10 +385,11 @@ def _read_pyosmium(
     the built geometry (post-hoc shapely intersection). This is the fallback for
     files too large for `pyrosm`; it is coarser than the `pyrosm` path by
     design (one geometry kind, one tag key per layer). For `get_network` the
-    `network_type="driving"` road subset is honoured via a `highway`-value
-    allow-list (`_DRIVING_HIGHWAY_VALUES`); any other `network_type` is not
-    value-filtered and logs a warning so the divergence from `pyrosm` is not
-    silent.
+    `network_type="driving"` request applies a `highway`-value allow-list
+    (`_DRIVING_HIGHWAY_VALUES`) — a coarse approximation of `pyrosm`'s drivable
+    subset, not a reproduction of it (see that constant); any other
+    `network_type` is not value-filtered and logs a warning so the divergence
+    from `pyrosm` is not silent.
 
     Args:
         path: Local `.osm.pbf` path.
@@ -443,10 +452,12 @@ def _pyosmium_value_filter(
     """Return the tag-value allow-list the `pyosmium` line read should apply.
 
     Only `get_network` carries a `network_type`. `"driving"` maps to the
-    `_DRIVING_HIGHWAY_VALUES` allow-list so the streaming engine returns the
-    same drivable subset as `pyrosm`; any other `network_type` returns `None`
-    (no value filter) and logs a warning, so the coarser result is explicit
-    rather than a silent semantic swap (`M1`).
+    `_DRIVING_HIGHWAY_VALUES` allow-list — a coarse approximation of `pyrosm`'s
+    drivable subset (it neither contains nor is contained by pyrosm's kept set;
+    see that constant), applied so the streaming engine does not silently return
+    every footway / cycleway. Any other `network_type` returns `None` (no value
+    filter) and logs a warning, so the coarser result is explicit rather than a
+    silent semantic swap.
 
     Args:
         pyrosm_method: The layer's `pyrosm` method name.
