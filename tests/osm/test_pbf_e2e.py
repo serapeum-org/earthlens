@@ -57,6 +57,6 @@ class TestPbfLive:
             _skip_on_network(exc)
         assert len(fc) >= 1, "expected at least one building footprint"
         assert fc.crs.to_epsg() == 4326
-        # pyrosm tags each row with an `id` + `osm_type` and the layer's key tag.
-        assert {"id", "osm_type"} <= set(fc.columns)
+        # the identity column is normalised to `osm_id` (from pyrosm's `id`).
+        assert {"osm_id", "osm_type"} <= set(fc.columns)
         assert "building" in fc.columns

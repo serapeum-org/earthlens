@@ -359,6 +359,11 @@ def _read_pyrosm(
     gdf = method(network_type=network_type) if pyrosm_method == "get_network" else method()
     if gdf is None or len(gdf) == 0:
         return empty_fc()
+    # pyrosm names its identity column `id`; normalise it to `osm_id` so every
+    # OSM path (overpass / ohsome / pbf-pyosmium / the empty schema) exposes the
+    # same identity column regardless of engine or hit count (`L1`).
+    if "id" in gdf.columns and "osm_id" not in gdf.columns:
+        gdf = gdf.rename(columns={"id": "osm_id"})
     return to_fc(gdf)
 
 

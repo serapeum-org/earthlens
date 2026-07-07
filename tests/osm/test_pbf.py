@@ -206,11 +206,11 @@ def fake_pyrosm(monkeypatch):
 
 
 def _buildings_frame():
-    """Build a one-row WGS84 GeoDataFrame of a building polygon."""
+    """Build a one-row WGS84 GeoDataFrame with pyrosm's native `id` column."""
     import geopandas as gpd
 
     return gpd.GeoDataFrame(
-        {"building": ["yes"]},
+        {"id": [42], "building": ["yes"]},
         geometry=[box(0.0, 0.0, 1.0, 1.0)],
         crs="EPSG:4326",
     )
@@ -220,12 +220,14 @@ class TestReadPyrosm:
     """The in-memory `pyrosm` engine path."""
 
     def test_get_buildings_dispatch(self, tmp_path, fake_pyrosm):
-        """`pbf:buildings` maps to `get_buildings` and wraps the frame."""
+        """`pbf:buildings` maps to `get_buildings`, wraps + normalises `id`."""
         fake_pyrosm.frame = _buildings_frame()
         pbf = tmp_path / "x.osm.pbf"
         pbf.write_bytes(b"x")
         fc = read_pbf(pbf, pyrosm_method="get_buildings", engine="pyrosm")
         assert len(fc) == 1 and fc.crs.to_epsg() == 4326
+        # pyrosm's `id` is normalised to `osm_id` for a uniform identity column.
+        assert "osm_id" in fc.columns and "id" not in fc.columns
 
     def test_network_type_forwarded(self, tmp_path, fake_pyrosm):
         """`get_network` receives the row's `network_type`."""

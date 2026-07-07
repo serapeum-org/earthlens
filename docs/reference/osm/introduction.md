@@ -102,10 +102,11 @@ One `FeatureCollection` (CRS `EPSG:4326`):
   MVP.
 - **ohsome** — the geometry plus ohsome's own columns, notably `@osmId` and
   `@snapshotTimestamp` (the history timestamp) and `@other_tags`.
-- **pbf** — with the default `pyrosm` engine, the geometry plus pyrosm's
-  columns (`id`, `osm_type`, `tags`, and each layer's key tags, e.g.
-  `building`); with the `pyosmium` engine, a slimmer `osm_id` / `osm_type` /
-  `geometry` schema (see the engine note in [Usage](usage.md)).
+- **pbf** — an `osm_id` / `osm_type` identity (pyrosm's native `id` column is
+  normalised to `osm_id` so it matches the other paths) plus, with the default
+  `pyrosm` engine, the layer's key tags (e.g. `building`); the `pyosmium`
+  engine returns the slimmer `osm_id` / `osm_type` / `geometry` schema (see the
+  engine note in [Usage](usage.md)).
 
 As a side effect, `download()` also writes the collection to one vector file in
 the output directory (GeoJSON by default, or GeoPackage).
