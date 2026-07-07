@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13476,6 +13476,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/osm/pbf_bulk_extracts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenStreetMap in bulk — Geofabrik extracts (pbf)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -23037,11 +23065,7 @@ collection when every fragment is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span>
 <span class="normal"><a href="#__codelineno-0-347">347</a></span>
@@ -23059,29 +23083,33 @@ collection when every fragment is empty.</p>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
-<span class="normal"><a href="#__codelineno-0-362">362</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="k">def</span><span class="w"> </span><span class="nf">concat_outlines</span><span class="p">(</span><span class="n">fragments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge per-region outline fragments into one collection.</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        fragments: One :class:`FeatureCollection` per region (or query).</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        FeatureCollection: The concatenated collection in EPSG:4326. The first</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            non-empty fragment when only one carries features; an empty</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            collection when every fragment is empty.</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        ValueError: If `fragments` is empty.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">fragments</span><span class="p">:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;concat_outlines() needs at least one fragment&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">non_empty</span> <span class="o">=</span> <span class="p">[</span><span class="n">fc</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">fragments</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">non_empty</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">fragments</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">non_empty</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="k">def</span><span class="w"> </span><span class="nf">concat_outlines</span><span class="p">(</span><span class="n">fragments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge per-region outline fragments into one collection.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        fragments: One :class:`FeatureCollection` per region (or query).</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        FeatureCollection: The concatenated collection in EPSG:4326. The first</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            non-empty fragment when only one carries features; an empty</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            collection when every fragment is empty.</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        ValueError: If `fragments` is empty.</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">fragments</span><span class="p">:</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;concat_outlines() needs at least one fragment&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="n">non_empty</span> <span class="o">=</span> <span class="p">[</span><span class="n">fc</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">fragments</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">non_empty</span><span class="p">:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">fragments</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">non_empty</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23432,25 +23460,25 @@ re-downloading. Retries transient HTTP failures with exponential backoff.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-485">485</a></span>
-<span class="normal"><a href="#__codelineno-0-486">486</a></span>
-<span class="normal"><a href="#__codelineno-0-487">487</a></span>
-<span class="normal"><a href="#__codelineno-0-488">488</a></span>
-<span class="normal"><a href="#__codelineno-0-489">489</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-489">489</a></span>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
 <span class="normal"><a href="#__codelineno-0-492">492</a></span>
 <span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_canonical</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a schema-only (zero-row) frame with the given columns.</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        columns: The column names to materialise.</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        pandas.DataFrame: An empty frame carrying exactly `columns`.</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
+<span class="normal"><a href="#__codelineno-0-494">494</a></span>
+<span class="normal"><a href="#__codelineno-0-495">495</a></span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span>
+<span class="normal"><a href="#__codelineno-0-497">497</a></span>
+<span class="normal"><a href="#__codelineno-0-498">498</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_canonical</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a schema-only (zero-row) frame with the given columns.</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        columns: The column names to materialise.</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        pandas.DataFrame: An empty frame carrying exactly `columns`.</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23498,29 +23526,29 @@ region / matches no outline, so <code>download()</code> always yields a collecti
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
 <span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_feature_collection</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an empty EPSG:4326 :class:`FeatureCollection` (no features).</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    Returned by the vector path when a request&#39;s bbox overlaps no glacier</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    region / matches no outline, so `download()` always yields a collection.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        FeatureCollection: A zero-feature collection in EPSG:4326.</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="p">[],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_feature_collection</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an empty EPSG:4326 :class:`FeatureCollection` (no features).</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    Returned by the vector path when a request&#39;s bbox overlaps no glacier</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    region / matches no outline, so `download()` always yields a collection.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        FeatureCollection: A zero-feature collection in EPSG:4326.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="p">[],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23761,7 +23789,11 @@ EPSG:4326. Empty when the query matched nothing.</p>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_glims</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_glims</span><span class="p">(</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="n">wfs_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="n">typename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
@@ -23793,16 +23825,20 @@ EPSG:4326. Empty when the query matched nothing.</p>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        requests.HTTPError: If the WFS returns a non-2xx status.</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="n">url</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">glims_wfs_url</span><span class="p">(</span><span class="n">wfs_url</span><span class="p">,</span> <span class="n">typename</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">max_features</span><span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="n">get</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="n">dest_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="n">dest_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="n">fc</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">dest_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()))</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="n">fc</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">return</span> <span class="n">_clip_to_bbox</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpClient</span><span class="p">,</span> <span class="n">RequestsGet</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="n">url</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">glims_wfs_url</span><span class="p">(</span><span class="n">wfs_url</span><span class="p">,</span> <span class="n">typename</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">max_features</span><span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="c1"># Route the single WFS GET through the shared HttpClient so it gains the</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="c1"># 429/5xx Retry-After/back-off policy; a passed `session` is reused for</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="c1"># connection pooling, else a fresh connection per call.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">session</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RequestsGet</span><span class="p">())</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="n">dest_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">dest_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="n">fc</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">dest_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()))</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">return</span> <span class="n">fc</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="n">_clip_to_bbox</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23966,11 +24002,7 @@ coordinates in the <code>glacier</code> table.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-432">432</a></span>
-<span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span>
-<span class="normal"><a href="#__codelineno-0-435">435</a></span>
-<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-436">436</a></span>
 <span class="normal"><a href="#__codelineno-0-437">437</a></span>
 <span class="normal"><a href="#__codelineno-0-438">438</a></span>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
@@ -24016,57 +24048,61 @@ coordinates in the <code>glacier</code> table.</p>
 <span class="normal"><a href="#__codelineno-0-479">479</a></span>
 <span class="normal"><a href="#__codelineno-0-480">480</a></span>
 <span class="normal"><a href="#__codelineno-0-481">481</a></span>
-<span class="normal"><a href="#__codelineno-0-482">482</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="k">def</span><span class="w"> </span><span class="nf">filter_wgms</span><span class="p">(</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="n">glaciers</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="n">glacier_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="n">glacier_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="n">region</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a WGMS fluctuations table by glacier / region / bbox.</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    `glacier_id` and `glacier_name` match the table directly; `region` and</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    `bbox` need the `glacier` join table (its `id` == the table&#39;s `glacier_id`,</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    its `gtng_region` is id-prefixed like `&quot;11_central_europe&quot;`, and it carries</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">    `latitude` / `longitude`).</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        df: A fluctuations table with a `glacier_id` (and `glacier_name`) column.</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        glaciers: The `glacier` join table; required for `region` / `bbox`.</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        glacier_id: One id or a list of ids (matched against `glacier_id`).</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        glacier_name: A case-insensitive substring matched against</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">            `glacier_name`.</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        region: One GTN-G region id (`&quot;11&quot;`) or a list, matched against the</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            `glacier` table&#39;s `gtng_region` prefix.</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        bbox: `[west, south, east, north]` filtering glaciers by their point</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            coordinates in the `glacier` table.</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        pandas.DataFrame: The filtered rows, with a reset index.</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="n">out</span> <span class="o">=</span> <span class="n">df</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="k">if</span> <span class="n">glacier_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">ids</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_as_list</span><span class="p">(</span><span class="n">glacier_id</span><span class="p">)}</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ids</span><span class="p">)]</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="k">if</span> <span class="n">glacier_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="n">names</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">glacier_name</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">glaciers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>        <span class="n">sel</span> <span class="o">=</span> <span class="n">glaciers</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="n">wanted</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_as_list</span><span class="p">(</span><span class="n">region</span><span class="p">)}</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="n">prefix</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;gtng_region&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="n">sel</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span><span class="n">prefix</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">wanted</span><span class="p">)]</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="k">if</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>            <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="n">sel</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>                <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">)</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>                <span class="o">&amp;</span> <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">south</span><span class="p">,</span> <span class="n">north</span><span class="p">)</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="p">]</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sel</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]))]</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-482">482</a></span>
+<span class="normal"><a href="#__codelineno-0-483">483</a></span>
+<span class="normal"><a href="#__codelineno-0-484">484</a></span>
+<span class="normal"><a href="#__codelineno-0-485">485</a></span>
+<span class="normal"><a href="#__codelineno-0-486">486</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="k">def</span><span class="w"> </span><span class="nf">filter_wgms</span><span class="p">(</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="n">glaciers</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="n">glacier_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>    <span class="n">glacier_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>    <span class="n">region</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a WGMS fluctuations table by glacier / region / bbox.</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    `glacier_id` and `glacier_name` match the table directly; `region` and</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">    `bbox` need the `glacier` join table (its `id` == the table&#39;s `glacier_id`,</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">    its `gtng_region` is id-prefixed like `&quot;11_central_europe&quot;`, and it carries</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">    `latitude` / `longitude`).</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        df: A fluctuations table with a `glacier_id` (and `glacier_name`) column.</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        glaciers: The `glacier` join table; required for `region` / `bbox`.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        glacier_id: One id or a list of ids (matched against `glacier_id`).</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        glacier_name: A case-insensitive substring matched against</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            `glacier_name`.</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        region: One GTN-G region id (`&quot;11&quot;`) or a list, matched against the</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            `glacier` table&#39;s `gtng_region` prefix.</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        bbox: `[west, south, east, north]` filtering glaciers by their point</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">            coordinates in the `glacier` table.</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        pandas.DataFrame: The filtered rows, with a reset index.</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="n">out</span> <span class="o">=</span> <span class="n">df</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>    <span class="k">if</span> <span class="n">glacier_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="n">ids</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_as_list</span><span class="p">(</span><span class="n">glacier_id</span><span class="p">)}</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ids</span><span class="p">)]</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="k">if</span> <span class="n">glacier_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="n">names</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">glacier_name</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">glaciers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="n">sel</span> <span class="o">=</span> <span class="n">glaciers</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>            <span class="n">wanted</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_as_list</span><span class="p">(</span><span class="n">region</span><span class="p">)}</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="n">prefix</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;gtng_region&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="n">sel</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span><span class="n">prefix</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">wanted</span><span class="p">)]</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="k">if</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>            <span class="n">sel</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>                <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">)</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>                <span class="o">&amp;</span> <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">south</span><span class="p">,</span> <span class="n">north</span><span class="p">)</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>            <span class="p">]</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sel</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]))]</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24377,11 +24413,7 @@ member — no reshaping, no array/NetCDF stack.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-374">374</a></span>
 <span class="normal"><a href="#__codelineno-0-375">375</a></span>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
@@ -24403,33 +24435,37 @@ member — no reshaping, no array/NetCDF stack.</p>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
 <span class="normal"><a href="#__codelineno-0-394">394</a></span>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_wgms_csv</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one WGMS FoG table out of the cached zip (`G8`).</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    The FoG tables are already long-format (`glacier_id` / year-or-date /</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    value), so this is a plain `pandas.read_csv` of the `data/&lt;table&gt;.csv`</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    member — no reshaping, no array/NetCDF stack.</span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span>
+<span class="normal"><a href="#__codelineno-0-398">398</a></span>
+<span class="normal"><a href="#__codelineno-0-399">399</a></span>
+<span class="normal"><a href="#__codelineno-0-400">400</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_wgms_csv</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one WGMS FoG table out of the cached zip (`G8`).</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip` (from :func:`download_zip`).</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        table: The table name (`&quot;mass_balance&quot;`, `&quot;front_variation&quot;`,</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            `&quot;state&quot;`).</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        pandas.DataFrame: The table rows.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        KeyError: If the zip has no `data/&lt;table&gt;.csv` member.</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="n">member</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;data/</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">if</span> <span class="n">member</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="sa">f</span><span class="s2">&quot;WGMS FoG zip has no </span><span class="si">{</span><span class="n">member</span><span class="si">!r}</span><span class="s2"> member &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="sa">f</span><span class="s2">&quot;(available: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">())</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">with</span> <span class="n">zf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()),</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    The FoG tables are already long-format (`glacier_id` / year-or-date /</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    value), so this is a plain `pandas.read_csv` of the `data/&lt;table&gt;.csv`</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    member — no reshaping, no array/NetCDF stack.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip` (from :func:`download_zip`).</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        table: The table name (`&quot;mass_balance&quot;`, `&quot;front_variation&quot;`,</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            `&quot;state&quot;`).</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        pandas.DataFrame: The table rows.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        KeyError: If the zip has no `data/&lt;table&gt;.csv` member.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">member</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;data/</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">if</span> <span class="n">member</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>                <span class="sa">f</span><span class="s2">&quot;WGMS FoG zip has no </span><span class="si">{</span><span class="n">member</span><span class="si">!r}</span><span class="s2"> member &quot;</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>                <span class="sa">f</span><span class="s2">&quot;(available: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">())</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="p">)</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">with</span> <span class="n">zf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()),</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24925,11 +24961,7 @@ region / bbox filter over a fluctuations table.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span>
-<span class="normal"><a href="#__codelineno-0-401">401</a></span>
-<span class="normal"><a href="#__codelineno-0-402">402</a></span>
-<span class="normal"><a href="#__codelineno-0-403">403</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-403">403</a></span>
 <span class="normal"><a href="#__codelineno-0-404">404</a></span>
 <span class="normal"><a href="#__codelineno-0-405">405</a></span>
 <span class="normal"><a href="#__codelineno-0-406">406</a></span>
@@ -24941,23 +24973,27 @@ region / bbox filter over a fluctuations table.</p>
 <span class="normal"><a href="#__codelineno-0-412">412</a></span>
 <span class="normal"><a href="#__codelineno-0-413">413</a></span>
 <span class="normal"><a href="#__codelineno-0-414">414</a></span>
-<span class="normal"><a href="#__codelineno-0-415">415</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="k">def</span><span class="w"> </span><span class="nf">wgms_glacier_table</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the WGMS `glacier` join table (coordinates + region) from the zip.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    The `glacier` table carries `id` (== the other tables&#39; `glacier_id`),</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    `latitude` / `longitude`, and `gtng_region`, so it is the key for a</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    region / bbox filter over a fluctuations table.</span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
+<span class="normal"><a href="#__codelineno-0-417">417</a></span>
+<span class="normal"><a href="#__codelineno-0-418">418</a></span>
+<span class="normal"><a href="#__codelineno-0-419">419</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="k">def</span><span class="w"> </span><span class="nf">wgms_glacier_table</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the WGMS `glacier` join table (coordinates + region) from the zip.</span>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip`.</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        pandas.DataFrame: The `glacier` table.</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        KeyError: If the zip has no `data/glacier.csv` member.</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>    <span class="k">return</span> <span class="n">parse_wgms_csv</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="s2">&quot;glacier&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    The `glacier` table carries `id` (== the other tables&#39; `glacier_id`),</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    `latitude` / `longitude`, and `gtng_region`, so it is the key for a</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    region / bbox filter over a fluctuations table.</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip`.</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        pandas.DataFrame: The `glacier` table.</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        KeyError: If the zip has no `data/glacier.csv` member.</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="k">return</span> <span class="n">parse_wgms_csv</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="s2">&quot;glacier&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28280,11 +28316,7 @@ collection when every fragment is empty.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span>
 <span class="normal"><a href="#__codelineno-0-347">347</a></span>
@@ -28302,29 +28334,33 @@ collection when every fragment is empty.</p>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
-<span class="normal"><a href="#__codelineno-0-362">362</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="k">def</span><span class="w"> </span><span class="nf">concat_outlines</span><span class="p">(</span><span class="n">fragments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge per-region outline fragments into one collection.</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        fragments: One :class:`FeatureCollection` per region (or query).</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        FeatureCollection: The concatenated collection in EPSG:4326. The first</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            non-empty fragment when only one carries features; an empty</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            collection when every fragment is empty.</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        ValueError: If `fragments` is empty.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">fragments</span><span class="p">:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;concat_outlines() needs at least one fragment&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">non_empty</span> <span class="o">=</span> <span class="p">[</span><span class="n">fc</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">fragments</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">non_empty</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">fragments</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">non_empty</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="k">def</span><span class="w"> </span><span class="nf">concat_outlines</span><span class="p">(</span><span class="n">fragments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge per-region outline fragments into one collection.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        fragments: One :class:`FeatureCollection` per region (or query).</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        FeatureCollection: The concatenated collection in EPSG:4326. The first</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            non-empty fragment when only one carries features; an empty</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            collection when every fragment is empty.</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        ValueError: If `fragments` is empty.</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">fragments</span><span class="p">:</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;concat_outlines() needs at least one fragment&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="n">non_empty</span> <span class="o">=</span> <span class="p">[</span><span class="n">fc</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">fragments</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">non_empty</span><span class="p">:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">fragments</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">non_empty</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28675,25 +28711,25 @@ re-downloading. Retries transient HTTP failures with exponential backoff.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-485">485</a></span>
-<span class="normal"><a href="#__codelineno-0-486">486</a></span>
-<span class="normal"><a href="#__codelineno-0-487">487</a></span>
-<span class="normal"><a href="#__codelineno-0-488">488</a></span>
-<span class="normal"><a href="#__codelineno-0-489">489</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-489">489</a></span>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
 <span class="normal"><a href="#__codelineno-0-492">492</a></span>
 <span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_canonical</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a schema-only (zero-row) frame with the given columns.</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        columns: The column names to materialise.</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        pandas.DataFrame: An empty frame carrying exactly `columns`.</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
+<span class="normal"><a href="#__codelineno-0-494">494</a></span>
+<span class="normal"><a href="#__codelineno-0-495">495</a></span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span>
+<span class="normal"><a href="#__codelineno-0-497">497</a></span>
+<span class="normal"><a href="#__codelineno-0-498">498</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_canonical</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a schema-only (zero-row) frame with the given columns.</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        columns: The column names to materialise.</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        pandas.DataFrame: An empty frame carrying exactly `columns`.</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28741,29 +28777,29 @@ region / matches no outline, so <code>download()</code> always yields a collecti
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
 <span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_feature_collection</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an empty EPSG:4326 :class:`FeatureCollection` (no features).</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    Returned by the vector path when a request&#39;s bbox overlaps no glacier</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    region / matches no outline, so `download()` always yields a collection.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        FeatureCollection: A zero-feature collection in EPSG:4326.</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="p">[],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_feature_collection</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an empty EPSG:4326 :class:`FeatureCollection` (no features).</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    Returned by the vector path when a request&#39;s bbox overlaps no glacier</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    region / matches no outline, so `download()` always yields a collection.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        FeatureCollection: A zero-feature collection in EPSG:4326.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="p">[],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29004,7 +29040,11 @@ EPSG:4326. Empty when the query matched nothing.</p>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_glims</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_glims</span><span class="p">(</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="n">wfs_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="n">typename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
@@ -29036,16 +29076,20 @@ EPSG:4326. Empty when the query matched nothing.</p>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        requests.HTTPError: If the WFS returns a non-2xx status.</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="n">url</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">glims_wfs_url</span><span class="p">(</span><span class="n">wfs_url</span><span class="p">,</span> <span class="n">typename</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">max_features</span><span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="n">get</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="n">dest_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="n">dest_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="n">fc</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">dest_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()))</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="n">fc</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">return</span> <span class="n">_clip_to_bbox</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpClient</span><span class="p">,</span> <span class="n">RequestsGet</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="n">url</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">glims_wfs_url</span><span class="p">(</span><span class="n">wfs_url</span><span class="p">,</span> <span class="n">typename</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">max_features</span><span class="p">)</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="c1"># Route the single WFS GET through the shared HttpClient so it gains the</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="c1"># 429/5xx Retry-After/back-off policy; a passed `session` is reused for</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="c1"># connection pooling, else a fresh connection per call.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">session</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RequestsGet</span><span class="p">())</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="n">dest_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">dest_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="n">fc</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">dest_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()))</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">return</span> <span class="n">fc</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="n">_clip_to_bbox</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29209,11 +29253,7 @@ coordinates in the <code>glacier</code> table.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-432">432</a></span>
-<span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span>
-<span class="normal"><a href="#__codelineno-0-435">435</a></span>
-<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-436">436</a></span>
 <span class="normal"><a href="#__codelineno-0-437">437</a></span>
 <span class="normal"><a href="#__codelineno-0-438">438</a></span>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
@@ -29259,57 +29299,61 @@ coordinates in the <code>glacier</code> table.</p>
 <span class="normal"><a href="#__codelineno-0-479">479</a></span>
 <span class="normal"><a href="#__codelineno-0-480">480</a></span>
 <span class="normal"><a href="#__codelineno-0-481">481</a></span>
-<span class="normal"><a href="#__codelineno-0-482">482</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="k">def</span><span class="w"> </span><span class="nf">filter_wgms</span><span class="p">(</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="n">glaciers</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="n">glacier_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="n">glacier_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="n">region</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a WGMS fluctuations table by glacier / region / bbox.</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    `glacier_id` and `glacier_name` match the table directly; `region` and</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    `bbox` need the `glacier` join table (its `id` == the table&#39;s `glacier_id`,</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    its `gtng_region` is id-prefixed like `&quot;11_central_europe&quot;`, and it carries</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">    `latitude` / `longitude`).</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        df: A fluctuations table with a `glacier_id` (and `glacier_name`) column.</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        glaciers: The `glacier` join table; required for `region` / `bbox`.</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        glacier_id: One id or a list of ids (matched against `glacier_id`).</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        glacier_name: A case-insensitive substring matched against</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">            `glacier_name`.</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        region: One GTN-G region id (`&quot;11&quot;`) or a list, matched against the</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            `glacier` table&#39;s `gtng_region` prefix.</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        bbox: `[west, south, east, north]` filtering glaciers by their point</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            coordinates in the `glacier` table.</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        pandas.DataFrame: The filtered rows, with a reset index.</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="n">out</span> <span class="o">=</span> <span class="n">df</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="k">if</span> <span class="n">glacier_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">ids</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_as_list</span><span class="p">(</span><span class="n">glacier_id</span><span class="p">)}</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ids</span><span class="p">)]</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="k">if</span> <span class="n">glacier_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="n">names</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">glacier_name</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">glaciers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>        <span class="n">sel</span> <span class="o">=</span> <span class="n">glaciers</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="n">wanted</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_as_list</span><span class="p">(</span><span class="n">region</span><span class="p">)}</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="n">prefix</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;gtng_region&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="n">sel</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span><span class="n">prefix</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">wanted</span><span class="p">)]</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="k">if</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>            <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="n">sel</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>                <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">)</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>                <span class="o">&amp;</span> <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">south</span><span class="p">,</span> <span class="n">north</span><span class="p">)</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="p">]</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sel</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]))]</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-482">482</a></span>
+<span class="normal"><a href="#__codelineno-0-483">483</a></span>
+<span class="normal"><a href="#__codelineno-0-484">484</a></span>
+<span class="normal"><a href="#__codelineno-0-485">485</a></span>
+<span class="normal"><a href="#__codelineno-0-486">486</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="k">def</span><span class="w"> </span><span class="nf">filter_wgms</span><span class="p">(</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="n">glaciers</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="n">glacier_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>    <span class="n">glacier_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>    <span class="n">region</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a WGMS fluctuations table by glacier / region / bbox.</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    `glacier_id` and `glacier_name` match the table directly; `region` and</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">    `bbox` need the `glacier` join table (its `id` == the table&#39;s `glacier_id`,</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">    its `gtng_region` is id-prefixed like `&quot;11_central_europe&quot;`, and it carries</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">    `latitude` / `longitude`).</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        df: A fluctuations table with a `glacier_id` (and `glacier_name`) column.</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        glaciers: The `glacier` join table; required for `region` / `bbox`.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        glacier_id: One id or a list of ids (matched against `glacier_id`).</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        glacier_name: A case-insensitive substring matched against</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            `glacier_name`.</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        region: One GTN-G region id (`&quot;11&quot;`) or a list, matched against the</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            `glacier` table&#39;s `gtng_region` prefix.</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        bbox: `[west, south, east, north]` filtering glaciers by their point</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">            coordinates in the `glacier` table.</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        pandas.DataFrame: The filtered rows, with a reset index.</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="n">out</span> <span class="o">=</span> <span class="n">df</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>    <span class="k">if</span> <span class="n">glacier_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="n">ids</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_as_list</span><span class="p">(</span><span class="n">glacier_id</span><span class="p">)}</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ids</span><span class="p">)]</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="k">if</span> <span class="n">glacier_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="n">names</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">glacier_name</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">glaciers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="n">sel</span> <span class="o">=</span> <span class="n">glaciers</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>            <span class="n">wanted</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_as_list</span><span class="p">(</span><span class="n">region</span><span class="p">)}</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="n">prefix</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;gtng_region&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="n">sel</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span><span class="n">prefix</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">wanted</span><span class="p">)]</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="k">if</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>            <span class="n">sel</span> <span class="o">=</span> <span class="n">sel</span><span class="p">[</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>                <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">)</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>                <span class="o">&amp;</span> <span class="n">sel</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">south</span><span class="p">,</span> <span class="n">north</span><span class="p">)</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>            <span class="p">]</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;glacier_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sel</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]))]</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29620,11 +29664,7 @@ member — no reshaping, no array/NetCDF stack.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-374">374</a></span>
 <span class="normal"><a href="#__codelineno-0-375">375</a></span>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
@@ -29646,33 +29686,37 @@ member — no reshaping, no array/NetCDF stack.</p>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
 <span class="normal"><a href="#__codelineno-0-394">394</a></span>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_wgms_csv</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one WGMS FoG table out of the cached zip (`G8`).</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    The FoG tables are already long-format (`glacier_id` / year-or-date /</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    value), so this is a plain `pandas.read_csv` of the `data/&lt;table&gt;.csv`</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    member — no reshaping, no array/NetCDF stack.</span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span>
+<span class="normal"><a href="#__codelineno-0-398">398</a></span>
+<span class="normal"><a href="#__codelineno-0-399">399</a></span>
+<span class="normal"><a href="#__codelineno-0-400">400</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_wgms_csv</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one WGMS FoG table out of the cached zip (`G8`).</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip` (from :func:`download_zip`).</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        table: The table name (`&quot;mass_balance&quot;`, `&quot;front_variation&quot;`,</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            `&quot;state&quot;`).</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        pandas.DataFrame: The table rows.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        KeyError: If the zip has no `data/&lt;table&gt;.csv` member.</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="n">member</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;data/</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">if</span> <span class="n">member</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="sa">f</span><span class="s2">&quot;WGMS FoG zip has no </span><span class="si">{</span><span class="n">member</span><span class="si">!r}</span><span class="s2"> member &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="sa">f</span><span class="s2">&quot;(available: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">())</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">with</span> <span class="n">zf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()),</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    The FoG tables are already long-format (`glacier_id` / year-or-date /</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    value), so this is a plain `pandas.read_csv` of the `data/&lt;table&gt;.csv`</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    member — no reshaping, no array/NetCDF stack.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip` (from :func:`download_zip`).</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        table: The table name (`&quot;mass_balance&quot;`, `&quot;front_variation&quot;`,</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            `&quot;state&quot;`).</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        pandas.DataFrame: The table rows.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        KeyError: If the zip has no `data/&lt;table&gt;.csv` member.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">member</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;data/</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">if</span> <span class="n">member</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>                <span class="sa">f</span><span class="s2">&quot;WGMS FoG zip has no </span><span class="si">{</span><span class="n">member</span><span class="si">!r}</span><span class="s2"> member &quot;</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>                <span class="sa">f</span><span class="s2">&quot;(available: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">())</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="p">)</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">with</span> <span class="n">zf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()),</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30168,11 +30212,7 @@ region / bbox filter over a fluctuations table.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/glaciers/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span>
-<span class="normal"><a href="#__codelineno-0-401">401</a></span>
-<span class="normal"><a href="#__codelineno-0-402">402</a></span>
-<span class="normal"><a href="#__codelineno-0-403">403</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-403">403</a></span>
 <span class="normal"><a href="#__codelineno-0-404">404</a></span>
 <span class="normal"><a href="#__codelineno-0-405">405</a></span>
 <span class="normal"><a href="#__codelineno-0-406">406</a></span>
@@ -30184,23 +30224,27 @@ region / bbox filter over a fluctuations table.</p>
 <span class="normal"><a href="#__codelineno-0-412">412</a></span>
 <span class="normal"><a href="#__codelineno-0-413">413</a></span>
 <span class="normal"><a href="#__codelineno-0-414">414</a></span>
-<span class="normal"><a href="#__codelineno-0-415">415</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="k">def</span><span class="w"> </span><span class="nf">wgms_glacier_table</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the WGMS `glacier` join table (coordinates + region) from the zip.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    The `glacier` table carries `id` (== the other tables&#39; `glacier_id`),</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    `latitude` / `longitude`, and `gtng_region`, so it is the key for a</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    region / bbox filter over a fluctuations table.</span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
+<span class="normal"><a href="#__codelineno-0-417">417</a></span>
+<span class="normal"><a href="#__codelineno-0-418">418</a></span>
+<span class="normal"><a href="#__codelineno-0-419">419</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="k">def</span><span class="w"> </span><span class="nf">wgms_glacier_table</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the WGMS `glacier` join table (coordinates + region) from the zip.</span>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip`.</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        pandas.DataFrame: The `glacier` table.</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        KeyError: If the zip has no `data/glacier.csv` member.</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>    <span class="k">return</span> <span class="n">parse_wgms_csv</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="s2">&quot;glacier&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    The `glacier` table carries `id` (== the other tables&#39; `glacier_id`),</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    `latitude` / `longitude`, and `gtng_region`, so it is the key for a</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    region / bbox filter over a fluctuations table.</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip`.</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        pandas.DataFrame: The `glacier` table.</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        KeyError: If the zip has no `data/glacier.csv` member.</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="k">return</span> <span class="n">parse_wgms_csv</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="s2">&quot;glacier&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

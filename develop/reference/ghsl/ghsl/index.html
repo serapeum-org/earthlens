@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13648,6 +13648,34 @@
     
   
     OpenStreetMap history — building footprints over time (ohsome)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/osm/pbf_bulk_extracts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenStreetMap in bulk — Geofabrik extracts (pbf)
   
 
     
@@ -32027,11 +32055,7 @@ payload is a CSV / GeoPackage / xlsx, not a raster.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/ghsl/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-387">387</a></span>
-<span class="normal"><a href="#__codelineno-0-388">388</a></span>
-<span class="normal"><a href="#__codelineno-0-389">389</a></span>
-<span class="normal"><a href="#__codelineno-0-390">390</a></span>
-<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
 <span class="normal"><a href="#__codelineno-0-394">394</a></span>
@@ -32063,43 +32087,47 @@ payload is a CSV / GeoPackage / xlsx, not a raster.</p>
 <span class="normal"><a href="#__codelineno-0-420">420</a></span>
 <span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
-<span class="normal"><a href="#__codelineno-0-423">423</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_and_extract</span><span class="p">(</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="n">dest_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">120.0</span><span class="p">,</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream a `.zip` to `dest_dir` and extract **all** members (tabular path).</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    Unlike `download_and_unzip` (which selects the single `.tif`), this keeps</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">    every member — used for the tabular DUC / WUP-statistics products whose</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">    payload is a CSV / GeoPackage / xlsx, not a raster.</span>
+<span class="normal"><a href="#__codelineno-0-423">423</a></span>
+<span class="normal"><a href="#__codelineno-0-424">424</a></span>
+<span class="normal"><a href="#__codelineno-0-425">425</a></span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span>
+<span class="normal"><a href="#__codelineno-0-427">427</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_and_extract</span><span class="p">(</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="n">dest_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">120.0</span><span class="p">,</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream a `.zip` to `dest_dir` and extract **all** members (tabular path).</span>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        url: A `.zip` URL.</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        dest_dir: Directory to download + extract into (created if absent).</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        retries: Attempts before giving up.</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        backoff: Base backoff seconds.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        timeout: Per-request timeout.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        chunk_size: Streaming chunk size.</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        list[Path]: The extracted member paths (the `.zip` itself is removed).</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>    <span class="n">dest_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>    <span class="n">zip_path</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="n">_download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">backoff</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="n">_assert_safe_members</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">)</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="n">members</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)]</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="n">zf</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">dest_dir</span><span class="p">)</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="n">zip_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">dest_dir</span> <span class="o">/</span> <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">members</span><span class="p">]</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    Unlike `download_and_unzip` (which selects the single `.tif`), this keeps</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    every member — used for the tabular DUC / WUP-statistics products whose</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    payload is a CSV / GeoPackage / xlsx, not a raster.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        url: A `.zip` URL.</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        dest_dir: Directory to download + extract into (created if absent).</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        retries: Attempts before giving up.</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        backoff: Base backoff seconds.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        timeout: Per-request timeout.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        chunk_size: Streaming chunk size.</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        list[Path]: The extracted member paths (the `.zip` itself is removed).</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="n">dest_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="n">zip_path</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="n">_download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">backoff</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">_assert_safe_members</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">)</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">members</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)]</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">zf</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">dest_dir</span><span class="p">)</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="n">zip_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">dest_dir</span> <span class="o">/</span> <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">members</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32911,11 +32939,7 @@ intermediate <code>{code}_{region}_{release}/</code> sub-product directory
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/ghsl/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-358">358</a></span>
-<span class="normal"><a href="#__codelineno-0-359">359</a></span>
-<span class="normal"><a href="#__codelineno-0-360">360</a></span>
-<span class="normal"><a href="#__codelineno-0-361">361</a></span>
-<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
 <span class="normal"><a href="#__codelineno-0-364">364</a></span>
 <span class="normal"><a href="#__codelineno-0-365">365</a></span>
@@ -32937,33 +32961,37 @@ intermediate <code>{code}_{region}_{release}/</code> sub-product directory
 <span class="normal"><a href="#__codelineno-0-381">381</a></span>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span>
 <span class="normal"><a href="#__codelineno-0-383">383</a></span>
-<span class="normal"><a href="#__codelineno-0-384">384</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="k">def</span><span class="w"> </span><span class="nf">latest_version_dir</span><span class="p">(</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="n">family_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the highest `V{maj}-{min}` directory name under a family URL.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        family_url: A product-family directory URL (e.g.</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            `…/GHS_DUC_GLOBE_R2023A`).</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        str: The newest version directory name (e.g. `&quot;V2-0&quot;`).</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        ValueError: If no `V{maj}-{min}` directory is found.</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="n">versions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">list_remote_dir</span><span class="p">(</span><span class="n">family_url</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">):</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">match</span> <span class="o">=</span> <span class="n">_VERSION_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="n">versions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>                <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span> <span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="p">)</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">versions</span><span class="p">:</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no V</span><span class="se">{{</span><span class="s2">maj</span><span class="se">}}</span><span class="s2">-</span><span class="se">{{</span><span class="s2">min</span><span class="se">}}</span><span class="s2"> version directory under </span><span class="si">{</span><span class="n">family_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="n">versions</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="k">return</span> <span class="n">versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="k">def</span><span class="w"> </span><span class="nf">latest_version_dir</span><span class="p">(</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="n">family_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the highest `V{maj}-{min}` directory name under a family URL.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        family_url: A product-family directory URL (e.g.</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">            `…/GHS_DUC_GLOBE_R2023A`).</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        str: The newest version directory name (e.g. `&quot;V2-0&quot;`).</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        ValueError: If no `V{maj}-{min}` directory is found.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>    <span class="n">versions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">list_remote_dir</span><span class="p">(</span><span class="n">family_url</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">):</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">match</span> <span class="o">=</span> <span class="n">_VERSION_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="n">versions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>                <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span> <span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="p">)</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">versions</span><span class="p">:</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no V</span><span class="se">{{</span><span class="s2">maj</span><span class="se">}}</span><span class="s2">-</span><span class="se">{{</span><span class="s2">min</span><span class="se">}}</span><span class="s2"> version directory under </span><span class="si">{</span><span class="n">family_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="n">versions</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="k">return</span> <span class="n">versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33095,7 +33123,11 @@ slash), excluding the parent-directory and column-sort links.</p>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span>
 <span class="normal"><a href="#__codelineno-0-354">354</a></span>
-<span class="normal"><a href="#__codelineno-0-355">355</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_remote_dir</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
+<span class="normal"><a href="#__codelineno-0-357">357</a></span>
+<span class="normal"><a href="#__codelineno-0-358">358</a></span>
+<span class="normal"><a href="#__codelineno-0-359">359</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_remote_dir</span><span class="p">(</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List the entry names in a JRC Apache-autoindex directory.</span>
@@ -33109,15 +33141,19 @@ slash), excluding the parent-directory and column-sort links.</p>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        list[str]: The `href` entry names (sub-directories keep their trailing</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            slash), excluding the parent-directory and column-sort links.</span>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="n">get</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">url</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="k">for</span> <span class="n">href</span> <span class="ow">in</span> <span class="n">_HREF_RE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">):</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="k">if</span> <span class="n">href</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;../&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">href</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="k">return</span> <span class="n">names</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpClient</span><span class="p">,</span> <span class="n">RequestsGet</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="c1"># Route the autoindex GET through the shared HttpClient for the 429/5xx</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="c1"># Retry-After/back-off policy; a passed `session` is reused, else a fresh</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="c1"># connection per call.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">session</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RequestsGet</span><span class="p">())</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="k">for</span> <span class="n">href</span> <span class="ow">in</span> <span class="n">_HREF_RE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">):</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="k">if</span> <span class="n">href</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;../&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">href</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="k">return</span> <span class="n">names</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
