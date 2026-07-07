@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import difflib
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import requests
@@ -34,6 +34,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    mask_to_geometry,
 )
 from earthlens.base.http import HttpClient
 from earthlens.bathymetry._helpers import (
@@ -330,9 +331,14 @@ class Bathymetry(AbstractDataSource):
             )
         return content
 
-    @staticmethod
-    def _to_geotiff(nc_path: Path, variable: str, tif_path: Path) -> None:
-        """Read the NetCDF band with pyramids and write a GeoTIFF.
+    def _to_geotiff(self, nc_path: Path, variable: str, tif_path: Path) -> None:
+        """Read the NetCDF band with pyramids, mask to the AOI, write a GeoTIFF.
+
+        The ERDDAP `griddap` server already subsets to the request *bbox*, so
+        no client-side bbox crop is needed. A polygon `aoi=`, however, is only
+        expressed to the server as its bounding box — so the exact polygon is
+        applied here with the shared `mask_to_geometry` (a no-op when the
+        request carries no polygon), matching every other raster backend.
 
         Args:
             nc_path: The downloaded NetCDF subset.
@@ -347,6 +353,7 @@ class Bathymetry(AbstractDataSource):
 
         nc = NetCDF.read_file(str(nc_path))
         band = nc.get_variable(variable)
+        band = mask_to_geometry(band, self.space)
         band.to_file(str(tif_path))
 
     def _log_estimated_size(
