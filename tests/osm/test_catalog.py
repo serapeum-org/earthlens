@@ -84,11 +84,13 @@ class TestCatalog:
     def test_every_row_has_protocol_and_query(self, catalog):
         """Catalog integrity: each row carries its protocol's query field."""
         for query_id, row in catalog.datasets.items():
-            assert row.protocol in ("overpass", "ohsome")
+            assert row.protocol in ("overpass", "ohsome", "pbf")
             if row.protocol == "overpass":
                 assert row.query_template and "{bbox}" in row.query_template
-            else:
+            elif row.protocol == "ohsome":
                 assert row.ohsome_filter
+            else:
+                assert row.pyrosm_method
 
     def test_id_prefix_matches_protocol(self, catalog):
         """Each id's `<protocol>:` prefix matches the row's protocol."""
