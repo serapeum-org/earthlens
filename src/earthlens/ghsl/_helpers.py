@@ -34,6 +34,8 @@ from typing import Any
 import requests
 from loguru import logger
 
+from earthlens.base.archive import extract_members
+
 from earthlens.base.http import HttpClient
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
 
@@ -289,21 +291,7 @@ def download_and_unzip(
 
     zip_path = dest_dir / zip_name
     _download(url, zip_path, session, retries, backoff, timeout, chunk_size)
-    with zipfile.ZipFile(zip_path) as zf:
-        _assert_safe_members(zf, dest_dir)
-        members = sorted(m for m in zf.namelist() if m.lower().endswith(".tif"))
-        if not members:
-            raise ValueError(
-                f"GHSL zip {url} contains no .tif member (found {zf.namelist()})."
-            )
-        if len(members) > 1:
-            logger.warning(
-                f"GHSL zip {url} has multiple .tif members {members}; "
-                f"using the first ({members[0]})."
-            )
-        member = members[0]
-        zf.extract(member, dest_dir)
-    extracted = dest_dir / member
+    (extracted,) = extract_members(zip_path, dest_dir, include=(".tif",), single=True)
     if extracted != tif_path:
         extracted.replace(tif_path)
     zip_path.unlink(missing_ok=True)

@@ -111,7 +111,7 @@ class TestDownloadAndUnzip:
             archive.writestr("only.txt", b"nope")
         url = "https://x/GHS_POP_z_V1_0.zip"
         session = fake_session({url: make_response(content=zpath.read_bytes())})
-        with pytest.raises(ValueError, match="no .tif member"):
+        with pytest.raises(ValueError, match="no matching member"):
             download_and_unzip(url, tmp_path / "dl", session=session)
 
     def test_retries_then_raises(self, tmp_path, fake_session, monkeypatch):
