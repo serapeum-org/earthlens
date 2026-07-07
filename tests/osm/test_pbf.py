@@ -114,23 +114,22 @@ class TestDownloadExtract:
         download_extract("europe/malta", tmp_path, http=http2, progress=False)
         assert http2.download_calls == []
 
-    def test_cache_miss_on_md5_mismatch_redownloads(self, tmp_path):
-        """A cached file whose md5 no longer matches is re-downloaded."""
+    def test_existing_cache_is_trusted_without_network(self, tmp_path):
+        """A present, non-empty cached file is reused — no download, no sidecar."""
         dest = tmp_path / "europe_malta-latest.osm.pbf"
-        dest.write_bytes(b"stale")
+        dest.write_bytes(b"already-here")
+        http = FakeHttp()
+        out = download_extract("europe/malta", tmp_path, http=http, progress=False)
+        assert out == dest
+        assert http.download_calls == [] and http.get_calls == []
+
+    def test_empty_cache_file_is_redownloaded(self, tmp_path):
+        """A zero-byte cached file is treated as a miss and re-downloaded."""
+        dest = tmp_path / "europe_malta-latest.osm.pbf"
+        dest.write_bytes(b"")
         http = FakeHttp()
         download_extract("europe/malta", tmp_path, http=http, progress=False)
         assert http.download_calls == [geofabrik_url("europe/malta")]
-
-    def test_verify_md5_false_is_cache_hit_without_sidecar(self, tmp_path):
-        """With verify_md5=False a present file is a hit and no md5 is fetched."""
-        dest = tmp_path / "europe_malta-latest.osm.pbf"
-        dest.write_bytes(b"anything")
-        http = FakeHttp()
-        out = download_extract(
-            "europe/malta", tmp_path, http=http, progress=False, verify_md5=False
-        )
-        assert out == dest and http.get_calls == [] and http.download_calls == []
 
     def test_md5_mismatch_after_download_raises_and_removes(self, tmp_path):
         """A downloaded file that fails the md5 check is removed and raises."""

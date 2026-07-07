@@ -182,15 +182,16 @@ def download_extract(
     """Fetch (and cache) a Geofabrik `.osm.pbf` extract for a region (`G13`).
 
     The extract is written under `cache_dir` as
-    `<continent>_<region>-latest.osm.pbf`. A cached file is reused: when
-    `verify_md5` is set the cached copy is validated against the current
-    Geofabrik `.osm.pbf.md5` sidecar and re-downloaded on a mismatch; otherwise
-    its mere presence is a cache hit. A fresh download streams atomically (via
-    :class:`~earthlens.base.http.HttpClient`, which follows the Geofabrik `302`
-    redirect and writes a `.part` renamed on success) and, when `verify_md5` is
-    set, is checked against the sidecar — a mismatch removes the file and
-    raises. An extract larger than `LARGE_FILE_WARN_BYTES` logs a warning before
-    the fetch.
+    `<continent>_<region>-latest.osm.pbf`. Caching is **presence-based**: an
+    existing, non-empty cached file is reused as-is — no per-call sidecar fetch
+    and no re-hashing of a (potentially multi-GB) local file, which the download
+    already verified. To pick up a newer Geofabrik extract, delete the cached
+    file (it is re-fetched on the next call). A fresh download streams
+    atomically (via :class:`~earthlens.base.http.HttpClient`, which follows the
+    Geofabrik `302` redirect and writes a `.part` renamed on success) and, when
+    `verify_md5` is set, is checked once against the `.osm.pbf.md5` sidecar — a
+    mismatch removes the file and raises. An extract larger than
+    `LARGE_FILE_WARN_BYTES` logs a warning before the fetch.
 
     Args:
         region_path: The Geofabrik path segment, e.g. `"europe/malta"`.
@@ -199,8 +200,9 @@ def download_extract(
             :class:`~earthlens.base.http.HttpClient` (retry/back-off on
             `5xx`/`429`).
         progress: Show a `tqdm` download progress bar.
-        verify_md5: Validate the file against Geofabrik's `.osm.pbf.md5`
-            sidecar (cache hit *and* fresh download). `False` skips the check.
+        verify_md5: Verify a **freshly-downloaded** file against Geofabrik's
+            `.osm.pbf.md5` sidecar. `False` skips the check. It does not affect
+            a cache hit (the cached file is trusted).
 
     Returns:
         Path: The path to the cached `.osm.pbf` file.
@@ -215,15 +217,9 @@ def download_extract(
     cache_dir = Path(cache_dir)
     dest = cache_dir / _cache_name(region_path)
 
-    if dest.exists():
-        if not verify_md5:
-            logger.info(f"OSM PBF cache hit: {dest}")
-            return dest
-        expected = _expected_md5(url, http)
-        if expected is None or _md5_of(dest) == expected:
-            logger.info(f"OSM PBF cache hit (md5 ok): {dest}")
-            return dest
-        logger.warning(f"Cached {dest.name} failed md5 check; re-downloading")
+    if dest.exists() and dest.stat().st_size > 0:
+        logger.info(f"OSM PBF cache hit: {dest}")
+        return dest
 
     _warn_large_extract(url, http)
     logger.info(f"Downloading Geofabrik extract {url}")
