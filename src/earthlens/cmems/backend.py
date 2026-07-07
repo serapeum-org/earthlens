@@ -34,7 +34,6 @@ from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
@@ -44,6 +43,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     date_windows,
+    safe_filename,
     window_labels,
 )
 from earthlens.cmems.auth import (
@@ -705,13 +705,13 @@ class CMEMS(AbstractDataSource):
 
 
 def _safe_filename(dataset_id: str) -> str:
-    """Replace characters illegal in Windows filenames with `_`.
+    """Sanitise a CMEMS dataset id into a filesystem-safe stem.
 
-    CMEMS dataset ids contain `.` (e.g.
-    `cmems_mod_glo_phy_my_0.083deg_P1D-m`); Windows tolerates a
-    single dot before the extension but mid-string dots are
-    confusing in `glob` patterns. Also strip any path separator
-    that could escape the output directory.
+    Thin alias over :func:`earthlens.base.safe_filename` (the shared
+    implementation). CMEMS dataset ids contain `.` (e.g.
+    `cmems_mod_glo_phy_my_0.083deg_P1D-m`), which the whitelist keeps,
+    while every path separator and Windows-illegal character
+    (`/ \\ : * ? " < > |`) collapses to `_`.
 
     Args:
         dataset_id: The raw CMEMS dataset id.
@@ -719,10 +719,7 @@ def _safe_filename(dataset_id: str) -> str:
     Returns:
         A filename-safe variant of the id.
     """
-    safe = dataset_id
-    for bad in ("/", "\\", ":", "*", "?", '"', "<", ">", "|"):
-        safe = safe.replace(bad, "_")
-    return safe
+    return safe_filename(dataset_id)
 
 
 def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:

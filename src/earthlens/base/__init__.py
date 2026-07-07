@@ -20,6 +20,7 @@ from earthlens.base.abstractdatasource import (
 from earthlens.base.auth import AbstractAuth, AuthenticationError
 from earthlens.base.http import HttpClient
 from earthlens.base.leaves import FluxableLeaf
+from earthlens.base.naming import safe_filename
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
 from earthlens.base.region import (
     clear_region_cache,
@@ -58,6 +59,7 @@ __all__ = [
     "normalize_aoi",
     "region_affinity",
     "resolve_aoi",
+    "safe_filename",
     "split_time",
     "date_windows",
     "to_datetime",

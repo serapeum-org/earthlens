@@ -20,7 +20,6 @@ the pyramids `PY-1` port.
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -36,6 +35,7 @@ from earthlens.base import (
     TemporalExtent,
     crop_to_aoi,
     date_windows,
+    safe_filename,
     to_datetime,
     warn_if_egress,
 )
@@ -46,12 +46,13 @@ from earthlens.s3.layouts import plan_products
 
 __all__ = ["S3"]
 
-_UNSAFE = re.compile(r"[^A-Za-z0-9._-]+")
-
-
 def _safe_name(value: str) -> str:
-    """Sanitise a product id into a filesystem-safe file stem."""
-    return _UNSAFE.sub("_", value).strip("_")
+    """Sanitise a product id into a filesystem-safe file stem.
+
+    Thin alias over :func:`earthlens.base.safe_filename` (the shared
+    implementation); kept as a module-local name for the call sites.
+    """
+    return safe_filename(value)
 
 
 @dataclass(frozen=True)

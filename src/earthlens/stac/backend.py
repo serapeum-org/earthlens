@@ -38,6 +38,7 @@ from earthlens.base import (
     TemporalExtent,
     crop_to_aoi,
     date_windows,
+    safe_filename,
     window_labels,
 )
 
@@ -250,8 +251,6 @@ class STAC(LazyClientMixin, AbstractDataSource):
         """Parse the date window into a :class:`TemporalExtent`."""
         import datetime as dt
 
-        import pandas as pd
-
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
@@ -344,7 +343,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 nodata = self._nodata_for(collection_key, assets)
                 # Endpoint-namespaced keys contain "/"; flatten for filenames so
                 # they don't create phantom subdirectories.
-                safe_key = collection_key.replace("/", "_")
+                safe_key = safe_filename(collection_key)
                 for band in assets:
                     # resolved_href resolves the asset href and applies the
                     # signer's sign_href (SAS graft / CDSE /vsis3 rewrite /
