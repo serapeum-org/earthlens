@@ -1,82 +1,75 @@
 # Change Log
 
-## Unreleased
+## 0.10.0 (2026-07-07)
 
 ### Feat
 
-- **soilgrids**: add `earthlens.soilgrids` — ISRIC SoilGrids 2.0 global 250 m
-  soil-property maps (clay, sand, silt, cfvo, phh2o, cec, nitrogen, soc, ocd,
-  ocs, bdod) subset **server-side over OGC WCS** and written as GeoTIFF
-  (`OUTPUT_KIND="raster"`). A request expands `variables` × `depths` ×
-  `quantiles` into `(property, depth, quantile)` coverage triples, one GeoTIFF
-  per cell named `{property}_{depth}_{quantile}.tif`. The WCS transport is
-  consumed from pyramids' `Dataset.from_wcs` (0.38.0) — earthlens imports no
-  OGC-WCS SDK; SoilGrids' native Interrupted Goode Homolosine grid
-  (`EPSG:152160`, unresolvable in PROJ) is handled with a `coverage_crs` shim and
-  reprojected to EPSG:4326 by default. Values are scaled integers (divide by a
-  per-property `scale_factor`); the backend records the unit/scale but never
-  rescales pixels. A polygon `aoi=` is masked to shape; per-coverage WCS failures
-  are isolated (skip-and-continue) under a progress bar; `aggregate=` is rejected
-  (static, no time axis). Ships a sharded property catalog, the `soilgrids` /
-  `isric` facade keys, a `datasets validate soilgrids` structural lint, a live
-  gated e2e, intro / usage / datasets / reference docs, and three example
-  notebooks. No extra SDK and no auth module — open, CC-BY 4.0.
-- **erddap**: add `earthlens.erddap` — a generic ERDDAP client that reaches many
-  public ERDDAP servers (NOAA CoastWatch / Coral Reef Watch, NCEI, …) from one
-  backend. A curated sharded catalog pins each dataset to a concrete
-  `(server_url, dataset_id, protocol)`; the `protocol` sets a **per-instance**
-  `OUTPUT_KIND` — `griddap` → raster NetCDF (accepts `aggregate=`, routed through
-  the pyramids `aggregate_netcdf` flow), `tabledap` → tabular `pandas.DataFrame`.
-  Built on IOOS `erddapy` (the tabledap `to_pandas()` path only); the griddap
-  path builds the OPeNDAP `.nc` URL directly and downloads it (erddapy's instance
-  `dataset_id` setter eagerly fetches the full coordinate axis and hangs), reading
-  it back via pyramids — earthlens never imports `xarray`. Validates NetCDF magic
-  bytes before writing (an ERDDAP HTML error page can arrive with a 200), and
-  flux variables are catalog-driven (`flux_variables` → `op="auto"` sums). Ships
-  four verified-public CoastWatch datasets (CRW SST anomaly + DHW, NCEI Pathfinder
-  SST, Aqua MODIS chlorophyll [historical 2003–2022], NDBC buoys), the `[erddap]`
-  optional extra (`erddapy`), aliases `erddap` / `ioos`, intro / usage / datasets
-  / reference docs, and three example notebooks (catalog explorer + griddap +
-  tabledap). Full `earthlens datasets` CLI integration: `validate erddap` lints
-  the rows, `refresh erddap [--write]` regenerates the `available_datasets:`
-  index by walking each curated server's `allDatasets` table, `audit erddap`
-  diffs curated-vs-live, `audit erddap --coverage` classifies the universe
-  into DONE / addressable (griddap) / table (tabledap) / thin (test datasets) /
-  missing, and `curate erddap <id> [--server …]` seeds a catalog row from a
-  dataset's `/info` metadata. Public servers only (no auth module).
-- **asf**: add `earthlens.asf` — Alaska Satellite Facility SAR backend with
-  `asf_search`-backed search and the InSAR baseline `stack()`. Reuses NASA
-  Earthdata Login auth from `earthlens.earthdata` (no second credential
-  system); search runs anonymously, only download authenticates. Ships a
-  42-row curated product catalog (Sentinel-1 SLC/BURST/GRD/OCN + per-satellite
-  variants, ALOS PALSAR / ALOS-2, the full OPERA-S1 family including
-  OPERA-S1-CALVAL, ARIA GUNW, the complete NISAR product family — RSLC /
-  GSLC / GCOV / L0B / RIFG / RUNW / GUNW / ROFF / GOFF / LRCLK_UTC — the
-  TROPO atmospheric corrections, ERS-1/2, JERS-1, RADARSAT-1, plus SEASAT /
-  SIR-C / AIRSAR / UAVSAR / SMAP). Aliases
-  `asf` / `alaska-satellite-facility` / `insar`. `aggregate=` rejected with
-  `NotImplementedError` — the MVP returns SAR product paths for downstream
-  InSAR tooling (HyP3 / ISCE / SNAP / MintPy) rather than processing them
-  in-flight. Catalog refresh is hand-maintained; `earthlens datasets validate
-  asf` checks every row's PLATFORM / DATASET / PRODUCT_TYPE member against the
-  installed asf_search. Adds intro / authentication / usage / available products
-  docs pages, five example notebooks (catalog explorer + anonymous quickstart
-  + InSAR stack walkthrough + OPERA RTC search workflow + an end-to-end
-  backscatter demo that downloads, opens with pyramids, and plots a 6 MB
-  OPERA RTC tile in decibels), and an `e2e-asf` weekly-cron CI lane.
+- **dem**: add anonymous Copernicus DEM backend (M3) (#699)
+- **cmip6**: add backend for the raw CMIP6 archive on gs://cmip6 (#700)
+- **goes**: add earthlens.goes NOAA GOES-R ABI backend (#679)
+- **jaxa**: add P-Tree Himawari HSD protocol branch (third JAXA protocol) (#677)
+- **air-quality**: add airnow, eea_aq & sensor_community ground-obs backends (#676)
+- add aifs-ens NWP row and optional ecmwf-modern client (#678)
+- **base**: add HttpClient and region_affinity, migrate 10 backends onto them (#667)
+- **nwp**: add mode={subset,whole} download override and catalog title/description (#655)
+- **ecmwf**: add EWDS endpoint with per-endpoint CADS routing and GloFAS forecast (#656)
+- **soilgrids**: add earthlens.soilgrids backend (ISRIC SoilGrids 2.0 via OGC WCS) (#633)
+- **eumetsat**: add Data Tailor server-side customisation (tailor=) (#650)
+- **drought**: add earthlens.drought backend (USDM, EDO/GDO, SPEIbase) (#514)
+- **glaciers**: add earthlens.glaciers backend (RGI 7.0 + GLIMS + WGMS) (#612)
+- **osm**: add earthlens.osm backend (OpenStreetMap via Overpass + ohsome) (#622)
+- **admin**: add earthlens.admin backend (geoBoundaries / CGAZ / Natural Earth / TIGER) (#593)
+- **nrel**: add earthlens.nrel backend (NREL NSRDB + WIND Toolkit time series) (#563)
+- **solar-wind-atlas**: add earthlens.solar_wind_atlas backend (M26) (#562)
+- **risk-indicators**: add earthlens.risk_indicators backend (ThinkHazard! + INFORM + GFW) (#583)
+- **pvgis**: add earthlens.pvgis backend (JRC PVGIS 5.3 solar / PV time series) (#543)
+- **climate-indices**: add earthlens.climate_indices backend (NOAA PSL + KNMI Climate Explorer) (#532)
+- **argo**: add earthlens.argo backend for Argo float ocean profiles (#504)
+- **erddap**: add generic ERDDAP backend (griddap raster / tabledap tabular) (#490)
+- **bathymetry**: add earthlens.bathymetry DEM backend (GEBCO 2020 + ETOPO1) (#503)
+- add the biodiversity backend cluster (gbif, obis, wdpa, iucn) (#470)
+- add the biodiversity backend cluster (gbif, obis, wdpa, iucn) 
+                                                                                                                 
+  Four new provider backends share one request shape (taxon / species /                                          
+  area selector over a bbox) and a small set of helpers:                                                         
+                                                                                                                 
+  - gbif (anonymous, pygbif) -> vector occurrence FeatureCollection                                              
+  - obis (anonymous, pyobis) -> vector occurrence FeatureCollection                                              
+  - wdpa / protected-planet (WDPA_TOKEN ?token=) -> vector polygons                                              
+  - iucn / redlist (IUCN_TOKEN Bearer) -> tabular DataFrame                                                      
+                                                                                                                 
+  Shared in earthlens.biodiversity:                                                                              
+                                                                                                                 
+  - wkt_from_bbox: SpatialExtent -> ccw POLYGON((...)) for geometry=                                             
+  - occurrences_to_fc: pygbif list[dict] / pyobis DataFrame ->                                                   
+    EPSG:4326 points FeatureCollection (modelled on fdsn.events)                                                 
+  - LicenseWarning / warn_license: promoted out of overture/_helpers                                             
+    with re-export so overture's is-identity is preserved (G8)                                                   
+                                                                                                                 
+  Each backend ships a catalog.py + curated YAML matching the standard                                           
+  subpackage layout, plus a richer available_datasets index (gbif 36                                             
+  taxa, obis 30 marine groups, wdpa/iucn 40 country codes each). The                                             
+  cluster is wired into every earthlens datasets CLI surface (list,                                              
+  show, search, where, validate, refresh, audit, curate, stanza).                                                
+                                                                                                                 
+  CI lanes e2e-iucn / e2e-wdpa added in .github/workflows/tests-e2e.yml                                          
+  against secrets.IUCN_TOKEN / secrets.WDPA_TOKEN; gbif/obis run live                                            
+  in nbval-lax. Cluster coverage: 100% line+branch (920/226).                                                    
+                                                                                                                 
+  New optional extras: gbif (pygbif >=0.6.6), obis (pyobis >=1.6.1);                                             
+  both folded into [all]. wdpa/iucn use core requests.                                                           
+                                                                                                                 
+  Closes #491, #492, #493, #494, #495, #496, #497, #498, #499, #500, #501, #502
+- **jaxa**: add earthlens.jaxa backend (jaxa-earth STAC/COG + G-Portal SFTP) (#469)
+- **asf**: new earthlens.asf — Alaska Satellite Facility SAR + InSAR baseline stack (#451)
 
 ### Fix
 
-- **pyproject**: require `pyramids-gis >=0.38.0` (core dependency plus the
-  `parquet` / `stac` / `viz` extras) and refresh `pixi.lock`. pyramids 0.38.0
-  ships the NetCDF `Container` / `Variable` type split (pyramids #625);
-  earthlens already consumes the typed `NetCDF` / `LabeledDataset` / `Dataset`
-  entry points and the `variable_names` property, so no source change is
-  needed. The lockfile refresh (via the repo-mandated `pixi update`, which
-  re-resolves the whole graph) also carries incidental minor/patch bumps of
-  unrelated transitives — `geopandas`, `pandas`, `pyogrio`, `typer`,
-  `google-auth`, `greenlet`, `httplib2`, `regex` (plus dev/docs `cleopatra`,
-  `ipython`) — none crossing a major-version boundary.
+- **cli**: bump distinct-backend count to 31 after erddap merge (#533)
+
+### Refactor
+
+- **http**: migrate 8 more backends onto HttpClient (#713)
 
 ## 0.9.0 (2026-06-17)
 
