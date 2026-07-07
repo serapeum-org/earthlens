@@ -39,6 +39,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
+    date_windows,
 )
 from earthlens.nwp._helpers import (
     cog_name,
@@ -305,7 +306,7 @@ class NWP(AbstractDataSource):
         """
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
-        dates = pd.date_range(start_dt, end_dt, freq="D")
+        dates = date_windows(start_dt, end_dt, "D")
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

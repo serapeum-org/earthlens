@@ -63,6 +63,7 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    date_windows,
     to_datetime,
 )
 from earthlens.gee._helpers import (
@@ -573,8 +574,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if temporal_resolution == "raw":
             dates = pd.DatetimeIndex([start_dt])
         elif temporal_resolution in _RESOLUTION_FREQ:
-            dates = pd.date_range(
-                start_dt, end_dt, freq=_RESOLUTION_FREQ[temporal_resolution]
+            dates = date_windows(
+                start_dt, end_dt, _RESOLUTION_FREQ[temporal_resolution]
             )
         else:
             raise ValueError(
@@ -779,7 +780,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             yield start, reduce_collection(collection, reducer)
             return
         freq = _RESOLUTION_FREQ[self.temporal_resolution]
-        bucket_starts = pd.date_range(start, end, freq=freq, inclusive="left")
+        bucket_starts = date_windows(start, end, freq, inclusive="left")
         for i, bucket_start in enumerate(bucket_starts):
             bucket_end = (
                 bucket_starts[i + 1]

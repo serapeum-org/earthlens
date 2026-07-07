@@ -35,6 +35,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
+    date_windows,
     to_datetime,
     warn_if_egress,
 )
@@ -215,7 +216,7 @@ class S3(AbstractDataSource):
             dates = pd.DatetimeIndex([start_date])
         else:
             resolution = "MS" if temporal_resolution == "monthly" else "D"
-            dates = pd.date_range(start_date, end_date, freq=resolution)
+            dates = date_windows(start_date, end_date, resolution)
             if len(dates) == 0:
                 dates = pd.DatetimeIndex([start_date])
         return TemporalExtent(

@@ -51,6 +51,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
+    date_windows,
     to_datetime,
 )
 from earthlens.chc.catalog import Catalog
@@ -502,7 +503,7 @@ class CHIRPS(AbstractDataSource):
             )
             return []
 
-        dates = pd.date_range(window_start, window_end, freq=dataset.pandas_freq)
+        dates = date_windows(window_start, window_end, dataset.pandas_freq)
         # M1: catch per-date failures so a single transient (TCP reset,
         # FTP 550, a one-off bad raster) doesn't abort the rest of the
         # batch for this `(ds, var)`. The outer `download()` loop kept

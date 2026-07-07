@@ -37,6 +37,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
+    date_windows,
 )
 
 if TYPE_CHECKING:
@@ -254,7 +255,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         end_dt = dt.datetime.strptime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
         resolution = freq_map.get(temporal_resolution, "D")
-        dates = pd.date_range(start_dt, end_dt, freq=resolution)
+        dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
         )

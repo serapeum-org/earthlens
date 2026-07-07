@@ -37,6 +37,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    date_windows,
 )
 from earthlens.base.http import HttpClient
 from earthlens.climate_indices import _helpers
@@ -231,7 +232,7 @@ class ClimateIndices(AbstractDataSource):
             start_date=start_dt,
             end_date=end_dt,
             resolution="MS",
-            dates=pd.date_range(start_dt, end_dt, freq="MS"),
+            dates=date_windows(start_dt, end_dt, "MS"),
         )
 
     def _api(self) -> list[pd.DataFrame]:

@@ -33,7 +33,7 @@ import pandas as pd
 import requests
 from joblib import Parallel, delayed
 
-from earthlens.base import OutputKind, RemoteProduct
+from earthlens.base import OutputKind, RemoteProduct, date_windows
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
@@ -375,7 +375,7 @@ class WorldPop(AbstractDataSource):
         """
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
-        dates = pd.date_range(start_dt, end_dt, freq="YS")
+        dates = date_windows(start_dt, end_dt, "YS")
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

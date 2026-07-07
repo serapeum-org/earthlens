@@ -35,6 +35,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    date_windows,
 )
 from earthlens.openeo._helpers import OUTPUT_FORMATS, period_for, reducer_for
 from earthlens.openeo.auth import OpeneoAuth, OpeneoCredentials
@@ -237,7 +238,7 @@ class OpenEO(AbstractDataSource):
         end_dt = dt.datetime.strptime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
         resolution = freq_map.get(temporal_resolution, "D")
-        dates = pd.date_range(start_dt, end_dt, freq=resolution)
+        dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
         )

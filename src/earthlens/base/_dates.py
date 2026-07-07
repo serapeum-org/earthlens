@@ -115,6 +115,52 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
     )
 
 
+def date_windows(
+    start: Any,
+    end: Any,
+    freq: str,
+    *,
+    inclusive: str = "both",
+) -> pd.DatetimeIndex:
+    """Expand a `[start, end]` range into its period starts at `freq`.
+
+    The single home for the `pd.date_range(to_datetime(start),
+    to_datetime(end), freq=...)` idiom that ~20 backends re-derive to turn a
+    request window into the per-file dates they download. `start` / `end` are
+    parsed through :func:`to_datetime`, so either raw date-likes (a string, a
+    `date`, a `Timestamp`) or already-parsed `datetime`s work.
+
+    Args:
+        start: The window start, in any form :func:`to_datetime` accepts.
+        end: The window end, in any form :func:`to_datetime` accepts.
+        freq: A pandas offset alias (`"D"`, `"MS"`, `"YS"`, `"6h"`, ...).
+        inclusive: Which endpoints to include — `"both"` (default), `"left"`,
+            `"right"`, or `"neither"`; forwarded to `pandas.date_range`.
+
+    Returns:
+        pandas.DatetimeIndex: One timestamp per period start in the window.
+
+    Examples:
+        - A monthly range is expanded to month starts:
+            ```python
+            >>> [d.strftime("%Y-%m-%d") for d in date_windows(
+            ...     "2020-01-01", "2020-03-01", "MS")]
+            ['2020-01-01', '2020-02-01', '2020-03-01']
+
+            ```
+        - `inclusive="left"` drops the closing endpoint:
+            ```python
+            >>> [d.strftime("%Y-%m-%d") for d in date_windows(
+            ...     "2020-01-01", "2020-03-01", "MS", inclusive="left")]
+            ['2020-01-01', '2020-02-01']
+
+            ```
+    """
+    return pd.date_range(
+        to_datetime(start), to_datetime(end), freq=freq, inclusive=inclusive
+    )
+
+
 def split_time(value: Any) -> tuple[Any, Any]:
     """Split a single time-range value into a `(start, end)` pair.
 
