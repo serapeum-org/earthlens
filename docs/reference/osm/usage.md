@@ -85,9 +85,15 @@ the whole extract — the bbox-area cap does **not** apply to a `pbf` read.
     `engine="pyrosm"` (the default) reads the whole extract in memory and gives
     the richest columns; it refuses a file over 4 GB. For a **continent- or
     planet-scale** extract, pass `engine="pyosmium"` to stream it with bounded
-    memory (a slimmer `osm_id` / `osm_type` / `geometry` schema, one geometry
-    kind per layer). The backend warns before downloading a multi-GB extract.
-    Never load `planet.osm` with `pyrosm`.
+    memory. The backend warns before downloading a multi-GB extract. Never load
+    `planet.osm` with `pyrosm`.
+
+    The `pyosmium` engine is a **coarser fallback**: it returns a slimmer
+    `osm_id` / `osm_type` / `geometry` schema and, per layer, a single geometry
+    kind under one representative tag (so it under-reports a row's advertised
+    `geometry_types` — e.g. `pbf:pois` yields only node points, `pbf:roads`
+    approximates `network_type="driving"` rather than reproducing `pyrosm`'s
+    exact filter). Use `pyrosm` when you need the full, exact per-layer output.
 
 ## Choosing the query — `variables`
 

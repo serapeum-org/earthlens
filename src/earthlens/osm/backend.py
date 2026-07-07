@@ -382,10 +382,11 @@ class OSM(AbstractDataSource):
         if protocols & {"overpass", "ohsome"}:
             self._guard_bbox()
         if "pbf" in protocols and self._region is None:
+            examples = ", ".join(self._catalog.region_ids()[:3])
             raise ValueError(
                 "a pbf:* query needs a Geofabrik region: pass region= (a key "
-                f"from the catalog, e.g. {self._catalog.region_ids()[:3]}, or a "
-                "raw 'continent/region' path)."
+                f"from the catalog, e.g. {examples}, or a raw 'continent/region' "
+                "path)."
             )
         return products
 

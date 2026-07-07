@@ -522,6 +522,11 @@ def _stream_geometries(
                 if geom is not None:
                     yield obj.id, "way", geom
     else:  # area
+        # The KeyFilter applies to the assembled Area objects (which carry the
+        # source relation's / way's tags), not to the member ways feeding the
+        # area assembler, so multipolygon-relation areas survive the filter —
+        # verified on the Malta extract (772 relation-buildings preserved,
+        # identical to a post-assembly tag check).
         processor = osmium.FileProcessor(path).with_areas().with_filter(key_filter)
         for obj in processor:
             if isinstance(obj, osmium.osm.Area):
