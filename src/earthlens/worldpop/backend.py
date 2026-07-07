@@ -25,7 +25,6 @@ from __future__ import annotations
 import datetime as dt
 import re
 import time
-import warnings
 from pathlib import Path
 
 import numpy as np
@@ -33,7 +32,7 @@ import pandas as pd
 import requests
 from joblib import Parallel, delayed
 
-from earthlens.base import OutputKind, RemoteProduct, date_windows
+from earthlens.base import OutputKind, RemoteProduct, date_windows, window_labels
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
@@ -687,7 +686,7 @@ class WorldPop(AbstractDataSource):
         Returns:
             list[Path]: One reduced GeoTIFF per `(product, cohort, window)`.
         """
-        from pyramids.dataset import Dataset
+        from pyramids.dataset import Dataset, DatasetCollection
 
         op = "mean" if cfg.op == "auto" else cfg.op
         by_series: dict[tuple[str, tuple[str, int] | None], dict[int, Path]] = {}
@@ -697,33 +696,26 @@ class WorldPop(AbstractDataSource):
         out: list[Path] = []
         for (product, cohort), year_paths in by_series.items():
             years = sorted(year_paths)
-            index = pd.to_datetime([f"{y}-01-01" for y in years])
-            series = pd.Series(years, index=index)
-            for window_label, bucket in series.groupby(pd.Grouper(freq=cfg.freq)):
-                bucket_years = list(bucket.values)
-                if not bucket_years:
-                    continue
-                template = Dataset.read_file(str(year_paths[bucket_years[0]]))
-                stack = np.stack(
-                    [
-                        _masked_array(Dataset.read_file(str(year_paths[y])))
-                        for y in bucket_years
-                    ]
-                )
-                with warnings.catch_warnings():
-                    # All-no-data cells reduce to NaN; that is expected for
-                    # ocean / outside-AOI pixels, so silence the empty-slice
-                    # RuntimeWarning numpy emits for them.
-                    warnings.simplefilter("ignore", RuntimeWarning)
-                    reduced = _REDUCERS[op](stack, axis=0)
-                tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
+            # Label each year by its `cfg.freq` window start (as %Y%m%d), then
+            # let DatasetCollection.groupby reduce the co-registered year
+            # rasters per window — the same COG-stack path stac / nwp use. This
+            # replaces the hand-rolled np.stack + local NaN-aware reducer table;
+            # DatasetCollection honours each raster's no-data under skipna.
+            dates = pd.to_datetime([f"{y}-01-01" for y in years])
+            files = [str(year_paths[y]) for y in years]
+            labels = window_labels(dates, cfg.freq)
+            collection = DatasetCollection.from_files(files)
+            reduced = getattr(collection.groupby(labels), op)(skipna=cfg.skipna)
+            template = Dataset.read_file(files[0])
+            geo, epsg = template.geotransform, template.epsg
+            tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
+            for label, array in reduced.items():
                 target = (
-                    Path(self.path)
-                    / f"{product}{tag}_{cfg.freq}_{window_label:%Y%m%d}_{op}.tif"
+                    Path(self.path) / f"{product}{tag}_{cfg.freq}_{label}_{op}.tif"
                 )
-                Dataset.create_from_array(
-                    arr=reduced, geo=template.geotransform, epsg=template.epsg
-                ).to_file(str(target))
+                Dataset.create_from_array(arr=array, geo=geo, epsg=epsg).to_file(
+                    str(target)
+                )
                 out.append(target)
         return out
 
@@ -992,16 +984,6 @@ class WorldPop(AbstractDataSource):
         target = Path(self.path) / f"{product}_{tif.stem}_{self._resolution}.tif"
         cropped.to_file(str(target))
         return target
-
-
-#: Per-op reducers over the year axis (axis 0), NaN-aware (NaN = no-data).
-_REDUCERS = {
-    "mean": np.nanmean,
-    "sum": np.nansum,
-    "min": np.nanmin,
-    "max": np.nanmax,
-    "std": np.nanstd,
-}
 
 
 def _masked_array(dataset) -> np.ndarray:
