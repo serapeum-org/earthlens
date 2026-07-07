@@ -18563,15 +18563,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#0100-2026-07-07" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Unreleased
+        0.10.0 (2026-07-07)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Unreleased">
+    <nav class="md-nav" aria-label="0.10.0 (2026-07-07)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -18590,6 +18590,17 @@
     <span class="md-ellipsis">
       
         Fix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refactor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Refactor
       
     </span>
   </a>
@@ -18703,7 +18714,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#refactor" class="md-nav__link">
+  <a href="#refactor_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Refactor
@@ -18787,7 +18798,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#refactor_1" class="md-nav__link">
+  <a href="#refactor_2" class="md-nav__link">
     <span class="md-ellipsis">
       
         Refactor
@@ -18978,15 +18989,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#0100-2026-07-07" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Unreleased
+        0.10.0 (2026-07-07)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Unreleased">
+    <nav class="md-nav" aria-label="0.10.0 (2026-07-07)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -19005,6 +19016,17 @@
     <span class="md-ellipsis">
       
         Fix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refactor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Refactor
       
     </span>
   </a>
@@ -19118,7 +19140,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#refactor" class="md-nav__link">
+  <a href="#refactor_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Refactor
@@ -19202,7 +19224,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#refactor_1" class="md-nav__link">
+  <a href="#refactor_2" class="md-nav__link">
     <span class="md-ellipsis">
       
         Refactor
@@ -19356,82 +19378,71 @@
 
 
 <h1 id="change-log"><a class="toclink" href="#change-log">Change Log</a><a class="headerlink" href="#change-log" title="Permanent link">#</a></h1>
-<h2 id="unreleased"><a class="toclink" href="#unreleased">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
+<h2 id="0100-2026-07-07"><a class="toclink" href="#0100-2026-07-07">0.10.0 (2026-07-07)</a><a class="headerlink" href="#0100-2026-07-07" title="Permanent link">#</a></h2>
 <h3 id="feat"><a class="toclink" href="#feat">Feat</a><a class="headerlink" href="#feat" title="Permanent link">#</a></h3>
 <ul>
-<li><strong>soilgrids</strong>: add <code>earthlens.soilgrids</code> — ISRIC SoilGrids 2.0 global 250 m
-  soil-property maps (clay, sand, silt, cfvo, phh2o, cec, nitrogen, soc, ocd,
-  ocs, bdod) subset <strong>server-side over OGC WCS</strong> and written as GeoTIFF
-  (<code>OUTPUT_KIND="raster"</code>). A request expands <code>variables</code> × <code>depths</code> ×
-  <code>quantiles</code> into <code>(property, depth, quantile)</code> coverage triples, one GeoTIFF
-  per cell named <code>{property}_{depth}_{quantile}.tif</code>. The WCS transport is
-  consumed from pyramids' <code>Dataset.from_wcs</code> (0.38.0) — earthlens imports no
-  OGC-WCS SDK; SoilGrids' native Interrupted Goode Homolosine grid
-  (<code>EPSG:152160</code>, unresolvable in PROJ) is handled with a <code>coverage_crs</code> shim and
-  reprojected to EPSG:4326 by default. Values are scaled integers (divide by a
-  per-property <code>scale_factor</code>); the backend records the unit/scale but never
-  rescales pixels. A polygon <code>aoi=</code> is masked to shape; per-coverage WCS failures
-  are isolated (skip-and-continue) under a progress bar; <code>aggregate=</code> is rejected
-  (static, no time axis). Ships a sharded property catalog, the <code>soilgrids</code> /
-  <code>isric</code> facade keys, a <code>datasets validate soilgrids</code> structural lint, a live
-  gated e2e, intro / usage / datasets / reference docs, and three example
-  notebooks. No extra SDK and no auth module — open, CC-BY 4.0.</li>
-<li><strong>erddap</strong>: add <code>earthlens.erddap</code> — a generic ERDDAP client that reaches many
-  public ERDDAP servers (NOAA CoastWatch / Coral Reef Watch, NCEI, …) from one
-  backend. A curated sharded catalog pins each dataset to a concrete
-  <code>(server_url, dataset_id, protocol)</code>; the <code>protocol</code> sets a <strong>per-instance</strong>
-  <code>OUTPUT_KIND</code> — <code>griddap</code> → raster NetCDF (accepts <code>aggregate=</code>, routed through
-  the pyramids <code>aggregate_netcdf</code> flow), <code>tabledap</code> → tabular <code>pandas.DataFrame</code>.
-  Built on IOOS <code>erddapy</code> (the tabledap <code>to_pandas()</code> path only); the griddap
-  path builds the OPeNDAP <code>.nc</code> URL directly and downloads it (erddapy's instance
-  <code>dataset_id</code> setter eagerly fetches the full coordinate axis and hangs), reading
-  it back via pyramids — earthlens never imports <code>xarray</code>. Validates NetCDF magic
-  bytes before writing (an ERDDAP HTML error page can arrive with a 200), and
-  flux variables are catalog-driven (<code>flux_variables</code> → <code>op="auto"</code> sums). Ships
-  four verified-public CoastWatch datasets (CRW SST anomaly + DHW, NCEI Pathfinder
-  SST, Aqua MODIS chlorophyll [historical 2003–2022], NDBC buoys), the <code>[erddap]</code>
-  optional extra (<code>erddapy</code>), aliases <code>erddap</code> / <code>ioos</code>, intro / usage / datasets
-  / reference docs, and three example notebooks (catalog explorer + griddap +
-  tabledap). Full <code>earthlens datasets</code> CLI integration: <code>validate erddap</code> lints
-  the rows, <code>refresh erddap [--write]</code> regenerates the <code>available_datasets:</code>
-  index by walking each curated server's <code>allDatasets</code> table, <code>audit erddap</code>
-  diffs curated-vs-live, <code>audit erddap --coverage</code> classifies the universe
-  into DONE / addressable (griddap) / table (tabledap) / thin (test datasets) /
-  missing, and <code>curate erddap &lt;id&gt; [--server …]</code> seeds a catalog row from a
-  dataset's <code>/info</code> metadata. Public servers only (no auth module).</li>
-<li><strong>asf</strong>: add <code>earthlens.asf</code> — Alaska Satellite Facility SAR backend with
-  <code>asf_search</code>-backed search and the InSAR baseline <code>stack()</code>. Reuses NASA
-  Earthdata Login auth from <code>earthlens.earthdata</code> (no second credential
-  system); search runs anonymously, only download authenticates. Ships a
-  42-row curated product catalog (Sentinel-1 SLC/BURST/GRD/OCN + per-satellite
-  variants, ALOS PALSAR / ALOS-2, the full OPERA-S1 family including
-  OPERA-S1-CALVAL, ARIA GUNW, the complete NISAR product family — RSLC /
-  GSLC / GCOV / L0B / RIFG / RUNW / GUNW / ROFF / GOFF / LRCLK_UTC — the
-  TROPO atmospheric corrections, ERS-1/2, JERS-1, RADARSAT-1, plus SEASAT /
-  SIR-C / AIRSAR / UAVSAR / SMAP). Aliases
-  <code>asf</code> / <code>alaska-satellite-facility</code> / <code>insar</code>. <code>aggregate=</code> rejected with
-  <code>NotImplementedError</code> — the MVP returns SAR product paths for downstream
-  InSAR tooling (HyP3 / ISCE / SNAP / MintPy) rather than processing them
-  in-flight. Catalog refresh is hand-maintained; <code>earthlens datasets validate
-  asf</code> checks every row's PLATFORM / DATASET / PRODUCT_TYPE member against the
-  installed asf_search. Adds intro / authentication / usage / available products
-  docs pages, five example notebooks (catalog explorer + anonymous quickstart</li>
-<li>InSAR stack walkthrough + OPERA RTC search workflow + an end-to-end
-  backscatter demo that downloads, opens with pyramids, and plots a 6 MB
-  OPERA RTC tile in decibels), and an <code>e2e-asf</code> weekly-cron CI lane.</li>
+<li><strong>dem</strong>: add anonymous Copernicus DEM backend (M3) (#699)</li>
+<li><strong>cmip6</strong>: add backend for the raw CMIP6 archive on gs://cmip6 (#700)</li>
+<li><strong>goes</strong>: add earthlens.goes NOAA GOES-R ABI backend (#679)</li>
+<li><strong>jaxa</strong>: add P-Tree Himawari HSD protocol branch (third JAXA protocol) (#677)</li>
+<li><strong>air-quality</strong>: add airnow, eea_aq &amp; sensor_community ground-obs backends (#676)</li>
+<li>add aifs-ens NWP row and optional ecmwf-modern client (#678)</li>
+<li><strong>base</strong>: add HttpClient and region_affinity, migrate 10 backends onto them (#667)</li>
+<li><strong>nwp</strong>: add mode={subset,whole} download override and catalog title/description (#655)</li>
+<li><strong>ecmwf</strong>: add EWDS endpoint with per-endpoint CADS routing and GloFAS forecast (#656)</li>
+<li><strong>soilgrids</strong>: add earthlens.soilgrids backend (ISRIC SoilGrids 2.0 via OGC WCS) (#633)</li>
+<li><strong>eumetsat</strong>: add Data Tailor server-side customisation (tailor=) (#650)</li>
+<li><strong>drought</strong>: add earthlens.drought backend (USDM, EDO/GDO, SPEIbase) (#514)</li>
+<li><strong>glaciers</strong>: add earthlens.glaciers backend (RGI 7.0 + GLIMS + WGMS) (#612)</li>
+<li><strong>osm</strong>: add earthlens.osm backend (OpenStreetMap via Overpass + ohsome) (#622)</li>
+<li><strong>admin</strong>: add earthlens.admin backend (geoBoundaries / CGAZ / Natural Earth / TIGER) (#593)</li>
+<li><strong>nrel</strong>: add earthlens.nrel backend (NREL NSRDB + WIND Toolkit time series) (#563)</li>
+<li><strong>solar-wind-atlas</strong>: add earthlens.solar_wind_atlas backend (M26) (#562)</li>
+<li><strong>risk-indicators</strong>: add earthlens.risk_indicators backend (ThinkHazard! + INFORM + GFW) (#583)</li>
+<li><strong>pvgis</strong>: add earthlens.pvgis backend (JRC PVGIS 5.3 solar / PV time series) (#543)</li>
+<li><strong>climate-indices</strong>: add earthlens.climate_indices backend (NOAA PSL + KNMI Climate Explorer) (#532)</li>
+<li><strong>argo</strong>: add earthlens.argo backend for Argo float ocean profiles (#504)</li>
+<li><strong>erddap</strong>: add generic ERDDAP backend (griddap raster / tabledap tabular) (#490)</li>
+<li><strong>bathymetry</strong>: add earthlens.bathymetry DEM backend (GEBCO 2020 + ETOPO1) (#503)</li>
+<li>add the biodiversity backend cluster (gbif, obis, wdpa, iucn) (#470)</li>
+<li>add the biodiversity backend cluster (gbif, obis, wdpa, iucn) </li>
 </ul>
+<p>Four new provider backends share one request shape (taxon / species /                                        <br />
+  area selector over a bbox) and a small set of helpers:                                                         </p>
+<ul>
+<li>gbif (anonymous, pygbif) -&gt; vector occurrence FeatureCollection                                              </li>
+<li>obis (anonymous, pyobis) -&gt; vector occurrence FeatureCollection                                              </li>
+<li>wdpa / protected-planet (WDPA_TOKEN ?token=) -&gt; vector polygons                                              </li>
+<li>iucn / redlist (IUCN_TOKEN Bearer) -&gt; tabular DataFrame                                                      </li>
+</ul>
+<p>Shared in earthlens.biodiversity:                                                                              </p>
+<ul>
+<li>wkt_from_bbox: SpatialExtent -&gt; ccw POLYGON((...)) for geometry=                                             </li>
+<li>occurrences_to_fc: pygbif list[dict] / pyobis DataFrame -&gt;                                                 <br />
+    EPSG:4326 points FeatureCollection (modelled on fdsn.events)                                                 </li>
+<li>LicenseWarning / warn_license: promoted out of overture/_helpers                                           <br />
+    with re-export so overture's is-identity is preserved (G8)                                                   </li>
+</ul>
+<p>Each backend ships a catalog.py + curated YAML matching the standard                                         <br />
+  subpackage layout, plus a richer available_datasets index (gbif 36                                           <br />
+  taxa, obis 30 marine groups, wdpa/iucn 40 country codes each). The                                           <br />
+  cluster is wired into every earthlens datasets CLI surface (list,                                            <br />
+  show, search, where, validate, refresh, audit, curate, stanza).                                                </p>
+<p>CI lanes e2e-iucn / e2e-wdpa added in .github/workflows/tests-e2e.yml                                        <br />
+  against secrets.IUCN_TOKEN / secrets.WDPA_TOKEN; gbif/obis run live                                          <br />
+  in nbval-lax. Cluster coverage: 100% line+branch (920/226).                                                    </p>
+<p>New optional extras: gbif (pygbif &gt;=0.6.6), obis (pyobis &gt;=1.6.1);                                           <br />
+  both folded into [all]. wdpa/iucn use core requests.                                                           </p>
+<p>Closes #491, #492, #493, #494, #495, #496, #497, #498, #499, #500, #501, #502
+- <strong>jaxa</strong>: add earthlens.jaxa backend (jaxa-earth STAC/COG + G-Portal SFTP) (#469)
+- <strong>asf</strong>: new earthlens.asf — Alaska Satellite Facility SAR + InSAR baseline stack (#451)</p>
 <h3 id="fix"><a class="toclink" href="#fix">Fix</a><a class="headerlink" href="#fix" title="Permanent link">#</a></h3>
 <ul>
-<li><strong>pyproject</strong>: require <code>pyramids-gis &gt;=0.38.0</code> (core dependency plus the
-  <code>parquet</code> / <code>stac</code> / <code>viz</code> extras) and refresh <code>pixi.lock</code>. pyramids 0.38.0
-  ships the NetCDF <code>Container</code> / <code>Variable</code> type split (pyramids #625);
-  earthlens already consumes the typed <code>NetCDF</code> / <code>LabeledDataset</code> / <code>Dataset</code>
-  entry points and the <code>variable_names</code> property, so no source change is
-  needed. The lockfile refresh (via the repo-mandated <code>pixi update</code>, which
-  re-resolves the whole graph) also carries incidental minor/patch bumps of
-  unrelated transitives — <code>geopandas</code>, <code>pandas</code>, <code>pyogrio</code>, <code>typer</code>,
-  <code>google-auth</code>, <code>greenlet</code>, <code>httplib2</code>, <code>regex</code> (plus dev/docs <code>cleopatra</code>,
-  <code>ipython</code>) — none crossing a major-version boundary.</li>
+<li><strong>cli</strong>: bump distinct-backend count to 31 after erddap merge (#533)</li>
+</ul>
+<h3 id="refactor"><a class="toclink" href="#refactor">Refactor</a><a class="headerlink" href="#refactor" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>http</strong>: migrate 8 more backends onto HttpClient (#713)</li>
 </ul>
 <h2 id="090-2026-06-17"><a class="toclink" href="#090-2026-06-17">0.9.0 (2026-06-17)</a><a class="headerlink" href="#090-2026-06-17" title="Permanent link">#</a></h2>
 <h3 id="feat_1"><a class="toclink" href="#feat_1">Feat</a><a class="headerlink" href="#feat_1" title="Permanent link">#</a></h3>
@@ -19472,7 +19483,7 @@
 <li><strong>tropycal</strong>: shim pkg_resources so tropycal imports under setuptools&gt;=81 (#307)</li>
 <li><strong>ci</strong>: add py7zr to the [all] extra so the wheel suite installs it (#338)</li>
 </ul>
-<h3 id="refactor"><a class="toclink" href="#refactor">Refactor</a><a class="headerlink" href="#refactor" title="Permanent link">#</a></h3>
+<h3 id="refactor_1"><a class="toclink" href="#refactor_1">Refactor</a><a class="headerlink" href="#refactor_1" title="Permanent link">#</a></h3>
 <ul>
 <li><strong>provider</strong>: align backend API surface and subpackage layout (#372)</li>
 <li><strong>cmems</strong>: decode the CF time axis via pyramids NetCDF, drop xarray (#206)</li>
@@ -19494,7 +19505,7 @@
 <li>overhaul GEE backend, add CHC subpackage, extract shared GIS primitives (#53)</li>
 </ul>
 <h2 id="040-2026-05-10"><a class="toclink" href="#040-2026-05-10">0.4.0 (2026-05-10)</a><a class="headerlink" href="#040-2026-05-10" title="Permanent link">#</a></h2>
-<h3 id="refactor_1"><a class="toclink" href="#refactor_1">Refactor</a><a class="headerlink" href="#refactor_1" title="Permanent link">#</a></h3>
+<h3 id="refactor_2"><a class="toclink" href="#refactor_2">Refactor</a><a class="headerlink" href="#refactor_2" title="Permanent link">#</a></h3>
 <ul>
 <li>rename earthly -&gt; earthlens and fix CDS notebooks (#47)</li>
 </ul>
