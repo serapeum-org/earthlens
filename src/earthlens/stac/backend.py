@@ -38,6 +38,7 @@ from earthlens.base import (
     TemporalExtent,
     crop_to_aoi,
     date_windows,
+    window_labels,
 )
 
 if TYPE_CHECKING:
@@ -567,7 +568,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
             dated.sort()
             dates = [d for d, _ in dated]
             files = [str(p) for _, p in dated]
-            labels = _window_labels(dates, config.freq)
+            labels = window_labels(dates, config.freq)
             collection = DatasetCollection.from_files(files)
             reduced = getattr(collection.groupby(labels), op)(skipna=config.skipna)
             geo, epsg = _geo_of(Dataset, files[0])
@@ -589,33 +590,6 @@ class STAC(LazyClientMixin, AbstractDataSource):
             f"window COG(s) (time/{config.freq} {op}) in {out_dir}"
         )
         return written
-
-
-def _window_labels(dates: list[str], freq: str) -> list[str]:
-    """Return one window-start label (`YYYYMMDD`) per date, bucketed by `freq`.
-
-    Dates sharing a `config.freq` window get the same label, so
-    `DatasetCollection.groupby` coarsens the time axis to one slice per window.
-
-    Args:
-        dates: Acquisition dates as `YYYY-MM-DD` strings, in file order.
-        freq: A pandas offset alias (`"1MS"`, `"7D"`, `"YS"`, …).
-
-    Returns:
-        One label per input date (length == `len(dates)`).
-    """
-    import pandas as pd
-
-    index = pd.DatetimeIndex(pd.to_datetime(list(dates)))
-    positions = pd.Series(range(len(index)), index=index)
-    label_for: dict[int, str] = {}
-    for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
-        if group.empty:
-            continue
-        label = window_start.strftime("%Y%m%d")
-        for pos in group.tolist():
-            label_for[int(pos)] = label
-    return [label_for[i] for i in range(len(index))]
 
 
 def _geo_of(dataset_cls: Any, path: str) -> tuple[Any, Any]:

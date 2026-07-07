@@ -161,6 +161,48 @@ def date_windows(
     )
 
 
+def window_labels(times: Any, freq: str, *, fmt: str = "%Y%m%d") -> list[str]:
+    """Bucket `times` by `freq`; return one window-start label per input time.
+
+    Times that fall in the same `freq` window get the same `strftime(fmt)`
+    label, so a downstream `NetCDF.reduce(groupby=...)` /
+    `DatasetCollection.groupby(...)` coarsens the time axis to one slice per
+    distinct window. The single home for the `pd.Grouper(freq=...)` bucketing
+    the cmems / stac / nwp aggregation paths each re-derived.
+
+    Args:
+        times: The per-step times, in file order (anything `pandas.to_datetime`
+            accepts — a `DatetimeIndex`, a list of `datetime`s / strings, ...).
+        freq: A pandas offset alias (`"6h"`, `"D"`, `"1MS"`, `"YS"`, ...).
+        fmt: `strftime` format for the label. Defaults to `"%Y%m%d"`; sub-daily
+            windows should pass `"%Y%m%d%H"` so same-day windows stay distinct.
+
+    Returns:
+        list[str]: One label per input time (same length / order as `times`).
+
+    Examples:
+        - Monthly windows collapse the days in each month to one label:
+            ```python
+            >>> window_labels(
+            ...     ["2020-01-05", "2020-01-20", "2020-02-03"], "MS")
+            ['20200101', '20200101', '20200201']
+
+            ```
+    """
+    import pandas as pd
+
+    index = pd.DatetimeIndex(pd.to_datetime(list(times)))
+    positions = pd.Series(range(len(index)), index=index)
+    label_for: dict[int, str] = {}
+    for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
+        if group.empty:
+            continue
+        label = window_start.strftime(fmt)
+        for pos in group.tolist():
+            label_for[int(pos)] = label
+    return [label_for[i] for i in range(len(index))]
+
+
 def split_time(value: Any) -> tuple[Any, Any]:
     """Split a single time-range value into a `(start, end)` pair.
 

@@ -44,6 +44,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     date_windows,
+    window_labels,
 )
 from earthlens.cmems.auth import (
     AuthenticationError,
@@ -520,16 +521,7 @@ class CMEMS(AbstractDataSource):
                 "cannot decode the NetCDF CF `time` axis for windowing "
                 "(no `time` variable with a CF `units` attribute)."
             )
-        time_index = pd.DatetimeIndex(pd.to_datetime(list(times)))
-        positions = pd.Series(range(len(time_index)), index=time_index)
-        label_for: dict[int, str] = {}
-        for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
-            if group.empty:
-                continue
-            label = window_start.strftime("%Y%m%d")
-            for pos in group.tolist():
-                label_for[int(pos)] = label
-        return [label_for[i] for i in range(len(time_index))]
+        return window_labels(times, freq)
 
     def _api(self) -> list[Path]:
         """Compose `_search` and `_fetch` into the canonical C3 shape."""

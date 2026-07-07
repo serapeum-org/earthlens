@@ -7,7 +7,7 @@ into the private module layout.
 
 from __future__ import annotations
 
-from earthlens.base._dates import date_windows, split_time, to_datetime
+from earthlens.base._dates import date_windows, split_time, to_datetime, window_labels
 from earthlens.base.abstractdatasource import (
     AbstractCatalog,
     AbstractDataSource,
@@ -61,5 +61,6 @@ __all__ = [
     "split_time",
     "date_windows",
     "to_datetime",
+    "window_labels",
     "warn_if_egress",
 ]

@@ -239,18 +239,9 @@ def window_labels(times: list[dt.datetime], freq: str) -> list[str]:
     Returns:
         list[str]: One label per input time (same length as `times`).
     """
-    import pandas as pd
+    from earthlens.base import window_labels as _base_window_labels
 
-    index = pd.DatetimeIndex(pd.to_datetime(list(times)))
-    positions = pd.Series(range(len(index)), index=index)
-    label_for: dict[int, str] = {}
-    for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
-        if group.empty:
-            continue
-        label = window_start.strftime("%Y%m%d%H")
-        for pos in group.tolist():
-            label_for[int(pos)] = label
-    return [label_for[i] for i in range(len(index))]
+    return _base_window_labels(times, freq, fmt="%Y%m%d%H")
 
 
 def ensure_dir(path: Path | str) -> Path:
