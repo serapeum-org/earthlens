@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -4992,17 +4992,6 @@
     <span class="md-ellipsis">
       
         Quickstart — building history at a snapshot (ohsome)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quickstart-every-building-in-a-region-pbf" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quickstart — every building in a region (pbf)
       
     </span>
   </a>
@@ -13016,34 +13005,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/osm/pbf_bulk_extracts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OpenStreetMap in bulk — Geofabrik extracts (pbf)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -18845,17 +18806,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart-every-building-in-a-region-pbf" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quickstart — every building in a region (pbf)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#choosing-the-query-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -18998,15 +18948,11 @@
 background and the named-query list see <a href="../introduction/">Introduction</a>; the
 rendered API is the <a href="../osm/">Reference</a> page.</p>
 <h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<p>The protocol SDKs ship behind two extras (imported lazily — the base package
-imports without them):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># overpy + ohsome  (Overpass + ohsome protocols)</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">  </span><span class="c1"># pyrosm + osmium  (the pbf protocol)</span>
+<p>The two query SDKs ship behind the <code>[osm]</code> extra (imported lazily — the base
+package imports without them):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># pulls overpy + ohsome</span>
 </code></pre></div>
-<p><code>[osm-pbf]</code> is <strong>not</strong> in <code>[all]</code> (it is heavy, and <code>pyrosm</code> builds a compiled
-dependency from source), so install it explicitly for bulk PBF work. Note
-<code>pyosmium</code> is published on PyPI as <code>osmium</code>. There are no credentials to
-configure — Overpass, ohsome, and Geofabrik are all public.</p>
+<p>There are no credentials to configure — both Overpass and ohsome are public.</p>
 <h2 id="quickstart-current-state-hospitals-overpass"><a class="toclink" href="#quickstart-current-state-hospitals-overpass">Quickstart — current-state hospitals (Overpass)</a><a class="headerlink" href="#quickstart-current-state-hospitals-overpass" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
@@ -19037,55 +18983,19 @@ shared community infrastructure.</p>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nb">print</span><span class="p">(</span><span class="n">buildings</span><span class="p">[</span><span class="s2">&quot;@snapshotTimestamp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>   <span class="c1"># the history timestamp</span>
 </code></pre></div>
-<h2 id="quickstart-every-building-in-a-region-pbf"><a class="toclink" href="#quickstart-every-building-in-a-region-pbf">Quickstart — every building in a region (pbf)</a><a class="headerlink" href="#quickstart-every-building-in-a-region-pbf" title="Permanent link">#</a></h2>
-<p>For a <strong>bulk</strong> ask — every building in a country — use the <code>pbf</code> protocol. It
-downloads a <a href="https://download.geofabrik.de/">Geofabrik</a> extract for <code>region=</code>
-(cached on disk), reads the layer with <code>pyrosm</code>, and clips to the request bbox:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">buildings</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pbf:buildings&quot;</span><span class="p">],</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">region</span><span class="o">=</span><span class="s2">&quot;malta&quot;</span><span class="p">,</span>                     <span class="c1"># a Geofabrik region key (or &quot;europe/andorra&quot;)</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.88</span><span class="p">,</span> <span class="mf">35.94</span><span class="p">],</span>             <span class="c1"># bbox clips the read; omit for the whole extract</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">14.48</span><span class="p">,</span> <span class="mf">14.54</span><span class="p">],</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">buildings</span><span class="p">),</span> <span class="s2">&quot;building footprints&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>The first call downloads the extract (Malta is ~8.8 MB) to a cross-run cache
-(<code>~/.earthlens/cache/osm_pbf/</code> by default, override with <code>cache_dir=</code>); repeat
-calls reuse it. List the region keys with <code>Catalog().region_ids()</code>, or pass a
-raw Geofabrik path (any string with a <code>/</code>). Omit <code>lat_lim</code> / <code>lon_lim</code> to read
-the whole extract — the bbox-area cap does <strong>not</strong> apply to a <code>pbf</code> read.</p>
-<div class="admonition note">
-<p class="admonition-title">Engines — <code>pyrosm</code> (default) vs <code>pyosmium</code></p>
-<p><code>engine="pyrosm"</code> (the default) reads the whole extract in memory and gives
-the richest columns; it refuses a file over 4 GB. For a <strong>continent- or
-planet-scale</strong> extract, pass <code>engine="pyosmium"</code> to stream it with bounded
-memory. The backend warns before downloading a multi-GB extract. Never load
-<code>planet.osm</code> with <code>pyrosm</code>.</p>
-<p>The <code>pyosmium</code> engine is a <strong>coarser fallback</strong>: it returns a slimmer
-<code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema and, per layer, a single geometry
-kind under one representative tag (so it under-reports a row's advertised
-<code>geometry_types</code> — e.g. <code>pbf:pois</code> yields only node points, <code>pbf:roads</code>
-approximates <code>network_type="driving"</code> rather than reproducing <code>pyrosm</code>'s
-exact filter). Use <code>pyrosm</code> when you need the full, exact per-layer output.</p>
-</div>
 <h2 id="choosing-the-query-variables"><a class="toclink" href="#choosing-the-query-variables">Choosing the query — <code>variables</code></a><a class="headerlink" href="#choosing-the-query-variables" title="Permanent link">#</a></h2>
 <p>For this backend <code>variables</code> is the list of <strong>named-query ids</strong>, not
 data-variable names. The <code>&lt;protocol&gt;:</code> prefix routes the request:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># one named query</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:roads&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># several at once — combined into one FeatureCollection</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:hospitals&quot;</span><span class="p">,</span> <span class="s2">&quot;overpass:cafes&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># one named query</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:roads&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># several at once — combined into one FeatureCollection</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:hospitals&quot;</span><span class="p">,</span> <span class="s2">&quot;overpass:cafes&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
 </code></pre></div>
 <p>The shipped named queries are <code>overpass:hospitals</code>, <code>overpass:roads</code>,
 <code>overpass:buildings</code>, <code>overpass:cafes</code>, <code>overpass:schools</code>, <code>ohsome:buildings</code>,
-<code>ohsome:highways</code>, <code>ohsome:amenities</code>, and the <code>pbf:*</code> layers (<code>pbf:buildings</code>,
-<code>pbf:roads</code>, <code>pbf:pois</code>, <code>pbf:landuse</code>, <code>pbf:natural</code>, <code>pbf:boundaries</code>). List
-them with <code>EarthLens.list_datasets("osm")</code>. An unknown id raises with a
-did-you-mean hint.</p>
+<code>ohsome:highways</code>, and <code>ohsome:amenities</code>. List them with
+<code>EarthLens.list_datasets("osm")</code>. An unknown id raises with a did-you-mean hint.</p>
 <p>The facade keys <code>"osm"</code>, <code>"openstreetmap"</code>, <code>"overpass"</code>, and <code>"ohsome"</code> all
 resolve to the same backend.</p>
 <h2 id="the-bbox-and-the-time-window"><a class="toclink" href="#the-bbox-and-the-time-window">The bbox and the time window</a><a class="headerlink" href="#the-bbox-and-the-time-window" title="Permanent link">#</a></h2>
@@ -19100,35 +19010,35 @@ resolve to the same backend.</p>
   <code>time</code> as <code>"start/end"</code>). An ohsome query with no <code>start</code> raises a helpful
   <code>ValueError</code>.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># ohsome over a multi-year range</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ohsome:highways&quot;</span><span class="p">],</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">],</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2016-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2022-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># ohsome over a multi-year range</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ohsome:highways&quot;</span><span class="p">],</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">],</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2016-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2022-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <h2 id="raw-query-filter-overrides-power-users"><a class="toclink" href="#raw-query-filter-overrides-power-users">Raw query / filter overrides (power users)</a><a class="headerlink" href="#raw-query-filter-overrides-power-users" title="Permanent link">#</a></h2>
 <p>When the named queries aren't enough, pass your own:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># raw Overpass QL — {bbox} is filled with the request bbox (S,W,N,E)</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:hospitals&quot;</span><span class="p">],</span>            <span class="c1"># still needed to route</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">],</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">query</span><span class="o">=</span><span class="s1">&#39;[out:json][timeout:180];(node[&quot;tourism&quot;=&quot;museum&quot;](</span><span class="si">{bbox}</span><span class="s1">););out geom;&#39;</span><span class="p">,</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># raw ohsome filter</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ohsome:buildings&quot;</span><span class="p">],</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">],</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;leisure=park and geometry:polygon&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># raw Overpass QL — {bbox} is filled with the request bbox (S,W,N,E)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:hospitals&quot;</span><span class="p">],</span>            <span class="c1"># still needed to route</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">],</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">query</span><span class="o">=</span><span class="s1">&#39;[out:json][timeout:180];(node[&quot;tourism&quot;=&quot;museum&quot;](</span><span class="si">{bbox}</span><span class="s1">););out geom;&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="c1"># raw ohsome filter</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ohsome:buildings&quot;</span><span class="p">],</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">],</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;leisure=park and geometry:polygon&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <p>A raw <code>query=</code> with no <code>{bbox}</code> placeholder is sent verbatim (you supply the
 bbox in the QL yourself). A raw Overpass <code>query=</code> <strong>must request JSON output</strong>
@@ -19166,36 +19076,18 @@ an <code>[out:xml]</code> / <code>[out:csv]</code> override will not parse.</p>
 </tr>
 <tr>
 <td><code>max_bbox_deg2</code></td>
-<td>bbox-area cap (square degrees) — guards the planet-wide footgun (live protocols only)</td>
+<td>bbox-area cap (square degrees) — guards the planet-wide footgun</td>
 <td><code>100.0</code></td>
-</tr>
-<tr>
-<td><code>region</code></td>
-<td>Geofabrik region key or raw path — <strong>required</strong> for a <code>pbf:*</code> query</td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>engine</code></td>
-<td><code>pbf</code> read engine: <code>"pyrosm"</code> (in-memory) or <code>"pyosmium"</code> (streaming)</td>
-<td><code>"pyrosm"</code></td>
-</tr>
-<tr>
-<td><code>cache_dir</code></td>
-<td>directory for cached <code>.osm.pbf</code> extracts</td>
-<td><code>~/.earthlens/cache/osm_pbf</code></td>
 </tr>
 </tbody>
 </table>
 <div class="admonition warning">
-<p class="admonition-title">Keep the bbox small (live protocols)</p>
-<p>Overpass / ohsome are for small/targeted queries. A box larger than
-<code>max_bbox_deg2</code> (the default <code>100</code> square degrees comfortably covers a large
-country) is rejected before any request — in particular the whole-Earth
-default you get if you omit <code>lat_lim</code> / <code>lon_lim</code> through the facade, which
-would hammer the shared public services. Raise <code>max_bbox_deg2=</code> for a
-genuinely larger area. The cap does <strong>not</strong> apply to a <code>pbf</code> read (it hits a
-local extract, not a shared service), so a <code>pbf</code> request with no bbox simply
-reads the whole downloaded extract.</p>
+<p class="admonition-title">Keep the bbox small</p>
+<p>OSM is for small/targeted queries. A box larger than <code>max_bbox_deg2</code> (the
+default <code>100</code> square degrees comfortably covers a large country) is rejected
+before any request — in particular the whole-Earth default you get if you
+omit <code>lat_lim</code> / <code>lon_lim</code> through the facade, which would hammer the shared
+public services. Raise <code>max_bbox_deg2=</code> for a genuinely larger area.</p>
 </div>
 <h2 id="the-returned-featurecollection"><a class="toclink" href="#the-returned-featurecollection">The returned FeatureCollection</a><a class="headerlink" href="#the-returned-featurecollection" title="Permanent link">#</a></h2>
 <p>CRS <code>EPSG:4326</code>. Overpass features carry <code>osm_id</code>, <code>osm_type</code>, the element's OSM
@@ -19208,29 +19100,29 @@ error.</p>
 <h3 id="writing-to-disk"><a class="toclink" href="#writing-to-disk">Writing to disk</a><a class="headerlink" href="#writing-to-disk" title="Permanent link">#</a></h3>
 <p><code>download()</code> writes one file automatically (<code>osm_&lt;ids&gt;.geojson</code>). To write it
 yourself:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">hospitals</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;hospitals.geojson&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">hospitals</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;hospitals.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">hospitals</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;hospitals.geojson&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">hospitals</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;hospitals.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="licensing-you-must-attribute-odbl"><a class="toclink" href="#licensing-you-must-attribute-odbl">Licensing — you must attribute (ODbL)</a><a class="headerlink" href="#licensing-you-must-attribute-odbl" title="Permanent link">#</a></h2>
 <p>OSM is <strong>ODbL 1.0</strong> (share-alike). Every <code>download()</code> emits a <code>LicenseWarning</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>OpenStreetMap data is licensed under the Open Database License (ODbL 1.0),
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>which carries attribution and share-alike obligations: credit
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>&#39;(c) OpenStreetMap contributors&#39; ...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>OpenStreetMap data is licensed under the Open Database License (ODbL 1.0),
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>which carries attribution and share-alike obligations: credit
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>&#39;(c) OpenStreetMap contributors&#39; ...
 </code></pre></div>
 <p>Credit <em>"© OpenStreetMap contributors"</em> and license any derived database you
 redistribute under ODbL.</p>
 <h2 id="aggregation-is-not-supported"><a class="toclink" href="#aggregation-is-not-supported">Aggregation is not supported</a><a class="headerlink" href="#aggregation-is-not-supported" title="Permanent link">#</a></h2>
 <p>OSM output is vector, so the <code>aggregate=</code> argument is rejected:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:roads&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1"># NotImplementedError: OSM features are vector, not gridded ...</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:roads&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1"># NotImplementedError: OSM features are vector, not gridded ...</span>
 </code></pre></div>
 <p>Post-process the returned FeatureCollection directly instead (it is a
 GeoDataFrame).</p>
 <h2 id="out-of-scope"><a class="toclink" href="#out-of-scope">Out of scope</a><a class="headerlink" href="#out-of-scope" title="Permanent link">#</a></h2>
-<p>ohsome's aggregation endpoints (counts / areas over time) are <strong>not</strong> part of
-this backend — see
-<a href="../introduction/#out-of-scope-follow-ons">Introduction</a>. For bulk asks, reach
-for the <code>pbf</code> protocol (above) rather than tiling many live queries.</p>
+<p>Bulk OSM PBF / planet or region extracts, and ohsome's aggregation endpoints
+(counts / areas over time), are <strong>not</strong> part of this backend — see
+<a href="../introduction/#out-of-scope-follow-ons">Introduction</a>. For a large area, query
+in small tiles and concatenate, or use a dedicated PBF tool.</p>
 
 
 

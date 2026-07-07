@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13694,34 +13694,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/osm/pbf_bulk_extracts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OpenStreetMap in bulk — Geofabrik extracts (pbf)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -25294,7 +25266,7 @@ tidy age/sex table, so the facade forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;YS&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">date_windows</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="s2">&quot;YS&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
@@ -28565,7 +28537,7 @@ tidy age/sex table, so the facade forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;YS&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">date_windows</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="s2">&quot;YS&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
