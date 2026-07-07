@@ -54,13 +54,14 @@ def fake_pbf(monkeypatch):
     return fake
 
 
-def _osm(**overrides):
+def _osm(tmp_path=None, **overrides):
     """Build an `OSM` for a pbf request over the Malta bbox by default."""
     kwargs: dict[str, Any] = {
         "variables": ["pbf:buildings"],
         "lat_lim": [35.8, 36.0],
         "lon_lim": [14.4, 14.6],
         "region": "malta",
+        "path": str(tmp_path) if tmp_path is not None else "",
     }
     kwargs.update(overrides)
     return backend.OSM(**kwargs)
@@ -91,9 +92,9 @@ class TestPbfSearch:
                 variables=["pbf:buildings"], lat_lim=[0, 1], lon_lim=[0, 1]
             )._api()
 
-    def test_large_bbox_allowed_for_pbf(self, fake_pbf):
+    def test_large_bbox_allowed_for_pbf(self, fake_pbf, tmp_path):
         """The area cap does not apply to a pbf read (whole-Earth is fine)."""
-        osm = _osm(lat_lim=[-90, 90], lon_lim=[-180, 180])
+        osm = _osm(tmp_path, lat_lim=[-90, 90], lon_lim=[-180, 180])
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
             fc = osm.download(progress_bar=False)
@@ -115,42 +116,44 @@ class TestPbfSearch:
 class TestPbfFetch:
     """Region resolution, layer dispatch, bbox mapping, and output contract."""
 
-    def test_region_key_resolved_to_path(self, fake_pbf):
+    def test_region_key_resolved_to_path(self, fake_pbf, tmp_path):
         """A region key resolves to its Geofabrik path for the fetch."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
-            _osm().download(progress_bar=False)
+            _osm(tmp_path).download(progress_bar=False)
         assert fake_pbf.download_args[0] == "europe/malta"
 
-    def test_raw_region_path_passthrough(self, fake_pbf):
+    def test_raw_region_path_passthrough(self, fake_pbf, tmp_path):
         """A raw 'continent/region' region is passed through unchanged."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
-            _osm(region="europe/andorra").download(progress_bar=False)
+            _osm(tmp_path, region="europe/andorra").download(progress_bar=False)
         assert fake_pbf.download_args[0] == "europe/andorra"
 
-    def test_layer_and_engine_dispatch(self, fake_pbf):
+    def test_layer_and_engine_dispatch(self, fake_pbf, tmp_path):
         """The row's pyrosm_method / network_type + engine reach read_pbf."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
-            _osm(variables=["pbf:roads"], engine="pyosmium").download(progress_bar=False)
+            _osm(tmp_path, variables=["pbf:roads"], engine="pyosmium").download(
+                progress_bar=False
+            )
         assert fake_pbf.read_kwargs["pyrosm_method"] == "get_network"
         assert fake_pbf.read_kwargs["network_type"] == "driving"
         assert fake_pbf.read_kwargs["engine"] == "pyosmium"
 
-    def test_bbox_mapped_wsen(self, fake_pbf):
+    def test_bbox_mapped_wsen(self, fake_pbf, tmp_path):
         """A finite request bbox reaches read_pbf as (W, S, E, N)."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
-            _osm().download(progress_bar=False)
+            _osm(tmp_path).download(progress_bar=False)
         assert fake_pbf.read_kwargs["bbox"] == (14.4, 35.8, 14.6, 36.0)
 
-    def test_odbl_warning_emitted(self, fake_pbf):
+    def test_odbl_warning_emitted(self, fake_pbf, tmp_path):
         """A successful pbf download warns about the ODbL licence."""
         with pytest.warns(LicenseWarning):
-            _osm().download(progress_bar=False)
+            _osm(tmp_path).download(progress_bar=False)
 
-    def test_aggregate_rejected(self, fake_pbf):
+    def test_aggregate_rejected(self, fake_pbf, tmp_path):
         """A pbf request rejects aggregate= like the other protocols."""
         with pytest.raises(NotImplementedError):
-            _osm().download(aggregate=object())
+            _osm(tmp_path).download(aggregate=object())
