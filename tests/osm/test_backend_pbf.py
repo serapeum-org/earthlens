@@ -25,10 +25,12 @@ class FakePbf:
     def __init__(self, frame: gpd.GeoDataFrame | None = None) -> None:
         self.frame = frame
         self.download_args: tuple[Any, ...] | None = None
+        self.download_http: Any = None
         self.read_kwargs: dict[str, Any] | None = None
 
     def download_extract(self, region_path: str, cache_dir: Any, **kwargs: Any) -> Path:
         self.download_args = (region_path, Path(cache_dir))
+        self.download_http = kwargs.get("http")
         return Path("/fake/cache") / f"{region_path.replace('/', '_')}.osm.pbf"
 
     def read_pbf(self, path: Any, **kwargs: Any):
@@ -147,6 +149,18 @@ class TestPbfFetch:
             warnings.simplefilter("ignore", LicenseWarning)
             _osm(tmp_path).download(progress_bar=False)
         assert fake_pbf.read_kwargs["bbox"] == (14.4, 35.8, 14.6, 36.0)
+
+    def test_download_client_retries_transport_errors(self, fake_pbf, tmp_path):
+        """The fetch client retries dropped-socket/timeout/disk errors."""
+        import requests
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            _osm(tmp_path).download(progress_bar=False)
+        retry_on = fake_pbf.download_http.retry_on_exceptions
+        assert requests.ConnectionError in retry_on
+        assert requests.Timeout in retry_on
+        assert OSError in retry_on
 
     def test_odbl_warning_emitted(self, fake_pbf, tmp_path):
         """A successful pbf download warns about the ODbL licence."""

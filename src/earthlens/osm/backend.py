@@ -587,7 +587,21 @@ class OSM(AbstractDataSource):
             f"Reading {query_id!r} from Geofabrik region {region_path!r} via the "
             f"{self._engine} engine"
         )
-        http = HttpClient(user_agent=self._user_agent, timeout=self._timeout)
+        # Retry a dropped socket / timeout / disk hiccup mid-stream — a multi-GB
+        # extract is exactly where a transient transport failure bites. Kept
+        # narrow (not the broad `requests.RequestException` the siblings use) so
+        # a definitive 4xx (e.g. a wrong region path -> 404) still fails fast
+        # rather than retrying five times; retryable 429/5xx statuses are already
+        # handled by the client's default `status_forcelist`.
+        http = HttpClient(
+            user_agent=self._user_agent,
+            timeout=self._timeout,
+            retry_on_exceptions=(
+                requests.ConnectionError,
+                requests.Timeout,
+                OSError,
+            ),
+        )
         path = download_extract(region_path, self._cache_dir, http=http)
         return read_pbf(
             path,
