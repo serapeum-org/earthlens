@@ -416,7 +416,9 @@ class S3(AbstractDataSource):
         Reads the granule's data variable as an array + geotransform and
         builds a `Dataset` tagged EPSG:4326 — NetCDF cubes do not expose a
         source SRS the crop warp can read, so cropping the cube directly
-        fails. Longitudes in the 0-360 convention are wrapped to -180..180.
+        fails. Longitudes in the 0-360 convention are wrapped to -180..180
+        via pyramids `Dataset.wrap_longitude` (the same call the nwp backend
+        uses), which validates the whole-globe span rather than assuming it.
         """
         import numpy as np
         from pyramids.dataset import Dataset as PyramidsDataset
@@ -426,9 +428,10 @@ class S3(AbstractDataSource):
         cube = nc.get_variable(self._nc_variable_name(nc, product))
         arr = np.asarray(cube.read_array())
         geo = tuple(cube.geotransform)
+        dataset = PyramidsDataset.create_from_array(arr=arr, geo=geo, epsg=4326)
         if self._dataset.lon_convention == "0-360":
-            arr, geo = _wrap_longitude_0_360(arr, geo)
-        return PyramidsDataset.create_from_array(arr=arr, geo=geo, epsg=4326)
+            dataset = dataset.wrap_longitude()
+        return dataset
 
     def _geostationary_to_wgs84(self, raw: Path, product: RemoteProduct):
         """Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.
@@ -575,29 +578,6 @@ class S3(AbstractDataSource):
             if variable.native == native:
                 return variable
         return None
-
-
-def _wrap_longitude_0_360(arr, geo):
-    """Roll a global 0-360-longitude array + geotransform to -180..180.
-
-    Assumes a global longitude span (the ERA5 grid): the second half of
-    the columns (>= 180 degrees) moves to the front as the negative
-    longitudes, and the geotransform origin shifts west by 180 degrees.
-
-    Args:
-        arr: Array whose last axis is longitude (`(..., rows, cols)`).
-        geo: The GDAL 6-tuple geotransform for `arr`.
-
-    Returns:
-        The rolled `(array, geotransform)` pair in the -180..180 convention.
-    """
-    import numpy as np
-
-    cols = arr.shape[-1]
-    half = cols // 2
-    rolled = np.concatenate([arr[..., half:], arr[..., :half]], axis=-1)
-    new_geo = (geo[0] - 180.0, geo[1], geo[2], geo[3], geo[4], geo[5])
-    return rolled, new_geo
 
 
 def _error_code(exc: BaseException) -> str:
