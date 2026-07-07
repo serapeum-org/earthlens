@@ -1,6 +1,6 @@
-"""Backend that fetches OpenStreetMap features over Overpass + ohsome.
+"""Backend that fetches OpenStreetMap features over Overpass + ohsome + pbf.
 
-`OSM(AbstractDataSource)` routes a request to one of two public, keyless OSM
+`OSM(AbstractDataSource)` routes a request to one of three public, keyless OSM
 query protocols and returns the result as a pyramids
 `~pyramids.feature.collection.FeatureCollection` (CRS `EPSG:4326`):
 
@@ -16,20 +16,28 @@ query protocols and returns the result as a pyramids
   `elements/geometry` endpoint. `OhsomeClient().elements.geometry.post(...)
   .as_dataframe()` already returns a geopandas `GeoDataFrame`, wrapped straight
   into a `FeatureCollection` (no `xarray`, `G7`).
+* **pbf** (`pyrosm` / `pyosmium`) — **bulk / regional** reads from a Geofabrik
+  `.osm.pbf` extract (`G9`, `G10`). The backend fetch-and-caches the extract
+  for the request's `region=` (via `download_extract`) and reads the row's
+  layer (`pyrosm_method`) into a `FeatureCollection` with the selected engine
+  (`read_pbf`), clipping to the request bbox. `pyrosm`/`pyosmium` are
+  OSM-domain SDKs, so this reader lives in earthlens — not pyramids — by
+  maintainer decision (`G9`).
 
 A request names one or more curated **named queries** (`variables=
-["overpass:hospitals"]`) plus a bbox; the catalog row's `protocol` picks the
-branch (`G2`). A raw `query=` (Overpass QL) / `filter=` (ohsome) override is
-accepted for power users (`G6`). OSM data is **ODbL** (share-alike), so every
-successful `download()` emits a `LicenseWarning` (`G5`).
+["overpass:hospitals"]`, `variables=["pbf:buildings"]`) plus a bbox; the
+catalog row's `protocol` picks the branch (`G2`, `G10`). A raw `query=`
+(Overpass QL) / `filter=` (ohsome) override is accepted for power users (`G6`).
+OSM data is **ODbL** (share-alike), so every successful `download()` emits a
+`LicenseWarning` (`G5`).
 
 This is a `vector` backend (`OUTPUT_KIND = "vector"`), so the
 `earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument and
-`download(aggregate=...)` raises `NotImplementedError` (`G1`). Both protocols
-are public — there is no auth class (`G6`) — and the two SDKs are imported
-lazily inside `_fetch`, so the package imports without `earthlens[osm]`. Bulk
-OSM PBF / planet extracts and ohsome's aggregation endpoints are out of scope
-(follow-ons, `G8`).
+`download(aggregate=...)` raises `NotImplementedError` (`G1`). All three
+protocols are public — there is no auth class (`G6`) — and the SDKs are
+imported lazily (Overpass/ohsome inside `_fetch`; pyrosm/pyosmium inside
+`read_pbf`), so the package imports without `earthlens[osm]` /
+`earthlens[osm-pbf]`. ohsome's aggregation endpoints remain out of scope.
 """
 
 from __future__ import annotations
@@ -59,6 +67,7 @@ from earthlens.osm._helpers import (
     overpy_to_gdf,
     to_fc,
 )
+from earthlens.osm._pbf import Engine, download_extract, read_pbf
 from earthlens.osm.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
@@ -81,6 +90,12 @@ ODBL_NOTICE = (
     "'(c) OpenStreetMap contributors' and license any derived database under "
     "ODbL when redistributing."
 )
+
+#: Default on-disk cache directory for fetched Geofabrik `.osm.pbf` extracts
+#: (`G13`). A cross-run user cache (mirroring the cmip6 resolver's location) so
+#: a re-run reuses a previously-downloaded extract regardless of the output
+#: `path`. Overridable via the backend's `cache_dir=` argument.
+DEFAULT_PBF_CACHE_DIR = Path.home() / ".earthlens" / "cache" / "osm_pbf"
 
 FileFormat = Literal["geojson", "gpkg"]
 
@@ -163,6 +178,9 @@ class OSM(AbstractDataSource):
         timeout: float = 180.0,
         file_format: FileFormat = "geojson",
         max_bbox_deg2: float | None = None,
+        region: str | None = None,
+        engine: Engine = "pyrosm",
+        cache_dir: Path | str | None = None,
     ):
         """Initialise an OSM backend instance.
 
@@ -209,13 +227,25 @@ class OSM(AbstractDataSource):
                 whole-Earth default a facade caller gets when they omit
                 `lat_lim` / `lon_lim`). `None` uses the built-in
                 `100.0`-square-degree default; pass a larger value for a
-                genuinely larger area.
+                genuinely larger area. The cap is **not** applied to a
+                `pbf` request (a local extract read is not a live-service
+                footgun).
+            region: The Geofabrik region for a `pbf` request — a key from the
+                catalog's `regions:` table (`"malta"`, `"netherlands"`, …) or a
+                raw Geofabrik path (`"europe/andorra"`). Required when any
+                requested query is a `pbf:*` layer, ignored otherwise.
+            engine: The `pbf` read engine — `"pyrosm"` (in-memory, the default)
+                or `"pyosmium"` (streaming, for planet-scale extracts). Ignored
+                by the `overpass` / `ohsome` protocols.
+            cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.
+                `None` uses `DEFAULT_PBF_CACHE_DIR` (a cross-run user cache).
 
         Raises:
             TypeError: If `variables` is a mapping rather than a list / string
                 of named-query ids.
-            ValueError: If `variables` is empty, or `file_format` is not
-                `"geojson"` / `"gpkg"`.
+            ValueError: If `variables` is empty, `file_format` is not
+                `"geojson"` / `"gpkg"`, or `engine` is not `"pyrosm"` /
+                `"pyosmium"`.
         """
         if isinstance(variables, dict):
             raise TypeError(
@@ -236,6 +266,10 @@ class OSM(AbstractDataSource):
                 f"file_format must be one of {sorted(_DRIVERS)}, got "
                 f"{file_format!r}."
             )
+        if engine not in ("pyrosm", "pyosmium"):
+            raise ValueError(
+                f"engine must be 'pyrosm' or 'pyosmium', got {engine!r}."
+            )
         self._query = query
         self._filter = filter
         self._endpoint = endpoint
@@ -243,6 +277,9 @@ class OSM(AbstractDataSource):
         self._timeout = timeout
         self._file_format: FileFormat = file_format
         self._max_bbox_deg2 = max_bbox_deg2
+        self._region = region
+        self._engine: Engine = engine
+        self._cache_dir = Path(cache_dir) if cache_dir else DEFAULT_PBF_CACHE_DIR
         self._catalog = Catalog()
         super().__init__(
             start=start,
@@ -329,16 +366,28 @@ class OSM(AbstractDataSource):
 
         Raises:
             ValueError: If an id in `self.vars` is not a registered named
-                query, or the requested bbox exceeds the area cap.
+                query, the requested bbox exceeds the area cap (live protocols
+                only), or a `pbf:*` query was requested without a `region=`.
         """
-        self._guard_bbox()
-        return [
+        products = [
             RemoteProduct(
                 id=query_id,
                 metadata={"dataset": self._catalog.get(query_id)},
             )
             for query_id in self.vars
         ]
+        protocols = {product.metadata["dataset"].protocol for product in products}
+        # The area cap guards the shared live services; a `pbf` read hits a
+        # local extract, so it is only applied when a live query is present.
+        if protocols & {"overpass", "ohsome"}:
+            self._guard_bbox()
+        if "pbf" in protocols and self._region is None:
+            raise ValueError(
+                "a pbf:* query needs a Geofabrik region: pass region= (a key "
+                f"from the catalog, e.g. {self._catalog.region_ids()[:3]}, or a "
+                "raw 'continent/region' path)."
+            )
+        return products
 
     def _guard_bbox(self) -> None:
         """Reject a bbox large enough to be a planet-wide live-query footgun.
@@ -381,9 +430,9 @@ class OSM(AbstractDataSource):
 
         Widens the inherited `-> list[Path]` contract: a vector backend
         returns in-memory `FeatureCollection`s. Routes on the resolved
-        `Dataset.protocol` (`G2`) — `overpass` via `_fetch_overpass`,
-        `ohsome` via `_fetch_ohsome`. An HTTP / SDK error propagates rather
-        than being silently swallowed.
+        `Dataset.protocol` (`G2`, `G10`) — `overpass` via `_fetch_overpass`,
+        `ohsome` via `_fetch_ohsome`, `pbf` via `_fetch_pbf`. An HTTP / SDK
+        error propagates rather than being silently swallowed.
 
         Args:
             products: The products returned by `_search`.
@@ -397,8 +446,10 @@ class OSM(AbstractDataSource):
             dataset: Dataset = product.metadata["dataset"]
             if dataset.protocol == "overpass":
                 collection = self._fetch_overpass(product.id, dataset)
-            else:
+            elif dataset.protocol == "ohsome":
                 collection = self._fetch_ohsome(product.id, dataset)
+            else:
+                collection = self._fetch_pbf(product.id, dataset)
             logger.info(f"{product.id}: fetched {len(collection)} feature(s)")
             collections.append(collection)
         return collections
@@ -506,6 +557,62 @@ class OSM(AbstractDataSource):
         if gdf.index.names and any(name is not None for name in gdf.index.names):
             gdf = gdf.reset_index()
         return to_fc(gdf)
+
+    def _fetch_pbf(self, query_id: str, dataset: Dataset) -> FeatureCollection:
+        """Fetch one `pbf` layer: resolve region, fetch-cache, read, bbox-clip.
+
+        Resolves `self._region` to a Geofabrik path, downloads the extract
+        (cached, via :func:`~earthlens.osm._pbf.download_extract`), and reads
+        the row's `pyrosm_method` layer into a `FeatureCollection` with the
+        selected engine (`self._engine`), clipping to the request bbox (`G12`,
+        `G13`, `G14`). The read stays `xarray`-free (`G7`).
+
+        Args:
+            query_id: The named-query id (for logging).
+            dataset: The resolved `pbf` `Dataset` row (its `pyrosm_method` and,
+                for the road network, `network_type`).
+
+        Returns:
+            FeatureCollection: The layer's features, CRS `EPSG:4326`.
+
+        Raises:
+            ImportError: If the selected engine's SDK is not installed
+                (`earthlens[osm-pbf]`).
+            ValueError: If `self._region` is not a known region / raw path, or
+                a `pyrosm` read is attempted on an oversized extract.
+        """
+        region_path = self._catalog.region_path(self._region)
+        logger.info(
+            f"Reading {query_id!r} from Geofabrik region {region_path!r} via the "
+            f"{self._engine} engine"
+        )
+        http = HttpClient(user_agent=self._user_agent, timeout=self._timeout)
+        path = download_extract(region_path, self._cache_dir, http=http)
+        return read_pbf(
+            path,
+            pyrosm_method=dataset.pyrosm_method,
+            network_type=dataset.network_type,
+            bbox=self._pbf_bbox(),
+            engine=self._engine,
+        )
+
+    def _pbf_bbox(self) -> tuple[float, float, float, float] | None:
+        """Return the request bbox as `(west, south, east, north)`, or `None`.
+
+        A `pbf` read clips to the request bbox, but the whole-Earth default a
+        facade caller gets when they omit `lat_lim` / `lon_lim` means "no clip"
+        (read the whole extract), so it maps to `None` rather than a redundant
+        planet-sized clip.
+
+        Returns:
+            tuple[float, float, float, float] | None: `(west, south, east,
+                north)`, or `None` when the bbox spans (at least) the whole
+                globe.
+        """
+        west, south, east, north = bbox_wsen(self.space)
+        if west <= -180 and south <= -90 and east >= 180 and north >= 90:
+            return None
+        return (west, south, east, north)
 
     def _ohsome_time(self) -> str:
         """Build the ohsome `time` argument from the request window.
