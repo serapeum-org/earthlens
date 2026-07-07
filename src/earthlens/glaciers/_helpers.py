@@ -311,10 +311,14 @@ def fetch_glims(
     Raises:
         requests.HTTPError: If the WFS returns a non-2xx status.
     """
+    from earthlens.base.http import HttpClient, RequestsGet
+
     url, params = glims_wfs_url(wfs_url, typename, bbox, max_features)
-    get = session.get if session is not None else requests.get
-    resp = get(url, params=params, timeout=timeout)
-    resp.raise_for_status()
+    # Route the single WFS GET through the shared HttpClient so it gains the
+    # 429/5xx Retry-After/back-off policy; a passed `session` is reused for
+    # connection pooling, else a fresh connection per call.
+    client = HttpClient(session=session if session is not None else RequestsGet())
+    resp = client.get(url, params=params, timeout=timeout)
     dest_path.parent.mkdir(parents=True, exist_ok=True)
     dest_path.write_text(resp.text, encoding="utf-8")
     fc = FeatureCollection.read_file(str(Path(dest_path).resolve()))

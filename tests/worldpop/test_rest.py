@@ -23,7 +23,7 @@ def test_rest_records_hits_alias_subalias_iso3(monkeypatch):
     """rest_records GETs /rest/data/{alias}/{subalias}?iso3= and returns data."""
     seen = {}
 
-    def fake_get(url, params=None, timeout=None):
+    def fake_get(url, params=None, timeout=None, **kwargs):
         seen["url"] = url
         seen["params"] = params
         return _FakeResponse(json_data={"data": pop_records()})
@@ -94,7 +94,7 @@ def test_files_for_year_no_geotiff_raises():
 def _fake_global(monkeypatch, summary, detail_files):
     """Patch requests.get to serve a global listing + a `?id=` detail record."""
 
-    def fake_get(url, params=None, timeout=None):
+    def fake_get(url, params=None, timeout=None, **kwargs):
         if params and "id" in params:
             return _FakeResponse(
                 json_data={"data": {"id": params["id"], "files": detail_files}}
@@ -160,7 +160,7 @@ def test_rest_records_uses_session_when_given(monkeypatch):
     calls = {"n": 0}
 
     class _Session:
-        def get(self, url, params=None, timeout=None):
+        def get(self, url, params=None, timeout=None, **kwargs):
             calls["n"] += 1
             return _FakeResponse(json_data={"data": pop_records()})
 

@@ -344,9 +344,13 @@ def list_remote_dir(
         list[str]: The `href` entry names (sub-directories keep their trailing
             slash), excluding the parent-directory and column-sort links.
     """
-    get = session.get if session is not None else requests.get
-    resp = get(url if url.endswith("/") else url + "/", timeout=timeout)
-    resp.raise_for_status()
+    from earthlens.base.http import HttpClient, RequestsGet
+
+    # Route the autoindex GET through the shared HttpClient for the 429/5xx
+    # Retry-After/back-off policy; a passed `session` is reused, else a fresh
+    # connection per call.
+    client = HttpClient(session=session if session is not None else RequestsGet())
+    resp = client.get(url if url.endswith("/") else url + "/", timeout=timeout)
     names = []
     for href in _HREF_RE.findall(resp.text):
         if href in ("/", "..", "../") or href.startswith("/"):

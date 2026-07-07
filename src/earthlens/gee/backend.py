@@ -24,8 +24,8 @@ Per `(asset, band-set, time-bucket)` the pipeline is:
   `export_via`: `"url"` (the default) computes the request's pixel
   dimensions and refuses if either axis exceeds Earth Engine's 32768-px
   synchronous limit (a clear, actionable `ValueError`), else
-  `image.getDownloadURL({..., "format": "GEO_TIFF"})` → `requests.get`
-  → a GeoTIFF under the output directory; multi-band responses (which
+  `image.getDownloadURL({..., "format": "GEO_TIFF"})` → an `HttpClient`
+  GET → a GeoTIFF under the output directory; multi-band responses (which
   Earth Engine returns as a zip of per-band tifs) are unpacked through
   `pyramids.dataset.Dataset.from_archive` into a single multi-band tif.
   `"drive"` / `"gcs"` queue an asynchronous
@@ -51,7 +51,6 @@ from typing import TYPE_CHECKING, Any, Iterable, Literal
 
 import ee
 import pandas as pd
-import requests
 from loguru import logger
 from pyramids.dataset import Dataset as PyramidsDataset
 from pyramids.dataset.merge import merge_rasters
@@ -886,12 +885,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
         expected to have already verified that the request fits the
         Earth Engine synchronous limit.
         """
+        from earthlens.base.http import HttpClient, RequestsGet
+
         url = image.getDownloadURL(
             {"scale": scale, "crs": self.crs, "region": region, "format": "GEO_TIFF"}
         )
         target = self.root_dir / f"{prefix}.tif"
-        response = requests.get(url, timeout=self.http_timeout)
-        response.raise_for_status()
+        # Route the (single-shot, expiring) getDownloadURL fetch through the
+        # shared HttpClient so a transient 429/5xx is retried with back-off
+        # instead of failing the tile outright.
+        client = HttpClient(session=RequestsGet(), timeout=self.http_timeout)
+        response = client.get(url)
         body = response.content
         if body[:4] == _ZIP_MAGIC:
             zip_path = self.root_dir / f"{prefix}.zip"
