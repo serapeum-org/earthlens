@@ -115,6 +115,18 @@ class TestValidateOsm:
         checked, issues = _validate_osm(catalog)
         assert any("missing ohsome_filter" in i for i in issues)
 
+    def test_flags_pbf_row_missing_method(self):
+        """A pbf row without a pyrosm_method is flagged."""
+        catalog = SimpleNamespace(
+            datasets={
+                "pbf:x": SimpleNamespace(
+                    protocol="pbf", pyrosm_method="", geometry_types=["Polygon"]
+                )
+            }
+        )
+        checked, issues = _validate_osm(catalog)
+        assert any("missing pyrosm_method" in i for i in issues)
+
 
 class TestValidateSoilgrids:
     """Tests for the soilgrids structural lint."""

@@ -163,6 +163,8 @@ def _validate_osm(catalog: Any) -> tuple[int, list[str]]:
             issues.append(f"{key}: overpass row missing query_template")
         if protocol == "ohsome" and not getattr(record, "ohsome_filter", None):
             issues.append(f"{key}: ohsome row missing ohsome_filter")
+        if protocol == "pbf" and not getattr(record, "pyrosm_method", None):
+            issues.append(f"{key}: pbf row missing pyrosm_method")
         return issues
 
     return _lint(catalog, check)
