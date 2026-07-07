@@ -20,8 +20,10 @@ import pytest
 import requests
 
 pytest.importorskip("pyrosm", reason="the pbf e2e needs the osm-pbf extra (pyrosm)")
+pytest.importorskip("osmium", reason="the pbf e2e needs the osm-pbf extra (osmium)")
 
 from earthlens.earthlens import EarthLens  # noqa: E402
+from earthlens.osm._pbf import download_extract, read_pbf  # noqa: E402
 
 pytestmark = [pytest.mark.e2e, pytest.mark.osm_pbf]
 
@@ -60,3 +62,31 @@ class TestPbfLive:
         # the identity column is normalised to `osm_id` (from pyrosm's `id`).
         assert {"osm_id", "osm_type"} <= set(fc.columns)
         assert "building" in fc.columns
+
+
+class TestPbfPyosmiumLive:
+    """A live Geofabrik download read through the streaming pyosmium engine."""
+
+    def test_malta_area_and_line_stream(self, tmp_path: Path):
+        """pyosmium reads the real Malta extract for an area + a line layer."""
+        try:
+            path = download_extract(
+                "europe/malta", tmp_path / "geofabrik", progress=False
+            )
+        except Exception as exc:  # noqa: BLE001 - transport -> skip, else re-raise
+            _skip_on_network(exc)
+        bbox = (_LON_LIM[0], _LAT_LIM[0], _LON_LIM[1], _LAT_LIM[1])
+        buildings = read_pbf(
+            path, pyrosm_method="get_buildings", bbox=bbox, engine="pyosmium"
+        )
+        roads = read_pbf(
+            path,
+            pyrosm_method="get_network",
+            network_type="driving",
+            bbox=bbox,
+            engine="pyosmium",
+        )
+        assert len(buildings) >= 1
+        assert set(buildings.geometry.geom_type) <= {"Polygon", "MultiPolygon"}
+        assert len(roads) >= 1
+        assert set(roads.geometry.geom_type) == {"LineString"}
