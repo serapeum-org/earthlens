@@ -763,7 +763,7 @@ def _crs_from_geojson(payload: dict[str, Any]) -> str:
 
 
 def _http_get_json(url: str) -> dict[str, Any]:
-    """Download a JSON payload over HTTP.
+    """Download a JSON payload over HTTP via the shared `HttpClient`.
 
     Args:
         url: The fully-rendered URL.
@@ -774,11 +774,7 @@ def _http_get_json(url: str) -> dict[str, Any]:
     Raises:
         requests.HTTPError: For non-2xx responses.
     """
-    response = requests.get(
-        url, timeout=_HTTP_TIMEOUT, headers={"User-Agent": _USER_AGENT}
-    )
-    response.raise_for_status()
-    return response.json()
+    return _http_client().get_json(url, timeout=_HTTP_TIMEOUT)
 
 
 class _RequestsGet:
@@ -793,6 +789,23 @@ class _RequestsGet:
     def get(self, url: str, **kwargs: Any) -> requests.Response:
         """Issue a GET via the module-level `requests.get`."""
         return requests.get(url, **kwargs)
+
+
+def _http_client() -> HttpClient:
+    """Build the drought `HttpClient`: fresh-connection GETs, no status retry.
+
+    Routes through the module-level `requests.get` (via `_RequestsGet`) so
+    tests that monkeypatch `requests.get` still drive the transport, and
+    keeps the previous single-shot-on-status behaviour (`status_forcelist=()`)
+    while reusing `HttpClient`'s streamed atomic `download`, transport-error
+    retry, and consistent User-Agent.
+    """
+    return HttpClient(
+        session=_RequestsGet(),
+        user_agent=_USER_AGENT,
+        status_forcelist=(),
+        max_backoff=None,
+    )
 
 
 def _http_download(url: str, target: Path) -> None:
@@ -812,12 +825,9 @@ def _http_download(url: str, target: Path) -> None:
     Raises:
         requests.HTTPError: For non-2xx responses.
     """
-    HttpClient(
-        session=_RequestsGet(),
-        user_agent=_USER_AGENT,
-        status_forcelist=(),
-        max_backoff=None,
-    ).download(url, target, chunk=1 << 16, progress=False, timeout=_HTTP_TIMEOUT)
+    _http_client().download(
+        url, target, chunk=1 << 16, progress=False, timeout=_HTTP_TIMEOUT
+    )
 
 
 def _http_download_raster(url: str, target: Path, *, label: str) -> None:
@@ -841,11 +851,11 @@ def _http_download_raster(url: str, target: Path, *, label: str) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(target.suffix + ".partial")
     try:
-        with requests.get(
-            url,
-            timeout=_HTTP_TIMEOUT,
-            stream=True,
-            headers={"User-Agent": _USER_AGENT},
+        # `raise_for_status=False` keeps the errored response in hand so the
+        # Copernicus JSON `{"message": ...}` body can be surfaced below rather
+        # than lost to a bare `HTTPError`.
+        with _http_client().stream(
+            url, timeout=_HTTP_TIMEOUT, raise_for_status=False
         ) as response:
             if response.status_code >= 400:
                 body = response.text
