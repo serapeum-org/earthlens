@@ -13532,34 +13532,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/osm/pbf_bulk_extracts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OpenStreetMap in bulk — Geofabrik extracts (pbf)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -23260,7 +23232,7 @@ the output as gridded artefacts.</p>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">freq_alias</span> <span class="o">=</span> <span class="n">_FREQ_ALIAS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;MS&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">)</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">date_windows</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq_alias</span><span class="p">)</span>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
@@ -26621,7 +26593,7 @@ the output as gridded artefacts.</p>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">freq_alias</span> <span class="o">=</span> <span class="n">_FREQ_ALIAS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;MS&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq_alias</span><span class="p">)</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">date_windows</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq_alias</span><span class="p">)</span>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
