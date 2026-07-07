@@ -195,19 +195,24 @@ class RequestsGet:
 
     Passed as `HttpClient(session=RequestsGet())` by the backends that want a
     fresh connection per call (no pooled `requests.Session`) rather than
-    connection reuse. Because it dispatches through the module-level
-    `requests.get` / `requests.post` — resolved at call time — a test that
-    monkeypatches `requests.get` (under any import alias; they all reference
-    the one `requests` module) still drives the transport. One shared class
-    instead of the shim re-declared verbatim in a dozen backends.
+    connection reuse. It re-imports `requests` on every call so it dispatches
+    through whatever `requests` is current — a test that monkeypatches
+    `requests.get` (under any import alias; they all reference the one module)
+    or injects a fake `requests` module via `sys.modules` still drives the
+    transport. One shared class instead of the shim re-declared verbatim in a
+    dozen backends.
     """
 
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a `GET` via the module-level `requests.get`."""
+    def get(self, url: str, **kwargs: Any) -> Any:
+        """Issue a `GET` via the current `requests.get`."""
+        import requests
+
         return requests.get(url, **kwargs)
 
-    def post(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a `POST` via the module-level `requests.post`."""
+    def post(self, url: str, **kwargs: Any) -> Any:
+        """Issue a `POST` via the current `requests.post`."""
+        import requests
+
         return requests.post(url, **kwargs)
 
 

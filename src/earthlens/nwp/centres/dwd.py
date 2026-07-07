@@ -78,8 +78,9 @@ class DWDCentre(_NWPCentre):
                 partial file is removed first, so no truncated `.grib2`
                 is left for a later `open_grib` to misread.
         """
-        import requests
+        from earthlens.base.http import HttpClient, RequestsGet
 
+        client = HttpClient(session=RequestsGet())
         out = self.save_dir / grib_name(model.model_family, cycle, step)
         # Stream into a sibling .part and atomically rename on full success, so
         # a failure partway through (variable 2 of N) never leaves a truncated
@@ -89,8 +90,7 @@ class DWDCentre(_NWPCentre):
             with open(tmp, "wb") as handle:
                 for param in params:
                     url = self._band_url(model, param, cycle, step)
-                    response = requests.get(url, timeout=_HTTP_TIMEOUT)
-                    response.raise_for_status()
+                    response = client.get(url, timeout=_HTTP_TIMEOUT)
                     handle.write(bz2.decompress(response.content))
             tmp.replace(out)
         except BaseException:
