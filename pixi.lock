@@ -12564,6 +12564,8 @@ packages:
   - erddapy>=3.0 ; extra == 'erddap'
   - overpy>=0.7 ; extra == 'osm'
   - ohsome>=0.4.0 ; extra == 'osm'
+  - pyrosm>=0.11.0 ; extra == 'osm-pbf'
+  - osmium>=4.3.1 ; extra == 'osm-pbf'
   - earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,cmip6,fdsn,earthdata,asf,hdx,eea-aq,eumetsat,nwp,nwm,radar,dem,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap] ; extra == 'all'
   requires_python: '>=3.11,<4'
 - pypi: https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl
