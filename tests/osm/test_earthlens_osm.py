@@ -55,6 +55,19 @@ class TestFacadeRouting:
         facade = _make_facade(tmp_path, endpoint="https://example.org/api")
         assert facade.datasource._endpoint == "https://example.org/api"
 
+    def test_pbf_kwargs_forwarded(self, tmp_path: Path):
+        """region= / engine= / cache_dir= ride through to the pbf backend."""
+        facade = _make_facade(
+            tmp_path,
+            variables=["pbf:buildings"],
+            region="malta",
+            engine="pyosmium",
+            cache_dir=str(tmp_path / "cache"),
+        )
+        assert facade.datasource._region == "malta"
+        assert facade.datasource._engine == "pyosmium"
+        assert facade.datasource._cache_dir == tmp_path / "cache"
+
 
 class TestFacadeDownload:
     """The facade returns the backend's FeatureCollection."""

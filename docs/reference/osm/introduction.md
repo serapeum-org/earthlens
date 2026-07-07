@@ -2,7 +2,7 @@
 
 [OpenStreetMap](https://www.openstreetmap.org/) (OSM) is a global, crowd-sourced
 map of the world. earthlens ships a single `osm` backend that fetches OSM
-features live through **two public, keyless query protocols** and returns them
+features through **three public, keyless query protocols** and returns them
 as a [pyramids](https://github.com/serapeum-org/pyramids) `FeatureCollection`
 (a `geopandas.GeoDataFrame` subclass, CRS `EPSG:4326`):
 
@@ -10,6 +10,13 @@ as a [pyramids](https://github.com/serapeum-org/pyramids) `FeatureCollection`
 |---|---|---|---|
 | **Overpass** | [`overpy`](https://github.com/DinoTools/python-overpy) | small/targeted **current-state** features by bbox + tag filter | points, lines, polygons |
 | **ohsome** | [`ohsome`](https://github.com/GIScience/ohsome-py) | OSM **history + analytics** (features at a point in time / over a range) | points, lines, polygons |
+| **pbf** | [`pyrosm`](https://pyrosm.readthedocs.io/) / [`pyosmium`](https://osmcode.org/pyosmium/) | **bulk / regional** reads from a Geofabrik `.osm.pbf` extract (a whole country's buildings, roads, …) | points, lines, polygons |
+
+The first two are **live-query** protocols (small, targeted asks against a
+shared public service). The `pbf` protocol is the **bulk** path: it downloads a
+[Geofabrik](https://download.geofabrik.de/) regional extract once, caches it,
+and reads a whole layer locally — the right tool for "every building in Malta",
+which would blow past Overpass's size limits.
 
 This page orients the backend. For the hands-on download walkthrough see
 [Usage](usage.md); the rendered API is the [Reference](osm.md) page.
@@ -50,17 +57,33 @@ facade makes `variables` required on every call). Each id is
 | `ohsome:buildings` | ohsome | building footprints at a snapshot/range |
 | `ohsome:highways` | ohsome | road / path centrelines at a snapshot/range |
 | `ohsome:amenities` | ohsome | tagged amenities at a snapshot/range |
+| `pbf:buildings` | pbf | building footprints from a Geofabrik extract |
+| `pbf:roads` | pbf | drivable road network from a Geofabrik extract |
+| `pbf:pois` | pbf | points of interest from a Geofabrik extract |
+| `pbf:landuse` | pbf | land-use polygons from a Geofabrik extract |
+| `pbf:natural` | pbf | natural features from a Geofabrik extract |
+| `pbf:boundaries` | pbf | administrative boundaries from a Geofabrik extract |
 
 The `<protocol>:` prefix is what tells the backend which API to call. An unknown
 id raises with a did-you-mean hint
 (`Catalog().get("overpass:hospital")` → *Did you mean 'overpass:hospitals'?*).
 
+A `pbf:*` query also needs a **`region=`** — a Geofabrik region key
+(`"malta"`, `"netherlands"`, …, listed by `Catalog().region_ids()`) or a raw
+Geofabrik path (`"europe/andorra"`). It picks which `.osm.pbf` extract to
+download; the request bbox then clips the read.
+
 ## Authentication
 
-**None.** Both Overpass and ohsome are fully public — no key, no token, no
-login, so there is no `authentication.md` page. The two SDKs ship behind the
-`[osm]` extra and are imported lazily (`pip install earthlens[osm]`); the
-package imports fine without them.
+**None.** Overpass, ohsome, and Geofabrik are all fully public — no key, no
+token, no login, so there is no `authentication.md` page. The SDKs ship behind
+two extras and are imported lazily, so the package imports fine without them:
+
+- `pip install earthlens[osm]` → `overpy` + `ohsome` (the live protocols).
+- `pip install earthlens[osm-pbf]` → `pyrosm` + `osmium` (the `pbf` protocol).
+  Note `pyosmium` is published on PyPI as `osmium`. This extra is **not** part
+  of `[all]` (it is heavy, and `pyrosm` builds a compiled dependency from
+  source), so install it explicitly for bulk PBF work.
 
 !!! note "Overpass needs a real User-Agent"
     The canonical `overpass-api.de` endpoint returns HTTP 406 to requests with
@@ -79,6 +102,11 @@ One `FeatureCollection` (CRS `EPSG:4326`):
   MVP.
 - **ohsome** — the geometry plus ohsome's own columns, notably `@osmId` and
   `@snapshotTimestamp` (the history timestamp) and `@other_tags`.
+- **pbf** — an `osm_id` / `osm_type` identity (pyrosm's native `id` column is
+  normalised to `osm_id` so it matches the other paths) plus, with the default
+  `pyrosm` engine, the layer's key tags (e.g. `building`); the `pyosmium`
+  engine returns the slimmer `osm_id` / `osm_type` / `geometry` schema (see the
+  engine note in [Usage](usage.md)).
 
 As a side effect, `download()` also writes the collection to one vector file in
 the output directory (GeoJSON by default, or GeoPackage).
@@ -92,26 +120,42 @@ database* you redistribute under ODbL. So **every** successful `download()`
 emits a `LicenseWarning` naming the obligation — it is not optional metadata.
 Honour it when you redistribute OSM-derived data.
 
+## Bulk PBF lives in earthlens by design
+
+The `pbf` reader wraps `pyrosm` / `pyosmium`. The pyramids porting policy would
+normally push a *generic format reader* to pyramids — but `pyrosm` and
+`pyosmium` are **OSM-domain SDKs**, not generic GIS libraries, so wrapping them
+is exactly the per-provider-SDK role `earthlens.osm` already plays for
+`overpy` / `ohsome`. By maintainer decision the whole OSM stack, PBF included,
+stays in earthlens; it is **not** ported to pyramids.
+
+The `pyrosm` (in-memory) engine reads a whole regional extract into memory and
+is the default. For a **continent- or planet-scale** extract too large to hold
+in memory, pass `engine="pyosmium"` to stream it with bounded memory; the
+backend also warns before downloading a multi-GB extract and refuses to load a
+>4 GB file with `pyrosm`. Never load `planet.osm` with `pyrosm`.
+
 ## Out of scope (follow-ons)
 
-- **Bulk OSM PBF / planet or region extracts.** The MVP is live, targeted
-  Overpass / ohsome queries. A bulk PBF reader (the heavy planet-extract path)
-  belongs in pyramids and is a follow-on, not part of this backend.
 - **ohsome aggregation endpoints** (counts / areas / lengths over time). The
   MVP ships ohsome's `elements/geometry` *feature* path; the *aggregation* API
   is a separate follow-on (and is **not** earthlens `aggregate=`).
 
 ## Cost
 
-**Free.** Both services are public, donation-funded community infrastructure
-(Overpass mirrors; the ohsome API run by HeiGIT). Query gently: keep bboxes
-small and time ranges focused, and respect each service's usage policy.
+**Free.** All three services are public infrastructure (Overpass mirrors; the
+ohsome API run by HeiGIT; Geofabrik's extract server). Query gently: keep
+Overpass / ohsome bboxes small and time ranges focused, and for `pbf` prefer
+the smallest regional extract that covers your area (a country, not a
+continent) and let the on-disk cache spare a re-download.
 
 ## References
 
 - OpenStreetMap: <https://www.openstreetmap.org/>
 - Overpass API: <https://wiki.openstreetmap.org/wiki/Overpass_API>
 - ohsome API: <https://docs.ohsome.org/ohsome-api/v1/>
+- Geofabrik extracts: <https://download.geofabrik.de/>
+- pyrosm: <https://pyrosm.readthedocs.io/> · pyosmium: <https://osmcode.org/pyosmium/>
 - ODbL: <https://opendatacommons.org/licenses/odbl/>
 - earthlens OSM usage: [Usage](usage.md)
 - earthlens OSM API: [Reference](osm.md)

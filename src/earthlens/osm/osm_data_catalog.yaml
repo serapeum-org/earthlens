@@ -20,8 +20,17 @@
 # A power user can bypass the catalogue entirely with a raw `query=`
 # (Overpass QL) / `filter=` (ohsome) override on the backend.
 #
-# Seeded + verified in A1 (overpy 0.7 / ohsome 0.4.0) — see
-# planning/osm/captures/osm-sdk-facts.md.
+#   * pbf — bulk / regional OpenStreetMap read from a Geofabrik `.osm.pbf`
+#     extract (`G9`..`G15`). Each row carries a `pyrosm_method`: the
+#     `pyrosm.OSM` reader method the layer maps to (`get_buildings`,
+#     `get_network`, `get_pois`, `get_landuse`, `get_natural`,
+#     `get_boundaries`). A `network_type` (only meaningful for
+#     `get_network`) selects the road subset. The extract is picked by the
+#     backend's `region=` kwarg against the `regions:` table below and the
+#     request bbox clips the read; no live query, no `{bbox}` placeholder.
+#
+# Seeded + verified in A1 (overpy 0.7 / ohsome 0.4.0; pyrosm 0.11.0 /
+# osmium 4.3.1 on cp314) — see planning/osm/captures/.
 datasets:
   overpass:hospitals:
     protocol: overpass
@@ -63,3 +72,52 @@ datasets:
     ohsome_filter: "amenity=*"
     geometry_types: [Point, Polygon]
     description: "Tagged amenities (history-aware snapshot) as points and polygons."
+  pbf:buildings:
+    protocol: pbf
+    pyrosm_method: get_buildings
+    geometry_types: [Polygon]
+    description: "Building footprints from a Geofabrik extract as polygons."
+  pbf:roads:
+    protocol: pbf
+    pyrosm_method: get_network
+    network_type: driving
+    geometry_types: [LineString]
+    description: "Drivable road network from a Geofabrik extract as lines."
+  pbf:pois:
+    protocol: pbf
+    pyrosm_method: get_pois
+    geometry_types: [Point, Polygon]
+    description: "Points of interest from a Geofabrik extract as points and polygons."
+  pbf:landuse:
+    protocol: pbf
+    pyrosm_method: get_landuse
+    geometry_types: [Polygon]
+    description: "Land-use polygons from a Geofabrik extract."
+  pbf:natural:
+    protocol: pbf
+    pyrosm_method: get_natural
+    geometry_types: [Point, Polygon]
+    description: "Natural features from a Geofabrik extract as points and polygons."
+  pbf:boundaries:
+    protocol: pbf
+    pyrosm_method: get_boundaries
+    geometry_types: [LineString, Polygon]
+    description: "Administrative boundaries from a Geofabrik extract as lines and polygons."
+
+# Geofabrik regional extract table (`G12`). Each key names a downloadable
+# `.osm.pbf` extract; the value is the Geofabrik path segment, so the URL is
+# `https://download.geofabrik.de/<path>-latest.osm.pbf`. Pass the key as the
+# backend's `region=` kwarg. A power user may also pass a raw path containing a
+# `/` (e.g. `region="europe/andorra"`) to reach any Geofabrik extract not
+# listed here. Sizes noted from the A1 capture (2026-07-07); the small ones
+# (malta / andorra / liechtenstein) are the test extracts.
+regions:
+  malta: europe/malta            # ~8.8 MB — the primary test extract
+  andorra: europe/andorra        # ~2 MB
+  liechtenstein: europe/liechtenstein  # ~3 MB
+  netherlands: europe/netherlands      # ~1.5 GB (large-file guard warns)
+  belgium: europe/belgium
+  luxembourg: europe/luxembourg
+  switzerland: europe/switzerland
+  denmark: europe/denmark
+  ireland-and-northern-ireland: europe/ireland-and-northern-ireland
