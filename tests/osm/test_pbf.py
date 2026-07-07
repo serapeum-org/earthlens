@@ -315,11 +315,17 @@ class FakeNode:
 
 
 class FakeWay:
-    """Stand-in for a tagged osmium way carrying its coordinates."""
+    """Stand-in for a tagged osmium way carrying its coordinates + tags."""
 
-    def __init__(self, wid: int, coords: list[tuple[float, float]]) -> None:
+    def __init__(
+        self,
+        wid: int,
+        coords: list[tuple[float, float]],
+        tags: dict[str, str] | None = None,
+    ) -> None:
         self.id = wid
         self.coords = coords
+        self.tags = tags or {}
 
     def is_node(self) -> bool:
         return False
@@ -408,6 +414,45 @@ class TestReadPyosmium:
         pbf.write_bytes(b"x")
         fc = read_pbf(pbf, pyrosm_method="get_network", engine="pyosmium")
         assert len(fc) == 1 and fc.geometry.iloc[0].geom_type == "LineString"
+
+    def test_driving_network_type_filters_by_highway_value(self, tmp_path, fake_osmium):
+        """network_type='driving' keeps drivable ways and drops a footway (M1)."""
+        fake_osmium.objects = [
+            FakeWay(1, [(0.0, 0.0), (1.0, 1.0)], {"highway": "residential"}),
+            FakeWay(2, [(0.0, 0.0), (1.0, 1.0)], {"highway": "footway"}),
+        ]
+        pbf = tmp_path / "x.osm.pbf"
+        pbf.write_bytes(b"x")
+        fc = read_pbf(
+            pbf,
+            pyrosm_method="get_network",
+            network_type="driving",
+            engine="pyosmium",
+        )
+        assert len(fc) == 1 and fc.osm_id.iloc[0] == 1
+
+    def test_unknown_network_type_warns_and_keeps_all(self, tmp_path, fake_osmium):
+        """A non-driving network_type is not filtered and logs a warning."""
+        from loguru import logger
+
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        fake_osmium.objects = [
+            FakeWay(1, [(0.0, 0.0), (1.0, 1.0)], {"highway": "footway"})
+        ]
+        pbf = tmp_path / "x.osm.pbf"
+        pbf.write_bytes(b"x")
+        try:
+            fc = read_pbf(
+                pbf,
+                pyrosm_method="get_network",
+                network_type="walking",
+                engine="pyosmium",
+            )
+        finally:
+            logger.remove(sink_id)
+        assert len(fc) == 1
+        assert any("does not replicate" in message for message in messages)
 
     def test_area_layer(self, tmp_path, fake_osmium):
         """An area layer (`get_buildings`) yields polygons from tagged areas."""

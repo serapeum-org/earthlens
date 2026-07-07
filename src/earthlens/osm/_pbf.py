@@ -69,6 +69,31 @@ _PYOSMIUM_LAYERS: dict[str, tuple[str, str]] = {
     "get_boundaries": ("boundary", "area"),
 }
 
+#: `highway=*` values kept for the `network_type="driving"` road subset, so the
+#: streaming `pyosmium` engine honours the same "drivable" filter the catalog's
+#: `pbf:roads` row and the default `pyrosm` engine promise (rather than silently
+#: returning every footway / cycleway / path). A superset of the drivable
+#: classes; `network_type`s other than `"driving"` are not value-filtered here.
+_DRIVING_HIGHWAY_VALUES: frozenset[str] = frozenset(
+    {
+        "motorway",
+        "trunk",
+        "primary",
+        "secondary",
+        "tertiary",
+        "unclassified",
+        "residential",
+        "living_street",
+        "service",
+        "road",
+        "motorway_link",
+        "trunk_link",
+        "primary_link",
+        "secondary_link",
+        "tertiary_link",
+    }
+)
+
 
 def geofabrik_url(region_path: str) -> str:
     """Build the Geofabrik extract URL for a region path.
@@ -280,7 +305,7 @@ def read_pbf(
     if engine == "pyrosm":
         return _read_pyrosm(path, pyrosm_method, network_type, bbox)
     if engine == "pyosmium":
-        return _read_pyosmium(path, pyrosm_method, bbox)
+        return _read_pyosmium(path, pyrosm_method, network_type, bbox)
     raise ValueError(
         f"engine must be 'pyrosm' or 'pyosmium', got {engine!r}."
     )
@@ -340,6 +365,7 @@ def _read_pyrosm(
 def _read_pyosmium(
     path: Path,
     pyrosm_method: str,
+    network_type: str | None,
     bbox: tuple[float, float, float, float] | None,
 ) -> FeatureCollection:
     """Read a layer with the streaming `pyosmium` engine (bounded memory).
@@ -349,12 +375,18 @@ def _read_pyosmium(
     `Point`, tagged ways → `LineString`, tagged areas → polygon. A `bbox` clips
     the built geometry (post-hoc shapely intersection). This is the fallback for
     files too large for `pyrosm`; it is coarser than the `pyrosm` path by
-    design (one geometry kind, one tag key per layer).
+    design (one geometry kind, one tag key per layer). For `get_network` the
+    `network_type="driving"` road subset is honoured via a `highway`-value
+    allow-list (`_DRIVING_HIGHWAY_VALUES`); any other `network_type` is not
+    value-filtered and logs a warning so the divergence from `pyrosm` is not
+    silent.
 
     Args:
         path: Local `.osm.pbf` path.
         pyrosm_method: The layer's `pyrosm` method name (mapped to a tag key +
             geometry strategy via `_PYOSMIUM_LAYERS`).
+        network_type: The road subset for `get_network` (`"driving"`, …), else
+            ignored.
         bbox: Optional `(west, south, east, north)` clip.
 
     Returns:
@@ -381,6 +413,7 @@ def _read_pyosmium(
             f"{sorted(_PYOSMIUM_LAYERS)}."
         )
     key, strategy = plan
+    value_filter = _pyosmium_value_filter(pyrosm_method, network_type)
     clip = None
     if bbox is not None:
         from shapely.geometry import box
@@ -390,7 +423,7 @@ def _read_pyosmium(
     factory = osmium.geom.WKBFactory()
     rows: list[dict] = []
     for osm_id, osm_type, geometry in _stream_geometries(
-        osmium, shapely.wkb, factory, str(path), key, strategy
+        osmium, shapely.wkb, factory, str(path), key, strategy, value_filter
     ):
         if clip is not None and not geometry.intersects(clip):
             continue
@@ -403,12 +436,46 @@ def _read_pyosmium(
     return to_fc(gpd.GeoDataFrame(rows, geometry="geometry", crs=OSM_CRS))
 
 
-def _stream_geometries(osmium, shapely_wkb, factory, path, key, strategy):
+def _pyosmium_value_filter(
+    pyrosm_method: str, network_type: str | None
+) -> frozenset[str] | None:
+    """Return the tag-value allow-list the `pyosmium` line read should apply.
+
+    Only `get_network` carries a `network_type`. `"driving"` maps to the
+    `_DRIVING_HIGHWAY_VALUES` allow-list so the streaming engine returns the
+    same drivable subset as `pyrosm`; any other `network_type` returns `None`
+    (no value filter) and logs a warning, so the coarser result is explicit
+    rather than a silent semantic swap (`M1`).
+
+    Args:
+        pyrosm_method: The layer's `pyrosm` method name.
+        network_type: The requested road subset, if any.
+
+    Returns:
+        frozenset[str] | None: The allowed `highway` values, or `None` for no
+            value filter.
+    """
+    if pyrosm_method != "get_network" or network_type is None:
+        return None
+    if network_type == "driving":
+        return _DRIVING_HIGHWAY_VALUES
+    logger.warning(
+        f"the pyosmium engine does not replicate network_type={network_type!r}; "
+        "returning every highway. Use engine='pyrosm' for the exact subset."
+    )
+    return None
+
+
+def _stream_geometries(
+    osmium, shapely_wkb, factory, path, key, strategy, value_filter=None
+):
     """Yield `(osm_id, osm_type, shapely_geometry)` for one layer via streaming.
 
     Selects the `osmium.FileProcessor` configuration for the strategy — node
     locations for lines, area assembly for areas — filtered to `key`, and
     converts each matched object to a shapely geometry through the WKB factory.
+    When `value_filter` is given (the `get_network` road subset), a way whose
+    `key` tag value is not in the set is skipped.
 
     Args:
         osmium: The imported `osmium` module.
@@ -417,6 +484,8 @@ def _stream_geometries(osmium, shapely_wkb, factory, path, key, strategy):
         path: Local `.osm.pbf` path (string).
         key: The OSM tag key to filter on (e.g. `"building"`).
         strategy: `"point"`, `"line"`, or `"area"`.
+        value_filter: Optional allow-list of accepted `key` tag values (line
+            strategy only); `None` accepts every value.
 
     Yields:
         tuple[int, str, shapely.geometry.base.BaseGeometry]: One record per
@@ -434,6 +503,8 @@ def _stream_geometries(osmium, shapely_wkb, factory, path, key, strategy):
         processor = osmium.FileProcessor(path).with_locations().with_filter(key_filter)
         for obj in processor:
             if obj.is_way():
+                if value_filter is not None and obj.tags.get(key) not in value_filter:
+                    continue
                 geom = _wkb_geometry(shapely_wkb, factory.create_linestring, obj)
                 if geom is not None:
                     yield obj.id, "way", geom
