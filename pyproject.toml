@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.9.0"
+version = "0.10.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -26,7 +26,7 @@ classifiers = [
 requires-python = ">=3.11,<4"
 
 dependencies = [
-    "pyramids-gis >=0.40.0",
+    "pyramids-gis >=0.41.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -72,7 +72,7 @@ fdsn = ["obspy >=1.5.0"]
 # read). Only `[parquet]` is needed, and only for LabeledDataset.to_parquet.
 nwm = [
     "earthlens[s3]",
-    "pyramids-gis[parquet] >=0.40.0",
+    "pyramids-gis[parquet] >=0.41.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 # ASF InSAR backend reuses the EDL token already minted by `[earthdata]`, so
@@ -106,7 +106,7 @@ dem = ["earthlens[s3]"]
 # granules out — decode is downstream (pyramids / satpy), so earthlens never
 # imports xarray/netCDF4/goes2go.
 goes = ["earthlens[s3]"]
-stac = ["pyramids-gis[stac] >=0.40.0"]
+stac = ["pyramids-gis[stac] >=0.41.0"]
 openeo = ["openeo >=0.47,<0.48"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
@@ -184,14 +184,8 @@ dev = [
     "nbval >=0.11.0",
     # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
-    # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
-    # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
-    # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.40.0",
-    # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
-    # animation.embed_gif, ArrayGlyph.save_animation); >=0.18.0 for that
-    # RGB-frame animation embed/save API.
-    "cleopatra >=0.18.0",
+    "pyramids-gis[viz] >=0.41.0",
+    "cleopatra >=0.21.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -219,11 +213,8 @@ docs = [
     "mkdocs-panzoom-plugin",
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
-    # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.40.0",
-    # cleopatra: notebooks import it directly; >=0.18.0 for the RGB-frame
-    # animation embed_gif / save_animation API used by the showcase GIFs.
-    "cleopatra >=0.18.0",
+    "pyramids-gis[viz] >=0.41.0",
+    "cleopatra >=0.21.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
