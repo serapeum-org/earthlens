@@ -39,6 +39,7 @@ from earthlens.base import (
     to_datetime,
     warn_if_egress,
 )
+from earthlens.base.raster import netcdf_variable_to_raster
 from earthlens.s3.auth import S3Auth, S3Credentials
 from earthlens.s3.catalog import Catalog, Dataset
 from earthlens.s3.layouts import plan_products
@@ -420,19 +421,18 @@ class S3(AbstractDataSource):
         fails. Longitudes in the 0-360 convention are wrapped to -180..180
         via pyramids `Dataset.wrap_longitude` (the same call the nwp backend
         uses), which validates the whole-globe span rather than assuming it.
+        Delegates the array read + rebuild to the shared
+        `netcdf_variable_to_raster`.
         """
-        import numpy as np
-        from pyramids.dataset import Dataset as PyramidsDataset
         from pyramids.netcdf import NetCDF
 
         nc = NetCDF.read_file(str(raw))
-        cube = nc.get_variable(self._nc_variable_name(nc, product))
-        arr = np.asarray(cube.read_array())
-        geo = tuple(cube.geotransform)
-        dataset = PyramidsDataset.create_from_array(arr=arr, geo=geo, epsg=4326)
-        if self._dataset.lon_convention == "0-360":
-            dataset = dataset.wrap_longitude()
-        return dataset
+        return netcdf_variable_to_raster(
+            nc,
+            self._nc_variable_name(nc, product),
+            epsg=4326,
+            wrap_longitude=self._dataset.lon_convention == "0-360",
+        )
 
     def _geostationary_to_wgs84(self, raw: Path, product: RemoteProduct):
         """Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.

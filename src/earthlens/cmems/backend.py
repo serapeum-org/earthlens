@@ -426,8 +426,9 @@ class CMEMS(AbstractDataSource):
         Raises:
             ValueError: When the file has no `time` dimension to window.
         """
-        from pyramids.dataset import Dataset
         from pyramids.netcdf import NetCDF
+
+        from earthlens.base.raster import array_to_raster
 
         nc = NetCDF.read_file(str(nc_path))
         dims = tuple(nc.dimension_names or ())
@@ -467,8 +468,8 @@ class CMEMS(AbstractDataSource):
                 target = out_dir / (
                     f"{nc_path.stem}_{var_name}_{config.freq}_{window}.tif"
                 )
-                Dataset.create_from_array(
-                    arr=arr[i], geo=var.geotransform, epsg=var.epsg
+                array_to_raster(
+                    arr[i], var.geotransform, epsg=var.epsg
                 ).to_file(str(target))
                 written.append(target)
 
