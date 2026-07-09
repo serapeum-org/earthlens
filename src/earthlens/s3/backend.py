@@ -367,8 +367,8 @@ class S3(AbstractDataSource):
         UTM / geostationary COGs are reprojected to WGS84 first). ERA5-style
         regular-grid NetCDF granules carry no GDAL-readable SRS, so they are
         rebuilt into a WGS84 raster (time as bands) before cropping.
-        Geostationary NetCDF (GOES) is warped to WGS84 via pyramids, which
-        georeferences the scan-angle grid on read (pyramids >=0.28).
+        Geostationary NetCDF (GOES) is warped to WGS84 from its GDAL
+        subdataset, which carries the CF `+proj=geos` grid-mapping.
 
         Args:
             raw: The downloaded source file.
@@ -433,14 +433,27 @@ class S3(AbstractDataSource):
     def _geostationary_to_wgs84(self, raw: Path, product: RemoteProduct):
         """Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.
 
-        pyramids (>=0.28) georeferences the scan-angle grid from the CF
-        `goes_imager_projection` grid-mapping when it reads the granule, so
-        the data variable reprojects to EPSG:4326 directly.
-        """
-        from pyramids.netcdf import NetCDF
+        The variable is opened through GDAL's NetCDF **subdataset**
+        (`NETCDF:"<file>":<variable>`) rather than the multidimensional
+        `pyramids.netcdf.NetCDF` class. The subdataset exposes the CF
+        `goes_imager_projection` grid-mapping as a `+proj=geos` spatial
+        reference over a projected-metre geotransform, so `to_crs(4326)`
+        warps the scan-angle grid correctly and cheaply.
 
-        nc = NetCDF.read_file(str(raw))
-        cube = nc.get_variable(self._nc_variable_name(nc, product))
+        The multidimensional path must not be used here. `NetCDF.read_file`
+        → `get_variable` → `read_array` returns the variable's array flipped
+        along `y` relative to its north-up geotransform, so the reprojected
+        raster keeps a correct header while its pixels are mirrored about
+        the grid's horizontal centre line: an AOI crop silently returns
+        radiances from the wrong latitude. It is also ~100x slower (a
+        full-disk `read_array()` takes minutes, the subdataset read is
+        sub-second). `test_goes_matches_source_radiance` guards the
+        regression.
+        """
+        from pyramids.dataset import Dataset as PyramidsDataset
+
+        variable = self._resolve_nc_variable(raw, product)
+        cube = PyramidsDataset.read_file(f'NETCDF:"{raw}":{variable}')
         return cube.to_crs(4326)
 
     def _nc_variable_name(self, nc: Any, product: RemoteProduct) -> str:
