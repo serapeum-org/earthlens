@@ -107,6 +107,7 @@ nav:
     - Architecture: overview/architecture.md
     - Temporal aggregation: aggregation.md
     - Command-line interface: reference/cli.md
+    - Troubleshooting pixi timeouts: troubleshooting-pixi.md
   - Data Sources:
     - Supported providers: reference/providers.md
     - Deferred providers: reference/deferred-providers.md
