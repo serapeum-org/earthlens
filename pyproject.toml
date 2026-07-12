@@ -26,7 +26,7 @@ classifiers = [
 requires-python = ">=3.11,<4"
 
 dependencies = [
-    "pyramids-gis >=0.41.0",
+    "pyramids-gis >=0.44.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -72,7 +72,7 @@ fdsn = ["obspy >=1.5.0"]
 # read). Only `[parquet]` is needed, and only for LabeledDataset.to_parquet.
 nwm = [
     "earthlens[s3]",
-    "pyramids-gis[parquet] >=0.41.0",
+    "pyramids-gis[parquet] >=0.44.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 # ASF InSAR backend reuses the EDL token already minted by `[earthdata]`, so
@@ -106,7 +106,7 @@ dem = ["earthlens[s3]"]
 # granules out — decode is downstream (pyramids / satpy), so earthlens never
 # imports xarray/netCDF4/goes2go.
 goes = ["earthlens[s3]"]
-stac = ["pyramids-gis[stac] >=0.41.0"]
+stac = ["pyramids-gis[stac] >=0.44.0"]
 openeo = ["openeo >=0.47,<0.48"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
@@ -184,8 +184,8 @@ dev = [
     "nbval >=0.11.0",
     # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
-    "pyramids-gis[viz] >=0.41.0",
-    "cleopatra >=0.21.0",
+    "pyramids-gis[viz] >=0.44.0",
+    "cleopatra >=0.22.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -213,8 +213,8 @@ docs = [
     "mkdocs-panzoom-plugin",
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
-    "pyramids-gis[viz] >=0.41.0",
-    "cleopatra >=0.21.0",
+    "pyramids-gis[viz] >=0.44.0",
+    "cleopatra >=0.22.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
@@ -379,7 +379,7 @@ platforms = ["win-64", "linux-64", "osx-arm64"]
 # without this floor the multi-platform lock cannot place it. Raising the
 # target to 15 matches that wheel; every other package's older-macOS wheels
 # stay valid (a lower macOS floor is always compatible with a higher target).
-# pyramids-gis 0.40.0 wheels are manylinux_2_28 (down from manylinux_2_39 in
+# pyramids-gis 0.44.0 wheels are manylinux_2_28 (down from manylinux_2_39 in
 # 0.38/0.39), which sits at/below pixi's default linux-64 __glibc floor, so no
 # explicit `libc = "…"` pin is needed to select the wheel over the sdist.
 [tool.pixi.system-requirements]
