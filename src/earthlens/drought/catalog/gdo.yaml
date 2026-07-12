@@ -56,26 +56,9 @@ datasets:
     native_crs: "EPSG:4326"
     timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
-  gdo-fpanv:
-    source: "Copernicus Global Drought Observatory (GDO)"
-    transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
-    coverage: fpanv
-    output_kind: raster
-    cadence: 10day
-    native_crs: "EPSG:4326"
-    timescale: "01"
-    license_note: "Copernicus EMS — free reuse with attribution"
-  gdo-cdinx:
-    source: "Copernicus Global Drought Observatory (GDO)"
-    transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
-    coverage: cdinx
-    output_kind: raster
-    cadence: 10day
-    native_crs: "EPSG:4326"
-    timescale: "01"
-    license_note: "Copernicus EMS — free reuse with attribution"
+  # gdo-fpanv / gdo-cdinx removed: same coverages (fpanv/cdinx) as the pruned edo-
+  # rows, permanently discontinued upstream (fpanv→fpanm ends 2022-09-21; cdinx
+  # after 2024-01-01) and 500ing on every date. See the edo.yaml notes.
   gdo-twsan:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs
