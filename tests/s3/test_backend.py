@@ -446,6 +446,10 @@ def test_goes_geostationary_localise_warps_to_wgs84(
     )
     out = source._localise(tiny_goes_nc, product)
     cropped = Dataset.read_file(str(out))
+    # Smoke check only: the synthetic tiny_goes_nc fixture cannot carry a real
+    # +proj=geos SRS, so this asserts the warp yields a non-empty WGS84 raster,
+    # not pixel registration. The mirror-about-y mis-registration C1 fixes is
+    # guarded by e2e test_goes_matches_source_radiance (needs a live GOES frame).
     assert cropped.epsg == 4326 and cropped.shape[1] >= 1 and cropped.shape[2] >= 1
 
 
