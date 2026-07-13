@@ -43,12 +43,6 @@ BASE_URL: str = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
 #: Path to the bundled 18×36 Mollweide land tile schema (375 tiles, ESRI:54009).
 TILE_SCHEMA_PATH: Path = Path(__file__).parent / "tile_schema.geojson"
 
-#: Points sampled per WGS84 bbox edge before transforming to Mollweide, so the
-#: curved Mollweide image of the (straight) lon/lat box is captured rather than
-#: clipping its bowed edges to the 4 transformed corners.
-_DENSIFY_PER_EDGE: int = 16
-
-
 def _ghsl_stem(
     code: str, epoch: int, release: str, crs: str, res_token: str, region: str
 ) -> str:
@@ -168,44 +162,6 @@ def _load_tile_schema() -> tuple[tuple[str, float, float, float, float], ...]:
     return tuple(rows)
 
 
-def _bbox_to_mollweide_envelope(
-    bbox_wgs84: tuple[float, float, float, float],
-) -> tuple[float, float, float, float]:
-    """Transform a WGS84 bbox to its Mollweide axis-aligned envelope.
-
-    Densifies the (straight) lon/lat box edges before transforming so the
-    bowed Mollweide image is captured, then returns the bounding rectangle of
-    the transformed points — a conservative superset suitable for tile
-    selection.
-
-    Args:
-        bbox_wgs84: `(west, south, east, north)` in degrees.
-
-    Returns:
-        tuple[float, float, float, float]: `(left, bottom, right, top)` in
-            Mollweide (ESRI:54009) metres.
-    """
-    from pyproj import Transformer
-
-    west, south, east, north = bbox_wgs84
-    transformer = Transformer.from_crs("EPSG:4326", "ESRI:54009", always_xy=True)
-    n = _DENSIFY_PER_EDGE
-    lons: list[float] = []
-    lats: list[float] = []
-    for i in range(n + 1):
-        frac = i / n
-        # bottom + top edges (lon varies)
-        lon = west + (east - west) * frac
-        lons.extend([lon, lon])
-        lats.extend([south, north])
-        # left + right edges (lat varies)
-        lat = south + (north - south) * frac
-        lons.extend([west, east])
-        lats.extend([lat, lat])
-    xs, ys = transformer.transform(lons, lats)
-    return min(xs), min(ys), max(xs), max(ys)
-
-
 def tiles_for_bbox(bbox_wgs84: tuple[float, float, float, float]) -> list[str]:
     """Return the land tile ids whose extent intersects the AOI.
 
@@ -233,7 +189,9 @@ def tiles_for_bbox(bbox_wgs84: tuple[float, float, float, float]) -> list[str]:
 
             ```
     """
-    left, bottom, right, top = _bbox_to_mollweide_envelope(bbox_wgs84)
+    from pyramids.feature.bbox import transform
+
+    left, bottom, right, top = transform(bbox_wgs84, 4326, "ESRI:54009")
     hits = [
         tile_id
         for tile_id, l, b, r, t in _load_tile_schema()
