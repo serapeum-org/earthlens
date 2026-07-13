@@ -439,14 +439,14 @@ class S3(AbstractDataSource):
         reference over a projected-metre geotransform, so `to_crs(4326)`
         warps the scan-angle grid correctly and cheaply.
 
-        The multidimensional path must not be used here. `NetCDF.read_file`
-        → `get_variable` → `read_array` returns the variable's array flipped
+        The multidimensional path must not be used here. On real GOES ABI
+        granules (observed with pyramids 0.45), `NetCDF.read_file` →
+        `get_variable` → `read_array` returned the variable's array flipped
         along `y` relative to its north-up geotransform, so the reprojected
-        raster keeps a correct header while its pixels are mirrored about
-        the grid's horizontal centre line: an AOI crop silently returns
-        radiances from the wrong latitude. It is also ~100x slower (a
-        full-disk `read_array()` takes minutes, the subdataset read is
-        sub-second).
+        raster kept a correct header while its pixels were mirrored about
+        the grid's horizontal centre line — an AOI crop silently returned
+        radiances from the wrong latitude. The subdataset read is also ~100x
+        faster (a full-disk `read_array()` takes minutes, sub-second here).
         """
         from pyramids.dataset import Dataset as PyramidsDataset
 
