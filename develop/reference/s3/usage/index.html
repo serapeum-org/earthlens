@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19083,7 +19083,9 @@ bbox→scene search):</p>
   using pyramids <code>merge_rasters</code>).</li>
 </ul>
 <p>GOES geostationary imagery now downloads, warps to WGS84, and crops like any
-other dataset (requires <code>pyramids-gis &gt;=0.28</code>).</p>
+other dataset — the scan-angle grid is read from its GDAL NetCDF subdataset
+(<code>NETCDF:"&lt;file&gt;":&lt;variable&gt;</code>, carrying the CF <code>+proj=geos</code> grid-mapping) and
+reprojected with <code>to_crs(4326)</code>.</p>
 
 
 
