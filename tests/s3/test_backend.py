@@ -446,11 +446,42 @@ def test_goes_geostationary_localise_warps_to_wgs84(
     )
     out = source._localise(tiny_goes_nc, product)
     cropped = Dataset.read_file(str(out))
-    # Smoke check only: the synthetic tiny_goes_nc fixture cannot carry a real
-    # +proj=geos SRS, so this asserts the warp yields a non-empty WGS84 raster,
-    # not pixel registration. The mirror-about-y mis-registration C1 fixes is
-    # guarded by e2e test_goes_matches_source_radiance (needs a live GOES frame).
+    # Smoke check: asserts the geostationary warp yields a non-empty WGS84 raster.
+    # Pixel y-orientation (the mirror-about-y bug C1 fixes) is guarded offline by
+    # test_goes_geostationary_preserves_north_south_orientation, and end-to-end on
+    # real data by e2e test_goes_matches_source_radiance.
     assert cropped.epsg == 4326 and cropped.shape[1] >= 1 and cropped.shape[2] >= 1
+
+
+def test_goes_geostationary_preserves_north_south_orientation(tmp_path, tiny_goes_nc):
+    """GOES warp keeps north-south orientation (offline guard for the C1 y-flip)."""
+    import numpy as np
+
+    from earthlens.base import RemoteProduct
+
+    source = S3(
+        start="2024-06-28",
+        end="2024-06-28",
+        lat_lim=[40.0, 42.0],
+        lon_lim=[-90.0, -88.0],
+        dataset="goes",
+        variables=["C13"],
+        path=str(tmp_path),
+    )
+    product = RemoteProduct(
+        id="C13", href="x.nc", metadata={"bucket": "noaa-goes16", "variable": "C13"}
+    )
+    warped = source._geostationary_to_wgs84(tiny_goes_nc, product)
+    arr = np.asarray(warped.read_array(), dtype="float64")
+    if arr.ndim == 3:
+        arr = arr[0]
+    # The fixture increases north->south (row 0 = north = 0), so a correctly
+    # oriented warp has a lower mean at the top (north) than the bottom (south);
+    # a mirror-about-y regression inverts this.
+    third = arr.shape[0] // 3
+    north = arr[:third][np.isfinite(arr[:third])].mean()
+    south = arr[-third:][np.isfinite(arr[-third:])].mean()
+    assert south - north > 5.0
 
 
 def test_variables_accepts_a_single_string(tmp_path, fake_client_factory, patch_auth):

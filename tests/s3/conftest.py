@@ -133,7 +133,11 @@ def tiny_goes_nc(tmp_path_factory) -> Path:
     n = 64
     x = np.linspace(-0.05, 0.05, n)
     y = np.linspace(0.14, 0.10, n)  # scan-angle radians, y descending
-    arr = np.random.RandomState(0).rand(n, n).astype("float32")
+    # Monotonic north->south value gradient (row 0 = northernmost scan angle,
+    # value 0; row n-1 = southernmost, value n-1) so a y-orientation regression
+    # is detectable after the warp — see
+    # test_goes_geostationary_preserves_north_south_orientation.
+    arr = np.tile(np.arange(n, dtype="float32").reshape(n, 1), (1, n))
     ds = xr.Dataset(
         {"CMI": (("y", "x"), arr, {"grid_mapping": "goes_imager_projection"})},
         coords={
