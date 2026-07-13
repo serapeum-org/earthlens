@@ -382,9 +382,8 @@ class S3(AbstractDataSource):
         west, south, east, north = self._bbox()
         if self._dataset.format == "netcdf":
             if self._dataset.crs is None:
-                # Geostationary NetCDF (GOES): pyramids (>=0.28) georeferences
-                # the scan-angle grid from the CF grid-mapping on read, so the
-                # variable warps to WGS84 directly.
+                # Geostationary NetCDF (GOES): warp to WGS84 from the GDAL
+                # subdataset, which carries the CF `+proj=geos` grid-mapping.
                 data = self._geostationary_to_wgs84(raw, product)
             else:
                 data = self._netcdf_to_wgs84_raster(raw, product)
@@ -447,8 +446,8 @@ class S3(AbstractDataSource):
         the grid's horizontal centre line: an AOI crop silently returns
         radiances from the wrong latitude. It is also ~100x slower (a
         full-disk `read_array()` takes minutes, the subdataset read is
-        sub-second). `test_goes_matches_source_radiance` guards the
-        regression.
+        sub-second). A regression test asserts the crop's radiances match
+        the geostationary source at the sampled lon/lat.
         """
         from pyramids.dataset import Dataset as PyramidsDataset
 
