@@ -20346,14 +20346,14 @@ default is unsigned public access.</p>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        reference over a projected-metre geotransform, so `to_crs(4326)`</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        warps the scan-angle grid correctly and cheaply.</span>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        The multidimensional path must not be used here. `NetCDF.read_file`</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        → `get_variable` → `read_array` returns the variable&#39;s array flipped</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        along `y` relative to its north-up geotransform, so the reprojected</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        raster keeps a correct header while its pixels are mirrored about</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        the grid&#39;s horizontal centre line: an AOI crop silently returns</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        radiances from the wrong latitude. It is also ~100x slower (a</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        full-disk `read_array()` takes minutes, the subdataset read is</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        sub-second).</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        The multidimensional path must not be used here. On real GOES ABI</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        granules (observed with pyramids 0.45), `NetCDF.read_file` →</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        `get_variable` → `read_array` returned the variable&#39;s array flipped</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        along `y` relative to its north-up geotransform, so the reprojected</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        raster kept a correct header while its pixels were mirrored about</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        the grid&#39;s horizontal centre line — an AOI crop silently returned</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        radiances from the wrong latitude. The subdataset read is also ~100x</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        faster (a full-disk `read_array()` takes minutes, sub-second here).</span>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>
