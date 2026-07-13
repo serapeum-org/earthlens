@@ -1,0 +1,309 @@
+# CMIP6 climate projections — Pangeo ARCO mirror on Google Cloud (`gs://cmip6`).
+#
+# This YAML holds the *config* + *curated vocabulary* for the CMIP6 backend. The
+# heavy per-store index (every model x scenario x variable x member Zarr store)
+# is NOT inlined here — it is the consolidated-stores CSV at `csv_url` below
+# (~515k rows), fetched and cached locally by the resolver. This is the
+# sanctioned "huge available index lives beside the curated YAML" layout.
+#
+# The request is a CMIP6 *facet tuple* — `source_id` (model), `experiment_id`
+# (scenario), `variable_id`, `table_id` (+ optional `member_id`, `grid_label`,
+# `version`) — which the resolver maps to the `zstore` (`gs://cmip6/...`) URI(s).
+# The curated `variables:` / `experiments:` / `tables:` / `sources:` blocks power
+# output metadata, docs, and did-you-mean hints; resolution itself runs against
+# the full CSV, so an uncurated facet still resolves.
+
+# The consolidated-stores CSV: one row per Zarr store, no auth (plain HTTPS).
+csv_url: https://storage.googleapis.com/cmip6/pangeo-cmip6.csv
+
+# The public GCS bucket the `zstore` URIs live on. Read anonymously through
+# pyramids' GDAL `/vsigs/` multidim driver (no gcsfs); the accessor forces
+# anonymous access with `GS_NO_SIGN_REQUEST`.
+bucket: cmip6
+
+# The CSV facet columns, in file order. The resolver filters the CSV by the
+# subset of these the request pins.
+facet_columns:
+  - activity_id
+  - institution_id
+  - source_id
+  - experiment_id
+  - member_id
+  - table_id
+  - variable_id
+  - grid_label
+  - version
+
+# Sensible defaults applied when a request leaves a facet unset.
+defaults:
+  # The most widely-published variant label — realisation 1, initial-conditions
+  # 1, physics 1, forcing 1. Present for nearly every model.
+  member_id: r1i1p1f1
+  # `latest` selects the newest `version` (data-publication date) among the
+  # stores matching the other facets.
+  version: latest
+
+# Fallback attribution note when a source carries no per-model `terms_note`.
+default_terms_note: >-
+  CMIP6 output is provided for research use under the source model's CMIP6 terms
+  of use (most models are CC BY 4.0). Cite the source GCM and acknowledge the
+  CMIP6 project and the modelling group (WCRP CMIP6).
+
+# --- Curated variables (informational; resolution runs against the full CSV) --
+# Units / long names follow the CMIP6 CMOR data-request conventions.
+variables:
+  tas:
+    units: K
+    long_name: Near-surface (2 m) air temperature
+    realm: atmos
+  tasmax:
+    units: K
+    long_name: Daily maximum near-surface air temperature
+    realm: atmos
+  tasmin:
+    units: K
+    long_name: Daily minimum near-surface air temperature
+    realm: atmos
+  ts:
+    units: K
+    long_name: Surface (skin) temperature
+    realm: atmos
+  pr:
+    units: kg m-2 s-1
+    long_name: Precipitation (all phases)
+    realm: atmos
+  psl:
+    units: Pa
+    long_name: Sea-level pressure
+    realm: atmos
+  ps:
+    units: Pa
+    long_name: Surface air pressure
+    realm: atmos
+  huss:
+    units: '1'
+    long_name: Near-surface specific humidity
+    realm: atmos
+  hurs:
+    units: '%'
+    long_name: Near-surface relative humidity
+    realm: atmos
+  sfcWind:
+    units: m s-1
+    long_name: Near-surface (10 m) wind speed
+    realm: atmos
+  uas:
+    units: m s-1
+    long_name: Eastward near-surface wind
+    realm: atmos
+  vas:
+    units: m s-1
+    long_name: Northward near-surface wind
+    realm: atmos
+  clt:
+    units: '%'
+    long_name: Total cloud cover percentage
+    realm: atmos
+  rsds:
+    units: W m-2
+    long_name: Surface downwelling shortwave radiation
+    realm: atmos
+  rlds:
+    units: W m-2
+    long_name: Surface downwelling longwave radiation
+    realm: atmos
+  rlut:
+    units: W m-2
+    long_name: Top-of-atmosphere outgoing longwave radiation
+    realm: atmos
+  hfls:
+    units: W m-2
+    long_name: Surface upward latent-heat flux
+    realm: atmos
+  hfss:
+    units: W m-2
+    long_name: Surface upward sensible-heat flux
+    realm: atmos
+  evspsbl:
+    units: kg m-2 s-1
+    long_name: Evaporation including sublimation and transpiration
+    realm: atmos
+  mrro:
+    units: kg m-2 s-1
+    long_name: Total runoff
+    realm: land
+  mrso:
+    units: kg m-2
+    long_name: Total soil-moisture content
+    realm: land
+  snw:
+    units: kg m-2
+    long_name: Surface snow amount
+    realm: landIce
+  ta:
+    units: K
+    long_name: Air temperature on pressure levels
+    realm: atmos
+  ua:
+    units: m s-1
+    long_name: Eastward wind on pressure levels
+    realm: atmos
+  va:
+    units: m s-1
+    long_name: Northward wind on pressure levels
+    realm: atmos
+  zg:
+    units: m
+    long_name: Geopotential height on pressure levels
+    realm: atmos
+  hus:
+    units: '1'
+    long_name: Specific humidity on pressure levels
+    realm: atmos
+  tos:
+    units: degC
+    long_name: Sea-surface temperature
+    realm: ocean
+  sos:
+    units: '0.001'
+    long_name: Sea-surface salinity
+    realm: ocean
+
+# --- Curated experiments (scenario / diagnostic) ------------------------------
+experiments:
+  historical:
+    activity_id: CMIP
+    description: All-forcings historical simulation (1850-2014).
+  piControl:
+    activity_id: CMIP
+    description: Pre-industrial control (constant 1850 forcing).
+  1pctCO2:
+    activity_id: CMIP
+    description: Idealised 1%/year CO2 increase from pre-industrial.
+  abrupt-4xCO2:
+    activity_id: CMIP
+    description: Abrupt quadrupling of pre-industrial CO2.
+  amip:
+    activity_id: CMIP
+    description: Atmosphere-only run with prescribed observed SST / sea ice.
+  ssp119:
+    activity_id: ScenarioMIP
+    description: SSP1-1.9 — very low emissions, ~1.5 C target.
+  ssp126:
+    activity_id: ScenarioMIP
+    description: SSP1-2.6 — low emissions, ~2 C target.
+  ssp245:
+    activity_id: ScenarioMIP
+    description: SSP2-4.5 — intermediate emissions.
+  ssp370:
+    activity_id: ScenarioMIP
+    description: SSP3-7.0 — high emissions, weak mitigation.
+  ssp434:
+    activity_id: ScenarioMIP
+    description: SSP4-3.4 — low forcing under high inequality.
+  ssp460:
+    activity_id: ScenarioMIP
+    description: SSP4-6.0 — medium-high forcing under high inequality.
+  ssp585:
+    activity_id: ScenarioMIP
+    description: SSP5-8.5 — very high emissions, fossil-fuelled growth.
+
+# --- Curated tables (realm x cadence; the CMIP6 MIP table) --------------------
+tables:
+  Amon:
+    realm: atmos
+    cadence: monthly
+    description: Monthly-mean atmospheric fields.
+  day:
+    realm: atmos
+    cadence: daily
+    description: Daily atmospheric fields.
+  3hr:
+    realm: atmos
+    cadence: 3-hourly
+    description: 3-hourly atmospheric fields.
+  Omon:
+    realm: ocean
+    cadence: monthly
+    description: Monthly-mean ocean fields.
+  Oyr:
+    realm: ocean
+    cadence: yearly
+    description: Annual-mean ocean biogeochemistry.
+  Lmon:
+    realm: land
+    cadence: monthly
+    description: Monthly-mean land-surface fields.
+  SImon:
+    realm: seaIce
+    cadence: monthly
+    description: Monthly-mean sea-ice fields.
+  AERmon:
+    realm: aerosol
+    cadence: monthly
+    description: Monthly-mean aerosol fields.
+  Emon:
+    realm: multiple
+    cadence: monthly
+    description: Monthly extension (E) variables across realms.
+  fx:
+    realm: atmos
+    cadence: fixed
+    description: Time-invariant fields (e.g. areacella, orography, land mask).
+  Ofx:
+    realm: ocean
+    cadence: fixed
+    description: Time-invariant ocean fields (e.g. areacello, deptho).
+
+# --- Curated sources (model x institution x attribution) ----------------------
+# `terms_note` records any per-model licence nuance; most CMIP6 models are
+# CC BY 4.0, cited via the source GCM.
+sources:
+  CanESM5:
+    institution_id: CCCma
+    terms_note: CC BY 4.0 — cite CanESM5 (Swart et al., 2019).
+  CESM2:
+    institution_id: NCAR
+    terms_note: CC BY 4.0 — cite CESM2 (Danabasoglu et al., 2020).
+  MIROC6:
+    institution_id: MIROC
+    terms_note: CC BY 4.0 — cite MIROC6 (Tatebe et al., 2019).
+  IPSL-CM6A-LR:
+    institution_id: IPSL
+    terms_note: CC BY 4.0 — cite IPSL-CM6A-LR (Boucher et al., 2020).
+  EC-Earth3:
+    institution_id: EC-Earth-Consortium
+    terms_note: CC BY 4.0 — cite EC-Earth3 (Döscher et al., 2022).
+  MPI-ESM1-2-LR:
+    institution_id: MPI-M
+    terms_note: CC BY 4.0 — cite MPI-ESM1.2-LR (Mauritsen et al., 2019).
+  MPI-ESM1-2-HR:
+    institution_id: MPI-M
+    terms_note: CC BY 4.0 — cite MPI-ESM1.2-HR (Müller et al., 2018).
+  GFDL-ESM4:
+    institution_id: NOAA-GFDL
+    terms_note: CC BY 4.0 — cite GFDL-ESM4 (Dunne et al., 2020).
+  GFDL-CM4:
+    institution_id: NOAA-GFDL
+    terms_note: CC BY 4.0 — cite GFDL-CM4 (Held et al., 2019).
+  UKESM1-0-LL:
+    institution_id: MOHC
+    terms_note: CC BY 4.0 — cite UKESM1.0-LL (Sellar et al., 2019).
+  CNRM-CM6-1:
+    institution_id: CNRM-CERFACS
+    terms_note: CC BY 4.0 — cite CNRM-CM6-1 (Voldoire et al., 2019).
+  CNRM-ESM2-1:
+    institution_id: CNRM-CERFACS
+    terms_note: CC BY 4.0 — cite CNRM-ESM2-1 (Séférian et al., 2019).
+  GISS-E2-1-G:
+    institution_id: NASA-GISS
+    terms_note: CC BY 4.0 — cite GISS-E2.1-G (Kelley et al., 2020).
+  NorESM2-LM:
+    institution_id: NCC
+    terms_note: CC BY 4.0 — cite NorESM2-LM (Seland et al., 2020).
+  ACCESS-CM2:
+    institution_id: CSIRO-ARCCSS
+    terms_note: CC BY 4.0 — cite ACCESS-CM2 (Bi et al., 2020).
+  ACCESS-ESM1-5:
+    institution_id: CSIRO
+    terms_note: CC BY 4.0 — cite ACCESS-ESM1.5 (Ziehn et al., 2020).

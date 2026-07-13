@@ -53,6 +53,32 @@ class TestDatasetModel:
         with pytest.raises(ValidationError):
             Dataset(protocol="wfs", query_template="x")
 
+    def test_pbf_row_needs_method(self):
+        """A pbf row without a pyrosm_method fails validation."""
+        with pytest.raises(ValidationError):
+            Dataset(protocol="pbf")
+
+    def test_pbf_row_rejects_unknown_method(self):
+        """A pbf row naming an unknown pyrosm_method fails validation."""
+        with pytest.raises(ValidationError):
+            Dataset(protocol="pbf", pyrosm_method="get_bogus")
+
+    def test_pbf_row_rejects_live_query_fields(self):
+        """A pbf row carrying an overpass/ohsome query field fails validation."""
+        with pytest.raises(ValidationError):
+            Dataset(
+                protocol="pbf",
+                pyrosm_method="get_buildings",
+                ohsome_filter="building=*",
+            )
+
+    def test_pbf_row_resolves(self):
+        """A well-formed pbf row exposes its method and network_type."""
+        row = Dataset(
+            protocol="pbf", pyrosm_method="get_network", network_type="driving"
+        )
+        assert row.pyrosm_method == "get_network" and row.network_type == "driving"
+
 
 class TestCatalog:
     """Loading and resolving the bundled named-query catalog."""
@@ -84,16 +110,37 @@ class TestCatalog:
     def test_every_row_has_protocol_and_query(self, catalog):
         """Catalog integrity: each row carries its protocol's query field."""
         for query_id, row in catalog.datasets.items():
-            assert row.protocol in ("overpass", "ohsome")
+            assert row.protocol in ("overpass", "ohsome", "pbf")
             if row.protocol == "overpass":
                 assert row.query_template and "{bbox}" in row.query_template
-            else:
+            elif row.protocol == "ohsome":
                 assert row.ohsome_filter
+            else:
+                assert row.pyrosm_method
 
     def test_id_prefix_matches_protocol(self, catalog):
         """Each id's `<protocol>:` prefix matches the row's protocol."""
         for query_id, row in catalog.datasets.items():
             assert query_id.split(":", 1)[0] == row.protocol
+
+    def test_pbf_row_resolves(self, catalog):
+        """pbf:buildings resolves to its get_buildings pyrosm method."""
+        assert catalog.get("pbf:buildings").pyrosm_method == "get_buildings"
+
+    def test_region_key_resolves(self, catalog):
+        """A region key resolves to its Geofabrik path; a raw path passes through."""
+        assert catalog.region_path("malta") == "europe/malta"
+        assert catalog.region_path("europe/andorra") == "europe/andorra"
+
+    def test_region_ids_sorted_and_populated(self, catalog):
+        """region_ids returns the sorted region keys including the test extract."""
+        ids = catalog.region_ids()
+        assert ids == sorted(ids) and "malta" in ids
+
+    def test_unknown_region_did_you_mean(self, catalog):
+        """An unknown region key raises with a did-you-mean hint."""
+        with pytest.raises(ValueError, match="not a known Geofabrik region"):
+            catalog.region_path("maltaa")
 
 
 class TestCatalogLoad:

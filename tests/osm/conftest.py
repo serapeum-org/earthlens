@@ -143,14 +143,24 @@ def fake_overpass_post(monkeypatch: pytest.MonkeyPatch) -> FakePostState:
     class _Response:
         def __init__(self, text: str) -> None:
             self.text = text
+            self.status_code = 200
+            self.headers: dict[str, str] = {}
 
         def raise_for_status(self) -> None:
             if not state.ok:
                 raise requests.HTTPError("Overpass returned an error status")
 
-    def _post(url: str, data: dict, headers: dict, timeout: float) -> _Response:
+        def close(self) -> None:
+            return None
+
+    def _post(url: str, **kwargs: Any) -> _Response:
         state.calls.append(
-            {"url": url, "data": data, "headers": headers, "timeout": timeout}
+            {
+                "url": url,
+                "data": kwargs.get("data"),
+                "headers": kwargs.get("headers"),
+                "timeout": kwargs.get("timeout"),
+            }
         )
         return _Response(state.text)
 

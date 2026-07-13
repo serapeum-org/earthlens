@@ -24,12 +24,16 @@ class _FakeResponse:
     def __init__(self, text: str) -> None:
         self.text = text
         self.status_code = 200
+        self.headers: dict[str, str] = {}
 
     def raise_for_status(self) -> None:
         """No-op: the fixture responses are always 200."""
 
+    def close(self) -> None:
+        """No-op close — the fake owns no socket."""
 
-def _fake_get(url: str, timeout: float | None = None) -> _FakeResponse:
+
+def _fake_get(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
     """Return the ONI fixture for any URL."""
     return _FakeResponse((DATA / "psl" / "oni.data").read_text())
 
@@ -46,9 +50,7 @@ class TestRegistry:
     @pytest.mark.parametrize("key", KEYS)
     def test_keys_resolve_to_climate_indices_class(self, key: str) -> None:
         """All keys resolve to `earthlens.climate_indices.ClimateIndices`."""
-        assert (
-            EarthLens.DataSources[key] is earthlens.climate_indices.ClimateIndices
-        )
+        assert EarthLens.DataSources[key] is earthlens.climate_indices.ClimateIndices
 
     @pytest.mark.parametrize("key", KEYS)
     def test_keys_hint_no_extra(self, key: str) -> None:

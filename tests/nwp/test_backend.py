@@ -29,13 +29,13 @@ def _make(mini_catalog, tmp_path, **kwargs):
 
 
 class _LonDS:
-    """Minimal Dataset stand-in tracking convert_longitude behaviour."""
+    """Minimal Dataset stand-in tracking wrap_longitude behaviour."""
 
     def __init__(self, global_360: bool):
         self.global_360 = global_360
         self.converted = False
 
-    def convert_longitude(self):
+    def wrap_longitude(self):
         """Convert only when global; mirror pyramids' ValueError otherwise."""
         if not self.global_360:
             raise ValueError("The raster should cover the whole globe")
@@ -441,6 +441,43 @@ class TestNormaliseLongitude:
         """A non-global grid that cannot be converted is returned as-is."""
         b = _make(mini_catalog, tmp_path, lon_lim=[-100, -50])
         ds = _LonDS(global_360=False)
+        assert b._normalise_longitude(ds) is ds
+
+
+def _real_dataset(*, global_360: bool):
+    """Build a real pyramids EPSG:4326 Dataset, whole-globe 0–360 or a small window."""
+    import numpy as np
+    from pyramids.dataset import Dataset
+
+    if global_360:
+        arr = np.arange(32, dtype="float32").reshape(1, 4, 8)
+        geo = (0.0, 45.0, 0.0, 90.0, 0.0, -45.0)
+    else:
+        arr = np.arange(100, dtype="float32").reshape(1, 10, 10)
+        geo = (10.0, 1.0, 0.0, 20.0, 0.0, -1.0)
+    return Dataset.create_from_array(arr=arr, geo=geo, epsg=4326)
+
+
+class TestNormaliseLongitudeRealPyramids:
+    """Real-pyramids coverage of `_normalise_longitude` so the fakes are not the sole guard."""
+
+    def test_negative_bbox_shifts_real_global_grid(self, mini_catalog, tmp_path):
+        """A real 0–360 global grid is shifted to start at −180 when the bbox goes negative."""
+        b = _make(mini_catalog, tmp_path, lon_lim=[-100, -50])
+        out = b._normalise_longitude(_real_dataset(global_360=True))
+        assert out.geotransform[0] == -180.0
+
+    def test_positive_bbox_real_global_is_noop(self, mini_catalog, tmp_path):
+        """An eastern-hemisphere bbox returns the same real Dataset untouched."""
+        b = _make(mini_catalog, tmp_path, lon_lim=[30, 40])
+        ds = _real_dataset(global_360=True)
+        out = b._normalise_longitude(ds)
+        assert out is ds and out.geotransform[0] == 0.0
+
+    def test_negative_bbox_real_regional_swallows_valueerror(self, mini_catalog, tmp_path):
+        """A real non-global grid raises inside pyramids and is returned as-is."""
+        b = _make(mini_catalog, tmp_path, lon_lim=[-100, -50])
+        ds = _real_dataset(global_360=False)
         assert b._normalise_longitude(ds) is ds
 
 

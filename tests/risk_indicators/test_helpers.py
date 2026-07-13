@@ -35,6 +35,8 @@ class _Resp:
 
     def __init__(self, payload):
         self._payload = payload
+        self.status_code = 200
+        self.headers = {}
 
     def raise_for_status(self):
         """No-op for the 200 fixtures."""
@@ -42,6 +44,9 @@ class _Resp:
     def json(self):
         """Return the canned payload."""
         return self._payload
+
+    def close(self):
+        """No-op close hook (HttpClient calls it on retry/errored responses)."""
 
 
 def _load(name):
@@ -90,33 +95,6 @@ class _HttpError(_Resp):
         raise err
 
 
-class TestIsTransient:
-    """_is_transient classifies which request errors are retryable."""
-
-    @pytest.mark.parametrize(
-        "exc, expected",
-        [
-            (_helpers.requests.ConnectionError("reset"), True),
-            (_helpers.requests.Timeout("slow"), True),
-            (_helpers.requests.exceptions.ChunkedEncodingError("mid-body"), True),
-            (_helpers.requests.exceptions.ContentDecodingError("gzip"), True),
-            (_helpers.requests.RequestException("other"), False),
-        ],
-    )
-    def test_connection_and_timeout(self, exc, expected):
-        """Connection resets (handshake or mid-body) and timeouts are transient."""
-        assert _helpers._is_transient(exc) is expected
-
-    def test_5xx_transient_4xx_not(self):
-        """A 5xx HTTPError is transient; a 4xx is not."""
-        err5 = _helpers.requests.HTTPError("boom")
-        err5.response = _HttpError(503)
-        err4 = _helpers.requests.HTTPError("nope")
-        err4.response = _HttpError(404)
-        assert _helpers._is_transient(err5) is True
-        assert _helpers._is_transient(err4) is False
-
-
 class TestRequestJsonRetry:
     """_request_json retries transient failures and fails fast on 4xx."""
 
@@ -144,6 +122,61 @@ class TestRequestJsonRetry:
         with pytest.raises(_helpers.requests.HTTPError):
             _helpers.inform_query(505, "INFORM")
         assert returns_404.calls == 1
+
+    def test_timeout_is_retried(self, monkeypatch):
+        """A Timeout is transient and retried, then the next attempt succeeds."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet([_helpers.requests.Timeout("slow")], {"data": [1]})
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        assert _helpers.thinkhazard_query("133") is not None
+        assert flaky.attempts == 2
+
+    def test_chunked_encoding_error_is_retried(self, monkeypatch):
+        """A mid-body ChunkedEncodingError (the GFW case) is retried."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet(
+            [_helpers.requests.exceptions.ChunkedEncodingError("mid-body")],
+            {"data": [1]},
+        )
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        assert _helpers.gfw_query("d", "v", "SELECT 1", api_key="k") == {"data": [1]}
+        assert flaky.attempts == 2
+
+    def test_content_decoding_error_is_retried(self, monkeypatch):
+        """A ContentDecodingError is transient and retried."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet(
+            [_helpers.requests.exceptions.ContentDecodingError("gzip")],
+            {"data": [1]},
+        )
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        assert _helpers.gfw_query("d", "v", "SELECT 1", api_key="k") == {"data": [1]}
+        assert flaky.attempts == 2
+
+    def test_5xx_is_retried(self, monkeypatch):
+        """A 5xx status is retried via the 500-599 forcelist."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        first_503 = _HttpError(503)
+        second_ok = _Resp({"data": [1]})
+        responses = iter([first_503, second_ok])
+        calls = {"n": 0}
+
+        def fake_get(url, **kwargs):
+            calls["n"] += 1
+            return next(responses)
+
+        monkeypatch.setattr(_helpers.requests, "get", fake_get)
+        assert _helpers.gfw_query("d", "v", "SELECT 1", api_key="k") == {"data": [1]}
+        assert calls["n"] == 2
+
+    def test_bare_request_exception_fails_fast(self, monkeypatch):
+        """A bare RequestException (not in retry_on_exceptions) is not retried."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        flaky = _FlakyGet([_helpers.requests.RequestException("weird")], {"data": [1]})
+        monkeypatch.setattr(_helpers.requests, "get", flaky)
+        with pytest.raises(_helpers.requests.RequestException):
+            _helpers.thinkhazard_query("133")
+        assert flaky.attempts == 1
 
 
 class TestThinkhazardQuery:

@@ -19,8 +19,12 @@ gate are applied by the per-provider URL builders so the backend hands
 
 from __future__ import annotations
 
+from typing import Any
+
 import requests
 from pyramids.feature.collection import FeatureCollection
+
+from earthlens.base.http import HttpClient
 
 #: geoBoundaries gbOpen API base — `"{base}/{ISO3}/{ADM}/"` returns the metadata
 #: whose `gjDownloadURL` is the GeoJSON to read (`geoboundaries_resolve`).
@@ -34,6 +38,20 @@ NE_BASE = "https://naciscdn.org/naturalearth"
 
 #: US Census TIGER base — the GENZ cartographic-boundary (`cb_`) shapefile tree.
 TIGER_BASE = "https://www2.census.gov/geo/tiger"
+
+
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so this
+    single-shot metadata call stays a fresh connection per call and tests
+    that monkeypatch `requests.get` still drive the transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
 
 
 def vsicurl(url: str) -> str:
@@ -73,9 +91,14 @@ def geoboundaries_resolve(iso: str, adm: str, timeout: float = 60.0) -> str:
             `(ISO, ADM)` pair).
         KeyError: If the metadata carries no `gjDownloadURL`.
     """
-    response = requests.get(f"{GEOBOUNDARIES_API}/{iso}/{adm}/", timeout=timeout)
-    response.raise_for_status()
-    meta = response.json()
+    http = HttpClient(
+        session=_RequestsGet(),
+        timeout=timeout,
+        max_retries=0,
+        status_forcelist=(),
+        raise_for_status=True,
+    )
+    meta = http.get_json(f"{GEOBOUNDARIES_API}/{iso}/{adm}/")
     if isinstance(meta, list):
         if not meta:
             raise ValueError(

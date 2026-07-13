@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import requests
@@ -44,6 +44,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.http import HttpClient
 from earthlens.gdacs import events
 from earthlens.gdacs.catalog import Catalog
 
@@ -81,6 +82,21 @@ _DRIVERS: dict[str, tuple[str, str]] = {
     "gpkg": ("GPKG", "gpkg"),
     "geojson": ("GeoJSON", "geojson"),
 }
+
+
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
+
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
+    module-level `requests.get` (rather than a private session) so the
+    single SEARCH GET stays a fresh connection per call and tests that
+    monkey-patch `earthlens.gdacs.backend.requests.get` still drive the
+    transport.
+    """
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
 
 
 class GDACS(AbstractDataSource):
@@ -310,9 +326,14 @@ class GDACS(AbstractDataSource):
             f"{params['fromDate']}..{params['toDate']} "
             f"(levels {params['alertlevel']})"
         )
-        response = requests.get(SEARCH_URL, params=params, timeout=self._timeout)
-        response.raise_for_status()
-        payload = response.json()
+        http = HttpClient(
+            session=_RequestsGet(),
+            timeout=self._timeout,
+            max_retries=0,
+            status_forcelist=(),
+            raise_for_status=True,
+        )
+        payload = http.get_json(SEARCH_URL, params=params)
         feature_count = len(payload.get("features") or [])
         if feature_count >= MAX_EVENTS_PER_RESPONSE:
             logger.warning(

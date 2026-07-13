@@ -543,7 +543,7 @@ class NWP(AbstractDataSource):
     def _normalise_longitude(self, dataset):
         """Shift a 0–360° global grid to −180..180 when the bbox needs it.
 
-        `pyramids` `convert_longitude` only applies to a whole-globe
+        `pyramids` `wrap_longitude` only applies to a whole-globe
         0–360 raster (it raises otherwise). A regional model (HRRR) or a
         bbox entirely in the eastern hemisphere needs no shift, so this
         is a no-op unless the request bbox reaches a negative longitude.
@@ -562,7 +562,7 @@ class NWP(AbstractDataSource):
         if self.space.west >= 0:
             return dataset
         try:
-            return dataset.convert_longitude()
+            return dataset.wrap_longitude()
         except ValueError:
             # Not a 0–360 global raster (e.g. a regional model already in
             # −180..180); the bbox is already in the dataset's CRS.

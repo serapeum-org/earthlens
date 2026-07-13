@@ -13,7 +13,7 @@ from earthlens.drought import Catalog
 
 cat = Catalog()
 sorted(cat.datasets)[:5]
-# ['edo-cdiad', 'edo-cdinx', 'edo-cdirc', 'edo-fpanv', 'edo-lfinx-lgs']
+# ['edo-cdiad', 'edo-cdirc', 'edo-lfinx-lgs', 'edo-msfTS', 'edo-rdria']
 
 row = cat.get("usdm")
 row.transport, row.output_kind, row.cadence
@@ -134,11 +134,11 @@ outside that range surfaces the Copernicus message verbatim:
 
 ```python
 >>> EarthLens(  # doctest: +SKIP
-...     data_source="drought", dataset="edo-cdinx",
-...     start="2026-06-21", end="2026-06-21",
+...     data_source="drought", dataset="edo-cdiad",
+...     start="2035-06-21", end="2035-06-21",
 ...     variables=[], lat_lim=[40.0, 50.0], lon_lim=[5.0, 15.0], path="out",
 ... ).download()
-ValueError: Copernicus EDO/GDO rejected 'edo-cdinx' (HTTP 422): Requested date ... is outside the available coverage range ...
+ValueError: Copernicus EDO/GDO rejected 'edo-cdiad' (HTTP 422): Requested date ... is outside the available coverage range ...
 ```
 
 The list of curated EDO/GDO ids lives in `src/earthlens/drought/catalog/edo.yaml`

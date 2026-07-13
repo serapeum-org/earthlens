@@ -607,7 +607,7 @@ def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
         end="2026-06-21",
         lat_lim=[40.0, 50.0],
         lon_lim=[5.0, 15.0],
-        dataset="edo-cdinx",
+        dataset="edo-cdiad",
         path=str(tmp_path),
     )
     with pytest.raises(ValueError, match="outside the available range"):
@@ -1031,7 +1031,7 @@ def test_http_download_raster_surfaces_json_message(monkeypatch, tmp_path):
     )
     with pytest.raises(ValueError, match="date outside coverage range"):
         backend_module._http_download_raster(
-            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdinx"
+            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdiad"
         )
 
 
@@ -1046,7 +1046,7 @@ def test_http_download_raster_falls_back_to_raw_body(monkeypatch, tmp_path):
     )
     with pytest.raises(ValueError, match="upstream mapserver error"):
         backend_module._http_download_raster(
-            "https://example.com/wcs", tmp_path / "x.tif", label="edo-fpanv"
+            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdirc"
         )
 
 

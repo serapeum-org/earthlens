@@ -25,12 +25,14 @@ Endpoints / response shapes were live-verified 2026-06-27 (see
 from __future__ import annotations
 
 import time
+from typing import Any
 
 import geopandas as gpd
 import pandas as pd
 import requests
-from loguru import logger
 from pyramids.feature.collection import FeatureCollection
+
+from earthlens.base.http import HttpClient
 
 #: ThinkHazard! public REST base (no auth). Hazard reports live under
 #: `/report/{division_code}.json` and `/report/{division_code}/{hazard}.json`.
@@ -59,7 +61,12 @@ _HTTP_TIMEOUT: float = 120.0
 #: timeout / 5xx). The GFW host in particular resets connections intermittently.
 _HTTP_RETRIES: int = 2
 
-#: Base back-off (seconds) between retries; the nth retry waits n * this.
+#: Base back-off (seconds) between retries; the nth retry waits
+#: `_HTTP_RETRY_BACKOFF * 2**(n-1)` (HttpClient's exponential back-off).
+#: Coincides with the previous hand-rolled linear back-off at
+#: `_HTTP_RETRIES=2` (both yield `[1s, 2s]`); bumping `_HTTP_RETRIES` diverges
+#: the two (linear grows as `n`, exponential as `2**(n-1)`), whereas scaling
+#: `_HTTP_RETRY_BACKOFF` rescales both by the same factor.
 _HTTP_RETRY_BACKOFF: float = 1.0
 
 
@@ -75,25 +82,17 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
 )
 
 
-def _is_transient(exc: requests.RequestException) -> bool:
-    """Return whether a request error is worth retrying.
+class _RequestsGet:
+    """Session-like GET adapter routing through the module `requests.get`.
 
-    Connection errors (including the GFW host's intermittent resets, whether
-    they land during the handshake or mid-body) and timeouts are transient; an
-    HTTP error is transient only for a 5xx status (a 4xx such as 404 is a real
-    miss and fails fast).
-
-    Args:
-        exc: The exception raised by `requests.get` / `raise_for_status`.
-
-    Returns:
-        bool: `True` to retry, `False` to fail fast.
+    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the module-level
+    `requests.get` (rather than a private session) so tests that monkeypatch
+    `_helpers.requests.get` still drive the transport.
     """
-    if isinstance(exc, _TRANSIENT_ERRORS):
-        return True
-    if isinstance(exc, requests.HTTPError) and exc.response is not None:
-        return exc.response.status_code >= 500
-    return False
+
+    def get(self, url: str, **kwargs: Any) -> requests.Response:
+        """Issue a GET via the module-level `requests.get`."""
+        return requests.get(url, **kwargs)
 
 
 def _request_json(
@@ -105,10 +104,16 @@ def _request_json(
 ) -> dict | list:
     """GET `url` and return parsed JSON, retrying transient failures.
 
+    Retries are delegated to :class:`~earthlens.base.http.HttpClient`: a 5xx
+    response or a transient transport error (see :data:`_TRANSIENT_ERRORS`)
+    is retried up to :data:`_HTTP_RETRIES` times with exponential back-off
+    (`1s`, `2s`); a 4xx (including 429) fails fast.
+
     Args:
         url: The request URL.
         params: Query parameters, or `None`.
-        headers: Request headers (carries the `User-Agent` and any key).
+        headers: Extra request headers (e.g. the GFW `x-api-key` on the
+            keyed sources; the `User-Agent` is a client-level default).
         timeout: Per-request timeout in seconds.
 
     Returns:
@@ -118,24 +123,18 @@ def _request_json(
         requests.RequestException: When the GET still fails after the retries
             (the last error is re-raised; a 4xx fails fast without retrying).
     """
-    last_exc: requests.RequestException | None = None
-    for attempt in range(_HTTP_RETRIES + 1):
-        try:
-            response = requests.get(
-                url, params=params, headers=headers, timeout=timeout
-            )
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as exc:
-            last_exc = exc
-            if not _is_transient(exc) or attempt == _HTTP_RETRIES:
-                raise
-            logger.warning(
-                f"risk-indicators: transient fetch error from {url} ({exc}); "
-                f"retry {attempt + 1}/{_HTTP_RETRIES}."
-            )
-            time.sleep(_HTTP_RETRY_BACKOFF * (attempt + 1))
-    raise last_exc  # pragma: no cover - loop always returns or raises above
+    client = HttpClient(
+        session=_RequestsGet(),
+        user_agent=_USER_AGENT,
+        timeout=timeout,
+        max_retries=_HTTP_RETRIES,
+        backoff_factor=_HTTP_RETRY_BACKOFF,
+        status_forcelist=tuple(range(500, 600)),
+        retry_on_exceptions=_TRANSIENT_ERRORS,
+        raise_for_status=True,
+        sleep=lambda seconds: time.sleep(seconds),
+    )
+    return client.get_json(url, params=params, headers=headers)
 
 
 #: Canonical column order for a ThinkHazard hazard-level table.
@@ -163,19 +162,21 @@ _LEVEL_TITLE_TO_MNEMONIC: dict[str, str] = {
 
 
 def _headers(api_key: str | None = None) -> dict[str, str]:
-    """Build request headers, adding the GFW key header when given.
+    """Build the per-call GFW `x-api-key` header, when given.
+
+    The descriptive `User-Agent` rides on every request via `HttpClient`'s
+    client-level default (set in :func:`_request_json`), so it does not need
+    to be re-set here — a per-call `User-Agent` header would only shadow the
+    identical default.
 
     Args:
         api_key: The GFW `x-api-key`, or `None` for the keyless public sources.
 
     Returns:
-        dict[str, str]: Headers carrying the `User-Agent` (always) and the
-            `x-api-key` (only when `api_key` is not `None`).
+        dict[str, str]: `{GFW_KEY_HEADER: api_key}` when a key is given, else
+            an empty dict.
     """
-    headers = {"User-Agent": _USER_AGENT}
-    if api_key is not None:
-        headers[GFW_KEY_HEADER] = api_key
-    return headers
+    return {GFW_KEY_HEADER: api_key} if api_key is not None else {}
 
 
 def thinkhazard_query(

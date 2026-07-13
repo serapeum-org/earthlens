@@ -8,13 +8,18 @@
 no `available_*` index (the named queries *are* the curated universe), and no
 refresh / probe / audit tooling.
 
-Two protocols share the one table (`G2`):
+Three protocols share the one table (`G2`, `G10`):
 
 * `overpass` rows carry a `query_template` — an Overpass QL string with a
   single `{bbox}` placeholder (filled with the bounding box in Overpass order
   `S,W,N,E`) and a `{timeout}` placeholder (the server-side QL timeout).
 * `ohsome` rows carry an `ohsome_filter` — an ohsome filter string; the
   backend supplies `bboxes` (order `W,S,E,N`) and a `time` window itself.
+* `pbf` rows carry a `pyrosm_method` — the `pyrosm.OSM` reader method the
+  layer maps to (`get_buildings`, `get_network`, …) — and, for `get_network`,
+  an optional `network_type`. The extract itself is picked by the backend's
+  `region=` kwarg against the `regions:` block (`G12`), which this loader
+  exposes as `Catalog.regions` (key → Geofabrik path).
 
 `Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that loads the
 bundled `osm_data_catalog.yaml` and exposes each row as a `Dataset`, keyed by
@@ -26,6 +31,7 @@ path to the bundled YAML and is monkey-patchable in tests.
 
 from __future__ import annotations
 
+from difflib import get_close_matches
 from pathlib import Path
 from typing import Any, Literal
 
@@ -36,13 +42,27 @@ from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "osm_data_catalog.yaml"
 
-#: The two query protocols a `Dataset` row can route to.
-Protocol = Literal["overpass", "ohsome"]
+#: The three query protocols a `Dataset` row can route to.
+Protocol = Literal["overpass", "ohsome", "pbf"]
+
+#: The `pyrosm.OSM` reader methods a `pbf` row's `pyrosm_method` may name.
+#: Validated at load so a typo in the catalog fails fast rather than at read.
+_PYROSM_METHODS: frozenset[str] = frozenset(
+    {
+        "get_buildings",
+        "get_network",
+        "get_pois",
+        "get_landuse",
+        "get_natural",
+        "get_boundaries",
+    }
+)
 
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
-#: the GDACS / FDSN / overture loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Dataset]] = {}
+#: the GDACS / FDSN / overture loaders. The cached value is the
+#: `(datasets, regions)` pair the loader assembles.
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], dict[str, str]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -57,16 +77,25 @@ class Dataset(BaseModel):
     `Catalog.datasets` and is not stored on the row.
 
     Attributes:
-        protocol: Which live query protocol routes this row — `"overpass"`
-            (current-state features via Overpass QL) or `"ohsome"` (OSM
+        protocol: Which query protocol routes this row — `"overpass"`
+            (current-state features via Overpass QL), `"ohsome"` (OSM
             history + analytics via the ohsome `elements/geometry`
-            endpoint).
+            endpoint), or `"pbf"` (bulk read from a Geofabrik `.osm.pbf`
+            extract via `pyrosm`).
         query_template: Overpass QL string with a `{bbox}` placeholder (and
             an optional `{timeout}` placeholder). Required for `overpass`
-            rows, must be absent for `ohsome` rows.
+            rows, must be absent for `ohsome` / `pbf` rows.
         ohsome_filter: ohsome filter string (e.g. `"building=* and
             geometry:polygon"`). Required for `ohsome` rows, must be absent
-            for `overpass` rows.
+            for `overpass` / `pbf` rows.
+        pyrosm_method: The `pyrosm.OSM` reader method this layer maps to —
+            one of `get_buildings`, `get_network`, `get_pois`,
+            `get_landuse`, `get_natural`, `get_boundaries`. Required for
+            `pbf` rows, must be absent for `overpass` / `ohsome` rows.
+        network_type: The `pyrosm` `get_network(network_type=...)` argument
+            (e.g. `"driving"`, `"walking"`, `"all"`); only meaningful on a
+            `pbf` row whose `pyrosm_method` is `get_network`, ignored
+            otherwise.
         geometry_types: The geometry kinds the query is expected to yield
             (`["Point"]`, `["Polygon"]`, `["Point", "Polygon"]`, …) —
             informational, for docs and the catalog reference.
@@ -101,6 +130,8 @@ class Dataset(BaseModel):
     protocol: Protocol
     query_template: str | None = None
     ohsome_filter: str | None = None
+    pyrosm_method: str | None = None
+    network_type: str | None = None
     geometry_types: list[str] = Field(default_factory=list)
     description: str = ""
 
@@ -108,20 +139,40 @@ class Dataset(BaseModel):
         """Validate the protocol carries (only) its required query field.
 
         Raises:
-            ValueError: If an `overpass` row has no `query_template` (or
-                carries an `ohsome_filter`), or an `ohsome` row has no
-                `ohsome_filter` (or carries a `query_template`).
+            ValueError: If an `overpass` row has no `query_template`, an
+                `ohsome` row has no `ohsome_filter`, or a `pbf` row has no
+                (or an unknown) `pyrosm_method` — or a row carries a field
+                belonging to a different protocol.
         """
         if self.protocol == "overpass":
             if not self.query_template:
                 raise ValueError("an 'overpass' row requires a 'query_template'")
-            if self.ohsome_filter is not None:
-                raise ValueError("an 'overpass' row must not carry an 'ohsome_filter'")
-        else:  # ohsome
+            if self.ohsome_filter is not None or self.pyrosm_method is not None:
+                raise ValueError(
+                    "an 'overpass' row must not carry an 'ohsome_filter' or "
+                    "'pyrosm_method'"
+                )
+        elif self.protocol == "ohsome":
             if not self.ohsome_filter:
                 raise ValueError("an 'ohsome' row requires an 'ohsome_filter'")
-            if self.query_template is not None:
-                raise ValueError("an 'ohsome' row must not carry a 'query_template'")
+            if self.query_template is not None or self.pyrosm_method is not None:
+                raise ValueError(
+                    "an 'ohsome' row must not carry a 'query_template' or "
+                    "'pyrosm_method'"
+                )
+        else:  # pbf
+            if not self.pyrosm_method:
+                raise ValueError("a 'pbf' row requires a 'pyrosm_method'")
+            if self.pyrosm_method not in _PYROSM_METHODS:
+                raise ValueError(
+                    f"a 'pbf' row's 'pyrosm_method' must be one of "
+                    f"{sorted(_PYROSM_METHODS)}, got {self.pyrosm_method!r}"
+                )
+            if self.query_template is not None or self.ohsome_filter is not None:
+                raise ValueError(
+                    "a 'pbf' row must not carry a 'query_template' or "
+                    "'ohsome_filter'"
+                )
 
 
 class Catalog(AbstractCatalog):
@@ -136,6 +187,9 @@ class Catalog(AbstractCatalog):
 
     Attributes:
         datasets: Map from the query id to its `Dataset` row.
+        regions: Map from a Geofabrik region key (`"malta"`, …) to its
+            Geofabrik path segment (`"europe/malta"`), read from the YAML's
+            `regions:` block. Used by the `pbf` protocol (`G12`).
 
     Examples:
         - List query ids and resolve one:
@@ -148,6 +202,10 @@ class Catalog(AbstractCatalog):
             'overpass'
             >>> cat.get("ohsome:buildings").ohsome_filter
             'building=* and geometry:polygon'
+            >>> cat.get("pbf:buildings").pyrosm_method
+            'get_buildings'
+            >>> cat.region_path("malta")
+            'europe/malta'
 
             ```
         - An unknown id raises with a did-you-mean hint:
@@ -165,6 +223,7 @@ class Catalog(AbstractCatalog):
     _entry_noun: str = "queries"
 
     datasets: dict[str, Dataset] = Field(default_factory=dict)
+    regions: dict[str, str] = Field(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no queries were supplied.
@@ -179,6 +238,8 @@ class Catalog(AbstractCatalog):
         if not self.datasets:
             loaded = Catalog.load()
             self.datasets = loaded.datasets
+            if not self.regions:
+                self.regions = loaded.regions
         super().model_post_init(__context)
 
     @classmethod
@@ -205,7 +266,8 @@ class Catalog(AbstractCatalog):
         key = (resolved, mtime)
         cached = _CATALOG_CACHE.get(key)
         if cached is not None:
-            return cls(datasets=dict(cached))
+            cached_datasets, cached_regions = cached
+            return cls(datasets=dict(cached_datasets), regions=dict(cached_regions))
         data = load_yaml_strict(catalog_path) or {}
         datasets_yaml = data.get("datasets") or {}
         if not datasets_yaml:
@@ -221,8 +283,12 @@ class Catalog(AbstractCatalog):
                 raise ValueError(
                     f"{catalog_path} query {query_id!r} failed validation:\n{exc}"
                 ) from exc
-        _CATALOG_CACHE[key] = datasets
-        return cls(datasets=dict(datasets))
+        regions: dict[str, str] = {
+            str(name): str(path)
+            for name, path in (data.get("regions") or {}).items()
+        }
+        _CATALOG_CACHE[key] = (datasets, regions)
+        return cls(datasets=dict(datasets), regions=dict(regions))
 
     def get_catalog(self) -> dict[str, Dataset]:
         """Return the named-query map (satisfies the abstract contract).
@@ -265,3 +331,65 @@ class Catalog(AbstractCatalog):
                 ```
         """
         return sorted(self.datasets)
+
+    def region_path(self, region: str) -> str:
+        """Resolve a `region=` value to its Geofabrik path segment (`G12`).
+
+        A `region` containing a `/` is taken as a raw Geofabrik path (the
+        power-user escape hatch, e.g. `"europe/andorra"`) and returned
+        unchanged; otherwise it is looked up in the `regions:` table, with a
+        did-you-mean hint on a miss.
+
+        Args:
+            region: A region key from the `regions:` table (`"malta"`, …), or
+                a raw Geofabrik path (any string containing a `/`).
+
+        Returns:
+            str: The Geofabrik path segment, e.g. `"europe/malta"`.
+
+        Raises:
+            ValueError: If `region` is neither a raw path nor a known region
+                key.
+
+        Examples:
+            - A known key resolves; a raw path passes through:
+                ```python
+                >>> from earthlens.osm import Catalog
+                >>> cat = Catalog()
+                >>> cat.region_path("malta")
+                'europe/malta'
+                >>> cat.region_path("europe/andorra")
+                'europe/andorra'
+
+                ```
+        """
+        if "/" in region:
+            return region
+        path = self.regions.get(region)
+        if path is not None:
+            return path
+        known = sorted(self.regions)
+        suggestion = get_close_matches(region, known, n=1)
+        hint = f" Did you mean {suggestion[0]!r}?" if suggestion else ""
+        raise ValueError(
+            f"{region!r} is not a known Geofabrik region. Known regions: "
+            f"{known}.{hint} You may also pass a raw Geofabrik path containing "
+            "a '/', e.g. 'europe/andorra'."
+        )
+
+    def region_ids(self) -> list[str]:
+        """Return the registered Geofabrik region keys, sorted.
+
+        Returns:
+            list[str]: The region keys (`["andorra", "belgium", ...]`).
+
+        Examples:
+            - The primary test extract is listed:
+                ```python
+                >>> from earthlens.osm import Catalog
+                >>> "malta" in Catalog().region_ids()
+                True
+
+                ```
+        """
+        return sorted(self.regions)

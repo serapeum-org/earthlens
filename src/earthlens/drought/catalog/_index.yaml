@@ -13,10 +13,8 @@ available_datasets:
   - edo-smian
   - edo-smang
   - edo-smand
-  - edo-fpanv
   - edo-cdiad
   - edo-cdirc
-  - edo-cdinx
   - edo-lfinx-lgs
   - edo-twsan
   - edo-snwvi
@@ -26,8 +24,6 @@ available_datasets:
   - gdo-spaLT
   - gdo-spgTS
   - gdo-smand
-  - gdo-fpanv
-  - gdo-cdinx
   - gdo-twsan
   - gdo-lfinx-sms
   - gdo-lfinx-mds

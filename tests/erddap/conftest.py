@@ -62,15 +62,24 @@ class FakeResponse:
     """Minimal `requests` response carrying canned NetCDF bytes."""
 
     def __init__(
-        self, content: bytes = FAKE_NETCDF_BYTES, error: Exception | None = None
+        self,
+        content: bytes = FAKE_NETCDF_BYTES,
+        error: Exception | None = None,
+        status_code: int = 200,
     ):
         self.content = content
         self._error = error
+        self.status_code = status_code
+        self.headers: dict[str, str] = {}
 
     def raise_for_status(self) -> None:
         """Raise the configured error, if any."""
         if self._error is not None:
             raise self._error
+
+    def close(self) -> None:
+        """No-op close; the HttpClient may release the response."""
+        return None
 
 
 @pytest.fixture
@@ -78,7 +87,7 @@ def fake_nc_get(monkeypatch):
     """Stub `backend.requests.get`; returns the recorded URL list."""
     calls: list[str] = []
 
-    def _get(url: str, timeout: float | None = None) -> FakeResponse:
+    def _get(url: str, **kwargs) -> FakeResponse:
         calls.append(url)
         return FakeResponse()
 

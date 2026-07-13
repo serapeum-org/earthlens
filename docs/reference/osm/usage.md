@@ -6,14 +6,18 @@ rendered API is the [Reference](osm.md) page.
 
 ## Install
 
-The two query SDKs ship behind the `[osm]` extra (imported lazily — the base
-package imports without them):
+The protocol SDKs ship behind two extras (imported lazily — the base package
+imports without them):
 
 ```bash
-pip install earthlens[osm]      # pulls overpy + ohsome
+pip install earthlens[osm]      # overpy + ohsome  (Overpass + ohsome protocols)
+pip install earthlens[osm-pbf]  # pyrosm + osmium  (the pbf protocol)
 ```
 
-There are no credentials to configure — both Overpass and ohsome are public.
+`[osm-pbf]` is **not** in `[all]` (it is heavy, and `pyrosm` builds a compiled
+dependency from source), so install it explicitly for bulk PBF work. Note
+`pyosmium` is published on PyPI as `osmium`. There are no credentials to
+configure — Overpass, ohsome, and Geofabrik are all public.
 
 ## Quickstart — current-state hospitals (Overpass)
 
@@ -52,6 +56,45 @@ buildings = EarthLens(
 print(buildings["@snapshotTimestamp"].iloc[0])   # the history timestamp
 ```
 
+## Quickstart — every building in a region (pbf)
+
+For a **bulk** ask — every building in a country — use the `pbf` protocol. It
+downloads a [Geofabrik](https://download.geofabrik.de/) extract for `region=`
+(cached on disk), reads the layer with `pyrosm`, and clips to the request bbox:
+
+```python
+buildings = EarthLens(
+    data_source="osm",
+    variables=["pbf:buildings"],
+    region="malta",                     # a Geofabrik region key (or "europe/andorra")
+    lat_lim=[35.88, 35.94],             # bbox clips the read; omit for the whole extract
+    lon_lim=[14.48, 14.54],
+    path="./out",
+).download()
+
+print(len(buildings), "building footprints")
+```
+
+The first call downloads the extract (Malta is ~8.8 MB) to a cross-run cache
+(`~/.earthlens/cache/osm_pbf/` by default, override with `cache_dir=`); repeat
+calls reuse it. List the region keys with `Catalog().region_ids()`, or pass a
+raw Geofabrik path (any string with a `/`). Omit `lat_lim` / `lon_lim` to read
+the whole extract — the bbox-area cap does **not** apply to a `pbf` read.
+
+!!! note "Engines — `pyrosm` (default) vs `pyosmium`"
+    `engine="pyrosm"` (the default) reads the whole extract in memory and gives
+    the richest columns; it refuses a file over 4 GB. For a **continent- or
+    planet-scale** extract, pass `engine="pyosmium"` to stream it with bounded
+    memory. The backend warns before downloading a multi-GB extract. Never load
+    `planet.osm` with `pyrosm`.
+
+    The `pyosmium` engine is a **coarser fallback**: it returns a slimmer
+    `osm_id` / `osm_type` / `geometry` schema and, per layer, a single geometry
+    kind under one representative tag (so it under-reports a row's advertised
+    `geometry_types` — e.g. `pbf:pois` yields only node points, `pbf:roads`
+    approximates `network_type="driving"` rather than reproducing `pyrosm`'s
+    exact filter). Use `pyrosm` when you need the full, exact per-layer output.
+
 ## Choosing the query — `variables`
 
 For this backend `variables` is the list of **named-query ids**, not
@@ -67,8 +110,10 @@ EarthLens(data_source="osm", variables=["overpass:hospitals", "overpass:cafes"],
 
 The shipped named queries are `overpass:hospitals`, `overpass:roads`,
 `overpass:buildings`, `overpass:cafes`, `overpass:schools`, `ohsome:buildings`,
-`ohsome:highways`, and `ohsome:amenities`. List them with
-`EarthLens.list_datasets("osm")`. An unknown id raises with a did-you-mean hint.
+`ohsome:highways`, `ohsome:amenities`, and the `pbf:*` layers (`pbf:buildings`,
+`pbf:roads`, `pbf:pois`, `pbf:landuse`, `pbf:natural`, `pbf:boundaries`). List
+them with `EarthLens.list_datasets("osm")`. An unknown id raises with a
+did-you-mean hint.
 
 The facade keys `"osm"`, `"openstreetmap"`, `"overpass"`, and `"ohsome"` all
 resolve to the same backend.
@@ -134,14 +179,20 @@ an `[out:xml]` / `[out:csv]` override will not parse.
 | `user_agent` | `User-Agent` sent on the Overpass POST (a real one is required) | `earthlens (+…)` |
 | `timeout` | Overpass HTTP timeout (s); also the QL `[timeout:N]` budget | `180.0` |
 | `file_format` | `"geojson"` or `"gpkg"` | `"geojson"` |
-| `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun | `100.0` |
+| `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun (live protocols only) | `100.0` |
+| `region` | Geofabrik region key or raw path — **required** for a `pbf:*` query | `None` |
+| `engine` | `pbf` read engine: `"pyrosm"` (in-memory) or `"pyosmium"` (streaming) | `"pyrosm"` |
+| `cache_dir` | directory for cached `.osm.pbf` extracts | `~/.earthlens/cache/osm_pbf` |
 
-!!! warning "Keep the bbox small"
-    OSM is for small/targeted queries. A box larger than `max_bbox_deg2` (the
-    default `100` square degrees comfortably covers a large country) is rejected
-    before any request — in particular the whole-Earth default you get if you
-    omit `lat_lim` / `lon_lim` through the facade, which would hammer the shared
-    public services. Raise `max_bbox_deg2=` for a genuinely larger area.
+!!! warning "Keep the bbox small (live protocols)"
+    Overpass / ohsome are for small/targeted queries. A box larger than
+    `max_bbox_deg2` (the default `100` square degrees comfortably covers a large
+    country) is rejected before any request — in particular the whole-Earth
+    default you get if you omit `lat_lim` / `lon_lim` through the facade, which
+    would hammer the shared public services. Raise `max_bbox_deg2=` for a
+    genuinely larger area. The cap does **not** apply to a `pbf` read (it hits a
+    local extract, not a shared service), so a `pbf` request with no bbox simply
+    reads the whole downloaded extract.
 
 ## The returned FeatureCollection
 
@@ -190,7 +241,7 @@ GeoDataFrame).
 
 ## Out of scope
 
-Bulk OSM PBF / planet or region extracts, and ohsome's aggregation endpoints
-(counts / areas over time), are **not** part of this backend — see
-[Introduction](introduction.md#out-of-scope-follow-ons). For a large area, query
-in small tiles and concatenate, or use a dedicated PBF tool.
+ohsome's aggregation endpoints (counts / areas over time) are **not** part of
+this backend — see
+[Introduction](introduction.md#out-of-scope-follow-ons). For bulk asks, reach
+for the `pbf` protocol (above) rather than tiling many live queries.

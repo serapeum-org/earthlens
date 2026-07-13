@@ -536,11 +536,17 @@ class TestCatalog:
         monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
 
         class _Resp:
+            status_code = 200
+            headers: dict[str, str] = {}
+
             def raise_for_status(self):
                 pass
 
             def json(self):
                 return {"asset": {"value": {}}}  # no href
+
+            def close(self):
+                pass
 
         import requests as _req
 
