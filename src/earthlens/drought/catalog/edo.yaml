@@ -90,16 +90,10 @@ datasets:
     native_crs: "EPSG:4326"
     timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
-  edo-fpanv:
-    source: "Copernicus European Drought Observatory (EDO)"
-    transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
-    coverage: fpanv
-    output_kind: raster
-    cadence: 10day
-    native_crs: "EPSG:4326"
-    timescale: "01"
-    license_note: "Copernicus EMS — free reuse with attribution"
+  # edo-fpanv (fAPAR anomaly) removed: superseded upstream by `fpanm` (fAPAR
+  # Anomaly MODIS) — the `fpanv` layer is retired (its series ended 2022-09-21),
+  # so this is a permanent replacement, not a bad-day outage. The EDO WCS also
+  # 500s GetCoverage for `fpanv` on every date.
   edo-cdiad:
     source: "Copernicus European Drought Observatory (EDO)"
     transport: edo-wcs
@@ -120,16 +114,10 @@ datasets:
     native_crs: "EPSG:4326"
     timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
-  edo-cdinx:
-    source: "Copernicus European Drought Observatory (EDO)"
-    transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
-    coverage: cdinx
-    output_kind: raster
-    cadence: 10day
-    native_crs: "EPSG:4326"
-    timescale: "01"
-    license_note: "Copernicus EMS — free reuse with attribution"
+  # edo-cdinx (Combined Drought Indicator v4.1) removed: superseded upstream by the
+  # current CDI coverages edo-cdiad / edo-cdirc (above) — the retired v4.1 layer
+  # stops after 2024-01-01, a permanent discontinuation, not a bad-day outage. The
+  # EDO WCS also 500s GetCoverage for it on every date.
   edo-lfinx-lgs:
     source: "Copernicus European Drought Observatory (EDO)"
     transport: edo-wcs
