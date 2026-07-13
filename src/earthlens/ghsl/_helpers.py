@@ -43,6 +43,7 @@ BASE_URL: str = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
 #: Path to the bundled 18×36 Mollweide land tile schema (375 tiles, ESRI:54009).
 TILE_SCHEMA_PATH: Path = Path(__file__).parent / "tile_schema.geojson"
 
+
 def _ghsl_stem(
     code: str, epoch: int, release: str, crs: str, res_token: str, region: str
 ) -> str:
