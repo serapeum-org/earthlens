@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19957,7 +19957,18 @@ default is unsigned public access.</p>
 <span class="normal"><a href="#__codelineno-0-574">574</a></span>
 <span class="normal"><a href="#__codelineno-0-575">575</a></span>
 <span class="normal"><a href="#__codelineno-0-576">576</a></span>
-<span class="normal"><a href="#__codelineno-0-577">577</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">S3</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-577">577</a></span>
+<span class="normal"><a href="#__codelineno-0-578">578</a></span>
+<span class="normal"><a href="#__codelineno-0-579">579</a></span>
+<span class="normal"><a href="#__codelineno-0-580">580</a></span>
+<span class="normal"><a href="#__codelineno-0-581">581</a></span>
+<span class="normal"><a href="#__codelineno-0-582">582</a></span>
+<span class="normal"><a href="#__codelineno-0-583">583</a></span>
+<span class="normal"><a href="#__codelineno-0-584">584</a></span>
+<span class="normal"><a href="#__codelineno-0-585">585</a></span>
+<span class="normal"><a href="#__codelineno-0-586">586</a></span>
+<span class="normal"><a href="#__codelineno-0-587">587</a></span>
+<span class="normal"><a href="#__codelineno-0-588">588</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">S3</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Unified backend for public AWS Open-Data datasets over unsigned S3.</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Args:</span>
@@ -20263,8 +20274,8 @@ default is unsigned public access.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        UTM / geostationary COGs are reprojected to WGS84 first). ERA5-style</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        regular-grid NetCDF granules carry no GDAL-readable SRS, so they are</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        rebuilt into a WGS84 raster (time as bands) before cropping.</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        Geostationary NetCDF (GOES) is warped to WGS84 via pyramids, which</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        georeferences the scan-angle grid on read (pyramids &gt;=0.28).</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        Geostationary NetCDF (GOES) is warped to WGS84 from its GDAL</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        subdataset, which carries the CF `+proj=geos` grid-mapping.</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            raw: The downloaded source file.</span>
@@ -20278,199 +20289,210 @@ default is unsigned public access.</p>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">()</span>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">format</span> <span class="o">==</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">:</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="c1"># Geostationary NetCDF (GOES): pyramids (&gt;=0.28) georeferences</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="c1"># the scan-angle grid from the CF grid-mapping on read, so the</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="c1"># variable warps to WGS84 directly.</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geostationary_to_wgs84</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netcdf_to_wgs84_raster</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="c1"># touch=False clips to the bbox extent; the default touch=True keeps</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="c1"># every cell that touches the mask and leaves the extent uncropped.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="c1"># A polygon aoi= masks to the exact shape (see crop_to_aoi).</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">crop_to_aoi</span><span class="p">(</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>            <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">],</span> <span class="n">touch</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="p">)</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="c1"># A rebuilt NetCDF is a raster (time as bands), so NetCDF datasets</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="c1"># also write a GeoTIFF.</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>        <span class="n">as_geotiff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;geotiff&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">format</span> <span class="ow">in</span> <span class="p">(</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>            <span class="s2">&quot;cog&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="s2">&quot;netcdf&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="p">)</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="n">out_ext</span> <span class="o">=</span> <span class="s2">&quot;.tif&quot;</span> <span class="k">if</span> <span class="n">as_geotiff</span> <span class="k">else</span> <span class="s2">&quot;.nc&quot;</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="si">}{</span><span class="n">out_ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="n">data</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="k">return</span> <span class="n">out_path</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_netcdf_to_wgs84_raster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">):</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Rebuild a regular-grid NetCDF variable as a WGS84 pyramids raster.</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        Reads the granule&#39;s data variable as an array + geotransform and</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        builds a `Dataset` tagged EPSG:4326 — NetCDF cubes do not expose a</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        source SRS the crop warp can read, so cropping the cube directly</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        fails. Longitudes in the 0-360 convention are wrapped to -180..180.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nc_variable_name</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span> <span class="n">product</span><span class="p">))</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cube</span><span class="o">.</span><span class="n">read_array</span><span class="p">())</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cube</span><span class="o">.</span><span class="n">geotransform</span><span class="p">)</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">lon_convention</span> <span class="o">==</span> <span class="s2">&quot;0-360&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="n">arr</span><span class="p">,</span> <span class="n">geo</span> <span class="o">=</span> <span class="n">_wrap_longitude_0_360</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">geo</span><span class="p">)</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_geostationary_to_wgs84</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">):</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        pyramids (&gt;=0.28) georeferences the scan-angle grid from the CF</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        `goes_imager_projection` grid-mapping when it reads the granule, so</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        the data variable reprojects to EPSG:4326 directly.</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="c1"># Geostationary NetCDF (GOES): warp to WGS84 from the GDAL</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="c1"># subdataset, which carries the CF `+proj=geos` grid-mapping.</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geostationary_to_wgs84</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_netcdf_to_wgs84_raster</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="c1"># touch=False clips to the bbox extent; the default touch=True keeps</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="c1"># every cell that touches the mask and leaves the extent uncropped.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="c1"># A polygon aoi= masks to the exact shape (see crop_to_aoi).</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">crop_to_aoi</span><span class="p">(</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">],</span> <span class="n">touch</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="p">)</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="c1"># A rebuilt NetCDF is a raster (time as bands), so NetCDF datasets</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="c1"># also write a GeoTIFF.</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="n">as_geotiff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;geotiff&quot;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">format</span> <span class="ow">in</span> <span class="p">(</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>            <span class="s2">&quot;cog&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>            <span class="s2">&quot;netcdf&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="p">)</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="n">out_ext</span> <span class="o">=</span> <span class="s2">&quot;.tif&quot;</span> <span class="k">if</span> <span class="n">as_geotiff</span> <span class="k">else</span> <span class="s2">&quot;.nc&quot;</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="si">}{</span><span class="n">out_ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="n">data</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_netcdf_to_wgs84_raster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">):</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Rebuild a regular-grid NetCDF variable as a WGS84 pyramids raster.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Reads the granule&#39;s data variable as an array + geotransform and</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        builds a `Dataset` tagged EPSG:4326 — NetCDF cubes do not expose a</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        source SRS the crop warp can read, so cropping the cube directly</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        fails. Longitudes in the 0-360 convention are wrapped to -180..180.</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nc_variable_name</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span> <span class="n">product</span><span class="p">))</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cube</span><span class="o">.</span><span class="n">read_array</span><span class="p">())</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cube</span><span class="o">.</span><span class="n">geotransform</span><span class="p">)</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">lon_convention</span> <span class="o">==</span> <span class="s2">&quot;0-360&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="n">arr</span><span class="p">,</span> <span class="n">geo</span> <span class="o">=</span> <span class="n">_wrap_longitude_0_360</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">geo</span><span class="p">)</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_geostationary_to_wgs84</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">):</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        The variable is opened through GDAL&#39;s NetCDF **subdataset**</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        (`NETCDF:&quot;&lt;file&gt;&quot;:&lt;variable&gt;`) rather than the multidimensional</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        `pyramids.netcdf.NetCDF` class. The subdataset exposes the CF</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        `goes_imager_projection` grid-mapping as a `+proj=geos` spatial</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        reference over a projected-metre geotransform, so `to_crs(4326)`</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        warps the scan-angle grid correctly and cheaply.</span>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nc_variable_name</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span> <span class="n">product</span><span class="p">))</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="k">return</span> <span class="n">cube</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_nc_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the in-file NetCDF data-variable name for `product`.</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Prefers the catalog row&#39;s pinned `nc_variable`; otherwise picks the</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        variable with the most dimensions (the gridded data variable rather</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        than a 1-D auxiliary like ERA5&#39;s `utc_date` or GOES&#39;s `band_id`).</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>            <span class="k">return</span> <span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable_for_native</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="k">if</span> <span class="n">variable</span> <span class="ow">and</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span> <span class="ow">and</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>            <span class="k">return</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        The multidimensional path must not be used here. On real GOES ABI</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        granules (observed with pyramids 0.45), `NetCDF.read_file` →</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        `get_variable` → `read_array` returned the variable&#39;s array flipped</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        along `y` relative to its north-up geotransform, so the reprojected</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        raster kept a correct header while its pixels were mirrored about</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        the grid&#39;s horizontal centre line — an AOI crop silently returned</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        radiances from the wrong latitude. The subdataset read is also ~100x</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        faster (a full-disk `read_array()` takes minutes, sub-second here).</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_nc_variable</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;NETCDF:&quot;</span><span class="si">{</span><span class="n">raw</span><span class="si">}</span><span class="s1">&quot;:</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">return</span> <span class="n">cube</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_nc_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nc</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the in-file NetCDF data-variable name for `product`.</span>
 <a id="__codelineno-0-459" name="__codelineno-0-459"></a>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">_rank</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="c1"># Rank by dimensionality, then de-prioritise known auxiliary</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="c1"># variables (quality flags, coordinate bounds, date helpers) so a</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="c1"># 2-D `DQF` never outranks a 2-D `CMI` on a tie.</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="n">auxiliary</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;DQF&quot;</span><span class="p">}</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;_bounds&quot;</span><span class="p">,</span> <span class="s2">&quot;_date&quot;</span><span class="p">,</span> <span class="s2">&quot;_id&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>                <span class="c1"># pyramids raises (e.g. RuntimeError &quot;Invalid iXDim/iYDim&quot;) for a</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>                <span class="c1"># 1-D auxiliary it cannot read as a grid; rank it lowest.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>                <span class="n">ndim</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>            <span class="k">return</span> <span class="p">(</span><span class="n">ndim</span><span class="p">,</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">auxiliary</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_rank</span><span class="p">)</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_nc_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;In-file NetCDF variable for `product`, opening the granule only if unpinned.</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        Uses the catalog&#39;s pinned `nc_variable` when present (no I/O); otherwise</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        reads the granule and falls back to `_nc_variable_name`.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>        <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable_for_native</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>        <span class="k">if</span> <span class="n">variable</span> <span class="ow">and</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span><span class="p">:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>            <span class="k">return</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        Prefers the catalog row&#39;s pinned `nc_variable`; otherwise picks the</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        variable with the most dimensions (the gridded data variable rather</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">        than a 1-D auxiliary like ERA5&#39;s `utc_date` or GOES&#39;s `band_id`).</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>            <span class="k">return</span> <span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable_for_native</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">if</span> <span class="n">variable</span> <span class="ow">and</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span> <span class="ow">and</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>            <span class="k">return</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">_rank</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="c1"># Rank by dimensionality, then de-prioritise known auxiliary</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="c1"># variables (quality flags, coordinate bounds, date helpers) so a</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="c1"># 2-D `DQF` never outranks a 2-D `CMI` on a tie.</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="n">auxiliary</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;DQF&quot;</span><span class="p">}</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;_bounds&quot;</span><span class="p">,</span> <span class="s2">&quot;_date&quot;</span><span class="p">,</span> <span class="s2">&quot;_id&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>                <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>                <span class="c1"># pyramids raises (e.g. RuntimeError &quot;Invalid iXDim/iYDim&quot;) for a</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>                <span class="c1"># 1-D auxiliary it cannot read as a grid; rank it lowest.</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>                <span class="n">ndim</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>            <span class="k">return</span> <span class="p">(</span><span class="n">ndim</span><span class="p">,</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">auxiliary</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_rank</span><span class="p">)</span>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nc_variable_name</span><span class="p">(</span><span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">)),</span> <span class="n">product</span><span class="p">)</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>    <span class="c1"># -- public API ----------------------------------------------------</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` + `_fetch` (the canonical post-C3 body).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download every planned product, cropped to the AOI.</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_nc_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;In-file NetCDF variable for `product`, opening the granule only if unpinned.</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        Uses the catalog&#39;s pinned `nc_variable` when present (no I/O); otherwise</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">        reads the granule and falls back to `_nc_variable_name`.</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable_for_native</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="k">if</span> <span class="n">variable</span> <span class="ow">and</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span><span class="p">:</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>            <span class="k">return</span> <span class="n">variable</span><span class="o">.</span><span class="n">nc_variable</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nc_variable_name</span><span class="p">(</span><span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">)),</span> <span class="n">product</span><span class="p">)</span>
 <a id="__codelineno-0-498" name="__codelineno-0-498"></a>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">            progress_bar: Show a per-product progress bar.</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">            aggregate: Optional `AggregationConfig`. Supported for NetCDF</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">                datasets (currently ERA5) — each raw granule is run through</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">                `aggregate_netcdf` to emit per-window GeoTIFFs. Rejected for</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">                COG datasets.</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            The cropped output paths, or — when `aggregate` is set — the</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            per-window aggregated GeoTIFF paths.</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>    <span class="c1"># -- public API ----------------------------------------------------</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` + `_fetch` (the canonical post-C3 body).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download every planned product, cropped to the AOI.</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            NotImplementedError: If `aggregate` is given for a COG dataset.</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="s2">&quot;aggregate= is only supported for NetCDF datasets &quot;</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>                <span class="s2">&quot;(e.g. era5); this dataset is stored as COG.&quot;</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>            <span class="p">)</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">],</span> <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window-aggregate the raw NetCDF granules, mirroring the ECMWF path.</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        Aggregation reads the granule&#39;s time axis, so it runs on the raw</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        NetCDF (not the cropped GeoTIFF). Per-window GeoTIFFs are written to</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">        `aggregate.out_dir` or `&lt;path&gt;/aggregated`. A granule that fails to</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        aggregate is logged and skipped (ECMWF behaviour).</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">            products: The planned products from `_search`.</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            aggregate: An `earthlens.aggregate.AggregationConfig`.</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            The per-window GeoTIFF paths.</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">aggregate_netcdf</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">client</span><span class="p">()</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="n">raw_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">()</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>            <span class="n">Path</span><span class="p">(</span><span class="n">aggregate</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">out_dir</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;aggregated&quot;</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="p">)</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;out_dir&quot;</span><span class="p">:</span> <span class="n">out_dir</span><span class="p">})</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="n">outputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>            <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_raw</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">raw_dir</span><span class="p">)</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>            <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>            <span class="n">native</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>            <span class="c1"># Resolve the *in-file* variable name (e.g. ERA5 `128_167_2t` -&gt;</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>            <span class="c1"># `VAR_2T`); the native token is not the NetCDF variable name. Prefer</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>            <span class="c1"># the catalog&#39;s pinned `nc_variable` so the granule is not re-opened</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>            <span class="c1"># just to read it (aggregate_netcdf opens it anyway).</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>            <span class="n">nc_variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_nc_variable</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>            <span class="n">var_info</span> <span class="o">=</span> <span class="n">_AggregationVariable</span><span class="p">(</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a>                <span class="n">nc_variable</span><span class="o">=</span><span class="n">nc_variable</span><span class="p">,</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>                <span class="n">cds_variable</span><span class="o">=</span><span class="n">native</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a>                <span class="n">is_flux</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>            <span class="p">)</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>                <span class="n">windows</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue like ECMWF</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aggregation failed for </span><span class="si">{</span><span class="n">raw</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>            <span class="n">outputs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">windows</span> <span class="k">if</span> <span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>        <span class="k">return</span> <span class="n">outputs</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_variable_for_native</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">native</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset `Variable` whose native token matches, or `None`.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>        <span class="k">if</span> <span class="n">native</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>            <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">native</span> <span class="o">==</span> <span class="n">native</span><span class="p">:</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>                <span class="k">return</span> <span class="n">variable</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            progress_bar: Show a per-product progress bar.</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            aggregate: Optional `AggregationConfig`. Supported for NetCDF</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">                datasets (currently ERA5) — each raw granule is run through</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">                `aggregate_netcdf` to emit per-window GeoTIFFs. Rejected for</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">                COG datasets.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">            The cropped output paths, or — when `aggregate` is set — the</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            per-window aggregated GeoTIFF paths.</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            NotImplementedError: If `aggregate` is given for a COG dataset.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>                <span class="s2">&quot;aggregate= is only supported for NetCDF datasets &quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>                <span class="s2">&quot;(e.g. era5); this dataset is stored as COG.&quot;</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>            <span class="p">)</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">],</span> <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window-aggregate the raw NetCDF granules, mirroring the ECMWF path.</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        Aggregation reads the granule&#39;s time axis, so it runs on the raw</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        NetCDF (not the cropped GeoTIFF). Per-window GeoTIFFs are written to</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">        `aggregate.out_dir` or `&lt;path&gt;/aggregated`. A granule that fails to</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">        aggregate is logged and skipped (ECMWF behaviour).</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            products: The planned products from `_search`.</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">            aggregate: An `earthlens.aggregate.AggregationConfig`.</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">            The per-window GeoTIFF paths.</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">aggregate_netcdf</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">client</span><span class="p">()</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="n">raw_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">()</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>            <span class="n">Path</span><span class="p">(</span><span class="n">aggregate</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">out_dir</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;aggregated&quot;</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>        <span class="p">)</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;out_dir&quot;</span><span class="p">:</span> <span class="n">out_dir</span><span class="p">})</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>        <span class="n">outputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>            <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_raw</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">raw_dir</span><span class="p">)</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>            <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="n">native</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>            <span class="c1"># Resolve the *in-file* variable name (e.g. ERA5 `128_167_2t` -&gt;</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>            <span class="c1"># `VAR_2T`); the native token is not the NetCDF variable name. Prefer</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>            <span class="c1"># the catalog&#39;s pinned `nc_variable` so the granule is not re-opened</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>            <span class="c1"># just to read it (aggregate_netcdf opens it anyway).</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>            <span class="n">nc_variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_nc_variable</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>            <span class="n">var_info</span> <span class="o">=</span> <span class="n">_AggregationVariable</span><span class="p">(</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>                <span class="n">nc_variable</span><span class="o">=</span><span class="n">nc_variable</span><span class="p">,</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>                <span class="n">cds_variable</span><span class="o">=</span><span class="n">native</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>                <span class="n">is_flux</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="p">)</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>                <span class="n">windows</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue like ECMWF</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aggregation failed for </span><span class="si">{</span><span class="n">raw</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>            <span class="n">outputs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">windows</span> <span class="k">if</span> <span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>        <span class="k">return</span> <span class="n">outputs</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_variable_for_native</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">native</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset `Variable` whose native token matches, or `None`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>        <span class="k">if</span> <span class="n">native</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>            <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>            <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">native</span> <span class="o">==</span> <span class="n">native</span><span class="p">:</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>                <span class="k">return</span> <span class="n">variable</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -20881,18 +20903,7 @@ COG datasets.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/s3/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-494">494</a></span>
-<span class="normal"><a href="#__codelineno-0-495">495</a></span>
-<span class="normal"><a href="#__codelineno-0-496">496</a></span>
-<span class="normal"><a href="#__codelineno-0-497">497</a></span>
-<span class="normal"><a href="#__codelineno-0-498">498</a></span>
-<span class="normal"><a href="#__codelineno-0-499">499</a></span>
-<span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span>
-<span class="normal"><a href="#__codelineno-0-502">502</a></span>
-<span class="normal"><a href="#__codelineno-0-503">503</a></span>
-<span class="normal"><a href="#__codelineno-0-504">504</a></span>
-<span class="normal"><a href="#__codelineno-0-505">505</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-505">505</a></span>
 <span class="normal"><a href="#__codelineno-0-506">506</a></span>
 <span class="normal"><a href="#__codelineno-0-507">507</a></span>
 <span class="normal"><a href="#__codelineno-0-508">508</a></span>
@@ -20908,34 +20919,45 @@ COG datasets.</p>
 <span class="normal"><a href="#__codelineno-0-518">518</a></span>
 <span class="normal"><a href="#__codelineno-0-519">519</a></span>
 <span class="normal"><a href="#__codelineno-0-520">520</a></span>
-<span class="normal"><a href="#__codelineno-0-521">521</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download every planned product, cropped to the AOI.</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        progress_bar: Show a per-product progress bar.</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        aggregate: Optional `AggregationConfig`. Supported for NetCDF</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">            datasets (currently ERA5) — each raw granule is run through</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">            `aggregate_netcdf` to emit per-window GeoTIFFs. Rejected for</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            COG datasets.</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        The cropped output paths, or — when `aggregate` is set — the</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        per-window aggregated GeoTIFF paths.</span>
+<span class="normal"><a href="#__codelineno-0-521">521</a></span>
+<span class="normal"><a href="#__codelineno-0-522">522</a></span>
+<span class="normal"><a href="#__codelineno-0-523">523</a></span>
+<span class="normal"><a href="#__codelineno-0-524">524</a></span>
+<span class="normal"><a href="#__codelineno-0-525">525</a></span>
+<span class="normal"><a href="#__codelineno-0-526">526</a></span>
+<span class="normal"><a href="#__codelineno-0-527">527</a></span>
+<span class="normal"><a href="#__codelineno-0-528">528</a></span>
+<span class="normal"><a href="#__codelineno-0-529">529</a></span>
+<span class="normal"><a href="#__codelineno-0-530">530</a></span>
+<span class="normal"><a href="#__codelineno-0-531">531</a></span>
+<span class="normal"><a href="#__codelineno-0-532">532</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download every planned product, cropped to the AOI.</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        NotImplementedError: If `aggregate` is given for a COG dataset.</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>            <span class="s2">&quot;aggregate= is only supported for NetCDF datasets &quot;</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="s2">&quot;(e.g. era5); this dataset is stored as COG.&quot;</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>        <span class="p">)</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        progress_bar: Show a per-product progress bar.</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">        aggregate: Optional `AggregationConfig`. Supported for NetCDF</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">            datasets (currently ERA5) — each raw granule is run through</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">            `aggregate_netcdf` to emit per-window GeoTIFFs. Rejected for</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">            COG datasets.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        The cropped output paths, or — when `aggregate` is set — the</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        per-window aggregated GeoTIFF paths.</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        NotImplementedError: If `aggregate` is given for a COG dataset.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>            <span class="s2">&quot;aggregate= is only supported for NetCDF datasets &quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>            <span class="s2">&quot;(e.g. era5); this dataset is stored as COG.&quot;</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="p">)</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

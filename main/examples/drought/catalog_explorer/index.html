@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19588,7 +19588,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="drought-catalog-explorer">Drought catalog explorer<a class="anchor-link" href="#drought-catalog-explorer">¶</a></h1><p>Walk through the 43 datasets the <code>earthlens.drought</code> backend curates across <strong>four</strong> public services —
+<h1 id="drought-catalog-explorer">Drought catalog explorer<a class="anchor-link" href="#drought-catalog-explorer">¶</a></h1><p>Walk through the 39 datasets the <code>earthlens.drought</code> backend curates across <strong>four</strong> public services —
 USDM, Copernicus EDO, Copernicus GDO, and CSIC SPEIbase — and the helper utilities the backend leans
 on. Network-free: every cell reads the bundled sharded catalog under <code>src/earthlens/drought/catalog/</code>.</p>
 </div>
@@ -19728,7 +19728,7 @@ frame</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>curated datasets: 43
+<pre>curated datasets: 39
 </pre>
 </div>
 </div>
@@ -19836,15 +19836,6 @@ frame</div>
 </tr>
 <tr>
 <th>8</th>
-<td>edo-fpanv</td>
-<td>edo-wcs</td>
-<td>raster</td>
-<td>10day</td>
-<td>fpanv</td>
-<td>Copernicus European Drought Observatory</td>
-</tr>
-<tr>
-<th>9</th>
 <td>edo-cdiad</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19853,7 +19844,7 @@ frame</div>
 <td>Copernicus European Drought Observatory</td>
 </tr>
 <tr>
-<th>10</th>
+<th>9</th>
 <td>edo-cdirc</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19862,16 +19853,7 @@ frame</div>
 <td>Copernicus European Drought Observatory</td>
 </tr>
 <tr>
-<th>11</th>
-<td>edo-cdinx</td>
-<td>edo-wcs</td>
-<td>raster</td>
-<td>10day</td>
-<td>cdinx</td>
-<td>Copernicus European Drought Observatory</td>
-</tr>
-<tr>
-<th>12</th>
+<th>10</th>
 <td>edo-lfinx-lgs</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19880,7 +19862,7 @@ frame</div>
 <td>Copernicus European Drought Observatory</td>
 </tr>
 <tr>
-<th>13</th>
+<th>11</th>
 <td>edo-twsan</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19889,7 +19871,7 @@ frame</div>
 <td>Copernicus European Drought Observatory</td>
 </tr>
 <tr>
-<th>14</th>
+<th>12</th>
 <td>edo-snwvi</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19898,7 +19880,7 @@ frame</div>
 <td>Copernicus European Drought Observatory</td>
 </tr>
 <tr>
-<th>15</th>
+<th>13</th>
 <td>edo-rdria</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19907,7 +19889,7 @@ frame</div>
 <td>Copernicus European Drought Observatory</td>
 </tr>
 <tr>
-<th>16</th>
+<th>14</th>
 <td>edo-msfTS</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19916,7 +19898,7 @@ frame</div>
 <td>Copernicus European Drought Observatory</td>
 </tr>
 <tr>
-<th>17</th>
+<th>15</th>
 <td>gdo-spaST</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19925,7 +19907,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>18</th>
+<th>16</th>
 <td>gdo-spaLT</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19934,7 +19916,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>19</th>
+<th>17</th>
 <td>gdo-spgTS</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19943,7 +19925,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>20</th>
+<th>18</th>
 <td>gdo-smand</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19952,25 +19934,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>21</th>
-<td>gdo-fpanv</td>
-<td>edo-wcs</td>
-<td>raster</td>
-<td>10day</td>
-<td>fpanv</td>
-<td>Copernicus Global Drought Observatory</td>
-</tr>
-<tr>
-<th>22</th>
-<td>gdo-cdinx</td>
-<td>edo-wcs</td>
-<td>raster</td>
-<td>10day</td>
-<td>cdinx</td>
-<td>Copernicus Global Drought Observatory</td>
-</tr>
-<tr>
-<th>23</th>
+<th>19</th>
 <td>gdo-twsan</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19979,7 +19943,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>24</th>
+<th>20</th>
 <td>gdo-lfinx-sms</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19988,7 +19952,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>25</th>
+<th>21</th>
 <td>gdo-lfinx-mds</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -19997,7 +19961,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>26</th>
+<th>22</th>
 <td>gdo-smian</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20006,7 +19970,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>27</th>
+<th>23</th>
 <td>gdo-smang</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20015,7 +19979,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>28</th>
+<th>24</th>
 <td>gdo-spcST</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20024,7 +19988,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>29</th>
+<th>25</th>
 <td>gdo-spcLT</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20033,7 +19997,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>30</th>
+<th>26</th>
 <td>gdo-cdiad</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20042,7 +20006,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>31</th>
+<th>27</th>
 <td>gdo-cdirc</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20051,7 +20015,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>32</th>
+<th>28</th>
 <td>gdo-lfinx-lgs</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20060,7 +20024,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>33</th>
+<th>29</th>
 <td>gdo-msfTS</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20069,7 +20033,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>34</th>
+<th>30</th>
 <td>gdo-snwvi</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20078,7 +20042,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>35</th>
+<th>31</th>
 <td>gdo-rdria</td>
 <td>edo-wcs</td>
 <td>raster</td>
@@ -20087,7 +20051,7 @@ frame</div>
 <td>Copernicus Global Drought Observatory</td>
 </tr>
 <tr>
-<th>36</th>
+<th>32</th>
 <td>speibase-01</td>
 <td>netcdf-url</td>
 <td>raster</td>
@@ -20096,7 +20060,7 @@ frame</div>
 <td>CSIC SPEIbase v2.11</td>
 </tr>
 <tr>
-<th>37</th>
+<th>33</th>
 <td>speibase-03</td>
 <td>netcdf-url</td>
 <td>raster</td>
@@ -20105,7 +20069,7 @@ frame</div>
 <td>CSIC SPEIbase v2.11</td>
 </tr>
 <tr>
-<th>38</th>
+<th>34</th>
 <td>speibase-06</td>
 <td>netcdf-url</td>
 <td>raster</td>
@@ -20114,7 +20078,7 @@ frame</div>
 <td>CSIC SPEIbase v2.11</td>
 </tr>
 <tr>
-<th>39</th>
+<th>35</th>
 <td>speibase-12</td>
 <td>netcdf-url</td>
 <td>raster</td>
@@ -20123,7 +20087,7 @@ frame</div>
 <td>CSIC SPEIbase v2.11</td>
 </tr>
 <tr>
-<th>40</th>
+<th>36</th>
 <td>speibase-24</td>
 <td>netcdf-url</td>
 <td>raster</td>
@@ -20132,7 +20096,7 @@ frame</div>
 <td>CSIC SPEIbase v2.11</td>
 </tr>
 <tr>
-<th>41</th>
+<th>37</th>
 <td>speibase-48</td>
 <td>netcdf-url</td>
 <td>raster</td>
@@ -20141,7 +20105,7 @@ frame</div>
 <td>CSIC SPEIbase v2.11</td>
 </tr>
 <tr>
-<th>42</th>
+<th>38</th>
 <td>usdm</td>
 <td>usdm-geojson</td>
 <td>vector</td>
@@ -20232,7 +20196,7 @@ one row per Copernicus drought indicator.</p>
 <td>edo-wcs</td>
 <td>raster</td>
 <td>10day</td>
-<td>28</td>
+<td>24</td>
 </tr>
 <tr>
 <th>1</th>
@@ -20525,7 +20489,7 @@ except ValueError as exc:
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>'usdmm' is not in the drought catalog. Known datasets: ['edo-cdiad', 'edo-cdinx', 'edo-cdirc', 'edo-fpanv', 'edo-lfinx-lgs', 'edo-msfTS', 'e ...
+<pre>'usdmm' is not in the drought catalog. Known datasets: ['edo-cdiad', 'edo-cdirc', 'edo-lfinx-lgs', 'edo-msfTS', 'edo-rdria', 'edo-smand', 'e ...
 </pre>
 </div>
 </div>
