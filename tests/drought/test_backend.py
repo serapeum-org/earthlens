@@ -594,6 +594,55 @@ def test_clip_wcs_raster_returns_none_when_bbox_outside_coverage():
     assert Drought._clip_wcs_raster(ds, (20.0, 20.0, 30.0, 30.0)) is None
 
 
+def test_fetch_wcs_warns_when_bbox_misses_downloaded_raster(monkeypatch, tmp_path):
+    """`_fetch_wcs` logs a warning and keeps the unclipped file when the crop is a no-op."""
+    from loguru import logger
+
+    def _fake_download(url, target, *, label):
+        Path(target).write_bytes(b"MM\x00*FAKE-GEOTIFF")
+
+    class _FakeDataset:
+        # Covers lon 0..8, lat 0..4 -- nowhere near the requested lon_lim/lat_lim.
+        bbox = [0.0, 0.0, 8.0, 4.0]
+        no_data_value = (None,)
+
+        @classmethod
+        def read_file(cls, path):
+            return _FakeDataset()
+
+        def read_array(self):
+            return np.zeros((4, 8), dtype="uint8")
+
+        def close(self):
+            pass
+
+    import pyramids.dataset as dataset_mod
+
+    monkeypatch.setattr(backend_module, "_http_download_raster", _fake_download)
+    monkeypatch.setattr(dataset_mod.Dataset, "read_file", _FakeDataset.read_file)
+
+    backend = Drought(
+        start="2025-12-01",
+        end="2025-12-31",
+        lat_lim=[40.0, 50.0],
+        lon_lim=[5.0, 15.0],
+        dataset="edo-spaST",
+        path=str(tmp_path),
+    )
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING")
+    try:
+        paths = backend.download(progress_bar=False)
+    finally:
+        logger.remove(sink_id)
+    warnings = [m for m in messages if "unclipped" in m]
+    assert len(warnings) == len(paths)
+    assert "edo-spaST" in warnings[0]
+    assert str(paths[0]) in warnings[0]
+    # The original, un-cropped download is left in place rather than dropped.
+    assert paths[0].exists()
+
+
 def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
     """A server rejection (out-of-range date) surfaces the Copernicus message."""
     import requests
