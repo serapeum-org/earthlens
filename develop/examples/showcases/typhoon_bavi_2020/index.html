@@ -20074,7 +20074,7 @@ GIF plays in any viewer with no JavaScript.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -20095,7 +20095,7 @@ GIF plays in any viewer with no JavaScript.</p>
 <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>  <span class="c1"># stamp each frame with its date</span>
 
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"bavi_2020_timelapse.gif"</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># save_animation wants a str path</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># save_animation() also accepts a Path directly; str() here just keeps the call explicit</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">labels = [label for label, _ in frames]
@@ -20106,7 +20106,7 @@ glyph = cube.plot(rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3200}, f
 glyph.animate(labels, interval=350)  # stamp each frame with its date
 
 gif_path = OUT / "bavi_2020_timelapse.gif"
-glyph.save_animation(str(gif_path), fps=3)  # save_animation wants a str path
+glyph.save_animation(str(gif_path), fps=3)  # save_animation() also accepts a Path directly; str() here just keeps the call explicit
 plt.close("all")</div>
 </div>
 </div>
