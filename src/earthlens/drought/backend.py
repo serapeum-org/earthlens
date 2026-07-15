@@ -557,7 +557,11 @@ class Drought(AbstractDataSource):
                 month, per the row's cadence).
 
         Returns:
-            list[Path]: The written GeoTIFFs in `products` order.
+            list[Path]: The written GeoTIFFs in `products` order. Each is
+                window-cropped to `bbox` via `_clip_wcs_raster`; on the rare
+                period where the requested bbox falls entirely outside the
+                downloaded raster's coverage, the crop is skipped, a warning
+                is logged, and the original uncropped file is kept instead.
 
         Raises:
             ValueError: When the server rejects a period (e.g. a date
@@ -679,8 +683,8 @@ class Drought(AbstractDataSource):
 
         Returns:
             A new cropped `pyramids.Dataset`, or `None` when the requested
-            bbox falls entirely outside the raster (caller keeps the original
-            file untouched).
+            bbox falls entirely outside the raster (`_fetch_wcs` keeps the
+            original file untouched and logs a warning in that case).
         """
         from pyramids.dataset import Dataset as PyramidsDataset
 
