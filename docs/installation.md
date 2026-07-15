@@ -105,17 +105,17 @@ listed per-backend extras yourself.
 |---|---|---|
 | `air-quality` | `airnow`, `eea-aq`, `openaq`, `sensor-community` |  |
 | `biodiversity` | `gbif`, `iucn`, `obis`, `wdpa` |  |
-| `climate` | `climate_indices`, `cmip6`, `ecmwf` |  |
-| `disasters` | `fdsn`, `firms`, `gdacs`, `risk_indicators` |  |
+| `climate` | `climate-indices`, `cmip6`, `ecmwf` |  |
+| `disasters` | `fdsn`, `firms`, `gdacs`, `thinkhazard` |  |
 | `elevation` | `bathymetry`, `dem` |  |
 | `glaciers-cryosphere` | `glaciers` |  |
 | `humanitarian` | `hdx` |  |
 | `hydrology` | `nwm`, `usgs-water` |  |
 | `ocean` | `argo`, `cmems`, `erddap` | Not meant to be combined with `platforms` in the same install — `argo`'s `argopy` needs `xarray>=2025.7`, `platforms`' `openeo` needs `xarray<2025.1.2`. |
-| `platforms` | `earthdata`, `eumetsat`, `gee`, `goes`, `jaxa`, `openeo`, `s3`, `sentinel-hub`, `stac` |  |
+| `platforms` | `amazon-s3`, `earthdata`, `eumetsat`, `gee`, `goes`, `jaxa`, `openeo`, `sentinel-hub`, `stac` |  |
 | `population-settlement` | `ghsl`, `worldpop` |  |
 | `precipitation-drought` | `chc`, `drought` |  |
-| `renewable-energy` | `nrel`, `pvgis`, `solar_wind_atlas` |  |
+| `renewable-energy` | `nrel`, `pvgis`, `solar-wind-atlas` |  |
 | `sar-radar` | `asf` |  |
 | `soil` | `soilgrids` |  |
 | `tropical-cyclones` | `tropycal` |  |
