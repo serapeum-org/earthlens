@@ -258,9 +258,11 @@ dev = [
     # runtime dep of earthlens itself.
     "pyramids-gis[viz] >=0.45.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
-    # animation.embed_gif, ArrayGlyph.save_animation); >=0.23.0 for the
-    # animate() default label-clipping fix (add_reference_map / save_animation
-    # (crf=...) landed in 0.22.0).
+    # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
+    # save_animation(crf=...) landed in 0.22.0, the animate() default
+    # label-clipping fix in 0.23.0, and the DATA_STYLES presets / dark-canvas
+    # helper (style=, apply_blank_canvas) used by the heatwave notebook in
+    # 0.24.0+ -- floor pinned to the latest of these, >=0.25.0.
     "cleopatra >=0.25.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
@@ -291,9 +293,11 @@ docs = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
     "pyramids-gis[viz] >=0.45.0",
-    # cleopatra: notebooks import it directly; >=0.23.0 for the animate()
-    # default label-clipping fix (add_reference_map / save_animation(crf=...)
-    # landed in 0.22.0) used by the showcases.
+    # cleopatra: notebooks import it directly; add_reference_map /
+    # save_animation(crf=...) landed in 0.22.0, the animate() default
+    # label-clipping fix in 0.23.0, and the DATA_STYLES presets / dark-canvas
+    # helper (style=, apply_blank_canvas) used by the heatwave notebook in
+    # 0.24.0+ -- floor pinned to the latest of these, >=0.25.0.
     "cleopatra >=0.25.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
