@@ -59,15 +59,11 @@ Each provider's `id` links to its own reference page for the full walkthrough, a
 | <img src="../_images/logos/obis.png" height="20"> | [OBIS](../reference/obis/introduction.md) | `obis` |
 | <img src="../_images/logos/wdpa.png" height="20"> | [Protected Planet (UNEP-WCMC)](../reference/wdpa/introduction.md) | `wdpa` |
 
-### Climate & reanalysis
+### Climate reanalysis & projections
 
 | | Provider | `data_source` |
 |---|---|---|
-| <img src="../_images/logos/chc.png" height="20"> | [Climate Hazards Center (UCSB)](../reference/chc/introduction.md) | `chc` |
 | <img src="../_images/logos/ecmwf.png" height="20"> | [Copernicus Climate Data Store (ECMWF)](../reference/ecmwf/introduction.md) | `ecmwf` |
-| <img src="../_images/logos/drought.svg" height="20"> | [Copernicus European Drought Observatory / NDMC](../reference/drought/introduction.md) | `drought` |
-| <img src="../_images/logos/cmems.svg" height="20"> | [Copernicus Marine Service](../reference/cmems/introduction.md) | `cmems` |
-| <img src="../_images/logos/nwp.png" height="20"> | [Herbie (NWP archive access)](../reference/nwp/introduction.md) | `nwp` |
 | <img src="../_images/logos/climate_indices.svg" height="20"> | [NOAA Physical Sciences Laboratory](../reference/climate_indices/introduction.md) | `climate-indices` |
 | <img src="../_images/logos/cmip6.svg" height="20"> | [WCRP CMIP6](../reference/cmip6/introduction.md) | `cmip6` |
 
@@ -86,31 +82,31 @@ Each provider's `id` links to its own reference page for the full walkthrough, a
 |---|---|---|
 | <img src="../_images/logos/dem.svg" height="20"> | [Copernicus DEM (ESA)](../reference/dem/introduction.md) | `dem` |
 | <img src="../_images/logos/bathymetry.png" height="20"> | [GEBCO](../reference/bathymetry/introduction.md) | `bathymetry` |
-| <img src="../_images/logos/glaciers.png" height="20"> | [NSIDC Randolph Glacier Inventory](../reference/glaciers/introduction.md) | `glaciers` |
 
-### Humanitarian & socio-economic
+### Glaciers & cryosphere
 
 | | Provider | `data_source` |
 |---|---|---|
-|  | [European Commission Joint Research Centre (GHSL)](../reference/ghsl/introduction.md) | `ghsl` |
+| <img src="../_images/logos/glaciers.png" height="20"> | [NSIDC Randolph Glacier Inventory](../reference/glaciers/introduction.md) | `glaciers` |
+
+### Humanitarian data
+
+| | Provider | `data_source` |
+|---|---|---|
 | <img src="../_images/logos/hdx.png" height="20"> | [Humanitarian Data Exchange (UN OCHA)](../reference/hdx/introduction.md) | `hdx` |
-| <img src="../_images/logos/worldpop.png" height="20"> | [WorldPop](../reference/worldpop/introduction.md) | `worldpop` |
 
 ### Hydrology
 
 | | Provider | `data_source` |
 |---|---|---|
-| <img src="../_images/logos/argo.png" height="20"> | [Argo Program](../reference/argo/introduction.md) | `argo` |
-| <img src="../_images/logos/erddap.svg" height="20"> | [NOAA ERDDAP](../reference/erddap/introduction.md) | `erddap` |
-|  | [NOAA National Water Model](../reference/nwm/introduction.md) | `nwm` |
+|   | [NOAA National Water Model](../reference/nwm/introduction.md) | `nwm` |
 | <img src="../_images/logos/usgs-water.svg" height="20"> | [USGS National Water Information System](../reference/usgs-water/introduction.md) | `usgs-water` |
 
-### Imagery platforms
+### Multi-mission imagery & data platforms
 
 | | Provider | `data_source` |
 |---|---|---|
 | <img src="../_images/logos/s3.png" height="20"> | [AWS Open Data](../reference/s3/introduction.md) | `amazon-s3` |
-| <img src="../_images/logos/asf.png" height="20"> | [Alaska Satellite Facility (ASF)](../reference/asf/introduction.md) | `asf` |
 | <img src="../_images/logos/eumetsat.svg" height="20"> | [EUMETSAT](../reference/eumetsat/introduction.md) | `eumetsat` |
 | <img src="../_images/logos/gee.png" height="20"> | [Google Earth Engine](../reference/gee/introduction.md) | `gee` |
 | <img src="../_images/logos/jaxa.svg" height="20"> | [JAXA](../reference/jaxa/introduction.md) | `jaxa` |
@@ -120,6 +116,28 @@ Each provider's `id` links to its own reference page for the full walkthrough, a
 | <img src="../_images/logos/sentinel-hub.png" height="20"> | [Sentinel Hub](../reference/sentinel-hub/introduction.md) | `sentinel-hub` |
 | <img src="../_images/logos/openeo.png" height="20"> | [openEO](../reference/openeo/introduction.md) | `openeo` |
 
+### Ocean
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="../_images/logos/argo.png" height="20"> | [Argo Program](../reference/argo/introduction.md) | `argo` |
+| <img src="../_images/logos/cmems.svg" height="20"> | [Copernicus Marine Service](../reference/cmems/introduction.md) | `cmems` |
+| <img src="../_images/logos/erddap.svg" height="20"> | [NOAA ERDDAP](../reference/erddap/introduction.md) | `erddap` |
+
+### Population & human settlement
+
+| | Provider | `data_source` |
+|---|---|---|
+|   | [European Commission Joint Research Centre (GHSL)](../reference/ghsl/introduction.md) | `ghsl` |
+| <img src="../_images/logos/worldpop.png" height="20"> | [WorldPop](../reference/worldpop/introduction.md) | `worldpop` |
+
+### Precipitation & drought
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="../_images/logos/chc.png" height="20"> | [Climate Hazards Center (UCSB)](../reference/chc/introduction.md) | `chc` |
+| <img src="../_images/logos/drought.svg" height="20"> | [Copernicus European Drought Observatory / NDMC](../reference/drought/introduction.md) | `drought` |
+
 ### Renewable energy
 
 | | Provider | `data_source` |
@@ -128,7 +146,13 @@ Each provider's `id` links to its own reference page for the full walkthrough, a
 | <img src="../_images/logos/nrel.svg" height="20"> | [National Laboratory of the Rockies (formerly NREL)](../reference/nrel/introduction.md) | `nrel` |
 | <img src="../_images/logos/pvgis.svg" height="20"> | [PVGIS (EU JRC)](../reference/pvgis/introduction.md) | `pvgis` |
 
-### Soil & land
+### SAR / radar imagery
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="../_images/logos/asf.png" height="20"> | [Alaska Satellite Facility (ASF)](../reference/asf/introduction.md) | `asf` |
+
+### Soil
 
 | | Provider | `data_source` |
 |---|---|---|
@@ -146,7 +170,13 @@ Each provider's `id` links to its own reference page for the full walkthrough, a
 |---|---|---|
 | <img src="../_images/logos/osm.svg" height="20"> | [OpenStreetMap](../reference/osm/introduction.md) | `osm` |
 | <img src="../_images/logos/overture.svg" height="20"> | [Overture Maps Foundation](../reference/overture/introduction.md) | `overture` |
-|  | [geoBoundaries](../reference/admin/introduction.md) | `admin` |
+|   | [geoBoundaries](../reference/admin/introduction.md) | `admin` |
+
+### Weather forecast (NWP)
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="../_images/logos/nwp.png" height="20"> | [Herbie (NWP archive access)](../reference/nwp/introduction.md) | `nwp` |
 
 ### Weather radar
 
