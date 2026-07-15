@@ -598,6 +598,12 @@ class Drought(AbstractDataSource):
                 clipped.to_file(str(tmp_path))
                 clipped.close()
                 tmp_path.replace(out_path)
+            else:
+                logger.warning(
+                    f"{self._dataset.id}: requested bbox {bbox} fell entirely "
+                    f"outside the downloaded raster's coverage; leaving "
+                    f"{out_path} unclipped (full server-returned extent)."
+                )
             written.append(out_path)
         return written
 
