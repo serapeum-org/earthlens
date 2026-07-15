@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -618,6 +618,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Available extras">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#per-backend-extras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-backend extras
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thematic-bundles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thematic bundles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -18858,6 +18886,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Available extras">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#per-backend-extras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-backend extras
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thematic-bundles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thematic bundles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -18961,114 +19017,300 @@ is an optional extra — pick the ones you actually need:</p>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>all<span class="o">]</span><span class="w">      </span><span class="c1"># everything</span>
 </code></pre></div>
 <h3 id="available-extras"><a class="toclink" href="#available-extras">Available extras</a><a class="headerlink" href="#available-extras" title="Permanent link">#</a></h3>
+<p>Two tiers of extras exist. <strong>Per-backend extras</strong> pull in exactly one backend's SDK; <strong>thematic
+bundles</strong> union several per-backend extras that cover the same kind of data (e.g. <code>earthlens[ocean]</code>
+pulls <code>cmems</code> + <code>argo</code> + <code>erddap</code> together) — see <a href="../examples/data-sources/">Data Sources</a> for how
+they're grouped, or <a href="https://github.com/serapeum-org/earthlens/blob/main/docs/_images/logos/ATTRIBUTION.md">_images/logos/ATTRIBUTION.md</a>.
+Both tiers are always available side by side — installing a bundle is equivalent to installing its
+listed per-backend extras yourself.</p>
+<h4 id="per-backend-extras"><a class="toclink" href="#per-backend-extras">Per-backend extras</a><a class="headerlink" href="#per-backend-extras" title="Permanent link">#</a></h4>
 <table>
 <thead>
 <tr>
 <th>Extra</th>
-<th>Backend(s)</th>
+<th>Provider</th>
 <th>Pulls</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>s3</code></td>
-<td>Amazon S3 (AWS Open Data)</td>
-<td><code>boto3</code>, <code>botocore</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/s3/introduction/">AWS Open Data</a></td>
+<td><code>boto3 &gt;=1.43.0</code>, <code>botocore &gt;=1.34.0</code></td>
 </tr>
 <tr>
 <td><code>ecmwf</code></td>
-<td>ECMWF / Copernicus CDS</td>
-<td><code>cdsapi</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/ecmwf/introduction/">Copernicus Climate Data Store (ECMWF)</a></td>
+<td><code>cdsapi &gt;=0.7.7</code></td>
+</tr>
+<tr>
+<td><code>ecmwf-modern</code></td>
+<td>ECMWF (alternate SDK)</td>
+<td><code>ecmwf-datastores-client &gt;=0.5.1</code></td>
 </tr>
 <tr>
 <td><code>gee</code></td>
-<td>Google Earth Engine</td>
-<td><code>earthengine-api</code>, <code>google-api-python-client</code>, <code>google-cloud-storage</code>, <code>Rtree</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/gee/introduction/">Google Earth Engine</a></td>
+<td><code>earthengine-api &gt;=1.7.26</code>, <code>google-api-python-client &gt;=2.0</code>, <code>google-cloud-storage &gt;=2.0</code>, <code>Rtree &gt;=1.0.0</code>, <code>urllib3 &gt;=1.26</code></td>
 </tr>
 <tr>
 <td><code>cmems</code></td>
-<td>Copernicus Marine</td>
-<td><code>copernicusmarine</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/cmems/introduction/">Copernicus Marine Service</a></td>
+<td><code>copernicusmarine &gt;=2.0.0,&lt;3</code></td>
 </tr>
 <tr>
-<td><code>earthdata</code></td>
-<td>NASA Earthdata</td>
-<td><code>earthaccess</code> (Python ≥ 3.12)</td>
-</tr>
-<tr>
-<td><code>eumetsat</code></td>
-<td>EUMETSAT Data Store</td>
-<td><code>eumdac</code></td>
+<td><code>cmip6</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/cmip6/introduction/">WCRP CMIP6</a></td>
+<td><em>(none — no SDK needed)</em></td>
 </tr>
 <tr>
 <td><code>fdsn</code></td>
-<td>FDSN seismic events</td>
-<td><code>obspy</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/fdsn/introduction/">FDSN</a></td>
+<td><code>obspy &gt;=1.5.0</code></td>
 </tr>
 <tr>
-<td><code>stac</code></td>
-<td>STAC (MPC / Earth Search / CDSE)</td>
-<td><code>pyramids-gis[stac]</code></td>
+<td><code>nwm</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/nwm/introduction/">NOAA National Water Model</a></td>
+<td><code>earthlens[s3]</code>, <code>pyramids-gis[parquet] &gt;=0.45.0</code></td>
 </tr>
 <tr>
-<td><code>openeo</code></td>
-<td>openEO server-side processing</td>
-<td><code>openeo</code></td>
+<td><code>earthdata</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/earthdata/introduction/">NASA Earthdata</a></td>
+<td><code>earthaccess &gt;=0.18.0; python_version &gt;= '3.12'</code></td>
 </tr>
 <tr>
-<td><code>sentinel-hub</code></td>
-<td>Sentinel Hub render</td>
-<td><code>sentinelhub</code></td>
+<td><code>asf</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/asf/introduction/">Alaska Satellite Facility (ASF)</a></td>
+<td><code>asf_search &gt;=12.2.2</code>, <code>earthlens[earthdata]</code></td>
 </tr>
 <tr>
-<td><code>nwp</code></td>
-<td>Open NWP forecasts</td>
-<td><code>herbie-data</code>, <code>ecmwf-opendata</code></td>
-</tr>
-<tr>
-<td><code>radar</code></td>
-<td>NEXRAD radar</td>
-<td><code>boto3</code>, <code>botocore</code></td>
+<td><code>eea_aq</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/eea-aq/introduction/">European Environment Agency</a></td>
+<td><code>airbase &gt;=1.0</code>, <code>nest_asyncio &gt;=1.5</code></td>
 </tr>
 <tr>
 <td><code>hdx</code></td>
-<td>Humanitarian Data Exchange</td>
-<td><code>hdx-python-api</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/hdx/introduction/">Humanitarian Data Exchange (UN OCHA)</a></td>
+<td><code>hdx-python-api &gt;=6,&lt;7</code></td>
 </tr>
 <tr>
-<td><code>overture</code></td>
-<td>Overture Maps</td>
-<td><code>overturemaps</code>, <code>duckdb</code></td>
+<td><code>eumetsat</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/eumetsat/introduction/">EUMETSAT</a></td>
+<td><code>eumdac &gt;=3.1</code></td>
+</tr>
+<tr>
+<td><code>nwp</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/nwp/introduction/">Herbie (NWP archive access)</a></td>
+<td><code>herbie-data &gt;=2026.3</code>, <code>ecmwf-opendata &gt;=0.3</code>, <code>ecmwflibs; sys_platform == 'win32'</code></td>
+</tr>
+<tr>
+<td><code>radar</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/radar/introduction/">NOAA NEXRAD</a></td>
+<td><code>earthlens[s3]</code></td>
+</tr>
+<tr>
+<td><code>dem</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/dem/introduction/">Copernicus DEM (ESA)</a></td>
+<td><code>earthlens[s3]</code></td>
+</tr>
+<tr>
+<td><code>goes</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/goes/introduction/">NOAA GOES-R</a></td>
+<td><code>earthlens[s3]</code></td>
+</tr>
+<tr>
+<td><code>stac</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/stac/introduction/">STAC (SpatioTemporal Asset Catalog)</a></td>
+<td><code>pyramids-gis[stac] &gt;=0.45.0</code></td>
+</tr>
+<tr>
+<td><code>openeo</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/openeo/introduction/">openEO</a></td>
+<td><code>openeo &gt;=0.47,&lt;0.48</code></td>
+</tr>
+<tr>
+<td><code>sentinel-hub</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/sentinel-hub/introduction/">Sentinel Hub</a></td>
+<td><code>sentinelhub &gt;=3.11.5</code></td>
 </tr>
 <tr>
 <td><code>tropycal</code></td>
-<td>Tropical cyclones</td>
-<td><code>tropycal</code>, <code>cartopy</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/tropycal/introduction/">Tropycal</a></td>
+<td><code>tropycal &gt;=1.4</code>, <code>cartopy &gt;=0.22</code></td>
+</tr>
+<tr>
+<td><code>overture</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/overture/introduction/">Overture Maps Foundation</a></td>
+<td><code>overturemaps &gt;=1.0.0</code>, <code>duckdb &gt;=1.0.0</code></td>
 </tr>
 <tr>
 <td><code>usgs-water</code></td>
-<td>USGS Water (NWIS)</td>
-<td><code>dataretrieval</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/usgs-water/introduction/">USGS National Water Information System</a></td>
+<td><code>dataretrieval &gt;=1.1.4</code></td>
+</tr>
+<tr>
+<td><code>ghsl</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/ghsl/introduction/">European Commission Joint Research Centre (GHSL)</a></td>
+<td><em>(none — no SDK needed)</em></td>
 </tr>
 <tr>
 <td><code>worldpop</code></td>
-<td>WorldPop</td>
-<td><code>worldpoppy</code>, <code>py7zr</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/worldpop/introduction/">WorldPop</a></td>
+<td><code>worldpoppy &gt;=0.4</code>, <code>py7zr &gt;=0.20</code></td>
+</tr>
+<tr>
+<td><code>gbif</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/gbif/introduction/">GBIF</a></td>
+<td><code>pygbif &gt;=0.6.6</code></td>
+</tr>
+<tr>
+<td><code>obis</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/obis/introduction/">OBIS</a></td>
+<td><code>pyobis &gt;=1.6.1</code></td>
+</tr>
+<tr>
+<td><code>jaxa</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/jaxa/introduction/">JAXA</a></td>
+<td><code>jaxa.earth &gt;=0.1.6,&lt;0.2</code>, <code>gportal &gt;=0.4,&lt;0.5</code></td>
+</tr>
+<tr>
+<td><code>argo</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/argo/introduction/">Argo Program</a></td>
+<td><code>argopy &gt;=1.4</code></td>
+</tr>
+<tr>
+<td><code>erddap</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/erddap/introduction/">NOAA ERDDAP</a></td>
+<td><code>erddapy &gt;=3.0</code></td>
+</tr>
+<tr>
+<td><code>osm</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/osm/introduction/">OpenStreetMap</a></td>
+<td><code>overpy &gt;=0.7</code>, <code>ohsome &gt;=0.4.0</code></td>
+</tr>
+<tr>
+<td><code>osm-pbf</code></td>
+<td>OpenStreetMap (bulk .osm.pbf extracts)</td>
+<td><code>pyrosm &gt;=0.11.0</code>, <code>osmium &gt;=4.3.1</code></td>
 </tr>
 <tr>
 <td><code>all</code></td>
-<td>every backend above</td>
-<td>all of the above</td>
+<td>every backend above except <code>argo</code>, <code>osm</code>, <code>osm-pbf</code> (pin conflicts — see note below)</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>
-<p>A bare <code>pip install earthlens</code> installs only the core dependencies
-(numpy, pandas, pyramids-gis, requests, …), which is enough for the
-backends that need no extra SDK: <strong>CHC / CHIRPS</strong> (anonymous FTP),
-<strong>GDACS</strong>, <strong>FIRMS</strong>, <strong>OpenAQ</strong>, and <strong>GHSL</strong> (plain HTTPS + the core
-GIS stack). Asking the facade for a backend whose extra is missing
-(e.g. <code>data_source="ecmwf"</code> without <code>earthlens[ecmwf]</code>) raises a clear
-<code>ImportError</code> naming the extra to install.</p>
+<h4 id="thematic-bundles"><a class="toclink" href="#thematic-bundles">Thematic bundles</a><a class="headerlink" href="#thematic-bundles" title="Permanent link">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Extra</th>
+<th>Covers (<code>data_source</code> keys)</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>air-quality</code></td>
+<td><code>airnow</code>, <code>eea-aq</code>, <code>openaq</code>, <code>sensor-community</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>biodiversity</code></td>
+<td><code>gbif</code>, <code>iucn</code>, <code>obis</code>, <code>wdpa</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>climate</code></td>
+<td><code>climate_indices</code>, <code>cmip6</code>, <code>ecmwf</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>disasters</code></td>
+<td><code>fdsn</code>, <code>firms</code>, <code>gdacs</code>, <code>risk_indicators</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>elevation</code></td>
+<td><code>bathymetry</code>, <code>dem</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>glaciers-cryosphere</code></td>
+<td><code>glaciers</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>humanitarian</code></td>
+<td><code>hdx</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hydrology</code></td>
+<td><code>nwm</code>, <code>usgs-water</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ocean</code></td>
+<td><code>argo</code>, <code>cmems</code>, <code>erddap</code></td>
+<td>Not meant to be combined with <code>platforms</code> in the same install — <code>argo</code>'s <code>argopy</code> needs <code>xarray&gt;=2025.7</code>, <code>platforms</code>' <code>openeo</code> needs <code>xarray&lt;2025.1.2</code>.</td>
+</tr>
+<tr>
+<td><code>platforms</code></td>
+<td><code>earthdata</code>, <code>eumetsat</code>, <code>gee</code>, <code>goes</code>, <code>jaxa</code>, <code>openeo</code>, <code>s3</code>, <code>sentinel-hub</code>, <code>stac</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>population-settlement</code></td>
+<td><code>ghsl</code>, <code>worldpop</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>precipitation-drought</code></td>
+<td><code>chc</code>, <code>drought</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>renewable-energy</code></td>
+<td><code>nrel</code>, <code>pvgis</code>, <code>solar_wind_atlas</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>sar-radar</code></td>
+<td><code>asf</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>soil</code></td>
+<td><code>soilgrids</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>tropical-cyclones</code></td>
+<td><code>tropycal</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>vector-basemaps</code></td>
+<td><code>admin</code>, <code>osm</code>, <code>overture</code></td>
+<td>Not meant to be combined with most other bundles — <code>osm</code>'s <code>ohsome</code> needs <code>pandas&lt;3.0.0</code>, conflicting with the rest of the dependency graph.</td>
+</tr>
+<tr>
+<td><code>weather-forecast</code></td>
+<td><code>nwp</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>weather-radar</code></td>
+<td><code>radar</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>A bare <code>pip install earthlens</code> installs only the core dependencies (numpy, pandas, pyramids-gis,
+requests, …), which is enough for every backend with no extra SDK of its own: <strong>geoBoundaries</strong>, <strong>AirNow</strong>, <strong>GEBCO/ETOPO bathymetry</strong>, <strong>CHC/CHIRPS</strong>, <strong>climate teleconnection indices</strong>, <strong>USDM/EDO/GDO/SPEIbase</strong>, <strong>NASA FIRMS</strong>, <strong>GDACS</strong>, <strong>RGI/GLIMS/WGMS glaciers</strong>, <strong>IUCN Red List</strong>, <strong>NREL/National Laboratory of the Rockies</strong>, <strong>OpenAQ</strong>, <strong>PVGIS</strong>, <strong>ThinkHazard!/INFORM</strong>, <strong>Sensor.Community</strong>, <strong>SoilGrids</strong>, <strong>Global Solar/Wind Atlas</strong>, <strong>Protected Planet</strong>.
+Asking the facade for a backend whose extra is missing (e.g. <code>data_source="ecmwf"</code> without
+<code>earthlens[ecmwf]</code>) raises a clear <code>ImportError</code> naming the extra to install.</p>
 <blockquote>
 <p><strong>Dependency note — <code>openeo</code> version pin.</strong> openeo <code>0.48+</code> hard-caps
 <code>pandas&lt;3.0.0</code>, which would drag the whole environment down to pandas 2.x.
@@ -19077,6 +19319,12 @@ on <strong>pandas 3</strong> (validated live against CDSE) — so <code>earthlen
 <code>earthlens[openeo]</code> keep pandas 3 for every backend. openeo <code>0.47</code> does still
 cap <code>xarray&lt;2025.01.2</code>, so installing it constrains <code>xarray</code> (not <code>pandas</code>).
 The upper bound will be lifted once openeo ships a pandas-3-compatible release.</p>
+<p><strong>Dependency note — <code>argo</code>, <code>osm</code>, <code>osm-pbf</code> excluded from <code>all</code>.</strong> <code>argopy</code> (via <code>argo</code>) pins
+<code>xarray&gt;=2025.7</code>, which conflicts with <code>openeo</code>'s <code>xarray&lt;2025.1.2</code>; <code>ohsome</code> (via <code>osm</code>) pins
+<code>pandas&lt;3.0.0</code>, which conflicts with the rest of the locked dependency graph; <code>osm-pbf</code>'s <code>pyrosm</code>
+has no prebuilt wheel and must compile from source. All three still install fine on their own
+(<code>pip install earthlens[argo]</code>, <code>earthlens[osm]</code>, <code>earthlens[osm-pbf]</code>) — they're just excluded
+from the <code>all</code> union so it stays installable in one shot.</p>
 </blockquote>
 <h2 id="from-sources"><a class="toclink" href="#from-sources">From Sources</a><a class="headerlink" href="#from-sources" title="Permanent link">#</a></h2>
 <p>The sources for earthlens can be downloaded from the <a href="https://github.com/serapeum-org/earthlens">GitHub repo</a>.</p>
