@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -21902,7 +21902,13 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-789">789</a></span>
 <span class="normal"><a href="#__codelineno-0-790">790</a></span>
 <span class="normal"><a href="#__codelineno-0-791">791</a></span>
-<span class="normal"><a href="#__codelineno-0-792">792</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="k">class</span><span class="w"> </span><span class="nc">Drought</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-792">792</a></span>
+<span class="normal"><a href="#__codelineno-0-793">793</a></span>
+<span class="normal"><a href="#__codelineno-0-794">794</a></span>
+<span class="normal"><a href="#__codelineno-0-795">795</a></span>
+<span class="normal"><a href="#__codelineno-0-796">796</a></span>
+<span class="normal"><a href="#__codelineno-0-797">797</a></span>
+<span class="normal"><a href="#__codelineno-0-798">798</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="k">class</span><span class="w"> </span><span class="nc">Drought</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Drought-indicator backend (per-instance output kind).</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    Wraps three live public services so a user can request a single drought</span>
@@ -22435,198 +22441,204 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-598" name="__codelineno-0-598"></a>                <span class="n">clipped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
 <a id="__codelineno-0-599" name="__codelineno-0-599"></a>                <span class="n">clipped</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 <a id="__codelineno-0-600" name="__codelineno-0-600"></a>                <span class="n">tmp_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>        <span class="k">return</span> <span class="n">written</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_render_wcs_url</span><span class="p">(</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="n">coverage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="n">timescale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="n">period</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a Copernicus EDO/GDO `GetCoverage` URL for one period.</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">            endpoint: The row&#39;s WCS map endpoint (carries `?map=DO_WCS`</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">                or `?map=GDO_WCS`).</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">            coverage: The WCS `coverageID` (e.g. `&quot;spaST&quot;`).</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">            timescale: The `SELECTED_TIMESCALE` value (`&quot;01&quot;`, `&quot;03&quot;`,</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">                …); omitted from the URL when `None`.</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">            period: The snapped date for this fetch (`TIME=`).</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            bbox: `(west, south, east, north)` in EPSG:4326 degrees.</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">            str: The fully-rendered GetCoverage URL.</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            ValueError: When `coverage` is `None` (an `edo-wcs` row must</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">                carry a coverage id).</span>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">coverage</span><span class="p">:</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a>                <span class="s2">&quot;an edo-wcs drought row must carry a `coverage` id; &quot;</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a>                <span class="s2">&quot;got None.&quot;</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a>            <span class="p">)</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="s2">&quot;SERVICE=WCS&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>            <span class="s2">&quot;VERSION=2.0.0&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>            <span class="s2">&quot;REQUEST=GetCoverage&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>            <span class="sa">f</span><span class="s2">&quot;coverageID=</span><span class="si">{</span><span class="n">coverage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>            <span class="s2">&quot;CRS=EPSG:4326&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>            <span class="s2">&quot;format=GEOTIFF&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="sa">f</span><span class="s2">&quot;TIME=</span><span class="si">{</span><span class="n">period</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="sa">f</span><span class="s2">&quot;SUBSET=Long(</span><span class="si">{</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">east</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="sa">f</span><span class="s2">&quot;SUBSET=Lat(</span><span class="si">{</span><span class="n">south</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">north</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="p">]</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>        <span class="k">if</span> <span class="n">timescale</span><span class="p">:</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECTED_TIMESCALE=</span><span class="si">{</span><span class="n">timescale</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>        <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">if</span> <span class="s2">&quot;?&quot;</span> <span class="ow">in</span> <span class="n">endpoint</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a>        <span class="k">return</span> <span class="n">endpoint</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_clip_wcs_raster</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window-crop a WCS raster to `bbox` when the server didn&#39;t clip it.</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        The Copernicus EDO/GDO `GetCoverage` endpoint honours the latitude</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">        subset but ignores longitude, returning a full -180..180 strip, and</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">        the GeoTIFF carries no embedded SRS so `pyramids.Dataset.crop`&#39;s</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">        cutline path is a no-op. We therefore compute the pixel window from</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">        the raster&#39;s own bounding box and rebuild the trimmed raster with</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        `Dataset.create_from_array` — a purely local operation that honours</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">        the requested bbox regardless of what the server returned. Latitude,</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">        already clipped server-side, is windowed again harmlessly; if the</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        server ever starts honouring `Long`, the window simply re-selects the</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        same region.</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">            dataset: The freshly-downloaded `pyramids.Dataset` (typically a</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">                full-width -180..180 strip).</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">            bbox: The requested `(west, south, east, north)` in EPSG:4326</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">                degrees.</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: requested bbox </span><span class="si">{</span><span class="n">bbox</span><span class="si">}</span><span class="s2"> fell entirely &quot;</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>                    <span class="sa">f</span><span class="s2">&quot;outside the downloaded raster&#39;s coverage; leaving &quot;</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2"> unclipped (full server-returned extent).&quot;</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>                <span class="p">)</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_render_wcs_url</span><span class="p">(</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="n">coverage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>        <span class="n">timescale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>        <span class="n">period</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>        <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a Copernicus EDO/GDO `GetCoverage` URL for one period.</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            endpoint: The row&#39;s WCS map endpoint (carries `?map=DO_WCS`</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">                or `?map=GDO_WCS`).</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">            coverage: The WCS `coverageID` (e.g. `&quot;spaST&quot;`).</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">            timescale: The `SELECTED_TIMESCALE` value (`&quot;01&quot;`, `&quot;03&quot;`,</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">                …); omitted from the URL when `None`.</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">            period: The snapped date for this fetch (`TIME=`).</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            bbox: `(west, south, east, north)` in EPSG:4326 degrees.</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">            str: The fully-rendered GetCoverage URL.</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            ValueError: When `coverage` is `None` (an `edo-wcs` row must</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">                carry a coverage id).</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">coverage</span><span class="p">:</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>                <span class="s2">&quot;an edo-wcs drought row must carry a `coverage` id; &quot;</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a>                <span class="s2">&quot;got None.&quot;</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a>            <span class="p">)</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="s2">&quot;SERVICE=WCS&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="s2">&quot;VERSION=2.0.0&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="s2">&quot;REQUEST=GetCoverage&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>            <span class="sa">f</span><span class="s2">&quot;coverageID=</span><span class="si">{</span><span class="n">coverage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a>            <span class="s2">&quot;CRS=EPSG:4326&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>            <span class="s2">&quot;format=GEOTIFF&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>            <span class="sa">f</span><span class="s2">&quot;TIME=</span><span class="si">{</span><span class="n">period</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>            <span class="sa">f</span><span class="s2">&quot;SUBSET=Long(</span><span class="si">{</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">east</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>            <span class="sa">f</span><span class="s2">&quot;SUBSET=Lat(</span><span class="si">{</span><span class="n">south</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">north</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>        <span class="p">]</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a>        <span class="k">if</span> <span class="n">timescale</span><span class="p">:</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a>            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECTED_TIMESCALE=</span><span class="si">{</span><span class="n">timescale</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>        <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">if</span> <span class="s2">&quot;?&quot;</span> <span class="ow">in</span> <span class="n">endpoint</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>        <span class="k">return</span> <span class="n">endpoint</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_clip_wcs_raster</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window-crop a WCS raster to `bbox` when the server didn&#39;t clip it.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">        The Copernicus EDO/GDO `GetCoverage` endpoint honours the latitude</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">        subset but ignores longitude, returning a full -180..180 strip, and</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        the GeoTIFF carries no embedded SRS so `pyramids.Dataset.crop`&#39;s</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        cutline path is a no-op. We therefore compute the pixel window from</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        the raster&#39;s own bounding box and rebuild the trimmed raster with</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        `Dataset.create_from_array` — a purely local operation that honours</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">        the requested bbox regardless of what the server returned. Latitude,</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">        already clipped server-side, is windowed again harmlessly; if the</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">        server ever starts honouring `Long`, the window simply re-selects the</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">        same region.</span>
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">            A new cropped `pyramids.Dataset`, or `None` when the requested</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            bbox falls entirely outside the raster (caller keeps the original</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            file untouched).</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>        <span class="n">col_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="n">col_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="n">cols</span><span class="p">)</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="n">row_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="n">row_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="n">rows</span><span class="p">)</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="k">if</span> <span class="n">col_stop</span> <span class="o">&lt;=</span> <span class="n">col_start</span> <span class="ow">or</span> <span class="n">row_stop</span> <span class="o">&lt;=</span> <span class="n">row_start</span><span class="p">:</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>            <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">window</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">:</span><span class="n">col_stop</span><span class="p">]</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>            <span class="n">x_min</span> <span class="o">+</span> <span class="n">col_start</span> <span class="o">*</span> <span class="n">cell_x</span><span class="p">,</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>            <span class="n">cell_x</span><span class="p">,</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>            <span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="n">y_max</span> <span class="o">-</span> <span class="n">row_start</span> <span class="o">*</span> <span class="n">cell_y</span><span class="p">,</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>            <span class="o">-</span><span class="n">cell_y</span><span class="p">,</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="p">)</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>        <span class="n">nodata</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>            <span class="n">arr</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>        <span class="p">)</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_vector</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an empty `FeatureCollection` with the USDM schema.</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="sd">        Used when every requested period produced zero polygons or fell</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a><span class="sd">        entirely outside the requested bbox.</span>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="sd">            FeatureCollection: Zero rows, the USDM columns, CRS</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">                `EPSG:4326`.</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureCollection</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>            <span class="p">{</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>                <span class="s2">&quot;OBJECTID&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>                <span class="s2">&quot;DM&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>                <span class="s2">&quot;Shape_Length&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>                <span class="s2">&quot;Shape_Area&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>                <span class="s2">&quot;release_date&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a>            <span class="p">}</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="p">)</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>            <span class="n">frame</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="p">)</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested drought indicator and return its artefacts.</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">            progress_bar: Accepted for facade-signature parity. The three</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">                drought transports run one fetch per period in serial</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">                today, so a `tqdm` bar would mostly idle; the argument is</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">                a no-op until a transport gains a per-byte progress hook.</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">            aggregate: A temporal reducer over the requested date range.</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">                Accepted for `OUTPUT_KIND == &quot;raster&quot;` (EDO/GDO/SPEIbase)</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">                and forwarded to the standard `earthlens.aggregate`</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">                pyramids reducer. **Rejected** for `OUTPUT_KIND ==</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">                &quot;vector&quot;` (USDM) — drought-class polygons have no</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">                gridded reduction.</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            FeatureCollection | list[Path]: For the vector USDM transport,</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">                the merged drought-class `FeatureCollection` in EPSG:4326.</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">                For the raster transports, the list of written file paths</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">                in period order.</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">            dataset: The freshly-downloaded `pyramids.Dataset` (typically a</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">                full-width -180..180 strip).</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            bbox: The requested `(west, south, east, north)` in EPSG:4326</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">                degrees.</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">            A new cropped `pyramids.Dataset`, or `None` when the requested</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">            bbox falls entirely outside the raster (caller keeps the original</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            file untouched).</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">col_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">col_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="n">cols</span><span class="p">)</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="n">row_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>        <span class="n">row_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="n">rows</span><span class="p">)</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="k">if</span> <span class="n">col_stop</span> <span class="o">&lt;=</span> <span class="n">col_start</span> <span class="ow">or</span> <span class="n">row_stop</span> <span class="o">&lt;=</span> <span class="n">row_start</span><span class="p">:</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>        <span class="n">window</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">:</span><span class="n">col_stop</span><span class="p">]</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>            <span class="n">x_min</span> <span class="o">+</span> <span class="n">col_start</span> <span class="o">*</span> <span class="n">cell_x</span><span class="p">,</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="n">cell_x</span><span class="p">,</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>            <span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>            <span class="n">y_max</span> <span class="o">-</span> <span class="n">row_start</span> <span class="o">*</span> <span class="n">cell_y</span><span class="p">,</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="o">-</span><span class="n">cell_y</span><span class="p">,</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>        <span class="p">)</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>        <span class="n">nodata</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="n">arr</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>            <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="p">)</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_vector</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an empty `FeatureCollection` with the USDM schema.</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        Used when every requested period produced zero polygons or fell</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">        entirely outside the requested bbox.</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">            FeatureCollection: Zero rows, the USDM columns, CRS</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">                `EPSG:4326`.</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureCollection</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>            <span class="p">{</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>                <span class="s2">&quot;OBJECTID&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>                <span class="s2">&quot;DM&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>                <span class="s2">&quot;Shape_Length&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>                <span class="s2">&quot;Shape_Area&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>                <span class="s2">&quot;release_date&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="p">}</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>        <span class="p">)</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>            <span class="n">frame</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="p">)</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested drought indicator and return its artefacts.</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">            progress_bar: Accepted for facade-signature parity. The three</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">                drought transports run one fetch per period in serial</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">                today, so a `tqdm` bar would mostly idle; the argument is</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">                a no-op until a transport gains a per-byte progress hook.</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">            aggregate: A temporal reducer over the requested date range.</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">                Accepted for `OUTPUT_KIND == &quot;raster&quot;` (EDO/GDO/SPEIbase)</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">                and forwarded to the standard `earthlens.aggregate`</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">                pyramids reducer. **Rejected** for `OUTPUT_KIND ==</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">                &quot;vector&quot;` (USDM) — drought-class polygons have no</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">                gridded reduction.</span>
 <a id="__codelineno-0-764" name="__codelineno-0-764"></a>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            NotImplementedError: When `aggregate is not None` on the</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">                vector USDM transport (drought-class polygons have no</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">                gridded reduction), or on any raster transport (the</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">                cross-period stack reducer is not wired yet).</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>                <span class="s2">&quot;Drought.download(aggregate=...) is not supported for the &quot;</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>                <span class="s2">&quot;USDM (vector) transport: drought-class polygons have no &quot;</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>                <span class="s2">&quot;gridded reduction. Call download() without aggregate= and &quot;</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>                <span class="s2">&quot;post-process the returned FeatureCollection directly.&quot;</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>            <span class="p">)</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="c1"># Force `progress_bar` into the local scope so a future per-period</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>        <span class="c1"># tqdm hook does not break the public signature when wired up.</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>        <span class="n">_</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;raster&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>                <span class="s2">&quot;Drought.download(aggregate=...) for raster transports is &quot;</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>                <span class="s2">&quot;not wired in this build. The SPEIbase / EDO / GDO outputs &quot;</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>                <span class="s2">&quot;are per-period GeoTIFFs; pass them through &quot;</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>                <span class="s2">&quot;`earthlens.aggregate.aggregate_netcdf` (or pyramids&#39; &quot;</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>                <span class="s2">&quot;`DatasetCollection.groupby`) directly until the drought &quot;</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>                <span class="s2">&quot;stack reducer ships.&quot;</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="p">)</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">attribution_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">transport</span><span class="p">))</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            FeatureCollection | list[Path]: For the vector USDM transport,</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">                the merged drought-class `FeatureCollection` in EPSG:4326.</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">                For the raster transports, the list of written file paths</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">                in period order.</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">            NotImplementedError: When `aggregate is not None` on the</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">                vector USDM transport (drought-class polygons have no</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">                gridded reduction), or on any raster transport (the</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">                cross-period stack reducer is not wired yet).</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>                <span class="s2">&quot;Drought.download(aggregate=...) is not supported for the &quot;</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>                <span class="s2">&quot;USDM (vector) transport: drought-class polygons have no &quot;</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>                <span class="s2">&quot;gridded reduction. Call download() without aggregate= and &quot;</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>                <span class="s2">&quot;post-process the returned FeatureCollection directly.&quot;</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>            <span class="p">)</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>        <span class="c1"># Force `progress_bar` into the local scope so a future per-period</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>        <span class="c1"># tqdm hook does not break the public signature when wired up.</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>        <span class="n">_</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;raster&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>                <span class="s2">&quot;Drought.download(aggregate=...) for raster transports is &quot;</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>                <span class="s2">&quot;not wired in this build. The SPEIbase / EDO / GDO outputs &quot;</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>                <span class="s2">&quot;are per-period GeoTIFFs; pass them through &quot;</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>                <span class="s2">&quot;`earthlens.aggregate.aggregate_netcdf` (or pyramids&#39; &quot;</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>                <span class="s2">&quot;`DatasetCollection.groupby`) directly until the drought &quot;</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>                <span class="s2">&quot;stack reducer ships.&quot;</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>            <span class="p">)</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">attribution_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">transport</span><span class="p">))</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>        <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23198,13 +23210,7 @@ cross-period stack reducer is not wired yet).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/drought/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-740">740</a></span>
-<span class="normal"><a href="#__codelineno-0-741">741</a></span>
-<span class="normal"><a href="#__codelineno-0-742">742</a></span>
-<span class="normal"><a href="#__codelineno-0-743">743</a></span>
-<span class="normal"><a href="#__codelineno-0-744">744</a></span>
-<span class="normal"><a href="#__codelineno-0-745">745</a></span>
-<span class="normal"><a href="#__codelineno-0-746">746</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-746">746</a></span>
 <span class="normal"><a href="#__codelineno-0-747">747</a></span>
 <span class="normal"><a href="#__codelineno-0-748">748</a></span>
 <span class="normal"><a href="#__codelineno-0-749">749</a></span>
@@ -23250,59 +23256,65 @@ cross-period stack reducer is not wired yet).</p>
 <span class="normal"><a href="#__codelineno-0-789">789</a></span>
 <span class="normal"><a href="#__codelineno-0-790">790</a></span>
 <span class="normal"><a href="#__codelineno-0-791">791</a></span>
-<span class="normal"><a href="#__codelineno-0-792">792</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested drought indicator and return its artefacts.</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">        progress_bar: Accepted for facade-signature parity. The three</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">            drought transports run one fetch per period in serial</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">            today, so a `tqdm` bar would mostly idle; the argument is</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">            a no-op until a transport gains a per-byte progress hook.</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        aggregate: A temporal reducer over the requested date range.</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">            Accepted for `OUTPUT_KIND == &quot;raster&quot;` (EDO/GDO/SPEIbase)</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">            and forwarded to the standard `earthlens.aggregate`</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">            pyramids reducer. **Rejected** for `OUTPUT_KIND ==</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">            &quot;vector&quot;` (USDM) — drought-class polygons have no</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">            gridded reduction.</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">        FeatureCollection | list[Path]: For the vector USDM transport,</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">            the merged drought-class `FeatureCollection` in EPSG:4326.</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            For the raster transports, the list of written file paths</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            in period order.</span>
+<span class="normal"><a href="#__codelineno-0-792">792</a></span>
+<span class="normal"><a href="#__codelineno-0-793">793</a></span>
+<span class="normal"><a href="#__codelineno-0-794">794</a></span>
+<span class="normal"><a href="#__codelineno-0-795">795</a></span>
+<span class="normal"><a href="#__codelineno-0-796">796</a></span>
+<span class="normal"><a href="#__codelineno-0-797">797</a></span>
+<span class="normal"><a href="#__codelineno-0-798">798</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested drought indicator and return its artefacts.</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">        progress_bar: Accepted for facade-signature parity. The three</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">            drought transports run one fetch per period in serial</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">            today, so a `tqdm` bar would mostly idle; the argument is</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">            a no-op until a transport gains a per-byte progress hook.</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">        aggregate: A temporal reducer over the requested date range.</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">            Accepted for `OUTPUT_KIND == &quot;raster&quot;` (EDO/GDO/SPEIbase)</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            and forwarded to the standard `earthlens.aggregate`</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">            pyramids reducer. **Rejected** for `OUTPUT_KIND ==</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            &quot;vector&quot;` (USDM) — drought-class polygons have no</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            gridded reduction.</span>
 <a id="__codelineno-0-764" name="__codelineno-0-764"></a>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        NotImplementedError: When `aggregate is not None` on the</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            vector USDM transport (drought-class polygons have no</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            gridded reduction), or on any raster transport (the</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">            cross-period stack reducer is not wired yet).</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="s2">&quot;Drought.download(aggregate=...) is not supported for the &quot;</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>            <span class="s2">&quot;USDM (vector) transport: drought-class polygons have no &quot;</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>            <span class="s2">&quot;gridded reduction. Call download() without aggregate= and &quot;</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>            <span class="s2">&quot;post-process the returned FeatureCollection directly.&quot;</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="p">)</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>    <span class="c1"># Force `progress_bar` into the local scope so a future per-period</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>    <span class="c1"># tqdm hook does not break the public signature when wired up.</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>    <span class="n">_</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;raster&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>            <span class="s2">&quot;Drought.download(aggregate=...) for raster transports is &quot;</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>            <span class="s2">&quot;not wired in this build. The SPEIbase / EDO / GDO outputs &quot;</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>            <span class="s2">&quot;are per-period GeoTIFFs; pass them through &quot;</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>            <span class="s2">&quot;`earthlens.aggregate.aggregate_netcdf` (or pyramids&#39; &quot;</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>            <span class="s2">&quot;`DatasetCollection.groupby`) directly until the drought &quot;</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="s2">&quot;stack reducer ships.&quot;</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="p">)</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">attribution_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">transport</span><span class="p">))</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        FeatureCollection | list[Path]: For the vector USDM transport,</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            the merged drought-class `FeatureCollection` in EPSG:4326.</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            For the raster transports, the list of written file paths</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">            in period order.</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">        NotImplementedError: When `aggregate is not None` on the</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">            vector USDM transport (drought-class polygons have no</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">            gridded reduction), or on any raster transport (the</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">            cross-period stack reducer is not wired yet).</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="s2">&quot;Drought.download(aggregate=...) is not supported for the &quot;</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>            <span class="s2">&quot;USDM (vector) transport: drought-class polygons have no &quot;</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="s2">&quot;gridded reduction. Call download() without aggregate= and &quot;</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>            <span class="s2">&quot;post-process the returned FeatureCollection directly.&quot;</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>        <span class="p">)</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="c1"># Force `progress_bar` into the local scope so a future per-period</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>    <span class="c1"># tqdm hook does not break the public signature when wired up.</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>    <span class="n">_</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;raster&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="s2">&quot;Drought.download(aggregate=...) for raster transports is &quot;</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="s2">&quot;not wired in this build. The SPEIbase / EDO / GDO outputs &quot;</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>            <span class="s2">&quot;are per-period GeoTIFFs; pass them through &quot;</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>            <span class="s2">&quot;`earthlens.aggregate.aggregate_netcdf` (or pyramids&#39; &quot;</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>            <span class="s2">&quot;`DatasetCollection.groupby`) directly until the drought &quot;</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>            <span class="s2">&quot;stack reducer ships.&quot;</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>        <span class="p">)</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">attribution_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">transport</span><span class="p">))</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24222,7 +24234,13 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-789">789</a></span>
 <span class="normal"><a href="#__codelineno-0-790">790</a></span>
 <span class="normal"><a href="#__codelineno-0-791">791</a></span>
-<span class="normal"><a href="#__codelineno-0-792">792</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="k">class</span><span class="w"> </span><span class="nc">Drought</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-792">792</a></span>
+<span class="normal"><a href="#__codelineno-0-793">793</a></span>
+<span class="normal"><a href="#__codelineno-0-794">794</a></span>
+<span class="normal"><a href="#__codelineno-0-795">795</a></span>
+<span class="normal"><a href="#__codelineno-0-796">796</a></span>
+<span class="normal"><a href="#__codelineno-0-797">797</a></span>
+<span class="normal"><a href="#__codelineno-0-798">798</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="k">class</span><span class="w"> </span><span class="nc">Drought</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Drought-indicator backend (per-instance output kind).</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    Wraps three live public services so a user can request a single drought</span>
@@ -24755,198 +24773,204 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-598" name="__codelineno-0-598"></a>                <span class="n">clipped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
 <a id="__codelineno-0-599" name="__codelineno-0-599"></a>                <span class="n">clipped</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 <a id="__codelineno-0-600" name="__codelineno-0-600"></a>                <span class="n">tmp_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>        <span class="k">return</span> <span class="n">written</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_render_wcs_url</span><span class="p">(</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="n">coverage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>        <span class="n">timescale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="n">period</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>        <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a Copernicus EDO/GDO `GetCoverage` URL for one period.</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">            endpoint: The row&#39;s WCS map endpoint (carries `?map=DO_WCS`</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">                or `?map=GDO_WCS`).</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">            coverage: The WCS `coverageID` (e.g. `&quot;spaST&quot;`).</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">            timescale: The `SELECTED_TIMESCALE` value (`&quot;01&quot;`, `&quot;03&quot;`,</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">                …); omitted from the URL when `None`.</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">            period: The snapped date for this fetch (`TIME=`).</span>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            bbox: `(west, south, east, north)` in EPSG:4326 degrees.</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">            str: The fully-rendered GetCoverage URL.</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            ValueError: When `coverage` is `None` (an `edo-wcs` row must</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">                carry a coverage id).</span>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">coverage</span><span class="p">:</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a>                <span class="s2">&quot;an edo-wcs drought row must carry a `coverage` id; &quot;</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a>                <span class="s2">&quot;got None.&quot;</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a>            <span class="p">)</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="s2">&quot;SERVICE=WCS&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>            <span class="s2">&quot;VERSION=2.0.0&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>            <span class="s2">&quot;REQUEST=GetCoverage&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>            <span class="sa">f</span><span class="s2">&quot;coverageID=</span><span class="si">{</span><span class="n">coverage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>            <span class="s2">&quot;CRS=EPSG:4326&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>            <span class="s2">&quot;format=GEOTIFF&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="sa">f</span><span class="s2">&quot;TIME=</span><span class="si">{</span><span class="n">period</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="sa">f</span><span class="s2">&quot;SUBSET=Long(</span><span class="si">{</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">east</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="sa">f</span><span class="s2">&quot;SUBSET=Lat(</span><span class="si">{</span><span class="n">south</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">north</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="p">]</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>        <span class="k">if</span> <span class="n">timescale</span><span class="p">:</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECTED_TIMESCALE=</span><span class="si">{</span><span class="n">timescale</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>        <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">if</span> <span class="s2">&quot;?&quot;</span> <span class="ow">in</span> <span class="n">endpoint</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a>        <span class="k">return</span> <span class="n">endpoint</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_clip_wcs_raster</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window-crop a WCS raster to `bbox` when the server didn&#39;t clip it.</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        The Copernicus EDO/GDO `GetCoverage` endpoint honours the latitude</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">        subset but ignores longitude, returning a full -180..180 strip, and</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">        the GeoTIFF carries no embedded SRS so `pyramids.Dataset.crop`&#39;s</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">        cutline path is a no-op. We therefore compute the pixel window from</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">        the raster&#39;s own bounding box and rebuild the trimmed raster with</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        `Dataset.create_from_array` — a purely local operation that honours</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">        the requested bbox regardless of what the server returned. Latitude,</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">        already clipped server-side, is windowed again harmlessly; if the</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        server ever starts honouring `Long`, the window simply re-selects the</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        same region.</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">            dataset: The freshly-downloaded `pyramids.Dataset` (typically a</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">                full-width -180..180 strip).</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">            bbox: The requested `(west, south, east, north)` in EPSG:4326</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">                degrees.</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: requested bbox </span><span class="si">{</span><span class="n">bbox</span><span class="si">}</span><span class="s2"> fell entirely &quot;</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>                    <span class="sa">f</span><span class="s2">&quot;outside the downloaded raster&#39;s coverage; leaving &quot;</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2"> unclipped (full server-returned extent).&quot;</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>                <span class="p">)</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_render_wcs_url</span><span class="p">(</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>        <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="n">coverage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>        <span class="n">timescale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>        <span class="n">period</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>        <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a Copernicus EDO/GDO `GetCoverage` URL for one period.</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            endpoint: The row&#39;s WCS map endpoint (carries `?map=DO_WCS`</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">                or `?map=GDO_WCS`).</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">            coverage: The WCS `coverageID` (e.g. `&quot;spaST&quot;`).</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">            timescale: The `SELECTED_TIMESCALE` value (`&quot;01&quot;`, `&quot;03&quot;`,</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">                …); omitted from the URL when `None`.</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">            period: The snapped date for this fetch (`TIME=`).</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            bbox: `(west, south, east, north)` in EPSG:4326 degrees.</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">            str: The fully-rendered GetCoverage URL.</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            ValueError: When `coverage` is `None` (an `edo-wcs` row must</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">                carry a coverage id).</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">coverage</span><span class="p">:</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a>                <span class="s2">&quot;an edo-wcs drought row must carry a `coverage` id; &quot;</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a>                <span class="s2">&quot;got None.&quot;</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a>            <span class="p">)</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a>            <span class="s2">&quot;SERVICE=WCS&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="s2">&quot;VERSION=2.0.0&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="s2">&quot;REQUEST=GetCoverage&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>            <span class="sa">f</span><span class="s2">&quot;coverageID=</span><span class="si">{</span><span class="n">coverage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a>            <span class="s2">&quot;CRS=EPSG:4326&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>            <span class="s2">&quot;format=GEOTIFF&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>            <span class="sa">f</span><span class="s2">&quot;TIME=</span><span class="si">{</span><span class="n">period</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>            <span class="sa">f</span><span class="s2">&quot;SUBSET=Long(</span><span class="si">{</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">east</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>            <span class="sa">f</span><span class="s2">&quot;SUBSET=Lat(</span><span class="si">{</span><span class="n">south</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">north</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>        <span class="p">]</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a>        <span class="k">if</span> <span class="n">timescale</span><span class="p">:</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a>            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECTED_TIMESCALE=</span><span class="si">{</span><span class="n">timescale</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>        <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">if</span> <span class="s2">&quot;?&quot;</span> <span class="ow">in</span> <span class="n">endpoint</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>        <span class="k">return</span> <span class="n">endpoint</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_clip_wcs_raster</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Window-crop a WCS raster to `bbox` when the server didn&#39;t clip it.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">        The Copernicus EDO/GDO `GetCoverage` endpoint honours the latitude</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">        subset but ignores longitude, returning a full -180..180 strip, and</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        the GeoTIFF carries no embedded SRS so `pyramids.Dataset.crop`&#39;s</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        cutline path is a no-op. We therefore compute the pixel window from</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        the raster&#39;s own bounding box and rebuild the trimmed raster with</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        `Dataset.create_from_array` — a purely local operation that honours</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">        the requested bbox regardless of what the server returned. Latitude,</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">        already clipped server-side, is windowed again harmlessly; if the</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">        server ever starts honouring `Long`, the window simply re-selects the</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">        same region.</span>
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">            A new cropped `pyramids.Dataset`, or `None` when the requested</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            bbox falls entirely outside the raster (caller keeps the original</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            file untouched).</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>        <span class="n">col_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="n">col_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="n">cols</span><span class="p">)</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="n">row_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="n">row_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="n">rows</span><span class="p">)</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="k">if</span> <span class="n">col_stop</span> <span class="o">&lt;=</span> <span class="n">col_start</span> <span class="ow">or</span> <span class="n">row_stop</span> <span class="o">&lt;=</span> <span class="n">row_start</span><span class="p">:</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>            <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">window</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">:</span><span class="n">col_stop</span><span class="p">]</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>            <span class="n">x_min</span> <span class="o">+</span> <span class="n">col_start</span> <span class="o">*</span> <span class="n">cell_x</span><span class="p">,</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>            <span class="n">cell_x</span><span class="p">,</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>            <span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="n">y_max</span> <span class="o">-</span> <span class="n">row_start</span> <span class="o">*</span> <span class="n">cell_y</span><span class="p">,</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>            <span class="o">-</span><span class="n">cell_y</span><span class="p">,</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="p">)</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>        <span class="n">nodata</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>            <span class="n">arr</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>        <span class="p">)</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_vector</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an empty `FeatureCollection` with the USDM schema.</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="sd">        Used when every requested period produced zero polygons or fell</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a><span class="sd">        entirely outside the requested bbox.</span>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="sd">            FeatureCollection: Zero rows, the USDM columns, CRS</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">                `EPSG:4326`.</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureCollection</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>            <span class="p">{</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>                <span class="s2">&quot;OBJECTID&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>                <span class="s2">&quot;DM&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>                <span class="s2">&quot;Shape_Length&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>                <span class="s2">&quot;Shape_Area&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>                <span class="s2">&quot;release_date&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a>            <span class="p">}</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="p">)</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>            <span class="n">frame</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="p">)</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested drought indicator and return its artefacts.</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">            progress_bar: Accepted for facade-signature parity. The three</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">                drought transports run one fetch per period in serial</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">                today, so a `tqdm` bar would mostly idle; the argument is</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">                a no-op until a transport gains a per-byte progress hook.</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">            aggregate: A temporal reducer over the requested date range.</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">                Accepted for `OUTPUT_KIND == &quot;raster&quot;` (EDO/GDO/SPEIbase)</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">                and forwarded to the standard `earthlens.aggregate`</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">                pyramids reducer. **Rejected** for `OUTPUT_KIND ==</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">                &quot;vector&quot;` (USDM) — drought-class polygons have no</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">                gridded reduction.</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            FeatureCollection | list[Path]: For the vector USDM transport,</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">                the merged drought-class `FeatureCollection` in EPSG:4326.</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">                For the raster transports, the list of written file paths</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">                in period order.</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">            dataset: The freshly-downloaded `pyramids.Dataset` (typically a</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">                full-width -180..180 strip).</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            bbox: The requested `(west, south, east, north)` in EPSG:4326</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">                degrees.</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">            A new cropped `pyramids.Dataset`, or `None` when the requested</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">            bbox falls entirely outside the raster (caller keeps the original</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            file untouched).</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">col_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">col_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="n">cols</span><span class="p">)</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="n">row_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>        <span class="n">row_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="n">rows</span><span class="p">)</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="k">if</span> <span class="n">col_stop</span> <span class="o">&lt;=</span> <span class="n">col_start</span> <span class="ow">or</span> <span class="n">row_stop</span> <span class="o">&lt;=</span> <span class="n">row_start</span><span class="p">:</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>        <span class="n">window</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">:</span><span class="n">col_stop</span><span class="p">]</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>            <span class="n">x_min</span> <span class="o">+</span> <span class="n">col_start</span> <span class="o">*</span> <span class="n">cell_x</span><span class="p">,</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="n">cell_x</span><span class="p">,</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>            <span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>            <span class="n">y_max</span> <span class="o">-</span> <span class="n">row_start</span> <span class="o">*</span> <span class="n">cell_y</span><span class="p">,</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="o">-</span><span class="n">cell_y</span><span class="p">,</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>        <span class="p">)</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>        <span class="n">nodata</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="n">arr</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>            <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="p">)</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_vector</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an empty `FeatureCollection` with the USDM schema.</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        Used when every requested period produced zero polygons or fell</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">        entirely outside the requested bbox.</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">            FeatureCollection: Zero rows, the USDM columns, CRS</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">                `EPSG:4326`.</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureCollection</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>            <span class="p">{</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>                <span class="s2">&quot;OBJECTID&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>                <span class="s2">&quot;DM&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>                <span class="s2">&quot;Shape_Length&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>                <span class="s2">&quot;Shape_Area&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>                <span class="s2">&quot;release_date&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="p">}</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>        <span class="p">)</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>            <span class="n">frame</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="p">)</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested drought indicator and return its artefacts.</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">            progress_bar: Accepted for facade-signature parity. The three</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">                drought transports run one fetch per period in serial</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">                today, so a `tqdm` bar would mostly idle; the argument is</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">                a no-op until a transport gains a per-byte progress hook.</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">            aggregate: A temporal reducer over the requested date range.</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">                Accepted for `OUTPUT_KIND == &quot;raster&quot;` (EDO/GDO/SPEIbase)</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">                and forwarded to the standard `earthlens.aggregate`</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">                pyramids reducer. **Rejected** for `OUTPUT_KIND ==</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">                &quot;vector&quot;` (USDM) — drought-class polygons have no</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">                gridded reduction.</span>
 <a id="__codelineno-0-764" name="__codelineno-0-764"></a>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            NotImplementedError: When `aggregate is not None` on the</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">                vector USDM transport (drought-class polygons have no</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">                gridded reduction), or on any raster transport (the</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">                cross-period stack reducer is not wired yet).</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>                <span class="s2">&quot;Drought.download(aggregate=...) is not supported for the &quot;</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>                <span class="s2">&quot;USDM (vector) transport: drought-class polygons have no &quot;</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>                <span class="s2">&quot;gridded reduction. Call download() without aggregate= and &quot;</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>                <span class="s2">&quot;post-process the returned FeatureCollection directly.&quot;</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>            <span class="p">)</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="c1"># Force `progress_bar` into the local scope so a future per-period</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>        <span class="c1"># tqdm hook does not break the public signature when wired up.</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>        <span class="n">_</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;raster&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>                <span class="s2">&quot;Drought.download(aggregate=...) for raster transports is &quot;</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>                <span class="s2">&quot;not wired in this build. The SPEIbase / EDO / GDO outputs &quot;</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>                <span class="s2">&quot;are per-period GeoTIFFs; pass them through &quot;</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>                <span class="s2">&quot;`earthlens.aggregate.aggregate_netcdf` (or pyramids&#39; &quot;</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>                <span class="s2">&quot;`DatasetCollection.groupby`) directly until the drought &quot;</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>                <span class="s2">&quot;stack reducer ships.&quot;</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="p">)</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">attribution_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">transport</span><span class="p">))</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            FeatureCollection | list[Path]: For the vector USDM transport,</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">                the merged drought-class `FeatureCollection` in EPSG:4326.</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">                For the raster transports, the list of written file paths</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">                in period order.</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">            NotImplementedError: When `aggregate is not None` on the</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">                vector USDM transport (drought-class polygons have no</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">                gridded reduction), or on any raster transport (the</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">                cross-period stack reducer is not wired yet).</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>                <span class="s2">&quot;Drought.download(aggregate=...) is not supported for the &quot;</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>                <span class="s2">&quot;USDM (vector) transport: drought-class polygons have no &quot;</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>                <span class="s2">&quot;gridded reduction. Call download() without aggregate= and &quot;</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>                <span class="s2">&quot;post-process the returned FeatureCollection directly.&quot;</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>            <span class="p">)</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>        <span class="c1"># Force `progress_bar` into the local scope so a future per-period</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>        <span class="c1"># tqdm hook does not break the public signature when wired up.</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>        <span class="n">_</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;raster&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>                <span class="s2">&quot;Drought.download(aggregate=...) for raster transports is &quot;</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>                <span class="s2">&quot;not wired in this build. The SPEIbase / EDO / GDO outputs &quot;</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>                <span class="s2">&quot;are per-period GeoTIFFs; pass them through &quot;</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>                <span class="s2">&quot;`earthlens.aggregate.aggregate_netcdf` (or pyramids&#39; &quot;</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>                <span class="s2">&quot;`DatasetCollection.groupby`) directly until the drought &quot;</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>                <span class="s2">&quot;stack reducer ships.&quot;</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>            <span class="p">)</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">attribution_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">transport</span><span class="p">))</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>        <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25518,13 +25542,7 @@ cross-period stack reducer is not wired yet).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/drought/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-740">740</a></span>
-<span class="normal"><a href="#__codelineno-0-741">741</a></span>
-<span class="normal"><a href="#__codelineno-0-742">742</a></span>
-<span class="normal"><a href="#__codelineno-0-743">743</a></span>
-<span class="normal"><a href="#__codelineno-0-744">744</a></span>
-<span class="normal"><a href="#__codelineno-0-745">745</a></span>
-<span class="normal"><a href="#__codelineno-0-746">746</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-746">746</a></span>
 <span class="normal"><a href="#__codelineno-0-747">747</a></span>
 <span class="normal"><a href="#__codelineno-0-748">748</a></span>
 <span class="normal"><a href="#__codelineno-0-749">749</a></span>
@@ -25570,59 +25588,65 @@ cross-period stack reducer is not wired yet).</p>
 <span class="normal"><a href="#__codelineno-0-789">789</a></span>
 <span class="normal"><a href="#__codelineno-0-790">790</a></span>
 <span class="normal"><a href="#__codelineno-0-791">791</a></span>
-<span class="normal"><a href="#__codelineno-0-792">792</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested drought indicator and return its artefacts.</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">        progress_bar: Accepted for facade-signature parity. The three</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">            drought transports run one fetch per period in serial</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">            today, so a `tqdm` bar would mostly idle; the argument is</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">            a no-op until a transport gains a per-byte progress hook.</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        aggregate: A temporal reducer over the requested date range.</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">            Accepted for `OUTPUT_KIND == &quot;raster&quot;` (EDO/GDO/SPEIbase)</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">            and forwarded to the standard `earthlens.aggregate`</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">            pyramids reducer. **Rejected** for `OUTPUT_KIND ==</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">            &quot;vector&quot;` (USDM) — drought-class polygons have no</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">            gridded reduction.</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">        FeatureCollection | list[Path]: For the vector USDM transport,</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">            the merged drought-class `FeatureCollection` in EPSG:4326.</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            For the raster transports, the list of written file paths</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            in period order.</span>
+<span class="normal"><a href="#__codelineno-0-792">792</a></span>
+<span class="normal"><a href="#__codelineno-0-793">793</a></span>
+<span class="normal"><a href="#__codelineno-0-794">794</a></span>
+<span class="normal"><a href="#__codelineno-0-795">795</a></span>
+<span class="normal"><a href="#__codelineno-0-796">796</a></span>
+<span class="normal"><a href="#__codelineno-0-797">797</a></span>
+<span class="normal"><a href="#__codelineno-0-798">798</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested drought indicator and return its artefacts.</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">        progress_bar: Accepted for facade-signature parity. The three</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">            drought transports run one fetch per period in serial</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">            today, so a `tqdm` bar would mostly idle; the argument is</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">            a no-op until a transport gains a per-byte progress hook.</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">        aggregate: A temporal reducer over the requested date range.</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">            Accepted for `OUTPUT_KIND == &quot;raster&quot;` (EDO/GDO/SPEIbase)</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            and forwarded to the standard `earthlens.aggregate`</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">            pyramids reducer. **Rejected** for `OUTPUT_KIND ==</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            &quot;vector&quot;` (USDM) — drought-class polygons have no</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            gridded reduction.</span>
 <a id="__codelineno-0-764" name="__codelineno-0-764"></a>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        NotImplementedError: When `aggregate is not None` on the</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            vector USDM transport (drought-class polygons have no</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            gridded reduction), or on any raster transport (the</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">            cross-period stack reducer is not wired yet).</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="s2">&quot;Drought.download(aggregate=...) is not supported for the &quot;</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>            <span class="s2">&quot;USDM (vector) transport: drought-class polygons have no &quot;</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>            <span class="s2">&quot;gridded reduction. Call download() without aggregate= and &quot;</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>            <span class="s2">&quot;post-process the returned FeatureCollection directly.&quot;</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="p">)</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>    <span class="c1"># Force `progress_bar` into the local scope so a future per-period</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>    <span class="c1"># tqdm hook does not break the public signature when wired up.</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>    <span class="n">_</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;raster&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>            <span class="s2">&quot;Drought.download(aggregate=...) for raster transports is &quot;</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>            <span class="s2">&quot;not wired in this build. The SPEIbase / EDO / GDO outputs &quot;</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>            <span class="s2">&quot;are per-period GeoTIFFs; pass them through &quot;</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>            <span class="s2">&quot;`earthlens.aggregate.aggregate_netcdf` (or pyramids&#39; &quot;</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>            <span class="s2">&quot;`DatasetCollection.groupby`) directly until the drought &quot;</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="s2">&quot;stack reducer ships.&quot;</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="p">)</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">attribution_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">transport</span><span class="p">))</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        FeatureCollection | list[Path]: For the vector USDM transport,</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            the merged drought-class `FeatureCollection` in EPSG:4326.</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            For the raster transports, the list of written file paths</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">            in period order.</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">        NotImplementedError: When `aggregate is not None` on the</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">            vector USDM transport (drought-class polygons have no</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">            gridded reduction), or on any raster transport (the</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">            cross-period stack reducer is not wired yet).</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="s2">&quot;Drought.download(aggregate=...) is not supported for the &quot;</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>            <span class="s2">&quot;USDM (vector) transport: drought-class polygons have no &quot;</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="s2">&quot;gridded reduction. Call download() without aggregate= and &quot;</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>            <span class="s2">&quot;post-process the returned FeatureCollection directly.&quot;</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>        <span class="p">)</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="c1"># Force `progress_bar` into the local scope so a future per-period</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>    <span class="c1"># tqdm hook does not break the public signature when wired up.</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>    <span class="n">_</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;raster&quot;</span> <span class="ow">and</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="s2">&quot;Drought.download(aggregate=...) for raster transports is &quot;</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="s2">&quot;not wired in this build. The SPEIbase / EDO / GDO outputs &quot;</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>            <span class="s2">&quot;are per-period GeoTIFFs; pass them through &quot;</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>            <span class="s2">&quot;`earthlens.aggregate.aggregate_netcdf` (or pyramids&#39; &quot;</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>            <span class="s2">&quot;`DatasetCollection.groupby`) directly until the drought &quot;</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>            <span class="s2">&quot;stack reducer ships.&quot;</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>        <span class="p">)</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">attribution_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">transport</span><span class="p">))</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
