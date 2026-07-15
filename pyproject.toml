@@ -176,28 +176,59 @@ osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
 
 # Thematic bundles mirroring the README / docs/examples/data-sources.md provider
 # categories -- a convenience grouping for "I want disaster data" / "I want
-# imagery data", not a minimal-footprint install. Each unions the individual
+# ocean data", not a minimal-footprint install. Each unions the individual
 # extras of that category's real SDK-needing backends; category members with
 # no SDK of their own (anonymous HTTP over core `requests`/`pandas`, e.g. chc,
-# gdacs, firms, drought, admin, iucn, wdpa, ...) already work without an extra
-# and so are omitted from the list below, not left out of the category.
+# gdacs, firms, drought, admin, bathymetry, glaciers, iucn, wdpa, ...) already
+# work without an extra and so are omitted from the list below, not left out
+# of the category.
+#
+# These categories are grouped by *actual physical data type*, verified by
+# reading every provider's own docs -- not by SDK, agency, or name. Two
+# earlier, coarser passes got this wrong in ways worth noting: `cmems` is
+# ocean, not "climate"; `argo` is ocean, not "hydrology"; `asf` is pure SAR,
+# not generic "imagery"; `chc`/`drought` are precipitation/drought products,
+# distinct from `ecmwf`'s assimilated reanalysis and `cmip6`'s free-running
+# projections; and `gee`/`sentinel-hub`/`stac`/`openeo`/`eumetsat`/`earthdata`/
+# `jaxa`/`s3` are broad multi-mission platforms that host many unrelated
+# dataset types under one SDK, not narrow single-variable providers -- hence
+# `platforms` below rather than the old, misleading `imagery` name.
 air-quality = ["earthlens[eea_aq]"]
 biodiversity = ["earthlens[gbif,obis]"]
-climate = ["earthlens[cmems,cmip6,ecmwf,nwp]"]
+# ecmwf (reanalysis) + cmip6 (free-running scenario projections). climate_indices
+# (ENSO/NAO/PDO/... scalar teleconnection series) has no SDK of its own.
+climate = ["earthlens[cmip6,ecmwf]"]
+# chc (CHIRPS/CHIRTS/WBGT) + drought (USDM/EDO/GDO/SPEIbase) are both
+# satellite/station-blended precipitation & drought-index products, distinct
+# from ecmwf's assimilated reanalysis above. Neither has an SDK of its own.
+precipitation-drought = []
 disasters = ["earthlens[fdsn]"]
 elevation = ["earthlens[dem]"]
-humanitarian = ["earthlens[ghsl,hdx,worldpop]"]
-# Deliberately not meant to be combined with `imagery` in the same install:
-# argopy pins xarray>=2025.7, openeo (in `imagery`) pins xarray<2025.1.2 -- the
-# same conflict that excludes `argo` from `all` below.
-hydrology = ["earthlens[argo,erddap,nwm,usgs-water]"]
-imagery = [
-    "earthlens[asf,earthdata,eumetsat,gee,goes,jaxa,openeo,s3,sentinel-hub,stac]",
+# glaciers (RGI/GLIMS outlines + WGMS mass-balance) has no SDK of its own; kept
+# (empty) for symmetry with the README/docs "Glaciers & cryosphere" category.
+glaciers-cryosphere = []
+humanitarian = ["earthlens[hdx]"]
+hydrology = ["earthlens[nwm,usgs-water]"]
+# Deliberately not meant to be combined with `platforms` in the same install:
+# argopy (via `argo`) pins xarray>=2025.7, openeo (in `platforms`) pins
+# xarray<2025.1.2 -- the same conflict that excludes `argo` from `all` below.
+# Verified: `earthlens[cmems,argo,erddap]` resolves cleanly alone; adding
+# `openeo` to that same install reproduces the conflict.
+ocean = ["earthlens[cmems,argo,erddap]"]
+population-settlement = ["earthlens[worldpop,ghsl]"]
+# The broad, overlapping-capability satellite/data platforms -- most public
+# imagery (e.g. Sentinel-2) is reachable through several of these at once, so
+# this bundle is "give me every way to reach generic satellite/EO data," not
+# a single physical variable. asf (pure SAR) is deliberately NOT here -- see
+# `sar-radar` below.
+platforms = [
+    "earthlens[earthdata,eumetsat,gee,goes,jaxa,openeo,s3,sentinel-hub,stac]",
 ]
 # nrel, pvgis and solar_wind_atlas are all anonymous-HTTP backends with no SDK
 # of their own; kept (empty) for symmetry with the README/docs "Renewable
 # energy" category, the same way the cmip6/ghsl provider extras are empty.
 renewable-energy = []
+sar-radar = ["earthlens[asf]"]
 # soilgrids has no SDK of its own; kept (empty) for symmetry with the
 # README/docs "Soil & land" category.
 soil = []
@@ -206,6 +237,9 @@ tropical-cyclones = ["earthlens[tropycal]"]
 # install: ohsome (via `osm`) pins pandas<3.0.0 -- the same conflict that
 # excludes `osm` from `all` below.
 vector-basemaps = ["earthlens[osm,overture]"]
+# nwp (Herbie-fetched GFS/HRRR/ICON/IFS forecasts) is model *forecast* output,
+# distinct from ecmwf's *reanalysis* in `climate` above.
+weather-forecast = ["earthlens[nwp]"]
 weather-radar = ["earthlens[radar]"]
 
 # Self-referential: the union of every backend extra, without re-listing deps.
