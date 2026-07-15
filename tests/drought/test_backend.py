@@ -484,6 +484,13 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
 
     import pyramids.dataset as dataset_mod
 
+    # `_clip_wcs_raster` writes the cropped output with a real, unpatched
+    # `pyramids.dataset.Dataset` (its own internal import), so the file on
+    # disk after `download()` is genuine — capture the real `read_file`
+    # classmethod before patching so it can re-open that file below, since
+    # `Dataset.read_file` is patched class-wide, not just backend.py's use.
+    _real_read_file = dataset_mod.Dataset.read_file.__func__
+
     monkeypatch.setattr(backend_module, "_http_download_raster", _fake_download)
     monkeypatch.setattr(dataset_mod.Dataset, "read_file", _FakeDataset.read_file)
 
@@ -506,6 +513,12 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
         assert "map=DO_WCS" in url and "SELECTED_TIMESCALE=01" in url
     # read_file was called once per written tif (the raster validation).
     assert len(read_calls) == len(paths)
+    # The final on-disk file is the real, cropped GeoTIFF -- not just the
+    # -180..180 strip `_FakeDataset` reports -- so re-open it (bypassing the
+    # `Dataset.read_file` patch above) and confirm the crop actually landed.
+    written = _real_read_file(dataset_mod.Dataset, str(paths[0]))
+    assert written.bbox == pytest.approx([5.0, 40.0, 15.0, 50.0])
+    written.close()
 
 
 def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
