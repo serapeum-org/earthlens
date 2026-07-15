@@ -1,5 +1,7 @@
 # OpenAQ — introduction
 
+<img src="../../_images/logos/openaq.svg" alt="OpenAQ logo" height="60">
+
 [OpenAQ](https://openaq.org/) is a non-profit that aggregates open
 air-quality data from **more than 180 monitoring networks worldwide** —
 government reference networks (US AirNow / EPA, the European

@@ -1,5 +1,7 @@
 # OpenStreetMap features — introduction
 
+<img src="../../_images/logos/osm.svg" alt="OpenStreetMap logo" height="60">
+
 [OpenStreetMap](https://www.openstreetmap.org/) (OSM) is a global, crowd-sourced
 map of the world. earthlens ships a single `osm` backend that fetches OSM
 features through **three public, keyless query protocols** and returns them

@@ -1,5 +1,7 @@
 # Amazon S3 (AWS Open Data) — introduction
 
+<img src="../../_images/logos/s3.png" alt="AWS Open Data logo" height="60">
+
 `earthlens.s3` is the backend for **public AWS Open-Data datasets reached over
 unsigned S3**. It is a *registry-driven, multi-dataset* backend: you pick a
 `dataset` and answer one uniform request shape (`variables`, a lat/lon bbox, a

@@ -1,5 +1,7 @@
 # Tropycal — introduction
 
+<img src="../../_images/logos/tropycal.png" alt="Tropycal logo" height="60">
+
 The `tropycal` backend (`data_source="tropycal"`) returns **tropical-cyclone
 best tracks** as a vector
 [`FeatureCollection`](https://serapeum-org.github.io/pyramids/) of track

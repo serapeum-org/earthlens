@@ -1,5 +1,7 @@
 # NREL — introduction
 
+<img src="../../_images/logos/nrel.svg" alt="National Laboratory of the Rockies (formerly NREL) logo" height="60">
+
 earthlens ships a single `nrel` backend that fetches **solar and wind resource
 time series** from the US [NREL](https://www.nrel.gov/) (National Renewable
 Energy Laboratory, since 2026 the "National Laboratory of the Rockies") via the

@@ -1,5 +1,7 @@
 # EEA air quality — introduction
 
+<img src="../../_images/logos/eea-aq.svg" alt="European Environment Agency logo" height="60">
+
 The [European Environment Agency](https://www.eea.europa.eu/) (EEA)
 operates the official European air-quality reporting system: member
 states submit **reference-grade monitor observations** under the Air

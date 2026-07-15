@@ -99,13 +99,128 @@ Features
 Supported data sources
 ----------------------
 
-| Source       | Provider                          | Protocol            | Resolutions     | Auth             | Install extra        |
-|--------------|-----------------------------------|---------------------|-----------------|------------------|----------------------|
-| CHIRPS       | UCSB Climate Hazards Center       | FTP (anonymous)     | daily, monthly  | none             | core                 |
-| Amazon S3    | ERA5 on AWS `era5-pds`            | S3 (unsigned)       | monthly         | none             | `[s3]`               |
-| ECMWF / CDS  | Copernicus Climate Data Store     | `cdsapi` (HTTPS)    | daily, monthly  | `~/.cdsapirc`    | `[ecmwf]`            |
-| GEE          | Google Earth Engine               | `earthengine-api`   | varies          | service account  | `[gee]`              |
-| JAXA         | JAXA Earth API + G-Portal         | HTTPS + SFTP        | varies          | optional         | `[jaxa]`             |
+`earthlens` wraps 48 providers behind the one `EarthLens(data_source=..., ...)` facade —
+pass the `data_source` value below and everything else (auth, request shaping, output
+format) is handled per-backend. See [Data Sources](https://serapeum-org.github.io/earthlens/examples/data-sources/)
+for the full walkthrough of each one.
+
+**Air quality**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/airnow.svg" height="20"> | [AirNow (US EPA)](https://www.airnow.gov/) | `airnow` |
+| <img src="docs/_images/logos/eea-aq.svg" height="20"> | [European Environment Agency](https://www.eea.europa.eu/) | `eea-aq` |
+| <img src="docs/_images/logos/openaq.svg" height="20"> | [OpenAQ](https://openaq.org/) | `openaq` |
+| <img src="docs/_images/logos/sensor-community.png" height="20"> | [Sensor.Community](https://sensor.community/) | `sensor-community` |
+
+**Biodiversity & protected areas**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/gbif.svg" height="20"> | [GBIF](https://www.gbif.org/) | `gbif` |
+| <img src="docs/_images/logos/iucn.svg" height="20"> | [IUCN Red List](https://www.iucnredlist.org/) | `iucn` |
+| <img src="docs/_images/logos/obis.png" height="20"> | [OBIS](https://obis.org/) | `obis` |
+| <img src="docs/_images/logos/wdpa.png" height="20"> | [Protected Planet (UNEP-WCMC)](https://www.protectedplanet.net/) | `wdpa` |
+
+**Climate & reanalysis**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/chc.png" height="20"> | [Climate Hazards Center (UCSB)](https://www.chc.ucsb.edu/) | `chc` |
+| <img src="docs/_images/logos/ecmwf.png" height="20"> | [Copernicus Climate Data Store (ECMWF)](https://cds.climate.copernicus.eu) | `ecmwf` |
+| <img src="docs/_images/logos/drought.svg" height="20"> | [Copernicus European Drought Observatory / NDMC](https://drought.emergency.copernicus.eu/) | `drought` |
+| <img src="docs/_images/logos/cmems.svg" height="20"> | [Copernicus Marine Service](https://marine.copernicus.eu/) | `cmems` |
+| <img src="docs/_images/logos/nwp.png" height="20"> | [Herbie (NWP archive access)](https://herbie.readthedocs.io) | `nwp` |
+| <img src="docs/_images/logos/climate_indices.svg" height="20"> | [NOAA Physical Sciences Laboratory](https://psl.noaa.gov/data/climateindices/) | `climate-indices` |
+| <img src="docs/_images/logos/cmip6.svg" height="20"> | [WCRP CMIP6](https://wcrp-cmip.org/) | `cmip6` |
+
+**Disasters & risk**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/fdsn.png" height="20"> | [FDSN](https://www.fdsn.org/) | `fdsn` |
+| <img src="docs/_images/logos/gdacs.png" height="20"> | [GDACS](https://www.gdacs.org/) | `gdacs` |
+| <img src="docs/_images/logos/firms.png" height="20"> | [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) | `firms` |
+| <img src="docs/_images/logos/risk_indicators.svg" height="20"> | [ThinkHazard! (GFDRR/World Bank)](https://thinkhazard.org) | `thinkhazard` |
+
+**Elevation & bathymetry**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/dem.svg" height="20"> | [Copernicus DEM (ESA)](https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model) | `dem` |
+| <img src="docs/_images/logos/bathymetry.png" height="20"> | [GEBCO](https://www.gebco.net/) | `bathymetry` |
+| <img src="docs/_images/logos/glaciers.png" height="20"> | [NSIDC Randolph Glacier Inventory](https://nsidc.org/data/nsidc-0770/versions/7) | `glaciers` |
+
+**Humanitarian & socio-economic**
+
+| | Provider | `data_source` |
+|---|---|---|
+|  | [European Commission Joint Research Centre (GHSL)](https://ghsl.jrc.ec.europa.eu/) | `ghsl` |
+| <img src="docs/_images/logos/hdx.png" height="20"> | [Humanitarian Data Exchange (UN OCHA)](https://data.humdata.org) | `hdx` |
+| <img src="docs/_images/logos/worldpop.png" height="20"> | [WorldPop](https://hub.worldpop.org) | `worldpop` |
+
+**Hydrology**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/argo.png" height="20"> | [Argo Program](https://argo.ucsd.edu/) | `argo` |
+| <img src="docs/_images/logos/erddap.svg" height="20"> | [NOAA ERDDAP](https://www.ncei.noaa.gov/erddap/information.html) | `erddap` |
+|  | [NOAA National Water Model](https://water.noaa.gov/about/nwm) | `nwm` |
+| <img src="docs/_images/logos/usgs-water.svg" height="20"> | [USGS National Water Information System](https://waterdata.usgs.gov/) | `usgs-water` |
+
+**Imagery platforms**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/s3.png" height="20"> | [AWS Open Data](https://registry.opendata.aws/) | `amazon-s3` |
+| <img src="docs/_images/logos/asf.png" height="20"> | [Alaska Satellite Facility (ASF)](https://asf.alaska.edu/) | `asf` |
+| <img src="docs/_images/logos/eumetsat.svg" height="20"> | [EUMETSAT](https://www.eumetsat.int/) | `eumetsat` |
+| <img src="docs/_images/logos/gee.png" height="20"> | [Google Earth Engine](https://earthengine.google.com/) | `gee` |
+| <img src="docs/_images/logos/jaxa.svg" height="20"> | [JAXA](https://www.jaxa.jp/) | `jaxa` |
+| <img src="docs/_images/logos/earthdata.png" height="20"> | [NASA Earthdata](https://www.earthdata.nasa.gov/) | `earthdata` |
+| <img src="docs/_images/logos/goes.png" height="20"> | [NOAA GOES-R](https://www.goes-r.gov/) | `goes` |
+| <img src="docs/_images/logos/stac.png" height="20"> | [STAC (SpatioTemporal Asset Catalog)](https://stacspec.org/) | `stac` |
+| <img src="docs/_images/logos/sentinel-hub.png" height="20"> | [Sentinel Hub](https://www.sentinel-hub.com/) | `sentinel-hub` |
+| <img src="docs/_images/logos/openeo.png" height="20"> | [openEO](https://openeo.org) | `openeo` |
+
+**Renewable energy**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/solar_wind_atlas.svg" height="20"> | [Global Solar Atlas / Global Wind Atlas (World Bank/ESMAP)](https://globalsolaratlas.info/) | `solar-wind-atlas` |
+| <img src="docs/_images/logos/nrel.svg" height="20"> | [National Laboratory of the Rockies (formerly NREL)](https://www.nlr.gov/) | `nrel` |
+| <img src="docs/_images/logos/pvgis.svg" height="20"> | [PVGIS (EU JRC)](https://re.jrc.ec.europa.eu/pvg_tools/) | `pvgis` |
+
+**Soil & land**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/soilgrids.svg" height="20"> | [ISRIC SoilGrids](https://www.isric.org/explore/soilgrids) | `soilgrids` |
+
+**Tropical cyclones**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/tropycal.png" height="20"> | [Tropycal](https://tropycal.github.io/tropycal/) | `tropycal` |
+
+**Vector basemaps & boundaries**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/osm.svg" height="20"> | [OpenStreetMap](https://www.openstreetmap.org/) | `osm` |
+| <img src="docs/_images/logos/overture.svg" height="20"> | [Overture Maps Foundation](https://overturemaps.org/) | `overture` |
+|  | [geoBoundaries](https://www.geoboundaries.org/) | `admin` |
+
+**Weather radar**
+
+| | Provider | `data_source` |
+|---|---|---|
+| <img src="docs/_images/logos/radar.svg" height="20"> | [NOAA NEXRAD](https://www.roc.noaa.gov/) | `radar` |
+
+Logos are each provider's own mark, used only to identify which service a backend talks to
+(not an endorsement of earthlens by that provider) — see
+[docs/_images/logos/ATTRIBUTION.md](docs/_images/logos/ATTRIBUTION.md) for sourcing and rights
+notes on every logo, including the handful of providers with no distinct mark of their own.
 
 
 Installation

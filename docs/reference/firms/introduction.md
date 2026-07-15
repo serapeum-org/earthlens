@@ -1,5 +1,7 @@
 # FIRMS — introduction
 
+<img src="../../_images/logos/firms.png" alt="NASA FIRMS logo" height="60">
+
 [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) (Fire Information for
 Resource Management System) distributes **active-fire / thermal-anomaly
 detections** from the MODIS (Terra/Aqua, C6.1), VIIRS

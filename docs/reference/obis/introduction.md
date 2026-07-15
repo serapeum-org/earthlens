@@ -1,5 +1,7 @@
 # OBIS marine occurrences — introduction
 
+<img src="../../_images/logos/obis.png" alt="OBIS logo" height="60">
+
 The [OBIS](https://obis.org/) (Ocean Biodiversity Information System)
 occurrence API serves 140 M+ georeferenced **marine** species-occurrence
 records — the ocean counterpart to GBIF. earthlens ships an `obis` backend

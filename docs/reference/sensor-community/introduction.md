@@ -1,5 +1,7 @@
 # Sensor.Community — introduction
 
+<img src="../../_images/logos/sensor-community.png" alt="Sensor.Community logo" height="60">
+
 [Sensor.Community](https://sensor.community/) (formerly luftdaten.info)
 is a global grassroots network of **low-cost, citizen-operated air and
 climate sensors** — tens of thousands of DIY stations, mostly reporting

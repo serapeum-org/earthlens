@@ -1,5 +1,7 @@
 # Humanitarian Data Exchange (HDX) — introduction
 
+<img src="../../_images/logos/hdx.png" alt="Humanitarian Data Exchange (UN OCHA) logo" height="60">
+
 `earthlens.hdx` is one wrapper over the **CKAN API of UN OCHA's
 [Humanitarian Data Exchange](https://data.humdata.org)** (~41,000
 datasets) via the official read-only `hdx-python-api` SDK. A request
