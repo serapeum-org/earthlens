@@ -173,6 +173,41 @@ osm = ["overpy >=0.7", "ohsome >=0.4.0"]
 # HttpClient), so they run in the `all` env without pyrosm/pyosmium installed;
 # the gated live e2e needs `pip install earthlens[osm-pbf]`.
 osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
+
+# Thematic bundles mirroring the README / docs/examples/data-sources.md provider
+# categories -- a convenience grouping for "I want disaster data" / "I want
+# imagery data", not a minimal-footprint install. Each unions the individual
+# extras of that category's real SDK-needing backends; category members with
+# no SDK of their own (anonymous HTTP over core `requests`/`pandas`, e.g. chc,
+# gdacs, firms, drought, admin, iucn, wdpa, ...) already work without an extra
+# and so are omitted from the list below, not left out of the category.
+air-quality = ["earthlens[eea_aq]"]
+biodiversity = ["earthlens[gbif,obis]"]
+climate = ["earthlens[cmems,cmip6,ecmwf,nwp]"]
+disasters = ["earthlens[fdsn]"]
+elevation = ["earthlens[dem]"]
+humanitarian = ["earthlens[ghsl,hdx,worldpop]"]
+# Deliberately not meant to be combined with `imagery` in the same install:
+# argopy pins xarray>=2025.7, openeo (in `imagery`) pins xarray<2025.1.2 -- the
+# same conflict that excludes `argo` from `all` below.
+hydrology = ["earthlens[argo,erddap,nwm,usgs-water]"]
+imagery = [
+    "earthlens[asf,earthdata,eumetsat,gee,goes,jaxa,openeo,s3,sentinel-hub,stac]",
+]
+# nrel, pvgis and solar_wind_atlas are all anonymous-HTTP backends with no SDK
+# of their own; kept (empty) for symmetry with the README/docs "Renewable
+# energy" category, the same way the cmip6/ghsl provider extras are empty.
+renewable-energy = []
+# soilgrids has no SDK of its own; kept (empty) for symmetry with the
+# README/docs "Soil & land" category.
+soil = []
+tropical-cyclones = ["earthlens[tropycal]"]
+# Deliberately not meant to be combined with most other bundles in the same
+# install: ohsome (via `osm`) pins pandas<3.0.0 -- the same conflict that
+# excludes `osm` from `all` below.
+vector-basemaps = ["earthlens[osm,overture]"]
+weather-radar = ["earthlens[radar]"]
+
 # Self-referential: the union of every backend extra, without re-listing deps.
 # (argo, osm and osm-pbf are intentionally excluded — see the notes above.)
 all = [
