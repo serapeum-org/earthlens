@@ -83,6 +83,45 @@ GIS stack). Asking the facade for a backend whose extra is missing
 (e.g. `data_source="ecmwf"` without `earthlens[ecmwf]`) raises a clear
 `ImportError` naming the extra to install.
 
+### Package layout
+
+`earthlens` is a meta-package. Installing it pulls in `earthlens-core` plus
+five thematic provider packages, each carrying a group of backends:
+
+| Package | Covers | Backends |
+|---------|--------|----------|
+| `earthlens-core` | facade, abstractions, CLI — no provider SDKs | — |
+| `earthlens-atmosphere` | weather · climate · air quality · solar/wind | `chc` `climate_indices` `cmip6` `drought` `ecmwf` `nwp` `amazon-s3` `airnow` `eea_aq` `openaq` `sensor_community` `goes` `radar` `tropycal` `nrel` `pvgis` `solar_wind_atlas` |
+| `earthlens-ocean` | ocean · freshwater · marine life | `argo` `cmems` `erddap` `nwm` `usgs_water` `obis` |
+| `earthlens-imagery` | satellite platforms · SAR · EO catalogs | `asf` `earthdata` `eumetsat` `gee` `jaxa` `openeo` `sentinel_hub` `stac` |
+| `earthlens-land` | terrain · elevation · soil · ecology · population | `bathymetry` `dem` `ghsl` `glaciers` `gbif` `iucn` `soilgrids` `wdpa` `worldpop` |
+| `earthlens-hazards` | hazards · humanitarian · vector basemaps | `fdsn` `firms` `gdacs` `risk_indicators` `admin` `osm` `overture` `hdx` |
+
+This changes nothing about how you use earthlens: the import path is the same
+(`from earthlens import EarthLens`, `earthlens.chc`, …), and every extra above
+works exactly as before — `pip install earthlens[gee]` still installs Earth
+Engine and nothing else.
+
+**Installing a single domain.** If you only need one group, install that package
+directly and skip the others' backends entirely:
+
+```bash
+pip install earthlens-imagery[gee]     # Earth Engine, without the other 40 backends
+pip install earthlens-ocean[argo,cmems]
+pip install earthlens-atmosphere[all]  # every atmosphere SDK
+```
+
+A thematic package depends only on `earthlens-core`, so its SDKs stay extras:
+`pip install earthlens-imagery` gives you the imagery backends' code without
+`earthengine-api`, `openeo`, `eumdac` and the rest.
+
+**Why the split.** A few provider SDKs cannot coexist — `argopy` requires
+`xarray >=2025.7` while `openeo <0.48` requires `xarray <2025.1.2`, and no
+version satisfies both. Those extras are therefore excluded from `earthlens[all]`
+(see the note below) and can be installed on their own or alongside their own
+group. Splitting the backends across packages lets you install one domain's
+dependencies without inheriting every other domain's constraints.
+
 > **Dependency note — `openeo` version pin.** openeo `0.48+` hard-caps
 > `pandas<3.0.0`, which would drag the whole environment down to pandas 2.x.
 > earthlens therefore pins `openeo >=0.47,<0.48` — the newest openeo that runs
@@ -107,26 +146,52 @@ Or download the tarball:
 curl -OJL https://github.com/serapeum-org/earthlens/tarball/main
 ```
 
-Once you have a copy of the source, you can install it with the
-extras you need:
+The repository is a workspace of seven distributions, so a source install has
+to install the members too — `pip install -e .` on its own installs the
+meta-package, which then looks for `earthlens-core` **on PyPI** at the version
+in the working tree, and an unreleased version is not there:
 
-```bash
-pip install -e ".[ecmwf]"
-# or all backends at once:
-pip install -e ".[all]"
+```text
+ERROR: No matching distribution found for earthlens-core==<version>
 ```
 
-To install directly from GitHub (from the HEAD of the main branch):
+Install the whole workspace instead, naming every member on one command line so
+pip resolves them locally rather than from the index:
 
 ```bash
-pip install "earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git"
+pip install -e libs/core \
+            -e libs/providers/atmosphere \
+            -e libs/providers/ocean \
+            -e libs/providers/imagery \
+            -e libs/providers/land \
+            -e libs/providers/hazards \
+            -e ".[ecmwf]"
 ```
 
-Or from a specific release:
+With [pixi](https://pixi.sh) this is a single command — the members are declared
+as editable path dependencies in `pyproject.toml`:
+
+```bash
+pixi install
+```
+
+If you only want one domain from a clone, its package plus core is enough:
+
+```bash
+pip install -e libs/core -e "libs/providers/imagery[gee]"
+```
+
+To install a **published release** directly from GitHub (its members are on PyPI,
+so the meta-package resolves normally):
 
 ```bash
 pip install "earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git@{release}"
 ```
+
+Installing the HEAD of `main` this way does **not** work: `main` carries an
+unreleased version whose members are not on PyPI yet, and pip cannot install a
+workspace's sibling packages out of a single git URL. Clone the repository and
+use the editable workspace install above.
 
 Now you should be able to start Python and try `import earthlens` to verify the installation.
 
@@ -147,15 +212,36 @@ pip install earthlens[ecmwf]
 
 ## Development install
 
-If you are planning to contribute to earthlens, do an editable install
-with the `[all]` extra so the full test suite (which exercises every
-backend) can run:
+If you are planning to contribute to earthlens, install the whole workspace
+editable with the `[all]` extra so the full test suite (which exercises every
+backend) can run. [pixi](https://pixi.sh) is the supported path — it installs
+every member from `pyproject.toml`'s editable path dependencies and resolves
+them from one lockfile:
 
 ```bash
 git clone https://github.com/serapeum-org/earthlens.git
 cd earthlens
-conda activate earthlens
-pip install -e ".[all]"
+pixi install
+pixi run test-no-e2e
 ```
+
+The equivalent with pip, which must name every member so they resolve from the
+clone rather than from PyPI:
+
+```bash
+pip install -e libs/core \
+            -e libs/providers/atmosphere \
+            -e libs/providers/ocean \
+            -e libs/providers/imagery \
+            -e libs/providers/land \
+            -e libs/providers/hazards \
+            -e ".[all]"
+```
+
+The tests import earthlens from the **installed** distributions, not from the
+source tree: `earthlens` is a regular package owned by `earthlens-core`, so a
+provider living in a different source tree is only reachable through the finder
+an editable install sets up. Running `pytest` against a clone without installing
+the workspace first will not collect.
 
 More details on conda environments: [Managing environments](https://conda.io/docs/user-guide/tasks/manage-environments.html)
