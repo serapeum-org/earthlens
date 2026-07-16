@@ -1,5 +1,7 @@
 # Climate Hazards Center — introduction
 
+<img src="../../_images/logos/chc.png" alt="Climate Hazards Center (UCSB) logo" height="60">
+
 The [Climate Hazards Center](https://www.chc.ucsb.edu/) (CHC) at UC
 Santa Barbara is one of the canonical public sources of long-record
 satellite + station-blended rainfall, temperature, and drought-index

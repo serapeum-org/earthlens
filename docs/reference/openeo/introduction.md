@@ -1,5 +1,7 @@
 # openEO backend — introduction
 
+<img src="../../_images/logos/openeo.png" alt="openEO logo" height="60">
+
 `earthlens.openeo` is a **server-side processing** backend. Unlike the
 fetch-to-disk backends (which download granules and process them locally), it
 builds an [openEO](https://openeo.org) **process graph** — a portable JSON DAG

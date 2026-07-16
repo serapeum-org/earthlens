@@ -1,5 +1,7 @@
 # NASA Earthdata — introduction
 
+<img src="../../_images/logos/earthdata.png" alt="NASA Earthdata logo" height="60">
+
 [NASA Earthdata](https://www.earthdata.nasa.gov/) is the public gateway
 to the EOSDIS archive — petabytes of Earth-observation data spread
 across twelve Distributed Active Archive Centers (DAACs). The

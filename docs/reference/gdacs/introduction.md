@@ -1,5 +1,7 @@
 # GDACS multi-hazard alerts — introduction
 
+<img src="../../_images/logos/gdacs.png" alt="GDACS logo" height="60">
+
 The [GDACS](https://www.gdacs.org/) (Global Disaster Alert and
 Coordination System) is a cooperation framework of the United Nations
 and the European Commission (run by the JRC together with UN OCHA) that

@@ -1,5 +1,7 @@
 # Overture Maps — Introduction
 
+<img src="../../_images/logos/overture.svg" alt="Overture Maps Foundation logo" height="60">
+
 `earthlens.overture` downloads vector features from the **Overture Maps
 Foundation** — an open, permissively-licensed basemap published as cloud
 GeoParquet. It wraps the official [`overturemaps`](https://github.com/OvertureMaps/overturemaps-py)

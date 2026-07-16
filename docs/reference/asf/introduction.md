@@ -1,5 +1,7 @@
 # ASF InSAR backend — introduction
 
+<img src="../../_images/logos/asf.png" alt="Alaska Satellite Facility (ASF) logo" height="60">
+
 The [Alaska Satellite Facility (ASF)](https://asf.alaska.edu/) holds
 NASA's archive of synthetic aperture radar (SAR) — Sentinel-1, ALOS
 PALSAR, NISAR, the OPERA processed-SAR family, and older missions —

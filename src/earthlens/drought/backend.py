@@ -557,7 +557,11 @@ class Drought(AbstractDataSource):
                 month, per the row's cadence).
 
         Returns:
-            list[Path]: The written GeoTIFFs in `products` order.
+            list[Path]: The written GeoTIFFs in `products` order. Each is
+                window-cropped to `bbox` via `_clip_wcs_raster`; on the rare
+                period where the requested bbox falls entirely outside the
+                downloaded raster's coverage, the crop is skipped, a warning
+                is logged, and the original uncropped file is kept instead.
 
         Raises:
             ValueError: When the server rejects a period (e.g. a date
@@ -582,10 +586,28 @@ class Drought(AbstractDataSource):
                 / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
             )
             _http_download_raster(url, out_path, label=self._dataset.id)
-            # Open to validate it is a real raster (guards against a 200
-            # response carrying a non-raster body), then leave it on disk.
+            # The Copernicus EDO/GDO MapServer honours the `Lat` subset but
+            # silently ignores `Long`, returning a full -180..180 strip
+            # (verified live), and tags the GeoTIFF with no embedded SRS — so
+            # `Dataset.crop`'s cutline path is a no-op. Window-crop to the
+            # requested bbox by hand so the output honours the documented
+            # extent, mirroring the USDM (`gdf.cx`) and SPEIbase
+            # (`NetCDF.subset`) transports. Reading the raster also validates
+            # it is a real raster (a non-raster 200 body raises here).
             ds = Dataset.read_file(str(out_path))
+            clipped = self._clip_wcs_raster(ds, bbox)
             ds.close()
+            if clipped is not None:
+                tmp_path = out_path.with_name(out_path.stem + ".tmp" + out_path.suffix)
+                clipped.to_file(str(tmp_path))
+                clipped.close()
+                tmp_path.replace(out_path)
+            else:
+                logger.warning(
+                    f"{self._dataset.id}: requested bbox {bbox} fell entirely "
+                    f"outside the downloaded raster's coverage; leaving "
+                    f"{out_path} unclipped (full server-returned extent)."
+                )
             written.append(out_path)
         return written
 
@@ -637,6 +659,65 @@ class Drought(AbstractDataSource):
             params.append(f"SELECTED_TIMESCALE={timescale}")
         sep = "&" if "?" in endpoint else "?"
         return endpoint + sep + "&".join(params)
+
+    @staticmethod
+    def _clip_wcs_raster(dataset: Any, bbox: tuple[float, float, float, float]) -> Any:
+        """Window-crop a WCS raster to `bbox` when the server didn't clip it.
+
+        The Copernicus EDO/GDO `GetCoverage` endpoint honours the latitude
+        subset but ignores longitude, returning a full -180..180 strip, and
+        the GeoTIFF carries no embedded SRS so `pyramids.Dataset.crop`'s
+        cutline path is a no-op. We therefore compute the pixel window from
+        the raster's own bounding box and rebuild the trimmed raster with
+        `Dataset.create_from_array` — a purely local operation that honours
+        the requested bbox regardless of what the server returned. Latitude,
+        already clipped server-side, is windowed again harmlessly; if the
+        server ever starts honouring `Long`, the window simply re-selects the
+        same region.
+
+        Args:
+            dataset: The freshly-downloaded `pyramids.Dataset` (typically a
+                full-width -180..180 strip).
+            bbox: The requested `(west, south, east, north)` in EPSG:4326
+                degrees.
+
+        Returns:
+            A new cropped `pyramids.Dataset`, or `None` when the requested
+            bbox falls entirely outside the raster (`_fetch_wcs` keeps the
+            original file untouched and logs a warning in that case).
+        """
+        from pyramids.dataset import Dataset as PyramidsDataset
+
+        west, south, east, north = bbox
+        arr = dataset.read_array()
+        if arr.ndim == 3:
+            arr = arr[0]
+        x_min, y_min, x_max, y_max = dataset.bbox
+        rows, cols = arr.shape
+        cell_x = (x_max - x_min) / cols
+        cell_y = (y_max - y_min) / rows
+        col_start = max(int(round((west - x_min) / cell_x)), 0)
+        col_stop = min(int(round((east - x_min) / cell_x)), cols)
+        row_start = max(int(round((y_max - north) / cell_y)), 0)
+        row_stop = min(int(round((y_max - south) / cell_y)), rows)
+        if col_stop <= col_start or row_stop <= row_start:
+            return None
+        window = arr[row_start:row_stop, col_start:col_stop]
+        geo = (
+            x_min + col_start * cell_x,
+            cell_x,
+            0.0,
+            y_max - row_start * cell_y,
+            0.0,
+            -cell_y,
+        )
+        nodata = dataset.no_data_value[0] if dataset.no_data_value else None
+        return PyramidsDataset.create_from_array(
+            arr=window,
+            geo=geo,
+            epsg=4326,
+            no_data_value=nodata,
+        )
 
     @staticmethod
     def _empty_vector() -> FeatureCollection:

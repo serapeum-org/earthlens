@@ -1,5 +1,7 @@
 # SoilGrids — introduction
 
+<img src="../../_images/logos/soilgrids.svg" alt="ISRIC SoilGrids logo" height="60">
+
 earthlens ships a single `soilgrids` backend that fetches **global soil-property
 maps** from [ISRIC SoilGrids 2.0](https://www.isric.org/explore/soilgrids) —
 250 m machine-learning predictions of clay, sand, silt, coarse fragments, pH,

@@ -1,5 +1,7 @@
 # Bathymetry DEMs — introduction
 
+<img src="../../_images/logos/bathymetry.png" alt="GEBCO logo" height="60">
+
 earthlens ships a single `bathymetry` backend that fetches **global
 topography / bathymetry digital elevation models (DEMs)** — continuous
 grids of land height and sea-floor depth — subset on the server to a

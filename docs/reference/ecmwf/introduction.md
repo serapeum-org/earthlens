@@ -1,5 +1,7 @@
 # ECMWF / Copernicus CDS — introduction
 
+<img src="../../_images/logos/ecmwf.png" alt="Copernicus Climate Data Store (ECMWF) logo" height="60">
+
 The `earthlens.ecmwf` backend downloads **ECMWF reanalyses from the
 [Copernicus Climate Data Store](https://cds.climate.copernicus.eu)** (CDS) —
 ERA5, ERA5-Land, CARRA, ORAS5, CMIP6 deltas, and their monthly-means siblings —
