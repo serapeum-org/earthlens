@@ -12,8 +12,8 @@ class TestEstimatePixelDims:
     """Tests for the free-function form `estimate_pixel_dims(w, s, e, n, scale)`."""
 
     def test_small_box_at_90m(self):
-        """A 0.1°×0.1° box at 90 m is ~124×124 px (matches the docstring example)."""
-        assert estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 90.0) == (124, 124)
+        """A 0.1°×0.1° box at 90 m is ~124×125 px (matches the docstring example)."""
+        assert estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 90.0) == (124, 125)
 
     def test_finer_scale_more_pixels(self):
         """A finer `scale_m` yields a larger pixel grid."""
@@ -57,10 +57,15 @@ class TestSpatialExtentMethod:
         )
 
     def test_method_round_trip(self):
-        """Sanity: SRTM at 30 m over a 1° box is roughly 3700 px."""
+        """Sanity: SRTM at 30 m over a 1° box is roughly 3700 px.
+
+        The height runs a little above the width: the latitude axis is sized
+        with the polar-maximum metres-per-degree, the longitude axis with the
+        equatorial one.
+        """
         box = SpatialExtent.from_pairs([0.0, 1.0], [0.0, 1.0])
         w, h = box.estimate_pixel_dims(30.0)
-        assert 3700 <= w <= 3720 and 3700 <= h <= 3720
+        assert 3700 <= w <= 3730 and 3700 <= h <= 3730
 
     def test_method_non_positive_scale_raises(self):
         """The method also raises on a non-positive scale (delegates errors)."""
