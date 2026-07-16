@@ -73,7 +73,7 @@ from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from earthlens.utm import project_to_utm
+from pyramids.utm import project_to_utm
 
 _WGS84_CODE: int = 4326
 
@@ -162,13 +162,13 @@ def count_cells_polygon(
 ) -> tuple[int, GeoDataFrame]:
     """Estimate the pixel count for a polygon at a given `cell_size`.
 
-    Projects the input to its UTM zone (via :func:`earthlens.utm.project_to_utm`)
+    Projects the input to its UTM zone (via :func:`pyramids.utm.project_to_utm`)
     so `cell_size` can be interpreted in metres, then computes
     `ceil((bbox_area * area_factor) / cell_size**2)`.
 
     Args:
         poly_gdf: A `GeoDataFrame` in WGS84 (`EPSG:4326`) or any CRS
-            that :func:`earthlens.utm.project_to_utm` accepts.
+            that :func:`pyramids.utm.project_to_utm` accepts.
         cell_size: Pixel size in metres.
         area_factor: Multiplier applied to the bbox area before
             dividing by `cell_size**2`. Defaults to `1.0`.
