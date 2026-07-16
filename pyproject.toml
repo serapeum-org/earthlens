@@ -260,10 +260,13 @@ dev = [
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
-    # label-clipping fix in 0.23.0, and the DATA_STYLES presets / dark-canvas
-    # helper (style=, apply_blank_canvas) used by the heatwave notebook in
-    # 0.24.0+ -- floor pinned to the latest of these, >=0.25.0.
-    "cleopatra >=0.25.0",
+    # label-clipping fix in 0.23.0, the DATA_STYLES presets / dark-canvas
+    # helper (style=, apply_blank_canvas) in 0.24.0+, and 0.26.0 replaces
+    # animate()'s text_loc/label_color kwargs with a FrameLabel(location=,
+    # color=) object (old kwargs still work as a deprecated alias, but the
+    # showcase notebooks already migrated) -- floor pinned to the latest
+    # of these, >=0.26.0.
+    "cleopatra >=0.26.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -295,10 +298,13 @@ docs = [
     "pyramids-gis[viz] >=0.45.0",
     # cleopatra: notebooks import it directly; add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
-    # label-clipping fix in 0.23.0, and the DATA_STYLES presets / dark-canvas
-    # helper (style=, apply_blank_canvas) used by the heatwave notebook in
-    # 0.24.0+ -- floor pinned to the latest of these, >=0.25.0.
-    "cleopatra >=0.25.0",
+    # label-clipping fix in 0.23.0, the DATA_STYLES presets / dark-canvas
+    # helper (style=, apply_blank_canvas) in 0.24.0+, and 0.26.0 replaces
+    # animate()'s text_loc/label_color kwargs with a FrameLabel(location=,
+    # color=) object (old kwargs still work as a deprecated alias, but the
+    # showcase notebooks already migrated) -- floor pinned to the latest
+    # of these, >=0.26.0.
+    "cleopatra >=0.26.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
