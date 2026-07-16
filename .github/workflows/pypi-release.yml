@@ -16,6 +16,27 @@ jobs:
       ${{ github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success' }}
 
+    strategy:
+      # One distribution at a time, dependencies before dependents: a member is
+      # pinned to `earthlens-core ==<version>`, so core must reach the index
+      # first or an install racing the release resolves against a version that
+      # is not there yet. `fail-fast` then stops on the first failure rather
+      # than publishing further members of a release that is already broken —
+      # a version can never be re-uploaded to PyPI, so publishing less is
+      # recoverable and publishing more is not.
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        package:
+          - earthlens-core
+          - earthlens-atmosphere
+          - earthlens-ocean
+          - earthlens-imagery
+          - earthlens-land
+          - earthlens-hazards
+          - earthlens
+
+    name: publish ${{ matrix.package }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -30,3 +51,4 @@ jobs:
           package-manager: 'pixi'
           install-groups: 'dev'
           verify-lock: 'false'
+          package: ${{ matrix.package }}

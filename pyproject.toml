@@ -185,6 +185,32 @@ show_missing = true
 name = "cz_conventional_commits"
 version_provider = "pep621"
 tag_format = "$version"
+# The workspace releases in lockstep: one version, one tag, one changelog for
+# all seven distributions. They are split to isolate dependencies, not to
+# release independently -- and since every member pins its siblings with `==`,
+# independent versions would be self-contradictory. `version_provider` bumps
+# this file's own `[project] version`; `version_files` carries the same bump to
+# every member's version and to every `==` pin, so a release can never ship a
+# provider built against a different core.
+version_files = [
+    "libs/core/pyproject.toml:^version = ",
+    "libs/providers/atmosphere/pyproject.toml:^version = ",
+    "libs/providers/ocean/pyproject.toml:^version = ",
+    "libs/providers/imagery/pyproject.toml:^version = ",
+    "libs/providers/land/pyproject.toml:^version = ",
+    "libs/providers/hazards/pyproject.toml:^version = ",
+    "pyproject.toml:earthlens-core ==",
+    "pyproject.toml:earthlens-atmosphere ==",
+    "pyproject.toml:earthlens-ocean ==",
+    "pyproject.toml:earthlens-imagery ==",
+    "pyproject.toml:earthlens-land ==",
+    "pyproject.toml:earthlens-hazards ==",
+    "libs/providers/atmosphere/pyproject.toml:earthlens-core ==",
+    "libs/providers/ocean/pyproject.toml:earthlens-core ==",
+    "libs/providers/imagery/pyproject.toml:earthlens-core ==",
+    "libs/providers/land/pyproject.toml:earthlens-core ==",
+    "libs/providers/hazards/pyproject.toml:earthlens-core ==",
+]
 changelog_file = "docs/change-log.md"
 update_changelog_on_bump = true
 major_version_zero = true       # while < 1.0
