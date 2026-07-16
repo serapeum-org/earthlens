@@ -45,6 +45,14 @@ dependencies = [
 
 [project.scripts]
 earthlens = "earthlens.cli:app"
+# Backend discovery. Each provider distribution publishes its `key -> spec`
+# table here, and the `EarthLens` facade merges every entry in this group into
+# `EarthLens.DataSources` (see `earthlens._backends.discover_backends`). The
+# target is one entry per thematic provider package; the monolith publishes a
+# single table for now.
+[project.entry-points."earthlens.backends"]
+earthlens = "earthlens._backends:BACKENDS"
+
 
 [project.optional-dependencies]
 s3 = ["boto3 >=1.43.0", "botocore >=1.34.0"]
