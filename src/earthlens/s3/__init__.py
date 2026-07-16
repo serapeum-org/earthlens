@@ -10,7 +10,7 @@ handle the (unsigned, public) access.
 
 from __future__ import annotations
 
-from earthlens.s3.auth import S3Auth, S3Credentials
+from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.s3.backend import S3
 from earthlens.s3.catalog import Catalog, Dataset, Variable
 

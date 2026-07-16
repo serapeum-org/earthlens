@@ -719,7 +719,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
 # --------------------------------------------------------------------------- #
 def _s3_live_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
     """Return one object key under `prefix` (unsigned `boto3`)."""
-    from earthlens.s3.auth import S3Auth, S3Credentials
+    from earthlens.base.s3 import S3Auth, S3Credentials
 
     client = S3Auth(S3Credentials(region=region)).client()
     response = client.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=1)

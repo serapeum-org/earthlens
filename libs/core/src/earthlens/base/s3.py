@@ -1,16 +1,21 @@
-"""Unsigned (and optionally profile-signed) AWS S3 authentication.
+"""Unsigned (and optionally profile-signed) AWS S3 transport.
 
-Hosts `S3Credentials` and `S3Auth`, the `earthlens.s3` backend's
-:class:`~earthlens.base.AbstractAuth` implementation. The AWS Open-Data
-buckets this backend targets (`nsf-ncar-era5`, `sentinel-cogs`,
-`noaa-goes16` / `noaa-goes18`, `copernicus-dem-30m` / `-90m`,
-`esa-worldcover`) are public, so the default path builds an **unsigned**
+Hosts `S3Credentials` and `S3Auth`, a shared
+:class:`~earthlens.base.AbstractAuth` implementation for the AWS
+Open-Data buckets that several backends read — `nsf-ncar-era5`
+(`earthlens.s3`), `copernicus-dem-30m` / `-90m` (`earthlens.dem`),
+`noaa-goes16` / `noaa-goes18`, `sentinel-cogs` and `esa-worldcover`.
+Those buckets are public, so the default path builds an **unsigned**
 `boto3` client — no credentials, no `~/.aws` config required.
 
-The class collapses the two ad-hoc clients the legacy module built (one
-in `S3._initialize`, a duplicate in `Catalog.initialize`) into a single
-auth surface, and imports `boto3` / `botocore` lazily inside
-:meth:`S3Auth.configure` so `import earthlens.s3` works without the
+Unsigned S3 is a transport rather than any one provider's concern, so it
+lives in `earthlens.base` beside `HttpClient`; a backend that reads an
+open bucket imports it from here instead of depending on a sibling
+backend.
+
+`boto3` / `botocore` are imported lazily inside :meth:`S3Auth.configure`,
+so this module — and therefore `earthlens.base` — carries no SDK of its
+own; the import raises only when a client is actually built without the
 `[s3]` extra installed.
 
 An optional `aws_profile` selects a named profile from the local AWS
@@ -50,7 +55,7 @@ class S3Credentials(BaseModel):
     Examples:
         - The default is unsigned (no profile):
             ```python
-            >>> from earthlens.s3.auth import S3Credentials
+            >>> from earthlens.base.s3 import S3Credentials
             >>> S3Credentials().aws_profile is None
             True
 
@@ -80,7 +85,7 @@ class S3Auth(AbstractAuth[S3Credentials]):
     Examples:
         - The client is not built until `configure()` runs:
             ```python
-            >>> from earthlens.s3.auth import S3Auth, S3Credentials
+            >>> from earthlens.base.s3 import S3Auth, S3Credentials
             >>> auth = S3Auth(S3Credentials())
             >>> auth.is_authenticated()
             False

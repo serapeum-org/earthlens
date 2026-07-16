@@ -38,7 +38,7 @@ from earthlens.base import (
     to_datetime,
     warn_if_egress,
 )
-from earthlens.s3.auth import S3Auth, S3Credentials
+from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.s3.catalog import Catalog, Dataset
 from earthlens.s3.layouts import plan_products
 

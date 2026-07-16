@@ -39,7 +39,7 @@ from earthlens.base import (
 )
 from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key
 from earthlens.dem.catalog import Catalog, DEMDataset
-from earthlens.s3.auth import S3Auth, S3Credentials
+from earthlens.base.s3 import S3Auth, S3Credentials
 
 __all__ = ["DEM"]
 

@@ -19,6 +19,7 @@ from earthlens.base.abstractdatasource import (
 )
 from earthlens.base.auth import AbstractAuth, AuthenticationError
 from earthlens.base.http import HttpClient
+from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
 from earthlens.base.region import (
@@ -42,6 +43,8 @@ __all__ = [
     "AuthenticationError",
     "FluxableLeaf",
     "HttpClient",
+    "S3Auth",
+    "S3Credentials",
     "LazyClientMixin",
     "METRES_PER_DEGREE",
     "OutputKind",

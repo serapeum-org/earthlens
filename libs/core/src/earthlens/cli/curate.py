@@ -631,7 +631,7 @@ def _overture_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 
 def _s3_sample_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
     """Return up to five object keys under `prefix` (unsigned `boto3`)."""
-    from earthlens.s3.auth import S3Auth, S3Credentials
+    from earthlens.base.s3 import S3Auth, S3Credentials
 
     client = S3Auth(S3Credentials(region=region)).client()
     response = client.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=5)

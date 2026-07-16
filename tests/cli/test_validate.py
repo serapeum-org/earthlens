@@ -938,7 +938,7 @@ class TestLivePrimitives:
 
     def test_s3_live_keys_lists_one(self, monkeypatch):
         """_s3_live_keys returns the object keys from an unsigned client."""
-        import earthlens.s3.auth as s3_auth
+        import earthlens.base.s3 as s3_auth
         from earthlens.cli.validate import _s3_live_keys
 
         class FakeClient:
