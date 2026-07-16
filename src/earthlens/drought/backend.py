@@ -10,11 +10,15 @@ SPEIbase return a `list[Path]` of written GeoTIFFs / NetCDFs.
 The constructor's `dataset=` selects one curated row (`"usdm"`,
 `"edo-spaST"`, `"speibase-12"`, …); the row's `transport` field drives the
 `_fetch` route (`usdm-geojson` / `netcdf-url` / `edo-wcs`). The EDO/GDO
-route builds the Copernicus `GetCoverage` URL by hand (`TIME` +
-`SELECTED_TIMESCALE` + a `SUBSET=Long/Lat` bbox), streams the GeoTIFF, and
-opens it via `pyramids.dataset.Dataset.read_file` — Copernicus EDO/GDO is a
-REST shim whose WCS discovery handshake is unreliable, so the standard
-`Dataset.from_wcs` / GDAL WCS driver path does not apply.
+route fetches each period through `pyramids.dataset.Dataset.from_wcs` in
+**direct** mode, as the soilgrids backend does — earthlens shapes the
+provider-specific request (`TIME` + `SELECTED_TIMESCALE` + the bbox) and
+translates the failure, pyramids speaks the protocol and returns the raster.
+`direct=True` is required because Copernicus EDO/GDO is a REST shim whose
+WCS discovery handshake is 502/400-flaky, so the GetCapabilities path does
+not apply; the shim also wants a lowercase `coverageID` and a WCS-1.x `CRS=`
+rather than the spec's `COVERAGEID` / `SUBSETTINGCRS=`, which direct-mode
+`extra_params` supplies. See `_fetch_wcs_coverage`.
 
 Authentication: none — all three sources are open. Each successful
 `download()` logs the per-source attribution once (`G6`); no
@@ -30,7 +34,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
-import requests
 from loguru import logger
 
 from earthlens.base import (
@@ -569,97 +572,105 @@ class Drought(AbstractDataSource):
                 outside the indicator's available coverage range); the
                 Copernicus error message is surfaced verbatim.
         """
-        from pyramids.dataset import Dataset
-
         bbox = bbox_from_extent(self.space)
         written: list[Path] = []
         for product in products:
             period: dt.date = product.metadata["period"]
-            url = self._render_wcs_url(
-                self._dataset.endpoint,
-                coverage=self._dataset.coverage,
-                timescale=self._dataset.timescale,
-                period=period,
-                bbox=bbox,
-            )
             out_path = (
                 self.root_dir
                 / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
             )
-            _http_download_raster(url, out_path, label=self._dataset.id)
+            dataset = self._fetch_wcs_coverage(period, bbox)
             # The Copernicus EDO/GDO MapServer honours the `Lat` subset but
             # silently ignores `Long`, returning a full -180..180 strip
-            # (verified live), and tags the GeoTIFF with no embedded SRS — so
-            # `Dataset.crop`'s cutline path is a no-op. Window-crop to the
+            # (re-verified live 2026-07-17: a Long(-10,5) request still comes
+            # back spanning -25..51), and tags the GeoTIFF with no embedded SRS
+            # — so `Dataset.crop`'s cutline path is a no-op. Window-crop to the
             # requested bbox by hand so the output honours the documented
             # extent, mirroring the USDM (`gdf.cx`) and SPEIbase
-            # (`NetCDF.subset`) transports. Reading the raster also validates
-            # it is a real raster (a non-raster 200 body raises here).
-            ds = Dataset.read_file(str(out_path))
-            clipped = self._clip_wcs_raster(ds, bbox)
-            ds.close()
+            # (`NetCDF.subset`) transports.
+            clipped = self._clip_wcs_raster(dataset, bbox)
             if clipped is not None:
-                tmp_path = out_path.with_name(out_path.stem + ".tmp" + out_path.suffix)
-                clipped.to_file(str(tmp_path))
+                clipped.to_file(str(out_path))
                 clipped.close()
-                tmp_path.replace(out_path)
             else:
                 logger.warning(
                     f"{self._dataset.id}: requested bbox {bbox} fell entirely "
                     f"outside the downloaded raster's coverage; leaving "
                     f"{out_path} unclipped (full server-returned extent)."
                 )
+                dataset.to_file(str(out_path))
+            dataset.close()
             written.append(out_path)
         return written
 
-    @staticmethod
-    def _render_wcs_url(
-        endpoint: str,
-        *,
-        coverage: str | None,
-        timescale: str | None,
-        period: dt.date,
-        bbox: tuple[float, float, float, float],
-    ) -> str:
-        """Build a Copernicus EDO/GDO `GetCoverage` URL for one period.
+    def _fetch_wcs_coverage(
+        self, period: dt.date, bbox: tuple[float, float, float, float]
+    ) -> Any:
+        """Fetch one EDO/GDO period as an in-memory `Dataset` over WCS.
+
+        The WCS transport is pyramids' (`Dataset.from_wcs`), matching the
+        soilgrids backend: earthlens shapes the provider-specific request and
+        translates the failure, pyramids speaks the protocol.
+
+        `direct=True` skips the GetCapabilities handshake (the EDO/GDO
+        discovery endpoint is 502/400-flaky) and builds the documented KVP
+        GetCoverage call. Two of those keys go through `extra_params` because
+        this MapServer is not spec-compliant: it rejects pyramids' uppercased
+        `COVERAGEID` and the WCS-2.0 `SUBSETTINGCRS=`, wanting lowercase
+        `coverageID` and the WCS-1.x `CRS=` instead — direct-mode
+        `extra_params` overrides a built-in KVP case-insensitively
+        (serapeum-org/pyramids#725). `wcs_format="GEOTIFF"` is mandatory:
+        `from_wcs` defaults it to `None`, and without a `format=` the shim
+        answers HTTP 500.
 
         Args:
-            endpoint: The row's WCS map endpoint (carries `?map=DO_WCS`
-                or `?map=GDO_WCS`).
-            coverage: The WCS `coverageID` (e.g. `"spaST"`).
-            timescale: The `SELECTED_TIMESCALE` value (`"01"`, `"03"`,
-                …); omitted from the URL when `None`.
             period: The snapped date for this fetch (`TIME=`).
             bbox: `(west, south, east, north)` in EPSG:4326 degrees.
 
         Returns:
-            str: The fully-rendered GetCoverage URL.
+            Dataset: The server's coverage, un-cropped (see `_clip_wcs_raster`).
 
         Raises:
-            ValueError: When `coverage` is `None` (an `edo-wcs` row must
-                carry a coverage id).
+            ValueError: When `coverage` is `None` (an `edo-wcs` row must carry
+                one), or when the server rejects the request — an out-of-range
+                date, an unknown coverage, or a non-raster body under HTTP 200.
+                The Copernicus message is surfaced verbatim.
         """
-        if not coverage:
+        from pyramids.dataset import Dataset
+        from pyramids.dataset._wcs import WCSError
+
+        if not self._dataset.coverage:
             raise ValueError(
-                "an edo-wcs drought row must carry a `coverage` id; "
-                "got None."
+                "an edo-wcs drought row must carry a `coverage` id; got None."
             )
-        west, south, east, north = bbox
-        params = [
-            "SERVICE=WCS",
-            "VERSION=2.0.0",
-            "REQUEST=GetCoverage",
-            f"coverageID={coverage}",
-            "CRS=EPSG:4326",
-            "format=GEOTIFF",
-            f"TIME={period.isoformat()}",
-            f"SUBSET=Long({west},{east})",
-            f"SUBSET=Lat({south},{north})",
-        ]
-        if timescale:
-            params.append(f"SELECTED_TIMESCALE={timescale}")
-        sep = "&" if "?" in endpoint else "?"
-        return endpoint + sep + "&".join(params)
+        params = {
+            "coverageID": self._dataset.coverage,
+            "CRS": "EPSG:4326",
+            "TIME": period.isoformat(),
+        }
+        if self._dataset.timescale:
+            params["SELECTED_TIMESCALE"] = self._dataset.timescale
+        try:
+            return Dataset.from_wcs(
+                self._dataset.endpoint,
+                coverage=self._dataset.coverage,
+                crs="EPSG:4326",
+                wcs_format="GEOTIFF",
+                direct=True,
+                bbox=bbox,
+                extra_params=params,
+            )
+        except WCSError as exc:
+            # `WCSError` is not a `ValueError`, and this backend's documented
+            # contract is a `ValueError` carrying the Copernicus text. Since
+            # pyramids 0.46.0 the message embeds the response body
+            # (serapeum-org/pyramids#744), so the informative
+            # `{"message": "...outside the available coverage range..."}` EDO
+            # answers a bad date with survives the translation.
+            raise ValueError(
+                f"Copernicus EDO/GDO rejected {self._dataset.id!r}: {exc}"
+            ) from exc
 
     @staticmethod
     def _clip_wcs_raster(dataset: Any, bbox: tuple[float, float, float, float]) -> Any:
@@ -894,75 +905,3 @@ def _http_download(url: str, target: Path) -> None:
     _http_client().download(
         url, target, chunk=1 << 16, progress=False, timeout=_HTTP_TIMEOUT
     )
-
-
-def _http_download_raster(url: str, target: Path, *, label: str) -> None:
-    """Stream a raster GeoTIFF to `target`, surfacing Copernicus JSON errors.
-
-    Like `_http_download`, but on a non-2xx response it reads the body and
-    re-raises a `ValueError` carrying the Copernicus error message (EDO/GDO
-    answer an out-of-range date or a bad coverage with an informative JSON
-    `{"message": ...}` body — far more useful than a bare HTTP status). A
-    2xx response is streamed to disk unchanged.
-
-    Args:
-        url: The fully-rendered GetCoverage URL.
-        target: The destination `.tif` path.
-        label: The dataset id, for the error message.
-
-    Raises:
-        ValueError: On a non-2xx response; the Copernicus message (or the
-            raw body) is included.
-    """
-    target.parent.mkdir(parents=True, exist_ok=True)
-    tmp = target.with_suffix(target.suffix + ".partial")
-    try:
-        # `raise_for_status=False` keeps the errored response in hand so the
-        # Copernicus JSON `{"message": ...}` body can be surfaced below rather
-        # than lost to a bare `HTTPError`.
-        with _http_client().stream(
-            url, timeout=_HTTP_TIMEOUT, raise_for_status=False
-        ) as response:
-            if response.status_code >= 400:
-                body = response.text
-                try:
-                    message = response.json().get("message", body)
-                except ValueError:
-                    message = body
-                raise ValueError(
-                    f"Copernicus EDO/GDO rejected {label!r} "
-                    f"(HTTP {response.status_code}): {message.strip()[:300]}"
-                )
-            chunks = response.iter_content(chunk_size=1 << 16)
-            first = next(chunks, b"")
-            # A 2xx is NOT a guarantee of a raster: this Copernicus MapServer
-            # answers an invalid `map=`/coverage with a plain-text or HTML
-            # body under HTTP 200 (e.g. `ERROR: invalid map parameter`).
-            # Reject any body that does not start with the (Big)TIFF magic so
-            # a non-raster error never reaches `Dataset.read_file` as an
-            # opaque GDAL failure. 42 = classic TIFF, 43 = BigTIFF, in both
-            # byte orders.
-            if first[:4] not in (
-                b"MM\x00*",
-                b"II*\x00",
-                b"MM\x00+",
-                b"II+\x00",
-            ):
-                detail = first.decode("utf-8", errors="replace").strip()[:300]
-                raise ValueError(
-                    f"Copernicus EDO/GDO returned a non-raster body for "
-                    f"{label!r} (HTTP {response.status_code}): {detail}"
-                )
-            with tmp.open("wb") as fh:
-                fh.write(first)
-                for chunk in chunks:
-                    if chunk:
-                        fh.write(chunk)
-        tmp.replace(target)
-    except BaseException:
-        # Mirror `_http_download`: a rejected body or a dropped connection
-        # mid-stream must not orphan a stale `.partial` on disk.
-        tmp.unlink(missing_ok=True)
-        raise
-
-
