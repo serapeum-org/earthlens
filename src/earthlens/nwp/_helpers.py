@@ -92,13 +92,12 @@ def enumerate_cycles(
     for hour in hours:
         if not 0 <= hour <= 23:
             raise ValueError(f"cycle hour {hour} is outside [0, 23].")
+    from earthlens.base import date_windows
+
     out: list[dt.datetime] = []
-    day = dt.datetime(start.year, start.month, start.day)
-    last = dt.datetime(end.year, end.month, end.day)
-    while day <= last:
+    for day in date_windows(start.date(), end.date(), "D"):
         for hour in hours:
-            out.append(day.replace(hour=hour))
-        day += dt.timedelta(days=1)
+            out.append(dt.datetime(day.year, day.month, day.day, hour))
     return out
 
 
