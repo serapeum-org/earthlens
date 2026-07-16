@@ -51,16 +51,15 @@ dependencies = [
     "rich >=13",
 ]
 
+# Unsigned AWS S3 is a shared transport (`earthlens.base.s3`), not any one
+# provider's concern: the ERA5, Copernicus DEM, GOES, radar and NWM backends
+# all read open buckets through it. `boto3` lives here with the code that
+# imports it, so a provider distribution never depends on a sibling for it.
+[project.optional-dependencies]
+s3 = ["boto3 >=1.43.0", "botocore >=1.34.0"]
+
 [project.scripts]
 earthlens = "earthlens.cli:app"
-
-# Backend discovery. Each provider distribution publishes its `key -> spec`
-# table under this group and the facade merges them all (see
-# `earthlens._backends.discover_backends`). Core still publishes the whole
-# table for now; `M1`-`M5` slice it out into the thematic packages, after
-# which core will name no provider at all.
-[project.entry-points."earthlens.backends"]
-earthlens = "earthlens._backends:BACKENDS"
 
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"

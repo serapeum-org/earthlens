@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=80.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "earthlens-hazards"
+version = "0.10.0"
+description = "hazard, humanitarian and vector-basemap backends for earthlens"
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+    { name = "Mostafa Farrag", email = "moah.farag@gmail.com" }
+]
+license = "GPL-3.0-only"
+keywords = ["remote sensing", "hazards"]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+]
+
+requires-python = ">=3.11,<4"
+
+# Only the core abstractions. Every provider SDK is an extra, so installing
+# this distribution brings the backends' code without their dependencies —
+# `pip install earthlens-hazards[<backend>]` adds exactly one backend's SDK.
+dependencies = [
+    "earthlens-core ==0.10.0",
+]
+
+[project.optional-dependencies]
+fdsn = ["obspy >=1.5.0"]
+hdx = ["hdx-python-api >=6,<7"]
+overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
+osm = ["overpy >=0.7", "ohsome >=0.4.0"]
+osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
+all = ["earthlens-hazards[fdsn,hdx,osm,osm-pbf,overture]"]
+
+# This distribution's slice of the facade's data-source table.
+[project.entry-points."earthlens.backends"]
+hazards = "earthlens._hazards:BACKENDS"
+
+[project.urls]
+Homepage = "https://github.com/serapeum-org/earthlens"
+
+# Ships only its own backends plus its registry package. `earthlens` itself is
+# absent: core owns `earthlens/__init__.py`, so no two wheels write the same path.
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.gdacs*", "earthlens.hdx*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "catalog/*.yaml"]

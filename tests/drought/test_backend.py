@@ -11,6 +11,8 @@ network-free.
 
 from __future__ import annotations
 
+import earthlens.drought
+
 import datetime as dt
 import re
 from pathlib import Path
@@ -856,7 +858,7 @@ def test_drought_src_does_not_import_owslib_or_xarray():
     `import xarray as xr` inside any helper) must not slip past this
     guard.
     """
-    src = Path(__file__).resolve().parents[2] / "src" / "earthlens" / "drought"
+    src = Path(earthlens.drought.__file__).parent
     offenders = _scan_for_leaky_imports(src)
     assert offenders == [], (
         f"owslib/xarray import leak — drought has no SDK extra: {offenders}"

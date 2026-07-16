@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import earthlens.nrel
+
 from pathlib import Path
 
 import pytest
@@ -361,7 +363,7 @@ class TestConstructorValidation:
 class TestNoLeak:
     """Meta-tests guarding the xarray/rex-free + key-redaction rules."""
 
-    SRC = Path(__file__).resolve().parents[2] / "src" / "earthlens" / "nrel"
+    SRC = Path(earthlens.nrel.__file__).parent
     FIXTURES = Path(__file__).parent / "fixtures"
 
     def test_no_array_archive_imports(self):

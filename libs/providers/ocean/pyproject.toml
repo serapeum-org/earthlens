@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=80.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "earthlens-ocean"
+version = "0.10.0"
+description = "ocean, freshwater and marine-life backends for earthlens"
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+    { name = "Mostafa Farrag", email = "moah.farag@gmail.com" }
+]
+license = "GPL-3.0-only"
+keywords = ["remote sensing", "ocean"]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+]
+
+requires-python = ">=3.11,<4"
+
+# Only the core abstractions. Every provider SDK is an extra, so installing
+# this distribution brings the backends' code without their dependencies —
+# `pip install earthlens-ocean[<backend>]` adds exactly one backend's SDK.
+dependencies = [
+    "earthlens-core ==0.10.0",
+]
+
+[project.optional-dependencies]
+argo = ["argopy >=1.4"]
+cmems = ["copernicusmarine >=2.0.0,<3"]
+erddap = ["erddapy >=3.0"]
+nwm = ["earthlens-core[s3]", "pyramids-gis[parquet] >=0.45.0"]
+usgs-water = ["dataretrieval >=1.1.4"]
+obis = ["pyobis >=1.6.1"]
+all = ["earthlens-ocean[argo,cmems,erddap,nwm,obis,usgs-water]"]
+
+# This distribution's slice of the facade's data-source table.
+[project.entry-points."earthlens.backends"]
+ocean = "earthlens._ocean:BACKENDS"
+
+[project.urls]
+Homepage = "https://github.com/serapeum-org/earthlens"
+
+# Ships only its own backends plus its registry package. `earthlens` itself is
+# absent: core owns `earthlens/__init__.py`, so no two wheels write the same path.
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["earthlens._ocean*", "earthlens.argo*", "earthlens.cmems*", "earthlens.erddap*", "earthlens.nwm*", "earthlens.obis*", "earthlens.usgs_water*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "catalog/*.yaml"]
