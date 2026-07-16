@@ -26,6 +26,7 @@ classifiers = [
 requires-python = ">=3.11,<4"
 
 dependencies = [
+    "earthlens-core ==0.10.0",
     "pyramids-gis >=0.45.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
@@ -42,16 +43,6 @@ dependencies = [
     "typer >=0.12",
     "rich >=13",
 ]
-
-[project.scripts]
-earthlens = "earthlens.cli:app"
-# Backend discovery. Each provider distribution publishes its `key -> spec`
-# table here, and the `EarthLens` facade merges every entry in this group into
-# `EarthLens.DataSources` (see `earthlens._backends.discover_backends`). The
-# target is one entry per thematic provider package; the monolith publishes a
-# single table for now.
-[project.entry-points."earthlens.backends"]
-earthlens = "earthlens._backends:BACKENDS"
 
 
 [project.optional-dependencies]
@@ -246,9 +237,12 @@ Changelog = "https://github.com/serapeum-org/earthlens/blob/main/docs/change-log
 requires = ["setuptools>=80.0.0"]
 build-backend = "setuptools.build_meta"
 
+# Core owns `earthlens` itself (`earthlens/__init__.py`); this distribution
+# ships only the provider subpackages, so the two wheels never write the same
+# path. `earthlens` is deliberately absent from `include`.
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["earthlens", "earthlens.*"]
+include = ["earthlens.*"]
 
 # Every backend ships its catalog YAML(s); the "*" key applies to all
 # subpackages, with per-package additions for non-YAML catalog artefacts.
@@ -315,7 +309,6 @@ style = [
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "--import-mode=importlib"
 markers = [
@@ -393,9 +386,14 @@ platforms = ["win-64", "linux-64", "osx-arm64"]
 [tool.pixi.system-requirements]
 macos = "15.0"
 
+# Workspace members. pixi has no `members` key (its `[tool.pixi.workspace]` is
+# the renamed `project` table); editable `path` dependencies are the equivalent
+# of uv's `{ workspace = true }` sources, and give every member an editable
+# install resolved from this one lockfile.
 [tool.pixi.pypi-dependencies]
 # Dev/test env pulls every backend's SDK (`[all]`) so the full suite runs.
 earthlens = { path = ".", editable = true, extras = ["all"] }
+earthlens-core = { path = "libs/core", editable = true }
 
 [tool.pixi.tasks]
 test-all = { cmd = "pytest -vvv --cov=src/earthlens -sv --cov-report=xml --cov-report=term-missing", description = "Run all testsuite" }

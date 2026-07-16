@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=80.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "earthlens-core"
+version = "0.10.0"
+description = "Core abstractions, facade and CLI for earthlens — no provider SDKs"
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+    { name = "Mostafa Farrag", email = "moah.farag@gmail.com" }
+]
+license = "GPL-3.0-only"
+keywords = ["remote sensing", "ecmwf"]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+]
+
+requires-python = ">=3.11,<4"
+
+# Core carries only what is always reachable: the package surface, the
+# `EarthLens` facade, the abstractions every backend subclasses, and the
+# unconditionally-registered console script. No provider SDK belongs here —
+# those live in the thematic provider distributions' own dependencies.
+dependencies = [
+    "pyramids-gis >=0.45.0",
+    "geopandas >=1.0.0",
+    "joblib >=1.5.0",
+    "loguru >=0.7.3",
+    "numpy >=2.0.0",
+    "pandas >=2.0.0",
+    "platformdirs >=3.0.0",
+    "pydantic >=2.0",
+    "pyproj >=3.7.0",
+    "PyYAML >=6.0.2",
+    "requests >=2.28.1",
+    "shapely >=2.0.0",
+    "tqdm >=4.66.0",
+    "typer >=0.12",
+    "rich >=13",
+]
+
+[project.scripts]
+earthlens = "earthlens.cli:app"
+
+# Backend discovery. Each provider distribution publishes its `key -> spec`
+# table under this group and the facade merges them all (see
+# `earthlens._backends.discover_backends`). Core still publishes the whole
+# table for now; `M1`-`M5` slice it out into the thematic packages, after
+# which core will name no provider at all.
+[project.entry-points."earthlens.backends"]
+earthlens = "earthlens._backends:BACKENDS"
+
+[project.urls]
+Homepage = "https://github.com/serapeum-org/earthlens"
+
+# Core owns the regular `earthlens` package (`earthlens/__init__.py`), so
+# `from earthlens import EarthLens` keeps working. A provider distribution
+# ships only its own `earthlens/<provider>/*` subpackage and never an
+# `__init__.py` at this level, so the wheels never collide.
+[tool.setuptools.packages.find]
+where = ["src"]
+include = [
+    "earthlens",
+    "earthlens.base*",
+    "earthlens.cli*",
+    "earthlens.grids*",
+    "earthlens.biodiversity*",
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "catalog/*.yaml"]
