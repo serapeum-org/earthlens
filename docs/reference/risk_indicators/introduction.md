@@ -1,5 +1,7 @@
 # Risk indicators — introduction
 
+<img src="../../_images/logos/risk_indicators.svg" alt="ThinkHazard! (GFDRR/World Bank) logo" height="60">
+
 earthlens ships a single `risk-indicators` backend that fetches **country /
 admin-indexed risk indicators** from three open or keyed sources and returns
 them either as a tidy `pandas.DataFrame` or, for geometry, a pyramids

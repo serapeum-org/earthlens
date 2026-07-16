@@ -1,5 +1,7 @@
 # JAXA — introduction
 
+<img src="../../_images/logos/jaxa.svg" alt="JAXA logo" height="60">
+
 JAXA's Earth-observation archive is reached through several portals — the
 authless **JAXA Earth API** (a STAC + COG view of ~118 ARCO-style
 collections), the credentialed **G-Portal** mission archive (raw L1 / L2

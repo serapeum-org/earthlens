@@ -1,5 +1,7 @@
 # NWP forecasts — introduction
 
+<img src="../../_images/logos/nwp.png" alt="Herbie (NWP archive access) logo" height="60">
+
 The `earthlens.nwp` backend fetches **open numerical-weather-prediction
 (NWP) forecasts** from the public clouds and turns them into
 bbox-cropped Cloud-Optimized GeoTIFFs. It is one subpackage with sibling

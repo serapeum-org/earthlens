@@ -1,5 +1,7 @@
 # WorldPop — Introduction
 
+<img src="../../_images/logos/worldpop.png" alt="WorldPop logo" height="60">
+
 `earthlens.worldpop` downloads gridded population and demographic data from
 the **WorldPop open population data hub** ([`hub.worldpop.org`](https://hub.worldpop.org)).
 It queries the documented WorldPop REST API for the matching per-country

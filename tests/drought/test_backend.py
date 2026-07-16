@@ -16,6 +16,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pytest
 
 from earthlens.drought import Drought
@@ -464,15 +465,31 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
     read_calls: list[str] = []
 
     class _FakeDataset:
+        # A full-width -180..180 strip, latitude-cropped like the real
+        # Copernicus server returns — so the backend's `_clip_wcs_raster`
+        # windows it down to the requested lon_lim.
+        bbox = [-180.0, 40.0, 180.0, 50.0]
+        no_data_value = (None,)
+
         @classmethod
         def read_file(cls, path):
             read_calls.append(path)
             return _FakeDataset()
 
+        def read_array(self):
+            return np.zeros((10, 360), dtype="uint8")
+
         def close(self):
             pass
 
     import pyramids.dataset as dataset_mod
+
+    # `_clip_wcs_raster` writes the cropped output with a real, unpatched
+    # `pyramids.dataset.Dataset` (its own internal import), so the file on
+    # disk after `download()` is genuine — capture the real `read_file`
+    # classmethod before patching so it can re-open that file below, since
+    # `Dataset.read_file` is patched class-wide, not just backend.py's use.
+    _real_read_file = dataset_mod.Dataset.read_file.__func__
 
     monkeypatch.setattr(backend_module, "_http_download_raster", _fake_download)
     monkeypatch.setattr(dataset_mod.Dataset, "read_file", _FakeDataset.read_file)
@@ -496,6 +513,12 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
         assert "map=DO_WCS" in url and "SELECTED_TIMESCALE=01" in url
     # read_file was called once per written tif (the raster validation).
     assert len(read_calls) == len(paths)
+    # The final on-disk file is the real, cropped GeoTIFF -- not just the
+    # -180..180 strip `_FakeDataset` reports -- so re-open it (bypassing the
+    # `Dataset.read_file` patch above) and confirm the crop actually landed.
+    written = _real_read_file(dataset_mod.Dataset, str(paths[0]))
+    assert written.bbox == pytest.approx([5.0, 40.0, 15.0, 50.0])
+    written.close()
 
 
 def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
@@ -507,9 +530,15 @@ def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
         Path(target).write_bytes(b"MM\x00*FAKE")
 
     class _FakeDataset:
+        bbox = [-180.0, 40.0, 180.0, 50.0]
+        no_data_value = (None,)
+
         @classmethod
         def read_file(cls, path):
             return _FakeDataset()
+
+        def read_array(self):
+            return np.zeros((10, 360), dtype="uint8")
 
         def close(self):
             pass
@@ -530,6 +559,88 @@ def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
     backend.download(progress_bar=False)
     assert seen and all("map=DO_WCS" in u for u in seen)
     assert all("GDO_WCS" not in u for u in seen)
+
+
+def test_clip_wcs_raster_trims_full_width_strip_to_bbox():
+    """`_clip_wcs_raster` windows a global-width WCS strip down to the bbox.
+
+    Regression: the Copernicus EDO/GDO server honours the `Lat` subset but
+    ignores `Long`, returning a full -180..180 strip with no embedded SRS, so
+    the backend must clip longitude locally rather than trust the server.
+    """
+    from pyramids.dataset import Dataset
+
+    # 64 rows over lat 36..52, 1440 cols over lon -180..180 (0.25 deg cells).
+    arr = np.arange(64 * 1440, dtype="float32").reshape(64, 1440)
+    geo = (-180.0, 0.25, 0.0, 52.0, 0.0, -0.25)
+    strip = Dataset.create_from_array(arr=arr, geo=geo, epsg=4326, no_data_value=None)
+
+    clipped = Drought._clip_wcs_raster(strip, (-10.0, 36.0, 12.0, 52.0))
+
+    assert clipped is not None
+    assert [round(b, 2) for b in clipped.bbox] == [-10.0, 36.0, 12.0, 52.0]
+    assert clipped.columns < strip.columns  # longitude trimmed
+    assert clipped.rows == strip.rows  # latitude already full-height
+
+
+def test_clip_wcs_raster_returns_none_when_bbox_outside_coverage():
+    """A bbox entirely outside the raster yields `None` (original untouched)."""
+    from pyramids.dataset import Dataset
+
+    arr = np.zeros((4, 8), dtype="uint8")  # covers lon 0..8, lat 0..4
+    geo = (0.0, 1.0, 0.0, 4.0, 0.0, -1.0)
+    ds = Dataset.create_from_array(arr=arr, geo=geo, epsg=4326, no_data_value=None)
+
+    assert Drought._clip_wcs_raster(ds, (20.0, 20.0, 30.0, 30.0)) is None
+
+
+def test_fetch_wcs_warns_when_bbox_misses_downloaded_raster(monkeypatch, tmp_path):
+    """`_fetch_wcs` logs a warning and keeps the unclipped file when the crop is a no-op."""
+    from loguru import logger
+
+    def _fake_download(url, target, *, label):
+        Path(target).write_bytes(b"MM\x00*FAKE-GEOTIFF")
+
+    class _FakeDataset:
+        # Covers lon 0..8, lat 0..4 -- nowhere near the requested lon_lim/lat_lim.
+        bbox = [0.0, 0.0, 8.0, 4.0]
+        no_data_value = (None,)
+
+        @classmethod
+        def read_file(cls, path):
+            return _FakeDataset()
+
+        def read_array(self):
+            return np.zeros((4, 8), dtype="uint8")
+
+        def close(self):
+            pass
+
+    import pyramids.dataset as dataset_mod
+
+    monkeypatch.setattr(backend_module, "_http_download_raster", _fake_download)
+    monkeypatch.setattr(dataset_mod.Dataset, "read_file", _FakeDataset.read_file)
+
+    backend = Drought(
+        start="2025-12-01",
+        end="2025-12-31",
+        lat_lim=[40.0, 50.0],
+        lon_lim=[5.0, 15.0],
+        dataset="edo-spaST",
+        path=str(tmp_path),
+    )
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING")
+    try:
+        paths = backend.download(progress_bar=False)
+    finally:
+        logger.remove(sink_id)
+    warnings = [m for m in messages if "unclipped" in m]
+    assert len(warnings) == len(paths)
+    assert "edo-spaST" in warnings[0]
+    assert str(paths[0]) in warnings[0]
+    # The original, un-cropped download is left in place rather than dropped.
+    assert paths[0].exists()
 
 
 def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
@@ -558,7 +669,7 @@ def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
         end="2026-06-21",
         lat_lim=[40.0, 50.0],
         lon_lim=[5.0, 15.0],
-        dataset="edo-cdinx",
+        dataset="edo-cdiad",
         path=str(tmp_path),
     )
     with pytest.raises(ValueError, match="outside the available range"):
@@ -982,7 +1093,7 @@ def test_http_download_raster_surfaces_json_message(monkeypatch, tmp_path):
     )
     with pytest.raises(ValueError, match="date outside coverage range"):
         backend_module._http_download_raster(
-            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdinx"
+            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdiad"
         )
 
 
@@ -997,7 +1108,7 @@ def test_http_download_raster_falls_back_to_raw_body(monkeypatch, tmp_path):
     )
     with pytest.raises(ValueError, match="upstream mapserver error"):
         backend_module._http_download_raster(
-            "https://example.com/wcs", tmp_path / "x.tif", label="edo-fpanv"
+            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdirc"
         )
 
 

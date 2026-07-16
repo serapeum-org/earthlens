@@ -1,5 +1,6 @@
 # Global Drought Observatory (GDO) — Copernicus EMS, the global counterpart of
-# EDO. Mirrors the 19 GDO WMS indicator codes (verified live 2026-07-01).
+# EDO. Curates 17 of the 19 GDO WMS indicator codes seen live 2026-07-01 (the
+# discontinued cdinx / fpanv were pruned — see the note further down).
 #
 # IMPORTANT — the EDO/GDO split is a portal convention, not a data or endpoint
 # difference. The Copernicus drought WCS exposes a SINGLE map, `map=DO_WCS`;
@@ -56,26 +57,10 @@ datasets:
     native_crs: "EPSG:4326"
     timescale: "01"
     license_note: "Copernicus EMS — free reuse with attribution"
-  gdo-fpanv:
-    source: "Copernicus Global Drought Observatory (GDO)"
-    transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
-    coverage: fpanv
-    output_kind: raster
-    cadence: 10day
-    native_crs: "EPSG:4326"
-    timescale: "01"
-    license_note: "Copernicus EMS — free reuse with attribution"
-  gdo-cdinx:
-    source: "Copernicus Global Drought Observatory (GDO)"
-    transport: edo-wcs
-    endpoint: "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS"
-    coverage: cdinx
-    output_kind: raster
-    cadence: 10day
-    native_crs: "EPSG:4326"
-    timescale: "01"
-    license_note: "Copernicus EMS — free reuse with attribution"
+  # gdo-fpanv / gdo-cdinx removed: same coverages (fpanv/cdinx) as the pruned edo-
+  # rows — superseded upstream (fpanv→fpanm; cdinx→cdiad/cdirc), a permanent
+  # replacement rather than a bad-day outage; the WCS also 500s on every date.
+  # See the edo.yaml notes for the full rationale.
   gdo-twsan:
     source: "Copernicus Global Drought Observatory (GDO)"
     transport: edo-wcs

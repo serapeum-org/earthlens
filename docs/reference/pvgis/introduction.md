@@ -1,5 +1,7 @@
 # PVGIS — introduction
 
+<img src="../../_images/logos/pvgis.svg" alt="PVGIS (EU JRC) logo" height="60">
+
 earthlens ships a single `pvgis` backend that fetches **solar-radiation and
 photovoltaic (PV) time series** from the European Commission JRC
 [Photovoltaic Geographical Information System (PVGIS)](https://re.jrc.ec.europa.eu/pvg_tools/)

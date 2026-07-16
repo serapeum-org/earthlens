@@ -370,8 +370,8 @@ class S3(AbstractDataSource):
         UTM / geostationary COGs are reprojected to WGS84 first). ERA5-style
         regular-grid NetCDF granules carry no GDAL-readable SRS, so they are
         rebuilt into a WGS84 raster (time as bands) before cropping.
-        Geostationary NetCDF (GOES) is warped to WGS84 via pyramids, which
-        georeferences the scan-angle grid on read (pyramids >=0.28).
+        Geostationary NetCDF (GOES) is warped to WGS84 from its GDAL
+        subdataset, which carries the CF `+proj=geos` grid-mapping.
 
         Args:
             raw: The downloaded source file.
@@ -385,9 +385,8 @@ class S3(AbstractDataSource):
         west, south, east, north = self._bbox()
         if self._dataset.format == "netcdf":
             if self._dataset.crs is None:
-                # Geostationary NetCDF (GOES): pyramids (>=0.28) georeferences
-                # the scan-angle grid from the CF grid-mapping on read, so the
-                # variable warps to WGS84 directly.
+                # Geostationary NetCDF (GOES): warp to WGS84 from the GDAL
+                # subdataset, which carries the CF `+proj=geos` grid-mapping.
                 data = self._geostationary_to_wgs84(raw, product)
             else:
                 data = self._netcdf_to_wgs84_raster(raw, product)
@@ -438,14 +437,26 @@ class S3(AbstractDataSource):
     def _geostationary_to_wgs84(self, raw: Path, product: RemoteProduct):
         """Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.
 
-        pyramids (>=0.28) georeferences the scan-angle grid from the CF
-        `goes_imager_projection` grid-mapping when it reads the granule, so
-        the data variable reprojects to EPSG:4326 directly.
-        """
-        from pyramids.netcdf import NetCDF
+        The variable is opened through GDAL's NetCDF **subdataset**
+        (`NETCDF:"<file>":<variable>`) rather than the multidimensional
+        `pyramids.netcdf.NetCDF` class. The subdataset exposes the CF
+        `goes_imager_projection` grid-mapping as a `+proj=geos` spatial
+        reference over a projected-metre geotransform, so `to_crs(4326)`
+        warps the scan-angle grid correctly and cheaply.
 
-        nc = NetCDF.read_file(str(raw))
-        cube = nc.get_variable(self._nc_variable_name(nc, product))
+        The multidimensional path must not be used here. On real GOES ABI
+        granules (observed with pyramids 0.45), `NetCDF.read_file` →
+        `get_variable` → `read_array` returned the variable's array flipped
+        along `y` relative to its north-up geotransform, so the reprojected
+        raster kept a correct header while its pixels were mirrored about
+        the grid's horizontal centre line — an AOI crop silently returned
+        radiances from the wrong latitude. The subdataset read is also ~100x
+        faster (a full-disk `read_array()` takes minutes, sub-second here).
+        """
+        from pyramids.dataset import Dataset as PyramidsDataset
+
+        variable = self._resolve_nc_variable(raw, product)
+        cube = PyramidsDataset.read_file(f'NETCDF:"{raw}":{variable}')
         return cube.to_crs(4326)
 
     def _nc_variable_name(self, nc: Any, product: RemoteProduct) -> str:

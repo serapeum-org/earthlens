@@ -1,5 +1,7 @@
 # NEXRAD radar — introduction
 
+<img src="../../_images/logos/radar.svg" alt="NOAA NEXRAD logo" height="60">
+
 The `earthlens.radar` backend fetches **WSR-88D Level-II radar volumes**
 from the NEXRAD network (the US national weather-radar system). Unlike a
 gridded forecast, a Level-II volume is a stack of polar radar sweeps

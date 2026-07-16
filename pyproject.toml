@@ -26,7 +26,7 @@ classifiers = [
 requires-python = ">=3.11,<4"
 
 dependencies = [
-    "pyramids-gis >=0.41.0",
+    "pyramids-gis >=0.45.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
@@ -72,7 +72,7 @@ fdsn = ["obspy >=1.5.0"]
 # read). Only `[parquet]` is needed, and only for LabeledDataset.to_parquet.
 nwm = [
     "earthlens[s3]",
-    "pyramids-gis[parquet] >=0.41.0",
+    "pyramids-gis[parquet] >=0.45.0",
 ]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 # ASF InSAR backend reuses the EDL token already minted by `[earthdata]`, so
@@ -106,7 +106,7 @@ dem = ["earthlens[s3]"]
 # granules out — decode is downstream (pyramids / satpy), so earthlens never
 # imports xarray/netCDF4/goes2go.
 goes = ["earthlens[s3]"]
-stac = ["pyramids-gis[stac] >=0.41.0"]
+stac = ["pyramids-gis[stac] >=0.45.0"]
 openeo = ["openeo >=0.47,<0.48"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
 # cartopy: not imported by earthlens, but `import tropycal.tracks` chains through
@@ -159,8 +159,91 @@ erddap = ["erddapy >=3.0"]
 # needs `pip install earthlens[osm]` in a (pandas<3) osm-capable environment.
 # (Same policy as the `argo` extra above.)
 osm = ["overpy >=0.7", "ohsome >=0.4.0"]
+# Bulk / regional OpenStreetMap reads from Geofabrik `.osm.pbf` extracts (the
+# `pbf` protocol): pyrosm (in-memory region engine) + pyosmium (streaming,
+# planet-scale). Both are OSM-domain SDKs imported lazily inside `read_pbf`, so
+# the package imports without [osm-pbf]. Floors pinned from the A1 gate (pyrosm
+# 0.11.0 / osmium 4.3.1 verified on cp314). NOTE the pyosmium distribution is
+# published on PyPI as `osmium` (not `pyosmium`), imported as `import osmium`.
+#
+# Deliberately NOT in `all` (`G15`): heavy, and pyrosm's `cykhash` dependency
+# is an sdist that must compile from source (no wheel), so adding it to the
+# locked `all` env would burden every dev/test/CI solve. Same policy as [osm]
+# and [argo]. The non-e2e pbf tests fake both SDKs (monkeypatched reader +
+# HttpClient), so they run in the `all` env without pyrosm/pyosmium installed;
+# the gated live e2e needs `pip install earthlens[osm-pbf]`.
+osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
+
+# Thematic bundles mirroring the README / docs/examples/data-sources.md provider
+# categories -- a convenience grouping for "I want disaster data" / "I want
+# ocean data", not a minimal-footprint install. Each unions the individual
+# extras of that category's real SDK-needing backends; category members with
+# no SDK of their own (anonymous HTTP over core `requests`/`pandas`, e.g. chc,
+# gdacs, firms, drought, admin, bathymetry, glaciers, iucn, wdpa, ...) already
+# work without an extra and so are omitted from the list below, not left out
+# of the category.
+#
+# These categories are grouped by *actual physical data type*, verified by
+# reading every provider's own docs -- not by SDK, agency, or name. Two
+# earlier, coarser passes got this wrong in ways worth noting: `cmems` is
+# ocean, not "climate"; `argo` is ocean, not "hydrology"; `asf` is pure SAR,
+# not generic "imagery"; `chc`/`drought` are precipitation/drought products,
+# distinct from `ecmwf`'s assimilated reanalysis and `cmip6`'s free-running
+# projections; and `gee`/`sentinel-hub`/`stac`/`openeo`/`eumetsat`/`earthdata`/
+# `jaxa`/`s3` are broad multi-mission platforms that host many unrelated
+# dataset types under one SDK, not narrow single-variable providers -- hence
+# `platforms` below rather than the old, misleading `imagery` name.
+air-quality = ["earthlens[eea_aq]"]
+biodiversity = ["earthlens[gbif,obis]"]
+# ecmwf (reanalysis) + cmip6 (free-running scenario projections). climate_indices
+# (ENSO/NAO/PDO/... scalar teleconnection series) has no SDK of its own.
+climate = ["earthlens[cmip6,ecmwf]"]
+# chc (CHIRPS/CHIRTS/WBGT) + drought (USDM/EDO/GDO/SPEIbase) are both
+# satellite/station-blended precipitation & drought-index products, distinct
+# from ecmwf's assimilated reanalysis above. Neither has an SDK of its own.
+precipitation-drought = []
+disasters = ["earthlens[fdsn]"]
+elevation = ["earthlens[dem]"]
+# glaciers (RGI/GLIMS outlines + WGMS mass-balance) has no SDK of its own; kept
+# (empty) for symmetry with the README/docs "Glaciers & cryosphere" category.
+glaciers-cryosphere = []
+humanitarian = ["earthlens[hdx]"]
+hydrology = ["earthlens[nwm,usgs-water]"]
+# Deliberately not meant to be combined with `platforms` in the same install:
+# argopy (via `argo`) pins xarray>=2025.7, openeo (in `platforms`) pins
+# xarray<2025.1.2 -- the same conflict that excludes `argo` from `all` below.
+# Verified: `earthlens[cmems,argo,erddap]` resolves cleanly alone; adding
+# `openeo` to that same install reproduces the conflict.
+ocean = ["earthlens[cmems,argo,erddap]"]
+population-settlement = ["earthlens[worldpop,ghsl]"]
+# The broad, overlapping-capability satellite/data platforms -- most public
+# imagery (e.g. Sentinel-2) is reachable through several of these at once, so
+# this bundle is "give me every way to reach generic satellite/EO data," not
+# a single physical variable. asf (pure SAR) is deliberately NOT here -- see
+# `sar-radar` below.
+platforms = [
+    "earthlens[earthdata,eumetsat,gee,goes,jaxa,openeo,s3,sentinel-hub,stac]",
+]
+# nrel, pvgis and solar_wind_atlas are all anonymous-HTTP backends with no SDK
+# of their own; kept (empty) for symmetry with the README/docs "Renewable
+# energy" category, the same way the cmip6/ghsl provider extras are empty.
+renewable-energy = []
+sar-radar = ["earthlens[asf]"]
+# soilgrids has no SDK of its own; kept (empty) for symmetry with the
+# README/docs "Soil & land" category.
+soil = []
+tropical-cyclones = ["earthlens[tropycal]"]
+# Deliberately not meant to be combined with most other bundles in the same
+# install: ohsome (via `osm`) pins pandas<3.0.0 -- the same conflict that
+# excludes `osm` from `all` below.
+vector-basemaps = ["earthlens[osm,overture]"]
+# nwp (Herbie-fetched GFS/HRRR/ICON/IFS forecasts) is model *forecast* output,
+# distinct from ecmwf's *reanalysis* in `climate` above.
+weather-forecast = ["earthlens[nwp]"]
+weather-radar = ["earthlens[radar]"]
+
 # Self-referential: the union of every backend extra, without re-listing deps.
-# (argo and osm are intentionally excluded — see the notes above their extras.)
+# (argo, osm and osm-pbf are intentionally excluded — see the notes above.)
 all = [
     "earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,cmip6,fdsn,earthdata,asf,hdx,eea_aq,eumetsat,nwp,nwm,radar,dem,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
 ]
@@ -170,8 +253,17 @@ dev = [
     "nbval >=0.11.0",
     # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
-    "pyramids-gis[viz] >=0.41.0",
-    "cleopatra >=0.21.0",
+    # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
+    # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
+    # runtime dep of earthlens itself.
+    "pyramids-gis[viz] >=0.45.0",
+    # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
+    # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
+    # save_animation(crf=...) landed in 0.22.0, the animate() default
+    # label-clipping fix in 0.23.0, and the DATA_STYLES presets / dark-canvas
+    # helper (style=, apply_blank_canvas) used by the heatwave notebook in
+    # 0.24.0+ -- floor pinned to the latest of these, >=0.25.0.
+    "cleopatra >=0.25.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -199,8 +291,14 @@ docs = [
     "mkdocs-panzoom-plugin",
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
-    "pyramids-gis[viz] >=0.41.0",
-    "cleopatra >=0.21.0",
+    # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
+    "pyramids-gis[viz] >=0.45.0",
+    # cleopatra: notebooks import it directly; add_reference_map /
+    # save_animation(crf=...) landed in 0.22.0, the animate() default
+    # label-clipping fix in 0.23.0, and the DATA_STYLES presets / dark-canvas
+    # helper (style=, apply_blank_canvas) used by the heatwave notebook in
+    # 0.24.0+ -- floor pinned to the latest of these, >=0.25.0.
+    "cleopatra >=0.25.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
@@ -350,6 +448,7 @@ markers = [
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
     "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
+    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",
     "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
     "soilgrids: tests for the SoilGrids backend (ISRIC SoilGrids 2.0 soil properties via OGC WCS at maps.isric.org; no extra SDK — core requests + pyramids' Dataset.from_wcs; all public, CC-BY 4.0, no auth).",
     "drought: tests for the drought backend (US Drought Monitor / Copernicus EDO+GDO / CSIC SPEIbase; no extra SDK — core `requests` + pyramids; EDO/GDO fetched via the Copernicus GetCoverage REST endpoint, SPEIbase via direct NetCDF).",
@@ -364,7 +463,7 @@ platforms = ["win-64", "linux-64", "osx-arm64"]
 # without this floor the multi-platform lock cannot place it. Raising the
 # target to 15 matches that wheel; every other package's older-macOS wheels
 # stay valid (a lower macOS floor is always compatible with a higher target).
-# pyramids-gis 0.40.0 wheels are manylinux_2_28 (down from manylinux_2_39 in
+# pyramids-gis 0.45.0 wheels are manylinux_2_28 (down from manylinux_2_39 in
 # 0.38/0.39), which sits at/below pixi's default linux-64 __glibc floor, so no
 # explicit `libc = "…"` pin is needed to select the wheel over the sdist.
 [tool.pixi.system-requirements]

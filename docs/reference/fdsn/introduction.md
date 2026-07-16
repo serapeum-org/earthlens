@@ -1,5 +1,7 @@
 # FDSN seismic events — introduction
 
+<img src="../../_images/logos/fdsn.png" alt="FDSN logo" height="60">
+
 The [FDSN](https://www.fdsn.org/) (International Federation of Digital
 Seismograph Networks) **event web service** is the common standard that
 seismological data centres expose for querying earthquake (and other

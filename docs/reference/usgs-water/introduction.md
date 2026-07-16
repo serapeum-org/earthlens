@@ -1,5 +1,7 @@
 # USGS Water — Introduction
 
+<img src="../../_images/logos/usgs-water.svg" alt="USGS National Water Information System logo" height="60">
+
 `earthlens.usgs_water` wraps the official
 [`dataretrieval`](https://github.com/DOI-USGS/dataretrieval-python) SDK to pull
 water observations from the U.S. Geological Survey's **National Water

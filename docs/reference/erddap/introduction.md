@@ -1,5 +1,7 @@
 # ERDDAP — introduction
 
+<img src="../../_images/logos/erddap.svg" alt="NOAA ERDDAP logo" height="60">
+
 [ERDDAP](https://www.ncei.noaa.gov/erddap/information.html) is a data-server protocol spoken by hundreds of
 independent public servers — NOAA CoastWatch / Coral Reef Watch, NCEI, PacIOOS, IOOS regional associations, and
 many more. The `earthlens` ERDDAP backend reaches any of them from **one** subpackage: a curated **catalog of

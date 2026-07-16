@@ -1,5 +1,7 @@
 # EUMETSAT Data Store — introduction
 
+<img src="../../_images/logos/eumetsat.svg" alt="EUMETSAT logo" height="60">
+
 `earthlens.eumetsat` is one unified backend over the **EUMETSAT Data
 Store**, the access point for EUMETSAT's satellite archive. A single
 OAuth2 consumer key / secret unlocks every collection the Data Store

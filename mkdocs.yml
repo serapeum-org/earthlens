@@ -107,6 +107,7 @@ nav:
     - Architecture: overview/architecture.md
     - Temporal aggregation: aggregation.md
     - Command-line interface: reference/cli.md
+    - Troubleshooting pixi timeouts: troubleshooting-pixi.md
   - Data Sources:
     - Supported providers: reference/providers.md
     - Deferred providers: reference/deferred-providers.md
@@ -381,6 +382,15 @@ nav:
       - Hurricane Harvey rainfall (NASA GPM/Earthdata): examples/showcase/hurricane_harvey_rainfall.ipynb
       - Hurricane Ian from GOES (geostationary, S3): examples/showcase/goes_hurricane_ian.ipynb
       - Sea-turtle occurrences (GBIF + OBIS): examples/showcase/species_occurrences_gbif_obis.ipynb
+      - Dubai urban growth, 2000-2023 (time-lapse): examples/showcases/dubai_urban_growth.ipynb
+      - Aral Sea shrinking, 1986-2023 (time-lapse): examples/showcases/aral_sea_shrinking.ipynb
+      - Great Aletsch Glacier retreat, 1986-2023 (time-lapse): examples/showcases/aletsch_glacier_retreat.ipynb
+      - Typhoon Bavi 2020 (time-lapse): examples/showcases/typhoon_bavi_2020.ipynb
+      - Hurricanes Ida & Milton from GOES (sub-daily): examples/showcases/hurricanes_goes_subdaily.ipynb
+    - June 2026 European heat wave:
+      - Full case study: examples/heatwave/european_heatwave_2026.ipynb
+      - True-colour time-lapse: examples/heatwave/european_heatwave_timelapse_2026.ipynb
+      - "Rotterdam, 4 July 2026: a street celebration from sensors": examples/heatwave/celebration_rotterdam_2026.ipynb
     - Drought indicators (USDM / EDO / GDO / SPEIbase):
       - Catalog explorer (no network): examples/drought/catalog_explorer.ipynb
       - Quickstart — USDM week (live): examples/drought/quickstart.ipynb
@@ -472,6 +482,7 @@ nav:
     - OpenStreetMap (Overpass / ohsome):
       - Quickstart — current-state features (Overpass): examples/osm/quickstart.ipynb
       - History — building footprints over time (ohsome): examples/osm/ohsome_history.ipynb
+      - Bulk extracts — buildings & roads from Geofabrik (pbf): examples/osm/pbf_bulk_extracts.ipynb
     - JAXA (Earth-observation archive):
       - Catalog explorer (no network): examples/jaxa/01_catalog_explorer.ipynb
       - AW3D30 elevation quickstart (live): examples/jaxa/02_aw3d30_quickstart.ipynb

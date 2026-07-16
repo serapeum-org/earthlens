@@ -1,5 +1,7 @@
 # Glaciers — introduction
 
+<img src="../../_images/logos/glaciers.png" alt="NSIDC Randolph Glacier Inventory logo" height="60">
+
 earthlens ships a single `glaciers` backend that fetches **glacier outlines and
 fluctuations** from three open sources and returns them either as a pyramids
 `FeatureCollection` (outlines) or a tidy `pandas.DataFrame` (fluctuations). The
