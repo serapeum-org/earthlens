@@ -23646,7 +23646,7 @@ epochs).</p>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">date_windows</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="s2">&quot;YS&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;YS&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
@@ -27394,7 +27394,7 @@ epochs).</p>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">date_windows</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="s2">&quot;YS&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;YS&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span>
@@ -32365,14 +32365,7 @@ payload is a CSV / GeoPackage / xlsx, not a raster.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/ghsl/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-350">350</a></span>
-<span class="normal"><a href="#__codelineno-0-351">351</a></span>
-<span class="normal"><a href="#__codelineno-0-352">352</a></span>
-<span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span>
-<span class="normal"><a href="#__codelineno-0-355">355</a></span>
-<span class="normal"><a href="#__codelineno-0-356">356</a></span>
-<span class="normal"><a href="#__codelineno-0-357">357</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-357">357</a></span>
 <span class="normal"><a href="#__codelineno-0-358">358</a></span>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span>
@@ -32401,43 +32394,50 @@ payload is a CSV / GeoPackage / xlsx, not a raster.</p>
 <span class="normal"><a href="#__codelineno-0-383">383</a></span>
 <span class="normal"><a href="#__codelineno-0-384">384</a></span>
 <span class="normal"><a href="#__codelineno-0-385">385</a></span>
-<span class="normal"><a href="#__codelineno-0-386">386</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_and_extract</span><span class="p">(</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>    <span class="n">dest_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">120.0</span><span class="p">,</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream a `.zip` to `dest_dir` and extract **all** members (tabular path).</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    Unlike `download_and_unzip` (which selects the single `.tif`), this keeps</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    every member — used for the tabular DUC / WUP-statistics products whose</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    payload is a CSV / GeoPackage / xlsx, not a raster.</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        url: A `.zip` URL.</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        dest_dir: Directory to download + extract into (created if absent).</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        retries: Attempts before giving up.</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        backoff: Base backoff seconds.</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        timeout: Per-request timeout.</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        chunk_size: Streaming chunk size.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        list[Path]: The extracted member paths (the `.zip` itself is removed).</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>    <span class="n">dest_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="n">zip_path</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="n">_download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">backoff</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="n">_assert_safe_members</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">)</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="n">members</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)]</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">zf</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">dest_dir</span><span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="n">zip_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">dest_dir</span> <span class="o">/</span> <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">members</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span>
+<span class="normal"><a href="#__codelineno-0-393">393</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_and_extract</span><span class="p">(</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="n">dest_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">120.0</span><span class="p">,</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream a `.zip` to `dest_dir` and extract **all** members (tabular path).</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Unlike `download_and_unzip` (which selects the single `.tif`), this keeps</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    every member — used for the tabular DUC / WUP-statistics products whose</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    payload is a CSV / GeoPackage / xlsx, not a raster.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        url: A `.zip` URL.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        dest_dir: Directory to download + extract into (created if absent).</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        retries: Attempts before giving up.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        backoff: Base backoff seconds.</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        timeout: Per-request timeout.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        chunk_size: Streaming chunk size.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        list[Path]: The extracted member paths (the `.zip` itself is removed).</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="n">dest_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="n">zip_path</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="n">_download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">backoff</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">_assert_safe_members</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">)</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">members</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)]</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">zf</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">dest_dir</span><span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="n">zip_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">dest_dir</span> <span class="o">/</span> <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">members</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32646,7 +32646,10 @@ zips also carry a PDF + xlsx sidecar which are ignored).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/ghsl/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-213">213</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-210">210</a></span>
+<span class="normal"><a href="#__codelineno-0-211">211</a></span>
+<span class="normal"><a href="#__codelineno-0-212">212</a></span>
+<span class="normal"><a href="#__codelineno-0-213">213</a></span>
 <span class="normal"><a href="#__codelineno-0-214">214</a></span>
 <span class="normal"><a href="#__codelineno-0-215">215</a></span>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
@@ -32691,52 +32694,77 @@ zips also carry a PDF + xlsx sidecar which are ignored).</p>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
 <span class="normal"><a href="#__codelineno-0-256">256</a></span>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
-<span class="normal"><a href="#__codelineno-0-258">258</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_and_unzip</span><span class="p">(</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="n">dest_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">120.0</span><span class="p">,</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream a GHSL `.zip` to `dest_dir`, unzip it, return the `.tif` inside.</span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span>
+<span class="normal"><a href="#__codelineno-0-262">262</a></span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span>
+<span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span>
+<span class="normal"><a href="#__codelineno-0-268">268</a></span>
+<span class="normal"><a href="#__codelineno-0-269">269</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_and_unzip</span><span class="p">(</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>    <span class="n">dest_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="n">backoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">120.0</span><span class="p">,</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream a GHSL `.zip` to `dest_dir`, unzip it, return the `.tif` inside.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    Idempotent: if the expected `.tif` already exists it is returned without</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    re-downloading. Retries transient HTTP failures with exponential backoff.</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    Idempotent: if the expected `.tif` already exists it is returned without</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    re-downloading. Retries transient HTTP failures with exponential backoff.</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        url: A GHSL `.zip` URL (from `ghsl_url`).</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        dest_dir: Directory to download + extract into (created if absent).</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        session: Optional shared `requests.Session` for connection reuse.</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        retries: Number of attempts before giving up.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        backoff: Base seconds for exponential backoff between retries.</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        timeout: Per-request timeout in seconds.</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        chunk_size: Streaming chunk size in bytes.</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        pathlib.Path: The extracted `.tif` (the single GeoTIFF member; JRC</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">            zips also carry a PDF + xlsx sidecar which are ignored).</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        ValueError: If the zip contains no `.tif` member.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        requests.HTTPError: If every attempt fails (the last error is raised).</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="n">dest_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="n">zip_name</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="n">tif_name</span> <span class="o">=</span> <span class="n">zip_name</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="n">tif_path</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">tif_name</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a>    <span class="k">if</span> <span class="n">tif_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="k">return</span> <span class="n">tif_path</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="n">zip_path</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">zip_name</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="n">_download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">backoff</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="p">(</span><span class="n">extracted</span><span class="p">,)</span> <span class="o">=</span> <span class="n">extract_members</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">,),</span> <span class="n">single</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="k">if</span> <span class="n">extracted</span> <span class="o">!=</span> <span class="n">tif_path</span><span class="p">:</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="n">extracted</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tif_path</span><span class="p">)</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">zip_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">return</span> <span class="n">tif_path</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        url: A GHSL `.zip` URL (from `ghsl_url`).</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        dest_dir: Directory to download + extract into (created if absent).</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        session: Optional shared `requests.Session` for connection reuse.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        retries: Number of attempts before giving up.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        backoff: Base seconds for exponential backoff between retries.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        timeout: Per-request timeout in seconds.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        chunk_size: Streaming chunk size in bytes.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        pathlib.Path: The extracted `.tif` (the single GeoTIFF member; JRC</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">            zips also carry a PDF + xlsx sidecar which are ignored).</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        ValueError: If the zip contains no `.tif` member.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        requests.HTTPError: If every attempt fails (the last error is raised).</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="n">dest_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="n">zip_name</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="n">tif_name</span> <span class="o">=</span> <span class="n">zip_name</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="n">tif_path</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">tif_name</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">if</span> <span class="n">tif_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="k">return</span> <span class="n">tif_path</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>    <span class="n">zip_path</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">zip_name</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="n">_download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">backoff</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="n">_assert_safe_members</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">)</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">members</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">members</span><span class="p">:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>                <span class="sa">f</span><span class="s2">&quot;GHSL zip </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> contains no .tif member (found </span><span class="si">{</span><span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>            <span class="p">)</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">members</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>                <span class="sa">f</span><span class="s2">&quot;GHSL zip </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> has multiple .tif members </span><span class="si">{</span><span class="n">members</span><span class="si">}</span><span class="s2">; &quot;</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>                <span class="sa">f</span><span class="s2">&quot;using the first (</span><span class="si">{</span><span class="n">members</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>            <span class="p">)</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="n">member</span> <span class="o">=</span> <span class="n">members</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">zf</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">)</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">extracted</span> <span class="o">=</span> <span class="n">dest_dir</span> <span class="o">/</span> <span class="n">member</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">if</span> <span class="n">extracted</span> <span class="o">!=</span> <span class="n">tif_path</span><span class="p">:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="n">extracted</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tif_path</span><span class="p">)</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="n">zip_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="k">return</span> <span class="n">tif_path</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32990,7 +33018,10 @@ intermediate <code>{code}_{region}_{release}/</code> sub-product directory
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/ghsl/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-70"> 70</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-67"> 67</a></span>
+<span class="normal"><a href="#__codelineno-0-68"> 68</a></span>
+<span class="normal"><a href="#__codelineno-0-69"> 69</a></span>
+<span class="normal"><a href="#__codelineno-0-70"> 70</a></span>
 <span class="normal"><a href="#__codelineno-0-71"> 71</a></span>
 <span class="normal"><a href="#__codelineno-0-72"> 72</a></span>
 <span class="normal"><a href="#__codelineno-0-73"> 73</a></span>
@@ -33058,81 +33089,78 @@ intermediate <code>{code}_{region}_{release}/</code> sub-product directory
 <span class="normal"><a href="#__codelineno-0-135">135</a></span>
 <span class="normal"><a href="#__codelineno-0-136">136</a></span>
 <span class="normal"><a href="#__codelineno-0-137">137</a></span>
-<span class="normal"><a href="#__codelineno-0-138">138</a></span>
-<span class="normal"><a href="#__codelineno-0-139">139</a></span>
-<span class="normal"><a href="#__codelineno-0-140">140</a></span>
-<span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="k">def</span><span class="w"> </span><span class="nf">ghsl_url</span><span class="p">(</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="n">release</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="n">tile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GLOBE&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="n">nested</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the deterministic JRC `.zip` URL for one artefact.</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">        family: Product-family directory token (`&quot;GHS_POP&quot;`,</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">            `&quot;GHS_BUILT_H&quot;`).</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">        code: Product file-stem token (equals `family` except for the</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">            `AGBH`/`ANBH`, `FUN`/`MSZ`, `NRES`, `VEG` sub-products).</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">        epoch: Reference year.</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">        release: Release id (`&quot;R2023A&quot;`).</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">        resolution: Friendly resolution label (`&quot;100m&quot;`); its source CRS is</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">            derived via `native_source_crs`.</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        tile: Optional `R{r}_C{c}` tile id; `None` builds the whole-globe URL.</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        version: `(major, minor)` data version. `V{maj}-{min}` in the path,</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">            `V{maj}_{min}` in the filename.</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        region: Region token in the path (`&quot;GLOBE&quot;` default, `&quot;EUROPE&quot;`,</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            `&quot;ARCTIC&quot;`).</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">        nested: When `True`, the per-epoch directory sits under an</span>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            intermediate `{code}_{region}_{release}/` sub-product directory</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            (the R2022A layout).</span>
+<span class="normal"><a href="#__codelineno-0-138">138</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="k">def</span><span class="w"> </span><span class="nf">ghsl_url</span><span class="p">(</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a>    <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="n">release</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="n">tile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GLOBE&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="n">nested</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the deterministic JRC `.zip` URL for one artefact.</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">        family: Product-family directory token (`&quot;GHS_POP&quot;`,</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            `&quot;GHS_BUILT_H&quot;`).</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">        code: Product file-stem token (equals `family` except for the</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            `AGBH`/`ANBH`, `FUN`/`MSZ`, `NRES`, `VEG` sub-products).</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">        epoch: Reference year.</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">        release: Release id (`&quot;R2023A&quot;`).</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">        resolution: Friendly resolution label (`&quot;100m&quot;`); its source CRS is</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">            derived via `native_source_crs`.</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">        tile: Optional `R{r}_C{c}` tile id; `None` builds the whole-globe URL.</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">        version: `(major, minor)` data version. `V{maj}-{min}` in the path,</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">            `V{maj}_{min}` in the filename.</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        region: Region token in the path (`&quot;GLOBE&quot;` default, `&quot;EUROPE&quot;`,</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">            `&quot;ARCTIC&quot;`).</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        nested: When `True`, the per-epoch directory sits under an</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">            intermediate `{code}_{region}_{release}/` sub-product directory</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            (the R2022A layout).</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        str: The fully-qualified `.zip` URL.</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">        str: The fully-qualified `.zip` URL.</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">        ValueError: If `resolution` is not a known GHSL resolution.</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        ValueError: If `resolution` is not a known GHSL resolution.</span>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        - The verified R2023A whole-globe + per-tile URLs:</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ghsl._helpers import ghsl_url</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">            &gt;&gt;&gt; ghsl_url(&quot;GHS_POP&quot;, &quot;GHS_POP&quot;, 2020, &quot;R2023A&quot;, &quot;100m&quot;,</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">            ...          tile=&quot;R6_C18&quot;).split(&quot;/ftp/&quot;)[1]</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">            &#39;jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R6_C18.zip&#39;</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">            &gt;&gt;&gt; ghsl_url(&quot;GHS_POP&quot;, &quot;GHS_POP&quot;, 2020, &quot;R2023A&quot;, &quot;1km&quot;).split(&quot;/V1-0/&quot;)[1]</span>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">            &#39;GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0.zip&#39;</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">        - The nested R2022A layout inserts the sub-product directory:</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ghsl._helpers import ghsl_url</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">            &gt;&gt;&gt; ghsl_url(&quot;GHS_BUILT_S&quot;, &quot;GHS_BUILT_S_NRES&quot;, 2020, &quot;R2022A&quot;,</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">            ...          &quot;1km&quot;, nested=True).split(&quot;/ftp/&quot;)[1]</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">            &#39;jrc-opendata/GHSL/GHS_BUILT_S_GLOBE_R2022A/GHS_BUILT_S_NRES_GLOBE_R2022A/GHS_BUILT_S_NRES_E2020_GLOBE_R2022A_54009_1000/V1-0/GHS_BUILT_S_NRES_E2020_GLOBE_R2022A_54009_1000_V1_0.zip&#39;</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="k">if</span> <span class="n">resolution</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">RES_TO_TOKEN</span><span class="p">:</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>            <span class="sa">f</span><span class="s2">&quot;unknown GHSL resolution </span><span class="si">{</span><span class="n">resolution</span><span class="si">!r}</span><span class="s2">; known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">RES_TO_TOKEN</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>        <span class="p">)</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>    <span class="n">crs</span> <span class="o">=</span> <span class="n">native_source_crs</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">res_token</span> <span class="o">=</span> <span class="n">RES_TO_TOKEN</span><span class="p">[</span><span class="n">resolution</span><span class="p">]</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">maj</span><span class="p">,</span> <span class="n">minr</span> <span class="o">=</span> <span class="n">version</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="n">stem</span> <span class="o">=</span> <span class="n">_ghsl_stem</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">release</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">res_token</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="n">fam_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">family</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="n">middle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">/&quot;</span> <span class="k">if</span> <span class="n">nested</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tile</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">tile</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">_V</span><span class="si">{</span><span class="n">maj</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">minr</span><span class="si">}{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.zip&quot;</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">sub</span> <span class="o">=</span> <span class="s2">&quot;tiles/&quot;</span> <span class="k">if</span> <span class="n">tile</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">fam_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">middle</span><span class="si">}{</span><span class="n">stem</span><span class="si">}</span><span class="s2">/V</span><span class="si">{</span><span class="n">maj</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">minr</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sub</span><span class="si">}{</span><span class="n">fname</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        - The verified R2023A whole-globe + per-tile URLs:</span>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ghsl._helpers import ghsl_url</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            &gt;&gt;&gt; ghsl_url(&quot;GHS_POP&quot;, &quot;GHS_POP&quot;, 2020, &quot;R2023A&quot;, &quot;100m&quot;,</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            ...          tile=&quot;R6_C18&quot;).split(&quot;/ftp/&quot;)[1]</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            &#39;jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R6_C18.zip&#39;</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">            &gt;&gt;&gt; ghsl_url(&quot;GHS_POP&quot;, &quot;GHS_POP&quot;, 2020, &quot;R2023A&quot;, &quot;1km&quot;).split(&quot;/V1-0/&quot;)[1]</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">            &#39;GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0.zip&#39;</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">        - The nested R2022A layout inserts the sub-product directory:</span>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ghsl._helpers import ghsl_url</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">            &gt;&gt;&gt; ghsl_url(&quot;GHS_BUILT_S&quot;, &quot;GHS_BUILT_S_NRES&quot;, 2020, &quot;R2022A&quot;,</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">            ...          &quot;1km&quot;, nested=True).split(&quot;/ftp/&quot;)[1]</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">            &#39;jrc-opendata/GHSL/GHS_BUILT_S_GLOBE_R2022A/GHS_BUILT_S_NRES_GLOBE_R2022A/GHS_BUILT_S_NRES_E2020_GLOBE_R2022A_54009_1000/V1-0/GHS_BUILT_S_NRES_E2020_GLOBE_R2022A_54009_1000_V1_0.zip&#39;</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="k">if</span> <span class="n">resolution</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">RES_TO_TOKEN</span><span class="p">:</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a>            <span class="sa">f</span><span class="s2">&quot;unknown GHSL resolution </span><span class="si">{</span><span class="n">resolution</span><span class="si">!r}</span><span class="s2">; known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">RES_TO_TOKEN</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a>        <span class="p">)</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">crs</span> <span class="o">=</span> <span class="n">native_source_crs</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="n">res_token</span> <span class="o">=</span> <span class="n">RES_TO_TOKEN</span><span class="p">[</span><span class="n">resolution</span><span class="p">]</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="n">maj</span><span class="p">,</span> <span class="n">minr</span> <span class="o">=</span> <span class="n">version</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>    <span class="n">stem</span> <span class="o">=</span> <span class="n">_ghsl_stem</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">release</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">res_token</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">fam_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">family</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">middle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">/&quot;</span> <span class="k">if</span> <span class="n">nested</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tile</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">tile</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">_V</span><span class="si">{</span><span class="n">maj</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">minr</span><span class="si">}{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.zip&quot;</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="n">sub</span> <span class="o">=</span> <span class="s2">&quot;tiles/&quot;</span> <span class="k">if</span> <span class="n">tile</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">fam_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">middle</span><span class="si">}{</span><span class="n">stem</span><span class="si">}</span><span class="s2">/V</span><span class="si">{</span><span class="n">maj</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">minr</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sub</span><span class="si">}{</span><span class="n">fname</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33249,14 +33277,7 @@ intermediate <code>{code}_{region}_{release}/</code> sub-product directory
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/ghsl/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
@@ -33275,33 +33296,40 @@ intermediate <code>{code}_{region}_{release}/</code> sub-product directory
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="k">def</span><span class="w"> </span><span class="nf">latest_version_dir</span><span class="p">(</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="n">family_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the highest `V{maj}-{min}` directory name under a family URL.</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        family_url: A product-family directory URL (e.g.</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            `…/GHS_DUC_GLOBE_R2023A`).</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        str: The newest version directory name (e.g. `&quot;V2-0&quot;`).</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        ValueError: If no `V{maj}-{min}` directory is found.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="n">versions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">list_remote_dir</span><span class="p">(</span><span class="n">family_url</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">):</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="n">match</span> <span class="o">=</span> <span class="n">_VERSION_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="n">versions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span> <span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>            <span class="p">)</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">versions</span><span class="p">:</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no V</span><span class="se">{{</span><span class="s2">maj</span><span class="se">}}</span><span class="s2">-</span><span class="se">{{</span><span class="s2">min</span><span class="se">}}</span><span class="s2"> version directory under </span><span class="si">{</span><span class="n">family_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="n">versions</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">return</span> <span class="n">versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span>
+<span class="normal"><a href="#__codelineno-0-348">348</a></span>
+<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span>
+<span class="normal"><a href="#__codelineno-0-353">353</a></span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="k">def</span><span class="w"> </span><span class="nf">latest_version_dir</span><span class="p">(</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="n">family_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the highest `V{maj}-{min}` directory name under a family URL.</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        family_url: A product-family directory URL (e.g.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            `…/GHS_DUC_GLOBE_R2023A`).</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        str: The newest version directory name (e.g. `&quot;V2-0&quot;`).</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        ValueError: If no `V{maj}-{min}` directory is found.</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="n">versions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">list_remote_dir</span><span class="p">(</span><span class="n">family_url</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">):</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="n">match</span> <span class="o">=</span> <span class="n">_VERSION_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>            <span class="n">versions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span> <span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>            <span class="p">)</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">versions</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no V</span><span class="se">{{</span><span class="s2">maj</span><span class="se">}}</span><span class="s2">-</span><span class="se">{{</span><span class="s2">min</span><span class="se">}}</span><span class="s2"> version directory under </span><span class="si">{</span><span class="n">family_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="n">versions</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="k">return</span> <span class="n">versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33411,18 +33439,7 @@ slash), excluding the parent-directory and column-sort links.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/ghsl/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span>
-<span class="normal"><a href="#__codelineno-0-298">298</a></span>
-<span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span>
-<span class="normal"><a href="#__codelineno-0-301">301</a></span>
-<span class="normal"><a href="#__codelineno-0-302">302</a></span>
-<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
@@ -33437,33 +33454,36 @@ slash), excluding the parent-directory and column-sort links.</p>
 <span class="normal"><a href="#__codelineno-0-315">315</a></span>
 <span class="normal"><a href="#__codelineno-0-316">316</a></span>
 <span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_remote_dir</span><span class="p">(</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List the entry names in a JRC Apache-autoindex directory.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        url: Directory URL (with or without a trailing slash).</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        timeout: Request timeout in seconds.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        list[str]: The `href` entry names (sub-directories keep their trailing</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            slash), excluding the parent-directory and column-sort links.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpClient</span><span class="p">,</span> <span class="n">RequestsGet</span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_remote_dir</span><span class="p">(</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List the entry names in a JRC Apache-autoindex directory.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="c1"># Route the autoindex GET through the shared HttpClient for the 429/5xx</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="c1"># Retry-After/back-off policy; a passed `session` is reused, else a fresh</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="c1"># connection per call.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">session</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">RequestsGet</span><span class="p">())</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">for</span> <span class="n">href</span> <span class="ow">in</span> <span class="n">_HREF_RE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">):</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">if</span> <span class="n">href</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;../&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">href</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="k">return</span> <span class="n">names</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        url: Directory URL (with or without a trailing slash).</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        session: Optional shared `requests.Session`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        timeout: Request timeout in seconds.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        list[str]: The `href` entry names (sub-directories keep their trailing</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            slash), excluding the parent-directory and column-sort links.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="n">get</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">url</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">for</span> <span class="n">href</span> <span class="ow">in</span> <span class="n">_HREF_RE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">):</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">if</span> <span class="n">href</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;../&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">href</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="n">names</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33557,7 +33577,10 @@ outside every land tile.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/earthlens/ghsl/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-169">169</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-166">166</a></span>
+<span class="normal"><a href="#__codelineno-0-167">167</a></span>
+<span class="normal"><a href="#__codelineno-0-168">168</a></span>
+<span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
@@ -33589,45 +33612,42 @@ outside every land tile.</p>
 <span class="normal"><a href="#__codelineno-0-198">198</a></span>
 <span class="normal"><a href="#__codelineno-0-199">199</a></span>
 <span class="normal"><a href="#__codelineno-0-200">200</a></span>
-<span class="normal"><a href="#__codelineno-0-201">201</a></span>
-<span class="normal"><a href="#__codelineno-0-202">202</a></span>
-<span class="normal"><a href="#__codelineno-0-203">203</a></span>
-<span class="normal"><a href="#__codelineno-0-204">204</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="k">def</span><span class="w"> </span><span class="nf">tiles_for_bbox</span><span class="p">(</span><span class="n">bbox_wgs84</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the land tile ids whose extent intersects the AOI.</span>
+<span class="normal"><a href="#__codelineno-0-201">201</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="k">def</span><span class="w"> </span><span class="nf">tiles_for_bbox</span><span class="p">(</span><span class="n">bbox_wgs84</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the land tile ids whose extent intersects the AOI.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        bbox_wgs84: `(west, south, east, north)` in degrees.</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        bbox_wgs84: `(west, south, east, north)` in degrees.</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        list[str]: Sorted `R{r}_C{c}` tile ids intersecting the AOI&#39;s</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            Mollweide envelope. Empty when the AOI covers only ocean / falls</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            outside every land tile.</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        - A small Moroccan-coast AOI selects the verified tile:</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ghsl._helpers import tiles_for_bbox</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">            &gt;&gt;&gt; tiles_for_bbox((-9.0, 30.5, -8.5, 31.0))</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            [&#39;R6_C18&#39;]</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        - An open-ocean AOI (South Pacific) selects nothing:</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ghsl._helpers import tiles_for_bbox</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            &gt;&gt;&gt; tiles_for_bbox((-140.0, -40.0, -139.8, -39.8))</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            []</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.bbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">transform</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">bbox_wgs84</span><span class="p">,</span> <span class="mi">4326</span><span class="p">,</span> <span class="s2">&quot;ESRI:54009&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="n">hits</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="n">tile_id</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="k">for</span> <span class="n">tile_id</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">_load_tile_schema</span><span class="p">()</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">r</span> <span class="o">&lt;=</span> <span class="n">left</span> <span class="ow">or</span> <span class="n">l</span> <span class="o">&gt;=</span> <span class="n">right</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="n">bottom</span> <span class="ow">or</span> <span class="n">b</span> <span class="o">&gt;=</span> <span class="n">top</span><span class="p">)</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="p">]</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">hits</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_tile_sort_key</span><span class="p">)</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        list[str]: Sorted `R{r}_C{c}` tile ids intersecting the AOI&#39;s</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            Mollweide envelope. Empty when the AOI covers only ocean / falls</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            outside every land tile.</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        - A small Moroccan-coast AOI selects the verified tile:</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ghsl._helpers import tiles_for_bbox</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            &gt;&gt;&gt; tiles_for_bbox((-9.0, 30.5, -8.5, 31.0))</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            [&#39;R6_C18&#39;]</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        - An open-ocean AOI (South Pacific) selects nothing:</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ghsl._helpers import tiles_for_bbox</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            &gt;&gt;&gt; tiles_for_bbox((-140.0, -40.0, -139.8, -39.8))</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            []</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.bbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">transform</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">bbox_wgs84</span><span class="p">,</span> <span class="mi">4326</span><span class="p">,</span> <span class="s2">&quot;ESRI:54009&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="n">hits</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="n">tile_id</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>        <span class="k">for</span> <span class="n">tile_id</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">_load_tile_schema</span><span class="p">()</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">r</span> <span class="o">&lt;=</span> <span class="n">left</span> <span class="ow">or</span> <span class="n">l</span> <span class="o">&gt;=</span> <span class="n">right</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="n">bottom</span> <span class="ow">or</span> <span class="n">b</span> <span class="o">&gt;=</span> <span class="n">top</span><span class="p">)</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="p">]</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">hits</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_tile_sort_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
