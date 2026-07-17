@@ -73,7 +73,7 @@ from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from earthlens.utm import project_to_utm
+from pyramids.utm import project_to_utm
 
 _WGS84_CODE: int = 4326
 
@@ -162,13 +162,13 @@ def count_cells_polygon(
 ) -> tuple[int, GeoDataFrame]:
     """Estimate the pixel count for a polygon at a given `cell_size`.
 
-    Projects the input to its UTM zone (via :func:`earthlens.utm.project_to_utm`)
+    Projects the input to its UTM zone (via :func:`pyramids.utm.project_to_utm`)
     so `cell_size` can be interpreted in metres, then computes
     `ceil((bbox_area * area_factor) / cell_size**2)`.
 
     Args:
         poly_gdf: A `GeoDataFrame` in WGS84 (`EPSG:4326`) or any CRS
-            that :func:`earthlens.utm.project_to_utm` accepts.
+            that :func:`pyramids.utm.project_to_utm` accepts.
         cell_size: Pixel size in metres.
         area_factor: Multiplier applied to the bbox area before
             dividing by `cell_size**2`. Defaults to `1.0`.
@@ -176,6 +176,14 @@ def count_cells_polygon(
     Returns:
         `(no_cells, projected_gdf)` — the cell count and the
         UTM-projected `GeoDataFrame`.
+
+    Raises:
+        ValueError: If `poly_gdf` is empty, or if its bounds span more than
+            180° of longitude — UTM is undefined at that width, so the zone
+            of the bbox centroid would be meaningless.
+        CRSError: If `poly_gdf` carries no CRS. Set one first
+            (`gdf.set_crs("EPSG:4326")`) — an unlabelled frame cannot be
+            projected.
 
     Examples:
         - Small WGS84 polygon at 30 m:

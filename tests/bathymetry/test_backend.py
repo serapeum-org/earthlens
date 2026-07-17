@@ -43,6 +43,11 @@ class _FakeBand:
     def __init__(self, recorder: dict):
         self._recorder = recorder
 
+    def crop(self, mask=None, touch: bool = True):
+        """Record the polygon-mask call and return the (masked) band."""
+        self._recorder["masked"] = {"mask": mask, "touch": touch}
+        return self
+
     def to_file(self, path: str) -> None:
         """Write a tiny stub file and record the destination."""
         Path(path).write_bytes(b"II*\x00stub-geotiff")
@@ -141,6 +146,27 @@ def test_etopo_bedrock_uses_second_id(
     """ETOPO bedrock routes through the distinct bedrock coverage id."""
     _make("etopo1_bedrock", tmp_path).download()
     assert "/griddap/etopo1_bedrock.nc?" in captured_get["url"]
+
+
+def test_bbox_only_request_does_not_mask(
+    tmp_path: Path, captured_get: dict, fake_pyramids: type[_FakeNetCDF]
+):
+    """A plain bbox request trusts the server subset — no client-side mask."""
+    _make("gebco_2020", tmp_path).download()
+    assert "masked" not in fake_pyramids.recorder
+    assert fake_pyramids.recorder["written"], "the band was still written"
+
+
+def test_polygon_aoi_masks_band_before_write(
+    tmp_path: Path, captured_get: dict, fake_pyramids: type[_FakeNetCDF]
+):
+    """A polygon aoi= is honoured client-side via crop(mask=) before the write."""
+    wkt = "POLYGON ((-18 25, -17 25, -17 26, -18 26, -18 25))"
+    result = Bathymetry(dataset="gebco_2020", aoi=wkt, path=tmp_path).download()
+    masked = fake_pyramids.recorder.get("masked")
+    assert masked is not None, "crop(mask=) should be applied for a polygon aoi"
+    assert masked["mask"] is not None and masked["touch"] is True
+    assert result[0].exists()
 
 
 def test_download_rejects_aggregate(tmp_path: Path):

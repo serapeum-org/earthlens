@@ -1,5 +1,7 @@
 # Copernicus DEM — introduction
 
+<img src="../../_images/logos/dem.svg" alt="Copernicus DEM (ESA) logo" height="60">
+
 earthlens ships a first-class `dem` backend for **global land elevation**
 data. It targets the public **[Copernicus DEM](https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model)**
 GLO-30 (~30 m) and GLO-90 (~90 m) grids on the anonymous AWS Open Data

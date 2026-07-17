@@ -1,5 +1,7 @@
 # CMIP6 climate projections — introduction
 
+<img src="../../_images/logos/cmip6.svg" alt="WCRP CMIP6 logo" height="60">
+
 `earthlens.cmip6` exposes the **raw, full CMIP6 archive** — the whole
 `model × scenario × variable × member` matrix of the Coupled Model
 Intercomparison Project Phase 6 — as analysis-ready cloud Zarr on the open

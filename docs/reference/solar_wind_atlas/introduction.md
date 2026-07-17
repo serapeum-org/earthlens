@@ -1,5 +1,7 @@
 # Solar & Wind Atlas — introduction
 
+<img src="../../_images/logos/solar_wind_atlas.svg" alt="Global Solar Atlas / Global Wind Atlas (World Bank/ESMAP) logo" height="60">
+
 earthlens ships a single `solar-wind-atlas` backend that fetches **global
 solar- and wind-resource climatology layers** — long-term-average grids of
 irradiation, PV potential, wind speed and related quantities — subset to a

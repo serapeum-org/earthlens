@@ -1,5 +1,7 @@
 # STAC backend — introduction
 
+<img src="../../_images/logos/stac.png" alt="STAC (SpatioTemporal Asset Catalog) logo" height="60">
+
 `earthlens.stac` is **one unified backend** over the STAC-API + Cloud-Optimized
 GeoTIFF (COG) providers. They all speak **STAC API v1**; the only per-provider
 difference is **how an asset is signed for reading**, so a single backend covers

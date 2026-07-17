@@ -17,6 +17,7 @@ from types import SimpleNamespace
 
 import pandas as pd
 import pytest
+import requests
 
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.gee import backend as backend_module
@@ -191,8 +192,13 @@ class _FakeHTTPResponse:
 
     def __init__(self, body: bytes):
         self.content = body
+        self.status_code = 200
+        self.headers: dict[str, str] = {}
 
     def raise_for_status(self):
+        return None
+
+    def close(self):
         return None
 
 
@@ -274,12 +280,11 @@ def fake_ee(monkeypatch) -> _FakeEE:
     monkeypatch.setenv("GEE_SERVICE_KEY", "key.json")
     fake = _FakeEE()
     monkeypatch.setattr(backend_module, "ee", fake)
+    # The tile fetch now runs through earthlens.base.http.RequestsGet, which
+    # re-imports `requests` per call — so patch the real module's `get`, not
+    # the backend module's binding.
     monkeypatch.setattr(
-        backend_module,
-        "requests",
-        SimpleNamespace(
-            get=lambda url, timeout=None: _FakeHTTPResponse(_FAKE_TIFF_BYTES)
-        ),
+        requests, "get", lambda url, **kwargs: _FakeHTTPResponse(_FAKE_TIFF_BYTES)
     )
     _FakePyramidsDataset.reset()
     monkeypatch.setattr(backend_module, "PyramidsDataset", _FakePyramidsDataset)
@@ -1115,11 +1120,7 @@ class TestApi:
         with zipfile.ZipFile(buf, "w") as zf:
             zf.writestr("inner.tif", b"data")
         monkeypatch.setattr(
-            backend_module,
-            "requests",
-            SimpleNamespace(
-                get=lambda url, timeout=None: _FakeHTTPResponse(buf.getvalue())
-            ),
+            requests, "get", lambda url, **kwargs: _FakeHTTPResponse(buf.getvalue())
         )
         paths = make_gee().download(progress_bar=False)
         target = paths[0]
@@ -1136,13 +1137,11 @@ class TestApi:
         """`http_timeout=` is forwarded verbatim to `requests.get`."""
         captured: dict = {}
 
-        def _capture_get(url, timeout=None):
+        def _capture_get(url, timeout=None, **kwargs):
             captured["timeout"] = timeout
             return _FakeHTTPResponse(_FAKE_TIFF_BYTES)
 
-        monkeypatch.setattr(
-            backend_module, "requests", SimpleNamespace(get=_capture_get)
-        )
+        monkeypatch.setattr(requests, "get", _capture_get)
         make_gee(http_timeout=42.5).download(progress_bar=False)
         assert captured["timeout"] == 42.5
 

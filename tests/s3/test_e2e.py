@@ -179,11 +179,8 @@ def test_naip_requester_pays(tmp_path):
     _assert_cropped(written[0])
 
 
-def test_goes_reprojects_from_geostationary(tmp_path):
-    """One GOES ABI frame downloads, warps geostationary->WGS84, and crops.
-
-    Relies on pyramids >=0.28 georeferencing the scan-angle grid on read.
-    """
+def _goes_source(tmp_path):
+    """Fetch one GOES ABI C13 frame over a Texas AOI; return (output, raw)."""
     from earthlens.s3 import S3
 
     source = S3(
@@ -198,4 +195,53 @@ def test_goes_reprojects_from_geostationary(tmp_path):
     products = source._search()
     assert products, "no GOES frames found"
     written = source._fetch(products[:1])
-    _assert_cropped(written[0])
+    raw = next(Path(tmp_path).rglob("*.nc"))
+    return written[0], raw
+
+
+def test_goes_reprojects_from_geostationary(tmp_path):
+    """One GOES ABI frame downloads, warps geostationary->WGS84, and crops."""
+    written, _ = _goes_source(tmp_path)
+    _assert_cropped(written)
+
+
+def test_goes_matches_source_radiance(tmp_path):
+    """The warped GOES crop carries the radiances its lon/lat actually name.
+
+    A wrong scan-angle georeference still yields an EPSG:4326 raster with the
+    requested bounds, so `_assert_cropped` cannot see it. This samples the
+    geostationary source grid at the AOI centre and requires the output's
+    value there to come from the same neighbourhood.
+    """
+    import numpy as np
+    from pyramids.base.crs import reproject_coordinates
+    from pyramids.dataset import Dataset
+
+    written, raw = _goes_source(tmp_path)
+    lon, lat = -99.0, 31.0
+
+    src = Dataset.read_file(f'NETCDF:"{raw}":CMI')
+    gt = src.geotransform
+    xs, ys = reproject_coordinates([lon], [lat], from_crs=4326, to_crs=src.crs)
+    col = int((xs[0] - gt[0]) / gt[1])
+    row = int((ys[0] - gt[3]) / gt[5])
+    source_arr = np.asarray(src.read_array())
+    if source_arr.ndim == 3:
+        source_arr = source_arr[0]
+    # A 5x5 window absorbs the nearest-neighbour choice the warp makes.
+    window = source_arr[row - 2 : row + 3, col - 2 : col + 3].astype("float64")
+
+    out = Dataset.read_file(str(written))
+    ogt = out.geotransform
+    out_arr = np.asarray(out.read_array())
+    if out_arr.ndim == 3:
+        out_arr = out_arr[0]
+    ocol = int((lon - ogt[0]) / ogt[1])
+    orow = int((lat - ogt[3]) / ogt[5])
+    value = float(out_arr[orow, ocol])
+
+    assert window.min() <= value <= window.max(), (
+        f"GOES crop at ({lon}, {lat}) reads {value}, outside the source "
+        f"neighbourhood [{window.min()}, {window.max()}] — the geostationary "
+        "grid is misregistered (the reprojected pixels do not match the header)."
+    )

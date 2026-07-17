@@ -92,13 +92,12 @@ def enumerate_cycles(
     for hour in hours:
         if not 0 <= hour <= 23:
             raise ValueError(f"cycle hour {hour} is outside [0, 23].")
+    from earthlens.base import date_windows
+
     out: list[dt.datetime] = []
-    day = dt.datetime(start.year, start.month, start.day)
-    last = dt.datetime(end.year, end.month, end.day)
-    while day <= last:
+    for day in date_windows(start.date(), end.date(), "D"):
         for hour in hours:
-            out.append(day.replace(hour=hour))
-        day += dt.timedelta(days=1)
+            out.append(dt.datetime(day.year, day.month, day.day, hour))
     return out
 
 
@@ -239,18 +238,9 @@ def window_labels(times: list[dt.datetime], freq: str) -> list[str]:
     Returns:
         list[str]: One label per input time (same length as `times`).
     """
-    import pandas as pd
+    from earthlens.base import window_labels as _base_window_labels
 
-    index = pd.DatetimeIndex(pd.to_datetime(list(times)))
-    positions = pd.Series(range(len(index)), index=index)
-    label_for: dict[int, str] = {}
-    for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
-        if group.empty:
-            continue
-        label = window_start.strftime("%Y%m%d%H")
-        for pos in group.tolist():
-            label_for[int(pos)] = label
-    return [label_for[i] for i in range(len(index))]
+    return _base_window_labels(times, freq, fmt="%Y%m%d%H")
 
 
 def ensure_dir(path: Path | str) -> Path:

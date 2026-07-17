@@ -21,6 +21,7 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    date_windows,
     to_datetime,
 )
 from earthlens.ecmwf.catalog import Catalog, Variable
@@ -322,10 +323,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         end = to_datetime(end, fmt)
 
         if temporal_resolution == "daily":
-            dates = pd.date_range(start, end, freq="D")
+            dates = date_windows(start, end, "D")
             resolution = "D"
         elif temporal_resolution == "monthly":
-            dates = pd.date_range(start, end, freq="MS")
+            dates = date_windows(start, end, "MS")
             resolution = "MS"
         else:
             raise ValueError(

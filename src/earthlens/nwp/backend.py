@@ -39,6 +39,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
+    date_windows,
 )
 from earthlens.nwp._helpers import (
     cog_name,
@@ -305,7 +306,7 @@ class NWP(AbstractDataSource):
         """
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
-        dates = pd.date_range(start_dt, end_dt, freq="D")
+        dates = date_windows(start_dt, end_dt, "D")
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
@@ -549,9 +550,12 @@ class NWP(AbstractDataSource):
         is a no-op unless the request bbox reaches a negative longitude.
 
         This handles the 0–360 ↔ −180..180 convention only. A bbox that
-        *crosses* the dateline cannot be expressed (the `SpatialExtent`
-        requires `longitude_min <= longitude_max`); split such an AOI
-        into two requests.
+        *crosses* the antimeridian would need `longitude_min >
+        longitude_max`, which the `SpatialExtent` value object forbids (it
+        requires `longitude_min <= longitude_max`). pyramids' `crop` itself
+        gained antimeridian-crossing support in 0.41, so the residual
+        limitation is earthlens's own `SpatialExtent`, not the GIS backend;
+        until that is relaxed, split such an AOI into two requests.
 
         Args:
             dataset: The freshly opened GRIB2 `Dataset`.

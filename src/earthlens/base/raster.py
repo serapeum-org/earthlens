@@ -1,0 +1,77 @@
+"""Backend-agnostic array/NetCDF-variable → pyramids raster helpers.
+
+The provider backends that download a NetCDF and re-emit it as a GeoTIFF share
+one step: rebuild an in-memory `(array, geotransform, epsg)` as a
+`pyramids.Dataset` (NetCDF cubes do not expose a source SRS the crop warp can
+read, so the variable is read out and re-tagged), optionally wrapping a
+whole-globe 0-360 longitude grid to -180..180. Kept here so the s3 whole-
+variable path and the cmems per-window slices build the raster the same way.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+
+def array_to_raster(
+    arr: Any,
+    geo: Any,
+    *,
+    epsg: Any,
+    wrap_longitude: bool = False,
+) -> Any:
+    """Build a pyramids `Dataset` from an array + geotransform.
+
+    Args:
+        arr: The pixel array (`(bands, rows, cols)` or `(rows, cols)`).
+        geo: The GDAL 6-tuple geotransform for `arr`.
+        epsg: The EPSG code to tag the raster with.
+        wrap_longitude: When `True`, roll a whole-globe 0-360 longitude grid to
+            -180..180 via `Dataset.wrap_longitude` (which validates the global
+            span and raises `ValueError` for a non-global grid).
+
+    Returns:
+        A new `pyramids.Dataset`.
+    """
+    from pyramids.dataset import Dataset
+
+    dataset = Dataset.create_from_array(arr=arr, geo=geo, epsg=epsg)
+    if wrap_longitude:
+        dataset = dataset.wrap_longitude()
+    return dataset
+
+
+def netcdf_variable_to_raster(
+    nc: Any,
+    name: str,
+    *,
+    epsg: Any = None,
+    wrap_longitude: bool = False,
+) -> Any:
+    """Read a NetCDF variable and rebuild it as a pyramids `Dataset`.
+
+    Reads the variable's array + geotransform from an already-open
+    `pyramids.netcdf.NetCDF` and rebuilds it as a `Dataset` — NetCDF cubes do
+    not expose a source SRS the crop warp can read, so cropping the cube
+    directly fails.
+
+    Args:
+        nc: An open `pyramids.netcdf.NetCDF`.
+        name: The in-file variable name to read.
+        epsg: The EPSG code to tag the raster with; the variable's own `epsg`
+            is used when `None`.
+        wrap_longitude: When `True`, wrap a whole-globe 0-360 longitude grid to
+            -180..180 (see :func:`array_to_raster`).
+
+    Returns:
+        A new `pyramids.Dataset` for the variable.
+    """
+    import numpy as np
+
+    cube = nc.get_variable(name)
+    return array_to_raster(
+        np.asarray(cube.read_array()),
+        tuple(cube.geotransform),
+        epsg=cube.epsg if epsg is None else epsg,
+        wrap_longitude=wrap_longitude,
+    )

@@ -1,5 +1,7 @@
 # Climate indices — introduction
 
+<img src="../../_images/logos/climate_indices.svg" alt="NOAA Physical Sciences Laboratory logo" height="60">
+
 earthlens ships a single `climate-indices` backend that fetches **monthly
 climate / teleconnection index series** — ENSO/ONI, NAO, AO, PDO, AMO,
 SOI, PNA and friends — from two open ASCII sources and returns them as a

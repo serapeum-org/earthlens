@@ -1,5 +1,7 @@
 # Sentinel Hub — introduction
 
+<img src="../../_images/logos/sentinel-hub.png" alt="Sentinel Hub logo" height="60">
+
 `earthlens.sentinel_hub` is a **server-side render** backend over
 [Sentinel Hub](https://www.sentinel-hub.com/) on the **Copernicus Data Space
 Ecosystem** (CDSE, `sh.dataspace.copernicus.eu` — free with a CDSE account).

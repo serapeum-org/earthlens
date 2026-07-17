@@ -1,11 +1,12 @@
-"""Lock-in for M2: `_clip_to_bbox` raises when the requested bbox doesn't overlap the raster."""
+"""Lock-in for the CHC crop: the bbox overlap guard (M2) and the outer window (H1)."""
 
 from __future__ import annotations
 
 import numpy as np
 import pytest
+from pyramids.dataset import Dataset
 
-from earthlens.chc.backend import CHIRPS
+from earthlens.chc.backend import CHIRPS, _snap_bbox_outward
 
 pytestmark = [pytest.mark.chc]
 
@@ -33,24 +34,118 @@ def _chirps_with_bbox(lat_lim: list[float], lon_lim: list[float]) -> CHIRPS:
 _FAKE_GEO: list[float] = [-180.0, 1.0, 0.0, 50.0, 0.0, -1.0]
 
 
-class TestClipToBboxOverlap:
-    """`_clip_to_bbox` refuses non-overlapping bboxes (M2)."""
+class TestSnapBboxOutward:
+    """`_snap_bbox_outward` grows a bbox to the enclosing cell edges (H1)."""
 
-    def test_overlapping_bbox_returns_a_non_empty_slice(self):
-        """A normal bbox inside the raster extent returns a populated slice."""
+    def test_aligned_bbox_is_unchanged(self):
+        """A bbox already on cell edges snaps to itself."""
+        assert _snap_bbox_outward((0.0, 0.0, 10.0, 10.0), _FAKE_GEO) == [
+            0.0,
+            0.0,
+            10.0,
+            10.0,
+        ]
+
+    def test_misaligned_bbox_grows_to_enclosing_cells(self):
+        """Every edge cutting through a cell moves out to that cell's boundary."""
+        assert _snap_bbox_outward((0.5, 0.5, 9.5, 9.5), _FAKE_GEO) == [
+            0.0,
+            0.0,
+            10.0,
+            10.0,
+        ]
+
+    def test_snapped_box_always_contains_the_request(self):
+        """The snap only ever grows the box — never trims it."""
+        west, south, east, north = 3.7, -4.2, 12.3, 8.9
+        snapped = _snap_bbox_outward((west, south, east, north), _FAKE_GEO)
+        assert snapped[0] <= west and snapped[1] <= south
+        assert snapped[2] >= east and snapped[3] >= north
+
+
+class TestClipAndNormaliseWindow:
+    """`_clip_and_normalise` keeps covering the requested bbox (H1 regression).
+
+    The crop must select the *outer* window: the hand-rolled slice this
+    replaced floored west/north and ceiled east/south, so the output was
+    always a superset of the request. A raw `crop_to_aoi(touch=False)` keeps
+    only fully-inside cells and would silently shrink every misaligned
+    request — which is the normal case on CHC's 0.05-degree grids.
+    """
+
+    @staticmethod
+    def _granule() -> Dataset:
+        """A 100x360 one-degree granule spanning the whole _FAKE_GEO extent."""
+        return Dataset.create_from_array(
+            arr=np.ones((100, 360), dtype=np.float32),
+            geo=tuple(_FAKE_GEO),
+            epsg=4326,
+            no_data_value=None,
+        )
+
+    def test_aligned_bbox_window(self):
+        """A cell-aligned request yields the exact 10x10 window at (0, 10)."""
+        chirps = _chirps_with_bbox(lat_lim=[0.0, 10.0], lon_lim=[0.0, 10.0])
+        out = chirps._clip_and_normalise(self._granule())
+        assert (out.rows, out.columns) == (10, 10)
+        assert out.geotransform[0] == pytest.approx(0.0)
+        assert out.geotransform[3] == pytest.approx(10.0)
+
+    def test_misaligned_bbox_still_covers_the_request(self):
+        """A misaligned request keeps its partially-covered edge cells.
+
+        Regression: without the outward snap this returned an 8x8 window
+        spanning 1..9, so the output no longer covered the 0.5..9.5 asked for.
+        """
+        chirps = _chirps_with_bbox(lat_lim=[0.5, 9.5], lon_lim=[0.5, 9.5])
+        out = chirps._clip_and_normalise(self._granule())
+        assert (out.rows, out.columns) == (10, 10)
+        west, south, east, north = out.bbox
+        assert west <= 0.5 and south <= 0.5
+        assert east >= 9.5 and north >= 9.5
+
+    def test_realistic_005_degree_grid_covers_the_request(self):
+        """A 0.05° CHIRPS-pitch grid (float, non-binary-exact edges) still covers.
+
+        The 1° fixture lands every snapped edge on an exactly-representable
+        coordinate, hiding whether the snap holds when a cell edge like
+        `-175.05` is not binary-exact — which is the real CHIRPS case. Build a
+        0.05° granule and request an off-grid box; the crop must still be a
+        superset of it.
+        """
+        pitch = 0.05
+        geo = (-180.0, pitch, 0.0, 40.0, 0.0, -pitch)  # 1600 rows x 7200 cols
+        granule = Dataset.create_from_array(
+            arr=np.ones((1600, 7200), dtype=np.float32),
+            geo=geo,
+            epsg=4326,
+            no_data_value=None,
+        )
+        chirps = _chirps_with_bbox(lat_lim=[3.72, 12.28], lon_lim=[-9.03, -0.07])
+        out = chirps._clip_and_normalise(granule)
+        west, south, east, north = out.bbox
+        assert west <= -9.03 and south <= 3.72
+        assert east >= -0.07 and north >= 12.28
+        # Snapped to whole 0.05° cells: no partially-covered edge cell dropped,
+        # and the -9999 sentinel is declared (no_data_value is per-band).
+        assert out.no_data_value[0] == pytest.approx(-9999.0)
+
+
+class TestClipToBboxOverlap:
+    """`_check_bbox_overlaps` refuses non-overlapping bboxes (M2)."""
+
+    def test_overlapping_bbox_does_not_raise(self):
+        """A normal bbox inside the raster extent passes the overlap guard."""
         chirps = _chirps_with_bbox(lat_lim=[0.0, 10.0], lon_lim=[0.0, 10.0])
         data = np.zeros((100, 360), dtype=np.float32)
-        clipped, new_geo = chirps._clip_to_bbox(data, _FAKE_GEO)
-        assert clipped.shape == (10, 10)
-        assert new_geo[0] == 0.0  # origin_x shifted to lon=0
-        assert new_geo[3] == 10.0  # origin_y shifted to lat=10 (top edge)
+        chirps._check_bbox_overlaps(data, _FAKE_GEO)  # no exception
 
     def test_bbox_entirely_north_of_raster_raises(self):
         """A bbox north of the raster's extent raises ValueError naming both extents."""
         chirps = _chirps_with_bbox(lat_lim=[60.0, 70.0], lon_lim=[0.0, 10.0])
         data = np.zeros((100, 360), dtype=np.float32)
         with pytest.raises(ValueError, match=r"does not overlap") as exc:
-            chirps._clip_to_bbox(data, _FAKE_GEO)
+            chirps._check_bbox_overlaps(data, _FAKE_GEO)
         message = str(exc.value)
         assert "60.0" in message and "70.0" in message
         assert "raster" in message.lower()
@@ -60,7 +155,7 @@ class TestClipToBboxOverlap:
         chirps = _chirps_with_bbox(lat_lim=[-80.0, -70.0], lon_lim=[0.0, 10.0])
         data = np.zeros((100, 360), dtype=np.float32)
         with pytest.raises(ValueError, match=r"does not overlap"):
-            chirps._clip_to_bbox(data, _FAKE_GEO)
+            chirps._check_bbox_overlaps(data, _FAKE_GEO)
 
     def test_bbox_east_of_narrow_raster_raises(self):
         """A bbox east of a *narrow* raster (lon [-180, -100]) raises ValueError."""
@@ -70,14 +165,14 @@ class TestClipToBboxOverlap:
         narrow_geo = [-180.0, 1.0, 0.0, 50.0, 0.0, -1.0]
         data = np.zeros((100, 80), dtype=np.float32)  # cols=80 -> east edge at lon=-100
         with pytest.raises(ValueError, match=r"does not overlap"):
-            chirps._clip_to_bbox(data, narrow_geo)
+            chirps._check_bbox_overlaps(data, narrow_geo)
 
     def test_message_names_both_bbox_and_raster_extent(self):
         """The error message must surface the user bbox AND the raster extent."""
         chirps = _chirps_with_bbox(lat_lim=[60.0, 70.0], lon_lim=[0.0, 10.0])
         data = np.zeros((100, 360), dtype=np.float32)
         with pytest.raises(ValueError) as exc:
-            chirps._clip_to_bbox(data, _FAKE_GEO)
+            chirps._check_bbox_overlaps(data, _FAKE_GEO)
         message = str(exc.value)
         # User bbox
         assert "60.0" in message and "70.0" in message

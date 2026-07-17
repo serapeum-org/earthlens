@@ -1,5 +1,7 @@
 # AirNow — introduction
 
+<img src="../../_images/logos/airnow.svg" alt="AirNow (US EPA) logo" height="60">
+
 [AirNow](https://www.airnow.gov/) is the US EPA's official real-time
 air-quality programme, run jointly with NOAA, the National Park Service,
 tribal, state, and local agencies, and Environment Canada. It publishes
