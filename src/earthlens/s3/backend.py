@@ -423,6 +423,13 @@ class S3(AbstractDataSource):
         uses), which validates the whole-globe span rather than assuming it.
         Delegates the array read + rebuild to the shared
         `netcdf_variable_to_raster`.
+
+        This assumes an ERA5 granule is the full global 0-360 grid, which the
+        `era5-pds` bucket always serves. Unlike the previous hand-rolled roll
+        (which shifted at `cols // 2` regardless), `wrap_longitude` raises
+        `ValueError` on a non-global 0-360 grid rather than producing a
+        mis-rolled raster — so a future non-global 0-360 S3 layout would fail
+        loudly here instead of silently.
         """
         from pyramids.netcdf import NetCDF
 
