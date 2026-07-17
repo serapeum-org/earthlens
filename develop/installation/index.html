@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -646,6 +646,17 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#package-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Package layout
+      
+    </span>
+  </a>
   
 </li>
         
@@ -19198,6 +19209,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#package-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Package layout
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -19593,6 +19615,69 @@ listed per-backend extras yourself.</p>
 requests, …), which is enough for every backend with no extra SDK of its own: <strong>geoBoundaries</strong>, <strong>AirNow</strong>, <strong>GEBCO/ETOPO bathymetry</strong>, <strong>CHC/CHIRPS</strong>, <strong>climate teleconnection indices</strong>, <strong>USDM/EDO/GDO/SPEIbase</strong>, <strong>NASA FIRMS</strong>, <strong>GDACS</strong>, <strong>RGI/GLIMS/WGMS glaciers</strong>, <strong>IUCN Red List</strong>, <strong>NREL/National Laboratory of the Rockies</strong>, <strong>OpenAQ</strong>, <strong>PVGIS</strong>, <strong>ThinkHazard!/INFORM</strong>, <strong>Sensor.Community</strong>, <strong>SoilGrids</strong>, <strong>Global Solar/Wind Atlas</strong>, <strong>Protected Planet</strong>.
 Asking the facade for a backend whose extra is missing (e.g. <code>data_source="ecmwf"</code> without
 <code>earthlens[ecmwf]</code>) raises a clear <code>ImportError</code> naming the extra to install.</p>
+<h3 id="package-layout"><a class="toclink" href="#package-layout">Package layout</a><a class="headerlink" href="#package-layout" title="Permanent link">#</a></h3>
+<p><code>earthlens</code> is a meta-package. Installing it pulls in <code>earthlens-core</code> plus
+five thematic provider packages, each carrying a group of backends:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Covers</th>
+<th>Backends</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>earthlens-core</code></td>
+<td>facade, abstractions, CLI — no provider SDKs</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>earthlens-atmosphere</code></td>
+<td>weather · climate · air quality · solar/wind</td>
+<td><code>chc</code> <code>climate_indices</code> <code>cmip6</code> <code>drought</code> <code>ecmwf</code> <code>nwp</code> <code>amazon-s3</code> <code>airnow</code> <code>eea_aq</code> <code>openaq</code> <code>sensor_community</code> <code>goes</code> <code>radar</code> <code>tropycal</code> <code>nrel</code> <code>pvgis</code> <code>solar_wind_atlas</code></td>
+</tr>
+<tr>
+<td><code>earthlens-ocean</code></td>
+<td>ocean · freshwater · marine life</td>
+<td><code>argo</code> <code>cmems</code> <code>erddap</code> <code>nwm</code> <code>usgs_water</code> <code>obis</code></td>
+</tr>
+<tr>
+<td><code>earthlens-imagery</code></td>
+<td>satellite platforms · SAR · EO catalogs</td>
+<td><code>asf</code> <code>earthdata</code> <code>eumetsat</code> <code>gee</code> <code>jaxa</code> <code>openeo</code> <code>sentinel_hub</code> <code>stac</code></td>
+</tr>
+<tr>
+<td><code>earthlens-land</code></td>
+<td>terrain · elevation · soil · ecology · population</td>
+<td><code>bathymetry</code> <code>dem</code> <code>ghsl</code> <code>glaciers</code> <code>gbif</code> <code>iucn</code> <code>soilgrids</code> <code>wdpa</code> <code>worldpop</code></td>
+</tr>
+<tr>
+<td><code>earthlens-hazards</code></td>
+<td>hazards · humanitarian · vector basemaps</td>
+<td><code>fdsn</code> <code>firms</code> <code>gdacs</code> <code>risk_indicators</code> <code>admin</code> <code>osm</code> <code>overture</code> <code>hdx</code></td>
+</tr>
+</tbody>
+</table>
+<p>This changes nothing about how you use earthlens: the import path is the same
+(<code>from earthlens import EarthLens</code>, <code>earthlens.chc</code>, …), and every extra above
+works exactly as before — <code>pip install earthlens[gee]</code> still installs Earth
+Engine and nothing else.</p>
+<p><strong>Installing a single domain.</strong> If you only need one group, install that package
+directly and skip the others' backends entirely:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens-imagery<span class="o">[</span>gee<span class="o">]</span><span class="w">     </span><span class="c1"># Earth Engine, without the other 40 backends</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens-ocean<span class="o">[</span>argo,cmems<span class="o">]</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens-atmosphere<span class="o">[</span>all<span class="o">]</span><span class="w">  </span><span class="c1"># every atmosphere SDK</span>
+</code></pre></div>
+<p>A thematic package depends only on <code>earthlens-core</code>, so its SDKs stay extras:
+<code>pip install earthlens-imagery</code> gives you the imagery backends' code without
+<code>earthengine-api</code>, <code>openeo</code>, <code>eumdac</code> and the rest.</p>
+<p><strong>Why the split.</strong> A few provider SDKs cannot coexist — <code>argopy</code> requires
+<code>xarray &gt;=2025.7</code> while <code>openeo &lt;0.48</code> requires <code>xarray &lt;2025.1.2</code>, and no
+version satisfies both. Those extras are therefore excluded from <code>earthlens[all]</code>
+(see the note below) and can be installed on their own or alongside their own
+group. Splitting the backends across packages lets you install one domain's
+dependencies without inheriting every other domain's constraints.</p>
 <blockquote>
 <p><strong>Dependency note — <code>openeo</code> version pin.</strong> openeo <code>0.48+</code> hard-caps
 <code>pandas&lt;3.0.0</code>, which would drag the whole environment down to pandas 2.x.
@@ -19611,41 +19696,77 @@ from the <code>all</code> union so it stays installable in one shot.</p>
 <h2 id="from-sources"><a class="toclink" href="#from-sources">From Sources</a><a class="headerlink" href="#from-sources" title="Permanent link">#</a></h2>
 <p>The sources for earthlens can be downloaded from the <a href="https://github.com/serapeum-org/earthlens">GitHub repo</a>.</p>
 <p>Clone the public repository:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
 </code></pre></div>
 <p>Or download the tarball:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl<span class="w"> </span>-OJL<span class="w"> </span>https://github.com/serapeum-org/earthlens/tarball/main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-OJL<span class="w"> </span>https://github.com/serapeum-org/earthlens/tarball/main
 </code></pre></div>
-<p>Once you have a copy of the source, you can install it with the
-extras you need:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[ecmwf]&quot;</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># or all backends at once:</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+<p>The repository is a workspace of seven distributions, so a source install has
+to install the members too — <code>pip install -e .</code> on its own installs the
+meta-package, which then looks for <code>earthlens-core</code> <strong>on PyPI</strong> at the version
+in the working tree, and an unreleased version is not there:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ERROR: No matching distribution found for earthlens-core==&lt;version&gt;
 </code></pre></div>
-<p>To install directly from GitHub (from the HEAD of the main branch):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git&quot;</span>
+<p>Install the whole workspace instead, naming every member on one command line so
+pip resolves them locally rather than from the index:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/atmosphere<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/ocean<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/imagery<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/land<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/hazards<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">            </span>-e<span class="w"> </span><span class="s2">&quot;.[ecmwf]&quot;</span>
 </code></pre></div>
-<p>Or from a specific release:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git@{release}&quot;</span>
+<p>With <a href="https://pixi.sh">pixi</a> this is a single command — the members are declared
+as editable path dependencies in <code>pyproject.toml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pixi<span class="w"> </span>install
 </code></pre></div>
+<p>If you only want one domain from a clone, its package plus core is enough:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;libs/providers/imagery[gee]&quot;</span>
+</code></pre></div>
+<p>To install a <strong>published release</strong> directly from GitHub (its members are on PyPI,
+so the meta-package resolves normally):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git@{release}&quot;</span>
+</code></pre></div>
+<p>Installing the HEAD of <code>main</code> this way does <strong>not</strong> work: <code>main</code> carries an
+unreleased version whose members are not on PyPI yet, and pip cannot install a
+workspace's sibling packages out of a single git URL. Clone the repository and
+use the editable workspace install above.</p>
 <p>Now you should be able to start Python and try <code>import earthlens</code> to verify the installation.</p>
 <h2 id="install-using-pip"><a class="toclink" href="#install-using-pip">Install using pip</a><a class="headerlink" href="#install-using-pip" title="Permanent link">#</a></h2>
 <p>Besides the recommended conda environment setup, you can also install earthlens with <code>pip</code>. For the more difficult to install Python dependencies, it is best to use conda:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>conda<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>scipy<span class="w"> </span>gdal<span class="w"> </span>pyproj
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>conda<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>scipy<span class="w"> </span>gdal<span class="w"> </span>pyproj
 </code></pre></div>
 <p>Then install earthlens with pip, picking the backend extras you
 need (see "From PyPI" above for the available extras):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>ecmwf<span class="o">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>ecmwf<span class="o">]</span>
 </code></pre></div>
 <h2 id="development-install"><a class="toclink" href="#development-install">Development install</a><a class="headerlink" href="#development-install" title="Permanent link">#</a></h2>
-<p>If you are planning to contribute to earthlens, do an editable install
-with the <code>[all]</code> extra so the full test suite (which exercises every
-backend) can run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nb">cd</span><span class="w"> </span>earthlens
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>conda<span class="w"> </span>activate<span class="w"> </span>earthlens
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+<p>If you are planning to contribute to earthlens, install the whole workspace
+editable with the <code>[all]</code> extra so the full test suite (which exercises every
+backend) can run. <a href="https://pixi.sh">pixi</a> is the supported path — it installs
+every member from <code>pyproject.toml</code>'s editable path dependencies and resolves
+them from one lockfile:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">cd</span><span class="w"> </span>earthlens
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>pixi<span class="w"> </span>install
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>pixi<span class="w"> </span>run<span class="w"> </span>test-no-e2e
 </code></pre></div>
+<p>The equivalent with pip, which must name every member so they resolve from the
+clone rather than from PyPI:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/atmosphere<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/ocean<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/imagery<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/land<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/hazards<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">            </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+</code></pre></div>
+<p>The tests import earthlens from the <strong>installed</strong> distributions, not from the
+source tree: <code>earthlens</code> is a regular package owned by <code>earthlens-core</code>, so a
+provider living in a different source tree is only reachable through the finder
+an editable install sets up. Running <code>pytest</code> against a clone without installing
+the workspace first will not collect.</p>
 <p>More details on conda environments: <a href="https://conda.io/docs/user-guide/tasks/manage-environments.html">Managing environments</a></p>
 
 
