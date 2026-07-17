@@ -36,9 +36,8 @@ from loguru import logger
 
 from earthlens.base.archive import extract_members
 
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, RequestsGet
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).
 BASE_URL: str = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
@@ -303,8 +302,6 @@ def list_remote_dir(
         list[str]: The `href` entry names (sub-directories keep their trailing
             slash), excluding the parent-directory and column-sort links.
     """
-    from earthlens.base.http import HttpClient, RequestsGet
-
     # Route the autoindex GET through the shared HttpClient for the 429/5xx
     # Retry-After/back-off policy; a passed `session` is reused, else a fresh
     # connection per call.
@@ -419,7 +416,7 @@ def _download(
         requests.HTTPError: If every attempt fails (the last error is wrapped).
     """
     client = HttpClient(
-        session=session if session is not None else _RequestsGet(),
+        session=session if session is not None else RequestsGet(),
         status_forcelist=(429, 500, 502, 503, 504),
         retry_on_exceptions=(requests.RequestException, OSError),
         raise_for_status=True,
