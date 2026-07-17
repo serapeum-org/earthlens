@@ -18,6 +18,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pytest
 
 from earthlens.drought import Drought
@@ -411,73 +412,35 @@ def test_usdm_aggregate_rejected(tmp_path):
     with pytest.raises(NotImplementedError, match="vector"):
         backend.download(aggregate=object())
 
-
-def test_edo_render_wcs_url_carries_custom_params():
-    """The EDO/GDO GetCoverage URL carries TIME + SELECTED_TIMESCALE + bbox."""
-    url = Drought._render_wcs_url(
-        "https://drought.emergency.copernicus.eu/api/wcs?map=DO_WCS",
-        coverage="spaST",
-        timescale="03",
-        period=dt.date(2025, 12, 21),
-        bbox=(5.0, 40.0, 15.0, 50.0),
-    )
-    assert "coverageID=spaST" in url
-    assert "TIME=2025-12-21" in url
-    assert "SELECTED_TIMESCALE=03" in url
-    assert "SUBSET=Long(5.0,15.0)" in url
-    assert "SUBSET=Lat(40.0,50.0)" in url
-    assert "format=GEOTIFF" in url
-    # The endpoint already has a query string, so the join uses `&`.
-    assert "map=DO_WCS&SERVICE=WCS" in url
-
-
-def test_edo_render_wcs_url_omits_timescale_when_none():
-    """A None timescale leaves SELECTED_TIMESCALE off the URL entirely."""
-    url = Drought._render_wcs_url(
-        "https://example.com/wcs?map=DO_WCS",
-        coverage="twsan",
-        timescale=None,
-        period=dt.date(2024, 6, 21),
-        bbox=(0.0, 0.0, 1.0, 1.0),
-    )
-    assert "SELECTED_TIMESCALE" not in url
-
-
-def test_edo_render_wcs_url_rejects_missing_coverage():
-    """An edo-wcs row without a coverage id is a clear ValueError."""
-    with pytest.raises(ValueError, match="must carry a `coverage`"):
-        Drought._render_wcs_url(
-            "https://example.com/wcs",
-            coverage=None,
-            timescale="01",
-            period=dt.date(2024, 6, 21),
-            bbox=(0.0, 0.0, 1.0, 1.0),
-        )
-
-
 def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
-    """The EDO route streams a GeoTIFF per period and validates via read_file."""
-    fetched: list[tuple[str, str]] = []
-
-    def _fake_download(url, target, *, label):
-        fetched.append((url, label))
-        Path(target).write_bytes(b"MM\x00*FAKE-GEOTIFF")
-
-    read_calls: list[str] = []
+    """The EDO route fetches one coverage per period over WCS and crops it."""
+    fetched: list[tuple[str, dict]] = []
 
     class _FakeDataset:
+        # A full-width -180..180 strip, latitude-cropped like the real
+        # Copernicus server returns — so the backend's `_clip_wcs_raster`
+        # windows it down to the requested lon_lim.
+        bbox = [-180.0, 40.0, 180.0, 50.0]
+        no_data_value = (None,)
+
         @classmethod
-        def read_file(cls, path):
-            read_calls.append(path)
+        def from_wcs(cls, endpoint, **kwargs):
+            fetched.append((endpoint, kwargs))
             return _FakeDataset()
+
+        def read_array(self):
+            return np.zeros((10, 360), dtype="uint8")
 
         def close(self):
             pass
 
     import pyramids.dataset as dataset_mod
 
-    monkeypatch.setattr(backend_module, "_http_download_raster", _fake_download)
-    monkeypatch.setattr(dataset_mod.Dataset, "read_file", _FakeDataset.read_file)
+    # `_clip_wcs_raster` writes the cropped output with a real, unpatched
+    # `pyramids.dataset.Dataset` (its own internal import), so the file on
+    # disk after `download()` is genuine — `from_wcs` is the only patched
+    # entry point, so `read_file` below re-opens it for real.
+    monkeypatch.setattr(dataset_mod.Dataset, "from_wcs", _FakeDataset.from_wcs)
 
     backend = Drought(
         start="2025-12-01",
@@ -491,35 +454,47 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
     assert backend.OUTPUT_KIND == "raster"
     assert all(p.suffix == ".tif" for p in paths)
     assert all(p.name.startswith("edo-spaST_") for p in paths)
-    # Every fetched URL is the EDO map endpoint with the SPI timescale.
+    # Every fetch hits the EDO map endpoint and carries the SPI timescale.
     assert fetched, "at least one period fetched"
-    for url, label in fetched:
-        assert label == "edo-spaST"
-        assert "map=DO_WCS" in url and "SELECTED_TIMESCALE=01" in url
-    # read_file was called once per written tif (the raster validation).
-    assert len(read_calls) == len(paths)
+    for endpoint, kwargs in fetched:
+        assert "map=DO_WCS" in endpoint
+        params = kwargs["extra_params"]
+        assert params["SELECTED_TIMESCALE"] == "01"
+        assert params["coverageID"] == "spaST"
+        # The shim needs the WCS-1.x CRS= and a format=, or it 500s.
+        assert params["CRS"] == "EPSG:4326"
+        assert kwargs["wcs_format"] == "GEOTIFF"
+        assert kwargs["direct"] is True
+    # The final on-disk file is the real, cropped GeoTIFF -- not just the
+    # -180..180 strip `_FakeDataset` reports -- so re-open it and confirm the
+    # crop actually landed.
+    written = dataset_mod.Dataset.read_file(str(paths[0]))
+    assert written.bbox == pytest.approx([5.0, 40.0, 15.0, 50.0])
+    written.close()
 
 
 def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
     """A GDO row routes through the same `map=DO_WCS` map as EDO."""
     seen: list[str] = []
 
-    def _fake_download(url, target, *, label):
-        seen.append(url)
-        Path(target).write_bytes(b"MM\x00*FAKE")
-
     class _FakeDataset:
+        bbox = [-180.0, 40.0, 180.0, 50.0]
+        no_data_value = (None,)
+
         @classmethod
-        def read_file(cls, path):
+        def from_wcs(cls, endpoint, **kwargs):
+            seen.append(endpoint)
             return _FakeDataset()
+
+        def read_array(self):
+            return np.zeros((10, 360), dtype="uint8")
 
         def close(self):
             pass
 
     import pyramids.dataset as dataset_mod
 
-    monkeypatch.setattr(backend_module, "_http_download_raster", _fake_download)
-    monkeypatch.setattr(dataset_mod.Dataset, "read_file", _FakeDataset.read_file)
+    monkeypatch.setattr(dataset_mod.Dataset, "from_wcs", _FakeDataset.from_wcs)
 
     backend = Drought(
         start="2024-06-21",
@@ -534,27 +509,141 @@ def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
     assert all("GDO_WCS" not in u for u in seen)
 
 
+def test_clip_wcs_raster_trims_full_width_strip_to_bbox():
+    """`_clip_wcs_raster` windows a global-width WCS strip down to the bbox.
+
+    Regression: the Copernicus EDO/GDO server honours the `Lat` subset but
+    ignores `Long`, returning a full -180..180 strip with no embedded SRS, so
+    the backend must clip longitude locally rather than trust the server.
+    """
+    from pyramids.dataset import Dataset
+
+    # 64 rows over lat 36..52, 1440 cols over lon -180..180 (0.25 deg cells).
+    arr = np.arange(64 * 1440, dtype="float32").reshape(64, 1440)
+    geo = (-180.0, 0.25, 0.0, 52.0, 0.0, -0.25)
+    strip = Dataset.create_from_array(arr=arr, geo=geo, epsg=4326, no_data_value=None)
+
+    clipped = Drought._clip_wcs_raster(strip, (-10.0, 36.0, 12.0, 52.0))
+
+    assert clipped is not None
+    assert [round(b, 2) for b in clipped.bbox] == [-10.0, 36.0, 12.0, 52.0]
+    assert clipped.columns < strip.columns  # longitude trimmed
+    assert clipped.rows == strip.rows  # latitude already full-height
+
+
+def test_clip_wcs_raster_returns_none_when_bbox_outside_coverage():
+    """A bbox entirely outside the raster yields `None` (original untouched)."""
+    from pyramids.dataset import Dataset
+
+    arr = np.zeros((4, 8), dtype="uint8")  # covers lon 0..8, lat 0..4
+    geo = (0.0, 1.0, 0.0, 4.0, 0.0, -1.0)
+    ds = Dataset.create_from_array(arr=arr, geo=geo, epsg=4326, no_data_value=None)
+
+    assert Drought._clip_wcs_raster(ds, (20.0, 20.0, 30.0, 30.0)) is None
+
+
+def test_fetch_wcs_warns_when_bbox_misses_downloaded_raster(monkeypatch, tmp_path):
+    """`_fetch_wcs` logs a warning and keeps the unclipped file when the crop is a no-op."""
+    from loguru import logger
+
+    class _FakeDataset:
+        # Covers lon 0..8, lat 0..4 -- nowhere near the requested lon_lim/lat_lim.
+        bbox = [0.0, 0.0, 8.0, 4.0]
+        no_data_value = (None,)
+
+        @classmethod
+        def from_wcs(cls, endpoint, **kwargs):
+            return _FakeDataset()
+
+        def read_array(self):
+            return np.zeros((4, 8), dtype="uint8")
+
+        def to_file(self, path):
+            # The crop is a no-op, so the backend writes the server's own
+            # coverage out unclipped rather than a cropped copy.
+            Path(path).write_bytes(b"MM\x00*FAKE-GEOTIFF")
+
+        def close(self):
+            pass
+
+    import pyramids.dataset as dataset_mod
+
+    monkeypatch.setattr(dataset_mod.Dataset, "from_wcs", _FakeDataset.from_wcs)
+
+    backend = Drought(
+        start="2025-12-01",
+        end="2025-12-31",
+        lat_lim=[40.0, 50.0],
+        lon_lim=[5.0, 15.0],
+        dataset="edo-spaST",
+        path=str(tmp_path),
+    )
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING")
+    try:
+        paths = backend.download(progress_bar=False)
+    finally:
+        logger.remove(sink_id)
+    warnings = [m for m in messages if "unclipped" in m]
+    assert len(warnings) == len(paths)
+    assert "edo-spaST" in warnings[0]
+    assert str(paths[0]) in warnings[0]
+    # The original, un-cropped download is left in place rather than dropped.
+    assert paths[0].exists()
+
+
+def test_edo_fetch_rejects_a_row_without_a_coverage_id(monkeypatch, tmp_path):
+    """An edo-wcs row carrying no `coverage` raises before any request goes out.
+
+    The guard moved from the deleted `_render_wcs_url` into
+    `_fetch_wcs_coverage`; this keeps it covered. `coverage` is `None` for the
+    non-WCS transports, so a mis-catalogued row would otherwise send
+    `coverageID=None` to Copernicus and get an opaque server error back.
+    """
+    import pyramids.dataset as dataset_mod
+
+    def _unreachable(cls, endpoint, **kwargs):
+        raise AssertionError("from_wcs must not be called without a coverage id")
+
+    monkeypatch.setattr(dataset_mod.Dataset, "from_wcs", classmethod(_unreachable))
+    backend = Drought(
+        start="2026-06-21",
+        end="2026-06-21",
+        lat_lim=[40.0, 50.0],
+        lon_lim=[5.0, 15.0],
+        dataset="edo-cdiad",
+        path=str(tmp_path),
+    )
+    # The catalog row is a frozen pydantic model, so swap in a copy rather
+    # than assigning through it.
+    monkeypatch.setattr(
+        backend, "_dataset", backend._dataset.model_copy(update={"coverage": None})
+    )
+    with pytest.raises(ValueError, match="must carry a `coverage` id"):
+        backend.download(progress_bar=False)
+
+
 def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
-    """A server rejection (out-of-range date) surfaces the Copernicus message."""
-    import requests
+    """A server rejection (out-of-range date) surfaces the Copernicus message.
 
-    class _FakeResp:
-        status_code = 422
+    The backend translates pyramids' `WCSError` — which is not a `ValueError` —
+    into one, so the documented contract survives the WCS transport living in
+    pyramids. The faked message mirrors the real shape: since pyramids 0.46.0
+    the response body is embedded in the error text
+    (serapeum-org/pyramids#744), which is what carries the Copernicus text.
+    """
+    import pyramids.dataset as dataset_mod
+    from pyramids.errors import WCSError
 
-        def json(self):
-            return {"message": "Requested date is outside the available range."}
+    def _reject(cls, endpoint, **kwargs):
+        raise WCSError(
+            f"WCS GetCoverage request failed for {endpoint!r}: "
+            "HTTP Error 422: Unprocessable Entity: "
+            '{"message":"Requested date is outside the available range.",'
+            '"code":"DATE_OUT_OF_RANGE"}'
+        )
 
-        @property
-        def text(self):
-            return "{...}"
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *exc):
-            return None
-
-    monkeypatch.setattr(requests, "get", lambda *a, **k: _FakeResp())
+    monkeypatch.setattr(dataset_mod.Dataset, "from_wcs", classmethod(_reject))
     backend = Drought(
         start="2026-06-21",
         end="2026-06-21",
@@ -953,133 +1042,6 @@ def test_http_download_streams_to_target(monkeypatch, tmp_path):
     assert target.exists()
     assert target.read_bytes() == body
     assert not (target.with_suffix(target.suffix + ".partial").exists())
-
-
-def test_http_download_raster_streams_on_success(monkeypatch, tmp_path):
-    """`_http_download_raster` writes a 2xx body atomically to the target."""
-    import requests
-
-    body = b"MM\x00*" + b"y" * (1 << 17)
-    monkeypatch.setattr(
-        requests, "get", lambda *a, **k: _FakeResponse(status=200, body=body)
-    )
-    target = tmp_path / "edo.tif"
-    backend_module._http_download_raster(
-        "https://example.com/wcs", target, label="edo-spaST"
-    )
-    assert target.read_bytes() == body
-    assert not target.with_suffix(target.suffix + ".partial").exists()
-
-
-def test_http_download_raster_surfaces_json_message(monkeypatch, tmp_path):
-    """A 4xx with a JSON `message` is re-raised as a clear ValueError."""
-    import requests
-
-    monkeypatch.setattr(
-        requests,
-        "get",
-        lambda *a, **k: _FakeResponse(
-            status=422, json_body={"message": "date outside coverage range"}
-        ),
-    )
-    with pytest.raises(ValueError, match="date outside coverage range"):
-        backend_module._http_download_raster(
-            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdiad"
-        )
-
-
-def test_http_download_raster_falls_back_to_raw_body(monkeypatch, tmp_path):
-    """A 5xx with a non-JSON body still surfaces the raw text (no crash)."""
-    import requests
-
-    monkeypatch.setattr(
-        requests,
-        "get",
-        lambda *a, **k: _FakeResponse(status=500, body=b"upstream mapserver error"),
-    )
-    with pytest.raises(ValueError, match="upstream mapserver error"):
-        backend_module._http_download_raster(
-            "https://example.com/wcs", tmp_path / "x.tif", label="edo-cdirc"
-        )
-
-
-def test_http_download_raster_rejects_non_raster_200(monkeypatch, tmp_path):
-    """A 200 carrying a non-TIFF body (MapServer error) is rejected, not written.
-
-    The Copernicus WCS answers an invalid `map=`/coverage with a plain-text
-    `ERROR: invalid map parameter` body under HTTP 200; without the magic-byte
-    guard it would slip through and reach `Dataset.read_file` as an opaque
-    GDAL failure.
-    """
-    import requests
-
-    monkeypatch.setattr(
-        requests,
-        "get",
-        lambda *a, **k: _FakeResponse(status=200, body=b"ERROR: invalid map parameter"),
-    )
-    target = tmp_path / "x.tif"
-    with pytest.raises(ValueError, match="non-raster body"):
-        backend_module._http_download_raster(
-            "https://example.com/wcs", target, label="gdo-smand"
-        )
-    assert not target.exists(), "no file written for a non-raster response"
-
-
-def test_http_download_raster_accepts_bigtiff(monkeypatch, tmp_path):
-    """A 200 body with BigTIFF magic is accepted (not rejected as non-raster)."""
-    import requests
-
-    body = b"II+\x00" + b"z" * (1 << 16)  # little-endian BigTIFF
-    monkeypatch.setattr(
-        requests, "get", lambda *a, **k: _FakeResponse(status=200, body=body)
-    )
-    target = tmp_path / "big.tif"
-    backend_module._http_download_raster(
-        "https://example.com/wcs", target, label="edo-spaST"
-    )
-    assert target.read_bytes() == body
-
-
-def test_http_download_removes_partial_on_stream_failure(monkeypatch, tmp_path):
-    """A mid-stream connection drop leaves no stale `.partial` on disk."""
-    import requests
-
-    class _BrokenResponse(_FakeResponse):
-        def iter_content(self, chunk_size: int = 1024):
-            yield b"first-chunk"
-            raise requests.ConnectionError("connection dropped mid-stream")
-
-    monkeypatch.setattr(
-        requests, "get", lambda *a, **k: _BrokenResponse(status=200, body=b"")
-    )
-    target = tmp_path / "file.nc"
-    with pytest.raises(requests.ConnectionError):
-        backend_module._http_download("https://example.com/file.nc", target)
-    assert not target.exists()
-    assert not target.with_suffix(target.suffix + ".partial").exists()
-
-
-def test_http_download_raster_removes_partial_on_stream_failure(monkeypatch, tmp_path):
-    """A mid-stream drop after the magic check leaves no stale `.partial`."""
-    import requests
-
-    class _BrokenRasterResponse(_FakeResponse):
-        def iter_content(self, chunk_size: int = 1024):
-            yield b"MM\x00*" + b"a" * 16  # valid TIFF magic, passes the guard
-            raise requests.ConnectionError("connection dropped mid-stream")
-
-    monkeypatch.setattr(
-        requests, "get", lambda *a, **k: _BrokenRasterResponse(status=200, body=b"")
-    )
-    target = tmp_path / "edo.tif"
-    with pytest.raises(requests.ConnectionError):
-        backend_module._http_download_raster(
-            "https://example.com/wcs", target, label="edo-spaST"
-        )
-    assert not target.exists()
-    assert not target.with_suffix(target.suffix + ".partial").exists()
-
 
 def test_usdm_reprojects_non_4326_payload(monkeypatch, tmp_path):
     """A payload arriving in EPSG:3857 is reprojected to 4326."""

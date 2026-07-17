@@ -78,8 +78,22 @@ dev = [
     "nbval >=0.11.0",
     # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
-    "pyramids-gis[viz] >=0.45.0",
-    "cleopatra >=0.25.0",
+    # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
+    # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
+    # runtime dep of earthlens itself.
+    "pyramids-gis[viz] >=0.46.0",
+    # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
+    # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
+    # save_animation(crf=...) landed in 0.22.0, the animate() default
+    # label-clipping fix in 0.23.0, the DATA_STYLES presets / dark-canvas
+    # helper (style=, apply_blank_canvas) in 0.24.0+, and 0.26.0 replaces
+    # animate()'s text_loc kwarg with a FrameLabel(location=, color=)
+    # object (the old kwarg still works as a deprecated alias, but the
+    # showcase notebooks already migrated their existing text_loc= calls,
+    # and the new dark-canvas notebook uses FrameLabel's color= directly
+    # rather than the also-deprecated label_color=) -- floor pinned to
+    # the latest of these, >=0.26.0.
+    "cleopatra >=0.26.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -107,8 +121,19 @@ docs = [
     "mkdocs-panzoom-plugin",
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
-    "pyramids-gis[viz] >=0.45.0",
-    "cleopatra >=0.25.0",
+    # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
+    "pyramids-gis[viz] >=0.46.0",
+    # cleopatra: notebooks import it directly; add_reference_map /
+    # save_animation(crf=...) landed in 0.22.0, the animate() default
+    # label-clipping fix in 0.23.0, the DATA_STYLES presets / dark-canvas
+    # helper (style=, apply_blank_canvas) in 0.24.0+, and 0.26.0 replaces
+    # animate()'s text_loc kwarg with a FrameLabel(location=, color=)
+    # object (the old kwarg still works as a deprecated alias, but the
+    # showcase notebooks already migrated their existing text_loc= calls,
+    # and the new dark-canvas notebook uses FrameLabel's color= directly
+    # rather than the also-deprecated label_color=) -- floor pinned to
+    # the latest of these, >=0.26.0.
+    "cleopatra >=0.26.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
@@ -299,7 +324,7 @@ platforms = ["win-64", "linux-64", "osx-arm64"]
 # without this floor the multi-platform lock cannot place it. Raising the
 # target to 15 matches that wheel; every other package's older-macOS wheels
 # stay valid (a lower macOS floor is always compatible with a higher target).
-# pyramids-gis 0.45.0 wheels are manylinux_2_28 (down from manylinux_2_39 in
+# pyramids-gis 0.46.0 wheels are manylinux_2_28 (down from manylinux_2_39 in
 # 0.38/0.39), which sits at/below pixi's default linux-64 __glibc floor, so no
 # explicit `libc = "…"` pin is needed to select the wheel over the sdist.
 [tool.pixi.system-requirements]

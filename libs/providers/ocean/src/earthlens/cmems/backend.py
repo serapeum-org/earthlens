@@ -34,7 +34,6 @@ from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
@@ -43,6 +42,9 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    date_windows,
+    safe_filename,
+    window_labels,
 )
 from earthlens.cmems.auth import (
     AuthenticationError,
@@ -252,7 +254,7 @@ class CMEMS(AbstractDataSource):
         end_dt = dt.datetime.strptime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h"}
         resolution = freq_map.get(temporal_resolution, "D")
-        dates = pd.date_range(start_dt, end_dt, freq=resolution)
+        dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
@@ -425,8 +427,9 @@ class CMEMS(AbstractDataSource):
         Raises:
             ValueError: When the file has no `time` dimension to window.
         """
-        from pyramids.dataset import Dataset
         from pyramids.netcdf import NetCDF
+
+        from earthlens.base.raster import array_to_raster
 
         nc = NetCDF.read_file(str(nc_path))
         dims = tuple(nc.dimension_names or ())
@@ -466,8 +469,8 @@ class CMEMS(AbstractDataSource):
                 target = out_dir / (
                     f"{nc_path.stem}_{var_name}_{config.freq}_{window}.tif"
                 )
-                Dataset.create_from_array(
-                    arr=arr[i], geo=var.geotransform, epsg=var.epsg
+                array_to_raster(
+                    arr[i], var.geotransform, epsg=var.epsg
                 ).to_file(str(target))
                 written.append(target)
 
@@ -518,16 +521,7 @@ class CMEMS(AbstractDataSource):
                 "cannot decode the NetCDF CF `time` axis for windowing "
                 "(no `time` variable with a CF `units` attribute)."
             )
-        time_index = pd.DatetimeIndex(pd.to_datetime(list(times)))
-        positions = pd.Series(range(len(time_index)), index=time_index)
-        label_for: dict[int, str] = {}
-        for window_start, group in positions.groupby(pd.Grouper(freq=freq)):
-            if group.empty:
-                continue
-            label = window_start.strftime("%Y%m%d")
-            for pos in group.tolist():
-                label_for[int(pos)] = label
-        return [label_for[i] for i in range(len(time_index))]
+        return window_labels(times, freq)
 
     def _api(self) -> list[Path]:
         """Compose `_search` and `_fetch` into the canonical C3 shape."""
@@ -711,13 +705,13 @@ class CMEMS(AbstractDataSource):
 
 
 def _safe_filename(dataset_id: str) -> str:
-    """Replace characters illegal in Windows filenames with `_`.
+    """Sanitise a CMEMS dataset id into a filesystem-safe stem.
 
-    CMEMS dataset ids contain `.` (e.g.
-    `cmems_mod_glo_phy_my_0.083deg_P1D-m`); Windows tolerates a
-    single dot before the extension but mid-string dots are
-    confusing in `glob` patterns. Also strip any path separator
-    that could escape the output directory.
+    Thin alias over :func:`earthlens.base.safe_filename` (the shared
+    implementation). CMEMS dataset ids contain `.` (e.g.
+    `cmems_mod_glo_phy_my_0.083deg_P1D-m`), which the whitelist keeps,
+    while every path separator and Windows-illegal character
+    (`/ \\ : * ? " < > |`) collapses to `_`.
 
     Args:
         dataset_id: The raw CMEMS dataset id.
@@ -725,10 +719,7 @@ def _safe_filename(dataset_id: str) -> str:
     Returns:
         A filename-safe variant of the id.
     """
-    safe = dataset_id
-    for bad in ("/", "\\", ":", "*", "?", '"', "<", ">", "|"):
-        safe = safe.replace(bad, "_")
-    return safe
+    return safe_filename(dataset_id)
 
 
 def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:

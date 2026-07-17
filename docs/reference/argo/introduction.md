@@ -1,5 +1,7 @@
 # Argo float profiles — introduction
 
+<img src="../../_images/logos/argo.png" alt="Argo Program logo" height="60">
+
 [Argo](https://argo.ucsd.edu/) is a global array of ~4000 autonomous
 profiling floats that drift with the ocean and surface roughly every ten
 days to report a vertical profile — temperature, salinity, and pressure

@@ -1,5 +1,7 @@
 # NOAA GOES-R ABI — introduction
 
+<img src="../../_images/logos/goes.png" alt="NOAA GOES-R logo" height="60">
+
 `earthlens.goes` wraps the **NOAA GOES-R series Advanced Baseline Imager
 (ABI)** — the geostationary imager on GOES-East / GOES-West that scans the
 Americas and the Pacific continuously. It fetches the raw ABI **NetCDF

@@ -7,7 +7,7 @@ into the private module layout.
 
 from __future__ import annotations
 
-from earthlens.base._dates import split_time, to_datetime
+from earthlens.base._dates import date_windows, split_time, to_datetime, window_labels
 from earthlens.base.abstractdatasource import (
     AbstractCatalog,
     AbstractDataSource,
@@ -21,6 +21,7 @@ from earthlens.base.auth import AbstractAuth, AuthenticationError
 from earthlens.base.http import HttpClient
 from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.base.leaves import FluxableLeaf
+from earthlens.base.naming import safe_filename
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
 from earthlens.base.region import (
     clear_region_cache,
@@ -55,13 +56,16 @@ __all__ = [
     "clear_providers_cache",
     "clear_region_cache",
     "crop_to_aoi",
+    "date_windows",
     "mask_to_geometry",
     "estimate_pixel_dims",
     "load_providers",
     "normalize_aoi",
     "region_affinity",
     "resolve_aoi",
+    "safe_filename",
     "split_time",
     "to_datetime",
     "warn_if_egress",
+    "window_labels",
 ]

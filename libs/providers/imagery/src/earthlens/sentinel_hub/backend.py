@@ -36,6 +36,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    date_windows,
 )
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
 from earthlens.sentinel_hub._helpers import (
@@ -256,7 +257,7 @@ class SentinelHub(AbstractDataSource):
         end_dt = dt.datetime.strptime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
         resolution = freq_map.get(temporal_resolution, "D")
-        dates = pd.date_range(start_dt, end_dt, freq=resolution)
+        dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
         )
@@ -1042,7 +1043,7 @@ class SentinelHub(AbstractDataSource):
         import pandas as pd
 
         edges = list(
-            pd.date_range(self.time.start_date, self.time.end_date, freq=aggregate.freq)
+            date_windows(self.time.start_date, self.time.end_date, aggregate.freq)
         )
         if not edges or pd.Timestamp(edges[0]) > pd.Timestamp(self.time.start_date):
             edges.insert(0, pd.Timestamp(self.time.start_date))

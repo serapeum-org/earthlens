@@ -44,6 +44,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    date_windows,
     region_affinity,
 )
 from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
@@ -294,7 +295,7 @@ class Earthdata(AbstractDataSource):
         end_dt = dt.datetime.strptime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h"}
         resolution = freq_map.get(temporal_resolution, "D")
-        dates = pd.date_range(start_dt, end_dt, freq=resolution)
+        dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

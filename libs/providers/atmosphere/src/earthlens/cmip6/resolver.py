@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING, Any
 import requests
 
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -138,22 +139,6 @@ class ResolvedStore:
             self.grid_label,
         ]
         return "_".join(str(p).replace("/", "-") for p in parts if p)
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so this
-    single-shot download stays a fresh connection per call and tests that
-    monkeypatch `requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 class StoreResolver:
     """Resolve CMIP6 facet tuples to `zstore` URIs over the consolidated CSV.
 

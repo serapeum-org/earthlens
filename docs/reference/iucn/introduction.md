@@ -1,5 +1,7 @@
 # IUCN Red List — introduction
 
+<img src="../../_images/logos/iucn.svg" alt="IUCN Red List logo" height="60">
+
 The [IUCN Red List](https://www.iucnredlist.org/) is the world's authoritative
 inventory of the conservation status of species — each assessment carries a
 category (e.g. `EN`, `VU`, `CR`), the criteria behind it, a population trend,

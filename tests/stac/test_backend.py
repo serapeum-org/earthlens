@@ -576,10 +576,10 @@ class TestModuleHelpers:
 
     def test_window_labels_skips_empty_buckets(self):
         """A monthly grouping over dates with a gap skips the empty window."""
-        from earthlens.stac.backend import _window_labels
+        from earthlens.base import window_labels
 
         # Jan + Mar dates: the February bucket is empty and is skipped.
-        labels = _window_labels(["2024-01-10", "2024-03-20"], "MS")
+        labels = window_labels(["2024-01-10", "2024-03-20"], "MS")
         assert labels == ["20240101", "20240301"]
 
     def test_cleanup_ignores_missing(self, tmp_path):

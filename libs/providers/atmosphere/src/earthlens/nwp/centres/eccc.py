@@ -136,15 +136,19 @@ class ECCCCentre(_NWPCentre):
                 f"ECCC Datamart serves from a single origin host; "
                 f"mirror={mirror!r} is not supported (use 'auto' or 'origin')."
             )
-        session = self._get_session()
+        from earthlens.base.http import HttpClient
+
+        # Reuse the centre's pooled `requests.Session` for connection reuse
+        # across the per-band GETs, wrapped in `HttpClient` for retry + a
+        # consistent User-Agent.
+        client = HttpClient(session=self._get_session())
         out = self.save_dir / grib_name(model.model_family, cycle, step, member)
         tmp = out.with_name(out.name + ".part")
         try:
             with open(tmp, "wb") as handle:
                 for param in params:
                     url = self._band_url(model, param, cycle, step, member)
-                    with session.get(url, stream=True, timeout=_HTTP_TIMEOUT) as response:
-                        response.raise_for_status()
+                    with client.stream(url, timeout=_HTTP_TIMEOUT) as response:
                         for chunk in response.iter_content(chunk_size=_STREAM_CHUNK):
                             if chunk:
                                 handle.write(chunk)

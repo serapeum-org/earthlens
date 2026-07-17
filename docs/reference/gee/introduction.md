@@ -1,5 +1,7 @@
 # Google Earth Engine — introduction
 
+<img src="../../_images/logos/gee.png" alt="Google Earth Engine logo" height="60">
+
 [Google Earth Engine](https://earthengine.google.com/) (GEE) is a
 cloud platform for planetary-scale geospatial analysis. It pairs a
 multi-petabyte, analysis-ready **data catalog** (satellite imagery,

@@ -1,5 +1,7 @@
 # Protected Planet (WDPA) — introduction
 
+<img src="../../_images/logos/wdpa.png" alt="Protected Planet (UNEP-WCMC) logo" height="60">
+
 [Protected Planet](https://www.protectedplanet.net/) publishes the **World
 Database on Protected and Conserved Areas (WDPCA)** — 300 k+ protected and
 conserved areas worldwide, with their boundaries, designations, and IUCN

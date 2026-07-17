@@ -20,7 +20,6 @@ the pyramids `PY-1` port.
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -35,21 +34,25 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
+    date_windows,
+    safe_filename,
     to_datetime,
     warn_if_egress,
 )
+from earthlens.base.raster import netcdf_variable_to_raster
 from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.s3.catalog import Catalog, Dataset
 from earthlens.s3.layouts import plan_products
 
 __all__ = ["S3"]
 
-_UNSAFE = re.compile(r"[^A-Za-z0-9._-]+")
-
-
 def _safe_name(value: str) -> str:
-    """Sanitise a product id into a filesystem-safe file stem."""
-    return _UNSAFE.sub("_", value).strip("_")
+    """Sanitise a product id into a filesystem-safe file stem.
+
+    Thin alias over :func:`earthlens.base.safe_filename` (the shared
+    implementation); kept as a module-local name for the call sites.
+    """
+    return safe_filename(value)
 
 
 @dataclass(frozen=True)
@@ -215,7 +218,7 @@ class S3(AbstractDataSource):
             dates = pd.DatetimeIndex([start_date])
         else:
             resolution = "MS" if temporal_resolution == "monthly" else "D"
-            dates = pd.date_range(start_date, end_date, freq=resolution)
+            dates = date_windows(start_date, end_date, resolution)
             if len(dates) == 0:
                 dates = pd.DatetimeIndex([start_date])
         return TemporalExtent(
@@ -415,19 +418,28 @@ class S3(AbstractDataSource):
         Reads the granule's data variable as an array + geotransform and
         builds a `Dataset` tagged EPSG:4326 — NetCDF cubes do not expose a
         source SRS the crop warp can read, so cropping the cube directly
-        fails. Longitudes in the 0-360 convention are wrapped to -180..180.
+        fails. Longitudes in the 0-360 convention are wrapped to -180..180
+        via pyramids `Dataset.wrap_longitude` (the same call the nwp backend
+        uses), which validates the whole-globe span rather than assuming it.
+        Delegates the array read + rebuild to the shared
+        `netcdf_variable_to_raster`.
+
+        This assumes an ERA5 granule is the full global 0-360 grid, which the
+        `era5-pds` bucket always serves. Unlike the previous hand-rolled roll
+        (which shifted at `cols // 2` regardless), `wrap_longitude` raises
+        `ValueError` on a non-global 0-360 grid rather than producing a
+        mis-rolled raster — so a future non-global 0-360 S3 layout would fail
+        loudly here instead of silently.
         """
-        import numpy as np
-        from pyramids.dataset import Dataset as PyramidsDataset
         from pyramids.netcdf import NetCDF
 
         nc = NetCDF.read_file(str(raw))
-        cube = nc.get_variable(self._nc_variable_name(nc, product))
-        arr = np.asarray(cube.read_array())
-        geo = tuple(cube.geotransform)
-        if self._dataset.lon_convention == "0-360":
-            arr, geo = _wrap_longitude_0_360(arr, geo)
-        return PyramidsDataset.create_from_array(arr=arr, geo=geo, epsg=4326)
+        return netcdf_variable_to_raster(
+            nc,
+            self._nc_variable_name(nc, product),
+            epsg=4326,
+            wrap_longitude=self._dataset.lon_convention == "0-360",
+        )
 
     def _geostationary_to_wgs84(self, raw: Path, product: RemoteProduct):
         """Warp a geostationary NetCDF variable (e.g. GOES ABI) to WGS84.
@@ -586,29 +598,6 @@ class S3(AbstractDataSource):
             if variable.native == native:
                 return variable
         return None
-
-
-def _wrap_longitude_0_360(arr, geo):
-    """Roll a global 0-360-longitude array + geotransform to -180..180.
-
-    Assumes a global longitude span (the ERA5 grid): the second half of
-    the columns (>= 180 degrees) moves to the front as the negative
-    longitudes, and the geotransform origin shifts west by 180 degrees.
-
-    Args:
-        arr: Array whose last axis is longitude (`(..., rows, cols)`).
-        geo: The GDAL 6-tuple geotransform for `arr`.
-
-    Returns:
-        The rolled `(array, geotransform)` pair in the -180..180 convention.
-    """
-    import numpy as np
-
-    cols = arr.shape[-1]
-    half = cols // 2
-    rolled = np.concatenate([arr[..., half:], arr[..., :half]], axis=-1)
-    new_geo = (geo[0] - 180.0, geo[1], geo[2], geo[3], geo[4], geo[5])
-    return rolled, new_geo
 
 
 def _error_code(exc: BaseException) -> str:

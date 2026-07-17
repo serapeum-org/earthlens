@@ -1,5 +1,7 @@
 # GBIF species occurrences — introduction
 
+<img src="../../_images/logos/gbif.svg" alt="GBIF logo" height="60">
+
 The [GBIF](https://www.gbif.org/) (Global Biodiversity Information Facility)
 occurrence API serves 3 B+ georeferenced species-occurrence records — every
 "this species was observed at this place and time" point that GBIF's network

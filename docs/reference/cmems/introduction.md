@@ -1,5 +1,7 @@
 # Copernicus Marine Service — introduction
 
+<img src="../../_images/logos/cmems.svg" alt="Copernicus Marine Service logo" height="60">
+
 The [Copernicus Marine Service](https://marine.copernicus.eu/) (CMEMS,
 operationally run by Mercator Ocean International for the European
 Commission's Copernicus programme) is the public European reference for

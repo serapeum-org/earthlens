@@ -47,6 +47,7 @@ from earthlens.base import (
 from earthlens.base.http import HttpClient
 from earthlens.gdacs import events
 from earthlens.gdacs.catalog import Catalog
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -82,23 +83,6 @@ _DRIVERS: dict[str, tuple[str, str]] = {
     "gpkg": ("GPKG", "gpkg"),
     "geojson": ("GeoJSON", "geojson"),
 }
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so the
-    single SEARCH GET stays a fresh connection per call and tests that
-    monkey-patch `earthlens.gdacs.backend.requests.get` still drive the
-    transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 class GDACS(AbstractDataSource):
     """GDACS multi-hazard alert backend (vector point-feature output).
 

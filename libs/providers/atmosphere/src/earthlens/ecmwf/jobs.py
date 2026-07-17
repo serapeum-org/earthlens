@@ -20,22 +20,7 @@ from typing import Any
 import requests
 
 from earthlens.base.http import HttpClient
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so tests
-    that monkeypatch `requests.get` still drive the transport, and each
-    call remains a fresh connection.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
+from earthlens.base.http import RequestsGet as _RequestsGet
 def read_cdsapirc() -> dict[str, str]:
     """Parse `~/.cdsapirc` into a `{url, key}` dict.
 

@@ -1,5 +1,7 @@
 # Drought indicators — introduction
 
+<img src="../../_images/logos/drought.svg" alt="Copernicus European Drought Observatory / NDMC logo" height="60">
+
 The drought backend reaches three public drought-monitoring services through
 one unified `EarthLens("drought", dataset=...)` shape:
 

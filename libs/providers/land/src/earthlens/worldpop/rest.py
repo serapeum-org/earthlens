@@ -22,6 +22,41 @@ BASE_URL: str = "https://hub.worldpop.org/rest/data"
 _TIMEOUT: int = 60
 
 
+def _rest_json(
+    url: str,
+    *,
+    session: requests.Session | None,
+    timeout: int,
+    params: dict[str, Any] | None = None,
+) -> Any:
+    """GET `url` through the shared `HttpClient` and decode the JSON body.
+
+    Routes every WorldPop metadata GET through
+    :class:`earthlens.base.http.HttpClient` so the four query helpers share
+    one `Retry-After`-aware retry / back-off policy against the hub's
+    occasional `429`/`5xx`. A passed `session` is reused (connection
+    pooling); otherwise each call opens a fresh connection.
+
+    Args:
+        url: The REST endpoint URL.
+        session: An optional shared `requests.Session` to reuse, or `None`
+            for a fresh connection per call.
+        timeout: Per-request timeout in seconds.
+        params: Optional query parameters.
+
+    Returns:
+        The decoded JSON body (typically a `dict` with a `data` key).
+
+    Raises:
+        requests.HTTPError: If the endpoint returns a non-2xx status after
+            the retry budget is exhausted.
+    """
+    from earthlens.base.http import HttpClient, RequestsGet
+
+    client = HttpClient(session=session if session is not None else RequestsGet())
+    return client.get_json(url, params=params, timeout=timeout)
+
+
 def rest_records(
     alias: str,
     subalias_id: str,
@@ -52,14 +87,13 @@ def rest_records(
     Raises:
         requests.HTTPError: If the endpoint returns a non-2xx status.
     """
-    getter = session.get if session is not None else requests.get
-    resp = getter(
+    body = _rest_json(
         f"{base_url}/{alias}/{subalias_id}",
-        params={"iso3": iso3},
+        session=session,
         timeout=timeout,
+        params={"iso3": iso3},
     )
-    resp.raise_for_status()
-    return resp.json().get("data", [])
+    return body.get("data", [])
 
 
 def files_for_year(records: list[dict[str, Any]], year: int | None) -> list[str]:
@@ -137,10 +171,10 @@ def global_records(
     Raises:
         requests.HTTPError: If the endpoint returns a non-2xx status.
     """
-    getter = session.get if session is not None else requests.get
-    resp = getter(f"{base_url}/{alias}/{subalias_id}", timeout=timeout)
-    resp.raise_for_status()
-    return resp.json().get("data", [])
+    body = _rest_json(
+        f"{base_url}/{alias}/{subalias_id}", session=session, timeout=timeout
+    )
+    return body.get("data", [])
 
 
 def record_files(
@@ -173,12 +207,13 @@ def record_files(
     Raises:
         requests.HTTPError: If the endpoint returns a non-2xx status.
     """
-    getter = session.get if session is not None else requests.get
-    resp = getter(
-        f"{base_url}/{alias}/{subalias_id}", params={"id": record_id}, timeout=timeout
+    body = _rest_json(
+        f"{base_url}/{alias}/{subalias_id}",
+        session=session,
+        timeout=timeout,
+        params={"id": record_id},
     )
-    resp.raise_for_status()
-    data = resp.json().get("data")
+    data = body.get("data")
     record = data[0] if isinstance(data, list) and data else (data or {})
     return [
         url
@@ -284,12 +319,13 @@ def record_archive_files(
     Raises:
         requests.HTTPError: If the endpoint returns a non-2xx status.
     """
-    getter = session.get if session is not None else requests.get
-    resp = getter(
-        f"{base_url}/{alias}/{subalias_id}", params={"id": record_id}, timeout=timeout
+    body = _rest_json(
+        f"{base_url}/{alias}/{subalias_id}",
+        session=session,
+        timeout=timeout,
+        params={"id": record_id},
     )
-    resp.raise_for_status()
-    data = resp.json().get("data")
+    data = body.get("data")
     record = data[0] if isinstance(data, list) and data else (data or {})
     suffix = f".{fmt.lower()}"
     return [url for url in (record.get("files") or []) if url.lower().endswith(suffix)]

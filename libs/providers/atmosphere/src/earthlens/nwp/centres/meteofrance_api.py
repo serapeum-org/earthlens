@@ -120,8 +120,9 @@ class MeteoFranceAPICentre(_NWPCentre):
                 f"model with backend {model.backend!r} needs request_options "
                 "with 'api_base' and 'coverage_service' for the WCS API centre."
             )
-        import requests
+        from earthlens.base.http import HttpClient, RequestsGet
 
+        client = HttpClient(session=RequestsGet())
         headers = {"apikey": resolve_api_key()}
         url = f"{api_base}/wcs/{coverage_service}/GetCoverage"
         valid = valid_time(cycle, step)
@@ -131,10 +132,9 @@ class MeteoFranceAPICentre(_NWPCentre):
             with open(tmp, "wb") as handle:
                 for param in params:
                     params_qs = self._coverage_query(model.bands[param], cycle, valid)
-                    response = requests.get(
+                    response = client.get(
                         url, params=params_qs, headers=headers, timeout=_HTTP_TIMEOUT
                     )
-                    response.raise_for_status()
                     handle.write(response.content)
             tmp.replace(out)
         except BaseException:

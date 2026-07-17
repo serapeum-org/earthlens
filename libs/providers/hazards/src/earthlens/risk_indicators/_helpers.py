@@ -33,6 +33,7 @@ import requests
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: ThinkHazard! public REST base (no auth). Hazard reports live under
 #: `/report/{division_code}.json` and `/report/{division_code}/{hazard}.json`.
@@ -80,21 +81,6 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
     requests.exceptions.ChunkedEncodingError,
     requests.exceptions.ContentDecodingError,
 )
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the module-level
-    `requests.get` (rather than a private session) so tests that monkeypatch
-    `_helpers.requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 def _request_json(
     url: str,
     *,
