@@ -638,7 +638,7 @@ class Drought(AbstractDataSource):
                 The Copernicus message is surfaced verbatim.
         """
         from pyramids.dataset import Dataset
-        from pyramids.dataset._wcs import WCSError
+        from pyramids.errors import WCSError
 
         if not self._dataset.coverage:
             raise ValueError(

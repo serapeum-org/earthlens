@@ -600,7 +600,7 @@ def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
     (serapeum-org/pyramids#744), which is what carries the Copernicus text.
     """
     import pyramids.dataset as dataset_mod
-    from pyramids.dataset._wcs import WCSError
+    from pyramids.errors import WCSError
 
     def _reject(cls, endpoint, **kwargs):
         raise WCSError(
