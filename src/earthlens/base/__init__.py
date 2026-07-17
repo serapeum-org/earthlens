@@ -53,6 +53,7 @@ __all__ = [
     "clear_providers_cache",
     "clear_region_cache",
     "crop_to_aoi",
+    "date_windows",
     "mask_to_geometry",
     "estimate_pixel_dims",
     "load_providers",
@@ -61,8 +62,7 @@ __all__ = [
     "resolve_aoi",
     "safe_filename",
     "split_time",
-    "date_windows",
     "to_datetime",
-    "window_labels",
     "warn_if_egress",
+    "window_labels",
 ]
