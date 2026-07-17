@@ -12437,9 +12437,9 @@ packages:
 - pypi: ./
   name: earthlens
   version: 0.10.0
-  sha256: f6803b1f274a19e6df1d63fc6607694e257556be2c9b30bd7a459dfdf9a490d8
+  sha256: 5ec514f721b2259f6453a0606cdfc3af417f8f5869016a5204e0eccd40ba8a76
   requires_dist:
-  - pyramids-gis>=0.45.0
+  - pyramids-gis>=0.46.0
   - geopandas>=1.0.0
   - joblib>=1.5.0
   - loguru>=0.7.3
@@ -12466,7 +12466,7 @@ packages:
   - copernicusmarine>=2.0.0,<3 ; extra == 'cmems'
   - obspy>=1.5.0 ; extra == 'fdsn'
   - earthlens[s3] ; extra == 'nwm'
-  - pyramids-gis[parquet]>=0.45.0 ; extra == 'nwm'
+  - pyramids-gis[parquet]>=0.46.0 ; extra == 'nwm'
   - earthaccess>=0.18.0 ; python_full_version >= '3.12' and extra == 'earthdata'
   - asf-search>=12.2.2 ; extra == 'asf'
   - earthlens[earthdata] ; extra == 'asf'
@@ -12480,7 +12480,7 @@ packages:
   - earthlens[s3] ; extra == 'radar'
   - earthlens[s3] ; extra == 'dem'
   - earthlens[s3] ; extra == 'goes'
-  - pyramids-gis[stac]>=0.45.0 ; extra == 'stac'
+  - pyramids-gis[stac]>=0.46.0 ; extra == 'stac'
   - openeo>=0.47,<0.48 ; extra == 'openeo'
   - sentinelhub>=3.11.5 ; extra == 'sentinel-hub'
   - tropycal>=1.4 ; extra == 'tropycal'

@@ -25,7 +25,6 @@ from __future__ import annotations
 import datetime as dt
 import re
 import time
-import warnings
 from pathlib import Path
 
 import numpy as np
@@ -33,7 +32,7 @@ import pandas as pd
 import requests
 from joblib import Parallel, delayed
 
-from earthlens.base import OutputKind, RemoteProduct
+from earthlens.base import OutputKind, RemoteProduct, date_windows, window_labels
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
@@ -59,6 +58,7 @@ from earthlens.worldpop.rest import (
     record_archive_files,
     rest_records,
 )
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: Sub-directory under the output path where raw per-country GeoTIFFs land.
 _RAW_DIRNAME: str = ".worldpop_raw"
@@ -82,22 +82,6 @@ _RESOLUTIONS: frozenset[str] = frozenset({"100m", "1km"})
 _SCOPES: frozenset[str] = frozenset({"countries", "global"})
 #: Allowed values for the `level=` selector (only `pwd` offers both).
 _LEVELS: frozenset[str] = frozenset({"national", "subnational"})
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so each
-    per-file download stays a fresh connection and the transport can be
-    driven by swapping `requests.get`.
-    """
-
-    def get(self, url: str, **kwargs: object) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 class WorldPop(AbstractDataSource):
     """Download WorldPop population + demographic products, localised via pyramids.
 
@@ -375,7 +359,7 @@ class WorldPop(AbstractDataSource):
         """
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
-        dates = pd.date_range(start_dt, end_dt, freq="YS")
+        dates = date_windows(start_dt, end_dt, "YS")
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
@@ -702,7 +686,7 @@ class WorldPop(AbstractDataSource):
         Returns:
             list[Path]: One reduced GeoTIFF per `(product, cohort, window)`.
         """
-        from pyramids.dataset import Dataset
+        from pyramids.dataset import Dataset, DatasetCollection
 
         op = "mean" if cfg.op == "auto" else cfg.op
         by_series: dict[tuple[str, tuple[str, int] | None], dict[int, Path]] = {}
@@ -712,33 +696,26 @@ class WorldPop(AbstractDataSource):
         out: list[Path] = []
         for (product, cohort), year_paths in by_series.items():
             years = sorted(year_paths)
-            index = pd.to_datetime([f"{y}-01-01" for y in years])
-            series = pd.Series(years, index=index)
-            for window_label, bucket in series.groupby(pd.Grouper(freq=cfg.freq)):
-                bucket_years = list(bucket.values)
-                if not bucket_years:
-                    continue
-                template = Dataset.read_file(str(year_paths[bucket_years[0]]))
-                stack = np.stack(
-                    [
-                        _masked_array(Dataset.read_file(str(year_paths[y])))
-                        for y in bucket_years
-                    ]
-                )
-                with warnings.catch_warnings():
-                    # All-no-data cells reduce to NaN; that is expected for
-                    # ocean / outside-AOI pixels, so silence the empty-slice
-                    # RuntimeWarning numpy emits for them.
-                    warnings.simplefilter("ignore", RuntimeWarning)
-                    reduced = _REDUCERS[op](stack, axis=0)
-                tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
+            # Label each year by its `cfg.freq` window start (as %Y%m%d), then
+            # let DatasetCollection.groupby reduce the co-registered year
+            # rasters per window — the same COG-stack path stac / nwp use. This
+            # replaces the hand-rolled np.stack + local NaN-aware reducer table;
+            # DatasetCollection honours each raster's no-data under skipna.
+            dates = pd.to_datetime([f"{y}-01-01" for y in years])
+            files = [str(year_paths[y]) for y in years]
+            labels = window_labels(dates, cfg.freq)
+            collection = DatasetCollection.from_files(files)
+            reduced = getattr(collection.groupby(labels), op)(skipna=cfg.skipna)
+            template = Dataset.read_file(files[0])
+            geo, epsg = template.geotransform, template.epsg
+            tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
+            for label, array in reduced.items():
                 target = (
-                    Path(self.path)
-                    / f"{product}{tag}_{cfg.freq}_{window_label:%Y%m%d}_{op}.tif"
+                    Path(self.path) / f"{product}{tag}_{cfg.freq}_{label}_{op}.tif"
                 )
-                Dataset.create_from_array(
-                    arr=reduced, geo=template.geotransform, epsg=template.epsg
-                ).to_file(str(target))
+                Dataset.create_from_array(arr=array, geo=geo, epsg=epsg).to_file(
+                    str(target)
+                )
                 out.append(target)
         return out
 
@@ -1007,16 +984,6 @@ class WorldPop(AbstractDataSource):
         target = Path(self.path) / f"{product}_{tif.stem}_{self._resolution}.tif"
         cropped.to_file(str(target))
         return target
-
-
-#: Per-op reducers over the year axis (axis 0), NaN-aware (NaN = no-data).
-_REDUCERS = {
-    "mean": np.nanmean,
-    "sum": np.nansum,
-    "min": np.nanmin,
-    "max": np.nanmax,
-    "std": np.nanstd,
-}
 
 
 def _masked_array(dataset) -> np.ndarray:

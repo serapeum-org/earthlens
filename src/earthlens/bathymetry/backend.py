@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import difflib
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import requests
@@ -34,6 +34,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    mask_to_geometry,
 )
 from earthlens.base.http import HttpClient
 from earthlens.bathymetry._helpers import (
@@ -42,6 +43,7 @@ from earthlens.bathymetry._helpers import (
     griddap_subset_url,
 )
 from earthlens.bathymetry.catalog import Catalog, Dataset
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -56,22 +58,6 @@ _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HD
 #: (≈ a 0.25-gigapixel grid). The server enforces the hard cap; this is an
 #: early heads-up for the user.
 _LARGE_PIXEL_THRESHOLD = 250_000_000
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so this
-    single-shot download stays a fresh connection per call and tests that
-    monkeypatch `requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 class Bathymetry(AbstractDataSource):
     """Global topography / bathymetry DEM backend (raster GeoTIFF output).
 
@@ -345,9 +331,14 @@ class Bathymetry(AbstractDataSource):
             )
         return content
 
-    @staticmethod
-    def _to_geotiff(nc_path: Path, variable: str, tif_path: Path) -> None:
-        """Read the NetCDF band with pyramids and write a GeoTIFF.
+    def _to_geotiff(self, nc_path: Path, variable: str, tif_path: Path) -> None:
+        """Read the NetCDF band with pyramids, mask to the AOI, write a GeoTIFF.
+
+        The ERDDAP `griddap` server already subsets to the request *bbox*, so
+        no client-side bbox crop is needed. A polygon `aoi=`, however, is only
+        expressed to the server as its bounding box — so the exact polygon is
+        applied here with the shared `mask_to_geometry` (a no-op when the
+        request carries no polygon), matching every other raster backend.
 
         Args:
             nc_path: The downloaded NetCDF subset.
@@ -362,6 +353,7 @@ class Bathymetry(AbstractDataSource):
 
         nc = NetCDF.read_file(str(nc_path))
         band = nc.get_variable(variable)
+        band = mask_to_geometry(band, self.space)
         band.to_file(str(tif_path))
 
     def _log_estimated_size(

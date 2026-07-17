@@ -11,9 +11,9 @@ testable without the network.
 from __future__ import annotations
 
 import re
-import stat
 from pathlib import Path
 
+from earthlens.base.archive import extract_members
 from earthlens.base.yaml_loader import load_yaml_strict
 
 #: Bundled ISO3 → `[west, south, east, north]` bbox table (WGS84).
@@ -212,41 +212,17 @@ def extract_geotiffs(archive_path: Path, fmt: str, dest_dir: Path) -> list[Path]
         ImportError: If `fmt == "7z"` and the optional `py7zr` is missing.
         ValueError: If `fmt` is not `"7z"` or `"zip"`.
     """
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    if fmt == "zip":
-        import zipfile
-
-        with zipfile.ZipFile(archive_path) as zf:
-            members = [
-                m for m in zf.namelist() if m.lower().endswith((".tif", ".tiff"))
-            ]
-            for member in members:
-                zf.extract(member, dest_dir)
-    elif fmt == "7z":
-        try:
-            import py7zr
-        except ImportError as exc:
-            raise ImportError(
-                "extracting .7z archives (dependency_ratios) needs py7zr. "
-                "Install it with: pip install earthlens[worldpop]"
-            ) from exc
-        with py7zr.SevenZipFile(archive_path) as zf:
-            members = [
-                n for n in zf.getnames() if n.lower().endswith((".tif", ".tiff"))
-            ]
-            zf.extract(path=dest_dir, targets=members)
-    else:
-        raise ValueError(f"unsupported archive format {fmt!r}; expected '7z' or 'zip'.")
-    extracted = sorted(
-        p for p in dest_dir.rglob("*") if p.suffix.lower() in (".tif", ".tiff")
+    # `fix_mode=True`: py7zr restores the archive's (restrictive) POSIX mode,
+    # so on Linux the downstream GDAL read would fail with "Permission denied"
+    # without a user read/write chmod. The shared extractor also applies the
+    # Zip-Slip guard the previous inline zip path lacked.
+    return extract_members(
+        archive_path,
+        dest_dir,
+        include=(".tif", ".tiff"),
+        fmt=fmt,
+        fix_mode=True,
     )
-    # Normalise the extracted files' permissions: py7zr restores the POSIX
-    # mode stored in the archive, and these WorldPop members carry a
-    # restrictive mode, so on Linux the downstream GDAL read fails with
-    # "Permission denied". Force user read/write so the crop can open them.
-    for tif in extracted:
-        tif.chmod(tif.stat().st_mode | stat.S_IRUSR | stat.S_IWUSR)
-    return extracted
 
 
 def iso3_for_bbox(bbox_wgs84: list[float], table: dict[str, list[float]]) -> list[str]:

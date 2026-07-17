@@ -489,7 +489,7 @@ class TestDWDCentre:
         import sys
         import types
 
-        def failing_get(url, timeout=None):
+        def failing_get(url, timeout=None, **kwargs):
             raise RuntimeError("network down")
 
         module = types.ModuleType("requests")
@@ -653,11 +653,13 @@ class TestMeteoFranceAPICentre:
         class _Resp:
             def __init__(self, content):
                 self.content = content
+                self.status_code = 200
+                self.headers = {}
 
             def raise_for_status(self):
                 pass
 
-        def fake_get(url, params=None, headers=None, timeout=None):
+        def fake_get(url, params=None, headers=None, timeout=None, **kwargs):
             calls.append({"url": url, "params": params, "headers": headers})
             return _Resp(b"GRIB-" + dict(params)["coverageid"].split("__")[0].encode())
 
@@ -679,7 +681,7 @@ class TestMeteoFranceAPICentre:
         assert first["url"].endswith(
             "/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/GetCoverage"
         )
-        assert first["headers"] == {"apikey": "k"}
+        assert first["headers"]["apikey"] == "k"
         qs = first["params"]
         assert ("service", "WCS") in qs and ("version", "2.0.1") in qs
         assert (
@@ -798,12 +800,17 @@ class TestECCCCentre:
         class _Resp:
             def __init__(self, body):
                 self._body = body
+                self.status_code = 200
+                self.headers = {}
 
             def __enter__(self):
                 return self
 
             def __exit__(self, *exc):
                 return False
+
+            def close(self):
+                return None
 
             def raise_for_status(self):
                 return None
@@ -817,7 +824,7 @@ class TestECCCCentre:
                 yield self._body[len(self._body) // 2 :]
 
         class _Session:
-            def get(self, url, stream=False, timeout=None):
+            def get(self, url, stream=False, timeout=None, **kwargs):
                 state["urls"].append(url)
                 var = url.rsplit("_MSC_GDPS_", 1)[-1].split("_LatLon", 1)[0]
                 return _Resp(b"<" + var.encode() + b">")
@@ -942,11 +949,18 @@ class TestECCCCentre:
         from earthlens.nwp.centres.eccc import ECCCCentre
 
         class _Resp:
+            def __init__(self):
+                self.status_code = 200
+                self.headers = {}
+
             def __enter__(self):
                 return self
 
             def __exit__(self, *exc):
                 return False
+
+            def close(self):
+                return None
 
             def raise_for_status(self):
                 return None
@@ -957,7 +971,7 @@ class TestECCCCentre:
                 yield b""
 
         class _Session:
-            def get(self, url, stream=False, timeout=None):
+            def get(self, url, stream=False, timeout=None, **kwargs):
                 return _Resp()
 
             def close(self):
@@ -1005,7 +1019,7 @@ class TestECCCCentre:
         import types
 
         class _FailingSession:
-            def get(self, url, stream=False, timeout=None):
+            def get(self, url, stream=False, timeout=None, **kwargs):
                 raise RuntimeError("network down")
 
             def close(self):

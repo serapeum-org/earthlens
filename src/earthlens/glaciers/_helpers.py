@@ -32,6 +32,7 @@ from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import box
 
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
@@ -120,23 +121,6 @@ def download_zip(
         return zip_path
     _stream_download(url, zip_path, session, retries, backoff, timeout, chunk_size)
     return zip_path
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) when no
-    session is supplied, so an un-shared download stays a fresh connection
-    per call and tests that monkeypatch `requests.get` still drive the
-    transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 def _stream_download(
     url: str,
     dest_path: Path,
@@ -327,10 +311,14 @@ def fetch_glims(
     Raises:
         requests.HTTPError: If the WFS returns a non-2xx status.
     """
+    from earthlens.base.http import HttpClient, RequestsGet
+
     url, params = glims_wfs_url(wfs_url, typename, bbox, max_features)
-    get = session.get if session is not None else requests.get
-    resp = get(url, params=params, timeout=timeout)
-    resp.raise_for_status()
+    # Route the single WFS GET through the shared HttpClient so it gains the
+    # 429/5xx Retry-After/back-off policy; a passed `session` is reused for
+    # connection pooling, else a fresh connection per call.
+    client = HttpClient(session=session if session is not None else RequestsGet())
+    resp = client.get(url, params=params, timeout=timeout)
     dest_path.parent.mkdir(parents=True, exist_ok=True)
     dest_path.write_text(resp.text, encoding="utf-8")
     fc = FeatureCollection.read_file(str(Path(dest_path).resolve()))

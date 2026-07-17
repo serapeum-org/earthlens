@@ -60,6 +60,7 @@ class _FakeResponse:
 
     def __init__(self, content: bytes) -> None:
         self.content = content
+        self.status_code = 200
         self.raised = False
 
     def raise_for_status(self) -> None:
@@ -122,7 +123,7 @@ def fake_requests(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 
     state: dict[str, Any] = {"urls": []}
 
-    def fake_get(url: str, timeout: int | None = None) -> _FakeResponse:
+    def fake_get(url: str, timeout: int | None = None, **kwargs: Any) -> _FakeResponse:
         state["urls"].append(url)
         # The URL carries the variable token twice: once as the lowercase
         # `{var_lc}` path segment and once in the filename. Recover it from

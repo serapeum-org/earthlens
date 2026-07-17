@@ -10,16 +10,18 @@ that's already pyramids-compatible.
 
 from __future__ import annotations
 
-import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
 from loguru import logger
+from pyramids.feature import bbox as _pyramids_bbox
 
-#: Approximate metres per degree of latitude at the equator. Used by
-#: :func:`estimate_pixel_dims` for fast pre-flight pixel-grid sizing;
-#: slightly over-counts longitude pixels away from the equator (which
-#: is the safe direction for a size guard).
+#: Approximate metres per degree of latitude at the equator. Retained as
+#: part of the public surface for callers doing their own rough
+#: degree-to-metre sizing. :func:`estimate_pixel_dims` no longer reads it
+#: — the sizing math now delegates to `pyramids.feature.bbox`, which uses
+#: the polar-maximum 111_694 m for the latitude axis (a slightly larger,
+#: safer over-count for a size guard).
 METRES_PER_DEGREE: float = 111_320.0
 
 
@@ -33,10 +35,19 @@ def estimate_pixel_dims(
     """Estimate the (width, height) in pixels of a WGS84 bbox at `scale_m`.
 
     A rough estimate suitable for pre-flight size guards on raster
-    downloads. Degrees are converted to metres with the equatorial
-    constant :data:`METRES_PER_DEGREE`, so the width is over-counted
-    away from the equator — the safe direction for a guard. For an
-    exact geodesic computation use pyproj's `Geod.inv` instead.
+    downloads. The sizing math is pyramids' — this is a thin
+    edge-argument adapter over `pyramids.feature.bbox.estimate_pixel_dims`,
+    which takes a `(west, south, east, north)` tuple. Both axes are
+    over-counted (longitude with the equatorial constant, latitude with
+    the polar-maximum one), which is the safe direction for a guard. For
+    an exact geodesic computation use pyproj's `Geod.inv` instead.
+
+    The edge guards below stay here rather than deferring to pyramids:
+    pyramids reads `east < west` as an **antimeridian-crossing** bbox and
+    happily returns a globe-spanning width, whereas earthlens's
+    `SpatialExtent` forbids `west > east` outright — so for this package
+    an inverted bbox is a caller bug to surface, not a dateline crossing
+    to honour.
 
     Args:
         west: Western edge of the bbox in degrees longitude.
@@ -57,13 +68,13 @@ def estimate_pixel_dims(
         - A 0.1° × 0.1° box at 90 m is tiny:
             ```python
             >>> estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 90.0)
-            (124, 124)
+            (124, 125)
 
             ```
         - The same box at 10 m is ~9× larger per axis:
             ```python
             >>> estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 10.0)
-            (1114, 1114)
+            (1114, 1117)
 
             ```
     """
@@ -73,23 +84,16 @@ def estimate_pixel_dims(
         raise ValueError(f"east ({east}) < west ({west})")
     if north < south:
         raise ValueError(f"north ({north}) < south ({south})")
-    deg_per_px = scale_m / METRES_PER_DEGREE
-    width_px = math.ceil((east - west) / deg_per_px)
-    height_px = math.ceil((north - south) / deg_per_px)
-    return max(width_px, 1), max(height_px, 1)
+    return _pyramids_bbox.estimate_pixel_dims((west, south, east, north), scale_m)
 
 
-#: Accepted spellings for each edge of a bounding-box mapping, tried in
-#: order. Covers the GeoJSON / pyramids `min_lon` form, the eodag
-#: `lonmin` form, the shapely / geopandas `minx` form, and the compass
-#: `west` form so a caller's bbox dict is read whatever convention they
-#: reach for.
-_BBOX_KEY_ALIASES: dict[str, tuple[str, ...]] = {
-    "min_lon": ("min_lon", "lonmin", "minlon", "minx", "west"),
-    "min_lat": ("min_lat", "latmin", "minlat", "miny", "south"),
-    "max_lon": ("max_lon", "lonmax", "maxlon", "maxx", "east"),
-    "max_lat": ("max_lat", "latmax", "maxlat", "maxy", "north"),
-}
+#: Accepted spellings for each edge of a bounding-box mapping are owned by
+#: `pyramids.feature.bbox.read_bbox_dict` — the GeoJSON / pyramids `min_lon`
+#: form, the eodag `lonmin` form, the shapely / geopandas `minx` form, and
+#: the compass `west` form, so a caller's bbox dict is read whatever
+#: convention they reach for. `tests/base/test_aoi.py` pins the spellings
+#: earthlens's AOI channel promises, so an upstream change to that set fails
+#: here rather than silently narrowing what a caller may pass.
 
 
 def _coords_bounds(coords: Any) -> tuple[float, float, float, float]:
@@ -176,7 +180,8 @@ def _geojson_bounds(obj: Mapping[str, Any]) -> tuple[float, float, float, float]
 def _bbox_dict_bounds(obj: Mapping[str, Any]) -> tuple[float, float, float, float]:
     """Return `(min_lon, min_lat, max_lon, max_lat)` from a bbox mapping.
 
-    Reads the four edges by trying each alias in :data:`_BBOX_KEY_ALIASES`.
+    A thin pass-through to `pyramids.feature.bbox.read_bbox_dict`, which
+    reads each edge by trying every accepted spelling in turn.
 
     Args:
         obj: A mapping with one spelling of each edge (e.g.
@@ -187,19 +192,10 @@ def _bbox_dict_bounds(obj: Mapping[str, Any]) -> tuple[float, float, float, floa
 
     Raises:
         ValueError: If any edge is missing under every accepted spelling.
+            The message names the missing edge by its compass spelling
+            (`'north'`), whichever convention the caller used for the keys.
     """
-    edges: dict[str, float] = {}
-    for canonical, aliases in _BBOX_KEY_ALIASES.items():
-        for alias in aliases:
-            if alias in obj:
-                edges[canonical] = float(obj[alias])
-                break
-        else:
-            raise ValueError(
-                f"aoi bbox mapping is missing {canonical!r} "
-                f"(accepted spellings: {list(aliases)})"
-            )
-    return edges["min_lon"], edges["min_lat"], edges["max_lon"], edges["max_lat"]
+    return _pyramids_bbox.read_bbox_dict(obj)
 
 
 _POLYGONAL_GEOM_TYPES = frozenset({"Polygon", "MultiPolygon"})
