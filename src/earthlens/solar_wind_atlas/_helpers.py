@@ -25,6 +25,7 @@ from urllib.parse import urlsplit
 import requests
 
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: GDAL `/vsicurl` HTTP settings applied (via `setdefault`) before the first
 #: remote read. `GDAL_DISABLE_READDIR_ON_OPEN` stops GDAL listing the "directory"
@@ -205,22 +206,6 @@ def zip_cache_path(url: str, cache_dir: Path) -> Path:
     """
     name = Path(urlsplit(url).path).name or "download.zip"
     return cache_dir / name
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so this
-    single-shot download stays a fresh connection per call and tests that
-    monkeypatch `requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 def download_zip(url: str, cache_dir: Path, *, timeout: float = 600.0) -> Path:
     """Download a ZIP archive into the cache once, reusing it if present.
 

@@ -26,15 +26,14 @@ from __future__ import annotations
 import json
 import re
 import time
-import zipfile
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
 
 import requests
-from loguru import logger
 
-from earthlens.base.http import HttpClient
+from earthlens.base.archive import extract_members
+
+from earthlens.base.http import HttpClient, RequestsGet
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
 
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).
@@ -248,50 +247,11 @@ def download_and_unzip(
 
     zip_path = dest_dir / zip_name
     _download(url, zip_path, session, retries, backoff, timeout, chunk_size)
-    with zipfile.ZipFile(zip_path) as zf:
-        _assert_safe_members(zf, dest_dir)
-        members = sorted(m for m in zf.namelist() if m.lower().endswith(".tif"))
-        if not members:
-            raise ValueError(
-                f"GHSL zip {url} contains no .tif member (found {zf.namelist()})."
-            )
-        if len(members) > 1:
-            logger.warning(
-                f"GHSL zip {url} has multiple .tif members {members}; "
-                f"using the first ({members[0]})."
-            )
-        member = members[0]
-        zf.extract(member, dest_dir)
-    extracted = dest_dir / member
+    (extracted,) = extract_members(zip_path, dest_dir, include=(".tif",), single=True)
     if extracted != tif_path:
         extracted.replace(tif_path)
     zip_path.unlink(missing_ok=True)
     return tif_path
-
-
-def _assert_safe_members(zf: zipfile.ZipFile, dest_dir: Path) -> None:
-    """Reject archive members that would extract outside `dest_dir` (Zip Slip).
-
-    The JRC tree is a trusted source, but extracting attacker-controlled member
-    names (CWE-22) is the standard untrusted-archive pitfall, so every member's
-    resolved destination is checked to stay within `dest_dir` before any
-    extraction runs.
-
-    Args:
-        zf: An open `zipfile.ZipFile`.
-        dest_dir: The directory members will be extracted into.
-
-    Raises:
-        ValueError: If any member resolves outside `dest_dir`.
-    """
-    base = dest_dir.resolve()
-    for name in zf.namelist():
-        target = (dest_dir / name).resolve()
-        if target != base and base not in target.parents:
-            raise ValueError(
-                f"refusing to extract unsafe path {name!r} from the archive "
-                f"(escapes {dest_dir})."
-            )
 
 
 #: Matches a GHSL data-version directory name (`V1-0`, `V2-0`, `V1-1`, …).
@@ -314,9 +274,11 @@ def list_remote_dir(
         list[str]: The `href` entry names (sub-directories keep their trailing
             slash), excluding the parent-directory and column-sort links.
     """
-    get = session.get if session is not None else requests.get
-    resp = get(url if url.endswith("/") else url + "/", timeout=timeout)
-    resp.raise_for_status()
+    # Route the autoindex GET through the shared HttpClient for the 429/5xx
+    # Retry-After/back-off policy; a passed `session` is reused, else a fresh
+    # connection per call.
+    client = HttpClient(session=session if session is not None else RequestsGet())
+    resp = client.get(url if url.endswith("/") else url + "/", timeout=timeout)
     names = []
     for href in _HREF_RE.findall(resp.text):
         if href in ("/", "..", "../") or href.startswith("/"):
@@ -385,28 +347,12 @@ def download_and_extract(
     dest_dir.mkdir(parents=True, exist_ok=True)
     zip_path = dest_dir / url.rsplit("/", 1)[-1]
     _download(url, zip_path, session, retries, backoff, timeout, chunk_size)
-    with zipfile.ZipFile(zip_path) as zf:
-        _assert_safe_members(zf, dest_dir)
-        members = [m for m in zf.namelist() if not m.endswith("/")]
-        zf.extractall(dest_dir)
+    # `include=()` keeps every member — a tabular payload can be a CSV,
+    # GeoPackage or xlsx — and the shared extractor applies the same Zip-Slip
+    # guard while skipping directory entries.
+    extracted = extract_members(zip_path, dest_dir, include=())
     zip_path.unlink(missing_ok=True)
-    return [dest_dir / m for m in members]
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the module-level
-    `requests.get` (rather than a private session) when no session is supplied,
-    so an un-pooled download stays a fresh connection per call and tests that
-    monkeypatch `requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
+    return extracted
 def _download(
     url: str,
     zip_path: Path,
@@ -442,7 +388,7 @@ def _download(
         requests.HTTPError: If every attempt fails (the last error is wrapped).
     """
     client = HttpClient(
-        session=session if session is not None else _RequestsGet(),
+        session=session if session is not None else RequestsGet(),
         status_forcelist=(429, 500, 502, 503, 504),
         retry_on_exceptions=(requests.RequestException, OSError),
         raise_for_status=True,

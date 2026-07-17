@@ -56,6 +56,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    date_windows,
 )
 from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
 
@@ -128,11 +129,9 @@ def enumerate_cycles(
     if bad:
         raise ValueError(f"run hour(s) {bad} are outside [0, 23].")
     out: list[dt.datetime] = []
-    day = start.date()
-    while day <= end.date():
+    for day in date_windows(start.date(), end.date(), "D"):
         for hour in sorted(cycles_utc):
             out.append(dt.datetime(day.year, day.month, day.day, hour))
-        day += dt.timedelta(days=1)
     return out
 
 

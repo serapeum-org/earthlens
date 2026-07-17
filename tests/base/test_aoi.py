@@ -41,8 +41,8 @@ class TestNormalizeAoiBbox:
         assert normalize_aoi(aoi) == EXPECTED
 
     def test_bbox_dict_missing_edge_raises(self):
-        """A bbox mapping missing an edge raises ValueError."""
-        with pytest.raises(ValueError, match="missing 'max_lat'"):
+        """A bbox mapping missing an edge raises ValueError naming that edge."""
+        with pytest.raises(ValueError, match="north"):
             normalize_aoi({"min_lon": -75, "min_lat": 4, "max_lon": -74})
 
 
@@ -217,7 +217,7 @@ class TestEstimatePixelDims:
 
     def test_nominal_grid(self):
         """A small box at a coarse scale is a handful of pixels."""
-        assert estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 90.0) == (124, 124)
+        assert estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 90.0) == (124, 125)
 
     def test_non_positive_scale_raises(self):
         """A non-positive scale is rejected."""

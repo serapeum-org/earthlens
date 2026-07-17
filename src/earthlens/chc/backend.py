@@ -33,6 +33,7 @@ The `variables` constructor argument accepts two shapes:
 
 from __future__ import annotations
 
+import math
 from contextlib import closing
 from ftplib import FTP  # nosec B402  # noqa: S402
 from pathlib import Path
@@ -50,7 +51,8 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
-    mask_to_geometry,
+    crop_to_aoi,
+    date_windows,
     to_datetime,
 )
 from earthlens.chc.catalog import Catalog
@@ -113,6 +115,57 @@ def _reopen_ftp(ftp: FTP) -> FTP:
     """
     _close_ftp_quietly(ftp)
     return _open_ftp()
+
+
+def _snap_bbox_outward(
+    bbox: tuple[float, float, float, float],
+    geo: tuple[float, ...] | list[float],
+) -> list[float]:
+    """Grow a bbox out to the enclosing cell edges of a north-up grid.
+
+    `crop_to_aoi(..., touch=False)` keeps only the cells lying **fully
+    inside** the box, so a request that cuts through a cell loses that whole
+    cell. CHC grids are fine (CHIRPS is 0.05°) and a caller's bbox is almost
+    never cell-aligned, so passing the raw request would shrink every output
+    by up to one cell per edge and stop it covering the extent the API
+    documents. Snapping the box out to the cell boundaries that enclose it
+    first makes the inner crop select exactly the **outer** window — the same
+    superset the hand-rolled `floor`/`ceil` slice used to produce — while the
+    crop itself stays pyramids'.
+
+    The snap is unclamped: a box reaching past the granule is left past it,
+    and `crop` bounds the window to the raster. An already-aligned edge is
+    left untouched (`floor`/`ceil` of a whole number is itself).
+
+    Args:
+        bbox: The requested `(west, south, east, north)` in the grid's CRS.
+        geo: The granule's GDAL geotransform. Only a north-up, axis-aligned
+            transform is supported — `geo[2]` / `geo[4]` (rotation) are
+            assumed zero, which every CHC product satisfies.
+
+    Returns:
+        list[float]: `[west, south, east, north]`, each moved outward to the
+            enclosing cell edge.
+
+    Examples:
+        - A misaligned box grows to the enclosing cells; an aligned one does not:
+            ```python
+            >>> geo = (-180.0, 1.0, 0.0, 50.0, 0.0, -1.0)
+            >>> _snap_bbox_outward((0.5, 0.5, 9.5, 9.5), geo)
+            [0.0, 0.0, 10.0, 10.0]
+            >>> _snap_bbox_outward((0.0, 0.0, 10.0, 10.0), geo)
+            [0.0, 0.0, 10.0, 10.0]
+
+            ```
+    """
+    west, south, east, north = (float(v) for v in bbox)
+    origin_x, pix_x, origin_y = float(geo[0]), float(geo[1]), float(geo[3])
+    pix_y = -float(geo[5])
+    snapped_west = origin_x + math.floor((west - origin_x) / pix_x) * pix_x
+    snapped_east = origin_x + math.ceil((east - origin_x) / pix_x) * pix_x
+    snapped_north = origin_y - math.floor((origin_y - north) / pix_y) * pix_y
+    snapped_south = origin_y - math.ceil((origin_y - south) / pix_y) * pix_y
+    return [snapped_west, snapped_south, snapped_east, snapped_north]
 
 
 def _reject_unsigned_for_nodata_sentinel(dtype: np.dtype) -> None:
@@ -502,7 +555,7 @@ class CHIRPS(AbstractDataSource):
             )
             return []
 
-        dates = pd.date_range(window_start, window_end, freq=dataset.pandas_freq)
+        dates = date_windows(window_start, window_end, dataset.pandas_freq)
         # M1: catch per-date failures so a single transient (TCP reset,
         # FTP 550, a one-off bad raster) doesn't abort the rest of the
         # batch for this `(ds, var)`. The outer `download()` loop kept
@@ -633,22 +686,7 @@ class CHIRPS(AbstractDataSource):
         :meth:`_post_process` behaviour.
         """
         raster = Dataset.read_file(str(path))
-        data = raster.read_array()
-        _reject_unsigned_for_nodata_sentinel(data.dtype)
-        clipped, new_geo = self._clip_to_bbox(data, raster.geotransform)
-        nodata_sentinel: float = -9999.0
-        clipped = np.where(clipped < 0, nodata_sentinel, clipped).astype(
-            data.dtype, copy=False
-        )
-        new_raster = Dataset.create_from_array(
-            clipped,
-            geo=new_geo,
-            epsg=raster.epsg,
-            no_data_value=nodata_sentinel,
-        )
-        # A polygon aoi= masks the bbox-clipped raster to the exact shape.
-        new_raster = mask_to_geometry(new_raster, self.space)
-        new_raster.to_file(str(path))
+        self._clip_and_normalise(raster).to_file(str(path))
 
     def _api(
         self,
@@ -833,29 +871,8 @@ class CHIRPS(AbstractDataSource):
             local_path = extracted
 
         raster = Dataset.read_file(str(local_path))
-        data = raster.read_array()
-        _reject_unsigned_for_nodata_sentinel(data.dtype)
-        clipped, new_geo = self._clip_to_bbox(data, raster.geotransform)
-
-        # CHIRPS encodes "missing" with -9999; some rasters do not
-        # declare a no-data value at all (`raster.no_data_value[0]`
-        # is `None`). Normalise: every negative pixel becomes -9999,
-        # and the output band carries -9999 as its declared no-data.
-        nodata_sentinel: float = -9999.0
-        clipped = np.where(clipped < 0, nodata_sentinel, clipped).astype(
-            data.dtype, copy=False
-        )
-
         out_path = self.root_dir / self._output_filename(ds_key, dataset, var, date)
-        new_raster = Dataset.create_from_array(
-            clipped,
-            geo=new_geo,
-            epsg=raster.epsg,
-            no_data_value=nodata_sentinel,
-        )
-        # A polygon aoi= masks the bbox-clipped raster to the exact shape.
-        new_raster = mask_to_geometry(new_raster, self.space)
-        new_raster.to_file(str(out_path))
+        self._clip_and_normalise(raster).to_file(str(out_path))
 
         try:
             local_path.unlink(missing_ok=True)
@@ -866,28 +883,100 @@ class CHIRPS(AbstractDataSource):
             )
         return out_path
 
-    def _clip_to_bbox(
+    def _clip_and_normalise(self, raster: Dataset) -> Dataset:
+        """Normalise CHC negatives to the -9999 no-data sentinel and clip to the AOI.
+
+        CHIRPS encodes "missing" as a negative value, and some rasters declare
+        no no-data value at all. Every negative pixel becomes -9999 and the
+        output band declares -9999 as its no-data value; the raster is then
+        clipped to the request bbox — or masked to the exact polygon when the
+        `aoi=` carried one — through the shared `crop_to_aoi`, rather than a
+        hand-rolled NumPy window slice. Normalising the whole granule before
+        the crop lets the polygon mask flag out-of-shape cells with the
+        now-declared -9999 no-data.
+
+        The bbox is snapped **outward** to the granule's cell edges first (see
+        :func:`_snap_bbox_outward`), because `crop_to_aoi(touch=False)` keeps
+        only cells lying fully inside the box. Passing the raw request would
+        drop every partially-covered edge cell, so a CHIRPS output would span
+        *less* than the extent the caller asked for. Snapping first makes the
+        crop reproduce the outer, superset window the hand-rolled slice
+        produced, while the crop itself stays pyramids'.
+
+        Args:
+            raster: The freshly read source `Dataset` (the whole granule).
+
+        Returns:
+            A new `Dataset` clipped (or polygon-masked) to the AOI, carrying
+            -9999 as its no-data value. The bbox path is a superset of the
+            request: partially-covered edge cells are kept.
+        """
+        data = raster.read_array()
+        _reject_unsigned_for_nodata_sentinel(data.dtype)
+        self._check_bbox_overlaps(data, raster.geotransform)
+        nodata_sentinel: float = -9999.0
+        request_bbox = [
+            self.space.west,
+            self.space.south,
+            self.space.east,
+            self.space.north,
+        ]
+        if getattr(self.space, "geometry", None) is not None:
+            # Polygon path only: the mask flags out-of-shape cells with the
+            # band's declared no-data, so -9999 has to be in place *before*
+            # the crop. That costs a whole-granule normalise + rebuild.
+            # `crop_to_aoi` masks to the geometry and ignores `bbox=` here, so
+            # the request bbox is passed unsnapped (the snap is bbox-path-only).
+            data = np.where(data < 0, nodata_sentinel, data).astype(
+                data.dtype, copy=False
+            )
+            full = Dataset.create_from_array(
+                data,
+                geo=raster.geotransform,
+                epsg=raster.epsg,
+                no_data_value=nodata_sentinel,
+            )
+            return crop_to_aoi(full, self.space, bbox=request_bbox, touch=False)
+        # Bbox path: crop first, normalise the window. A global CHIRPS daily
+        # granule is ~7200x2000 and the request is usually a few hundred cells,
+        # so normalising before the crop would allocate the whole granule twice
+        # (the np.where copy and the rebuilt Dataset) per date, for nothing —
+        # no mask is involved, so nothing depends on the sentinel being
+        # declared up front. Snap the bbox out to the granule's cell edges so
+        # `touch=False` keeps every partially-covered edge cell (see H1).
+        bbox = _snap_bbox_outward(tuple(request_bbox), raster.geotransform)
+        cropped = crop_to_aoi(raster, self.space, bbox=bbox, touch=False)
+        window = cropped.read_array()
+        window = np.where(window < 0, nodata_sentinel, window).astype(
+            window.dtype, copy=False
+        )
+        return Dataset.create_from_array(
+            window,
+            geo=cropped.geotransform,
+            epsg=cropped.epsg,
+            no_data_value=nodata_sentinel,
+        )
+
+    def _check_bbox_overlaps(
         self,
         data: np.ndarray,
         geo: tuple[float, ...] | list[float],
-    ) -> tuple[np.ndarray, list[float]]:
-        """Clip a raster array to `self.space` using its own geo-affine.
+    ) -> None:
+        """Raise a helpful error when the request bbox misses the raster (M2).
 
-        Works for any pixel size and any extent — no hardcoded 0.05°
-        or ±50° assumption. The returned geo-affine is updated so the
-        output GeoTIFF has the correct origin.
+        Cropping a non-overlapping bbox would otherwise yield an empty raster
+        and write a 0-cell GeoTIFF. This pre-check names the user bbox and the
+        raster's geographic extent so a swapped lat/lon, off-globe coordinate,
+        or region mismatch is easy to spot. Per-date `_download_dataset`
+        failures are caught and logged (M1), so a single miss never aborts a
+        full batch.
+
+        Args:
+            data: The raster array; only its last two dims (rows, cols) are read.
+            geo: The GDAL 6-tuple geotransform of `data`.
 
         Raises:
-            ValueError: If the requested bbox does not overlap the
-                raster — without the check, the slice math would
-                collapse to a `(0, 0)`-shape array and the caller
-                would write an empty GeoTIFF. The error message
-                names the user's bbox and the raster's geographic
-                extent so the typo (swapped lat/lon, off-globe
-                coords, dataset region mismatch) is easy to spot.
-                Per-date `_download_dataset` failures are now caught
-                and logged per the M1 fix, so this never aborts a
-                full batch.
+            ValueError: When the request bbox does not overlap the raster.
         """
         origin_x = float(geo[0])
         pix_x = float(geo[1])
@@ -897,15 +986,10 @@ class CHIRPS(AbstractDataSource):
         rows, cols = data.shape[-2:]
         raster_east = origin_x + cols * pix_x
         raster_south = origin_y - rows * pix_y
-        col_left_raw = int(np.floor((self.space.west - origin_x) / pix_x))
-        col_right_raw = int(np.ceil((self.space.east - origin_x) / pix_x))
-        row_top_raw = int(np.floor((origin_y - self.space.north) / pix_y))
-        row_bot_raw = int(np.ceil((origin_y - self.space.south) / pix_y))
-
-        col_left = max(0, col_left_raw)
-        col_right = min(cols, col_right_raw)
-        row_top = max(0, row_top_raw)
-        row_bot = min(rows, row_bot_raw)
+        col_left = max(0, int(np.floor((self.space.west - origin_x) / pix_x)))
+        col_right = min(cols, int(np.ceil((self.space.east - origin_x) / pix_x)))
+        row_top = max(0, int(np.floor((origin_y - self.space.north) / pix_y)))
+        row_bot = min(rows, int(np.ceil((origin_y - self.space.south) / pix_y)))
 
         if col_right <= col_left or row_bot <= row_top:
             raise ValueError(
@@ -917,12 +1001,6 @@ class CHIRPS(AbstractDataSource):
                 "for swapped lat/lon, off-globe coordinates, or a "
                 "dataset whose region doesn't cover the bbox."
             )
-
-        clipped = data[..., row_top:row_bot, col_left:col_right]
-        new_origin_x = origin_x + col_left * pix_x
-        new_origin_y = origin_y - row_top * pix_y
-        new_geo = [new_origin_x, pix_x, 0.0, new_origin_y, 0.0, -pix_y]
-        return clipped, new_geo
 
     @staticmethod
     def _output_filename(

@@ -42,7 +42,7 @@ from pydantic import SecretStr
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
 
-from earthlens.base import OutputKind
+from earthlens.base import OutputKind, date_windows
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
@@ -318,7 +318,7 @@ class JAXA(AbstractDataSource):
         start_dt = dt.datetime.strptime(start, fmt)
         end_dt = dt.datetime.strptime(end, fmt)
         freq_alias = _FREQ_ALIAS.get(temporal_resolution, "MS")
-        dates = pd.date_range(start_dt, end_dt, freq=freq_alias)
+        dates = date_windows(start_dt, end_dt, freq_alias)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

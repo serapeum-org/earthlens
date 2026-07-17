@@ -50,6 +50,9 @@ class _StreamResp:
 class _TextResp:
     """A non-streaming response stand-in over a text payload."""
 
+    status_code = 200
+    headers: dict[str, str] = {}
+
     def __init__(self, text: str) -> None:
         self.text = text
 

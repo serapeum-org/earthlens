@@ -25,6 +25,7 @@ import requests
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: geoBoundaries gbOpen API base — `"{base}/{ISO3}/{ADM}/"` returns the metadata
 #: whose `gjDownloadURL` is the GeoJSON to read (`geoboundaries_resolve`).
@@ -38,22 +39,6 @@ NE_BASE = "https://naciscdn.org/naturalearth"
 
 #: US Census TIGER base — the GENZ cartographic-boundary (`cb_`) shapefile tree.
 TIGER_BASE = "https://www2.census.gov/geo/tiger"
-
-
-class _RequestsGet:
-    """Session-like GET adapter routing through the module `requests.get`.
-
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the
-    module-level `requests.get` (rather than a private session) so this
-    single-shot metadata call stays a fresh connection per call and tests
-    that monkeypatch `requests.get` still drive the transport.
-    """
-
-    def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
-
-
 def vsicurl(url: str) -> str:
     """Wrap an HTTP(S) URL in GDAL's `/vsicurl/` virtual-filesystem prefix.
 
