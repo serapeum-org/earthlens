@@ -20065,7 +20065,10 @@ advances past frame 0 (see the code comment below).</p>
 <span class="c1"># track (Ida spins up in the Caribbean, Milton in the south-western Gulf). `crop`</span>
 <span class="c1"># trims cleopatra's figure margins down to a tight border on the saved MP4 --</span>
 <span class="c1"># measured per storm (200 dpi) since Milton's bbox is a very different aspect</span>
-<span class="c1"># ratio from Ida's, so their tick-label margins don't crop identically.</span>
+<span class="c1"># ratio from Ida's, so their tick-label margins don't crop identically. The</span>
+<span class="c1"># assertion below re-derives the rendered frame size from the live figure each</span>
+<span class="c1"># run and fails loudly if it no longer matches what `crop` was measured against,</span>
+<span class="c1"># instead of silently clipping content or leaving a mismatched border.</span>
 <span class="n">STORMS</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Ida"</span><span class="p">,</span> <span class="s2">"satellite"</span><span class="p">:</span> <span class="s2">"16"</span><span class="p">,</span>
@@ -20080,6 +20083,7 @@ advances past frame 0 (see the code comment below).</p>
         <span class="s2">"crop"</span><span class="p">:</span> <span class="s2">"crop=1794:1124:203:184"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">]</span>
+<span class="n">DPI</span> <span class="o">=</span> <span class="mi">200</span>
 
 <span class="n">videos</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">storm</span> <span class="ow">in</span> <span class="n">STORMS</span><span class="p">:</span>
@@ -20149,6 +20153,19 @@ advances past frame 0 (see the code comment below).</p>
     <span class="c1"># down to a thin, LinkedIn-tight border on all four sides.</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.121</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.879</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.92</span><span class="p">)</span>
 
+    <span class="c1"># `crop` was hand-measured against a specific rendered frame size; fail loudly</span>
+    <span class="c1"># here if the figure pipeline (dpi, figsize formula, tight_layout, style) has</span>
+    <span class="c1"># drifted since, rather than letting ffmpeg silently clip real content or</span>
+    <span class="c1"># leave a mismatched border with nothing to catch it (M1).</span>
+    <span class="n">frame_w</span><span class="p">,</span> <span class="n">frame_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span> <span class="o">*</span> <span class="n">DPI</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">crop_w</span><span class="p">,</span> <span class="n">crop_h</span><span class="p">,</span> <span class="n">crop_x</span><span class="p">,</span> <span class="n">crop_y</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">storm</span><span class="p">[</span><span class="s2">"crop"</span><span class="p">]</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"crop="</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">":"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">crop_x</span> <span class="o">+</span> <span class="n">crop_w</span> <span class="o">&lt;=</span> <span class="n">frame_w</span> <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">+</span> <span class="n">crop_h</span> <span class="o">&lt;=</span> <span class="n">frame_h</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">storm</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">: crop rectangle </span><span class="si">{</span><span class="n">crop_w</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">crop_h</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">crop_x</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">crop_y</span><span class="si">}</span><span class="s2"> no longer fits the "</span>
+        <span class="sa">f</span><span class="s2">"rendered frame </span><span class="si">{</span><span class="n">frame_w</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">frame_h</span><span class="si">}</span><span class="s2"> -- re-measure 'crop' for the current figure pipeline."</span>
+    <span class="p">)</span>
+
     <span class="c1"># Write a crisp, LinkedIn-ready MP4: 200 dpi (roughly 2200 px wide) for a</span>
     <span class="c1"># sharp look on large feeds, crf=20 (visually near-lossless, still a small</span>
     <span class="c1"># file), preset="slow" trades a bit of encode time for better compression at</span>
@@ -20157,7 +20174,7 @@ advances past frame 0 (see the code comment below).</p>
     <span class="c1"># a wide grey mat.</span>
     <span class="n">mp4_path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">storm</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.mp4"</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
-        <span class="nb">str</span><span class="p">(</span><span class="n">mp4_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">crf</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">preset</span><span class="o">=</span><span class="s2">"slow"</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">mp4_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">DPI</span><span class="p">,</span> <span class="n">crf</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">preset</span><span class="o">=</span><span class="s2">"slow"</span><span class="p">,</span>
         <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="n">storm</span><span class="p">[</span><span class="s2">"crop"</span><span class="p">]],</span>
     <span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
@@ -20171,7 +20188,10 @@ advances past frame 0 (see the code comment below).</p>
 # track (Ida spins up in the Caribbean, Milton in the south-western Gulf). `crop`
 # trims cleopatra's figure margins down to a tight border on the saved MP4 --
 # measured per storm (200 dpi) since Milton's bbox is a very different aspect
-# ratio from Ida's, so their tick-label margins don't crop identically.
+# ratio from Ida's, so their tick-label margins don't crop identically. The
+# assertion below re-derives the rendered frame size from the live figure each
+# run and fails loudly if it no longer matches what `crop` was measured against,
+# instead of silently clipping content or leaving a mismatched border.
 STORMS = [
     {
         "name": "Ida", "satellite": "16",
@@ -20186,6 +20206,7 @@ STORMS = [
         "crop": "crop=1794:1124:203:184",
     },
 ]
+DPI = 200
 
 videos = {}
 for storm in STORMS:
@@ -20255,6 +20276,19 @@ for storm in STORMS:
     # down to a thin, LinkedIn-tight border on all four sides.
     glyph.fig.subplots_adjust(left=0.121, right=0.879, bottom=0.05, top=0.92)
 
+    # `crop` was hand-measured against a specific rendered frame size; fail loudly
+    # here if the figure pipeline (dpi, figsize formula, tight_layout, style) has
+    # drifted since, rather than letting ffmpeg silently clip real content or
+    # leave a mismatched border with nothing to catch it (M1).
+    frame_w, frame_h = (glyph.fig.get_size_inches() * DPI).round().astype(int)
+    crop_w, crop_h, crop_x, crop_y = (
+        int(v) for v in storm["crop"].removeprefix("crop=").split(":")
+    )
+    assert crop_x + crop_w &lt;= frame_w and crop_y + crop_h &lt;= frame_h, (
+        f"{storm['name']}: crop rectangle {crop_w}x{crop_h}+{crop_x}+{crop_y} no longer fits the "
+        f"rendered frame {frame_w}x{frame_h} -- re-measure 'crop' for the current figure pipeline."
+    )
+
     # Write a crisp, LinkedIn-ready MP4: 200 dpi (roughly 2200 px wide) for a
     # sharp look on large feeds, crf=20 (visually near-lossless, still a small
     # file), preset="slow" trades a bit of encode time for better compression at
@@ -20263,7 +20297,7 @@ for storm in STORMS:
     # a wide grey mat.
     mp4_path = out_dir / f"{storm['name'].lower()}.mp4"
     glyph.save_animation(
-        str(mp4_path), fps=2, dpi=200, crf=20, preset="slow",
+        str(mp4_path), fps=2, dpi=DPI, crf=20, preset="slow",
         extra_args=["-vf", storm["crop"]],
     )
     plt.close("all")
