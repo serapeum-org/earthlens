@@ -45,16 +45,24 @@ def _assert_safe_members(names: list[str], dest_dir: Path) -> None:
 
 
 def _matches(name: str, include: tuple[str, ...]) -> bool:
-    """Whether a member name ends with one of the `include` suffixes.
+    """Whether a member name is a file matching one of the `include` suffixes.
+
+    Directory entries never match. An archive may carry explicit directory
+    members (a trailing `/`), and with the default `include=()` — which keeps
+    every *file* — those would otherwise be returned as extracted paths and,
+    under `fix_mode`, get `chmod`ed as if they were files.
 
     Args:
         name: The archive member name.
-        include: Suffixes to keep; an empty tuple keeps every member.
+        include: Suffixes to keep; an empty tuple keeps every file.
 
     Returns:
-        bool: `True` when `include` is empty or `name` ends with one of it,
-            compared case-insensitively.
+        bool: `True` when `name` is not a directory entry and either `include`
+            is empty or `name` ends with one of its suffixes, compared
+            case-insensitively.
     """
+    if name.endswith("/"):
+        return False
     return not include or name.lower().endswith(include)
 
 
