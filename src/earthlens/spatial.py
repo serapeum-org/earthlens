@@ -177,6 +177,14 @@ def count_cells_polygon(
         `(no_cells, projected_gdf)` — the cell count and the
         UTM-projected `GeoDataFrame`.
 
+    Raises:
+        ValueError: If `poly_gdf` is empty, or if its bounds span more than
+            180° of longitude — UTM is undefined at that width, so the zone
+            of the bbox centroid would be meaningless.
+        CRSError: If `poly_gdf` carries no CRS. Set one first
+            (`gdf.set_crs("EPSG:4326")`) — an unlabelled frame cannot be
+            projected.
+
     Examples:
         - Small WGS84 polygon at 30 m:
             ```python
