@@ -580,27 +580,45 @@ class Drought(AbstractDataSource):
                 self.root_dir
                 / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
             )
+            # Write to a sibling temp first and rename only on success, so a
+            # failed write (full disk, GDAL error mid-write) never leaves a
+            # truncated GeoTIFF that a later run would read as valid. `.part`
+            # goes *before* the suffix — GDAL picks its driver from the
+            # extension, so a trailing `.part` is an unknown format.
+            tmp_path = out_path.with_name(f"{out_path.stem}.part{out_path.suffix}")
             dataset = self._fetch_wcs_coverage(period, bbox)
-            # The Copernicus EDO/GDO MapServer honours the `Lat` subset but
-            # silently ignores `Long`, returning a full -180..180 strip
-            # (re-verified live 2026-07-17: a Long(-10,5) request still comes
-            # back spanning -25..51), and tags the GeoTIFF with no embedded SRS
-            # — so `Dataset.crop`'s cutline path is a no-op. Window-crop to the
-            # requested bbox by hand so the output honours the documented
-            # extent, mirroring the USDM (`gdf.cx`) and SPEIbase
-            # (`NetCDF.subset`) transports.
-            clipped = self._clip_wcs_raster(dataset, bbox)
-            if clipped is not None:
-                clipped.to_file(str(out_path))
-                clipped.close()
-            else:
-                logger.warning(
-                    f"{self._dataset.id}: requested bbox {bbox} fell entirely "
-                    f"outside the downloaded raster's coverage; leaving "
-                    f"{out_path} unclipped (full server-returned extent)."
-                )
-                dataset.to_file(str(out_path))
-            dataset.close()
+            clipped = None
+            try:
+                # The Copernicus EDO/GDO MapServer honours the `Lat` subset but
+                # silently ignores `Long`, returning a full -180..180 strip
+                # (re-verified live 2026-07-17: a Long(-10,5) request still
+                # comes back spanning -25..51), and tags the GeoTIFF with no
+                # embedded SRS — so `Dataset.crop`'s cutline path is a no-op.
+                # Window-crop to the requested bbox by hand so the output
+                # honours the documented extent, mirroring the USDM (`gdf.cx`)
+                # and SPEIbase (`NetCDF.subset`) transports.
+                clipped = self._clip_wcs_raster(dataset, bbox)
+                if clipped is None:
+                    logger.warning(
+                        f"{self._dataset.id}: requested bbox {bbox} fell "
+                        f"entirely outside the downloaded raster's coverage; "
+                        f"writing {out_path} unclipped (full server-returned "
+                        f"extent)."
+                    )
+                (dataset if clipped is None else clipped).to_file(str(tmp_path))
+            except BaseException:
+                tmp_path.unlink(missing_ok=True)
+                raise
+            finally:
+                # Close on every path: `crop` / `to_file` can raise, and
+                # without this the GDAL handles leak for the rest of the batch.
+                if clipped is not None:
+                    clipped.close()
+                dataset.close()
+            # Only now: GDAL keeps the written file open until its source
+            # Dataset is closed, and Windows refuses to rename a file that is
+            # still held open — so the promotion must follow the `finally`.
+            tmp_path.replace(out_path)
             written.append(out_path)
         return written
 
