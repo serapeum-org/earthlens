@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from earthlens.base import SpatialExtent
@@ -41,9 +43,27 @@ class TestEstimatePixelDims:
         with pytest.raises(ValueError, match="north"):
             estimate_pixel_dims(0.0, 2.0, 1.0, 1.0, 30.0)
 
-    def test_metres_per_degree_constant(self):
+
+class TestMetresPerDegree:
+    """The exported constant, which no longer backs `estimate_pixel_dims`."""
+
+    def test_matches_the_equatorial_approximation(self):
         """The exported constant matches the equatorial WGS84 approximation."""
         assert METRES_PER_DEGREE == pytest.approx(111_320.0)
+
+    def test_does_not_predict_estimate_pixel_dims_height(self):
+        """The constant no longer describes the height the sizing returns.
+
+        `estimate_pixel_dims` delegates to pyramids, which sizes the latitude
+        axis with the polar-maximum 111_694 m/deg. Pinning this keeps the
+        constant from being read as the function's basis: a caller predicting
+        the height from it would be wrong, and would then over-trust a
+        pre-flight size guard.
+        """
+        _, height = estimate_pixel_dims(31.0, 30.0, 31.1, 30.1, 90.0)
+        predicted = math.ceil(0.1 / (90.0 / METRES_PER_DEGREE))
+        assert height != predicted
+        assert height > predicted  # pyramids over-counts: the safe direction
 
 
 class TestSpatialExtentMethod:
