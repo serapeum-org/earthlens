@@ -166,17 +166,19 @@ osm = ["overpy >=0.7", "ohsome >=0.4.0"]
 # 0.11.0 / osmium 4.3.1 verified on cp314). NOTE the pyosmium distribution is
 # published on PyPI as `osmium` (not `pyosmium`), imported as `import osmium`.
 #
-# Deliberately NOT in `all` (`G15`): heavy, and pyrosm's `cykhash` dependency
-# is an sdist that must compile from source (no wheel), so adding it to the
-# locked `all` env would burden every dev/test/CI solve. Same policy as [osm]
-# and [argo]. The non-e2e pbf tests fake both SDKs (monkeypatched reader +
-# HttpClient), so they run in the `all` env without pyrosm/pyosmium installed;
-# the gated live e2e needs `pip install earthlens[osm-pbf]`.
+# Included in `all` (unlike [osm] and [argo]): pyrosm/osmium have NO version
+# conflict with the locked `all` env — verified they install and run alongside
+# pandas 3.x / numpy 2.x / geopandas 1.x. ([osm] can't join `all` because ohsome
+# pins pandas<3; [argo] can't because argopy and openeo pin incompatible xarray
+# ranges — those are hard, unsatisfiable conflicts; this is not.) The only cost
+# is that pyrosm's `cykhash` dependency is sdist-only and compiles from source
+# in the solve; that build cost is accepted so the full suite runs against the
+# real SDKs.
 osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
 # Self-referential: the union of every backend extra, without re-listing deps.
-# (argo, osm and osm-pbf are intentionally excluded — see the notes above.)
+# (argo and osm are intentionally excluded — hard version conflicts, see above.)
 all = [
-    "earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,cmip6,fdsn,earthdata,asf,hdx,eea_aq,eumetsat,nwp,nwm,radar,dem,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap]",
+    "earthlens[s3,ecmwf,ecmwf-modern,gee,cmems,cmip6,fdsn,earthdata,asf,hdx,eea_aq,eumetsat,nwp,nwm,radar,dem,goes,stac,openeo,sentinel-hub,tropycal,overture,usgs-water,ghsl,worldpop,gbif,obis,jaxa,erddap,osm-pbf]",
 ]
 
 [dependency-groups]
