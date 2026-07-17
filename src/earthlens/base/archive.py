@@ -133,7 +133,15 @@ def extract_members(
     # A member name can carry sub-directories, and py7zr may nest, so resolve
     # every extracted member from its own name rather than an rglob sweep (which
     # would also pick up files that were already in `dest_dir`).
-    extracted = sorted((dest_dir / member) for member in members)
+    #
+    # Filter to real files on disk: `_matches` rejects directory entries by
+    # their trailing `/`, but py7zr's `getnames()` can list a directory member
+    # *without* one, so a name-only check can't catch it. Testing the extracted
+    # path is authoritative for both formats and keeps a directory out of the
+    # returned list (and away from the `fix_mode` chmod).
+    extracted = sorted(
+        path for member in members if (path := dest_dir / member).is_file()
+    )
     if fix_mode:
         for path in extracted:
             path.chmod(path.stat().st_mode | stat.S_IRUSR | stat.S_IWUSR)
