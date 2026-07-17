@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20644,28 +20644,35 @@ downloaded above, animate the whole window with the genuine ECMWF colour scale, 
 <span class="c1"># shades each) with the gradient packed into the middle third. Auto-ranging tightly to</span>
 <span class="c1"># this window's own ~6-36 degC span pushes most of the heat dome into that flat magenta</span>
 <span class="c1"># cap, reading as overexposed. Widen the range so the actual data spread lands in the</span>
-<span class="c1"># gradient band instead of the saturated ends.</span>
+<span class="c1"># gradient band instead of the saturated ends. DATA_STYLES is cleopatra's shared,</span>
+<span class="c1"># module-level preset table -- restore the injected keys in `finally` so this cell</span>
+<span class="c1"># doesn't leak a mutated "2t" style into any other cell/notebook reusing it in the</span>
+<span class="c1"># same interpreter session.</span>
 <span class="n">DATA_STYLES</span><span class="p">[</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"vmin"</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">10.0</span>
 <span class="n">DATA_STYLES</span><span class="p">[</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"vmax"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">50.0</span>
 
-<span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">celsius_paths</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"2t"</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">7.6</span><span class="p">))</span>
-<span class="n">apply_blank_canvas</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>  <span class="c1"># the ECMWF/CAMS dark-animation look</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">celsius_paths</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"2t"</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">7.6</span><span class="p">))</span>
+    <span class="n">apply_blank_canvas</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>  <span class="c1"># the ECMWF/CAMS dark-animation look</span>
 
-<span class="n">west</span><span class="p">,</span> <span class="n">east</span> <span class="o">=</span> <span class="n">EUROPE</span><span class="p">[</span><span class="s2">"lon_lim"</span><span class="p">]</span>
-<span class="n">south</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">EUROPE</span><span class="p">[</span><span class="s2">"lat_lim"</span><span class="p">]</span>
-<span class="c1"># frame_label's location is set in the SAME degree coordinates add_reference_map's extent</span>
-<span class="c1"># uses below -- ax.transData is live, so the label lands correctly once that extent is</span>
-<span class="c1"># applied below, with no transform/clip_on/subplots_adjust juggling.</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
-    <span class="n">labels</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"2t"</span><span class="p">,</span>
-    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">north</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">),</span> <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">add_reference_map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"ecmwf-dark"</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">])</span>
+    <span class="n">west</span><span class="p">,</span> <span class="n">east</span> <span class="o">=</span> <span class="n">EUROPE</span><span class="p">[</span><span class="s2">"lon_lim"</span><span class="p">]</span>
+    <span class="n">south</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">EUROPE</span><span class="p">[</span><span class="s2">"lat_lim"</span><span class="p">]</span>
+    <span class="c1"># frame_label's location is set in the SAME degree coordinates add_reference_map's extent</span>
+    <span class="c1"># uses below -- ax.transData is live, so the label lands correctly once that extent is</span>
+    <span class="c1"># applied below, with no transform/clip_on/subplots_adjust juggling.</span>
+    <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
+        <span class="n">labels</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"2t"</span><span class="p">,</span>
+        <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">north</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">),</span> <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">glyph</span><span class="o">.</span><span class="n">add_reference_map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"ecmwf-dark"</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">])</span>
 
-<span class="n">dome_mp4</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heat_dome_2t.mp4"</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dome_mp4</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">crf</span><span class="o">=</span><span class="mi">26</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
+    <span class="n">dome_mp4</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heat_dome_2t.mp4"</span>
+    <span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dome_mp4</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">crf</span><span class="o">=</span><span class="mi">26</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="k">del</span> <span class="n">DATA_STYLES</span><span class="p">[</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"vmin"</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">DATA_STYLES</span><span class="p">[</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"vmax"</span><span class="p">]</span>
 
 <span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">dome_mp4</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
 <span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s1">'&lt;video src="data:video/mp4;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">" width="700" autoplay loop muted playsinline controls&gt;&lt;/video&gt;'</span><span class="p">)</span>
@@ -20686,28 +20693,35 @@ labels = [pd.to_datetime(p.stem.split("_")[-1]).strftime("%b %d") for p in sorte
 # shades each) with the gradient packed into the middle third. Auto-ranging tightly to
 # this window's own ~6-36 degC span pushes most of the heat dome into that flat magenta
 # cap, reading as overexposed. Widen the range so the actual data spread lands in the
-# gradient band instead of the saturated ends.
+# gradient band instead of the saturated ends. DATA_STYLES is cleopatra's shared,
+# module-level preset table -- restore the injected keys in `finally` so this cell
+# doesn't leak a mutated "2t" style into any other cell/notebook reusing it in the
+# same interpreter session.
 DATA_STYLES["2t"]["2t"]["vmin"] = -10.0
 DATA_STYLES["2t"]["2t"]["vmax"] = 50.0
 
-cube = DatasetCollection.read_multiple_files(celsius_paths, date=False)
-glyph = cube.plot(style="2t", figsize=(8, 7.6))
-apply_blank_canvas(glyph.ax, facecolor="black")  # the ECMWF/CAMS dark-animation look
+try:
+    cube = DatasetCollection.read_multiple_files(celsius_paths, date=False)
+    glyph = cube.plot(style="2t", figsize=(8, 7.6))
+    apply_blank_canvas(glyph.ax, facecolor="black")  # the ECMWF/CAMS dark-animation look
 
-west, east = EUROPE["lon_lim"]
-south, north = EUROPE["lat_lim"]
-# frame_label's location is set in the SAME degree coordinates add_reference_map's extent
-# uses below -- ax.transData is live, so the label lands correctly once that extent is
-# applied below, with no transform/clip_on/subplots_adjust juggling.
-glyph.animate(
-    labels, interval=400, style="2t",
-    frame_label=FrameLabel(location=[west, north + 2], color="white"), cbar_label_size=16,
-)
-glyph.add_reference_map(style="ecmwf-dark", extent=[west, south, east, north])
+    west, east = EUROPE["lon_lim"]
+    south, north = EUROPE["lat_lim"]
+    # frame_label's location is set in the SAME degree coordinates add_reference_map's extent
+    # uses below -- ax.transData is live, so the label lands correctly once that extent is
+    # applied below, with no transform/clip_on/subplots_adjust juggling.
+    glyph.animate(
+        labels, interval=400, style="2t",
+        frame_label=FrameLabel(location=[west, north + 2], color="white"), cbar_label_size=16,
+    )
+    glyph.add_reference_map(style="ecmwf-dark", extent=[west, south, east, north])
 
-dome_mp4 = OUT / "heat_dome_2t.mp4"
-glyph.save_animation(str(dome_mp4), fps=2, crf=26)
-plt.close("all")
+    dome_mp4 = OUT / "heat_dome_2t.mp4"
+    glyph.save_animation(str(dome_mp4), fps=2, crf=26)
+    plt.close("all")
+finally:
+    del DATA_STYLES["2t"]["2t"]["vmin"]
+    del DATA_STYLES["2t"]["2t"]["vmax"]
 
 encoded = base64.b64encode(dome_mp4.read_bytes()).decode()
 HTML(f'&lt;video src="data:video/mp4;base64,{encoded}" width="700" autoplay loop muted playsinline controls&gt;&lt;/video&gt;')
