@@ -189,8 +189,6 @@ def window_labels(times: Any, freq: str, *, fmt: str = "%Y%m%d") -> list[str]:
 
             ```
     """
-    import pandas as pd
-
     index = pd.DatetimeIndex(pd.to_datetime(list(times)))
     positions = pd.Series(range(len(index)), index=index)
     label_for: dict[int, str] = {}
