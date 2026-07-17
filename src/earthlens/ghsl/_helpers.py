@@ -26,13 +26,10 @@ from __future__ import annotations
 import json
 import re
 import time
-import zipfile
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
 
 import requests
-from loguru import logger
 
 from earthlens.base.archive import extract_members
 
@@ -257,31 +254,6 @@ def download_and_unzip(
     return tif_path
 
 
-def _assert_safe_members(zf: zipfile.ZipFile, dest_dir: Path) -> None:
-    """Reject archive members that would extract outside `dest_dir` (Zip Slip).
-
-    The JRC tree is a trusted source, but extracting attacker-controlled member
-    names (CWE-22) is the standard untrusted-archive pitfall, so every member's
-    resolved destination is checked to stay within `dest_dir` before any
-    extraction runs.
-
-    Args:
-        zf: An open `zipfile.ZipFile`.
-        dest_dir: The directory members will be extracted into.
-
-    Raises:
-        ValueError: If any member resolves outside `dest_dir`.
-    """
-    base = dest_dir.resolve()
-    for name in zf.namelist():
-        target = (dest_dir / name).resolve()
-        if target != base and base not in target.parents:
-            raise ValueError(
-                f"refusing to extract unsafe path {name!r} from the archive "
-                f"(escapes {dest_dir})."
-            )
-
-
 #: Matches a GHSL data-version directory name (`V1-0`, `V2-0`, `V1-1`, …).
 _VERSION_RE = re.compile(r"^V(\d+)-(\d+)$")
 #: Matches an Apache-autoindex `href="…"` entry.
@@ -375,12 +347,12 @@ def download_and_extract(
     dest_dir.mkdir(parents=True, exist_ok=True)
     zip_path = dest_dir / url.rsplit("/", 1)[-1]
     _download(url, zip_path, session, retries, backoff, timeout, chunk_size)
-    with zipfile.ZipFile(zip_path) as zf:
-        _assert_safe_members(zf, dest_dir)
-        members = [m for m in zf.namelist() if not m.endswith("/")]
-        zf.extractall(dest_dir)
+    # `include=()` keeps every member — a tabular payload can be a CSV,
+    # GeoPackage or xlsx — and the shared extractor applies the same Zip-Slip
+    # guard while skipping directory entries.
+    extracted = extract_members(zip_path, dest_dir, include=())
     zip_path.unlink(missing_ok=True)
-    return [dest_dir / m for m in members]
+    return extracted
 def _download(
     url: str,
     zip_path: Path,
