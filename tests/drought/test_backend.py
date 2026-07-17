@@ -590,6 +590,37 @@ def test_fetch_wcs_warns_when_bbox_misses_downloaded_raster(monkeypatch, tmp_pat
     assert paths[0].exists()
 
 
+def test_edo_fetch_rejects_a_row_without_a_coverage_id(monkeypatch, tmp_path):
+    """An edo-wcs row carrying no `coverage` raises before any request goes out.
+
+    The guard moved from the deleted `_render_wcs_url` into
+    `_fetch_wcs_coverage`; this keeps it covered. `coverage` is `None` for the
+    non-WCS transports, so a mis-catalogued row would otherwise send
+    `coverageID=None` to Copernicus and get an opaque server error back.
+    """
+    import pyramids.dataset as dataset_mod
+
+    def _unreachable(cls, endpoint, **kwargs):
+        raise AssertionError("from_wcs must not be called without a coverage id")
+
+    monkeypatch.setattr(dataset_mod.Dataset, "from_wcs", classmethod(_unreachable))
+    backend = Drought(
+        start="2026-06-21",
+        end="2026-06-21",
+        lat_lim=[40.0, 50.0],
+        lon_lim=[5.0, 15.0],
+        dataset="edo-cdiad",
+        path=str(tmp_path),
+    )
+    # The catalog row is a frozen pydantic model, so swap in a copy rather
+    # than assigning through it.
+    monkeypatch.setattr(
+        backend, "_dataset", backend._dataset.model_copy(update={"coverage": None})
+    )
+    with pytest.raises(ValueError, match="must carry a `coverage` id"):
+        backend.download(progress_bar=False)
+
+
 def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
     """A server rejection (out-of-range date) surfaces the Copernicus message.
 
