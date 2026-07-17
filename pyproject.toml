@@ -262,10 +262,12 @@ dev = [
     # save_animation(crf=...) landed in 0.22.0, the animate() default
     # label-clipping fix in 0.23.0, the DATA_STYLES presets / dark-canvas
     # helper (style=, apply_blank_canvas) in 0.24.0+, and 0.26.0 replaces
-    # animate()'s text_loc/label_color kwargs with a FrameLabel(location=,
-    # color=) object (old kwargs still work as a deprecated alias, but the
-    # showcase notebooks already migrated) -- floor pinned to the latest
-    # of these, >=0.26.0.
+    # animate()'s text_loc kwarg with a FrameLabel(location=, color=)
+    # object (the old kwarg still works as a deprecated alias, but the
+    # showcase notebooks already migrated their existing text_loc= calls,
+    # and the new dark-canvas notebook uses FrameLabel's color= directly
+    # rather than the also-deprecated label_color=) -- floor pinned to
+    # the latest of these, >=0.26.0.
     "cleopatra >=0.26.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
@@ -300,10 +302,12 @@ docs = [
     # save_animation(crf=...) landed in 0.22.0, the animate() default
     # label-clipping fix in 0.23.0, the DATA_STYLES presets / dark-canvas
     # helper (style=, apply_blank_canvas) in 0.24.0+, and 0.26.0 replaces
-    # animate()'s text_loc/label_color kwargs with a FrameLabel(location=,
-    # color=) object (old kwargs still work as a deprecated alias, but the
-    # showcase notebooks already migrated) -- floor pinned to the latest
-    # of these, >=0.26.0.
+    # animate()'s text_loc kwarg with a FrameLabel(location=, color=)
+    # object (the old kwarg still works as a deprecated alias, but the
+    # showcase notebooks already migrated their existing text_loc= calls,
+    # and the new dark-canvas notebook uses FrameLabel's color= directly
+    # rather than the also-deprecated label_color=) -- floor pinned to
+    # the latest of these, >=0.26.0.
     "cleopatra >=0.26.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
