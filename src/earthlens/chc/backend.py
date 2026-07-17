@@ -915,14 +915,18 @@ class CHIRPS(AbstractDataSource):
         _reject_unsigned_for_nodata_sentinel(data.dtype)
         self._check_bbox_overlaps(data, raster.geotransform)
         nodata_sentinel: float = -9999.0
-        bbox = _snap_bbox_outward(
-            (self.space.west, self.space.south, self.space.east, self.space.north),
-            raster.geotransform,
-        )
+        request_bbox = [
+            self.space.west,
+            self.space.south,
+            self.space.east,
+            self.space.north,
+        ]
         if getattr(self.space, "geometry", None) is not None:
             # Polygon path only: the mask flags out-of-shape cells with the
             # band's declared no-data, so -9999 has to be in place *before*
             # the crop. That costs a whole-granule normalise + rebuild.
+            # `crop_to_aoi` masks to the geometry and ignores `bbox=` here, so
+            # the request bbox is passed unsnapped (the snap is bbox-path-only).
             data = np.where(data < 0, nodata_sentinel, data).astype(
                 data.dtype, copy=False
             )
@@ -932,13 +936,15 @@ class CHIRPS(AbstractDataSource):
                 epsg=raster.epsg,
                 no_data_value=nodata_sentinel,
             )
-            return crop_to_aoi(full, self.space, bbox=bbox, touch=False)
+            return crop_to_aoi(full, self.space, bbox=request_bbox, touch=False)
         # Bbox path: crop first, normalise the window. A global CHIRPS daily
         # granule is ~7200x2000 and the request is usually a few hundred cells,
         # so normalising before the crop would allocate the whole granule twice
         # (the np.where copy and the rebuilt Dataset) per date, for nothing —
         # no mask is involved, so nothing depends on the sentinel being
-        # declared up front.
+        # declared up front. Snap the bbox out to the granule's cell edges so
+        # `touch=False` keeps every partially-covered edge cell (see H1).
+        bbox = _snap_bbox_outward(tuple(request_bbox), raster.geotransform)
         cropped = crop_to_aoi(raster, self.space, bbox=bbox, touch=False)
         window = cropped.read_array()
         window = np.where(window < 0, nodata_sentinel, window).astype(
