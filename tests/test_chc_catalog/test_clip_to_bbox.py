@@ -104,6 +104,32 @@ class TestClipAndNormaliseWindow:
         assert west <= 0.5 and south <= 0.5
         assert east >= 9.5 and north >= 9.5
 
+    def test_realistic_005_degree_grid_covers_the_request(self):
+        """A 0.05° CHIRPS-pitch grid (float, non-binary-exact edges) still covers.
+
+        The 1° fixture lands every snapped edge on an exactly-representable
+        coordinate, hiding whether the snap holds when a cell edge like
+        `-175.05` is not binary-exact — which is the real CHIRPS case. Build a
+        0.05° granule and request an off-grid box; the crop must still be a
+        superset of it.
+        """
+        pitch = 0.05
+        geo = (-180.0, pitch, 0.0, 40.0, 0.0, -pitch)  # 1600 rows x 7200 cols
+        granule = Dataset.create_from_array(
+            arr=np.ones((1600, 7200), dtype=np.float32),
+            geo=geo,
+            epsg=4326,
+            no_data_value=None,
+        )
+        chirps = _chirps_with_bbox(lat_lim=[3.72, 12.28], lon_lim=[-9.03, -0.07])
+        out = chirps._clip_and_normalise(granule)
+        west, south, east, north = out.bbox
+        assert west <= -9.03 and south <= 3.72
+        assert east >= -0.07 and north >= 12.28
+        # Snapped to whole 0.05° cells: no partially-covered edge cell dropped,
+        # and the -9999 sentinel is declared (no_data_value is per-band).
+        assert out.no_data_value[0] == pytest.approx(-9999.0)
+
 
 class TestClipToBboxOverlap:
     """`_check_bbox_overlaps` refuses non-overlapping bboxes (M2)."""
