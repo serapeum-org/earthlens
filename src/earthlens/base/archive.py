@@ -44,6 +44,20 @@ def _assert_safe_members(names: list[str], dest_dir: Path) -> None:
             )
 
 
+def _matches(name: str, include: tuple[str, ...]) -> bool:
+    """Whether a member name ends with one of the `include` suffixes.
+
+    Args:
+        name: The archive member name.
+        include: Suffixes to keep; an empty tuple keeps every member.
+
+    Returns:
+        bool: `True` when `include` is empty or `name` ends with one of it,
+            compared case-insensitively.
+    """
+    return not include or name.lower().endswith(include)
+
+
 def extract_members(
     archive_path: Path,
     dest_dir: Path,
@@ -84,13 +98,10 @@ def extract_members(
     dest_dir.mkdir(parents=True, exist_ok=True)
     fmt = fmt or ("7z" if archive_path.suffix.lower() == ".7z" else "zip")
 
-    def _matches(name: str) -> bool:
-        return not include or name.lower().endswith(include)
-
     if fmt == "zip":
         with zipfile.ZipFile(archive_path) as zf:
             _assert_safe_members(zf.namelist(), dest_dir)
-            members = sorted(m for m in zf.namelist() if _matches(m))
+            members = sorted(m for m in zf.namelist() if _matches(m, include))
             members = _select(members, archive_path, single=single)
             for member in members:
                 zf.extract(member, dest_dir)
@@ -105,7 +116,7 @@ def extract_members(
         with py7zr.SevenZipFile(archive_path) as zf:
             names = zf.getnames()
             _assert_safe_members(names, dest_dir)
-            members = sorted(n for n in names if _matches(n))
+            members = sorted(n for n in names if _matches(n, include))
             members = _select(members, archive_path, single=single)
             zf.extract(path=dest_dir, targets=members)
     else:
