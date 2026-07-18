@@ -49,6 +49,6 @@ jobs:
           pypi-username: __token__
           pypi-password: ${{ secrets.PYPI_PUBLISH }}
           package-manager: 'uv'
-          install-groups: 'dev'
+          install-groups: 'groups: dev'
           verify-lock: 'false'
           package: ${{ matrix.package }}
