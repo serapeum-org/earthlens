@@ -32,9 +32,8 @@ _LIVE_CDS_TEST_CLASSES = frozenset({"TestApiE2E", "TestFacadeE2E", "TestGlofasE2
 def pytest_collection_modifyitems(items):
     """Tag every test in this subtree with `@pytest.mark.ecmwf`.
 
-    Lets the suite be filtered with `-m ecmwf` and lets the
-    `test-backend ecmwf` pixi task / GitHub workflow step run only
-    the ECMWF backend's tests.
+    Lets the suite be filtered with `-m ecmwf` to run only the ECMWF
+    backend's tests (e.g. within the atmosphere CI lane).
 
     Pytest delivers the FULL item list to every conftest hook,
     not just items from this subtree, so we filter by path.

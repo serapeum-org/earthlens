@@ -10,9 +10,8 @@ import pytest
 def pytest_collection_modifyitems(items):
     """Tag every test in this subtree with `@pytest.mark.drought`.
 
-    Lets the suite be filtered with `-m drought` and lets the
-    parameterised `test-backend drought` pixi task run only the
-    drought backend's tests.
+    Lets the suite be filtered with `-m drought` to run only the
+    drought backend's tests (e.g. within the atmosphere CI lane).
 
     Pytest delivers the FULL item list to every conftest hook, not
     just items from this subtree, so we filter by path.
