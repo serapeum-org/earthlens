@@ -79,3 +79,24 @@ include = ["earthlens*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
+
+# Per-distribution pytest config: lets this member's tests run standalone
+# (`cd libs/core && uv run pytest`, or `pytest -c libs/core/pyproject.toml libs/core/tests`).
+# The root pyproject aggregates all six member test roots for the whole-suite run.
+[tool.pytest.ini_options]
+testpaths = "tests"
+consider_namespace_packages = true
+addopts = "--import-mode=importlib"
+markers = [
+    "biodiversity: tests for the shared biodiversity-cluster helpers (`wkt_from_bbox`, `occurrences_to_fc`, `LicenseWarning`; no extra SDK).",
+    "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
+    "cli: tests for the `earthlens` console script / federated catalog-query CLI (typer and rich are core dependencies; no extra needed).",
+    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "ecmwf: tests for the ECMWF/CDS backend (requires the `ecmwf` extra: cdsapi).",
+    "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
+    "integration: exercises multiple modules together with mocked I/O.",
+    "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
+    "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
+    "slow: mark test as slow.",
+    "unit: in-process unit test, no network or filesystem outside tmp_path.",
+]

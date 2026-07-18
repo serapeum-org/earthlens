@@ -76,3 +76,26 @@ include = ["earthlens._imagery*", "earthlens.asf*", "earthlens.earthdata*", "ear
 # locks and develops against the local earthlens-core.
 [tool.uv.sources]
 earthlens-core = { workspace = true }
+
+# Per-distribution pytest config: lets this member's tests run standalone
+# (`cd libs/providers/imagery && uv run pytest`, or `pytest -c libs/providers/imagery/pyproject.toml libs/providers/imagery/tests`).
+# The root pyproject aggregates all six member test roots for the whole-suite run.
+[tool.pytest.ini_options]
+testpaths = "tests"
+consider_namespace_packages = true
+addopts = "--import-mode=importlib"
+markers = [
+    "asf: tests for the ASF InSAR backend (requires the `asf` extra: asf_search; reuses EDL auth from `earthdata`).",
+    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "earthdata: tests for the NASA Earthdata backend (requires the `earthdata` extra: earthaccess; Python >=3.12).",
+    "eumetsat: tests for the EUMETSAT Data Store backend (requires the `eumetsat` extra: eumdac).",
+    "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
+    "integration: exercises multiple modules together with mocked I/O.",
+    "jaxa: tests for the JAXA backend (three protocols — authless STAC/COG via jaxa.earth, credentialed SFTP via gportal, credentialed FTP via P-Tree/Himawari; the jaxa-earth and gportal branches need the `jaxa` extra, the ptree branch uses stdlib `ftplib` only).",
+    "openeo: tests for the openEO server-side-processing backend (requires the `openeo` extra: openeo).",
+    "ptree: e2e-only selector for the live P-Tree Himawari HSD FTP fetch (needs $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD; 30-day rolling archive; the no-network ptree unit tests carry `@pytest.mark.jaxa + @pytest.mark.unit` instead so `-m ptree` does not pick them up).",
+    "sentinel_hub: tests for the Sentinel Hub server-side-render backend (requires the `sentinel-hub` extra: sentinelhub).",
+    "slow: mark test as slow.",
+    "stac: tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",
+    "unit: in-process unit test, no network or filesystem outside tmp_path.",
+]

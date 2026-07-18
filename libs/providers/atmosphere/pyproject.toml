@@ -72,3 +72,34 @@ include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.chc*", "ear
 # locks and develops against the local earthlens-core.
 [tool.uv.sources]
 earthlens-core = { workspace = true }
+
+# Per-distribution pytest config: lets this member's tests run standalone
+# (`cd libs/providers/atmosphere && uv run pytest`, or `pytest -c libs/providers/atmosphere/pyproject.toml libs/providers/atmosphere/tests`).
+# The root pyproject aggregates all six member test roots for the whole-suite run.
+[tool.pytest.ini_options]
+testpaths = "tests"
+consider_namespace_packages = true
+addopts = "--import-mode=importlib"
+markers = [
+    "airnow: tests for the AirNow air-quality backend (US/Canada EPA `/aq/data/` bbox REST; no extra SDK — core `requests` + `pandas`; needs a free AIRNOW_API_KEY for live e2e).",
+    "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
+    "climate_indices: tests for the climate / teleconnection index backend (NOAA PSL + KNMI Climate Explorer monthly ASCII series; no extra SDK — core requests + pandas).",
+    "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",
+    "drought: tests for the drought backend (US Drought Monitor / Copernicus EDO+GDO / CSIC SPEIbase; no extra SDK — core `requests` + pyramids; EDO/GDO fetched via the Copernicus GetCoverage REST endpoint, SPEIbase via direct NetCDF).",
+    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "ecmwf: tests for the ECMWF/CDS backend (requires the `ecmwf` extra: cdsapi).",
+    "eea: tests for the EEA (`eea_aq`) air-quality backend (requires the `eea_aq` extra: airbase; European monitor observations via Parquet; public, no auth).",
+    "goes: tests for the NOAA GOES-R ABI backend (requires the `goes` extra: boto3; unsigned noaa-goes19/18/16 buckets).",
+    "integration: exercises multiple modules together with mocked I/O.",
+    "nrel: tests for the NREL NSRDB / WIND Toolkit solar-wind time-series backend (keyed REST CSV via core `requests` + `pandas`; no extra SDK; required api_key + email auth).",
+    "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
+    "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
+    "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
+    "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
+    "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
+    "sensor_community: tests for the Sensor.Community air-quality backend (crowdsourced low-cost sensors; no extra SDK — core `requests` + `pandas`; public archive + live JSON API, ODbL).",
+    "slow: mark test as slow.",
+    "solar_wind_atlas: tests for the Solar & Wind Atlas backend (Global Solar Atlas + Global Wind Atlas climatology layers; no extra SDK — core requests + pyramids; GWA windowed /vsicurl COG read, GSA download-then-localise).",
+    "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
+    "unit: in-process unit test, no network or filesystem outside tmp_path.",
+]
