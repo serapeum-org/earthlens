@@ -1182,7 +1182,7 @@ wheels = [
 
 [[package]]
 name = "cleopatra"
-version = "0.26.0"
+version = "0.26.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "hpc-utils" },
@@ -1191,9 +1191,9 @@ dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6d/c2/9fc4be96af70123f7b75f7904cdfe0bafbec19e3eab7d9f5a112441dfabc/cleopatra-0.26.0.tar.gz", hash = "sha256:e14a7dfc43f73808e0bbf9fd9e26ac0ad24fe19ddf8ab3bb71c45e123bc70a17", size = 3344793, upload-time = "2026-07-16T18:09:18.444Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/26/7a/5fae69e5c6940fd1bada2de643858a40dca1d251d1338726cafca2db9b08/cleopatra-0.26.1.tar.gz", hash = "sha256:5e8f0bac65ac76602ba9a883b0702a02f0a972233f2addc5b0b0ce1577f7eaca", size = 3358707, upload-time = "2026-07-18T20:48:26.008Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/cf/998205896a3f085c88cc7815d6b54570d6ff0b679d660b5ac0592bc4f7dc/cleopatra-0.26.0-py3-none-any.whl", hash = "sha256:f48e9811d1cd60d644beaf37ad180dc7476cdc714957d576b1a340c7c5850bf3", size = 241064, upload-time = "2026-07-16T18:09:16.851Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/16/b4b57346fcc575059872f3f9792b17f33528659e835b6e99d5c2d77a1ca6/cleopatra-0.26.1-py3-none-any.whl", hash = "sha256:a82530a4847a72781b8e6aef62041312bd0a0702d277d5163d9aceb30603e678", size = 244868, upload-time = "2026-07-18T20:48:24.69Z" },
 ]
 
 [package.optional-dependencies]
@@ -2086,7 +2086,7 @@ provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf",
 [package.metadata.requires-dev]
 dev = [
     { name = "build", specifier = ">=1.0.0" },
-    { name = "cleopatra", specifier = ">=0.26.0" },
+    { name = "cleopatra", specifier = ">=0.26.1" },
     { name = "commitizen", specifier = ">=4.8.4" },
     { name = "coverage" },
     { name = "jupyter" },
@@ -2103,7 +2103,7 @@ dev = [
     { name = "twine", specifier = ">=5.0.0" },
 ]
 docs = [
-    { name = "cleopatra", specifier = ">=0.26.0" },
+    { name = "cleopatra", specifier = ">=0.26.1" },
     { name = "matplotlib", specifier = ">=3.5" },
     { name = "mike", specifier = ">=2.1.3" },
     { name = "mkdocs", specifier = ">=1.5.3" },
@@ -2433,7 +2433,7 @@ name = "eccodeslib"
 version = "2.48.0.26"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "eckitlib" },
+    { name = "eckitlib", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or extra != 'extra-15-earthlens-ocean-argo' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/88/a9/670a1e84381324c167b339a130e22f50a18528b9d7d09cfbd4e88aa1a7b2/eccodeslib-2.48.0.26-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha256:8a9bfdf8a7d081c108150c769a0fdb349d917ea1333fcf627460505ce594765a", size = 9097184, upload-time = "2026-07-17T13:27:21.841Z" },
@@ -5839,7 +5839,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess" },
+    { name = "ptyprocess", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or extra != 'extra-15-earthlens-ocean-argo' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -8337,8 +8337,8 @@ name = "secretstorage"
 version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cryptography" },
-    { name = "jeepney" },
+    { name = "cryptography", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or extra != 'extra-15-earthlens-ocean-argo' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "jeepney", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or extra != 'extra-15-earthlens-ocean-argo' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1c/03/e834bcd866f2f8a49a85eaff47340affa3bfa391ee9912a952a1faa68c7b/secretstorage-3.5.0.tar.gz", hash = "sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be", size = 19884, upload-time = "2025-11-23T19:02:53.191Z" }
 wheels = [

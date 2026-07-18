@@ -92,8 +92,8 @@ dev = [
     # showcase notebooks already migrated their existing text_loc= calls,
     # and the new dark-canvas notebook uses FrameLabel's color= directly
     # rather than the also-deprecated label_color=) -- floor pinned to
-    # the latest of these, >=0.26.0.
-    "cleopatra >=0.26.0",
+    # the latest of these, >=0.26.1.
+    "cleopatra >=0.26.1",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -132,8 +132,8 @@ docs = [
     # showcase notebooks already migrated their existing text_loc= calls,
     # and the new dark-canvas notebook uses FrameLabel's color= directly
     # rather than the also-deprecated label_color=) -- floor pinned to
-    # the latest of these, >=0.26.0.
-    "cleopatra >=0.26.0",
+    # the latest of these, >=0.26.1.
+    "cleopatra >=0.26.1",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
