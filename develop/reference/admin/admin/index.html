@@ -19790,7 +19790,7 @@ TIGER/Line</strong> (states / counties / tracts / nation, public domain). Every 
 returns polygon boundaries, so this is a <code>vector</code> backend: <code>download()</code> returns a
 pyramids <code>~pyramids.feature.collection.FeatureCollection</code> of polygons in
 EPSG:4326 (and writes it to a vector file when a <code>path</code> is set), and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument.</p>
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument.</p>
 <p>A request names a <strong>dataset</strong> (<code>variables=["geoboundaries:adm1"]</code>) plus the
 selector that dataset needs — <code>country=&lt;ISO3&gt;</code> for geoBoundaries, an optional
 <code>scale=</code> for Natural Earth, an optional <code>year=</code> (and <code>state=</code> for tracts) for
@@ -22421,7 +22421,7 @@ ADM0/1/2), Natural Earth (global cultural admin layers), or US Census TIGER/Line
 EPSG:4326, and returns a <code>FeatureCollection</code> of polygons.</p>
 <p>This is a <code>vector</code> backend: the result is a table of boundary polygons, not a
 gridded array, so <code>OUTPUT_KIND = "vector"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument (there is
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument (there is
 no meaningful gridded reduction of a boundary layer). <code>download()</code> returns the
 in-memory <code>FeatureCollection</code> and, when a <code>path</code> is set, also writes it to one
 vector file.</p>

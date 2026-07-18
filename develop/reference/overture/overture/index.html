@@ -20181,7 +20181,7 @@ GeoParquet for each requested feature type, surfaces a per-row
 <p>This is a <code>vector</code> backend: the result is a table of features
 (building footprints, POIs, road segments, admin boundaries), not a
 gridded array, so <code>Overture.OUTPUT_KIND</code> is <code>"vector"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument
 for it. Overture is a static per-release snapshot, so <code>start</code> / <code>end</code>
 are accepted but ignored (there is no temporal axis to iterate).</p>
 <p>Overture needs <strong>no credentials</strong> — the bucket is public, so (like
@@ -25365,7 +25365,7 @@ pyramids <code>~pyramids.feature.collection.FeatureCollection</code>.</p>
 <p>This is a <code>vector</code> backend: the on-the-wire result is a table of
 features (footprints, POIs, road segments, admin boundaries), not a
 gridded array, so <code>OUTPUT_KIND = "vector"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument.
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument.
 Overture is a static per-release snapshot, so <code>start</code> / <code>end</code> are
 accepted but ignored (there is no temporal axis to iterate); the SDK
 auto-targets the newest release when <code>release</code> is <code>None</code>.</p>

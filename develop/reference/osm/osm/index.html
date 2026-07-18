@@ -20299,7 +20299,7 @@ protocol, produces the features, converts them to a <code>FeatureCollection</cod
 warns about OSM's <strong>ODbL</strong> share-alike licence. A raw <code>query=</code> (Overpass QL) /
 <code>filter=</code> (ohsome) override is accepted for power users.</p>
 <p>This is a <code>vector</code> backend (<code>OUTPUT_KIND = "vector"</code>), so the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument. All
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument. All
 three protocols are public — there is <strong>no auth class</strong>, and the SDKs are
 imported lazily, so the package imports without <code>earthlens[osm]</code> /
 <code>earthlens[osm-pbf]</code>. ohsome's aggregation endpoints remain out of scope.</p>
@@ -26207,7 +26207,7 @@ catalog row's <code>protocol</code> picks the branch (<code>G2</code>, <code>G10
 OSM data is <strong>ODbL</strong> (share-alike), so every successful <code>download()</code> emits a
 <code>LicenseWarning</code> (<code>G5</code>).</p>
 <p>This is a <code>vector</code> backend (<code>OUTPUT_KIND = "vector"</code>), so the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument and
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument and
 <code>download(aggregate=...)</code> raises <code>NotImplementedError</code> (<code>G1</code>). All three
 protocols are public — there is no auth class (<code>G6</code>) — and the SDKs are
 imported lazily (Overpass/ohsome inside <code>_fetch</code>; pyrosm/pyosmium inside

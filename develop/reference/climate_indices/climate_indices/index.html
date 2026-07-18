@@ -22688,7 +22688,7 @@ requested window, and returns the concatenation as a long-format
 the URL and the ASCII dialect. Climate indices are <strong>global scalar
 monthly series</strong> with no geometry, so this is <code>OUTPUT_KIND = "tabular"</code>:
 spatial arguments (<code>lat_lim</code> / <code>lon_lim</code> / <code>aoi</code>) are accepted for
-signature parity but ignored, and the :class:<code>earthlens.earthlens.core.EarthLens</code>
+signature parity but ignored, and the :class:<code>earthlens.earthlens.EarthLens</code>
 facade rejects a non-<code>None</code> <code>aggregate=</code> (these are already monthly
 scalars — there is nothing to grid-reduce).</p>
 <p>The two sources are open (no auth, no SDK), so there is no <code>auth.py</code>; the

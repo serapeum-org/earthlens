@@ -19780,7 +19780,7 @@ EarthScope (ex-IRIS DMC), ISC (global reviewed bulletin), and GeoNet
 features (CRS <code>EPSG:4326</code>).</p>
 <p>This is the package's first <code>vector</code> backend: the result is a table of
 events, not a gridded array, so :data:<code>FDSN.OUTPUT_KIND</code> is
-<code>"vector"</code> and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade
+<code>"vector"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument for it.</p>
 <p>Provider selection: for this backend <code>variables</code> is a <code>list[str]</code> of
 network keys — <code>variables=["USGS"]</code>, <code>variables=["USGS", "EMSC"]</code> —
@@ -23157,7 +23157,7 @@ to a pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code>
 by :mod:<code>earthlens.fdsn.events</code>.</p>
 <p>This is the first <code>vector</code> backend: the on-the-wire result is a table
 of point features, not a gridded array, so <code>OUTPUT_KIND = "vector"</code>
-and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an
+and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument (there is no meaningful gridded reduction of an
 event table). <code>download()</code> returns the in-memory FeatureCollection
 (the union across requested networks) and, as a side effect, writes

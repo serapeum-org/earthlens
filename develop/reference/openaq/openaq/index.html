@@ -20276,7 +20276,7 @@ ground-station pollutant measurements as a long-format
 <p>This is the package's first <code>tabular</code> backend: the result is a table
 of per-row station observations, not a gridded array, so
 :data:<code>OpenAQ.OUTPUT_KIND</code> is <code>"tabular"</code> and the
-:class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
+:class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument for it (use the server-side <code>temporal_resolution</code> rollup
 instead).</p>
 <p>Parameter selection: for this backend <code>variables</code> is a <code>list[str]</code> of
@@ -24358,7 +24358,7 @@ and returns ground-station pollutant measurements as a long-format
 :class:<code>pandas.DataFrame</code> (one row per measurement).</p>
 <p>This is the package's first <code>tabular</code> backend: the result is a table
 of per-row station observations, not a gridded array, so
-<code>OUTPUT_KIND = "tabular"</code> and the :class:<code>earthlens.earthlens.core.EarthLens</code>
+<code>OUTPUT_KIND = "tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code>
 facade rejects an <code>aggregate=</code> argument (there is no meaningful
 gridded reduction of a pollutant timeseries; use the server-side
 <code>temporal_resolution</code> rollup instead).</p>

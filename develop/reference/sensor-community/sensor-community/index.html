@@ -20040,7 +20040,7 @@ long-format <code>pandas.DataFrame</code> (one row per measurement), the same
 <code>tabular</code> shape as <code>earthlens.openaq</code>.</p>
 <p>This is a <code>tabular</code> backend: the result is per-row station observations,
 not a gridded array, so <code>SensorCommunity.OUTPUT_KIND</code> is <code>"tabular"</code> and
-the <code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
+the <code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument for it.</p>
 <p>The archive has one CSV per (sensor, day) but no bbox index, so the
 backend discovers active sensors in the bbox via the live JSON API, then
@@ -23009,7 +23009,7 @@ Sensor.Community low-cost-sensor network as a long-format
 <code>earthlens.openaq</code>.</p>
 <p>This is a <code>tabular</code> backend: the result is per-row station observations,
 not a gridded array, so <code>OUTPUT_KIND = "tabular"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument.</p>
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument.</p>
 <p>Transport (a search/fetch split, like OpenAQ). The archive has one CSV
 per (sensor, day) but no bbox index, so <code>_search</code> first hits the <strong>live
 JSON API</strong> (<code>data.sensor.community</code>) to discover which sensors are active

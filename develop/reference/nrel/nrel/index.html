@@ -20270,7 +20270,7 @@ bbox expanded to a point grid), issues one throttled keyed <code>GET</code> per
 them.</p>
 <p>This is a <code>tabular</code> backend: the result is a per-coordinate time-series table,
 not a gridded array, so <code>NREL.OUTPUT_KIND</code> is <code>"tabular"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument for it
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument for it
 (NREL already returns the resolved series). There is no heavy gridded-archive
 SDK and no <code>pyramids</code> array dependency — pure <code>requests</code> + <code>pandas</code>; no array /
 NetCDF / HSDS layer.</p>
@@ -24477,7 +24477,7 @@ long-format <code>pandas.DataFrame</code> tagged with <code>lat</code>/<code>lon
 passed as <code>api_key=</code> / <code>email=</code> or via <code>NREL_API_KEY</code> / <code>NREL_EMAIL</code>. They are
 resolved (and a missing one raises <code>AuthenticationError</code>) at construction.</p>
 <p>This is a <code>tabular</code> backend: the result is a per-coordinate time-series table,
-so <code>OUTPUT_KIND = "tabular"</code> and the <code>earthlens.earthlens.core.EarthLens</code> facade
+so <code>OUTPUT_KIND = "tabular"</code> and the <code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument for it — NREL already returns the resolved
 hourly / TMY series.</p>
 <p>NREL coverage is region-dependent (NSRDB: Americas + parts of Asia/Africa/

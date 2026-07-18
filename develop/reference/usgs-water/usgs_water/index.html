@@ -20075,7 +20075,7 @@ water-quality sites across the United States — and returns them as a
 long-format :class:<code>pandas.DataFrame</code>.</p>
 <p>This is a <code>tabular</code> backend: the result is a table of per-site
 observations, not a gridded array, so :data:<code>USGSWater.OUTPUT_KIND</code> is
-<code>"tabular"</code> and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade
+<code>"tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument for it (use <code>service="statistics"</code> for
 a server-side temporal rollup instead).</p>
 <p>Request shape: <code>variables</code> is a <code>list[str]</code> of NWIS <strong>parameter codes</strong>
@@ -24319,7 +24319,7 @@ United States. A request is a bbox (or explicit <code>sites=</code>) + a time
 window + a list of <strong>NWIS parameter codes</strong> (<code>["00060"]</code> discharge,
 <code>["00065"]</code> gage height, …); the backend returns a per-site time-series
 as a long-format :class:<code>pandas.DataFrame</code>, so <code>OUTPUT_KIND = "tabular"</code>
-and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an
+and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument (use the server-side <code>service="statistics"</code>
 rollup instead).</p>
 <p>The full NWIS / Water Data service surface is selectable via a

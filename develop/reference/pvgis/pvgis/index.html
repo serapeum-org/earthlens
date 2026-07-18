@@ -19901,7 +19901,7 @@ the 30 req/s limit), parses the JSON into a long-format <code>pandas.DataFrame</
 tagged with <code>lat</code>/<code>lon</code>, and returns it.</p>
 <p>This is a <code>tabular</code> backend: the result is a per-coordinate hourly table, not
 a gridded array, so <code>PVGIS.OUTPUT_KIND</code> is <code>"tabular"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument for it
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument for it
 (PVGIS already returns the resolved hourly / TMY series). There is no SDK, no
 authentication, and no <code>pyramids</code> array dependency — pure <code>requests</code> +
 <code>pandas</code>.</p>
@@ -22760,7 +22760,7 @@ throttled to the 30 req/s rate limit, parses each JSON response into a
 long-format <code>pandas.DataFrame</code> tagged with <code>lat</code>/<code>lon</code>/<code>product</code>, and
 concatenates them.</p>
 <p>This is a <code>tabular</code> backend: the result is a per-coordinate hourly table, so
-<code>OUTPUT_KIND = "tabular"</code> and the <code>earthlens.earthlens.core.EarthLens</code> facade
+<code>OUTPUT_KIND = "tabular"</code> and the <code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument for it — PVGIS already returns the resolved
 hourly / TMY series.</p>
 <p>Per-tool knobs (PV <code>pvcalculation</code> / <code>peakpower</code> / <code>loss</code> / <code>angle</code> /

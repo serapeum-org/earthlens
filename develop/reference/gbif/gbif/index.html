@@ -21958,7 +21958,7 @@ range. The paginated result is mapped to a pyramids
 shared <code>earthlens.biodiversity</code> mapper.</p>
 <p>This is the reference occurrence backend the OBIS twin mirrors. Like
 FDSN/Overture it is a <code>vector</code> backend (<code>OUTPUT_KIND = "vector"</code>), so the
-:class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
+:class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument. <code>download()</code> returns the in-memory FeatureCollection and, when
 <code>path</code> is set, writes it (GeoParquet by default).</p>
 <p>GBIF search is paginated at 300 records/page and capped at an

@@ -20231,7 +20231,7 @@ North America — that returns them as a long-format <code>pandas.DataFrame</cod
 <code>earthlens.openaq</code>.</p>
 <p>This is a <code>tabular</code> backend: the result is per-row station observations,
 not a gridded array, so <code>AirNow.OUTPUT_KIND</code> is <code>"tabular"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument
 for it.</p>
 <p>Pollutant selection: for this backend <code>variables</code> is a <code>list[str]</code> of
 pollutant names — <code>variables=["pm25"]</code>, <code>variables=["pm25", "o3"]</code> —
@@ -23947,7 +23947,7 @@ observations for North America — and returns them as a long-format
 as <code>earthlens.openaq.OpenAQ</code>.</p>
 <p>This is a <code>tabular</code> backend: the result is per-row station observations,
 not a gridded array, so <code>OUTPUT_KIND = "tabular"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument
 (there is no meaningful gridded reduction of a pollutant timeseries).</p>
 <p>HTTP path: a thin <code>requests</code>-based client
 (<code>earthlens.airnow.client.AirnowClient</code>) owns the <code>API_KEY</code> argument and

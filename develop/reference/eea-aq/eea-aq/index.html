@@ -19874,7 +19874,7 @@ reference-grade European monitor observations as a long-format
 <code>earthlens.openaq</code>.</p>
 <p>This is a <code>tabular</code> backend: the result is per-row station observations,
 not a gridded array, so <code>EEA_AQ.OUTPUT_KIND</code> is <code>"tabular"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument
 for it.</p>
 <p>The EEA service is queried per <strong>country</strong> (ISO2) and delivers Parquet.
 The backend maps the request bbox to the reporting countries that
@@ -22757,7 +22757,7 @@ monitor observations as a long-format <code>pandas.DataFrame</code> (one row per
 measurement), the same <code>tabular</code> shape as <code>earthlens.openaq</code>.</p>
 <p>This is a <code>tabular</code> backend: the result is per-row station observations,
 not a gridded array, so <code>OUTPUT_KIND = "tabular"</code> and the
-<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument.</p>
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument.</p>
 <p>Transport: the EEA service is queried per <strong>country</strong> (ISO2), not per
 bbox, and delivers <strong>Parquet</strong> files (via <code>airbase</code>). The backend maps
 the request bbox to the reporting countries whose own bounding box

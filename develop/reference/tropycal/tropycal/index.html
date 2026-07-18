@@ -20207,7 +20207,7 @@ cyclone best tracks — from IBTrACS (global, 1848-present) or HURDAT2
 (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of track features, not
 a gridded array, so :data:<code>TropicalCyclone.OUTPUT_KIND</code> is <code>"vector"</code> and
-the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
+the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument for it. The default geometry is one <code>Point</code> per 6-hourly fix; a
 <code>geometry="track"</code> kwarg returns one <code>LineString</code> per storm with summary
 attributes.</p>
@@ -26289,7 +26289,7 @@ storms in the requested seasons are mapped to a pyramids
 <p>This is a <code>vector</code> backend: the result is a table of track features
 (per-fix <code>Point</code>s by default, or one <code>LineString</code> per storm with
 <code>geometry="track"</code>), not a gridded array, so <code>OUTPUT_KIND = "vector"</code> and
-the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
+the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument. <code>download()</code> returns the in-memory FeatureCollection (the union
 across requested basins) and writes one vector file per basin to <code>path</code>.</p>
 <p>tropycal needs <strong>no credentials</strong> — it fetches best-track files from

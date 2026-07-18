@@ -26558,7 +26558,7 @@ accepts the country to build its SQL / geostore call.</p>
   is copied onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>tabular</code> returns a
   :class:<code>pandas.DataFrame</code>, <code>vector</code> returns a pyramids
   :class:<code>~pyramids.feature.collection.FeatureCollection</code>. The
-  :class:<code>earthlens.earthlens.core.EarthLens</code> facade reads the instance attribute to
+  :class:<code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   gate <code>aggregate=</code> (rejected for both) and to know the return shape.</li>
 <li><strong>Conditional, per-source auth (<code>G3</code>).</strong> Only a dataset whose provider is
   <code>gfw</code> builds and configures a :class:<code>GfwAuth</code>; ThinkHazard and INFORM stay

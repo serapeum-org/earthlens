@@ -25344,7 +25344,7 @@ glacier / region selector (wgms).</p>
   copied onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>vector</code> returns a pyramids
   :class:<code>~pyramids.feature.collection.FeatureCollection</code> (rgi/glims outlines),
   <code>tabular</code> returns a :class:<code>pandas.DataFrame</code> (wgms fluctuations). The
-  :class:<code>earthlens.earthlens.core.EarthLens</code> facade reads the instance attribute to
+  :class:<code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   gate <code>aggregate=</code> (rejected for both) and to know the return shape.</li>
 <li><strong>Region-download-then-clip (<code>G6</code>).</strong> RGI ships per GTN-G region; the backend
   maps the request bbox to the overlapping region(s) (a <code>region=</code> override is

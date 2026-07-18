@@ -19622,7 +19622,7 @@ output shape — <code>griddap</code> datasets are gridded fields → <strong>ra
 NetCDF</strong>, <code>tabledap</code> datasets are record tables → <strong>tabular
 <code>DataFrame</code></strong>. The backend therefore sets its <code>OUTPUT_KIND</code> <strong>per
 instance</strong> from the resolved dataset (a sanctioned earthdata/eumetsat
-override), so the :class:<code>earthlens.earthlens.core.EarthLens</code> facade accepts
+override), so the :class:<code>earthlens.earthlens.EarthLens</code> facade accepts
 <code>aggregate=</code> for a griddap dataset and rejects it for a tabledap one.</p>
 <p>Built on the <strong><code>erddapy</code></strong> SDK (the tabledap <code>to_pandas()</code> path); the
 griddap path builds the OPeNDAP <code>.nc</code> URL directly and downloads it,
@@ -22609,7 +22609,7 @@ the per-instance :attr:<code>ERDDAP.OUTPUT_KIND</code> and the realisation path:
 <li><strong><code>tabledap</code></strong> → <code>OUTPUT_KIND = "tabular"</code>. The request is shaped with
   the <strong><code>erddapy</code></strong> SDK and realised through <code>ERDDAP.to_pandas()</code>, so the
   result is a :class:<code>pandas.DataFrame</code>. The
-  :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects <code>aggregate=</code> for
+  :class:<code>earthlens.earthlens.EarthLens</code> facade rejects <code>aggregate=</code> for
   it (a table has no gridded reduction).</li>
 <li><strong><code>griddap</code></strong> → <code>OUTPUT_KIND = "raster"</code>. The OPeNDAP <code>.nc</code> download
   URL is built directly (see :func:<code>earthlens.erddap._helpers.build_griddap_url</code>)

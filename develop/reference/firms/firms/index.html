@@ -20352,7 +20352,7 @@ NOAA-21) as a pyramids
 points (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of geolocated fire
 detections, not a gridded array, so :data:<code>FIRMS.OUTPUT_KIND</code> is
-<code>"vector"</code> and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects
+<code>"vector"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects
 an <code>aggregate=</code> argument for it.</p>
 <p>FIRMS needs a free <strong><code>MAP_KEY</code></strong> (no SDK): the only dependencies are
 <code>requests</code> + <code>pandas</code>, both core, so there is <strong>no <code>[firms]</code> extra</strong> to
@@ -25707,7 +25707,7 @@ back as CSV, which :mod:<code>earthlens.firms.events</code> maps to a pyramids
 points.</p>
 <p>This is a <code>vector</code> backend: the on-the-wire result is a table of
 geolocated detections, not a gridded array, so <code>OUTPUT_KIND = "vector"</code>
-and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an
+and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument (there is no meaningful gridded reduction of a
 detection table). <code>download()</code> returns the in-memory FeatureCollection
 and, as a side effect, writes it to one vector file under <code>path</code>.</p>

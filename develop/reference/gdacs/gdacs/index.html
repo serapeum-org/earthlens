@@ -19789,7 +19789,7 @@ pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code> of
 geolocated alert features (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of alerts, not a
 gridded array, so :data:<code>GDACS.OUTPUT_KIND</code> is <code>"vector"</code> and the
-:class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
+:class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument for it.</p>
 <p>GDACS needs <strong>no credentials</strong> — the feed is public, so (like CHC)
 there is no auth class and no <code>[gdacs]</code> extra to install; the only
@@ -22765,7 +22765,7 @@ HTTPS GET, which :mod:<code>earthlens.gdacs.events</code> maps to a pyramids
 features.</p>
 <p>This is a <code>vector</code> backend: the on-the-wire result is a table of
 geolocated alerts, not a gridded array, so <code>OUTPUT_KIND = "vector"</code> and
-the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an
+the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument (there is no meaningful gridded reduction of an
 alert table). <code>download()</code> returns the in-memory FeatureCollection and,
 as a side effect, writes it to one vector file under <code>path</code>.</p>

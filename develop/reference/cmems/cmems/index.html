@@ -24964,7 +24964,7 @@ dataset on the server and streams a single NetCDF (or Zarr) back to
 the user's <code>path</code>.</p>
 <p>The on-disk artefact is a gridded NetCDF/Zarr, so
 <code>OUTPUT_KIND = "raster"</code> — structurally identical to ECMWF's
-per-variable NetCDF output. The :class:<code>earthlens.earthlens.core.EarthLens</code>
+per-variable NetCDF output. The :class:<code>earthlens.earthlens.EarthLens</code>
 facade therefore forwards <code>aggregate=AggregationConfig(...)</code> to this
 backend's <code>download()</code>. The aggregation runs through
 :meth:<code>pyramids.netcdf.NetCDF.reduce</code> (the generalised time-window

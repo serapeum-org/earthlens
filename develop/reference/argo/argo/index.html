@@ -19709,7 +19709,7 @@ biogeochemical parameters — from the global Argo array, and returns them
 as a long-format :class:<code>pandas.DataFrame</code>.</p>
 <p>This is a <code>tabular</code> backend: Argo profiles are irregular point data (one
 per float per ~10-day cycle), not a grid, so :data:<code>ARGO.OUTPUT_KIND</code> is
-<code>"tabular"</code> and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects
+<code>"tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects
 an <code>aggregate=</code> argument for it (gridded ocean fields are the CMEMS
 path).</p>
 <p>Request shape: <code>variables</code> is either a list of Argo parameter names
@@ -22584,7 +22584,7 @@ autonomous-float ocean profiles — temperature, salinity, pressure, and
 of ~4000 active floats. A request is either a bbox + time window over a
 set of parameter names (a <strong>region</strong> selection) or a <code>float:</code> / <code>profile:</code>
 selector; the backend returns a long-format :class:<code>pandas.DataFrame</code>, so
-<code>OUTPUT_KIND = "tabular"</code> and the :class:<code>earthlens.earthlens.core.EarthLens</code>
+<code>OUTPUT_KIND = "tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code>
 facade rejects an <code>aggregate=</code> argument (gridded ocean fields are the
 CMEMS path).</p>
 <p>The selection mode is routed from <code>variables</code> (see
