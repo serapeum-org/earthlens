@@ -17,7 +17,7 @@ chains it via `ECMWF.download(aggregate=...)` for the
 The two public symbols are :class:`AggregationConfig` (the frozen
 request shape) and :func:`aggregate_netcdf` (the function). They are
 also re-exported from `earthlens` so callers can write
-`from earthlens import AggregationConfig, aggregate_netcdf`.
+`from earthlens.core import AggregationConfig, aggregate_netcdf`.
 
 Examples:
     - Standalone aggregation: read a CDS NetCDF, write per-month
@@ -27,7 +27,7 @@ Examples:
       built:
 
         ```python
-        >>> from earthlens import AggregationConfig, aggregate_netcdf  # doctest: +SKIP
+        >>> from earthlens.core import AggregationConfig, aggregate_netcdf  # doctest: +SKIP
         >>> from earthlens.ecmwf import Catalog  # doctest: +SKIP
         >>> spec = Catalog().get_variable(  # doctest: +SKIP
         ...     "reanalysis-era5-single-levels", "2m-temperature"
@@ -45,7 +45,7 @@ Examples:
       and inspect the per-window arrays directly:
 
         ```python
-        >>> from earthlens import AggregationConfig, aggregate_netcdf  # doctest: +SKIP
+        >>> from earthlens.core import AggregationConfig, aggregate_netcdf  # doctest: +SKIP
         >>> from earthlens.ecmwf import Catalog  # doctest: +SKIP
         >>> spec = Catalog().get_variable(  # doctest: +SKIP
         ...     "reanalysis-era5-single-levels", "2m-temperature"
@@ -64,7 +64,7 @@ Examples:
       retrieves and aggregates each variable):
 
         ```python
-        >>> from earthlens import AggregationConfig  # doctest: +SKIP
+        >>> from earthlens.core import AggregationConfig  # doctest: +SKIP
         >>> from earthlens.earthlens import EarthLens  # doctest: +SKIP
         >>> earthlens = EarthLens(  # doctest: +SKIP
         ...     data_source="ecmwf",
@@ -76,7 +76,7 @@ Examples:
         ...     lon_lim=[-75.0, -74.0],
         ...     path="out/era5",
         ... )
-        >>> earthlens.download(  # doctest: +SKIP
+        >>> earthlens.core.download(  # doctest: +SKIP
         ...     aggregate=AggregationConfig(freq="1MS", op="mean"),
         ... )
 

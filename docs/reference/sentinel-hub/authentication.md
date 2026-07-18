@@ -48,7 +48,7 @@ The backend resolves credentials in this order:
     ```
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="sentinel-hub",

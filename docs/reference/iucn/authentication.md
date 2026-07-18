@@ -31,7 +31,7 @@ If neither resolves, `IucnAuth.configure()` raises
 URL — it never blocks on an interactive prompt.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # (a) explicit — handy in a notebook
 EarthLens(data_source="iucn", token="...", variables=["species:Panthera leo"], ...)

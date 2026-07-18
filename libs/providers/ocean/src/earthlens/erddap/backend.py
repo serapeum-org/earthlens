@@ -8,7 +8,7 @@ the per-instance :attr:`ERDDAP.OUTPUT_KIND` and the realisation path:
 * **`tabledap`** → `OUTPUT_KIND = "tabular"`. The request is shaped with
   the **`erddapy`** SDK and realised through `ERDDAP.to_pandas()`, so the
   result is a :class:`pandas.DataFrame`. The
-  :class:`earthlens.earthlens.EarthLens` facade rejects `aggregate=` for
+  :class:`earthlens.earthlens.core.EarthLens` facade rejects `aggregate=` for
   it (a table has no gridded reduction).
 * **`griddap`** → `OUTPUT_KIND = "raster"`. The OPeNDAP `.nc` download
   URL is built directly (see :func:`earthlens.erddap._helpers.build_griddap_url`)

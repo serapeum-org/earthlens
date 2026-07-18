@@ -68,7 +68,7 @@ class ASF(AbstractDataSource):
 
     Note:
         ASF ships every product as a SAFE `.zip` archive (not a
-        bare GeoTIFF / NetCDF), so :meth:`earthlens.earthlens.EarthLens.load`
+        bare GeoTIFF / NetCDF), so :meth:`earthlens.earthlens.core.EarthLens.load`
         — which calls `pyramids` on `.tif` / `.nc` / `.cog` /
         `.zarr` extensions — returns the downloaded `.zip` path as
         a plain :class:`pathlib.Path` rather than a pyramids object.

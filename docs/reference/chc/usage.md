@@ -208,7 +208,7 @@ final summary tells you what succeeded and what didn't.
 The CHC backend is registered in the facade under two keys:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # Canonical key
 EarthLens(

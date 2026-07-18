@@ -8,7 +8,7 @@ and returns ground-station pollutant measurements as a long-format
 
 This is the package's first `tabular` backend: the result is a table
 of per-row station observations, not a gridded array, so
-`OUTPUT_KIND = "tabular"` and the :class:`earthlens.earthlens.EarthLens`
+`OUTPUT_KIND = "tabular"` and the :class:`earthlens.earthlens.core.EarthLens`
 facade rejects an `aggregate=` argument (there is no meaningful
 gridded reduction of a pollutant timeseries; use the server-side
 `temporal_resolution` rollup instead).

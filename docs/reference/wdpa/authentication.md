@@ -29,7 +29,7 @@ If neither resolves, `WdpaAuth.configure()` raises
 request URL — it never blocks on an interactive prompt.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # (a) explicit — handy in a notebook
 EarthLens(data_source="wdpa", token="...", variables=["KEN"], ...)

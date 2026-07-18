@@ -6,7 +6,7 @@ long-format `pandas.DataFrame` (one row per measurement), the same
 
 This is a `tabular` backend: the result is per-row station observations,
 not a gridded array, so `SensorCommunity.OUTPUT_KIND` is `"tabular"` and
-the `earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
+the `earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=`
 argument for it.
 
 The archive has one CSV per (sensor, day) but no bbox index, so the

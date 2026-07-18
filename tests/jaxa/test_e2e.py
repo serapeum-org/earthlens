@@ -100,8 +100,7 @@ def test_gportal_sftp_download_lives(tmp_path: Path) -> None:
     L3 mosaics totalling ~10 MB.
     """
     pytest.importorskip("gportal")
-    from earthlens import EarthLens
-
+    from earthlens.core import EarthLens
     lens = EarthLens(
         data_source="jaxa",
         variables=["sgli-l3-nwlr"],
@@ -142,8 +141,7 @@ def test_ptree_ftp_download_lives(tmp_path: Path) -> None:
     import datetime as dt
     import re
 
-    from earthlens import EarthLens
-
+    from earthlens.core import EarthLens
     # 3 days back at 12:00 UTC: safely inside the 30-day retention
     # boundary in either direction and well past upload latency (near-
     # real-time slots can lag by 10-15 min). Yesterday 00:00 UTC was

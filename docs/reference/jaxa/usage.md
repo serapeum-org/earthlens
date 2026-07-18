@@ -3,7 +3,7 @@
 ## Quick start: AW3D30 elevation tile (authless)
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="jaxa",
@@ -25,7 +25,7 @@ The output GeoTIFF is north-up, EPSG:4326, with one band per request
 ## Quick start: ALOS-2 PALSAR-2 product (credentialed SFTP)
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="jaxa",

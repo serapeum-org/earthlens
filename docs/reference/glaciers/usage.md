@@ -13,7 +13,7 @@ pyramids, and clips to the bbox. The result is a `FeatureCollection` in
 EPSG:4326.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 fc = EarthLens(
     data_source="glaciers",

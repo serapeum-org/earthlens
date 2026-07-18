@@ -10,7 +10,7 @@ EPSG:4326, and returns a `FeatureCollection` of polygons.
 
 This is a `vector` backend: the result is a table of boundary polygons, not a
 gridded array, so `OUTPUT_KIND = "vector"` and the
-`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument (there is
+`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument (there is
 no meaningful gridded reduction of a boundary layer). `download()` returns the
 in-memory `FeatureCollection` and, when a `path` is set, also writes it to one
 vector file.

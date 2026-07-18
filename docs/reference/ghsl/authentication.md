@@ -6,7 +6,7 @@ data served over anonymous HTTPS from the JRC JEODPP file tree
 key, token, environment variable, or credentials file is required.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # No credentials, no setup — this just works:
 EarthLens(

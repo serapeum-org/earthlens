@@ -19,7 +19,7 @@ There is no `[gdacs]` extra and no credentials to configure.
 ## Quickstart — recent global earthquake alerts
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 alerts = EarthLens(
     variables=["EQ"],            # the hazard type(s) to query — see below

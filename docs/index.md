@@ -60,7 +60,7 @@ earthlens = EarthLens(
     lon_lim=[-75.65, -74.73],
     path="examples/data/chirps",
 )
-earthlens.download()
+earthlens.core.download()
 ```
 
 ## Installation

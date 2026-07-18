@@ -206,7 +206,7 @@ Once the GEE backend ships, the service account flows straight into the
 `EarthLens` facade:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="gee",

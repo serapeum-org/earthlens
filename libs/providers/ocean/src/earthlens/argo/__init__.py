@@ -7,7 +7,7 @@ as a long-format :class:`pandas.DataFrame`.
 
 This is a `tabular` backend: Argo profiles are irregular point data (one
 per float per ~10-day cycle), not a grid, so :data:`ARGO.OUTPUT_KIND` is
-`"tabular"` and the :class:`earthlens.earthlens.EarthLens` facade rejects
+`"tabular"` and the :class:`earthlens.earthlens.core.EarthLens` facade rejects
 an `aggregate=` argument for it (gridded ocean fields are the CMEMS
 path).
 

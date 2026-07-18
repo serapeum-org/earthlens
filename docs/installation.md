@@ -143,7 +143,7 @@ five thematic provider packages, each carrying a group of backends:
 | `earthlens-hazards` | hazards · humanitarian · vector basemaps | `fdsn` `firms` `gdacs` `risk_indicators` `admin` `osm` `overture` `hdx` |
 
 This changes nothing about how you use earthlens: the import path is the same
-(`from earthlens import EarthLens`, `earthlens.chc`, …), and every extra above
+(`from earthlens.core import EarthLens`, `earthlens.chc`, …), and every extra above
 works exactly as before — `pip install earthlens[gee]` still installs Earth
 Engine and nothing else.
 

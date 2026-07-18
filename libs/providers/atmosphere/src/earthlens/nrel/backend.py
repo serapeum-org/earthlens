@@ -17,7 +17,7 @@ passed as `api_key=` / `email=` or via `NREL_API_KEY` / `NREL_EMAIL`. They are
 resolved (and a missing one raises `AuthenticationError`) at construction.
 
 This is a `tabular` backend: the result is a per-coordinate time-series table,
-so `OUTPUT_KIND = "tabular"` and the `earthlens.earthlens.EarthLens` facade
+so `OUTPUT_KIND = "tabular"` and the `earthlens.earthlens.core.EarthLens` facade
 rejects an `aggregate=` argument for it — NREL already returns the resolved
 hourly / TMY series.
 

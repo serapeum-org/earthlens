@@ -34,7 +34,7 @@ that 0.05° grid automatically (regular CDS datasets keep their 0.125° ERA5
 snap). Request it with `temporal_resolution="daily"`:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="ecmwf",

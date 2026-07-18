@@ -10,7 +10,7 @@ One basin, a date window, and a bounding box. `variables` selects the
 **basin**; the result is one feature per 6-hourly fix.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="tropycal",

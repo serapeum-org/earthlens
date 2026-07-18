@@ -21,7 +21,7 @@ raises `AuthenticationError` naming `WDPA_TOKEN`.
 Fetch a country's protected areas as polygons:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 fc = EarthLens(
     data_source="wdpa",

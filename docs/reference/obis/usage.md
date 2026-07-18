@@ -11,7 +11,7 @@ pip install earthlens[obis]
 Fetch ocean-sunfish occurrences over a North-Atlantic bounding box:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 fc = EarthLens(
     data_source="obis",

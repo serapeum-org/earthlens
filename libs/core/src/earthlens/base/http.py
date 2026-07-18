@@ -185,8 +185,7 @@ def _default_user_agent() -> str:
         The default agent string, e.g. `"earthlens/0.38.0"` (or
         `"earthlens/unknown"` when the package metadata is unavailable).
     """
-    from earthlens import __version__
-
+    from earthlens.core import __version__
     return f"earthlens/{__version__}"
 
 

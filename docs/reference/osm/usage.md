@@ -22,7 +22,7 @@ configure — Overpass, ohsome, and Geofabrik are all public.
 ## Quickstart — current-state hospitals (Overpass)
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 hospitals = EarthLens(
     data_source="osm",

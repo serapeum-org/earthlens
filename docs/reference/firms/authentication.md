@@ -38,7 +38,7 @@ resolves a key, `authenticate()` raises
 blocks on an interactive prompt.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # (a) explicit — handy in a notebook
 EarthLens(data_source="firms", ...).authenticate(api_key="...").download()

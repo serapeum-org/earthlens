@@ -12,7 +12,7 @@ shared `earthlens.biodiversity` mapper.
 
 This is the reference occurrence backend the OBIS twin mirrors. Like
 FDSN/Overture it is a `vector` backend (`OUTPUT_KIND = "vector"`), so the
-:class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
+:class:`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=`
 argument. `download()` returns the in-memory FeatureCollection and, when
 `path` is set, writes it (GeoParquet by default).
 

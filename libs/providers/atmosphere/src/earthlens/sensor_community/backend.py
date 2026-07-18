@@ -7,7 +7,7 @@ Sensor.Community low-cost-sensor network as a long-format
 
 This is a `tabular` backend: the result is per-row station observations,
 not a gridded array, so `OUTPUT_KIND = "tabular"` and the
-`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument.
+`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument.
 
 Transport (a search/fetch split, like OpenAQ). The archive has one CSV
 per (sensor, day) but no bbox index, so `_search` first hits the **live

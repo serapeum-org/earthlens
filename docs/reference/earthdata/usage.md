@@ -7,7 +7,7 @@ directly as `earthlens.earthdata.EarthData`.
 ## Quickstart
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="earthdata",

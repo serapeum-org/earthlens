@@ -14,7 +14,7 @@ Three design points carry this backend:
   copied onto `self.OUTPUT_KIND` in `__init__`: `vector` returns a pyramids
   :class:`~pyramids.feature.collection.FeatureCollection` (rgi/glims outlines),
   `tabular` returns a :class:`pandas.DataFrame` (wgms fluctuations). The
-  :class:`earthlens.earthlens.EarthLens` facade reads the instance attribute to
+  :class:`earthlens.earthlens.core.EarthLens` facade reads the instance attribute to
   gate `aggregate=` (rejected for both) and to know the return shape.
 * **Region-download-then-clip (`G6`).** RGI ships per GTN-G region; the backend
   maps the request bbox to the overlapping region(s) (a `region=` override is

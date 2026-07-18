@@ -8,7 +8,7 @@ sector). GOES is sub-hourly, so give `start` / `end` a **time** for a tight
 window (a bare date spans the whole UTC day).
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="goes",

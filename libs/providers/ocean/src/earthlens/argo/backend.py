@@ -6,7 +6,7 @@ autonomous-float ocean profiles — temperature, salinity, pressure, and
 of ~4000 active floats. A request is either a bbox + time window over a
 set of parameter names (a **region** selection) or a `float:` / `profile:`
 selector; the backend returns a long-format :class:`pandas.DataFrame`, so
-`OUTPUT_KIND = "tabular"` and the :class:`earthlens.earthlens.EarthLens`
+`OUTPUT_KIND = "tabular"` and the :class:`earthlens.earthlens.core.EarthLens`
 facade rejects an `aggregate=` argument (gridded ocean fields are the
 CMEMS path).
 

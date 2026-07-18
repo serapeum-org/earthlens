@@ -13,7 +13,7 @@ by :mod:`earthlens.fdsn.events`.
 
 This is the first `vector` backend: the on-the-wire result is a table
 of point features, not a gridded array, so `OUTPUT_KIND = "vector"`
-and the :class:`earthlens.earthlens.EarthLens` facade rejects an
+and the :class:`earthlens.earthlens.core.EarthLens` facade rejects an
 `aggregate=` argument (there is no meaningful gridded reduction of an
 event table). `download()` returns the in-memory FeatureCollection
 (the union across requested networks) and, as a side effect, writes
@@ -367,8 +367,7 @@ class FDSN(AbstractDataSource):
         from obspy.clients.fdsn import Client
         from obspy.clients.fdsn.header import FDSNNoDataException
 
-        from earthlens import __version__
-
+        from earthlens.core import __version__
         provider_key = product.id
         fdsn_id = product.metadata["fdsn_id"]
         needs_token = product.metadata.get("needs_token", False)

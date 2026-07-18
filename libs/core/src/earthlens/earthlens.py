@@ -1401,7 +1401,7 @@ class EarthLens:
                 ...     lon_lim=[-75.65, -74.73],
                 ...     path="examples/data/chirps",
                 ... )
-                >>> earthlens.download()  # doctest: +SKIP
+                >>> earthlens.core.download()  # doctest: +SKIP
 
                 ```
             - ECMWF download via the facade. Marked
@@ -1422,7 +1422,7 @@ class EarthLens:
                 ...     lon_lim=[-75.0, -74.0],
                 ...     path="examples/data/era5",
                 ... )
-                >>> earthlens.download()  # doctest: +SKIP
+                >>> earthlens.core.download()  # doctest: +SKIP
 
                 ```
 
@@ -1592,7 +1592,7 @@ def download(
 
     The one-shot convenience for the common case: it forwards every
     request argument to :class:`EarthLens` and the run-time arguments to
-    :meth:`EarthLens.download`, so `earthlens.download(...)` replaces the
+    :meth:`EarthLens.download`, so `earthlens.core.download(...)` replaces the
     two-step construct-then-download.
 
     Args:
@@ -1637,7 +1637,7 @@ def download(
           makes a live FTP connection:
             ```python
             >>> import earthlens
-            >>> earthlens.download(  # doctest: +SKIP
+            >>> earthlens.core.download(  # doctest: +SKIP
             ...     data_source="chc",
             ...     variables=["precipitation"],
             ...     start="2009-01-01", end="2009-01-02",
@@ -1673,7 +1673,7 @@ def sources() -> list[str]:
     """Return the sorted list of distinct backends, one canonical key each.
 
     The top-level discovery entry point — no class needed to see what
-    backends `earthlens.download(...)` / :class:`EarthLens` accept. Alias and
+    backends `earthlens.core.download(...)` / :class:`EarthLens` accept. Alias and
     endpoint keys (`"chirps"` for `"chc"`, `"google-earth-engine"` for
     `"gee"`, the STAC endpoint keys `"planetary-computer"` / `"earth-search"`
     / `"cdse"`, …) still work as `data_source=` values but are collapsed to
@@ -1686,7 +1686,7 @@ def sources() -> list[str]:
         - The CHIRPS and GEE backends are listed by their canonical keys:
             ```python
             >>> import earthlens
-            >>> keys = earthlens.sources()
+            >>> keys = earthlens.core.sources()
             >>> "chc" in keys and "gee" in keys
             True
 
@@ -1694,7 +1694,7 @@ def sources() -> list[str]:
         - Aliases are collapsed, so each backend appears once:
             ```python
             >>> import earthlens
-            >>> keys = earthlens.sources()
+            >>> keys = earthlens.core.sources()
             >>> "chirps" in keys or "google-earth-engine" in keys
             False
 
@@ -1768,7 +1768,7 @@ def search(
           skipped here because it queries a remote catalog):
             ```python
             >>> import earthlens
-            >>> products = earthlens.search(  # doctest: +SKIP
+            >>> products = earthlens.core.search(  # doctest: +SKIP
             ...     "stac",
             ...     dataset="sentinel-2-l2a",
             ...     variables=["red"],
@@ -1818,7 +1818,7 @@ def find(text: str) -> dict[str, list[str]]:
         - Find sources whose catalog mentions precipitation (live; skipped):
             ```python
             >>> import earthlens
-            >>> earthlens.find("precipitation")  # doctest: +SKIP
+            >>> earthlens.core.find("precipitation")  # doctest: +SKIP
             {'chc': ['global-daily', ...], ...}
 
             ```

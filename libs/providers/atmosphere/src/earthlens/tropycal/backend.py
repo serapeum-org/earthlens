@@ -12,7 +12,7 @@ storms in the requested seasons are mapped to a pyramids
 This is a `vector` backend: the result is a table of track features
 (per-fix `Point`s by default, or one `LineString` per storm with
 `geometry="track"`), not a gridded array, so `OUTPUT_KIND = "vector"` and
-the :class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
+the :class:`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=`
 argument. `download()` returns the in-memory FeatureCollection (the union
 across requested basins) and writes one vector file per basin to `path`.
 

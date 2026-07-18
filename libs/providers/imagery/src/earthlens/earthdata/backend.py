@@ -14,7 +14,7 @@ vector (GEDI L4A, ICESat-2), and tabular (some ORNL CSV). Every other
 earthlens backend fixes one `OUTPUT_KIND` as a class attribute; this
 one resolves the requested dataset row(s) in `__init__` and copies the
 row's `output_kind` onto `self.OUTPUT_KIND`. The
-:class:`earthlens.earthlens.EarthLens` facade reads that per-instance
+:class:`earthlens.earthlens.core.EarthLens` facade reads that per-instance
 value at `download()` time to gate `aggregate=` (`G6`): forwarded for
 `"raster"`, rejected for `"vector"` / `"tabular"`.
 

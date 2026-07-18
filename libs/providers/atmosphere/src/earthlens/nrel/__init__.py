@@ -13,7 +13,7 @@ them.
 
 This is a `tabular` backend: the result is a per-coordinate time-series table,
 not a gridded array, so `NREL.OUTPUT_KIND` is `"tabular"` and the
-`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument for it
+`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument for it
 (NREL already returns the resolved series). There is no heavy gridded-archive
 SDK and no `pyramids` array dependency — pure `requests` + `pandas`; no array /
 NetCDF / HSDS layer.

@@ -10,7 +10,7 @@ features (CRS `EPSG:4326`).
 
 This is the package's first `vector` backend: the result is a table of
 events, not a gridded array, so :data:`FDSN.OUTPUT_KIND` is
-`"vector"` and the :class:`earthlens.earthlens.EarthLens` facade
+`"vector"` and the :class:`earthlens.earthlens.core.EarthLens` facade
 rejects an `aggregate=` argument for it.
 
 Provider selection: for this backend `variables` is a `list[str]` of

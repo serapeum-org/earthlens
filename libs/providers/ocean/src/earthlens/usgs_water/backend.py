@@ -8,7 +8,7 @@ United States. A request is a bbox (or explicit `sites=`) + a time
 window + a list of **NWIS parameter codes** (`["00060"]` discharge,
 `["00065"]` gage height, …); the backend returns a per-site time-series
 as a long-format :class:`pandas.DataFrame`, so `OUTPUT_KIND = "tabular"`
-and the :class:`earthlens.earthlens.EarthLens` facade rejects an
+and the :class:`earthlens.earthlens.core.EarthLens` facade rejects an
 `aggregate=` argument (use the server-side `service="statistics"`
 rollup instead).
 

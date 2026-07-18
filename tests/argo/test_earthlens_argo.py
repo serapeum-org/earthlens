@@ -7,7 +7,7 @@ from typing import Any, Callable
 import pandas as pd
 import pytest
 
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 from earthlens.argo import ARGO
 from tests.argo.conftest import FakeArgo
 
@@ -25,7 +25,7 @@ def test_aliases_collapse_to_canonical():
     """sources() lists the canonical 'argo' key, not its aliases."""
     import earthlens
 
-    keys = earthlens.sources()
+    keys = earthlens.core.sources()
     assert "argo" in keys
     assert "argo-floats" not in keys
     assert "argopy" not in keys

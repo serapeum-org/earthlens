@@ -8,7 +8,7 @@ North America — that returns them as a long-format `pandas.DataFrame`
 
 This is a `tabular` backend: the result is per-row station observations,
 not a gridded array, so `AirNow.OUTPUT_KIND` is `"tabular"` and the
-`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument
+`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument
 for it.
 
 Pollutant selection: for this backend `variables` is a `list[str]` of

@@ -11,7 +11,7 @@ points.
 
 This is a `vector` backend: the on-the-wire result is a table of
 geolocated detections, not a gridded array, so `OUTPUT_KIND = "vector"`
-and the :class:`earthlens.earthlens.EarthLens` facade rejects an
+and the :class:`earthlens.earthlens.core.EarthLens` facade rejects an
 `aggregate=` argument (there is no meaningful gridded reduction of a
 detection table). `download()` returns the in-memory FeatureCollection
 and, as a side effect, writes it to one vector file under `path`.

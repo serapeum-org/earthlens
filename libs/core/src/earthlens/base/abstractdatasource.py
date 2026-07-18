@@ -462,7 +462,7 @@ class AbstractDataSource(ABC):
     Attributes:
         OUTPUT_KIND: Class-level declaration of the natural output
             shape this backend emits. Read by
-            :class:`earthlens.earthlens.EarthLens` at facade
+            :class:`earthlens.earthlens.core.EarthLens` at facade
             `download()` time to gate the `aggregate=` argument:
             `"raster"` accepts it (the existing pyramids-backed
             `aggregate_netcdf` flow); `"vector"` and `"tabular"`

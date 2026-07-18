@@ -11,7 +11,7 @@ pyramids `~pyramids.feature.collection.FeatureCollection`.
 This is a `vector` backend: the on-the-wire result is a table of
 features (footprints, POIs, road segments, admin boundaries), not a
 gridded array, so `OUTPUT_KIND = "vector"` and the
-`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument.
+`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument.
 Overture is a static per-release snapshot, so `start` / `end` are
 accepted but ignored (there is no temporal axis to iterate); the SDK
 auto-targets the newest release when `release` is `None`.

@@ -12,7 +12,7 @@ long-format `pandas.DataFrame` tagged with `lat`/`lon`/`product`, and
 concatenates them.
 
 This is a `tabular` backend: the result is a per-coordinate hourly table, so
-`OUTPUT_KIND = "tabular"` and the `earthlens.earthlens.EarthLens` facade
+`OUTPUT_KIND = "tabular"` and the `earthlens.earthlens.core.EarthLens` facade
 rejects an `aggregate=` argument for it — PVGIS already returns the resolved
 hourly / TMY series.
 

@@ -9,7 +9,7 @@ ground-station pollutant measurements as a long-format
 This is the package's first `tabular` backend: the result is a table
 of per-row station observations, not a gridded array, so
 :data:`OpenAQ.OUTPUT_KIND` is `"tabular"` and the
-:class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
+:class:`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=`
 argument for it (use the server-side `temporal_resolution` rollup
 instead).
 

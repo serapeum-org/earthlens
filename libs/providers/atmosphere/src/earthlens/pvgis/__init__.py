@@ -10,7 +10,7 @@ tagged with `lat`/`lon`, and returns it.
 
 This is a `tabular` backend: the result is a per-coordinate hourly table, not
 a gridded array, so `PVGIS.OUTPUT_KIND` is `"tabular"` and the
-`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument for it
+`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument for it
 (PVGIS already returns the resolved hourly / TMY series). There is no SDK, no
 authentication, and no `pyramids` array dependency — pure `requests` +
 `pandas`.

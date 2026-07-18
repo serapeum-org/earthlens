@@ -8,7 +8,7 @@ cyclone best tracks — from IBTrACS (global, 1848-present) or HURDAT2
 
 This is a `vector` backend: the result is a table of track features, not
 a gridded array, so :data:`TropicalCyclone.OUTPUT_KIND` is `"vector"` and
-the :class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
+the :class:`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=`
 argument for it. The default geometry is one `Point` per 6-hourly fix; a
 `geometry="track"` kwarg returns one `LineString` per storm with summary
 attributes.

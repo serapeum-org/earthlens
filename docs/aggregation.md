@@ -9,7 +9,7 @@ mean, seasonal climatology, ...). It runs against `pyramids` +
 
 The feature is reachable two ways:
 
-1. **Standalone.** `from earthlens import aggregate_netcdf,
+1. **Standalone.** `from earthlens.core import aggregate_netcdf,
    AggregationConfig` and call against any pyramids-readable NetCDF.
    No `ECMWF` instance needed.
 2. **Bundled with download.** `ECMWF.download(aggregate=...)` —
@@ -214,7 +214,7 @@ Single-call pipeline that downloads daily ERA5 2-metre temperature
 for January 2022 over a 1° box and writes one monthly-mean GeoTIFF:
 
 ```python
-from earthlens import AggregationConfig
+from earthlens.core import AggregationConfig
 from earthlens.earthlens import EarthLens
 
 earthlens = EarthLens(
@@ -227,7 +227,7 @@ earthlens = EarthLens(
     lon_lim=[-75.0, -74.0],
     path="out/era5",
 )
-earthlens.download(
+earthlens.core.download(
     aggregate=AggregationConfig(freq="1MS", op="mean"),
 )
 ```
@@ -243,7 +243,7 @@ aggregated GeoTIFF lands at
 If you already have the NetCDF on disk:
 
 ```python
-from earthlens import AggregationConfig, aggregate_netcdf
+from earthlens.core import AggregationConfig, aggregate_netcdf
 from earthlens.ecmwf import Catalog
 
 spec = Catalog().get_variable(
@@ -263,7 +263,7 @@ for window_label, arr, target in results:
 Skip GeoTIFF writes entirely and inspect the per-window arrays:
 
 ```python
-from earthlens import AggregationConfig, aggregate_netcdf
+from earthlens.core import AggregationConfig, aggregate_netcdf
 from earthlens.ecmwf import Catalog
 
 spec = Catalog().get_variable(

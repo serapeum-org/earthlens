@@ -13,7 +13,7 @@ Two design points carry this backend:
   is copied onto `self.OUTPUT_KIND` in `__init__`: `tabular` returns a
   :class:`pandas.DataFrame`, `vector` returns a pyramids
   :class:`~pyramids.feature.collection.FeatureCollection`. The
-  :class:`earthlens.earthlens.EarthLens` facade reads the instance attribute to
+  :class:`earthlens.earthlens.core.EarthLens` facade reads the instance attribute to
   gate `aggregate=` (rejected for both) and to know the return shape.
 * **Conditional, per-source auth (`G3`).** Only a dataset whose provider is
   `gfw` builds and configures a :class:`GfwAuth`; ThinkHazard and INFORM stay

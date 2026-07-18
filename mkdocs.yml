@@ -59,6 +59,16 @@ plugins:
       default_handler: python
       handlers:
         python:
+          # earthlens is a PEP 420 namespace split across the core and provider
+          # distributions; point griffe at every member's src so it can collect
+          # `earthlens.<backend>` from whichever distribution ships it.
+          paths:
+            - libs/core/src
+            - libs/providers/atmosphere/src
+            - libs/providers/ocean/src
+            - libs/providers/imagery/src
+            - libs/providers/land/src
+            - libs/providers/hazards/src
           options:
             show_source: true
             show_root_heading: true

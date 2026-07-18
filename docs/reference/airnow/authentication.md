@@ -26,7 +26,7 @@ If neither resolves, `AirnowAuth.configure()` raises
 never blocks on an interactive prompt.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # (a) explicit — handy in a notebook
 EarthLens(data_source="airnow", api_key="...", ...)

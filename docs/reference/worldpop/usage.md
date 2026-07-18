@@ -130,7 +130,7 @@ bucketed by `freq`, with `op` ∈ `mean` / `sum` / `min` / `max` / `std`
 (`auto` → `mean` for population):
 
 ```python
-from earthlens import AggregationConfig
+from earthlens.core import AggregationConfig
 
 EarthLens(
     data_source="worldpop", variables=["pop"], aoi="KEN",

@@ -3,7 +3,7 @@
 ## Request shape
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="ghsl",              # or "ghs" / "human-settlement"

@@ -32,7 +32,7 @@ examples](examples/authentication.md).
 CHIRPS daily rainfall needs no credentials, so it makes the simplest first run:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="chc",            # default; CHIRPS over anonymous FTP

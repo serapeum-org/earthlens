@@ -238,7 +238,7 @@ class NWP(AbstractDataSource):
 
         Stacklevel attribution: 3 frames is correct for a direct
         `NWP(...)` call (1=this method, 2=`__init__`, 3=caller). The
-        :class:`~earthlens.EarthLens` facade adds one frame, so a
+        :class:`~earthlens.core.EarthLens` facade adds one frame, so a
         facade-route warning is attributed to `earthlens.py`; users
         wanting a precise call-site should filter on
         `category=RetentionWarning` rather than module.
