@@ -20,7 +20,7 @@ def _build_capturing_results_cls(captured_fileNames: list[list[str]]) -> type:
     files). Hoisted out of the test body so it does not violate the
     "no nested function defs" convention.
     """
-    from tests.asf.conftest import _FakeResults
+    from .conftest import _FakeResults
 
     class _CapturingResults(_FakeResults):
         def download(
@@ -40,7 +40,7 @@ def _build_capturing_results_cls(captured_fileNames: list[list[str]]) -> type:
 
 def _fake_remote_product(fake_asf_search_module, scene: str) -> RemoteProduct:
     """Build a `RemoteProduct` whose metadata mimics a real `_search` row."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     product = _FakeProduct(sceneName=scene)
     return RemoteProduct(
@@ -61,7 +61,7 @@ def test_fetch_authenticates_once_and_downloads(
     fake_asf_search, fake_earthdata_auth, tmp_path: Path
 ) -> None:
     """`_fetch` calls `auth.session()` once and downloads every product."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     fake_asf_search.search_results = [
         _FakeProduct(sceneName="S1A_AAA_SLC"),
@@ -87,7 +87,7 @@ def test_fetch_is_idempotent_skips_existing_files(
     fake_asf_search, fake_earthdata_auth, tmp_path: Path
 ) -> None:
     """A product already on disk is not re-downloaded."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     fake_asf_search.search_results = [
         _FakeProduct(sceneName="S1A_PRESENT"),
@@ -124,7 +124,7 @@ def test_fetch_skips_download_when_all_files_present(
     fake_asf_search, fake_earthdata_auth, tmp_path: Path
 ) -> None:
     """Every product already on disk → no download call at all."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     fake_asf_search.search_results = [_FakeProduct(sceneName="S1A_HAVE")]
     backend = ASF(
@@ -148,7 +148,7 @@ def test_download_passes_aggregate_none_through(
     fake_asf_search, fake_earthdata_auth, tmp_path: Path
 ) -> None:
     """A plain `download()` returns the path list."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     fake_asf_search.search_results = [_FakeProduct(sceneName="S1A_X")]
     backend = ASF(
@@ -204,7 +204,7 @@ def test_fetch_raises_clear_error_on_missing_filename(
     fake_asf_search, fake_earthdata_auth, tmp_path: Path
 ) -> None:
     """A product without a resolvable `fileName` raises `ValueError`, not `TypeError`."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     backend = ASF(
         start="2024-01-01",

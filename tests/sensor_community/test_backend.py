@@ -9,7 +9,7 @@ import pytest
 
 from earthlens.sensor_community import SensorCommunity
 from earthlens.sensor_community._helpers import LicenseWarning
-from tests.sensor_community.conftest import DHT_CSV, _FakeClient, _record
+from .conftest import DHT_CSV, _FakeClient, _record
 
 
 def _backend(client, tmp_path: Path, **overrides) -> SensorCommunity:

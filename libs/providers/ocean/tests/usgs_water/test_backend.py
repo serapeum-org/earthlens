@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 from earthlens.usgs_water import USGSWater
-from tests.usgs_water.conftest import modern_long_frame
+from .conftest import modern_long_frame
 
 pytestmark = pytest.mark.usgs_water
 

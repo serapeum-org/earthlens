@@ -9,7 +9,7 @@ import pytest
 
 from earthlens.core import EarthLens
 from earthlens.argo import ARGO
-from tests.argo.conftest import FakeArgo
+from .conftest import FakeArgo
 
 pytestmark = pytest.mark.argo
 

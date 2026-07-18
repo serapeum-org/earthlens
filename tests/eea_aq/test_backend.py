@@ -10,7 +10,7 @@ import pandas as pd
 import pytest
 
 from earthlens.eea_aq import EEA_AQ
-from tests.eea_aq.conftest import _FakeAirbaseClient
+from .conftest import _FakeAirbaseClient
 
 
 def _hourly_frame() -> pd.DataFrame:

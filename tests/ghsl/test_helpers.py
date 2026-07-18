@@ -15,7 +15,7 @@ from earthlens.ghsl._helpers import (
     list_remote_dir,
     tiles_for_bbox,
 )
-from tests.ghsl.conftest import make_tiny_tif, zip_with_tif
+from .conftest import make_tiny_tif, zip_with_tif
 
 
 @pytest.mark.ghsl

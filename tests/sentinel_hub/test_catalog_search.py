@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from earthlens.sentinel_hub.backend import SentinelHub
-from tests.sentinel_hub.conftest import FakeSentinelHubCatalog
+from .conftest import FakeSentinelHubCatalog
 
 pytestmark = pytest.mark.sentinel_hub
 

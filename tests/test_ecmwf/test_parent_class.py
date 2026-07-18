@@ -17,7 +17,7 @@ import cdsapi
 import pytest
 
 from earthlens.ecmwf import ECMWF, Variable
-from tests.test_ecmwf._fakes import _SentinelClient
+from ._fakes import _SentinelClient
 
 pytestmark = [pytest.mark.integration]
 

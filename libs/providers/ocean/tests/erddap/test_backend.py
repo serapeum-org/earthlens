@@ -193,7 +193,7 @@ class TestGriddap:
         backend = _grid_backend(tmp_path)
         result = backend.download()
 
-        from tests.erddap.conftest import FAKE_NETCDF_BYTES
+        from .conftest import FAKE_NETCDF_BYTES
 
         assert isinstance(result, list)
         assert result == [tmp_path / f"{GRIDDAP_ID}.nc"]
@@ -268,7 +268,7 @@ class TestGriddap:
 
     def test_griddap_http_error_becomes_valueerror(self, tmp_path, monkeypatch):
         """An out-of-coverage griddap response surfaces as a clear ValueError."""
-        from tests.erddap.conftest import FakeResponse
+        from .conftest import FakeResponse
 
         def _get(url, **kwargs):
             return FakeResponse(
@@ -281,7 +281,7 @@ class TestGriddap:
 
     def test_griddap_non_netcdf_body_rejected(self, tmp_path, monkeypatch):
         """A 200 response with an HTML error body is rejected, not written."""
-        from tests.erddap.conftest import FakeResponse
+        from .conftest import FakeResponse
 
         def _get(url, **kwargs):
             return FakeResponse(content=b"<html><body>Resource not found</body></html>")

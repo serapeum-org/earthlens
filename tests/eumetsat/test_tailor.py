@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from earthlens.eumetsat import EUMETSAT, TailorConfig
-from tests.eumetsat.conftest import _FakeCustomisation, _FakeProduct
+from .conftest import _FakeCustomisation, _FakeProduct
 
 pytestmark = pytest.mark.eumetsat
 

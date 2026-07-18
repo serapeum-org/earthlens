@@ -12,7 +12,7 @@ from earthlens.sensor_community._helpers import (
     frame_from_csv,
     sensors_in_bbox,
 )
-from tests.sensor_community.conftest import SDS_CSV, _record
+from .conftest import SDS_CSV, _record
 
 
 class _Resp:

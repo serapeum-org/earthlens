@@ -31,7 +31,7 @@ def test_stack_opts_passes_empty_options_regardless_of_perp_window(
     fake_asf_search, tmp_path: Path
 ) -> None:
     """The SDK opts are always empty; perpendicular filtering happens client-side."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     reference = _FakeProduct(sceneName="REF", stack_return=[])
     fake_asf_search.granule_results = [reference]
@@ -54,7 +54,7 @@ def test_stack_opts_passes_empty_options_regardless_of_temporal_window(
     fake_asf_search, tmp_path: Path
 ) -> None:
     """The SDK opts are always empty; temporal filtering happens client-side."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     reference = _FakeProduct(sceneName="REF", stack_return=[])
     fake_asf_search.granule_results = [reference]
@@ -126,7 +126,7 @@ def test_download_in_stack_mode_returns_path_list(
     fake_asf_search, fake_earthdata_auth, tmp_path: Path
 ) -> None:
     """Stack-mode `download()` returns paths and respects idempotency, like search mode."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     stacked = [
         _FakeProduct(
@@ -162,7 +162,7 @@ def test_download_accepts_progress_bar_flag(
     fake_asf_search, fake_earthdata_auth, tmp_path: Path
 ) -> None:
     """The `progress_bar=` flag is documented as accepted; both values must not crash."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     fake_asf_search.search_results = [_FakeProduct(sceneName="S1A_X")]
     backend = ASF(
@@ -215,7 +215,7 @@ def test_stack_mode_metadata_carries_baseline_keys(
     fake_asf_search, tmp_path: Path
 ) -> None:
     """Stack-mode RemoteProduct.metadata includes the two baseline keys (search-mode omits)."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     stacked = [
         _FakeProduct(

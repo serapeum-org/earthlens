@@ -11,7 +11,7 @@ import pytest
 from earthlens.aggregate import AggregationConfig
 from earthlens.ghsl import backend as backend_mod
 from earthlens.ghsl.backend import GHSL, _close_dataset, _epsg_int
-from tests.ghsl.conftest import make_tiny_tif
+from .conftest import make_tiny_tif
 
 
 def _build(tmp_path: Path, variables, **kw) -> GHSL:

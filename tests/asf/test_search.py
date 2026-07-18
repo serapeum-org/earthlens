@@ -79,7 +79,7 @@ def test_search_mode_calls_geo_search_with_resolved_args(
     fake_asf_search, tmp_path: Path
 ) -> None:
     """Search mode dispatches `geo_search` with WKT + resolved constants."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     fake_asf_search.search_results = [
         _FakeProduct(sceneName="S1A_FOO_SLC"),
@@ -144,7 +144,7 @@ def test_stack_mode_runs_granule_search_then_stack(
     fake_asf_search, tmp_path: Path
 ) -> None:
     """Stack mode calls `granule_search` and then `.stack()` on the result."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     stacked = [
         _FakeProduct(sceneName="S1A_REF_SLC", perpendicularBaseline=0.0, temporalBaseline=0),
@@ -181,7 +181,7 @@ def test_stack_mode_post_filters_baseline_windows(
     fake_asf_search, tmp_path: Path
 ) -> None:
     """Stacked products outside the windows are dropped client-side."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     stacked = [
         _FakeProduct(sceneName="S1_A", perpendicularBaseline=10.0, temporalBaseline=6),
@@ -227,7 +227,7 @@ def test_search_mode_remote_product_metadata_omits_baseline_keys(
     fake_asf_search, tmp_path: Path
 ) -> None:
     """Search-mode `RemoteProduct.metadata` omits baseline keys (stack-only)."""
-    from tests.asf.conftest import _FakeProduct
+    from .conftest import _FakeProduct
 
     fake_asf_search.search_results = [
         _FakeProduct(

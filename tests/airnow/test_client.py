@@ -6,7 +6,7 @@ import pytest
 import requests
 
 from earthlens.airnow.client import AirnowClient
-from tests.airnow.conftest import _FakeAirnow, _FakeResponse, _FakeSession
+from .conftest import _FakeAirnow, _FakeResponse, _FakeSession
 
 
 @pytest.mark.airnow

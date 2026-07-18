@@ -368,7 +368,7 @@ class TestAggregate:
         self, fake_earthaccess, edl_env, tmp_path, monkeypatch
     ):
         """_search surfaces a friendly ImportError when earthaccess is gone."""
-        from tests.earthdata.test_auth import _block_earthaccess
+        from .test_auth import _block_earthaccess
 
         obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
         monkeypatch.delitem(__import__("sys").modules, "earthaccess", raising=False)

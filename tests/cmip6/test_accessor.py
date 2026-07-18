@@ -17,7 +17,7 @@ from earthlens.cmip6.accessor import (
     zstore_to_vsi,
 )
 from earthlens.cmip6.resolver import ResolvedStore
-from tests.cmip6.conftest import FakeContainer, FakeLabeled
+from .conftest import FakeContainer, FakeLabeled
 
 pytestmark = [pytest.mark.cmip6, pytest.mark.unit]
 

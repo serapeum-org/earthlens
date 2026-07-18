@@ -20,7 +20,7 @@ from pydantic import ValidationError
 
 from earthlens.ecmwf import Variable
 from earthlens.ecmwf import constraints as constraints_module
-from tests.test_ecmwf._fakes import captured_request
+from ._fakes import captured_request
 
 pytestmark = [pytest.mark.unit]
 

@@ -18,7 +18,7 @@ from earthlens.nwm.backend import (
     build_key,
     enumerate_cycles,
 )
-from tests.nwm.conftest import FakeS3
+from .conftest import FakeS3
 
 pytestmark = [pytest.mark.nwm]
 

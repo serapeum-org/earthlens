@@ -11,7 +11,7 @@ import pytest
 import earthlens.airnow
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
-from tests.airnow.conftest import _FakeAirnow, _FakeSession
+from .conftest import _FakeAirnow, _FakeSession
 
 
 def _facade(state: _FakeAirnow, tmp_path: Path, **overrides: Any) -> EarthLens:

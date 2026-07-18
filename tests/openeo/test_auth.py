@@ -12,7 +12,7 @@ from earthlens.openeo.auth import (
     OpeneoAuth,
     OpeneoCredentials,
 )
-from tests.openeo.conftest import FakeConnection, FakeOpeneoModule
+from .conftest import FakeConnection, FakeOpeneoModule
 
 
 @pytest.mark.openeo

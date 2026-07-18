@@ -8,7 +8,7 @@ import pytest
 
 from earthlens.eumetsat import EUMETSAT
 from earthlens.eumetsat.catalog import DataStoreGroup
-from tests.eumetsat.conftest import _FakeProduct
+from .conftest import _FakeProduct
 
 pytestmark = pytest.mark.eumetsat
 
@@ -171,7 +171,7 @@ def test_search_without_eumdac_raises_friendly_import_error(tmp_path, monkeypatc
     import sys
 
     # Construct with a fake so auth/catalog resolve, then hide eumdac for _search.
-    from tests.eumetsat.conftest import _FakeEumdac
+    from .conftest import _FakeEumdac
 
     fake = _FakeEumdac()
     monkeypatch.setitem(sys.modules, "eumdac", fake)

@@ -11,7 +11,7 @@ from pyramids.dataset import Dataset
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.worldpop import WorldPop
-from tests.worldpop.conftest import _FakeResponse, age_records, pop_records
+from .conftest import _FakeResponse, age_records, pop_records
 
 pytestmark = pytest.mark.worldpop
 
@@ -401,8 +401,8 @@ def test_404_propagates(wp_kwargs, monkeypatch):
     """A 404 on a file download surfaces as an error."""
     import requests as _rq
 
-    from tests.worldpop.conftest import _FakeResponse
-    from tests.worldpop.conftest import pop_records as _pr
+    from .conftest import _FakeResponse
+    from .conftest import pop_records as _pr
 
     def fake_get(url, params=None, timeout=None, **kwargs):
         if "/rest/data/" in url:

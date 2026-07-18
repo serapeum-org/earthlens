@@ -51,7 +51,7 @@ class TestPerInstanceAggregateGuard:
         """A raster instance forwards aggregate= into the backend (stack path)."""
         import pyramids.dataset as dsmod
 
-        from tests.earthdata.test_backend import _FakeDatasetCollection
+        from .test_backend import _FakeDatasetCollection
 
         monkeypatch.setattr(dsmod, "DatasetCollection", _FakeDatasetCollection)
         fac = _facade(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})

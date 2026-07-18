@@ -9,7 +9,7 @@ import pytest
 
 from earthlens.airnow import AirNow
 from earthlens.airnow.auth import AuthenticationError
-from tests.airnow.conftest import _FakeAirnow, _FakeSession, _observation
+from .conftest import _FakeAirnow, _FakeSession, _observation
 
 
 def _backend(state: _FakeAirnow, tmp_path: Path, **overrides) -> AirNow:

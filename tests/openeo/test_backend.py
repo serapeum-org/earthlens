@@ -8,7 +8,7 @@ import pytest
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.openeo.backend import OpenEO, _apply_step, _safe_name
-from tests.openeo.conftest import FakeAuth, FakeConnection, FakeCube
+from .conftest import FakeAuth, FakeConnection, FakeCube
 
 
 def _make_backend(variables, output_dir, **kwargs) -> OpenEO:

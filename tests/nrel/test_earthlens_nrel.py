@@ -93,7 +93,7 @@ class TestFacadeConstruction:
         self, nrel_env: None, nsrdb_csv: str, bind_session, tmp_path: Path
     ) -> None:
         """A faked download routed through the facade returns a long DataFrame."""
-        from tests.nrel.conftest import FakeResponse
+        from .conftest import FakeResponse
 
         bind_session(FakeResponse(text=nsrdb_csv))
         df = EarthLens(

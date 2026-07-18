@@ -16,7 +16,7 @@ from earthlens.osm._helpers import (
     shapely_bbox,
     to_fc,
 )
-from tests.osm.conftest import FakeResult, make_result
+from .conftest import FakeResult, make_result
 
 pytestmark = pytest.mark.osm
 
@@ -84,14 +84,14 @@ class TestOverpyToGdf:
 
     def test_short_way_is_dropped(self):
         """A way with a single coordinate is skipped (too few points)."""
-        from tests.osm.conftest import FakeWay
+        from .conftest import FakeWay
 
         result = FakeResult([], [FakeWay(9, {"x": "y"}, [(0.0, 0.0)])], [])
         assert len(overpy_to_gdf(result)) == 0
 
     def test_reserved_columns_not_clobbered_by_tags(self):
         """A tag named like a reserved column cannot overwrite identity/geometry."""
-        from tests.osm.conftest import FakeNode
+        from .conftest import FakeNode
 
         node = FakeNode(
             7, 49.41, 8.69, {"osm_id": "junk", "osm_type": "x", "name": "ok"}
@@ -143,7 +143,7 @@ class TestWayGeometry:
     def test_closed_ring_is_polygon(self):
         """A 4+ point ring whose ends match becomes a Polygon."""
         from earthlens.osm._helpers import _way_geometry
-        from tests.osm.conftest import FakeWay
+        from .conftest import FakeWay
 
         way = FakeWay(1, {}, [(0, 0), (0, 1), (1, 1), (0, 0)])
         assert isinstance(_way_geometry(way), Polygon)
@@ -151,7 +151,7 @@ class TestWayGeometry:
     def test_open_way_is_linestring(self):
         """An open run of points becomes a LineString."""
         from earthlens.osm._helpers import _way_geometry
-        from tests.osm.conftest import FakeWay
+        from .conftest import FakeWay
 
         way = FakeWay(1, {}, [(0, 0), (1, 1), (2, 0)])
         assert isinstance(_way_geometry(way), LineString)
@@ -159,6 +159,6 @@ class TestWayGeometry:
     def test_too_few_points_is_none(self):
         """A way with one point yields no geometry."""
         from earthlens.osm._helpers import _way_geometry
-        from tests.osm.conftest import FakeWay
+        from .conftest import FakeWay
 
         assert _way_geometry(FakeWay(1, {}, [(0, 0)])) is None

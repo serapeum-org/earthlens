@@ -12,7 +12,7 @@ import pytest
 import earthlens.argo
 from earthlens.argo import ARGO
 from earthlens.argo._helpers import ARGO_COLUMNS, region_box
-from tests.argo.conftest import DataNotFound, FakeArgo
+from .conftest import DataNotFound, FakeArgo
 
 pytestmark = pytest.mark.argo
 
