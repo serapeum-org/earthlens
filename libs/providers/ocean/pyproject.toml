@@ -60,6 +60,13 @@ include = ["earthlens._ocean*", "earthlens.argo*", "earthlens.cmems*", "earthlen
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
 
+[tool.setuptools.exclude-package-data]
+# The informational available_parameters.yaml (~1.5 MB, ~19.7k codes) is a
+# repo/tooling + docs artefact that nothing loads at runtime (the Catalog reads
+# only the curated file; raw codes pass through variables= without it), so it is
+# deliberately excluded from the wheel.
+"earthlens.usgs_water" = ["available_parameters.yaml"]
+
 # Resolve the core distribution from the workspace, not PyPI, so this package
 # locks and develops against the local earthlens-core.
 [tool.uv.sources]
