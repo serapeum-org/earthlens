@@ -619,34 +619,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Available extras">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#per-backend-extras" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Per-backend extras
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#thematic-bundles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Thematic bundles
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -19179,34 +19151,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Available extras">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#per-backend-extras" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Per-backend extras
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#thematic-bundles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Thematic bundles
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -19321,13 +19265,9 @@ is an optional extra — pick the ones you actually need:</p>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>all<span class="o">]</span><span class="w">      </span><span class="c1"># everything</span>
 </code></pre></div>
 <h3 id="available-extras"><a class="toclink" href="#available-extras">Available extras</a><a class="headerlink" href="#available-extras" title="Permanent link">#</a></h3>
-<p>Two tiers of extras exist. <strong>Per-backend extras</strong> pull in exactly one backend's SDK; <strong>thematic
-bundles</strong> union several per-backend extras that cover the same kind of data (e.g. <code>earthlens[ocean]</code>
-pulls <code>cmems</code> + <code>argo</code> + <code>erddap</code> together) — see <a href="../examples/data-sources/">Data Sources</a> for how
-they're grouped, or <a href="https://github.com/serapeum-org/earthlens/blob/main/docs/_images/logos/ATTRIBUTION.md">_images/logos/ATTRIBUTION.md</a>.
-Both tiers are always available side by side — installing a bundle is equivalent to installing its
-listed per-backend extras yourself.</p>
-<h4 id="per-backend-extras"><a class="toclink" href="#per-backend-extras">Per-backend extras</a><a class="headerlink" href="#per-backend-extras" title="Permanent link">#</a></h4>
+<p>Each extra pulls in exactly one backend's SDK. The names work the same whether
+you install the meta-package or a thematic distribution directly:
+<code>pip install earthlens[gee]</code> forwards to <code>earthlens-imagery[gee]</code>.</p>
 <table>
 <thead>
 <tr>
@@ -19375,7 +19315,7 @@ listed per-backend extras yourself.</p>
 <tr>
 <td><code>nwm</code></td>
 <td><a href="https://serapeum-org.github.io/earthlens/reference/nwm/introduction/">NOAA National Water Model</a></td>
-<td><code>earthlens[s3]</code>, <code>pyramids-gis[parquet] &gt;=0.45.0</code></td>
+<td><code>earthlens[s3]</code>, <code>pyramids-gis[parquet] &gt;=0.46.0</code></td>
 </tr>
 <tr>
 <td><code>earthdata</code></td>
@@ -19425,7 +19365,7 @@ listed per-backend extras yourself.</p>
 <tr>
 <td><code>stac</code></td>
 <td><a href="https://serapeum-org.github.io/earthlens/reference/stac/introduction/">STAC (SpatioTemporal Asset Catalog)</a></td>
-<td><code>pyramids-gis[stac] &gt;=0.45.0</code></td>
+<td><code>pyramids-gis[stac] &gt;=0.46.0</code></td>
 </tr>
 <tr>
 <td><code>openeo</code></td>
@@ -19501,113 +19441,6 @@ listed per-backend extras yourself.</p>
 <td><code>all</code></td>
 <td>every backend above except <code>argo</code>, <code>osm</code>, <code>osm-pbf</code> (pin conflicts — see note below)</td>
 <td>—</td>
-</tr>
-</tbody>
-</table>
-<h4 id="thematic-bundles"><a class="toclink" href="#thematic-bundles">Thematic bundles</a><a class="headerlink" href="#thematic-bundles" title="Permanent link">#</a></h4>
-<table>
-<thead>
-<tr>
-<th>Extra</th>
-<th>Covers (<code>data_source</code> keys)</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>air-quality</code></td>
-<td><code>airnow</code>, <code>eea-aq</code>, <code>openaq</code>, <code>sensor-community</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>biodiversity</code></td>
-<td><code>gbif</code>, <code>iucn</code>, <code>obis</code>, <code>wdpa</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>climate</code></td>
-<td><code>climate-indices</code>, <code>cmip6</code>, <code>ecmwf</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>disasters</code></td>
-<td><code>fdsn</code>, <code>firms</code>, <code>gdacs</code>, <code>thinkhazard</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>elevation</code></td>
-<td><code>bathymetry</code>, <code>dem</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>glaciers-cryosphere</code></td>
-<td><code>glaciers</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>humanitarian</code></td>
-<td><code>hdx</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>hydrology</code></td>
-<td><code>nwm</code>, <code>usgs-water</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>ocean</code></td>
-<td><code>argo</code>, <code>cmems</code>, <code>erddap</code></td>
-<td>Not meant to be combined with <code>platforms</code> in the same install — <code>argo</code>'s <code>argopy</code> needs <code>xarray&gt;=2025.7</code>, <code>platforms</code>' <code>openeo</code> needs <code>xarray&lt;2025.1.2</code>.</td>
-</tr>
-<tr>
-<td><code>platforms</code></td>
-<td><code>amazon-s3</code>, <code>earthdata</code>, <code>eumetsat</code>, <code>gee</code>, <code>goes</code>, <code>jaxa</code>, <code>openeo</code>, <code>sentinel-hub</code>, <code>stac</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>population-settlement</code></td>
-<td><code>ghsl</code>, <code>worldpop</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>precipitation-drought</code></td>
-<td><code>chc</code>, <code>drought</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>renewable-energy</code></td>
-<td><code>nrel</code>, <code>pvgis</code>, <code>solar-wind-atlas</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>sar-radar</code></td>
-<td><code>asf</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>soil</code></td>
-<td><code>soilgrids</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>tropical-cyclones</code></td>
-<td><code>tropycal</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>vector-basemaps</code></td>
-<td><code>admin</code>, <code>osm</code>, <code>overture</code></td>
-<td>Not meant to be combined with most other bundles — <code>osm</code>'s <code>ohsome</code> needs <code>pandas&lt;3.0.0</code>, conflicting with the rest of the dependency graph.</td>
-</tr>
-<tr>
-<td><code>weather-forecast</code></td>
-<td><code>nwp</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>weather-radar</code></td>
-<td><code>radar</code></td>
-<td></td>
 </tr>
 </tbody>
 </table>
