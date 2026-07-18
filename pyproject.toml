@@ -201,7 +201,7 @@ skips = ["B101"]
 
 [tool.coverage.run]
 branch = true
-source = ["src/earthlens"]
+source = ["libs"]
 
 [tool.coverage.report]
 show_missing = true
