@@ -76,7 +76,7 @@ Examples:
         ...     lon_lim=[-75.0, -74.0],
         ...     path="out/era5",
         ... )
-        >>> earthlens.core.download(  # doctest: +SKIP
+        >>> earthlens.download(  # doctest: +SKIP
         ...     aggregate=AggregationConfig(freq="1MS", op="mean"),
         ... )
 

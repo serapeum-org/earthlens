@@ -1401,7 +1401,7 @@ class EarthLens:
                 ...     lon_lim=[-75.65, -74.73],
                 ...     path="examples/data/chirps",
                 ... )
-                >>> earthlens.core.download()  # doctest: +SKIP
+                >>> earthlens.download()  # doctest: +SKIP
 
                 ```
             - ECMWF download via the facade. Marked
@@ -1422,7 +1422,7 @@ class EarthLens:
                 ...     lon_lim=[-75.0, -74.0],
                 ...     path="examples/data/era5",
                 ... )
-                >>> earthlens.core.download()  # doctest: +SKIP
+                >>> earthlens.download()  # doctest: +SKIP
 
                 ```
 

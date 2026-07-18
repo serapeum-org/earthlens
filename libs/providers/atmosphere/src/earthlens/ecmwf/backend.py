@@ -673,7 +673,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ...     lon_lim=[-75.0, -74.0],
                 ...     path="examples/data/era5",
                 ... )
-                >>> earthlens.core.download()  # doctest: +SKIP
+                >>> earthlens.download()  # doctest: +SKIP
 
                 ```
 
@@ -872,7 +872,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ...     lon_lim=[-75.0, -74.0],
                 ...     path="examples/data/era5",
                 ... )
-                >>> earthlens.core.download()  # doctest: +SKIP
+                >>> earthlens.download()  # doctest: +SKIP
 
                 ```
 
