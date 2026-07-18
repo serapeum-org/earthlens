@@ -298,4 +298,12 @@ CI mirrors this: `tests.yml` runs one lane per distribution
 failure is attributed to the distribution that owns it. End-to-end tests
 (`-m e2e`) are opt-in and run in the separate `tests-e2e.yml` workflow.
 
+One coupling to note: `earthlens-core`'s entry-point discovery and facade tests
+(`test_backends.py`, `test_earthlens.py`) exercise the **whole** registry — they
+assert every provider's backends are discoverable — so they require all five
+provider distributions to be installed, which the workspace dev setup
+(`uv sync --extra all`) always provides. A consequence is that a cross-provider
+entry-point or packaging regression surfaces in the `core` lane, not only the
+offending provider's lane.
+
 More details on conda environments: [Managing environments](https://conda.io/docs/user-guide/tasks/manage-environments.html)
