@@ -64,10 +64,10 @@ earthlens = "earthlens.cli:app"
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
 
-# Core owns the regular `earthlens` package (`earthlens/__init__.py`), so
-# `from earthlens import EarthLens` keeps working. A provider distribution
-# ships only its own `earthlens/<provider>/*` subpackage and never an
-# `__init__.py` at this level, so the wheels never collide.
+# `earthlens` is a PEP 420 namespace (no `earthlens/__init__.py` in any
+# distribution); core ships the `earthlens.core` entry point plus its
+# subpackages and loose modules, and each provider ships only its own
+# `earthlens/<provider>/*`, so no two wheels write the same path.
 [tool.setuptools.packages.find]
 where = ["src"]
 # `earthlens` is a PEP 420 namespace (no __init__.py) shared with the provider

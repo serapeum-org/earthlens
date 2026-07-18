@@ -50,7 +50,8 @@ land = "earthlens._land:BACKENDS"
 Homepage = "https://github.com/serapeum-org/earthlens"
 
 # Ships only its own backends plus its registry package. `earthlens` itself is
-# absent: core owns `earthlens/__init__.py`, so no two wheels write the same path.
+# a PEP 420 namespace (no `__init__.py` in any distribution), so no two wheels
+# write the same path.
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["earthlens._land*", "earthlens.bathymetry*", "earthlens.dem*", "earthlens.gbif*", "earthlens.ghsl*", "earthlens.glaciers*", "earthlens.iucn*", "earthlens.soilgrids*", "earthlens.wdpa*", "earthlens.worldpop*"]
