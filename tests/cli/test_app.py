@@ -2,18 +2,30 @@
 
 from __future__ import annotations
 
+import importlib
 import subprocess
 import sys
+from functools import partial
 
 import pytest
 from typer.testing import CliRunner
 
 from earthlens.cli import app as cli_app
-from earthlens.cli.app import app, main
+from earthlens.cli.app import _provider_backend_hint, app, main
 
 pytestmark = pytest.mark.cli
 
 runner = CliRunner()
+
+# The `app` submodule and the `app` Typer object share a name, so the dotted
+# attribute `earthlens.cli.app` resolves to the Typer object; reach the real
+# module (to patch its `app` global) through `import_module` instead.
+_app_module = importlib.import_module("earthlens.cli.app")
+
+
+def _raise(exc: BaseException) -> None:
+    """Module-level thunk that raises `exc` when called (stands in for `app`)."""
+    raise exc
 
 
 class TestApp:
@@ -71,3 +83,54 @@ class TestApp:
 
         dunder_main = importlib.import_module("earthlens.cli.__main__")
         assert dunder_main.main is main, "__main__ wires the app's main()"
+
+
+class TestProviderBackendHint:
+    """Tests for the missing-provider-backend install hint."""
+
+    @pytest.mark.parametrize(
+        "missing",
+        [
+            "earthlens.ecmwf",
+            "earthlens.ecmwf.catalog",
+            "earthlens.nwm",
+            "earthlens.gee.auth",
+        ],
+    )
+    def test_provider_miss_returns_hint(self, missing):
+        """A missing provider module yields a `pip install earthlens[<backend>]` hint."""
+        exc = ModuleNotFoundError(f"No module named {missing!r}", name=missing)
+        hint = _provider_backend_hint(exc)
+        backend = missing.split(".")[1]
+        assert hint is not None, "provider miss should produce a hint"
+        assert f"earthlens[{backend}]" in hint, "hint names the backend extra"
+
+    @pytest.mark.parametrize(
+        "missing",
+        ["earthlens.base", "earthlens.core", "earthlens", "cdsapi", "boto3", None, ""],
+    )
+    def test_core_or_sdk_miss_returns_none(self, missing):
+        """A core module, bare namespace, or third-party SDK miss is not rewritten."""
+        exc = ModuleNotFoundError("boom", name=missing)
+        assert _provider_backend_hint(exc) is None, "only provider misses are rewritten"
+
+
+class TestMainGuard:
+    """Tests for main()'s missing-provider rewrite."""
+
+    def test_provider_miss_prints_hint_and_exits_one(self, monkeypatch, capsys):
+        """main() turns a missing provider backend into a friendly hint and exit 1."""
+        exc = ModuleNotFoundError("No module named 'earthlens.ecmwf'", name="earthlens.ecmwf")
+        monkeypatch.setattr(_app_module, "app", partial(_raise, exc))
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 1, "provider miss exits non-zero"
+        assert "earthlens[ecmwf]" in capsys.readouterr().err, "hint printed to stderr"
+
+    def test_sdk_miss_propagates(self, monkeypatch):
+        """main() re-raises a missing backend SDK unchanged (not a provider distribution)."""
+        exc = ModuleNotFoundError("No module named 'cdsapi'", name="cdsapi")
+        monkeypatch.setattr(_app_module, "app", partial(_raise, exc))
+        with pytest.raises(ModuleNotFoundError) as exc_info:
+            main()
+        assert exc_info.value.name == "cdsapi", "unrelated import error is not rewritten"
