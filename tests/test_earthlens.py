@@ -390,7 +390,7 @@ class TestEarthLensDownloadAggregate:
 
 @pytest.mark.unit
 class TestTopLevelReExports:
-    """Pin the top-level `earthlens` package surface (L2)."""
+    """Pin the `earthlens.core` public surface (L2)."""
 
     def test_earthlens_facade_importable_from_package_root(self):
         """`from earthlens.core import EarthLens` resolves to the facade class."""
