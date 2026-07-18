@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -21176,14 +21148,14 @@ download), refined per product as needed and reconciled by the audit tool.</p>
 <strong>public</strong> Data Store browse endpoint, so they need <strong>no credentials</strong>.</p>
 <h3 id="refresh-the-index"><a class="toclink" href="#refresh-the-index">Refresh the index</a><a class="headerlink" href="#refresh-the-index" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Rebuild available_datasets from the public browse endpoint (all ~180)</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/refresh_eumetsat_catalog.py<span class="w"> </span>refresh
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/refresh_eumetsat_catalog.py<span class="w"> </span>refresh
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Emit a curated stanza for one collection (paste into a per-group file)</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/refresh_eumetsat_catalog.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/refresh_eumetsat_catalog.py<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span>add-collection<span class="w"> </span>msg-hrseviri<span class="w"> </span>EO:EUM:DAT:MSG:HRSEVIRI<span class="w"> </span>--group<span class="w"> </span>MSG
 </code></pre></div>
 <h3 id="audit-curated-vs-live"><a class="toclink" href="#audit-curated-vs-live">Audit curated vs live</a><a class="headerlink" href="#audit-curated-vs-live" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/audit_eumetsat_catalog.py<span class="w"> </span>--strict
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/audit_eumetsat_catalog.py<span class="w"> </span>--strict
 </code></pre></div>
 <p>The audit reports <strong>GONE</strong> (a curated id the live store no longer lists),
 <strong>INDEX-GONE</strong> (an index id no longer live), and <strong>NEW</strong> (a live id absent
@@ -21191,7 +21163,7 @@ from the index). <code>--strict</code> exits non-zero on any drift, for CI.</p>
 <h3 id="probe-one-collection"><a class="toclink" href="#probe-one-collection">Probe one collection</a><a class="headerlink" href="#probe-one-collection" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Print a collection&#39;s public metadata (title, abstract, date range);</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># accepts a real id or a curated key. --out writes the full JSON.</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/probe_eumetsat_product.py<span class="w"> </span>msg-hrseviri
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/probe_eumetsat_product.py<span class="w"> </span>msg-hrseviri
 </code></pre></div>
 
 

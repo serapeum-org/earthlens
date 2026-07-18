@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -20186,7 +20158,7 @@ shim" — the second one is the product_type of the sibling.</p>
 <tr>
 <td><code>available_datasets:</code></td>
 <td>The CDS server</td>
-<td><code>pixi run -e dev python tools/ecmwf/refresh_available_datasets.py</code></td>
+<td><code>uv run python tools/ecmwf/refresh_available_datasets.py</code></td>
 </tr>
 <tr>
 <td><code>datasets:</code></td>
@@ -20209,7 +20181,7 @@ package targets, and rewrites the <code>available_datasets:</code> block in
 <code>cds_data_catalog.yaml</code> in place. Other parts of the YAML (the
 <code>datasets:</code> curated map and the schema header comments) are preserved
 verbatim.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/refresh_available_datasets.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/refresh_available_datasets.py
 </code></pre></div>
 <p>Run before each release so the catalogue file reflects whatever
 datasets CDS hosts on release day. Exits 0 on success, 1 on any
@@ -20222,7 +20194,7 @@ HTTP / parse error.</p>
 <li>how many distinct <code>variable</code> values appear,</li>
 <li>which extra request fields beyond the ERA5 standard set are required.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/audit_cds_datasets.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/audit_cds_datasets.py
 </code></pre></div>
 <p>Output is grouped by category (<code>DONE</code> / <code>addressable</code> /
 <code>no-variable-key</code> / <code>no-or-empty-constraints</code>) so you can see at a
@@ -20250,7 +20222,7 @@ extraction by <code>probe_cds_netcdf.py</code> or hand inspection.</p>
 variable's <code>long_name</code>, <code>units</code>, and short name. Writes a JSON
 sidecar mapping <code>cds_variable</code> → metadata that you copy into the
 <code>datasets:</code> block.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/probe_cds_netcdf.py<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/probe_cds_netcdf.py<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span>--dataset<span class="w"> </span>reanalysis-era5-land<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span>--variables<span class="w"> </span>evaporation_from_bare_soil,total_evaporation<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span>--out<span class="w"> </span>C:/tmp/cds_probe/era5land_missing.json
@@ -20288,8 +20260,8 @@ the package doesn't yet support:</p>
 <ol>
 <li>
 <p><strong>Surface the gap.</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/refresh_available_datasets.py
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/audit_cds_datasets.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/refresh_available_datasets.py
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/audit_cds_datasets.py
 </code></pre></div>
 </li>
 </ol>
@@ -20337,7 +20309,7 @@ add one more variable:</p>
 <ol>
 <li>
 <p>Probe it for <code>nc_variable</code> / <code>units</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/probe_cds_netcdf.py<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/ecmwf/probe_cds_netcdf.py<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span>--dataset<span class="w"> </span>reanalysis-era5-single-levels<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span>--variables<span class="w"> </span>surface_pressure<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span>--out<span class="w"> </span>C:/tmp/cds_probe/era5_sp.json

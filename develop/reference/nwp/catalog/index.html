@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -19125,9 +19097,11 @@ are missing:</p>
 </ul>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>eccodes<span class="w"> </span>libgdal-grib
 </code></pre></div>
-<p>In the pixi workspace, <code>eccodes</code> is declared on the <code>nwp</code> feature (used by
-the <code>dev</code> / <code>notebook</code> environments), so <code>pixi run -e dev …</code> provides it
-automatically — the docs and per-Python test-matrix envs stay lean.</p>
+<p>The <code>earthlens[nwp]</code> extra installs only the Python SDKs (<code>herbie-data</code>,
+<code>ecmwf-opendata</code>); the two binary libraries above are not on PyPI, so install
+them from conda-forge as shown. earthlens' own GRIB read path decodes through
+<code>pyramids</code>' bundled GDAL driver, so <code>eccodes</code> is needed only to satisfy Herbie's
+<code>cfgrib</code> import chain, not by earthlens itself.</p>
 <div class="admonition note">
 <p class="admonition-title">conda eccodes on Windows</p>
 <p>On Windows, conda installs the library as <code>Library\bin\eccodes.dll</code>,
