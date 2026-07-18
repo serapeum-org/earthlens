@@ -1636,7 +1636,7 @@ def download(
         - One-shot CHIRPS download. Marked `# doctest: +SKIP` because it
           makes a live FTP connection:
             ```python
-            >>> import earthlens
+            >>> import earthlens.core
             >>> earthlens.core.download(  # doctest: +SKIP
             ...     data_source="chc",
             ...     variables=["precipitation"],
@@ -1685,7 +1685,7 @@ def sources() -> list[str]:
     Examples:
         - The CHIRPS and GEE backends are listed by their canonical keys:
             ```python
-            >>> import earthlens
+            >>> import earthlens.core
             >>> keys = earthlens.core.sources()
             >>> "chc" in keys and "gee" in keys
             True
@@ -1693,7 +1693,7 @@ def sources() -> list[str]:
             ```
         - Aliases are collapsed, so each backend appears once:
             ```python
-            >>> import earthlens
+            >>> import earthlens.core
             >>> keys = earthlens.core.sources()
             >>> "chirps" in keys or "google-earth-engine" in keys
             False
@@ -1767,7 +1767,7 @@ def search(
         - Dry-run a STAC search and inspect the first product id (live;
           skipped here because it queries a remote catalog):
             ```python
-            >>> import earthlens
+            >>> import earthlens.core
             >>> products = earthlens.core.search(  # doctest: +SKIP
             ...     "stac",
             ...     dataset="sentinel-2-l2a",
@@ -1817,7 +1817,7 @@ def find(text: str) -> dict[str, list[str]]:
     Examples:
         - Find sources whose catalog mentions precipitation (live; skipped):
             ```python
-            >>> import earthlens
+            >>> import earthlens.core
             >>> earthlens.core.find("precipitation")  # doctest: +SKIP
             {'chc': ['global-daily', ...], ...}
 
