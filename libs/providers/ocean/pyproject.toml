@@ -76,3 +76,23 @@ include = ["earthlens._ocean*", "earthlens.argo*", "earthlens.cmems*", "earthlen
 # locks and develops against the local earthlens-core.
 [tool.uv.sources]
 earthlens-core = { workspace = true }
+
+# Per-distribution pytest config: lets this member's tests run standalone
+# (`cd libs/providers/ocean && uv run pytest`, or `pytest -c libs/providers/ocean/pyproject.toml libs/providers/ocean/tests`).
+# The root pyproject aggregates all six member test roots for the whole-suite run.
+[tool.pytest.ini_options]
+testpaths = "tests"
+consider_namespace_packages = true
+addopts = "--import-mode=importlib"
+markers = [
+    "argo: tests for the Argo float-profile backend (requires the `argo` extra: argopy; open data, no auth).",
+    "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
+    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "erddap: tests for the generic ERDDAP backend (requires the `erddap` extra: erddapy; griddap raster via direct .nc download + pyramids, tabledap tabular via to_pandas; public servers only).",
+    "integration: exercises multiple modules together with mocked I/O.",
+    "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
+    "obis: tests for the OBIS marine-occurrence backend (requires the `obis` extra: pyobis; search is anonymous).",
+    "slow: mark test as slow.",
+    "unit: in-process unit test, no network or filesystem outside tmp_path.",
+    "usgs_water: tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",
+]

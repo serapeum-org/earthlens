@@ -92,8 +92,8 @@ dev = [
     # showcase notebooks already migrated their existing text_loc= calls,
     # and the new dark-canvas notebook uses FrameLabel's color= directly
     # rather than the also-deprecated label_color=) -- floor pinned to
-    # the latest of these, >=0.26.0.
-    "cleopatra >=0.26.0",
+    # the latest of these, >=0.26.1.
+    "cleopatra >=0.26.1",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     "pytest >=8.2.2",
@@ -132,8 +132,8 @@ docs = [
     # showcase notebooks already migrated their existing text_loc= calls,
     # and the new dark-canvas notebook uses FrameLabel's color= directly
     # rather than the also-deprecated label_color=) -- floor pinned to
-    # the latest of these, >=0.26.0.
-    "cleopatra >=0.26.0",
+    # the latest of these, >=0.26.1.
+    "cleopatra >=0.26.1",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
@@ -235,7 +235,16 @@ style = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Tests are co-located with each distribution under `libs/<member>/tests/` (#785).
+testpaths = [
+    "libs/core/tests",
+    "libs/providers/atmosphere/tests",
+    "libs/providers/hazards/tests",
+    "libs/providers/imagery/tests",
+    "libs/providers/land/tests",
+    "libs/providers/ocean/tests",
+]
+consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
     "slow: mark test as slow.",

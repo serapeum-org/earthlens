@@ -10,13 +10,26 @@ on:
   pull_request:
 
 jobs:
-  main-package:
-    runs-on: ${{ matrix.os }}
+  # One lane per distribution (#785): each member's tests run against its own
+  # `pyproject.toml` config and report coverage only for its own `src`, tagged
+  # with a Codecov flag. The union of the six members is the whole non-e2e
+  # suite. `extras: all` installs every backend SDK except the mutually
+  # exclusive argo / osm / osm-pbf (excluded from the meta `all` extra and faked
+  # in their unit tests); `verify-lock` is the `uv.lock` up-to-date check.
+  test:
+    name: ${{ matrix.member.name }} (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
         python-version: ["3.11", "3.12", "3.13", "3.14"]
+        member:
+          - { name: core, dir: libs/core }
+          - { name: atmosphere, dir: libs/providers/atmosphere }
+          - { name: ocean, dir: libs/providers/ocean }
+          - { name: imagery, dir: libs/providers/imagery }
+          - { name: land, dir: libs/providers/land }
+          - { name: hazards, dir: libs/providers/hazards }
 
     steps:
       - uses: actions/checkout@v5
@@ -27,15 +40,19 @@ jobs:
         uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
           python-version: ${{ matrix.python-version }}
-          # `extras: all` installs every backend SDK except the mutually
-          # exclusive ones (argo / osm / osm-pbf are excluded from the meta
-          # `all` extra and faked in their unit tests). `verify-lock` is the
-          # `uv.lock` up-to-date check (the old `pixi install --locked`).
           install-groups: "groups: dev, extras: all"
           verify-lock: true
 
-      - name: Run unit + integration suite
-        run: uv run pytest -m "not e2e" --cov=libs --cov-report=xml
+      - name: Run ${{ matrix.member.name }} unit + integration suite
+        run: >
+          uv run pytest
+          -c ${{ matrix.member.dir }}/pyproject.toml
+          ${{ matrix.member.dir }}/tests
+          -m "not e2e"
+          --cov=${{ matrix.member.dir }}/src
+          --cov-report=xml
 
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v5
+        with:
+          flags: ${{ matrix.member.name }}

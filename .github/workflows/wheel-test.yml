@@ -104,7 +104,10 @@ jobs:
 
       - name: Run tests against installed wheel
         shell: bash -el {0}
-        # Skip e2e tests — they hit live CDS / FTP / S3 services and
-        # require credentials that aren't provisioned in this workflow.
-        # The dedicated tests-e2e.yml workflow runs them with secrets.
-        run: pytest -vvv -sv -m "not e2e" tests/
+        # No path argument: tests are co-located per distribution under
+        # `libs/<member>/tests/`, so let the root `pyproject.toml` `testpaths`
+        # (all six member roots, with `consider_namespace_packages` + the full
+        # marker set) drive collection. Skip e2e tests — they hit live CDS /
+        # FTP / S3 services and require credentials that aren't provisioned
+        # here. The dedicated tests-e2e.yml workflow runs them with secrets.
+        run: pytest -vvv -sv -m "not e2e"

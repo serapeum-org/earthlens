@@ -71,3 +71,26 @@ include = ["earthlens._land*", "earthlens.bathymetry*", "earthlens.dem*", "earth
 # locks and develops against the local earthlens-core.
 [tool.uv.sources]
 earthlens-core = { workspace = true }
+
+# Per-distribution pytest config: lets this member's tests run standalone
+# (`cd libs/providers/land && uv run pytest`, or `pytest -c libs/providers/land/pyproject.toml libs/providers/land/tests`).
+# The root pyproject aggregates all six member test roots for the whole-suite run.
+[tool.pytest.ini_options]
+testpaths = "tests"
+consider_namespace_packages = true
+addopts = "--import-mode=importlib"
+markers = [
+    "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; no extra SDK — core requests + pyramids).",
+    "dem: tests for the Copernicus DEM backend (GLO-30 / GLO-90; requires the `dem` extra: boto3; anonymous copernicus-dem-30m / -90m buckets; raw COG tiles — no decode, mosaic/crop is pyramids downstream).",
+    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "gbif: tests for the GBIF species-occurrence backend (requires the `gbif` extra: pygbif; search is anonymous).",
+    "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
+    "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",
+    "integration: exercises multiple modules together with mocked I/O.",
+    "iucn: tests for the IUCN Red List v4 backend (no extra SDK; direct v4 REST via core `requests`; needs a Bearer token).",
+    "slow: mark test as slow.",
+    "soilgrids: tests for the SoilGrids backend (ISRIC SoilGrids 2.0 soil properties via OGC WCS at maps.isric.org; no extra SDK — core requests + pyramids' Dataset.from_wcs; all public, CC-BY 4.0, no auth).",
+    "unit: in-process unit test, no network or filesystem outside tmp_path.",
+    "wdpa: tests for the Protected Planet (WDPA) backend (no extra SDK; direct v4 REST via core `requests`; needs a token).",
+    "worldpop: tests for the WorldPop population data hub backend (open CC-BY-4.0; default REST path needs only core requests + pyramids, optional `worldpop` extra adds worldpoppy).",
+]

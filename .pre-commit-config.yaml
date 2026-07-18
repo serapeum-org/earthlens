@@ -52,7 +52,7 @@ repos:
       - id: flake8
         additional_dependencies: [Flake8-pyproject]
         name: "[py   - check] flake8"
-        exclude: ^(examples/|tests/)
+        exclude: ^(examples/|libs/.*/tests/)
 #   - repo: https://github.com/pycqa/docformatter
 #     rev: v1.4
 #     hooks:
@@ -95,7 +95,7 @@ repos:
       - id: nbqa-flake8
         name: "[ipynb -   lint] flake8"
         additional_dependencies: [Flake8-pyproject]
-        exclude: ^(examples/|tests/)
+        exclude: ^(examples/|libs/.*/tests/)
 
   - repo: https://github.com/lovesegfault/beautysh
     rev: v6.4.3

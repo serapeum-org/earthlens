@@ -264,9 +264,46 @@ pip install -e libs/core \
 ```
 
 The tests import earthlens from the **installed** distributions, not from the
-source tree: `earthlens` is a regular package owned by `earthlens-core`, so a
-provider living in a different source tree is only reachable through the finder
-an editable install sets up. Running `pytest` against a clone without installing
-the workspace first will not collect.
+source tree: `earthlens` is a PEP 420 namespace shared across all seven
+distributions, and each provider's `earthlens.<backend>` subpackage lives in its
+own source tree, reachable only through the finder an editable install sets up.
+Running `pytest` against a clone without installing the workspace first will not
+collect.
+
+### Running the tests
+
+Tests are co-located with the distribution they cover, under each member's
+`tests/` directory:
+
+```text
+libs/core/tests/               # facade, base, CLI, grids, entry-point discovery
+libs/providers/<theme>/tests/  # each theme's backend tests
+                               # (atmosphere, ocean, imagery, land, hazards)
+```
+
+`uv run pytest -m "not e2e"` from the repo root runs the **whole** suite — the
+root `pyproject.toml` lists all six member test roots in `testpaths`. To run (or
+measure coverage for) a **single** distribution, point pytest at that member's
+own config:
+
+```bash
+# one distribution, standalone
+uv run pytest -c libs/providers/imagery/pyproject.toml libs/providers/imagery/tests -m "not e2e"
+# or, equivalently, from inside the member
+cd libs/providers/imagery && uv run pytest -m "not e2e"
+```
+
+CI mirrors this: `tests.yml` runs one lane per distribution
+(`--cov=libs/<member>/src`, uploaded to Codecov under a per-member flag), so a
+failure is attributed to the distribution that owns it. End-to-end tests
+(`-m e2e`) are opt-in and run in the separate `tests-e2e.yml` workflow.
+
+One coupling to note: `earthlens-core`'s entry-point discovery and facade tests
+(`test_backends.py`, `test_earthlens.py`) exercise the **whole** registry — they
+assert every provider's backends are discoverable — so they require all five
+provider distributions to be installed, which the workspace dev setup
+(`uv sync --extra all`) always provides. A consequence is that a cross-provider
+entry-point or packaging regression surfaces in the `core` lane, not only the
+offending provider's lane.
 
 More details on conda environments: [Managing environments](https://conda.io/docs/user-guide/tasks/manage-environments.html)
