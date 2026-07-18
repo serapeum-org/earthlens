@@ -38,8 +38,8 @@ jobs:
       - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1
         with:
           trigger: 'pull_request'
-          package-manager: 'pixi'
-          install-groups: 'docs'
+          package-manager: 'uv'
+          install-groups: "groups: docs"
           deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
 
   deploy-main:
@@ -52,8 +52,8 @@ jobs:
     - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1
       with:
         trigger: 'main'
-        package-manager: 'pixi'
-        install-groups: 'docs'
+        package-manager: 'uv'
+        install-groups: "groups: docs"
         deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
 
   deploy-release:
@@ -76,8 +76,8 @@ jobs:
     - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1
       with:
         trigger: 'release'
-        package-manager: 'pixi'
-        install-groups: "docs"
+        package-manager: 'uv'
+        install-groups: "groups: docs"
         deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
         release-tag: ${{ github.event.release.tag_name || steps.version.outputs.tag }}
         mike-alias: 'latest'

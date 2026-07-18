@@ -48,7 +48,7 @@ jobs:
         with:
           pypi-username: __token__
           pypi-password: ${{ secrets.PYPI_PUBLISH }}
-          package-manager: 'pixi'
+          package-manager: 'uv'
           install-groups: 'dev'
           verify-lock: 'false'
           package: ${{ matrix.package }}

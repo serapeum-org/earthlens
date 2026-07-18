@@ -46,7 +46,6 @@ radar = ["earthlens-core[s3]"]
 goes = ["earthlens-core[s3]"]
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 eea_aq = ["airbase >=1.0", "nest_asyncio >=1.5"]
-all = ["earthlens-atmosphere[cmip6,ecmwf,ecmwf-modern,eea_aq,goes,nwp,radar,s3,tropycal]"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
@@ -63,3 +62,8 @@ include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.chc*", "ear
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
+
+# Resolve the core distribution from the workspace, not PyPI, so this package
+# locks and develops against the local earthlens-core.
+[tool.uv.sources]
+earthlens-core = { workspace = true }

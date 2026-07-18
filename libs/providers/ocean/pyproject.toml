@@ -43,7 +43,6 @@ erddap = ["erddapy >=3.0"]
 nwm = ["earthlens-core[s3]", "pyramids-gis[parquet] >=0.46.0"]
 usgs-water = ["dataretrieval >=1.1.4"]
 obis = ["pyobis >=1.6.1"]
-all = ["earthlens-ocean[argo,cmems,erddap,nwm,obis,usgs-water]"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
@@ -60,3 +59,8 @@ include = ["earthlens._ocean*", "earthlens.argo*", "earthlens.cmems*", "earthlen
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
+
+# Resolve the core distribution from the workspace, not PyPI, so this package
+# locks and develops against the local earthlens-core.
+[tool.uv.sources]
+earthlens-core = { workspace = true }

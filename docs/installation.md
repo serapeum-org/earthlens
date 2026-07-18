@@ -14,12 +14,12 @@ conda install -c conda-forge earthlens
 
 If this works, it will install earthlens with all dependencies including Python and GDAL, and you can skip the rest of the installation instructions.
 
-### pixi
+### uv
 
-You can also use [pixi](https://pixi.sh) to manage the environment:
+You can also use [uv](https://docs.astral.sh/uv/) to manage the environment:
 
 ```bash
-pixi add earthlens
+uv add earthlens
 ```
 
 ### Installing Python and GDAL dependencies
@@ -220,11 +220,11 @@ pip install -e libs/core \
             -e ".[ecmwf]"
 ```
 
-With [pixi](https://pixi.sh) this is a single command — the members are declared
-as editable path dependencies in `pyproject.toml`:
+With [uv](https://docs.astral.sh/uv/) this is a single command — the members are
+declared as a workspace in `pyproject.toml`, so one lock covers them all:
 
 ```bash
-pixi install
+uv sync
 ```
 
 If you only want one domain from a clone, its package plus core is enough:
@@ -266,15 +266,16 @@ pip install earthlens[ecmwf]
 
 If you are planning to contribute to earthlens, install the whole workspace
 editable with the `[all]` extra so the full test suite (which exercises every
-backend) can run. [pixi](https://pixi.sh) is the supported path — it installs
-every member from `pyproject.toml`'s editable path dependencies and resolves
-them from one lockfile:
+backend) can run. [uv](https://docs.astral.sh/uv/) is the supported path — it
+installs every workspace member from one lockfile (`uv.lock`). `--extra all`
+pulls every backend SDK except the mutually exclusive `argo` / `osm` (which are
+faked in their unit tests):
 
 ```bash
 git clone https://github.com/serapeum-org/earthlens.git
 cd earthlens
-pixi install
-pixi run test-no-e2e
+uv sync --extra all --group dev
+uv run pytest -m "not e2e"
 ```
 
 The equivalent with pip, which must name every member so they resolve from the

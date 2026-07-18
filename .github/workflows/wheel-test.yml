@@ -17,31 +17,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Pixi
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@cd02ddbe749b77cbafd08bc48c788974fc989db7 # pixi/v1
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: dev
-          activate-environment: dev
-          cache: true
+          python-version: "3.12"
+          verify-lock: true
 
       - name: Build every distribution's wheel
         # The workspace publishes seven distributions and the root one is a
         # meta-package with no modules, so building only it would produce a
-        # wheel that imports nothing. Each member is built into the same dist/
-        # so the install step can resolve the whole set locally.
+        # wheel that imports nothing. `uv build --all-packages` builds every
+        # workspace member into the same dist/ so the install step can resolve
+        # the whole set locally.
         run: |
           set -euo pipefail
-          for pkg in libs/core \
-                     libs/providers/atmosphere \
-                     libs/providers/ocean \
-                     libs/providers/imagery \
-                     libs/providers/land \
-                     libs/providers/hazards \
-                     . ; do
-            echo "::group::build $pkg"
-            pixi run -e dev python -m build --wheel --outdir dist/ "$pkg"
-            echo "::endgroup::"
-          done
+          uv build --all-packages --wheel --out-dir dist/
           test "$(ls dist/*.whl | wc -l)" -eq 7 || {
             echo "::error::expected 7 wheels, got $(ls dist/*.whl | wc -l)"; exit 1; }
           ls -1 dist/*.whl

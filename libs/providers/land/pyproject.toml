@@ -41,7 +41,6 @@ dem = ["earthlens-core[s3]"]
 ghsl = []
 gbif = ["pygbif >=0.6.6"]
 worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
-all = ["earthlens-land[dem,gbif,ghsl,worldpop]"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
@@ -58,3 +57,8 @@ include = ["earthlens._land*", "earthlens.bathymetry*", "earthlens.dem*", "earth
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
+
+# Resolve the core distribution from the workspace, not PyPI, so this package
+# locks and develops against the local earthlens-core.
+[tool.uv.sources]
+earthlens-core = { workspace = true }

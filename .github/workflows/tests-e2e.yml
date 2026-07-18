@@ -33,18 +33,19 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: py312
-          activate-environment: py312
-          cache: true
+          python-version: \"3.12\"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          verify-lock: true
 
       - name: Run live CDS e2e tests
         env:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          pixi run -e py312 pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp" -v
+          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp" -v
 
   e2e-gee:
     runs-on: ubuntu-latest
@@ -56,11 +57,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: py312
-          activate-environment: py312
-          cache: true
+          python-version: \"3.12\"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          verify-lock: true
 
       - name: Run live Google Earth Engine e2e tests
         # The GEE e2e test skips itself when these are unset, so this
@@ -69,7 +71,7 @@ jobs:
           GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
           GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
         run: |
-          pixi run -e py312 pytest -m "e2e and gee" -v
+          uv run pytest -m "e2e and gee" -v
 
   e2e-earthdata:
     runs-on: ubuntu-latest
@@ -81,13 +83,13 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
           # earthaccess >=0.18 requires Python >=3.12, so the Earthdata
           # extra is exercised under the py312 environment.
-          environments: py312
-          activate-environment: py312
-          cache: true
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
 
       - name: Run live NASA Earthdata e2e tests
         # The Earthdata e2e test skips itself when these are unset, so
@@ -98,7 +100,7 @@ jobs:
           # Alternative to username/password: a single EDL bearer token.
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          pixi run -e py312 pytest -m "e2e and earthdata" -v
+          uv run pytest -m "e2e and earthdata" -v
 
   e2e-eumetsat:
     runs-on: ubuntu-latest
@@ -110,11 +112,11 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: dev
-          activate-environment: dev
-          cache: true
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
 
       - name: Run live EUMETSAT Data Store e2e tests
         # The EUMETSAT e2e test skips itself when these are unset, so this
@@ -124,7 +126,7 @@ jobs:
           EUMETSAT_CONSUMER_KEY: ${{ secrets.EUMETSAT_CONSUMER_KEY }}
           EUMETSAT_CONSUMER_SECRET: ${{ secrets.EUMETSAT_CONSUMER_SECRET }}
         run: |
-          pixi run -e dev pytest -m "e2e and eumetsat" -v
+          uv run pytest -m "e2e and eumetsat" -v
 
   e2e-stac:
     runs-on: ubuntu-latest
@@ -136,11 +138,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: py312
-          activate-environment: py312
-          cache: true
+          python-version: \"3.12\"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          verify-lock: true
 
       - name: Run live STAC e2e tests
         # Earth Search is anonymous (no creds); MPC runs via planetary-computer
@@ -150,7 +153,7 @@ jobs:
           CDSE_S3_ACCESS_KEY: ${{ secrets.CDSE_S3_ACCESS_KEY }}
           CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
         run: |
-          pixi run -e py312 pytest -m "stac and e2e" -v
+          uv run pytest -m "stac and e2e" -v
 
   e2e-sentinel-hub:
     runs-on: ubuntu-latest
@@ -162,11 +165,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: py312
-          activate-environment: py312
-          cache: true
+          python-version: \"3.12\"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          verify-lock: true
 
       - name: Run live Sentinel Hub e2e tests
         # The Sentinel Hub e2e tests skip themselves when these are unset, so
@@ -176,7 +180,7 @@ jobs:
           SENTINELHUB_CLIENT_ID: ${{ secrets.SENTINELHUB_CLIENT_ID }}
           SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
         run: |
-          pixi run -e py312 pytest -m "sentinel_hub and e2e" -v
+          uv run pytest -m "sentinel_hub and e2e" -v
 
   e2e-nwp:
     runs-on: ubuntu-latest
@@ -188,11 +192,11 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: dev
-          activate-environment: dev
-          cache: true
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
 
       - name: Run live NWP e2e tests
         # The `dev` env carries the eccodes binary (the `nwp` pixi feature), so
@@ -201,7 +205,7 @@ jobs:
         # Open Data are anonymous (no secrets); the suite skips anything that is
         # transiently unavailable.
         run: |
-          pixi run -e dev pytest -m "e2e and nwp" -v
+          uv run pytest -m "e2e and nwp" -v
 
   e2e-asf:
     runs-on: ubuntu-latest
@@ -213,13 +217,13 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
           # asf_search reuses the EDL auth from `earthdata`, which needs
           # Python >=3.12 for earthaccess >=0.18.
-          environments: py312
-          activate-environment: py312
-          cache: true
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
 
       - name: Run live ASF (InSAR) e2e tests
         # Anonymous search and stack run with no secrets; the authed
@@ -231,7 +235,7 @@ jobs:
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          pixi run -e py312 pytest -m "e2e and asf" -v
+          uv run pytest -m "e2e and asf" -v
 
   e2e-iucn:
     runs-on: ubuntu-latest
@@ -243,11 +247,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: py312
-          activate-environment: py312
-          cache: true
+          python-version: \"3.12\"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          verify-lock: true
 
       - name: Run live IUCN Red List e2e tests
         # The IUCN e2e test skips itself when IUCN_TOKEN is unset, so this
@@ -256,7 +261,7 @@ jobs:
         env:
           IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
         run: |
-          pixi run -e py312 pytest -m "e2e and iucn" -v
+          uv run pytest -m "e2e and iucn" -v
 
   e2e-wdpa:
     runs-on: ubuntu-latest
@@ -268,11 +273,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@pixi/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: py312
-          activate-environment: py312
-          cache: true
+          python-version: \"3.12\"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          verify-lock: true
 
       - name: Run live Protected Planet (WDPA) e2e tests
         # The WDPA e2e test skips itself when WDPA_TOKEN is unset, so this
@@ -281,4 +287,4 @@ jobs:
         env:
           WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
         run: |
-          pixi run -e py312 pytest -m "e2e and wdpa" -v
+          uv run pytest -m "e2e and wdpa" -v

@@ -45,7 +45,6 @@ jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5"]
 openeo = ["openeo >=0.47,<0.48"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
 stac = ["pyramids-gis[stac] >=0.46.0"]
-all = ["earthlens-imagery[asf,earthdata,eumetsat,gee,jaxa,openeo,sentinel-hub,stac]"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
@@ -62,3 +61,8 @@ include = ["earthlens._imagery*", "earthlens.asf*", "earthlens.earthdata*", "ear
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
+
+# Resolve the core distribution from the workspace, not PyPI, so this package
+# locks and develops against the local earthlens-core.
+[tool.uv.sources]
+earthlens-core = { workspace = true }

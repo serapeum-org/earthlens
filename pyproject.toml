@@ -315,77 +315,41 @@ markers = [
     "drought: tests for the drought backend (US Drought Monitor / Copernicus EDO+GDO / CSIC SPEIbase; no extra SDK — core `requests` + pyramids; EDO/GDO fetched via the Copernicus GetCoverage REST endpoint, SPEIbase via direct NetCDF).",
 ]
 
-[tool.pixi.workspace]
-channels = ["conda-forge"]
-platforms = ["win-64", "linux-64", "osx-arm64"]
+# uv workspace. Each member (libs/core, libs/providers/*) is an independently
+# lockable uv project; this root is the workspace root and the "install
+# everything" meta-package. `[tool.uv.sources]` resolves the sibling
+# distributions from the local workspace instead of PyPI, so the whole repo
+# develops editable from one place while each member can also be locked and
+# built on its own (its own uv.lock).
+[tool.uv]
+# Some backend SDKs cannot coexist in one resolution, so the universal lock is
+# told to fork rather than fail:
+#   * argopy (earthlens-ocean[argo]) needs xarray>=2025.7 while openeo
+#     (earthlens-imagery[openeo]) needs xarray<2025.1.2 — no version satisfies
+#     both. Declaring the extras conflicting makes uv resolve them in separate
+#     forks of uv.lock instead of trying to install both at once.
+conflicts = [
+    # argopy (earthlens-ocean[argo]) needs xarray>=2025.7; openeo
+    # (earthlens-imagery[openeo]) needs xarray<2025.1.2 -- no version satisfies
+    # both. Declaring the two leaf extras conflicting makes uv fork the
+    # universal lock instead of failing, and (with no member-level `all` extra
+    # to collide) `uv sync --extra <x>` stays unambiguous.
+    [
+        { package = "earthlens-ocean", extra = "argo" },
+        { package = "earthlens-imagery", extra = "openeo" },
+    ],
+]
 
-# ecmwflibs (the Windows GRIB binary for the nwp extra) only ships an
-# osx-arm64 wheel tagged macosx_15; pixi defaults osx-arm64 to macOS 13, so
-# without this floor the multi-platform lock cannot place it. Raising the
-# target to 15 matches that wheel; every other package's older-macOS wheels
-# stay valid (a lower macOS floor is always compatible with a higher target).
-# pyramids-gis 0.46.0 wheels are manylinux_2_28 (down from manylinux_2_39 in
-# 0.38/0.39), which sits at/below pixi's default linux-64 __glibc floor, so no
-# explicit `libc = "…"` pin is needed to select the wheel over the sdist.
-[tool.pixi.system-requirements]
-macos = "15.0"
+[tool.uv.workspace]
+members = [
+    "libs/core",
+    "libs/providers/*",
+]
 
-# Workspace members. pixi has no `members` key (its `[tool.pixi.workspace]` is
-# the renamed `project` table); editable `path` dependencies are the equivalent
-# of uv's `{ workspace = true }` sources, and give every member an editable
-# install resolved from this one lockfile.
-[tool.pixi.pypi-dependencies]
-# Dev/test env pulls every backend's SDK (`[all]`) so the full suite runs.
-earthlens = { path = ".", editable = true, extras = ["all"] }
-earthlens-core = { path = "libs/core", editable = true }
-earthlens-atmosphere = { path = "libs/providers/atmosphere", editable = true }
-earthlens-ocean = { path = "libs/providers/ocean", editable = true }
-earthlens-imagery = { path = "libs/providers/imagery", editable = true }
-earthlens-land = { path = "libs/providers/land", editable = true }
-earthlens-hazards = { path = "libs/providers/hazards", editable = true }
-
-[tool.pixi.tasks]
-test-all = { cmd = "pytest -vvv --cov=src/earthlens -sv --cov-report=xml --cov-report=term-missing", description = "Run all testsuite" }
-test-no-e2e = { cmd = "pytest -vvv -m 'not e2e' --cov=src/earthlens -sv --cov-report=xml --cov-report=term-missing", description = "Run unit + integration suite (skips live e2e)" }
-test-e2e = { cmd = "pytest -m e2e -v", description = "Run live CDS end-to-end suite (requires CDSAPI_URL / CDSAPI_KEY)" }
-# One task for every per-backend suite: `pixi run test-backend <marker>` (e.g.
-# `pixi run test-backend gee`). The markers (and which extra each backend
-# needs) are documented in [tool.pytest.ini_options] markers.
-test-backend = { cmd = "pytest -vvv -m '{{ marker }} and not e2e' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", args = ["marker"], description = "Run one backend's tests by pytest marker (see [tool.pytest.ini_options] markers)" }
-test-cli = { cmd = "pytest -vvv -m 'cli and not slow' --cov=src/earthlens --cov-report=xml --cov-report=term-missing", description = "Run federated catalog-query CLI tests (typer and rich are core dependencies)" }
-test-doctests = { cmd = "pytest --doctest-modules src/earthlens", description = "Run docstring examples across the package (catches drift in catalog / API docstrings)" }
-notebooks = { cmd = "pytest --nbval --nbval-lax --verbose docs/examples", description = "check notebooks" }
-jupyter = { cmd = "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --port=8889", description = "check notebooks" }
-build-dist = { cmd = "python -m build", description = "Build sdist and wheel for PyPI" }
-publish-pypi = { cmd = "twine upload --non-interactive --repository pypi dist/*", depends-on = ["build-dist"], description = "Build and upload package to PyPI" }
-cz-changelog = { cmd = "cz changelog", description = "Generate changelog using Commitizen" }
-cz-bump = { cmd = "cz bump", description = "Bump version using Commitizen" }
-
-[tool.pixi.environments]
-default = { solve-group = "default" }
-dev = { features = ["dev", "all", "nwp"], solve-group = "default" }
-docs = { features = ["docs"], solve-group = "docs" }
-py311 = { features = ["py311", "dev", "all"], solve-group = "py311" }
-py312 = { features = ["py312", "dev", "all"], solve-group = "py312" }
-py313 = { features = ["py313", "dev", "all"], solve-group = "py313" }
-py314 = { features = ["py314", "dev", "all"], solve-group = "py314" }
-notebook = { features = ["dev", "notebook", "all", "nwp"], solve-group = "default" }
-
-# eccodes C library (conda-forge): herbie-data's cfgrib import chain needs the
-# binary at runtime — the pip `eccodes` binding cannot locate the native lib on
-# its own (it fails with `OSError: cannot load library 'libeccodes.dll'`). Scoped
-# to the `nwp` feature, which the `dev` and `notebook` envs include, so the NWP
-# backend and the live `nwp/*` notebooks can decode GRIB. The docs and per-Python
-# test-matrix envs deliberately omit it: CI's unit suite fakes herbie, so those
-# envs never touch the binary.
-[tool.pixi.feature.nwp.dependencies]
-eccodes = ">=2.47,<3"
-
-[tool.pixi.feature.py311.dependencies]
-python = "3.11.*"
-[tool.pixi.feature.py312.dependencies]
-python = "3.12.*"
-[tool.pixi.feature.py313.dependencies]
-python = "3.13.*"
-[tool.pixi.feature.py314.dependencies]
-python = "3.14.*"
+[tool.uv.sources]
+earthlens-core = { workspace = true }
+earthlens-atmosphere = { workspace = true }
+earthlens-ocean = { workspace = true }
+earthlens-imagery = { workspace = true }
+earthlens-land = { workspace = true }
+earthlens-hazards = { workspace = true }
