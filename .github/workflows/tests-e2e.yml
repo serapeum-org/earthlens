@@ -195,9 +195,10 @@ jobs:
           verify-lock: true
 
       - name: Run live NWP e2e tests
-        # The `dev` env carries the eccodes binary (the `nwp` pixi feature), so
-        # the Herbie-fetched models (GFS / NODD) import and download live here —
-        # the py312 lanes lack eccodes and would skip them. NODD / DWD / ECMWF
+        # This lane installs the `nwp` extra (Herbie / ecmwf-opendata) via the
+        # uv sync above, so the Herbie-fetched models (GFS / NODD) import and
+        # download live here; the GRIB read path decodes through pyramids' GDAL
+        # driver, so it needs no separate eccodes binary. NODD / DWD / ECMWF
         # Open Data are anonymous (no secrets); the suite skips anything that is
         # transiently unavailable.
         run: |
