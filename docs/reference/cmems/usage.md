@@ -221,7 +221,7 @@ To promote an uncurated id into the bundled catalog without
 hand-writing the stanza, run:
 
 ```bash
-pixi run -e dev python tools/cmems/refresh_cmems_catalog.py add-ids \
+uv run python tools/cmems/refresh_cmems_catalog.py add-ids \
     <new_dataset_id>
 ```
 

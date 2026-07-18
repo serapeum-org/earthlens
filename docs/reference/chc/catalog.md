@@ -325,7 +325,7 @@ rows are reinstated only when the probe confirms a verified pattern.
    (alphabetical or walk-order — the order is informational).
 4. Run the catalog test suite:
    ```bash
-   pixi run -e dev python -m pytest tests/test_chc_catalog/ -q
+   uv run python -m pytest tests/test_chc_catalog/ -q
    ```
 5. Run `Catalog().health()` and make sure no new keys show up
    non-empty.

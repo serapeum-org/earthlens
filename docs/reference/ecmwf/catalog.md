@@ -560,7 +560,7 @@ The two top-level blocks have **different ownership**:
 
 | Block | Authored by | Refreshed via |
 |---|---|---|
-| `available_datasets:` | The CDS server | `pixi run -e dev python tools/ecmwf/refresh_available_datasets.py` |
+| `available_datasets:` | The CDS server | `uv run python tools/ecmwf/refresh_available_datasets.py` |
 | `datasets:` | Hand or catalog automation | No script regenerates it from CDS — see below |
 
 When CDS publishes a new dataset, run `refresh_available_datasets.py`
@@ -582,7 +582,7 @@ package targets, and rewrites the `available_datasets:` block in
 verbatim.
 
 ```bash
-pixi run -e dev python tools/ecmwf/refresh_available_datasets.py
+uv run python tools/ecmwf/refresh_available_datasets.py
 ```
 
 Run before each release so the catalogue file reflects whatever
@@ -599,7 +599,7 @@ For each short name in `available_datasets:`, hits CDS's public
 - which extra request fields beyond the ERA5 standard set are required.
 
 ```bash
-pixi run -e dev python tools/ecmwf/audit_cds_datasets.py
+uv run python tools/ecmwf/audit_cds_datasets.py
 ```
 
 Output is grouped by category (`DONE` / `addressable` /
@@ -640,7 +640,7 @@ sidecar mapping `cds_variable` → metadata that you copy into the
 `datasets:` block.
 
 ```bash
-pixi run -e dev python tools/ecmwf/probe_cds_netcdf.py \
+uv run python tools/ecmwf/probe_cds_netcdf.py \
     --dataset reanalysis-era5-land \
     --variables evaporation_from_bare_soil,total_evaporation \
     --out C:/tmp/cds_probe/era5land_missing.json
@@ -690,8 +690,8 @@ the package doesn't yet support:
 1. **Surface the gap.**
 
     ```bash
-    pixi run -e dev python tools/ecmwf/refresh_available_datasets.py
-    pixi run -e dev python tools/ecmwf/audit_cds_datasets.py
+    uv run python tools/ecmwf/refresh_available_datasets.py
+    uv run python tools/ecmwf/audit_cds_datasets.py
     ```
 
    The audit prints which datasets in `available_datasets:` have no
@@ -740,7 +740,7 @@ add one more variable:
 1. Probe it for `nc_variable` / `units`:
 
     ```bash
-    pixi run -e dev python tools/ecmwf/probe_cds_netcdf.py \
+    uv run python tools/ecmwf/probe_cds_netcdf.py \
         --dataset reanalysis-era5-single-levels \
         --variables surface_pressure \
         --out C:/tmp/cds_probe/era5_sp.json

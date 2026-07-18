@@ -52,16 +52,16 @@ extend it with:
 ```bash
 # Rebuild the informational code index (needs API_USGS_PAT — the modern
 # reference-table endpoint rate-limits anonymous requests).
-pixi run -e dev python tools/usgs_water/refresh_usgs_catalog.py refresh
+uv run python tools/usgs_water/refresh_usgs_catalog.py refresh
 
 # Append a curated friendly-name row, then reload to validate it.
-pixi run -e dev python tools/usgs_water/refresh_usgs_catalog.py \
+uv run python tools/usgs_water/refresh_usgs_catalog.py \
     add-parameter chlorophyll 32209 --units "ug/l" --group Biological \
     --services daily samples
 
 # Validate: every curated row's services are known, and (when the index
 # exists) every curated code is a real USGS code.
-pixi run -e dev python tools/usgs_water/refresh_usgs_catalog.py validate
+uv run python tools/usgs_water/refresh_usgs_catalog.py validate
 ```
 
 ## Services

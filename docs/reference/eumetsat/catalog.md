@@ -278,17 +278,17 @@ The scripts under `tools/eumetsat/` (not shipped in the wheel) use the
 
 ```bash
 # Rebuild available_datasets from the public browse endpoint (all ~180)
-pixi run -e dev python tools/eumetsat/refresh_eumetsat_catalog.py refresh
+uv run python tools/eumetsat/refresh_eumetsat_catalog.py refresh
 
 # Emit a curated stanza for one collection (paste into a per-group file)
-pixi run -e dev python tools/eumetsat/refresh_eumetsat_catalog.py \
+uv run python tools/eumetsat/refresh_eumetsat_catalog.py \
     add-collection msg-hrseviri EO:EUM:DAT:MSG:HRSEVIRI --group MSG
 ```
 
 ### Audit curated vs live
 
 ```bash
-pixi run -e dev python tools/eumetsat/audit_eumetsat_catalog.py --strict
+uv run python tools/eumetsat/audit_eumetsat_catalog.py --strict
 ```
 
 The audit reports **GONE** (a curated id the live store no longer lists),
@@ -300,5 +300,5 @@ from the index). `--strict` exits non-zero on any drift, for CI.
 ```bash
 # Print a collection's public metadata (title, abstract, date range);
 # accepts a real id or a curated key. --out writes the full JSON.
-pixi run -e dev python tools/eumetsat/probe_eumetsat_product.py msg-hrseviri
+uv run python tools/eumetsat/probe_eumetsat_product.py msg-hrseviri
 ```

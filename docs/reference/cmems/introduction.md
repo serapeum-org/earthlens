@@ -81,7 +81,7 @@ each:
 | **Indicators (OMI)** | ocean monitoring indicators | trends + anomalies (no downloadable variables, so not curated) |
 
 Browse the full live dataset index with
-`pixi run -e dev python tools/cmems/refresh_cmems_catalog.py refresh --dry-run`
+`uv run python tools/cmems/refresh_cmems_catalog.py refresh --dry-run`
 (or read it from `Catalog().available_datasets`). Curated rows live
 under `Catalog().datasets`, and every curated id is a member of
 `available_datasets`.

@@ -190,13 +190,13 @@ the **public** browse endpoint, so they need **no credentials**:
 
 ```bash
 # Rebuild the available_datasets index from the public browse endpoint
-pixi run -e dev python tools/eumetsat/refresh_eumetsat_catalog.py refresh
+uv run python tools/eumetsat/refresh_eumetsat_catalog.py refresh
 
 # Diff the curated catalog + index against live (CI: --strict)
-pixi run -e dev python tools/eumetsat/audit_eumetsat_catalog.py --strict
+uv run python tools/eumetsat/audit_eumetsat_catalog.py --strict
 
 # Print one collection's public metadata (by id or curated key)
-pixi run -e dev python tools/eumetsat/probe_eumetsat_product.py msg-hrseviri
+uv run python tools/eumetsat/probe_eumetsat_product.py msg-hrseviri
 ```
 
 See the [catalog reference](catalog.md) for details.
