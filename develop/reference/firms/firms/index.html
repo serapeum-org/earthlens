@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20352,7 +20352,7 @@ NOAA-21) as a pyramids
 points (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of geolocated fire
 detections, not a gridded array, so :data:<code>FIRMS.OUTPUT_KIND</code> is
-<code>"vector"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects
+<code>"vector"</code> and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects
 an <code>aggregate=</code> argument for it.</p>
 <p>FIRMS needs a free <strong><code>MAP_KEY</code></strong> (no SDK): the only dependencies are
 <code>requests</code> + <code>pandas</code>, both core, so there is <strong>no <code>[firms]</code> extra</strong> to
@@ -20445,7 +20445,7 @@ can catch every backend's auth failure with one <code>except</code> clause.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-44">44</a></span>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
 <span class="normal"><a href="#__codelineno-0-46">46</a></span>
@@ -20560,7 +20560,7 @@ row.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-160">160</a></span>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span>
@@ -20980,7 +20980,7 @@ row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
@@ -21038,7 +21038,7 @@ row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-269">269</a></span>
 <span class="normal"><a href="#__codelineno-0-270">270</a></span>
 <span class="normal"><a href="#__codelineno-0-271">271</a></span>
@@ -21186,7 +21186,7 @@ row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
@@ -21335,7 +21335,7 @@ row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
 <span class="normal"><a href="#__codelineno-0-279">279</a></span>
@@ -21463,7 +21463,7 @@ other two-level catalogs use.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
@@ -21597,7 +21597,7 @@ fails :class:<code>Sensor</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-226">226</a></span>
 <span class="normal"><a href="#__codelineno-0-227">227</a></span>
 <span class="normal"><a href="#__codelineno-0-228">228</a></span>
@@ -21728,7 +21728,7 @@ missing, empty, or has a malformed sensor row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-211">211</a></span>
 <span class="normal"><a href="#__codelineno-0-212">212</a></span>
 <span class="normal"><a href="#__codelineno-0-213">213</a></span>
@@ -21834,7 +21834,7 @@ features, so the facade rejects <code>aggregate=</code> with
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
 <span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
 <span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
@@ -23237,7 +23237,7 @@ sensor codes.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-117">117</a></span>
 <span class="normal"><a href="#__codelineno-0-118">118</a></span>
 <span class="normal"><a href="#__codelineno-0-119">119</a></span>
@@ -23553,7 +23553,7 @@ only needed to pass a key directly or to validate up front.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-217">217</a></span>
 <span class="normal"><a href="#__codelineno-0-218">218</a></span>
 <span class="normal"><a href="#__codelineno-0-219">219</a></span>
@@ -23797,7 +23797,7 @@ Empty (schema-only) when nothing matched.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-568">568</a></span>
 <span class="normal"><a href="#__codelineno-0-569">569</a></span>
 <span class="normal"><a href="#__codelineno-0-570">570</a></span>
@@ -24008,7 +24008,7 @@ there is no per-instance resource to release.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
 <span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
 <span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
@@ -24346,7 +24346,7 @@ carrying the optional <code>MAP_KEY</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-129">129</a></span>
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
 <span class="normal"><a href="#__codelineno-0-131">131</a></span>
@@ -24417,7 +24417,7 @@ it never blocks on an interactive prompt.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-140">140</a></span>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
@@ -24522,7 +24522,7 @@ before.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
@@ -24635,7 +24635,7 @@ environment variable.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-56">56</a></span>
 <span class="normal"><a href="#__codelineno-0-57">57</a></span>
 <span class="normal"><a href="#__codelineno-0-58">58</a></span>
@@ -24865,7 +24865,7 @@ absent (LANDSAT carries no brightness or FRP column).</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
 <span class="normal"><a href="#__codelineno-0-115">115</a></span>
@@ -25058,7 +25058,7 @@ descriptive metadata.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span>
@@ -25318,7 +25318,7 @@ the filters drop everything.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
 <span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
 <span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
@@ -25598,7 +25598,7 @@ column, CRS <code>EPSG:4326</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-236">236</a></span>
 <span class="normal"><a href="#__codelineno-0-237">237</a></span>
 <span class="normal"><a href="#__codelineno-0-238">238</a></span>
@@ -25707,7 +25707,7 @@ back as CSV, which :mod:<code>earthlens.firms.events</code> maps to a pyramids
 points.</p>
 <p>This is a <code>vector</code> backend: the on-the-wire result is a table of
 geolocated detections, not a gridded array, so <code>OUTPUT_KIND = "vector"</code>
-and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
+and the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument (there is no meaningful gridded reduction of a
 detection table). <code>download()</code> returns the in-memory FeatureCollection
 and, as a side effect, writes it to one vector file under <code>path</code>.</p>
@@ -25807,7 +25807,7 @@ features, so the facade rejects <code>aggregate=</code> with
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
 <span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
 <span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
@@ -27210,7 +27210,7 @@ sensor codes.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-117">117</a></span>
 <span class="normal"><a href="#__codelineno-0-118">118</a></span>
 <span class="normal"><a href="#__codelineno-0-119">119</a></span>
@@ -27526,7 +27526,7 @@ only needed to pass a key directly or to validate up front.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-217">217</a></span>
 <span class="normal"><a href="#__codelineno-0-218">218</a></span>
 <span class="normal"><a href="#__codelineno-0-219">219</a></span>
@@ -27770,7 +27770,7 @@ Empty (schema-only) when nothing matched.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-568">568</a></span>
 <span class="normal"><a href="#__codelineno-0-569">569</a></span>
 <span class="normal"><a href="#__codelineno-0-570">570</a></span>
@@ -28058,7 +28058,7 @@ schema-only empty collection when every input was empty.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
@@ -28297,7 +28297,7 @@ the filters drop everything.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
 <span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
 <span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
@@ -28577,7 +28577,7 @@ column, CRS <code>EPSG:4326</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-236">236</a></span>
 <span class="normal"><a href="#__codelineno-0-237">237</a></span>
 <span class="normal"><a href="#__codelineno-0-238">238</a></span>
@@ -28805,7 +28805,7 @@ row.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-160">160</a></span>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span>
@@ -29225,7 +29225,7 @@ row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
@@ -29283,7 +29283,7 @@ row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-269">269</a></span>
 <span class="normal"><a href="#__codelineno-0-270">270</a></span>
 <span class="normal"><a href="#__codelineno-0-271">271</a></span>
@@ -29431,7 +29431,7 @@ row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
@@ -29580,7 +29580,7 @@ row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
 <span class="normal"><a href="#__codelineno-0-279">279</a></span>
@@ -29708,7 +29708,7 @@ other two-level catalogs use.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
@@ -29842,7 +29842,7 @@ fails :class:<code>Sensor</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-226">226</a></span>
 <span class="normal"><a href="#__codelineno-0-227">227</a></span>
 <span class="normal"><a href="#__codelineno-0-228">228</a></span>
@@ -29973,7 +29973,7 @@ missing, empty, or has a malformed sensor row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-211">211</a></span>
 <span class="normal"><a href="#__codelineno-0-212">212</a></span>
 <span class="normal"><a href="#__codelineno-0-213">213</a></span>
@@ -30147,7 +30147,7 @@ absent (LANDSAT carries no brightness or FRP column).</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
 <span class="normal"><a href="#__codelineno-0-115">115</a></span>
@@ -30340,7 +30340,7 @@ descriptive metadata.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span>
@@ -30510,7 +30510,7 @@ silently empty upstream, so the backend warns and names the
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-82"> 82</a></span>
 <span class="normal"><a href="#__codelineno-0-83"> 83</a></span>
 <span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
@@ -30608,7 +30608,7 @@ silently empty upstream, so the backend warns and names the
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -30719,7 +30719,7 @@ can catch every backend's auth failure with one <code>except</code> clause.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-44">44</a></span>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
 <span class="normal"><a href="#__codelineno-0-46">46</a></span>
@@ -30823,7 +30823,7 @@ there is no per-instance resource to release.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
 <span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
 <span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
@@ -31161,7 +31161,7 @@ carrying the optional <code>MAP_KEY</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-129">129</a></span>
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
 <span class="normal"><a href="#__codelineno-0-131">131</a></span>
@@ -31232,7 +31232,7 @@ it never blocks on an interactive prompt.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-140">140</a></span>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
@@ -31337,7 +31337,7 @@ before.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
@@ -31450,7 +31450,7 @@ environment variable.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/firms/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-56">56</a></span>
 <span class="normal"><a href="#__codelineno-0-57">57</a></span>
 <span class="normal"><a href="#__codelineno-0-58">58</a></span>

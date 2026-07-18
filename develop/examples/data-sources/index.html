@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20135,7 +20135,7 @@ the relevant ERA5 dataset on the CDS website.</p>
 <a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
 <a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
 <a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="p">)</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Expect to wait</p>
@@ -20160,7 +20160,7 @@ mocked; the live end-to-end suite is selected with <code>pytest -m e2e</code>.</
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
 <a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">)</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="parallel-download"><a class="toclink" href="#parallel-download">Parallel Download</a><a class="headerlink" href="#parallel-download" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;examples/data/chirps-cores&quot;</span>
@@ -20175,7 +20175,7 @@ mocked; the live end-to-end suite is selected with <code>pytest -m e2e</code>.</
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
 <a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="amazon-s3"><a class="toclink" href="#amazon-s3">Amazon S3</a><a class="headerlink" href="#amazon-s3" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;examples/data/s3-backend&quot;</span>
@@ -20190,7 +20190,7 @@ mocked; the live end-to-end suite is selected with <code>pytest -m e2e</code>.</
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">)</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 
 

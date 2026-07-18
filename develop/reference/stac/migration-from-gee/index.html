@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19389,7 +19389,7 @@ also valid anonymous mirrors with different default extents.</p>
 <p>Each snippet replaces the equivalent <code>ee.ImageCollection(...).filterBounds(...).filterDate(...)
 .first()</code> recipe in Earth Engine and writes a Cloud-Optimized GeoTIFF.</p>
 <h3 id="copernicuss2_sr_harmonized-mpc-sentinel-2-l2a-rgb"><a class="toclink" href="#copernicuss2_sr_harmonized-mpc-sentinel-2-l2a-rgb"><code>COPERNICUS/S2_SR_HARMONIZED</code> → MPC sentinel-2-l2a (RGB)</a><a class="headerlink" href="#copernicuss2_sr_harmonized-mpc-sentinel-2-l2a-rgb" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;planetary-computer&quot;</span><span class="p">,</span>
@@ -19400,7 +19400,7 @@ also valid anonymous mirrors with different default extents.</p>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="landsatlc08c02t1_l2-usgs-landsatlook-requester-pays"><a class="toclink" href="#landsatlc08c02t1_l2-usgs-landsatlook-requester-pays"><code>LANDSAT/LC08/C02/T1_L2</code> → USGS LandsatLook (requester-pays)</a><a class="headerlink" href="#landsatlc08c02t1_l2-usgs-landsatlook-requester-pays" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;usgs-landsat&quot;</span><span class="p">,</span>        <span class="c1"># alias &#39;landsat&#39; works too</span>

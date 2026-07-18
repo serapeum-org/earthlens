@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19622,7 +19622,7 @@ output shape — <code>griddap</code> datasets are gridded fields → <strong>ra
 NetCDF</strong>, <code>tabledap</code> datasets are record tables → <strong>tabular
 <code>DataFrame</code></strong>. The backend therefore sets its <code>OUTPUT_KIND</code> <strong>per
 instance</strong> from the resolved dataset (a sanctioned earthdata/eumetsat
-override), so the :class:<code>earthlens.earthlens.EarthLens</code> facade accepts
+override), so the :class:<code>earthlens.earthlens.core.EarthLens</code> facade accepts
 <code>aggregate=</code> for a griddap dataset and rejects it for a tabledap one.</p>
 <p>Built on the <strong><code>erddapy</code></strong> SDK (the tabledap <code>to_pandas()</code> path); the
 griddap path builds the OPeNDAP <code>.nc</code> URL directly and downloads it,
@@ -19748,7 +19748,7 @@ is a :class:<code>Dataset</code> row.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-229">229</a></span>
 <span class="normal"><a href="#__codelineno-0-230">230</a></span>
 <span class="normal"><a href="#__codelineno-0-231">231</a></span>
@@ -20122,7 +20122,7 @@ close match).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
@@ -20233,7 +20233,7 @@ Same object as :attr:<code>datasets</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
@@ -20359,7 +20359,7 @@ Same object as :attr:<code>datasets</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-283">283</a></span>
 <span class="normal"><a href="#__codelineno-0-284">284</a></span>
 <span class="normal"><a href="#__codelineno-0-285">285</a></span>
@@ -20456,7 +20456,7 @@ cache so repeated construction is fast. If the caller passed
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
@@ -20664,7 +20664,7 @@ overwhelmingly state fields (SST anomaly, DHW, chlorophyll).</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-173">173</a></span>
 <span class="normal"><a href="#__codelineno-0-174">174</a></span>
 <span class="normal"><a href="#__codelineno-0-175">175</a></span>
@@ -20892,7 +20892,7 @@ eumetsat override. The facade reads it to gate <code>aggregate=</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-107">107</a></span>
 <span class="normal"><a href="#__codelineno-0-108">108</a></span>
 <span class="normal"><a href="#__codelineno-0-109">109</a></span>
@@ -22082,7 +22082,7 @@ list of names; the dataset is named by <code>dataset=</code>).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-162">162</a></span>
 <span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
@@ -22398,7 +22398,7 @@ coverage (from :meth:<code>_fetch_grid</code>).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-445">445</a></span>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
@@ -22556,7 +22556,7 @@ mutation invalidates the entry on its own.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
@@ -22609,7 +22609,7 @@ the per-instance :attr:<code>ERDDAP.OUTPUT_KIND</code> and the realisation path:
 <li><strong><code>tabledap</code></strong> → <code>OUTPUT_KIND = "tabular"</code>. The request is shaped with
   the <strong><code>erddapy</code></strong> SDK and realised through <code>ERDDAP.to_pandas()</code>, so the
   result is a :class:<code>pandas.DataFrame</code>. The
-  :class:<code>earthlens.earthlens.EarthLens</code> facade rejects <code>aggregate=</code> for
+  :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects <code>aggregate=</code> for
   it (a table has no gridded reduction).</li>
 <li><strong><code>griddap</code></strong> → <code>OUTPUT_KIND = "raster"</code>. The OPeNDAP <code>.nc</code> download
   URL is built directly (see :func:<code>earthlens.erddap._helpers.build_griddap_url</code>)
@@ -22744,7 +22744,7 @@ eumetsat override. The facade reads it to gate <code>aggregate=</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-107">107</a></span>
 <span class="normal"><a href="#__codelineno-0-108">108</a></span>
 <span class="normal"><a href="#__codelineno-0-109">109</a></span>
@@ -23934,7 +23934,7 @@ list of names; the dataset is named by <code>dataset=</code>).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-162">162</a></span>
 <span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
@@ -24250,7 +24250,7 @@ coverage (from :meth:<code>_fetch_grid</code>).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-445">445</a></span>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
@@ -24536,7 +24536,7 @@ is a :class:<code>Dataset</code> row.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-229">229</a></span>
 <span class="normal"><a href="#__codelineno-0-230">230</a></span>
 <span class="normal"><a href="#__codelineno-0-231">231</a></span>
@@ -24910,7 +24910,7 @@ close match).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
@@ -25021,7 +25021,7 @@ Same object as :attr:<code>datasets</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
@@ -25147,7 +25147,7 @@ Same object as :attr:<code>datasets</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-283">283</a></span>
 <span class="normal"><a href="#__codelineno-0-284">284</a></span>
 <span class="normal"><a href="#__codelineno-0-285">285</a></span>
@@ -25244,7 +25244,7 @@ cache so repeated construction is fast. If the caller passed
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
@@ -25452,7 +25452,7 @@ overwhelmingly state fields (SST anomaly, DHW, chlorophyll).</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-173">173</a></span>
 <span class="normal"><a href="#__codelineno-0-174">174</a></span>
 <span class="normal"><a href="#__codelineno-0-175">175</a></span>
@@ -25604,7 +25604,7 @@ mutation invalidates the entry on its own.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/erddap/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>

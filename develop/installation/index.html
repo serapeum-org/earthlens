@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -578,10 +578,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pixi" class="md-nav__link">
+  <a href="#uv" class="md-nav__link">
     <span class="md-ellipsis">
       
-        pixi
+        uv
       
     </span>
   </a>
@@ -19138,10 +19138,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pixi" class="md-nav__link">
+  <a href="#uv" class="md-nav__link">
     <span class="md-ellipsis">
       
-        pixi
+        uv
       
     </span>
   </a>
@@ -19299,9 +19299,9 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>earthlens
 </code></pre></div>
 <p>If this works, it will install earthlens with all dependencies including Python and GDAL, and you can skip the rest of the installation instructions.</p>
-<h3 id="pixi"><a class="toclink" href="#pixi">pixi</a><a class="headerlink" href="#pixi" title="Permanent link">#</a></h3>
-<p>You can also use <a href="https://pixi.sh">pixi</a> to manage the environment:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pixi<span class="w"> </span>add<span class="w"> </span>earthlens
+<h3 id="uv"><a class="toclink" href="#uv">uv</a><a class="headerlink" href="#uv" title="Permanent link">#</a></h3>
+<p>You can also use <a href="https://docs.astral.sh/uv/">uv</a> to manage the environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>add<span class="w"> </span>earthlens
 </code></pre></div>
 <h3 id="installing-python-and-gdal-dependencies"><a class="toclink" href="#installing-python-and-gdal-dependencies">Installing Python and GDAL dependencies</a><a class="headerlink" href="#installing-python-and-gdal-dependencies" title="Permanent link">#</a></h3>
 <p>The main dependencies for earthlens are Python 3.11+ and GDAL.</p>
@@ -19660,7 +19660,7 @@ five thematic provider packages, each carrying a group of backends:</p>
 </tbody>
 </table>
 <p>This changes nothing about how you use earthlens: the import path is the same
-(<code>from earthlens import EarthLens</code>, <code>earthlens.chc</code>, …), and every extra above
+(<code>from earthlens.core import EarthLens</code>, <code>earthlens.chc</code>, …), and every extra above
 works exactly as before — <code>pip install earthlens[gee]</code> still installs Earth
 Engine and nothing else.</p>
 <p><strong>Installing a single domain.</strong> If you only need one group, install that package
@@ -19717,9 +19717,9 @@ pip resolves them locally rather than from the index:</p>
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/hazards<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">            </span>-e<span class="w"> </span><span class="s2">&quot;.[ecmwf]&quot;</span>
 </code></pre></div>
-<p>With <a href="https://pixi.sh">pixi</a> this is a single command — the members are declared
-as editable path dependencies in <code>pyproject.toml</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pixi<span class="w"> </span>install
+<p>With <a href="https://docs.astral.sh/uv/">uv</a> this is a single command — the members are
+declared as a workspace in <code>pyproject.toml</code>, so one lock covers them all:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>uv<span class="w"> </span>sync
 </code></pre></div>
 <p>If you only want one domain from a clone, its package plus core is enough:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;libs/providers/imagery[gee]&quot;</span>
@@ -19744,13 +19744,14 @@ need (see "From PyPI" above for the available extras):</p>
 <h2 id="development-install"><a class="toclink" href="#development-install">Development install</a><a class="headerlink" href="#development-install" title="Permanent link">#</a></h2>
 <p>If you are planning to contribute to earthlens, install the whole workspace
 editable with the <code>[all]</code> extra so the full test suite (which exercises every
-backend) can run. <a href="https://pixi.sh">pixi</a> is the supported path — it installs
-every member from <code>pyproject.toml</code>'s editable path dependencies and resolves
-them from one lockfile:</p>
+backend) can run. <a href="https://docs.astral.sh/uv/">uv</a> is the supported path — it
+installs every workspace member from one lockfile (<code>uv.lock</code>). <code>--extra all</code>
+pulls every backend SDK except the mutually exclusive <code>argo</code> / <code>osm</code> (which are
+faked in their unit tests):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">cd</span><span class="w"> </span>earthlens
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>pixi<span class="w"> </span>install
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>pixi<span class="w"> </span>run<span class="w"> </span>test-no-e2e
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not e2e&quot;</span>
 </code></pre></div>
 <p>The equivalent with pip, which must name every member so they resolve from the
 clone rather than from PyPI:</p>

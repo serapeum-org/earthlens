@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19986,7 +19986,7 @@ print('S3 configured:', have_bucket)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="k">if</span> <span class="n">has_sh_credentials</span><span class="p">()</span> <span class="ow">and</span> <span class="n">have_bucket</span><span class="p">:</span>
     <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
@@ -20009,7 +20009,7 @@ print('S3 configured:', have_bucket)</div>
         <span class="s1">'SENTINELHUB_BATCH_IAM_ROLE to run the Batch job against your bucket.'</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">from earthlens import EarthLens
+<div class="clipboard-copy-txt" id="cell-3">from earthlens.core import EarthLens
 
 if has_sh_credentials() and have_bucket:
     facade = EarthLens(

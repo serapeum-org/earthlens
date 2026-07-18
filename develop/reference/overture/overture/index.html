@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20181,7 +20181,7 @@ GeoParquet for each requested feature type, surfaces a per-row
 <p>This is a <code>vector</code> backend: the result is a table of features
 (building footprints, POIs, road segments, admin boundaries), not a
 gridded array, so <code>Overture.OUTPUT_KIND</code> is <code>"vector"</code> and the
-<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument
+<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument
 for it. Overture is a static per-release snapshot, so <code>start</code> / <code>end</code>
 are accepted but ignored (there is no temporal axis to iterate).</p>
 <p>Overture needs <strong>no credentials</strong> — the bucket is public, so (like
@@ -20351,7 +20351,7 @@ newest first, from the bundled YAML's informational index.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-168">168</a></span>
 <span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
@@ -20870,7 +20870,7 @@ theme's <code>types</code> are a subset of it.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span>
@@ -20962,7 +20962,7 @@ theme's <code>types</code> are a subset of it.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
 <span class="normal"><a href="#__codelineno-0-291">291</a></span>
 <span class="normal"><a href="#__codelineno-0-292">292</a></span>
@@ -21088,7 +21088,7 @@ theme's <code>types</code> are a subset of it.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
 <span class="normal"><a href="#__codelineno-0-300">300</a></span>
@@ -21202,7 +21202,7 @@ auto-target the newest release at fetch time.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-369">369</a></span>
 <span class="normal"><a href="#__codelineno-0-370">370</a></span>
 <span class="normal"><a href="#__codelineno-0-371">371</a></span>
@@ -21352,7 +21352,7 @@ fails <code>Theme</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-236">236</a></span>
 <span class="normal"><a href="#__codelineno-0-237">237</a></span>
 <span class="normal"><a href="#__codelineno-0-238">238</a></span>
@@ -21505,7 +21505,7 @@ empty, or has a malformed theme row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-219">219</a></span>
 <span class="normal"><a href="#__codelineno-0-220">220</a></span>
 <span class="normal"><a href="#__codelineno-0-221">221</a></span>
@@ -21592,7 +21592,7 @@ empty, or has a malformed theme row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-326">326</a></span>
 <span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
@@ -21675,7 +21675,7 @@ re-exports it for backward compatibility.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/biodiversity/_helpers.py</code></summary>
+                <summary>Source code in <code>libs/core/src/earthlens/biodiversity/_helpers.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57">57</a></span>
 <span class="normal"><a href="#__codelineno-0-58">58</a></span>
 <span class="normal"><a href="#__codelineno-0-59">59</a></span>
@@ -21769,7 +21769,7 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
 <span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
 <span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
@@ -23036,7 +23036,7 @@ formats, or <code>variables</code> is empty.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-109">109</a></span>
 <span class="normal"><a href="#__codelineno-0-110">110</a></span>
 <span class="normal"><a href="#__codelineno-0-111">111</a></span>
@@ -23381,7 +23381,7 @@ requested feature type.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-511">511</a></span>
 <span class="normal"><a href="#__codelineno-0-512">512</a></span>
 <span class="normal"><a href="#__codelineno-0-513">513</a></span>
@@ -23595,7 +23595,7 @@ case they carry <code>ODbL-1.0</code> — surfaced per-row by the backend.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57"> 57</a></span>
 <span class="normal"><a href="#__codelineno-0-58"> 58</a></span>
 <span class="normal"><a href="#__codelineno-0-59"> 59</a></span>
@@ -23867,7 +23867,7 @@ case they carry <code>ODbL-1.0</code> — surfaced per-row by the backend.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-111">111</a></span>
 <span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
@@ -24008,7 +24008,7 @@ in first-seen order.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-123">123</a></span>
 <span class="normal"><a href="#__codelineno-0-124">124</a></span>
 <span class="normal"><a href="#__codelineno-0-125">125</a></span>
@@ -24281,7 +24281,7 @@ are always retained).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/query.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/query.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-73"> 73</a></span>
 <span class="normal"><a href="#__codelineno-0-74"> 74</a></span>
 <span class="normal"><a href="#__codelineno-0-75"> 75</a></span>
@@ -24438,7 +24438,7 @@ empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/collection.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/collection.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-115">115</a></span>
 <span class="normal"><a href="#__codelineno-0-116">116</a></span>
 <span class="normal"><a href="#__codelineno-0-117">117</a></span>
@@ -24703,7 +24703,7 @@ nothing matched.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/query.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/query.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-122">122</a></span>
 <span class="normal"><a href="#__codelineno-0-123">123</a></span>
 <span class="normal"><a href="#__codelineno-0-124">124</a></span>
@@ -24934,7 +24934,7 @@ licenses.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
 <span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
 <span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
@@ -25186,7 +25186,7 @@ schema-correct empty collection.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/collection.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/collection.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-42"> 42</a></span>
 <span class="normal"><a href="#__codelineno-0-43"> 43</a></span>
 <span class="normal"><a href="#__codelineno-0-44"> 44</a></span>
@@ -25365,7 +25365,7 @@ pyramids <code>~pyramids.feature.collection.FeatureCollection</code>.</p>
 <p>This is a <code>vector</code> backend: the on-the-wire result is a table of
 features (footprints, POIs, road segments, admin boundaries), not a
 gridded array, so <code>OUTPUT_KIND = "vector"</code> and the
-<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument.
+<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument.
 Overture is a static per-release snapshot, so <code>start</code> / <code>end</code> are
 accepted but ignored (there is no temporal axis to iterate); the SDK
 auto-targets the newest release when <code>release</code> is <code>None</code>.</p>
@@ -25462,7 +25462,7 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
 <span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
 <span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
@@ -26729,7 +26729,7 @@ formats, or <code>variables</code> is empty.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-109">109</a></span>
 <span class="normal"><a href="#__codelineno-0-110">110</a></span>
 <span class="normal"><a href="#__codelineno-0-111">111</a></span>
@@ -27074,7 +27074,7 @@ requested feature type.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-511">511</a></span>
 <span class="normal"><a href="#__codelineno-0-512">512</a></span>
 <span class="normal"><a href="#__codelineno-0-513">513</a></span>
@@ -27324,7 +27324,7 @@ newest first, from the bundled YAML's informational index.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-168">168</a></span>
 <span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
@@ -27843,7 +27843,7 @@ theme's <code>types</code> are a subset of it.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span>
@@ -27935,7 +27935,7 @@ theme's <code>types</code> are a subset of it.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
 <span class="normal"><a href="#__codelineno-0-291">291</a></span>
 <span class="normal"><a href="#__codelineno-0-292">292</a></span>
@@ -28061,7 +28061,7 @@ theme's <code>types</code> are a subset of it.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
 <span class="normal"><a href="#__codelineno-0-300">300</a></span>
@@ -28175,7 +28175,7 @@ auto-target the newest release at fetch time.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-369">369</a></span>
 <span class="normal"><a href="#__codelineno-0-370">370</a></span>
 <span class="normal"><a href="#__codelineno-0-371">371</a></span>
@@ -28325,7 +28325,7 @@ fails <code>Theme</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-236">236</a></span>
 <span class="normal"><a href="#__codelineno-0-237">237</a></span>
 <span class="normal"><a href="#__codelineno-0-238">238</a></span>
@@ -28478,7 +28478,7 @@ empty, or has a malformed theme row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-219">219</a></span>
 <span class="normal"><a href="#__codelineno-0-220">220</a></span>
 <span class="normal"><a href="#__codelineno-0-221">221</a></span>
@@ -28565,7 +28565,7 @@ empty, or has a malformed theme row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-326">326</a></span>
 <span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
@@ -28751,7 +28751,7 @@ case they carry <code>ODbL-1.0</code> — surfaced per-row by the backend.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57"> 57</a></span>
 <span class="normal"><a href="#__codelineno-0-58"> 58</a></span>
 <span class="normal"><a href="#__codelineno-0-59"> 59</a></span>
@@ -29023,7 +29023,7 @@ case they carry <code>ODbL-1.0</code> — surfaced per-row by the backend.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-111">111</a></span>
 <span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
@@ -29164,7 +29164,7 @@ in first-seen order.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-123">123</a></span>
 <span class="normal"><a href="#__codelineno-0-124">124</a></span>
 <span class="normal"><a href="#__codelineno-0-125">125</a></span>
@@ -29280,7 +29280,7 @@ in first-seen order.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -29405,7 +29405,7 @@ empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/collection.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/collection.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-115">115</a></span>
 <span class="normal"><a href="#__codelineno-0-116">116</a></span>
 <span class="normal"><a href="#__codelineno-0-117">117</a></span>
@@ -29611,7 +29611,7 @@ schema-correct empty collection.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/collection.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/collection.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-42"> 42</a></span>
 <span class="normal"><a href="#__codelineno-0-43"> 43</a></span>
 <span class="normal"><a href="#__codelineno-0-44"> 44</a></span>
@@ -29859,7 +29859,7 @@ re-exports it for backward compatibility.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/biodiversity/_helpers.py</code></summary>
+                <summary>Source code in <code>libs/core/src/earthlens/biodiversity/_helpers.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57">57</a></span>
 <span class="normal"><a href="#__codelineno-0-58">58</a></span>
 <span class="normal"><a href="#__codelineno-0-59">59</a></span>
@@ -29992,7 +29992,7 @@ column of source structs).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
 <span class="normal"><a href="#__codelineno-0-144">144</a></span>
@@ -30189,7 +30189,7 @@ licenses.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
 <span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
 <span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
@@ -30409,7 +30409,7 @@ warning message (e.g. <code>"buildings/building"</code>).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/overture/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-188">188</a></span>
 <span class="normal"><a href="#__codelineno-0-189">189</a></span>
 <span class="normal"><a href="#__codelineno-0-190">190</a></span>

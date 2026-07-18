@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20050,7 +20050,7 @@ geostrophic flow over a region.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span><span class="p">,</span> <span class="n">Variable</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data/era5-500hpa"</span><span class="p">)</span>
@@ -20065,7 +20065,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pyramids.dataset import Dataset
 
-from earthlens import AggregationConfig, EarthLens, aggregate_netcdf
+from earthlens.core import AggregationConfig, EarthLens, aggregate_netcdf
 from earthlens.ecmwf import Catalog, Variable
 
 OUT = Path("data/era5-500hpa")

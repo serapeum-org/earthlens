@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19472,7 +19472,7 @@ exposes a single :meth:<code>download</code> entry point.</p>
               <div class="doc-md-description">
                 <p>Class-level declaration of the natural output
 shape this backend emits. Read by
-:class:<code>earthlens.earthlens.EarthLens</code> at facade
+:class:<code>earthlens.earthlens.core.EarthLens</code> at facade
 <code>download()</code> time to gate the <code>aggregate=</code> argument:
 <code>"raster"</code> accepts it (the existing pyramids-backed
 <code>aggregate_netcdf</code> flow); <code>"vector"</code> and <code>"tabular"</code>
@@ -19501,7 +19501,7 @@ instance attribute, so both forms work.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+                <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-452">452</a></span>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
 <span class="normal"><a href="#__codelineno-0-454">454</a></span>
@@ -19997,7 +19997,7 @@ instance attribute, so both forms work.</p>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        OUTPUT_KIND: Class-level declaration of the natural output</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            shape this backend emits. Read by</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">            :class:`earthlens.earthlens.EarthLens` at facade</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">            :class:`earthlens.earthlens.core.EarthLens` at facade</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">            `download()` time to gate the `aggregate=` argument:</span>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            `&quot;raster&quot;` accepts it (the existing pyramids-backed</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">            `aggregate_netcdf` flow); `&quot;vector&quot;` and `&quot;tabular&quot;`</span>
@@ -20665,7 +20665,7 @@ Defaults to the current working directory.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-567">567</a></span>
 <span class="normal"><a href="#__codelineno-0-568">568</a></span>
 <span class="normal"><a href="#__codelineno-0-569">569</a></span>
@@ -20865,7 +20865,7 @@ already-resolved native parameters (<code>lat_lim</code> / <code>lon_lim</code> 
 </details>
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-485">485</a></span>
 <span class="normal"><a href="#__codelineno-0-486">486</a></span>
 <span class="normal"><a href="#__codelineno-0-487">487</a></span>
@@ -21113,7 +21113,7 @@ and is idempotent.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-662">662</a></span>
 <span class="normal"><a href="#__codelineno-0-663">663</a></span>
 <span class="normal"><a href="#__codelineno-0-664">664</a></span>
@@ -21207,7 +21207,7 @@ the policy becomes uniformly caller-controllable.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-710">710</a></span>
 <span class="normal"><a href="#__codelineno-0-711">711</a></span>
 <span class="normal"><a href="#__codelineno-0-712">712</a></span>
@@ -21344,7 +21344,7 @@ for the ECMWF backend).</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+                <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-937"> 937</a></span>
 <span class="normal"><a href="#__codelineno-0-938"> 938</a></span>
 <span class="normal"><a href="#__codelineno-0-939"> 939</a></span>
@@ -21895,7 +21895,7 @@ for the ECMWF backend).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1084">1084</a></span>
 <span class="normal"><a href="#__codelineno-0-1085">1085</a></span>
 <span class="normal"><a href="#__codelineno-0-1086">1086</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1084" name="__codelineno-0-1084"></a><span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -21922,7 +21922,7 @@ for the ECMWF backend).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1077">1077</a></span>
 <span class="normal"><a href="#__codelineno-0-1078">1078</a></span>
 <span class="normal"><a href="#__codelineno-0-1079">1079</a></span>
@@ -21955,7 +21955,7 @@ for the ECMWF backend).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1088">1088</a></span>
 <span class="normal"><a href="#__codelineno-0-1089">1089</a></span>
 <span class="normal"><a href="#__codelineno-0-1090">1090</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1088" name="__codelineno-0-1088"></a><span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -21982,7 +21982,7 @@ for the ECMWF backend).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1092">1092</a></span>
 <span class="normal"><a href="#__codelineno-0-1093">1093</a></span>
 <span class="normal"><a href="#__codelineno-0-1094">1094</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1092" name="__codelineno-0-1092"></a><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -22009,7 +22009,7 @@ for the ECMWF backend).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1096">1096</a></span>
 <span class="normal"><a href="#__codelineno-0-1097">1097</a></span>
 <span class="normal"><a href="#__codelineno-0-1098">1098</a></span>
@@ -22046,7 +22046,7 @@ override.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1178">1178</a></span>
 <span class="normal"><a href="#__codelineno-0-1179">1179</a></span>
 <span class="normal"><a href="#__codelineno-0-1180">1180</a></span>
@@ -22131,7 +22131,7 @@ instance, a <code>dict</code>, or whatever shape the backend uses).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-994"> 994</a></span>
 <span class="normal"><a href="#__codelineno-0-995"> 995</a></span>
 <span class="normal"><a href="#__codelineno-0-996"> 996</a></span>
@@ -22256,7 +22256,7 @@ CHC dataset key).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1049">1049</a></span>
 <span class="normal"><a href="#__codelineno-0-1050">1050</a></span>
 <span class="normal"><a href="#__codelineno-0-1051">1051</a></span>
@@ -22424,7 +22424,7 @@ mirror a domain-specific record (earthdata mirrors its
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1103">1103</a></span>
 <span class="normal"><a href="#__codelineno-0-1104">1104</a></span>
 <span class="normal"><a href="#__codelineno-0-1105">1105</a></span>
@@ -22620,7 +22620,7 @@ level.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1006">1006</a></span>
 <span class="normal"><a href="#__codelineno-0-1007">1007</a></span>
 <span class="normal"><a href="#__codelineno-0-1008">1008</a></span>
@@ -22725,7 +22725,7 @@ catalog-loading behaviour.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-984">984</a></span>
 <span class="normal"><a href="#__codelineno-0-985">985</a></span>
 <span class="normal"><a href="#__codelineno-0-986">986</a></span>
@@ -22898,7 +22898,7 @@ endpoint).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/base/abstractdatasource.py</code></summary>
+              <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1133">1133</a></span>
 <span class="normal"><a href="#__codelineno-0-1134">1134</a></span>
 <span class="normal"><a href="#__codelineno-0-1135">1135</a></span>

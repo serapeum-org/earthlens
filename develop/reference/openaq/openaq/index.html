@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20276,7 +20276,7 @@ ground-station pollutant measurements as a long-format
 <p>This is the package's first <code>tabular</code> backend: the result is a table
 of per-row station observations, not a gridded array, so
 :data:<code>OpenAQ.OUTPUT_KIND</code> is <code>"tabular"</code> and the
-:class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
+:class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument for it (use the server-side <code>temporal_resolution</code> rollup
 instead).</p>
 <p>Parameter selection: for this backend <code>variables</code> is a <code>list[str]</code> of
@@ -20373,7 +20373,7 @@ so callers can catch every backend's auth failure with one
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-42">42</a></span>
 <span class="normal"><a href="#__codelineno-0-43">43</a></span>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>
@@ -20483,7 +20483,7 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
 <span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
 <span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
@@ -21001,7 +21001,7 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-244">244</a></span>
 <span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
@@ -21119,7 +21119,7 @@ exists, adds a did-you-mean hint.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
@@ -21260,7 +21260,7 @@ across names are dropped (first occurrence wins).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-272">272</a></span>
 <span class="normal"><a href="#__codelineno-0-273">273</a></span>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span>
@@ -21416,7 +21416,7 @@ row fails :class:<code>Parameter</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-201">201</a></span>
 <span class="normal"><a href="#__codelineno-0-202">202</a></span>
 <span class="normal"><a href="#__codelineno-0-203">203</a></span>
@@ -21548,7 +21548,7 @@ missing, empty, or has a malformed parameter row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-186">186</a></span>
 <span class="normal"><a href="#__codelineno-0-187">187</a></span>
 <span class="normal"><a href="#__codelineno-0-188">188</a></span>
@@ -21656,7 +21656,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
 <span class="normal"><a href="#__codelineno-0-88"> 88</a></span>
 <span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
@@ -22840,7 +22840,7 @@ Defaults to <code>1000</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
@@ -23145,7 +23145,7 @@ UTC). Empty (schema-only) when nothing matched.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-434">434</a></span>
 <span class="normal"><a href="#__codelineno-0-435">435</a></span>
 <span class="normal"><a href="#__codelineno-0-436">436</a></span>
@@ -23362,7 +23362,7 @@ exit — there is no per-instance resource to release.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-93"> 93</a></span>
 <span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
 <span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
@@ -23700,7 +23700,7 @@ carrying the optional API key.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-127">127</a></span>
 <span class="normal"><a href="#__codelineno-0-128">128</a></span>
 <span class="normal"><a href="#__codelineno-0-129">129</a></span>
@@ -23771,7 +23771,7 @@ URL — it never blocks on an interactive prompt.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-138">138</a></span>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
 <span class="normal"><a href="#__codelineno-0-140">140</a></span>
@@ -23876,7 +23876,7 @@ URL — it never blocks on an interactive prompt.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-168">168</a></span>
 <span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
@@ -23989,7 +23989,7 @@ environment variable.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
@@ -24211,7 +24211,7 @@ pollutant), <code>"particulate"</code>, <code>"meteorological"</code>, or
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>
@@ -24358,7 +24358,7 @@ and returns ground-station pollutant measurements as a long-format
 :class:<code>pandas.DataFrame</code> (one row per measurement).</p>
 <p>This is the package's first <code>tabular</code> backend: the result is a table
 of per-row station observations, not a gridded array, so
-<code>OUTPUT_KIND = "tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code>
+<code>OUTPUT_KIND = "tabular"</code> and the :class:<code>earthlens.earthlens.core.EarthLens</code>
 facade rejects an <code>aggregate=</code> argument (there is no meaningful
 gridded reduction of a pollutant timeseries; use the server-side
 <code>temporal_resolution</code> rollup instead).</p>
@@ -24460,7 +24460,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
 <span class="normal"><a href="#__codelineno-0-88"> 88</a></span>
 <span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
@@ -25644,7 +25644,7 @@ Defaults to <code>1000</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
@@ -25949,7 +25949,7 @@ UTC). Empty (schema-only) when nothing matched.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-434">434</a></span>
 <span class="normal"><a href="#__codelineno-0-435">435</a></span>
 <span class="normal"><a href="#__codelineno-0-436">436</a></span>
@@ -26228,7 +26228,7 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
 <span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
 <span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
@@ -26746,7 +26746,7 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-244">244</a></span>
 <span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
@@ -26864,7 +26864,7 @@ exists, adds a did-you-mean hint.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
@@ -27005,7 +27005,7 @@ across names are dropped (first occurrence wins).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-272">272</a></span>
 <span class="normal"><a href="#__codelineno-0-273">273</a></span>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span>
@@ -27161,7 +27161,7 @@ row fails :class:<code>Parameter</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-201">201</a></span>
 <span class="normal"><a href="#__codelineno-0-202">202</a></span>
 <span class="normal"><a href="#__codelineno-0-203">203</a></span>
@@ -27293,7 +27293,7 @@ missing, empty, or has a malformed parameter row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-186">186</a></span>
 <span class="normal"><a href="#__codelineno-0-187">187</a></span>
 <span class="normal"><a href="#__codelineno-0-188">188</a></span>
@@ -27459,7 +27459,7 @@ pollutant), <code>"particulate"</code>, <code>"meteorological"</code>, or
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>
@@ -27593,7 +27593,7 @@ pollutant), <code>"particulate"</code>, <code>"meteorological"</code>, or
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-38">38</a></span>
 <span class="normal"><a href="#__codelineno-0-39">39</a></span>
 <span class="normal"><a href="#__codelineno-0-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -27755,7 +27755,7 @@ response's error is raised.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/client.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/client.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-53"> 53</a></span>
 <span class="normal"><a href="#__codelineno-0-54"> 54</a></span>
 <span class="normal"><a href="#__codelineno-0-55"> 55</a></span>
@@ -28402,7 +28402,7 @@ real delays.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/client.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/client.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-71"> 71</a></span>
 <span class="normal"><a href="#__codelineno-0-72"> 72</a></span>
 <span class="normal"><a href="#__codelineno-0-73"> 73</a></span>
@@ -28604,7 +28604,7 @@ does by parameter <strong>name</strong>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/client.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/client.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-191">191</a></span>
 <span class="normal"><a href="#__codelineno-0-192">192</a></span>
 <span class="normal"><a href="#__codelineno-0-193">193</a></span>
@@ -28836,7 +28836,7 @@ sensor.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/client.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/client.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-225">225</a></span>
 <span class="normal"><a href="#__codelineno-0-226">226</a></span>
 <span class="normal"><a href="#__codelineno-0-227">227</a></span>
@@ -29042,7 +29042,7 @@ empty round-trip.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/client.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/client.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-146">146</a></span>
 <span class="normal"><a href="#__codelineno-0-147">147</a></span>
 <span class="normal"><a href="#__codelineno-0-148">148</a></span>
@@ -29242,7 +29242,7 @@ so callers can catch every backend's auth failure with one
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-42">42</a></span>
 <span class="normal"><a href="#__codelineno-0-43">43</a></span>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>
@@ -29346,7 +29346,7 @@ exit — there is no per-instance resource to release.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-93"> 93</a></span>
 <span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
 <span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
@@ -29684,7 +29684,7 @@ carrying the optional API key.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-127">127</a></span>
 <span class="normal"><a href="#__codelineno-0-128">128</a></span>
 <span class="normal"><a href="#__codelineno-0-129">129</a></span>
@@ -29755,7 +29755,7 @@ URL — it never blocks on an interactive prompt.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-138">138</a></span>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
 <span class="normal"><a href="#__codelineno-0-140">140</a></span>
@@ -29860,7 +29860,7 @@ URL — it never blocks on an interactive prompt.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-168">168</a></span>
 <span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
@@ -29973,7 +29973,7 @@ environment variable.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/openaq/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>

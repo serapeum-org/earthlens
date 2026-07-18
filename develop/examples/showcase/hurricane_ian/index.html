@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20048,7 +20048,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
@@ -20060,7 +20060,7 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 logger.disable("earthlens")
 logger.disable("pyramids")</div>

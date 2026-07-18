@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20035,7 +20035,7 @@ for reading the file that lands on disk; <code>matplotlib</code> draws the map.<
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf.endpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENDPOINTS</span>
 </pre></div>
@@ -20045,7 +20045,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pyramids.netcdf import NetCDF
 
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 from earthlens.ecmwf import Catalog
 from earthlens.ecmwf.endpoints import ENDPOINTS</div>
 </div>
@@ -20311,11 +20311,11 @@ window this small) and returns the written NetCDF path(s).</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="o">**</span><span class="n">request</span><span class="p">)</span>
-<span class="n">out_paths</span> <span class="o">=</span> <span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">out_paths</span> <span class="o">=</span> <span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">out_paths</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">earthlens = EarthLens(**request)
-out_paths = earthlens.download()
+out_paths = earthlens.core.download()
 out_paths</div>
 </div>
 </div>

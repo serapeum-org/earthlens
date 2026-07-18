@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20207,7 +20207,7 @@ cyclone best tracks — from IBTrACS (global, 1848-present) or HURDAT2
 (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of track features, not
 a gridded array, so :data:<code>TropicalCyclone.OUTPUT_KIND</code> is <code>"vector"</code> and
-the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
+the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument for it. The default geometry is one <code>Point</code> per 6-hourly fix; a
 <code>geometry="track"</code> kwarg returns one <code>LineString</code> per storm with summary
 attributes.</p>
@@ -20363,7 +20363,7 @@ short code (<code>"vmax"</code>, <code>"mslp"</code>, <code>"category"</code>).<
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-128">128</a></span>
 <span class="normal"><a href="#__codelineno-0-129">129</a></span>
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
@@ -20535,7 +20535,7 @@ track field with :meth:<code>get_field</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span>
@@ -21110,7 +21110,7 @@ track field with :meth:<code>get_field</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
@@ -21262,7 +21262,7 @@ walking the YAML.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
@@ -21440,7 +21440,7 @@ walking the YAML.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
@@ -21516,7 +21516,7 @@ walking the YAML.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
 <span class="normal"><a href="#__codelineno-0-247">247</a></span>
@@ -21665,7 +21665,7 @@ walking the YAML.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-270">270</a></span>
 <span class="normal"><a href="#__codelineno-0-271">271</a></span>
 <span class="normal"><a href="#__codelineno-0-272">272</a></span>
@@ -21809,7 +21809,7 @@ the other two-level catalogs use.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-296">296</a></span>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
@@ -21908,7 +21908,7 @@ schema cannot express.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
@@ -22116,7 +22116,7 @@ fails :class:<code>Basin</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-225">225</a></span>
 <span class="normal"><a href="#__codelineno-0-226">226</a></span>
 <span class="normal"><a href="#__codelineno-0-227">227</a></span>
@@ -22203,7 +22203,7 @@ missing, empty, or has a malformed basin row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
@@ -22336,7 +22336,7 @@ missing, empty, or has a malformed basin row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
@@ -22454,7 +22454,7 @@ is not stored on the row.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-101">101</a></span>
 <span class="normal"><a href="#__codelineno-0-102">102</a></span>
 <span class="normal"><a href="#__codelineno-0-103">103</a></span>
@@ -22592,7 +22592,7 @@ features, so the facade rejects <code>aggregate=</code> with
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
 <span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
 <span class="normal"><a href="#__codelineno-0-92"> 92</a></span>
@@ -24526,7 +24526,7 @@ is given no <code>ships_time</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
 <span class="normal"><a href="#__codelineno-0-115">115</a></span>
@@ -24987,7 +24987,7 @@ basin's track features, CRS <code>EPSG:4326</code>. Empty
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-630">630</a></span>
 <span class="normal"><a href="#__codelineno-0-631">631</a></span>
 <span class="normal"><a href="#__codelineno-0-632">632</a></span>
@@ -25159,7 +25159,7 @@ own.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-51">51</a></span>
 <span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
@@ -25273,7 +25273,7 @@ declared dtypes, an empty <code>geometry</code> column, CRS
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
@@ -25407,7 +25407,7 @@ their dtypes, an empty <code>geometry</code>, CRS <code>EPSG:4326</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
@@ -25654,7 +25654,7 @@ stamped on every row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-144">144</a></span>
 <span class="normal"><a href="#__codelineno-0-145">145</a></span>
 <span class="normal"><a href="#__codelineno-0-146">146</a></span>
@@ -26079,7 +26079,7 @@ every row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
@@ -26289,7 +26289,7 @@ storms in the requested seasons are mapped to a pyramids
 <p>This is a <code>vector</code> backend: the result is a table of track features
 (per-fix <code>Point</code>s by default, or one <code>LineString</code> per storm with
 <code>geometry="track"</code>), not a gridded array, so <code>OUTPUT_KIND = "vector"</code> and
-the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
+the :class:<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument. <code>download()</code> returns the in-memory FeatureCollection (the union
 across requested basins) and writes one vector file per basin to <code>path</code>.</p>
 <p>tropycal needs <strong>no credentials</strong> — it fetches best-track files from
@@ -26387,7 +26387,7 @@ features, so the facade rejects <code>aggregate=</code> with
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
 <span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
 <span class="normal"><a href="#__codelineno-0-92"> 92</a></span>
@@ -28321,7 +28321,7 @@ is given no <code>ships_time</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
 <span class="normal"><a href="#__codelineno-0-115">115</a></span>
@@ -28782,7 +28782,7 @@ basin's track features, CRS <code>EPSG:4326</code>. Empty
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-630">630</a></span>
 <span class="normal"><a href="#__codelineno-0-631">631</a></span>
 <span class="normal"><a href="#__codelineno-0-632">632</a></span>
@@ -29090,7 +29090,7 @@ short code (<code>"vmax"</code>, <code>"mslp"</code>, <code>"category"</code>).<
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-128">128</a></span>
 <span class="normal"><a href="#__codelineno-0-129">129</a></span>
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
@@ -29262,7 +29262,7 @@ track field with :meth:<code>get_field</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span>
@@ -29837,7 +29837,7 @@ track field with :meth:<code>get_field</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
@@ -29989,7 +29989,7 @@ walking the YAML.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
@@ -30167,7 +30167,7 @@ walking the YAML.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
@@ -30243,7 +30243,7 @@ walking the YAML.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
 <span class="normal"><a href="#__codelineno-0-247">247</a></span>
@@ -30392,7 +30392,7 @@ walking the YAML.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-270">270</a></span>
 <span class="normal"><a href="#__codelineno-0-271">271</a></span>
 <span class="normal"><a href="#__codelineno-0-272">272</a></span>
@@ -30536,7 +30536,7 @@ the other two-level catalogs use.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-296">296</a></span>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
@@ -30635,7 +30635,7 @@ schema cannot express.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
@@ -30843,7 +30843,7 @@ fails :class:<code>Basin</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-225">225</a></span>
 <span class="normal"><a href="#__codelineno-0-226">226</a></span>
 <span class="normal"><a href="#__codelineno-0-227">227</a></span>
@@ -30930,7 +30930,7 @@ missing, empty, or has a malformed basin row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
@@ -31063,7 +31063,7 @@ missing, empty, or has a malformed basin row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
@@ -31181,7 +31181,7 @@ is not stored on the row.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-101">101</a></span>
 <span class="normal"><a href="#__codelineno-0-102">102</a></span>
 <span class="normal"><a href="#__codelineno-0-103">103</a></span>
@@ -31275,7 +31275,7 @@ own.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-51">51</a></span>
 <span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
@@ -31458,7 +31458,7 @@ empty-result schema when every input is empty.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
@@ -31531,7 +31531,7 @@ empty-result schema when every input is empty.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-449">449</a></span>
 <span class="normal"><a href="#__codelineno-0-450">450</a></span>
 <span class="normal"><a href="#__codelineno-0-451">451</a></span>
@@ -31645,7 +31645,7 @@ declared dtypes, an empty <code>geometry</code> column, CRS
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
@@ -31779,7 +31779,7 @@ their dtypes, an empty <code>geometry</code>, CRS <code>EPSG:4326</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
@@ -32026,7 +32026,7 @@ stamped on every row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-144">144</a></span>
 <span class="normal"><a href="#__codelineno-0-145">145</a></span>
 <span class="normal"><a href="#__codelineno-0-146">146</a></span>
@@ -32451,7 +32451,7 @@ every row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
@@ -32719,7 +32719,7 @@ follow the standard SSHWS knot thresholds. A missing wind (<code>None</code> /
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/tropycal/events.py</code></summary>
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/tropycal/events.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-105">105</a></span>
 <span class="normal"><a href="#__codelineno-0-106">106</a></span>
 <span class="normal"><a href="#__codelineno-0-107">107</a></span>

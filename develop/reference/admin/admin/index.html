@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19790,7 +19790,7 @@ TIGER/Line</strong> (states / counties / tracts / nation, public domain). Every 
 returns polygon boundaries, so this is a <code>vector</code> backend: <code>download()</code> returns a
 pyramids <code>~pyramids.feature.collection.FeatureCollection</code> of polygons in
 EPSG:4326 (and writes it to a vector file when a <code>path</code> is set), and the
-<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument.</p>
+<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument.</p>
 <p>A request names a <strong>dataset</strong> (<code>variables=["geoboundaries:adm1"]</code>) plus the
 selector that dataset needs — <code>country=&lt;ISO3&gt;</code> for geoBoundaries, an optional
 <code>scale=</code> for Natural Earth, an optional <code>year=</code> (and <code>state=</code> for tracts) for
@@ -19879,7 +19879,7 @@ so the facade rejects <code>aggregate=</code> with <code>NotImplementedError</co
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-102">102</a></span>
 <span class="normal"><a href="#__codelineno-0-103">103</a></span>
 <span class="normal"><a href="#__codelineno-0-104">104</a></span>
@@ -20926,7 +20926,7 @@ a dataset's required selector (<code>country</code> / <code>state</code>) is mis
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-117">117</a></span>
 <span class="normal"><a href="#__codelineno-0-118">118</a></span>
 <span class="normal"><a href="#__codelineno-0-119">119</a></span>
@@ -21249,7 +21249,7 @@ belt-and-suspenders guard for direct callers.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
@@ -21430,7 +21430,7 @@ keys.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-210">210</a></span>
 <span class="normal"><a href="#__codelineno-0-211">211</a></span>
 <span class="normal"><a href="#__codelineno-0-212">212</a></span>
@@ -21736,7 +21736,7 @@ lists the known ids with a did-you-mean hint.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-276">276</a></span>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
@@ -21809,7 +21809,7 @@ lists the known ids with a did-you-mean hint.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-272">272</a></span>
 <span class="normal"><a href="#__codelineno-0-273">273</a></span>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
@@ -21920,7 +21920,7 @@ is absent from <code>available_datasets:</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
@@ -22012,7 +22012,7 @@ empty, or has a malformed row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-232">232</a></span>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
@@ -22260,7 +22260,7 @@ for geoBoundaries (whose two-step resolve uses the module constant).</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57"> 57</a></span>
 <span class="normal"><a href="#__codelineno-0-58"> 58</a></span>
 <span class="normal"><a href="#__codelineno-0-59"> 59</a></span>
@@ -22421,7 +22421,7 @@ ADM0/1/2), Natural Earth (global cultural admin layers), or US Census TIGER/Line
 EPSG:4326, and returns a <code>FeatureCollection</code> of polygons.</p>
 <p>This is a <code>vector</code> backend: the result is a table of boundary polygons, not a
 gridded array, so <code>OUTPUT_KIND = "vector"</code> and the
-<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument (there is
+<code>earthlens.earthlens.core.EarthLens</code> facade rejects an <code>aggregate=</code> argument (there is
 no meaningful gridded reduction of a boundary layer). <code>download()</code> returns the
 in-memory <code>FeatureCollection</code> and, when a <code>path</code> is set, also writes it to one
 vector file.</p>
@@ -22509,7 +22509,7 @@ so the facade rejects <code>aggregate=</code> with <code>NotImplementedError</co
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-102">102</a></span>
 <span class="normal"><a href="#__codelineno-0-103">103</a></span>
 <span class="normal"><a href="#__codelineno-0-104">104</a></span>
@@ -23556,7 +23556,7 @@ a dataset's required selector (<code>country</code> / <code>state</code>) is mis
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-117">117</a></span>
 <span class="normal"><a href="#__codelineno-0-118">118</a></span>
 <span class="normal"><a href="#__codelineno-0-119">119</a></span>
@@ -23879,7 +23879,7 @@ belt-and-suspenders guard for direct callers.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
@@ -24118,7 +24118,7 @@ keys.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-210">210</a></span>
 <span class="normal"><a href="#__codelineno-0-211">211</a></span>
 <span class="normal"><a href="#__codelineno-0-212">212</a></span>
@@ -24424,7 +24424,7 @@ lists the known ids with a did-you-mean hint.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-276">276</a></span>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
@@ -24497,7 +24497,7 @@ lists the known ids with a did-you-mean hint.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-272">272</a></span>
 <span class="normal"><a href="#__codelineno-0-273">273</a></span>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
@@ -24608,7 +24608,7 @@ is absent from <code>available_datasets:</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
@@ -24700,7 +24700,7 @@ empty, or has a malformed row.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-232">232</a></span>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
@@ -24948,7 +24948,7 @@ for geoBoundaries (whose two-step resolve uses the module constant).</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57"> 57</a></span>
 <span class="normal"><a href="#__codelineno-0-58"> 58</a></span>
 <span class="normal"><a href="#__codelineno-0-59"> 59</a></span>
@@ -25098,7 +25098,7 @@ invalidates the entry on its own.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-46">46</a></span>
 <span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
@@ -25248,7 +25248,7 @@ gate are applied by the per-provider URL builders so the backend hands
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
 <span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
 <span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
@@ -25315,7 +25315,7 @@ EPSG:4326.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-181">181</a></span>
 <span class="normal"><a href="#__codelineno-0-182">182</a></span>
 <span class="normal"><a href="#__codelineno-0-183">183</a></span>
@@ -25504,7 +25504,7 @@ caller / backend.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
 <span class="normal"><a href="#__codelineno-0-57">57</a></span>
@@ -25676,7 +25676,7 @@ caller / backend.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-109">109</a></span>
 <span class="normal"><a href="#__codelineno-0-110">110</a></span>
 <span class="normal"><a href="#__codelineno-0-111">111</a></span>
@@ -25788,7 +25788,7 @@ GDAL <code>/vsicurl/</code> / <code>/vsizip//vsicurl/</code> path from the URL b
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
 <span class="normal"><a href="#__codelineno-0-144">144</a></span>
@@ -25988,7 +25988,7 @@ for per-state entities (e.g. <code>"06"</code> for California tracts).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-123">123</a></span>
 <span class="normal"><a href="#__codelineno-0-124">124</a></span>
 <span class="normal"><a href="#__codelineno-0-125">125</a></span>
@@ -26098,7 +26098,7 @@ for per-state entities (e.g. <code>"06"</code> for California tracts).</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/admin/_helpers.py</code></summary>
+              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/_helpers.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-42">42</a></span>
 <span class="normal"><a href="#__codelineno-0-43">43</a></span>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>

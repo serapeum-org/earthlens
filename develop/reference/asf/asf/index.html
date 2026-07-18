@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20236,7 +20236,7 @@ in-flight.</p>
 <details class="note" open>
   <summary>Note</summary>
   <p>ASF ships every product as a SAFE <code>.zip</code> archive (not a
-bare GeoTIFF / NetCDF), so :meth:<code>earthlens.earthlens.EarthLens.load</code>
+bare GeoTIFF / NetCDF), so :meth:<code>earthlens.earthlens.core.EarthLens.load</code>
 — which calls <code>pyramids</code> on <code>.tif</code> / <code>.nc</code> / <code>.cog</code> /
 <code>.zarr</code> extensions — returns the downloaded <code>.zip</code> path as
 a plain :class:<code>pathlib.Path</code> rather than a pyramids object.
@@ -20272,7 +20272,7 @@ SNAP, <code>sarsen</code>, …) to open the archive.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-50"> 50</a></span>
 <span class="normal"><a href="#__codelineno-0-51"> 51</a></span>
 <span class="normal"><a href="#__codelineno-0-52"> 52</a></span>
@@ -20813,7 +20813,7 @@ SNAP, <code>sarsen</code>, …) to open the archive.</p>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    Note:</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">        ASF ships every product as a SAFE `.zip` archive (not a</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        bare GeoTIFF / NetCDF), so :meth:`earthlens.earthlens.EarthLens.load`</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        bare GeoTIFF / NetCDF), so :meth:`earthlens.earthlens.core.EarthLens.load`</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        — which calls `pyramids` on `.tif` / `.nc` / `.cog` /</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">        `.zarr` extensions — returns the downloaded `.zip` path as</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">        a plain :class:`pathlib.Path` rather than a pyramids object.</span>
@@ -21660,7 +21660,7 @@ to the EDL env vars / <code>~/.netrc</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-103">103</a></span>
 <span class="normal"><a href="#__codelineno-0-104">104</a></span>
 <span class="normal"><a href="#__codelineno-0-105">105</a></span>
@@ -22060,7 +22060,7 @@ present and skipped.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-519">519</a></span>
 <span class="normal"><a href="#__codelineno-0-520">520</a></span>
 <span class="normal"><a href="#__codelineno-0-521">521</a></span>
@@ -22277,7 +22277,7 @@ token. <code>None</code> until :meth:<code>configure</code> runs.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
@@ -22692,7 +22692,7 @@ context-manager form) to talk to EDL.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-150">150</a></span>
 <span class="normal"><a href="#__codelineno-0-151">151</a></span>
 <span class="normal"><a href="#__codelineno-0-152">152</a></span>
@@ -22791,7 +22791,7 @@ message names the <code>earthlens[asf]</code> extra.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span>
 <span class="normal"><a href="#__codelineno-0-166">166</a></span>
@@ -22966,7 +22966,7 @@ during the current process and the <code>ASFSession</code> is ready.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-247">247</a></span>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
@@ -23082,7 +23082,7 @@ on missing / bad credentials.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-270">270</a></span>
 <span class="normal"><a href="#__codelineno-0-271">271</a></span>
 <span class="normal"><a href="#__codelineno-0-272">272</a></span>
@@ -23247,7 +23247,7 @@ to <code>~/.netrc</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-60"> 60</a></span>
 <span class="normal"><a href="#__codelineno-0-61"> 61</a></span>
 <span class="normal"><a href="#__codelineno-0-62"> 62</a></span>
@@ -23405,7 +23405,7 @@ to <code>~/.netrc</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>
@@ -23518,7 +23518,7 @@ against the same store.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
@@ -24176,7 +24176,7 @@ against the same store.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-348">348</a></span>
 <span class="normal"><a href="#__codelineno-0-349">349</a></span>
 <span class="normal"><a href="#__codelineno-0-350">350</a></span>
@@ -24295,7 +24295,7 @@ exists, adds a did-you-mean hint.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-378">378</a></span>
 <span class="normal"><a href="#__codelineno-0-379">379</a></span>
 <span class="normal"><a href="#__codelineno-0-380">380</a></span>
@@ -24450,7 +24450,7 @@ row fails :class:<code>Product</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
@@ -24558,7 +24558,7 @@ an alias is reused across two product rows.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
 <span class="normal"><a href="#__codelineno-0-291">291</a></span>
 <span class="normal"><a href="#__codelineno-0-292">292</a></span>
@@ -24716,7 +24716,7 @@ nor a known alias.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-398">398</a></span>
 <span class="normal"><a href="#__codelineno-0-399">399</a></span>
 <span class="normal"><a href="#__codelineno-0-400">400</a></span>
@@ -24836,7 +24836,7 @@ nor a known alias.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-429">429</a></span>
 <span class="normal"><a href="#__codelineno-0-430">430</a></span>
 <span class="normal"><a href="#__codelineno-0-431">431</a></span>
@@ -25050,7 +25050,7 @@ messages and documentation.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
@@ -25383,7 +25383,7 @@ in-flight.</p>
 <details class="note" open>
   <summary>Note</summary>
   <p>ASF ships every product as a SAFE <code>.zip</code> archive (not a
-bare GeoTIFF / NetCDF), so :meth:<code>earthlens.earthlens.EarthLens.load</code>
+bare GeoTIFF / NetCDF), so :meth:<code>earthlens.earthlens.core.EarthLens.load</code>
 — which calls <code>pyramids</code> on <code>.tif</code> / <code>.nc</code> / <code>.cog</code> /
 <code>.zarr</code> extensions — returns the downloaded <code>.zip</code> path as
 a plain :class:<code>pathlib.Path</code> rather than a pyramids object.
@@ -25419,7 +25419,7 @@ SNAP, <code>sarsen</code>, …) to open the archive.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/backend.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/backend.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-50"> 50</a></span>
 <span class="normal"><a href="#__codelineno-0-51"> 51</a></span>
 <span class="normal"><a href="#__codelineno-0-52"> 52</a></span>
@@ -25960,7 +25960,7 @@ SNAP, <code>sarsen</code>, …) to open the archive.</p>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    Note:</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">        ASF ships every product as a SAFE `.zip` archive (not a</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        bare GeoTIFF / NetCDF), so :meth:`earthlens.earthlens.EarthLens.load`</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        bare GeoTIFF / NetCDF), so :meth:`earthlens.earthlens.core.EarthLens.load`</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        — which calls `pyramids` on `.tif` / `.nc` / `.cog` /</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">        `.zarr` extensions — returns the downloaded `.zip` path as</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">        a plain :class:`pathlib.Path` rather than a pyramids object.</span>
@@ -26807,7 +26807,7 @@ to the EDL env vars / <code>~/.netrc</code>.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-103">103</a></span>
 <span class="normal"><a href="#__codelineno-0-104">104</a></span>
 <span class="normal"><a href="#__codelineno-0-105">105</a></span>
@@ -27207,7 +27207,7 @@ present and skipped.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/backend.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/backend.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-519">519</a></span>
 <span class="normal"><a href="#__codelineno-0-520">520</a></span>
 <span class="normal"><a href="#__codelineno-0-521">521</a></span>
@@ -27466,7 +27466,7 @@ against the same store.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
@@ -28124,7 +28124,7 @@ against the same store.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-348">348</a></span>
 <span class="normal"><a href="#__codelineno-0-349">349</a></span>
 <span class="normal"><a href="#__codelineno-0-350">350</a></span>
@@ -28243,7 +28243,7 @@ exists, adds a did-you-mean hint.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-378">378</a></span>
 <span class="normal"><a href="#__codelineno-0-379">379</a></span>
 <span class="normal"><a href="#__codelineno-0-380">380</a></span>
@@ -28398,7 +28398,7 @@ row fails :class:<code>Product</code> validation.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
@@ -28506,7 +28506,7 @@ an alias is reused across two product rows.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
 <span class="normal"><a href="#__codelineno-0-291">291</a></span>
 <span class="normal"><a href="#__codelineno-0-292">292</a></span>
@@ -28664,7 +28664,7 @@ nor a known alias.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-398">398</a></span>
 <span class="normal"><a href="#__codelineno-0-399">399</a></span>
 <span class="normal"><a href="#__codelineno-0-400">400</a></span>
@@ -28784,7 +28784,7 @@ nor a known alias.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-429">429</a></span>
 <span class="normal"><a href="#__codelineno-0-430">430</a></span>
 <span class="normal"><a href="#__codelineno-0-431">431</a></span>
@@ -28998,7 +28998,7 @@ messages and documentation.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
@@ -29228,7 +29228,7 @@ invalidates the entry on its own.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/catalog.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-43">43</a></span>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
@@ -29418,7 +29418,7 @@ token. <code>None</code> until :meth:<code>configure</code> runs.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-112">112</a></span>
 <span class="normal"><a href="#__codelineno-0-113">113</a></span>
 <span class="normal"><a href="#__codelineno-0-114">114</a></span>
@@ -29833,7 +29833,7 @@ context-manager form) to talk to EDL.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-150">150</a></span>
 <span class="normal"><a href="#__codelineno-0-151">151</a></span>
 <span class="normal"><a href="#__codelineno-0-152">152</a></span>
@@ -29932,7 +29932,7 @@ message names the <code>earthlens[asf]</code> extra.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span>
 <span class="normal"><a href="#__codelineno-0-166">166</a></span>
@@ -30107,7 +30107,7 @@ during the current process and the <code>ASFSession</code> is ready.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-247">247</a></span>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
@@ -30223,7 +30223,7 @@ on missing / bad credentials.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-270">270</a></span>
 <span class="normal"><a href="#__codelineno-0-271">271</a></span>
 <span class="normal"><a href="#__codelineno-0-272">272</a></span>
@@ -30388,7 +30388,7 @@ to <code>~/.netrc</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-60"> 60</a></span>
 <span class="normal"><a href="#__codelineno-0-61"> 61</a></span>
 <span class="normal"><a href="#__codelineno-0-62"> 62</a></span>
@@ -30546,7 +30546,7 @@ to <code>~/.netrc</code>.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>.pixi/envs/docs/lib/python3.14/site-packages/earthlens/asf/auth.py</code></summary>
+                <summary>Source code in <code>libs/providers/imagery/src/earthlens/asf/auth.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>

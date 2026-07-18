@@ -60,7 +60,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19912,7 +19912,7 @@ expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)
     <span class="nb">print</span><span class="p">(</span><span class="s1">'Register at https://www.eorc.jaxa.jp/ptree/registration_top.html and re-run.'</span><span class="p">)</span>
     <span class="n">written</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
     <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'jaxa'</span><span class="p">,</span>
@@ -19941,7 +19941,7 @@ if not (os.environ.get('JAXA_PTREE_USERNAME') and os.environ.get('JAXA_PTREE_PAS
     print('Register at https://www.eorc.jaxa.jp/ptree/registration_top.html and re-run.')
     written = []
 else:
-    from earthlens import EarthLens
+    from earthlens.core import EarthLens
     OUT_DIR.mkdir(exist_ok=True)
     lens = EarthLens(
         data_source='jaxa',

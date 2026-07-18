@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19161,7 +19161,7 @@
 
 <h1 id="jaxa-usage"><a class="toclink" href="#jaxa-usage">JAXA — usage</a><a class="headerlink" href="#jaxa-usage" title="Permanent link">#</a></h1>
 <h2 id="quick-start-aw3d30-elevation-tile-authless"><a class="toclink" href="#quick-start-aw3d30-elevation-tile-authless">Quick start: AW3D30 elevation tile (authless)</a><a class="headerlink" href="#quick-start-aw3d30-elevation-tile-authless" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jaxa&quot;</span><span class="p">,</span>
@@ -19179,7 +19179,7 @@
 <p>The output GeoTIFF is north-up, EPSG:4326, with one band per request
 (default band from the catalog, or one file per <code>bands=</code> entry).</p>
 <h2 id="quick-start-alos-2-palsar-2-product-credentialed-sftp"><a class="toclink" href="#quick-start-alos-2-palsar-2-product-credentialed-sftp">Quick start: ALOS-2 PALSAR-2 product (credentialed SFTP)</a><a class="headerlink" href="#quick-start-alos-2-palsar-2-product-credentialed-sftp" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jaxa&quot;</span><span class="p">,</span>
