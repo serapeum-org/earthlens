@@ -52,33 +52,43 @@ app.add_typer(providers_app, name="providers")
 
 
 def _provider_backend_hint(exc: ModuleNotFoundError) -> str | None:
-    """Return an install hint if `exc` is a missing provider backend, else `None`.
+    """Return an install hint if `exc` is a missing provider distribution, else `None`.
 
     The catalog-tooling subcommands defer-import provider modules
     (`earthlens.ecmwf`, `earthlens.gee`, `earthlens.nwm`, …) that ship in
     the theme distributions rather than in `earthlens-core`. On a
-    core-only install those imports raise `ModuleNotFoundError`; this
-    turns such a miss into a message naming the backend to install.
+    core-only install those imports fail at the top-level provider
+    package, so Python reports the missing module as exactly
+    `earthlens.<backend>`; this rewrites that miss into a message naming
+    the package to install.
+
+    Only a **top-level** `earthlens.<backend>` miss is rewritten. A deeper
+    miss (`earthlens.<backend>.<submodule>`) means the distribution is
+    installed but one of its own imports failed — a provider bug, not a
+    missing install — so this returns `None` and the caller re-raises the
+    real traceback. The hint recommends `pip install earthlens` (the meta
+    package that bundles every provider) rather than a per-backend extra,
+    because the SDK-free backends have no matching extra to name.
 
     Args:
         exc: The `ModuleNotFoundError` raised while running a command.
 
     Returns:
-        A one-line install hint when the missing module is a provider
-        backend under the `earthlens` namespace, or `None` when the miss
-        is a core module or an unrelated third-party import (which the
-        caller should re-raise unchanged).
+        A one-line install hint when the missing module is exactly a
+        top-level provider package under the `earthlens` namespace, or
+        `None` for a core module, a deeper (provider-internal) miss, or an
+        unrelated third-party import — all of which the caller re-raises
+        unchanged.
     """
     name = exc.name or ""
     parts = name.split(".")
     hint = None
-    if len(parts) >= 2 and parts[0] == "earthlens" and parts[1] not in _CORE_MODULES:
+    if len(parts) == 2 and parts[0] == "earthlens" and parts[1] not in _CORE_MODULES:
         backend = parts[1]
         hint = (
             f"This command needs the {backend!r} provider backend, which is not "
             f"installed. It ships in a provider distribution — install the full "
-            f"package with `pip install earthlens`, or just this backend with "
-            f"`pip install earthlens[{backend}]`."
+            f"package with `pip install earthlens` (it bundles every provider)."
         )
     return hint
 
