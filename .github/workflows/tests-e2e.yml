@@ -35,9 +35,8 @@ jobs:
       - name: Set up Python
         uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          python-version: \"3.12\"
+          python-version: "3.12"
           install-groups: "groups: dev, extras: all"
-          verify-lock: true
           verify-lock: true
 
       - name: Run live CDS e2e tests
@@ -59,9 +58,8 @@ jobs:
       - name: Set up Python
         uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          python-version: \"3.12\"
+          python-version: "3.12"
           install-groups: "groups: dev, extras: all"
-          verify-lock: true
           verify-lock: true
 
       - name: Run live Google Earth Engine e2e tests
@@ -140,9 +138,8 @@ jobs:
       - name: Set up Python
         uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          python-version: \"3.12\"
+          python-version: "3.12"
           install-groups: "groups: dev, extras: all"
-          verify-lock: true
           verify-lock: true
 
       - name: Run live STAC e2e tests
@@ -167,9 +164,8 @@ jobs:
       - name: Set up Python
         uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          python-version: \"3.12\"
+          python-version: "3.12"
           install-groups: "groups: dev, extras: all"
-          verify-lock: true
           verify-lock: true
 
       - name: Run live Sentinel Hub e2e tests
@@ -249,9 +245,8 @@ jobs:
       - name: Set up Python
         uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          python-version: \"3.12\"
+          python-version: "3.12"
           install-groups: "groups: dev, extras: all"
-          verify-lock: true
           verify-lock: true
 
       - name: Run live IUCN Red List e2e tests
@@ -275,9 +270,8 @@ jobs:
       - name: Set up Python
         uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          python-version: \"3.12\"
+          python-version: "3.12"
           install-groups: "groups: dev, extras: all"
-          verify-lock: true
           verify-lock: true
 
       - name: Run live Protected Planet (WDPA) e2e tests
