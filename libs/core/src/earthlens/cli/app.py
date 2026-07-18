@@ -1,10 +1,10 @@
 """Top-level Typer application that wires the earthlens CLI together.
 
-Defines the root :data:`app` and mounts the `datasets` and `providers`
+Defines the root `app` and mounts the `datasets` and `providers`
 command groups. The console script declared in `pyproject.toml`
-(`earthlens = "earthlens.cli:main"`) resolves to :func:`main`, which
-runs :data:`app` and rewrites a missing provider distribution into a
-friendly install hint (see :func:`_provider_backend_hint`).
+(`earthlens = "earthlens.cli:main"`) resolves to `main`, which
+runs `app` and rewrites a missing provider distribution into a
+friendly install hint (see `_provider_backend_hint`).
 """
 
 from __future__ import annotations
@@ -87,7 +87,7 @@ def main() -> None:
     """Run the root application, rewriting a missing backend into an install hint.
 
     This is the `earthlens` console-script entry point. It invokes
-    :data:`app` and, when a catalog-tooling subcommand defer-imports a
+    `app` and, when a catalog-tooling subcommand defer-imports a
     provider module that is not installed, prints a friendly
     `pip install earthlens[<backend>]` hint and exits non-zero instead of
     letting the raw `ModuleNotFoundError` traceback surface. Any other
