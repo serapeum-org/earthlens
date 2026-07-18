@@ -235,7 +235,11 @@ style = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Tests are migrating to per-distribution `libs/<member>/tests/` (#785). During
+# the move both roots are collected; `tests/` shrinks to empty as each theme
+# lands and is removed in the final step.
+testpaths = ["libs/core/tests", "tests"]
+consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
     "slow: mark test as slow.",

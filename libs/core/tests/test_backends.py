@@ -14,8 +14,8 @@ from earthlens.earthlens import EarthLens
 #: Every thematic provider distribution installed in the dev workspace.
 THEMES = ["atmosphere", "ocean", "imagery", "land", "hazards"]
 
-#: The workspace root (tests/ sits directly under it).
-_REPO_ROOT = Path(__file__).resolve().parents[1]
+#: The workspace root (this file lives at libs/core/tests/test_backends.py).
+_REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _theme_shipped_segments(theme: str) -> set[str]:
