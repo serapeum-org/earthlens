@@ -19244,7 +19244,7 @@ the per-mission shards from scratch.</p>
 <h2 id="when-the-live-e2e-tests-run"><a class="toclink" href="#when-the-live-e2e-tests-run">When the live e2e tests run</a><a class="headerlink" href="#when-the-live-e2e-tests-run" title="Permanent link">#</a></h2>
 <p>The end-to-end tests are gated:</p>
 <ul>
-<li><code>pytest tests/jaxa -m "jaxa and e2e"</code> — runs the live <code>jaxa-earth</code> pull
+<li><code>pytest -m "jaxa and e2e"</code> — runs the live <code>jaxa-earth</code> pull
   unconditionally (authless), and the live <code>gportal</code> search only when
   <code>$GPORTAL_USERNAME</code> + <code>$GPORTAL_PASSWORD</code> are set in the environment.</li>
 <li>The default <code>pytest -m "not e2e"</code> run skips both, so the suite stays

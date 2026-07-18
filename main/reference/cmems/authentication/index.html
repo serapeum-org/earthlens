@@ -19260,7 +19260,7 @@ them up from the environment:</p>
 <a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">cmems</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <p>The same env vars are read by the live <code>e2e</code> test suite
-(<code>pytest -m e2e tests/cmems</code>); set them locally to exercise the
+(<code>pytest -m "cmems and e2e"</code>); set them locally to exercise the
 end-to-end paths.</p>
 <h2 id="5-the-mounted-file-path-ci-secret-managers"><a class="toclink" href="#5-the-mounted-file-path-ci-secret-managers">5. The mounted-file path (CI / secret managers)</a><a class="headerlink" href="#5-the-mounted-file-path-ci-secret-managers" title="Permanent link">#</a></h2>
 <p>For setups where the credentials file is mounted as a secret rather
