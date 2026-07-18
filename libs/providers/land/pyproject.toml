@@ -57,6 +57,10 @@ include = ["earthlens._land*", "earthlens.bathymetry*", "earthlens.dem*", "earth
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
+# GHSL ships the 18x36 Mollweide tile-grid index (the JRC land tile schema,
+# converted to GeoJSON) alongside its catalog; `tiles_for_bbox` opens it
+# unconditionally on the download path, so it must be in the wheel.
+"earthlens.ghsl" = ["*.geojson"]
 
 # Resolve the core distribution from the workspace, not PyPI, so this package
 # locks and develops against the local earthlens-core.
