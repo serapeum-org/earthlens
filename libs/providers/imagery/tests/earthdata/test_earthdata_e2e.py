@@ -30,7 +30,7 @@ _HAVE_CREDS = bool(
     or os.environ.get("EARTHDATA_TOKEN")
 )
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
+_REPO_ROOT = Path(__file__).resolve().parents[5]
 _EXAMPLES = _REPO_ROOT / "docs" / "examples" / "earthdata"
 # The real-life (live-download) notebooks — distinct from the offline
 # catalog_explorer / output_kinds demos, which need no credentials.

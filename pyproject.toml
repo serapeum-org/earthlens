@@ -238,7 +238,7 @@ style = [
 # Tests are migrating to per-distribution `libs/<member>/tests/` (#785). During
 # the move both roots are collected; `tests/` shrinks to empty as each theme
 # lands and is removed in the final step.
-testpaths = ["libs/core/tests", "libs/providers/ocean/tests", "libs/providers/hazards/tests", "tests"]
+testpaths = ["libs/core/tests", "libs/providers/ocean/tests", "libs/providers/hazards/tests", "libs/providers/imagery/tests", "tests"]
 consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
