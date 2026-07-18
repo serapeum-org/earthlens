@@ -19628,6 +19628,13 @@ own config:</p>
 (<code>--cov=libs/&lt;member&gt;/src</code>, uploaded to Codecov under a per-member flag), so a
 failure is attributed to the distribution that owns it. End-to-end tests
 (<code>-m e2e</code>) are opt-in and run in the separate <code>tests-e2e.yml</code> workflow.</p>
+<p>One coupling to note: <code>earthlens-core</code>'s entry-point discovery and facade tests
+(<code>test_backends.py</code>, <code>test_earthlens.py</code>) exercise the <strong>whole</strong> registry — they
+assert every provider's backends are discoverable — so they require all five
+provider distributions to be installed, which the workspace dev setup
+(<code>uv sync --extra all</code>) always provides. A consequence is that a cross-provider
+entry-point or packaging regression surfaces in the <code>core</code> lane, not only the
+offending provider's lane.</p>
 <p>More details on conda environments: <a href="https://conda.io/docs/user-guide/tasks/manage-environments.html">Managing environments</a></p>
 
 
