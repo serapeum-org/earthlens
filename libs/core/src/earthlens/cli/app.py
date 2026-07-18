@@ -103,5 +103,5 @@ def main() -> None:
         raise SystemExit(1) from exc
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover - module-run shim
     main()
