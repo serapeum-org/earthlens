@@ -162,24 +162,6 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = []
 
-# Every backend ships its catalog YAML(s); the "*" key applies to all
-# subpackages, with per-package additions for non-YAML catalog artefacts.
-[tool.setuptools.package-data]
-"*" = ["*.yaml", "catalog/*.yaml"]
-"earthlens.earthdata" = ["catalog/*.json"]
-"earthlens.hdx" = ["catalog/*.json", "catalog/*.json.gz"]
-"earthlens.sentinel_hub" = ["evalscripts/*.js"]
-# GHSL ships the 18x36 Mollweide tile-grid index (the JRC land tile schema,
-# converted to GeoJSON) alongside its catalog.
-"earthlens.ghsl" = ["*.geojson"]
-
-[tool.setuptools.exclude-package-data]
-# Ship only the curated catalog; the informational available_parameters.yaml
-# (~1.5 MB, ~19.7k codes) is a repo/tooling + docs artefact that nothing loads
-# at runtime (the Catalog reads only the curated file; raw codes pass through
-# variables= without it), so it is deliberately excluded from the wheel.
-"earthlens.usgs_water" = ["available_parameters.yaml"]
-
 [tool.flake8]
 ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
 max-line-length = 88

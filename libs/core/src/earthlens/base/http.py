@@ -176,7 +176,7 @@ def _default_user_agent() -> str:
 
     The version is read lazily from the installed package metadata so
     importing this module never triggers a circular import against
-    `earthlens.__init__`. The string is deliberately **non-Mozilla**:
+    the `earthlens.core` package surface. The string is deliberately **non-Mozilla**:
     the DIGITAL.CSIC Anubis anti-bot wall (SPEIbase) blocks browser-like
     `User-Agent`s, and several upstreams throttle the bare python-requests
     default.
