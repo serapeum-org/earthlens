@@ -61,6 +61,9 @@ include = ["earthlens._imagery*", "earthlens.asf*", "earthlens.earthdata*", "ear
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
+# Sentinel Hub ships its bundled evalscript recipes; read_evalscript() reads
+# these at request time, so they must be in the wheel.
+"earthlens.sentinel_hub" = ["evalscripts/*.js"]
 
 # Resolve the core distribution from the workspace, not PyPI, so this package
 # locks and develops against the local earthlens-core.
