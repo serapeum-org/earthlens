@@ -235,10 +235,15 @@ style = [
 ]
 
 [tool.pytest.ini_options]
-# Tests are migrating to per-distribution `libs/<member>/tests/` (#785). During
-# the move both roots are collected; `tests/` shrinks to empty as each theme
-# lands and is removed in the final step.
-testpaths = ["libs/core/tests", "libs/providers/ocean/tests", "libs/providers/hazards/tests", "libs/providers/imagery/tests", "libs/providers/land/tests", "tests"]
+# Tests are co-located with each distribution under `libs/<member>/tests/` (#785).
+testpaths = [
+    "libs/core/tests",
+    "libs/providers/atmosphere/tests",
+    "libs/providers/hazards/tests",
+    "libs/providers/imagery/tests",
+    "libs/providers/land/tests",
+    "libs/providers/ocean/tests",
+]
 consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
