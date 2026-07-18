@@ -106,7 +106,7 @@ the per-mission shards from scratch.
 
 The end-to-end tests are gated:
 
-* `pytest tests/jaxa -m "jaxa and e2e"` — runs the live `jaxa-earth` pull
+* `pytest -m "jaxa and e2e"` — runs the live `jaxa-earth` pull
   unconditionally (authless), and the live `gportal` search only when
   `$GPORTAL_USERNAME` + `$GPORTAL_PASSWORD` are set in the environment.
 * The default `pytest -m "not e2e"` run skips both, so the suite stays

@@ -102,7 +102,7 @@ cmems.download()
 ```
 
 The same env vars are read by the live `e2e` test suite
-(`pytest -m e2e tests/cmems`); set them locally to exercise the
+(`pytest -m "cmems and e2e"`); set them locally to exercise the
 end-to-end paths.
 
 ## 5. The mounted-file path (CI / secret managers)
