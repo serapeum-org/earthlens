@@ -94,7 +94,9 @@ jobs:
 
       - name: Verify package import
         shell: bash -el {0}
-        run: python -c "import earthlens; print(earthlens.__version__)"
+        # earthlens is a PEP 420 namespace with no attributes; the version and
+        # facade live in earthlens.core.
+        run: python -c "import earthlens.core; print(earthlens.core.__version__)"
 
       - name: Install test dependencies
         shell: bash -el {0}
