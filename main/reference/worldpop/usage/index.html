@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -19358,7 +19330,7 @@ outside a product's availability raises listing the valid years.</p>
 <code>AggregationConfig</code>. It reduces the per-year raster stack across years,
 bucketed by <code>freq</code>, with <code>op</code> ∈ <code>mean</code> / <code>sum</code> / <code>min</code> / <code>max</code> / <code>std</code>
 (<code>auto</code> → <code>mean</code> for population):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;worldpop&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pop&quot;</span><span class="p">],</span> <span class="n">aoi</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>

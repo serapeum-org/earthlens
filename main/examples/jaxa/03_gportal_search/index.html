@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -20017,7 +19989,7 @@ for p in list(result.products())[:3]:
     <span class="nb">print</span><span class="p">(</span><span class="s1">'Register at https://gportal.jaxa.jp/gpr/user/regist1 and re-run.'</span><span class="p">)</span>
     <span class="n">written</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
     <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'earthlens-jaxa-sgli-'</span><span class="p">))</span>
     <span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'jaxa'</span><span class="p">,</span>
@@ -20042,7 +20014,7 @@ if not (os.environ.get('GPORTAL_USERNAME') and os.environ.get('GPORTAL_PASSWORD'
     print('Register at https://gportal.jaxa.jp/gpr/user/regist1 and re-run.')
     written = []
 else:
-    from earthlens import EarthLens
+    from earthlens.core import EarthLens
     out_dir = Path(tempfile.mkdtemp(prefix='earthlens-jaxa-sgli-'))
     lens = EarthLens(
         data_source='jaxa',

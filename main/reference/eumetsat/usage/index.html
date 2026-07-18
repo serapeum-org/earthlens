@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -19530,13 +19502,13 @@ Space. Inspect the value with:</p>
 <p>Three scripts under <code>tools/eumetsat/</code> keep the catalog honest. They use
 the <strong>public</strong> browse endpoint, so they need <strong>no credentials</strong>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Rebuild the available_datasets index from the public browse endpoint</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/refresh_eumetsat_catalog.py<span class="w"> </span>refresh
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/refresh_eumetsat_catalog.py<span class="w"> </span>refresh
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Diff the curated catalog + index against live (CI: --strict)</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/audit_eumetsat_catalog.py<span class="w"> </span>--strict
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/audit_eumetsat_catalog.py<span class="w"> </span>--strict
 <a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
 <a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># Print one collection&#39;s public metadata (by id or curated key)</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/probe_eumetsat_product.py<span class="w"> </span>msg-hrseviri
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/eumetsat/probe_eumetsat_product.py<span class="w"> </span>msg-hrseviri
 </code></pre></div>
 <p>See the <a href="../catalog/">catalog reference</a> for details.</p>
 

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -19710,7 +19682,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">src</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"amazon-s3"</span><span class="p">,</span>
@@ -19728,7 +19700,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">_search</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'bucket'</span><span class="p">],</span> <span class="s1">'-&gt;'</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">href</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens import EarthLens
+<div class="clipboard-copy-txt" id="cell-1">from earthlens.core import EarthLens
 
 src = EarthLens(
     data_source="amazon-s3",

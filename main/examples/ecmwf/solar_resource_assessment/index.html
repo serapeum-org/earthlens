@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -19992,7 +19964,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5fb58fb9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4de3c003">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20014,7 +19986,7 @@ variability. ERA5 gives 40+ years of monthly fields to evaluate it.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8af0f00b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=371ef1d6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20029,7 +20001,7 @@ the plot.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0e4f3b74">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=21e17ddb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20055,7 +20027,7 @@ the plot.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from calendar import monthrange
@@ -20066,7 +20038,7 @@ import numpy as np
 import pandas as pd
 from pyramids.dataset import Dataset
 
-from earthlens import AggregationConfig, EarthLens
+from earthlens.core import AggregationConfig, EarthLens
 from earthlens.ecmwf import Catalog</div>
 </div>
 </div>
@@ -20074,7 +20046,7 @@ from earthlens.ecmwf import Catalog</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=48ac49b2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=235c437d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20087,7 +20059,7 @@ reaching the surface (direct + diffuse). It's a flux, so <code>op="auto"</code>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=66639146">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=244fff89">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20126,7 +20098,7 @@ print(f"is_flux:     {spec.is_flux}  # auto -&gt; sum")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c0943132">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b981b6ce">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20139,7 +20111,7 @@ seasonal cycle and inter-annual variability.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2e23c651">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f68eb51b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20152,7 +20124,7 @@ variable, and the Seville bounding box.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6be7ce60">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=aa5deda8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20207,7 +20179,7 @@ earthlens = EarthLens(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19113f2c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=469c4963">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20221,7 +20193,7 @@ above stays readable.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c1ffa699">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cecb0110">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20239,16 +20211,16 @@ above stays readable.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
+<div class="clipboard-copy-txt" id="cell-4">earthlens.core.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5048efe8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2b631917">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20262,7 +20234,7 @@ by <code>(3.6e6 × days)</code> to express in kWh/m²/day.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8e40673a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a646f8f4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20274,7 +20246,7 @@ a single cube of joules per square metre.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0e00e94f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4d5e4fa3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20305,7 +20277,7 @@ joules_per_m2 = np.stack([Dataset.read_file(str(p)).read_array() for p in paths]
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=90f1cf12">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=843214e5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20318,7 +20290,7 @@ site, then divide the monthly Joule total by the seconds in the month
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e5248323">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9c37007b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20359,7 +20331,7 @@ kWh_day = site_total_J / (3.6e6 * days)  # daily energy yield per m²</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=507f2294">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f4855ddc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20371,7 +20343,7 @@ the seasonal pattern is easy to read.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6bdc9ff4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ea9dc15b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20406,7 +20378,7 @@ df</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=91e9644c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f0bf5f9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20420,7 +20392,7 @@ well-sited PV plant.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4c414c1f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2d91c1b4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20461,7 +20433,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e5383add">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=527e0e3d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

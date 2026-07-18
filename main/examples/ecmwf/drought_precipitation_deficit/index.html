@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -20113,7 +20085,7 @@ entry point plus <code>AggregationConfig</code> for the monthly-sum aggregation.
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
@@ -20122,7 +20094,7 @@ import numpy as np
 import pandas as pd
 from pyramids.dataset import Dataset
 
-from earthlens import AggregationConfig, EarthLens</div>
+from earthlens.core import AggregationConfig, EarthLens</div>
 </div>
 </div>
 </div>
@@ -20275,9 +20247,9 @@ resolves to a monthly <code>sum</code>; the <code>1MS</code> frequency keeps one
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"1MS"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">earthlens.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
+<div class="clipboard-copy-txt" id="cell-4">earthlens.core.download(aggregate=AggregationConfig(freq="1MS", op="auto"))</div>
 </div>
 </div>
 </div>

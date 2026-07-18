@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -19906,7 +19878,7 @@ def run_or_skip(facade, **download_kwargs):
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
@@ -19922,7 +19894,7 @@ def run_or_skip(facade, **download_kwargs):
 <span class="n">paths</span> <span class="o">=</span> <span class="n">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">'1MS'</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">))</span>
 <span class="n">paths</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from earthlens import EarthLens
+<div class="clipboard-copy-txt" id="cell-2">from earthlens.core import EarthLens
 from earthlens.aggregate import AggregationConfig
 
 facade = EarthLens(

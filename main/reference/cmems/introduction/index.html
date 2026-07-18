@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -610,34 +610,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -19294,7 +19266,7 @@ each:</p>
 </tbody>
 </table>
 <p>Browse the full live dataset index with
-<code>pixi run -e dev python tools/cmems/refresh_cmems_catalog.py refresh --dry-run</code>
+<code>uv run python tools/cmems/refresh_cmems_catalog.py refresh --dry-run</code>
 (or read it from <code>Catalog().available_datasets</code>). Curated rows live
 under <code>Catalog().datasets</code>, and every curated id is a member of
 <code>available_datasets</code>.</p>

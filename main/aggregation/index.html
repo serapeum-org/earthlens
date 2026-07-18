@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -883,34 +883,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../troubleshooting-pixi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting pixi timeouts
   
 
     
@@ -19453,7 +19425,7 @@ mean, seasonal climatology, ...). It runs against <code>pyramids</code> +
 <code>numpy</code> + <code>pandas</code>; <strong><code>xarray</code> is not a runtime dependency</strong>.</p>
 <p>The feature is reachable two ways:</p>
 <ol>
-<li><strong>Standalone.</strong> <code>from earthlens import aggregate_netcdf,
+<li><strong>Standalone.</strong> <code>from earthlens.core import aggregate_netcdf,
    AggregationConfig</code> and call against any pyramids-readable NetCDF.
    No <code>ECMWF</code> instance needed.</li>
 <li><strong>Bundled with download.</strong> <code>ECMWF.download(aggregate=...)</code> —
@@ -19786,7 +19758,7 @@ supported — the user must pick a level explicitly.</p>
 <h2 id="worked-example-download-to-monthly-mean-geotiffs"><a class="toclink" href="#worked-example-download-to-monthly-mean-geotiffs">Worked example — download to monthly mean GeoTIFFs</a><a class="headerlink" href="#worked-example-download-to-monthly-mean-geotiffs" title="Permanent link">#</a></h2>
 <p>Single-call pipeline that downloads daily ERA5 2-metre temperature
 for January 2022 over a 1° box and writes one monthly-mean GeoTIFF:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
@@ -19799,7 +19771,7 @@ for January 2022 over a 1° box and writes one monthly-mean GeoTIFF:</p>
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">],</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/era5&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="p">)</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
 <a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">),</span>
 <a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="p">)</span>
 </code></pre></div>
@@ -19810,7 +19782,7 @@ aggregated GeoTIFF lands at
 <code>out_dir = &lt;root_dir&gt;/aggregated/</code>).</p>
 <h2 id="worked-example-aggregate-later-separately"><a class="toclink" href="#worked-example-aggregate-later-separately">Worked example — aggregate later, separately</a><a class="headerlink" href="#worked-example-aggregate-later-separately" title="Permanent link">#</a></h2>
 <p>If you already have the NetCDF on disk:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">spec</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
@@ -19826,7 +19798,7 @@ aggregated GeoTIFF lands at
 </code></pre></div>
 <h2 id="in-memory-mode-out_dirnone"><a class="toclink" href="#in-memory-mode-out_dirnone">In-memory mode (<code>out_dir=None</code>)</a><a class="headerlink" href="#in-memory-mode-out_dirnone" title="Permanent link">#</a></h2>
 <p>Skip GeoTIFF writes entirely and inspect the per-window arrays:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">spec</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
