@@ -12,7 +12,7 @@ the user's `path`.
 
 The on-disk artefact is a gridded NetCDF/Zarr, so
 `OUTPUT_KIND = "raster"` — structurally identical to ECMWF's
-per-variable NetCDF output. The :class:`earthlens.earthlens.core.EarthLens`
+per-variable NetCDF output. The :class:`earthlens.earthlens.EarthLens`
 facade therefore forwards `aggregate=AggregationConfig(...)` to this
 backend's `download()`. The aggregation runs through
 :meth:`pyramids.netcdf.NetCDF.reduce` (the generalised time-window

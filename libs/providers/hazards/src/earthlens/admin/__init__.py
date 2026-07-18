@@ -8,7 +8,7 @@ TIGER/Line** (states / counties / tracts / nation, public domain). Every source
 returns polygon boundaries, so this is a `vector` backend: `download()` returns a
 pyramids `~pyramids.feature.collection.FeatureCollection` of polygons in
 EPSG:4326 (and writes it to a vector file when a `path` is set), and the
-`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument.
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument.
 
 A request names a **dataset** (`variables=["geoboundaries:adm1"]`) plus the
 selector that dataset needs — `country=<ISO3>` for geoBoundaries, an optional

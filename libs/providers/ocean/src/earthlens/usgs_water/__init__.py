@@ -8,7 +8,7 @@ long-format :class:`pandas.DataFrame`.
 
 This is a `tabular` backend: the result is a table of per-site
 observations, not a gridded array, so :data:`USGSWater.OUTPUT_KIND` is
-`"tabular"` and the :class:`earthlens.earthlens.core.EarthLens` facade
+`"tabular"` and the :class:`earthlens.earthlens.EarthLens` facade
 rejects an `aggregate=` argument for it (use `service="statistics"` for
 a server-side temporal rollup instead).
 

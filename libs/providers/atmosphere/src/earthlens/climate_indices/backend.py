@@ -11,7 +11,7 @@ A request is `variables=[index id, …]` (e.g. `["oni", "nao"]`) + a
 the URL and the ASCII dialect. Climate indices are **global scalar
 monthly series** with no geometry, so this is `OUTPUT_KIND = "tabular"`:
 spatial arguments (`lat_lim` / `lon_lim` / `aoi`) are accepted for
-signature parity but ignored, and the :class:`earthlens.earthlens.core.EarthLens`
+signature parity but ignored, and the :class:`earthlens.earthlens.EarthLens`
 facade rejects a non-`None` `aggregate=` (these are already monthly
 scalars — there is nothing to grid-reduce).
 

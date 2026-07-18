@@ -7,7 +7,7 @@ reference-grade European monitor observations as a long-format
 
 This is a `tabular` backend: the result is per-row station observations,
 not a gridded array, so `EEA_AQ.OUTPUT_KIND` is `"tabular"` and the
-`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument
 for it.
 
 The EEA service is queried per **country** (ISO2) and delivers Parquet.

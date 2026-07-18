@@ -8,7 +8,7 @@ as `earthlens.openaq.OpenAQ`.
 
 This is a `tabular` backend: the result is per-row station observations,
 not a gridded array, so `OUTPUT_KIND = "tabular"` and the
-`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument
 (there is no meaningful gridded reduction of a pollutant timeseries).
 
 HTTP path: a thin `requests`-based client

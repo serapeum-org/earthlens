@@ -21,7 +21,7 @@ warns about OSM's **ODbL** share-alike licence. A raw `query=` (Overpass QL) /
 `filter=` (ohsome) override is accepted for power users.
 
 This is a `vector` backend (`OUTPUT_KIND = "vector"`), so the
-`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument. All
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument. All
 three protocols are public — there is **no auth class**, and the SDKs are
 imported lazily, so the package imports without `earthlens[osm]` /
 `earthlens[osm-pbf]`. ohsome's aggregation endpoints remain out of scope.

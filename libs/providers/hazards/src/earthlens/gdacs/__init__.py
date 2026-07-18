@@ -9,7 +9,7 @@ geolocated alert features (CRS `EPSG:4326`).
 
 This is a `vector` backend: the result is a table of alerts, not a
 gridded array, so :data:`GDACS.OUTPUT_KIND` is `"vector"` and the
-:class:`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=`
+:class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
 argument for it.
 
 GDACS needs **no credentials** — the feed is public, so (like CHC)

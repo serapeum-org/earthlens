@@ -885,7 +885,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 calls this method and returns the same path.
             :class:`Catalog`: Resolves `(dataset, variable)` pairs
                 to :class:`Variable` rows.
-            :class:`earthlens.earthlens.core.EarthLens`: User-facing facade
+            :class:`earthlens.earthlens.EarthLens`: User-facing facade
                 that wires this method into the `download()` flow.
         """
         dataset = var_info.cds_dataset

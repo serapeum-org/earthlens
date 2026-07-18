@@ -32,7 +32,7 @@ OSM data is **ODbL** (share-alike), so every successful `download()` emits a
 `LicenseWarning` (`G5`).
 
 This is a `vector` backend (`OUTPUT_KIND = "vector"`), so the
-`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument and
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument and
 `download(aggregate=...)` raises `NotImplementedError` (`G1`). All three
 protocols are public — there is no auth class (`G6`) — and the SDKs are
 imported lazily (Overpass/ohsome inside `_fetch`; pyrosm/pyosmium inside

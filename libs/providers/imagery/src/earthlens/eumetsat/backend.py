@@ -13,7 +13,7 @@ EUMETSAT spans gridded imagery (SEVIRI / FCI L1.5/L1c, OLCI / SLSTR
 grids) and swath / sounding products (S5P TROPOMI L2, ASCAT, IASI). The
 class default is `"raster"`; `__init__` resolves the requested
 collection row(s) and copies the row's `output_kind` onto
-`self.OUTPUT_KIND`. The `earthlens.earthlens.core.EarthLens` facade reads that
+`self.OUTPUT_KIND`. The `earthlens.earthlens.EarthLens` facade reads that
 per-instance value at `download()` time to gate `aggregate=`.
 
 A single request may name several collections, but they must all share

@@ -13,7 +13,7 @@ by :mod:`earthlens.fdsn.events`.
 
 This is the first `vector` backend: the on-the-wire result is a table
 of point features, not a gridded array, so `OUTPUT_KIND = "vector"`
-and the :class:`earthlens.earthlens.core.EarthLens` facade rejects an
+and the :class:`earthlens.earthlens.EarthLens` facade rejects an
 `aggregate=` argument (there is no meaningful gridded reduction of an
 event table). `download()` returns the in-memory FeatureCollection
 (the union across requested networks) and, as a side effect, writes

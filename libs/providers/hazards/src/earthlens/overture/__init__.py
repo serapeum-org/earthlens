@@ -12,7 +12,7 @@ GeoParquet for each requested feature type, surfaces a per-row
 This is a `vector` backend: the result is a table of features
 (building footprints, POIs, road segments, admin boundaries), not a
 gridded array, so `Overture.OUTPUT_KIND` is `"vector"` and the
-`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument
 for it. Overture is a static per-release snapshot, so `start` / `end`
 are accepted but ignored (there is no temporal axis to iterate).
 

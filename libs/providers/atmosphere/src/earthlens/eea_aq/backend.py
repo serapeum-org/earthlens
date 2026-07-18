@@ -7,7 +7,7 @@ measurement), the same `tabular` shape as `earthlens.openaq`.
 
 This is a `tabular` backend: the result is per-row station observations,
 not a gridded array, so `OUTPUT_KIND = "tabular"` and the
-`earthlens.earthlens.core.EarthLens` facade rejects an `aggregate=` argument.
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument.
 
 Transport: the EEA service is queried per **country** (ISO2), not per
 bbox, and delivers **Parquet** files (via `airbase`). The backend maps

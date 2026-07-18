@@ -11,7 +11,7 @@ features.
 
 This is a `vector` backend: the on-the-wire result is a table of
 geolocated alerts, not a gridded array, so `OUTPUT_KIND = "vector"` and
-the :class:`earthlens.earthlens.core.EarthLens` facade rejects an
+the :class:`earthlens.earthlens.EarthLens` facade rejects an
 `aggregate=` argument (there is no meaningful gridded reduction of an
 alert table). `download()` returns the in-memory FeatureCollection and,
 as a side effect, writes it to one vector file under `path`.
