@@ -5,6 +5,12 @@ from pathlib import Path
 
 import pytest
 
+# `dates`, `number_downloaded_files`, `daily_temporal_resolution`, `lat_bounds`,
+# `lon_bounds` and `chirps_variables` below are intentionally duplicated in
+# libs/providers/atmosphere/tests/conftest.py (the only other member that uses
+# them) — there is no shared root conftest by design (#785). Keep the two copies
+# in sync.
+
 #: Scratch root for the download fixtures below. Anchored under the OS temp dir
 #: (not the repo) so an e2e/download test never recreates a stray `tests/` tree
 #: at the working directory after the per-distribution move (#785).
