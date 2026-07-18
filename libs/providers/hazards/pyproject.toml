@@ -58,6 +58,8 @@ include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.fdsn*", "earthl
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
+# hdx ships its (large, gzipped) available-datasets index alongside the YAML.
+"earthlens.hdx" = ["catalog/*.json", "catalog/*.json.gz"]
 
 # Resolve the core distribution from the workspace, not PyPI, so this package
 # locks and develops against the local earthlens-core.
