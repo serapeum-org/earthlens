@@ -56,6 +56,10 @@ Homepage = "https://github.com/serapeum-org/earthlens"
 # write the same path.
 [tool.setuptools.packages.find]
 where = ["src"]
+# `earthlens` is a PEP 420 namespace shared across all distributions, so
+# `namespaces = true` lets setuptools discover the __init__-less parent (matches
+# earthlens-core).
+namespaces = true
 include = ["earthlens._ocean*", "earthlens.argo*", "earthlens.cmems*", "earthlens.erddap*", "earthlens.nwm*", "earthlens.obis*", "earthlens.usgs_water*"]
 
 [tool.setuptools.package-data]
