@@ -54,14 +54,9 @@ pip install earthlens[all]      # everything
 
 ### Available extras
 
-Two tiers of extras exist. **Per-backend extras** pull in exactly one backend's SDK; **thematic
-bundles** union several per-backend extras that cover the same kind of data (e.g. `earthlens[ocean]`
-pulls `cmems` + `argo` + `erddap` together) — see [Data Sources](examples/data-sources.md) for how
-they're grouped, or [_images/logos/ATTRIBUTION.md](https://github.com/serapeum-org/earthlens/blob/main/docs/_images/logos/ATTRIBUTION.md).
-Both tiers are always available side by side — installing a bundle is equivalent to installing its
-listed per-backend extras yourself.
-
-#### Per-backend extras
+Each extra pulls in exactly one backend's SDK. The names work the same whether
+you install the meta-package or a thematic distribution directly:
+`pip install earthlens[gee]` forwards to `earthlens-imagery[gee]`.
 
 | Extra | Provider | Pulls |
 |---|---|---|
@@ -72,7 +67,7 @@ listed per-backend extras yourself.
 | `cmems` | [Copernicus Marine Service](https://serapeum-org.github.io/earthlens/reference/cmems/introduction/) | `copernicusmarine >=2.0.0,<3` |
 | `cmip6` | [WCRP CMIP6](https://serapeum-org.github.io/earthlens/reference/cmip6/introduction/) | *(none — no SDK needed)* |
 | `fdsn` | [FDSN](https://serapeum-org.github.io/earthlens/reference/fdsn/introduction/) | `obspy >=1.5.0` |
-| `nwm` | [NOAA National Water Model](https://serapeum-org.github.io/earthlens/reference/nwm/introduction/) | `earthlens[s3]`, `pyramids-gis[parquet] >=0.45.0` |
+| `nwm` | [NOAA National Water Model](https://serapeum-org.github.io/earthlens/reference/nwm/introduction/) | `earthlens[s3]`, `pyramids-gis[parquet] >=0.46.0` |
 | `earthdata` | [NASA Earthdata](https://serapeum-org.github.io/earthlens/reference/earthdata/introduction/) | `earthaccess >=0.18.0; python_version >= '3.12'` |
 | `asf` | [Alaska Satellite Facility (ASF)](https://serapeum-org.github.io/earthlens/reference/asf/introduction/) | `asf_search >=12.2.2`, `earthlens[earthdata]` |
 | `eea_aq` | [European Environment Agency](https://serapeum-org.github.io/earthlens/reference/eea-aq/introduction/) | `airbase >=1.0`, `nest_asyncio >=1.5` |
@@ -82,7 +77,7 @@ listed per-backend extras yourself.
 | `radar` | [NOAA NEXRAD](https://serapeum-org.github.io/earthlens/reference/radar/introduction/) | `earthlens[s3]` |
 | `dem` | [Copernicus DEM (ESA)](https://serapeum-org.github.io/earthlens/reference/dem/introduction/) | `earthlens[s3]` |
 | `goes` | [NOAA GOES-R](https://serapeum-org.github.io/earthlens/reference/goes/introduction/) | `earthlens[s3]` |
-| `stac` | [STAC (SpatioTemporal Asset Catalog)](https://serapeum-org.github.io/earthlens/reference/stac/introduction/) | `pyramids-gis[stac] >=0.45.0` |
+| `stac` | [STAC (SpatioTemporal Asset Catalog)](https://serapeum-org.github.io/earthlens/reference/stac/introduction/) | `pyramids-gis[stac] >=0.46.0` |
 | `openeo` | [openEO](https://serapeum-org.github.io/earthlens/reference/openeo/introduction/) | `openeo >=0.47,<0.48` |
 | `sentinel-hub` | [Sentinel Hub](https://serapeum-org.github.io/earthlens/reference/sentinel-hub/introduction/) | `sentinelhub >=3.11.5` |
 | `tropycal` | [Tropycal](https://serapeum-org.github.io/earthlens/reference/tropycal/introduction/) | `tropycal >=1.4`, `cartopy >=0.22` |
@@ -99,29 +94,6 @@ listed per-backend extras yourself.
 | `osm-pbf` | OpenStreetMap (bulk .osm.pbf extracts) | `pyrosm >=0.11.0`, `osmium >=4.3.1` |
 | `all` | every backend above except `argo`, `osm`, `osm-pbf` (pin conflicts — see note below) | — |
 
-#### Thematic bundles
-
-| Extra | Covers (`data_source` keys) | Notes |
-|---|---|---|
-| `air-quality` | `airnow`, `eea-aq`, `openaq`, `sensor-community` |  |
-| `biodiversity` | `gbif`, `iucn`, `obis`, `wdpa` |  |
-| `climate` | `climate-indices`, `cmip6`, `ecmwf` |  |
-| `disasters` | `fdsn`, `firms`, `gdacs`, `thinkhazard` |  |
-| `elevation` | `bathymetry`, `dem` |  |
-| `glaciers-cryosphere` | `glaciers` |  |
-| `humanitarian` | `hdx` |  |
-| `hydrology` | `nwm`, `usgs-water` |  |
-| `ocean` | `argo`, `cmems`, `erddap` | Not meant to be combined with `platforms` in the same install — `argo`'s `argopy` needs `xarray>=2025.7`, `platforms`' `openeo` needs `xarray<2025.1.2`. |
-| `platforms` | `amazon-s3`, `earthdata`, `eumetsat`, `gee`, `goes`, `jaxa`, `openeo`, `sentinel-hub`, `stac` |  |
-| `population-settlement` | `ghsl`, `worldpop` |  |
-| `precipitation-drought` | `chc`, `drought` |  |
-| `renewable-energy` | `nrel`, `pvgis`, `solar-wind-atlas` |  |
-| `sar-radar` | `asf` |  |
-| `soil` | `soilgrids` |  |
-| `tropical-cyclones` | `tropycal` |  |
-| `vector-basemaps` | `admin`, `osm`, `overture` | Not meant to be combined with most other bundles — `osm`'s `ohsome` needs `pandas<3.0.0`, conflicting with the rest of the dependency graph. |
-| `weather-forecast` | `nwp` |  |
-| `weather-radar` | `radar` |  |
 
 A bare `pip install earthlens` installs only the core dependencies (numpy, pandas, pyramids-gis,
 requests, …), which is enough for every backend with no extra SDK of its own: **geoBoundaries**, **AirNow**, **GEBCO/ETOPO bathymetry**, **CHC/CHIRPS**, **climate teleconnection indices**, **USDM/EDO/GDO/SPEIbase**, **NASA FIRMS**, **GDACS**, **RGI/GLIMS/WGMS glaciers**, **IUCN Red List**, **NREL/National Laboratory of the Rockies**, **OpenAQ**, **PVGIS**, **ThinkHazard!/INFORM**, **Sensor.Community**, **SoilGrids**, **Global Solar/Wind Atlas**, **Protected Planet**.
