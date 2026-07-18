@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import tomllib
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -11,6 +13,30 @@ from earthlens.earthlens import EarthLens
 
 #: Every thematic provider distribution installed in the dev workspace.
 THEMES = ["atmosphere", "ocean", "imagery", "land", "hazards"]
+
+#: The workspace root (tests/ sits directly under it).
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _theme_shipped_segments(theme: str) -> set[str]:
+    """Top-level `earthlens.<seg>` packages a theme distribution ships.
+
+    Reads the `[tool.setuptools.packages.find] include` globs from the
+    theme's `pyproject.toml` and reduces each `earthlens.<seg>*` glob to
+    its `<seg>`, giving the exact set of top-level packages that
+    distribution puts on the wheel.
+
+    Args:
+        theme: A provider theme name (e.g. `"ocean"`).
+
+    Returns:
+        The set of top-level segment names (e.g. `{"_ocean", "argo",
+        "cmems", ...}`) the distribution's find globs cover.
+    """
+    pyproject = _REPO_ROOT / "libs" / "providers" / theme / "pyproject.toml"
+    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    includes = data["tool"]["setuptools"]["packages"]["find"]["include"]
+    return {glob.removeprefix("earthlens.").rstrip("*") for glob in includes}
 
 
 class _FakeEntryPoint:
@@ -112,9 +138,17 @@ class TestThemeTables:
         import importlib
 
         table = importlib.import_module(f"earthlens._{theme}").BACKENDS
-        modules = {spec[0] for spec in table.values()}
-        for module in modules:
-            assert module.startswith("earthlens.")
+        shipped = _theme_shipped_segments(theme)
+        for key, spec in table.items():
+            module = spec[0]
+            assert module.startswith("earthlens."), (
+                f"{theme}:{key} names {module!r}, not under the earthlens namespace"
+            )
+            top_level = module.split(".")[1]
+            assert top_level in shipped, (
+                f"{theme} table key {key!r} points at earthlens.{top_level}, which "
+                f"earthlens-{theme} does not ship (it ships {sorted(shipped)})"
+            )
 
 
 @pytest.mark.unit
