@@ -20,12 +20,7 @@ typically, through the :class:`EarthLens` facade's `data_source=` argument.
 
 from __future__ import annotations
 
-try:
-    from importlib.metadata import PackageNotFoundError  # type: ignore
-    from importlib.metadata import version
-except ImportError:  # pragma: no cover
-    from importlib_metadata import PackageNotFoundError  # type: ignore
-    from importlib_metadata import version
+from importlib.metadata import PackageNotFoundError, version
 
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
 from earthlens.earthlens import EarthLens, download, find, search, sources
