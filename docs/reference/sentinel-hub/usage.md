@@ -15,7 +15,7 @@ See the [collections & recipes reference](datasets.md) for the full bundled
 library.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="sentinel-hub",

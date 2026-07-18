@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import earthlens.eumetsat
+
 from pathlib import Path
 
 import pytest
@@ -379,7 +381,7 @@ def test_native_download_unchanged_without_tailor(fake_eumdac, tmp_path):
 
 
 def _eumetsat_py_files() -> list[Path]:
-    src = Path(__file__).resolve().parents[2] / "src" / "earthlens" / "eumetsat"
+    src = Path(earthlens.eumetsat.__file__).parent
     return list(src.rglob("*.py"))
 
 

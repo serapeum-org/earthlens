@@ -222,7 +222,7 @@ earthlens = EarthLens(
     temporal_resolution=temporal_resolution,
     path=path,
 )
-earthlens.download()
+earthlens.core.download()
 ```
 
 !!! note "Expect to wait"
@@ -249,7 +249,7 @@ earthlens = EarthLens(
     temporal_resolution=temporal_resolution,
     path=path,
 )
-earthlens.download()
+earthlens.core.download()
 ```
 
 ### Parallel Download
@@ -267,7 +267,7 @@ earthlens = EarthLens(
     temporal_resolution=temporal_resolution,
     path=path,
 )
-earthlens.download(cores=4)
+earthlens.core.download(cores=4)
 ```
 
 ## Amazon S3
@@ -285,5 +285,5 @@ earthlens = EarthLens(
     temporal_resolution=temporal_resolution,
     path=path,
 )
-earthlens.download()
+earthlens.core.download()
 ```

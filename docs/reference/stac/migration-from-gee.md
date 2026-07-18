@@ -44,7 +44,7 @@ Each snippet replaces the equivalent `ee.ImageCollection(...).filterBounds(...).
 ### `COPERNICUS/S2_SR_HARMONIZED` → MPC sentinel-2-l2a (RGB)
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="planetary-computer",
@@ -58,7 +58,7 @@ paths = EarthLens(
 ### `LANDSAT/LC08/C02/T1_L2` → USGS LandsatLook (requester-pays)
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="usgs-landsat",        # alias 'landsat' works too

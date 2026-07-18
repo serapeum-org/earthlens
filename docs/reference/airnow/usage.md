@@ -14,7 +14,7 @@ on the [Reference](airnow.md) page.
 ## 1. A first query
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     data_source="airnow",

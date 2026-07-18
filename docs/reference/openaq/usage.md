@@ -15,7 +15,7 @@ background see the [Introduction](introduction.md); for credentials see
 ## 1. A first query
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     data_source="openaq",

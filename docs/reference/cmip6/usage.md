@@ -6,7 +6,7 @@ Pin a facet tuple, a date window, and a bounding box; `download()` returns the
 `list[Path]` of written NetCDF subsets (one per resolved store):
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     "cmip6",

@@ -36,7 +36,7 @@ discoverability aliases — all resolve to the same backend and all
 require an explicit `dataset=`:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 facade = EarthLens(
     data_source="usdm",
@@ -78,7 +78,7 @@ through `pyramids.netcdf.NetCDF.subset`, and writes one GeoTIFF per
 month under `path/`.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 facade = EarthLens(
     data_source="drought",
@@ -116,7 +116,7 @@ anomaly, etc. The backend builds the Copernicus `GetCoverage` URL by hand
 streams the GeoTIFF, and opens it through `pyramids.dataset.Dataset.read_file`:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="drought",

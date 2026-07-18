@@ -43,7 +43,7 @@ and Google Earth Engine is a server-side image-collection model. **earthlens**
 flattens that into one call:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 earthlens = EarthLens(
     data_source="ecmwf",          # or "chc" (alias "chirps"), "amazon-s3", "gee"
@@ -298,7 +298,7 @@ Quick examples per backend
 **CHIRPS daily rainfall** — anonymous FTP, no credentials.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 EarthLens(
     data_source="chc",
@@ -332,7 +332,7 @@ monthly GeoTIFFs aggregated with the right reduction per variable (mean for
 temperature, sum for precipitation):
 
 ```python
-from earthlens import EarthLens, AggregationConfig
+from earthlens.core import EarthLens, AggregationConfig
 
 EarthLens(
     data_source="ecmwf",

@@ -390,34 +390,31 @@ class TestEarthLensDownloadAggregate:
 
 @pytest.mark.unit
 class TestTopLevelReExports:
-    """Pin the top-level `earthlens` package surface (L2)."""
+    """Pin the `earthlens.core` public surface (L2)."""
 
     def test_earthlens_facade_importable_from_package_root(self):
-        """`from earthlens import EarthLens` resolves to the facade class."""
-        import earthlens
-
-        assert earthlens.EarthLens is EarthLens, (
+        """`from earthlens.core import EarthLens` resolves to the facade class."""
+        import earthlens.core
+        assert earthlens.core.EarthLens is EarthLens, (
             f"Top-level re-export should be the facade class; got "
-            f"{earthlens.EarthLens!r}"
+            f"{earthlens.core.EarthLens!r}"
         )
 
     def test_aggregate_symbols_importable_from_package_root(self):
         """`AggregationConfig` and `aggregate_netcdf` resolve at top level."""
-        import earthlens
-
+        import earthlens.core
         assert (
-            earthlens.AggregationConfig is AggregationConfig
-        ), f"Top-level AggregationConfig drift: {earthlens.AggregationConfig!r}"
-        assert callable(earthlens.aggregate_netcdf), (
+            earthlens.core.AggregationConfig is AggregationConfig
+        ), f"Top-level AggregationConfig drift: {earthlens.core.AggregationConfig!r}"
+        assert callable(earthlens.core.aggregate_netcdf), (
             f"Top-level aggregate_netcdf must be callable; got "
-            f"{earthlens.aggregate_netcdf!r}"
+            f"{earthlens.core.aggregate_netcdf!r}"
         )
 
     def test_all_lists_only_sdk_free_symbols(self):
         """`__all__` excludes the per-backend classes (each needs an extra)."""
-        import earthlens
-
-        assert sorted(earthlens.__all__) == [
+        import earthlens.core
+        assert sorted(earthlens.core.__all__) == [
             "AggregationConfig",
             "EarthLens",
             "aggregate_netcdf",
@@ -425,21 +422,20 @@ class TestTopLevelReExports:
             "find",
             "search",
             "sources",
-        ], f"Unexpected top-level __all__: {earthlens.__all__!r}"
+        ], f"Unexpected top-level __all__: {earthlens.core.__all__!r}"
 
 
 class TestFunctionalDownload:
-    """The one-shot earthlens.download() entry point."""
+    """The one-shot earthlens.core.download() entry point."""
 
     def test_download_is_exported(self):
-        """earthlens.download is a callable on the package surface."""
-        import earthlens
-
-        assert callable(earthlens.download), "download should be callable"
+        """earthlens.core.download is a callable on the package surface."""
+        import earthlens.core
+        assert callable(earthlens.core.download), "download should be callable"
 
     def test_download_delegates_to_facade(self, monkeypatch):
         """download() builds an EarthLens and forwards the run-time args."""
-        import earthlens
+        import earthlens.core
         from earthlens import earthlens as facade_module
 
         captured = {}
@@ -453,7 +449,7 @@ class TestFunctionalDownload:
                 return ["written.tif"]
 
         monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
-        result = earthlens.download(
+        result = earthlens.core.download(
             data_source="chc",
             variables=["precipitation"],
             start="2009-01-01",
@@ -564,8 +560,8 @@ class TestFacadeLoad:
         ), f"a .nc should read as NetCDF; got {out[0]!r}"
 
     def test_module_download_load_true_calls_load(self, monkeypatch):
-        """earthlens.download(load=True) routes to EarthLens.load()."""
-        import earthlens
+        """earthlens.core.download(load=True) routes to EarthLens.load()."""
+        import earthlens.core
         from earthlens import earthlens as facade_module
 
         calls = {}
@@ -583,7 +579,7 @@ class TestFacadeLoad:
                 return ["loaded"]
 
         monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
-        result = earthlens.download(
+        result = earthlens.core.download(
             data_source="chc", variables=["precipitation"], load=True
         )
         assert result == ["loaded"], "download(load=True) should return load()"
@@ -595,17 +591,15 @@ class TestTopLevelDiscovery:
 
     def test_sources_lists_registered_keys(self):
         """sources() returns the sorted registered data_source keys."""
-        import earthlens
-
-        keys = earthlens.sources()
+        import earthlens.core
+        keys = earthlens.core.sources()
         assert keys == sorted(keys), "sources() should be sorted"
         assert "chc" in keys and "gee" in keys, f"missing core keys: {keys[:5]}"
 
     def test_sources_collapses_aliases_to_canonical(self):
         """sources() lists one canonical key per backend, not the aliases."""
-        import earthlens
-
-        keys = earthlens.sources()
+        import earthlens.core
+        keys = earthlens.core.sources()
         assert "chirps" not in keys, "the chirps alias should collapse to chc"
         assert "google-earth-engine" not in keys, "the gee alias should collapse"
         assert "planetary-computer" not in keys, "STAC endpoint keys collapse to stac"
@@ -614,15 +608,14 @@ class TestTopLevelDiscovery:
 
     def test_sources_is_exported(self):
         """sources / search / find are on the package surface."""
-        import earthlens
-
+        import earthlens.core
         assert all(
-            callable(getattr(earthlens, name)) for name in ("sources", "search", "find")
+            callable(getattr(earthlens.core, name)) for name in ("sources", "search", "find")
         ), "sources/search/find must be callable package attributes"
 
     def test_search_delegates_to_facade(self, monkeypatch):
         """search() builds an EarthLens and returns its .search()."""
-        import earthlens
+        import earthlens.core
         from earthlens import earthlens as facade_module
 
         captured = {}
@@ -636,14 +629,14 @@ class TestTopLevelDiscovery:
                 return ["product"]
 
         monkeypatch.setattr(facade_module, "EarthLens", _FakeFacade)
-        result = earthlens.search(data_source="stac", variables=["red"])
+        result = earthlens.core.search(data_source="stac", variables=["red"])
         assert result == ["product"], "search() should return facade.search()"
         assert captured["init"]["data_source"] == "stac"
         assert captured.get("search"), "facade.search() should be called"
 
     def test_find_aggregates_guess_dataset(self, monkeypatch):
         """find() collects guess_dataset hits and skips sources that raise."""
-        import earthlens
+        import earthlens.core
         from earthlens import earthlens as facade_module
 
         monkeypatch.setattr(facade_module, "sources", lambda: ["chc", "gee", "broken"])
@@ -658,7 +651,7 @@ class TestTopLevelDiscovery:
             "guess_dataset",
             classmethod(_fake_guess),
         )
-        result = earthlens.find("precip")
+        result = earthlens.core.find("precip")
         assert result == {"chc": ["chc-ds"]}, f"unexpected find() result: {result}"
 
 

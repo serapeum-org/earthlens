@@ -11,7 +11,7 @@ every feature of a `FeatureCollection`) and writes a tidy CSV. Use a **stats**
 recipe (or a custom evalscript with a `dataMask` band).
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 polygon = {
     "type": "Polygon",

@@ -17,7 +17,7 @@ pip install earthlens[fdsn]
 ## Quickstart — recent global M5+ events
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 events = EarthLens(
     variables=["USGS"],          # the network(s) to query — see below

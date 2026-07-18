@@ -7,7 +7,7 @@ products, and `configuration=` picks the operational run that produced
 them.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="nwm",

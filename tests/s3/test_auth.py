@@ -1,4 +1,4 @@
-"""Unit tests for `earthlens.s3.auth`."""
+"""Unit tests for `earthlens.base.s3`."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import builtins
 import pytest
 
 from earthlens.base import AbstractAuth
-from earthlens.s3.auth import S3Auth, S3Credentials
+from earthlens.base.s3 import S3Auth, S3Credentials
 
 pytestmark = [pytest.mark.s3]
 

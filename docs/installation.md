@@ -14,12 +14,12 @@ conda install -c conda-forge earthlens
 
 If this works, it will install earthlens with all dependencies including Python and GDAL, and you can skip the rest of the installation instructions.
 
-### pixi
+### uv
 
-You can also use [pixi](https://pixi.sh) to manage the environment:
+You can also use [uv](https://docs.astral.sh/uv/) to manage the environment:
 
 ```bash
-pixi add earthlens
+uv add earthlens
 ```
 
 ### Installing Python and GDAL dependencies
@@ -54,14 +54,9 @@ pip install earthlens[all]      # everything
 
 ### Available extras
 
-Two tiers of extras exist. **Per-backend extras** pull in exactly one backend's SDK; **thematic
-bundles** union several per-backend extras that cover the same kind of data (e.g. `earthlens[ocean]`
-pulls `cmems` + `argo` + `erddap` together) — see [Data Sources](examples/data-sources.md) for how
-they're grouped, or [_images/logos/ATTRIBUTION.md](https://github.com/serapeum-org/earthlens/blob/main/docs/_images/logos/ATTRIBUTION.md).
-Both tiers are always available side by side — installing a bundle is equivalent to installing its
-listed per-backend extras yourself.
-
-#### Per-backend extras
+Each extra pulls in exactly one backend's SDK. The names work the same whether
+you install the meta-package or a thematic distribution directly:
+`pip install earthlens[gee]` forwards to `earthlens-imagery[gee]`.
 
 | Extra | Provider | Pulls |
 |---|---|---|
@@ -72,7 +67,7 @@ listed per-backend extras yourself.
 | `cmems` | [Copernicus Marine Service](https://serapeum-org.github.io/earthlens/reference/cmems/introduction/) | `copernicusmarine >=2.0.0,<3` |
 | `cmip6` | [WCRP CMIP6](https://serapeum-org.github.io/earthlens/reference/cmip6/introduction/) | *(none — no SDK needed)* |
 | `fdsn` | [FDSN](https://serapeum-org.github.io/earthlens/reference/fdsn/introduction/) | `obspy >=1.5.0` |
-| `nwm` | [NOAA National Water Model](https://serapeum-org.github.io/earthlens/reference/nwm/introduction/) | `earthlens[s3]`, `pyramids-gis[parquet] >=0.45.0` |
+| `nwm` | [NOAA National Water Model](https://serapeum-org.github.io/earthlens/reference/nwm/introduction/) | `earthlens[s3]`, `pyramids-gis[parquet] >=0.46.0` |
 | `earthdata` | [NASA Earthdata](https://serapeum-org.github.io/earthlens/reference/earthdata/introduction/) | `earthaccess >=0.18.0; python_version >= '3.12'` |
 | `asf` | [Alaska Satellite Facility (ASF)](https://serapeum-org.github.io/earthlens/reference/asf/introduction/) | `asf_search >=12.2.2`, `earthlens[earthdata]` |
 | `eea_aq` | [European Environment Agency](https://serapeum-org.github.io/earthlens/reference/eea-aq/introduction/) | `airbase >=1.0`, `nest_asyncio >=1.5` |
@@ -82,7 +77,7 @@ listed per-backend extras yourself.
 | `radar` | [NOAA NEXRAD](https://serapeum-org.github.io/earthlens/reference/radar/introduction/) | `earthlens[s3]` |
 | `dem` | [Copernicus DEM (ESA)](https://serapeum-org.github.io/earthlens/reference/dem/introduction/) | `earthlens[s3]` |
 | `goes` | [NOAA GOES-R](https://serapeum-org.github.io/earthlens/reference/goes/introduction/) | `earthlens[s3]` |
-| `stac` | [STAC (SpatioTemporal Asset Catalog)](https://serapeum-org.github.io/earthlens/reference/stac/introduction/) | `pyramids-gis[stac] >=0.45.0` |
+| `stac` | [STAC (SpatioTemporal Asset Catalog)](https://serapeum-org.github.io/earthlens/reference/stac/introduction/) | `pyramids-gis[stac] >=0.46.0` |
 | `openeo` | [openEO](https://serapeum-org.github.io/earthlens/reference/openeo/introduction/) | `openeo >=0.47,<0.48` |
 | `sentinel-hub` | [Sentinel Hub](https://serapeum-org.github.io/earthlens/reference/sentinel-hub/introduction/) | `sentinelhub >=3.11.5` |
 | `tropycal` | [Tropycal](https://serapeum-org.github.io/earthlens/reference/tropycal/introduction/) | `tropycal >=1.4`, `cartopy >=0.22` |
@@ -99,34 +94,50 @@ listed per-backend extras yourself.
 | `osm-pbf` | OpenStreetMap (bulk .osm.pbf extracts) | `pyrosm >=0.11.0`, `osmium >=4.3.1` |
 | `all` | every backend above except `argo`, `osm`, `osm-pbf` (pin conflicts — see note below) | — |
 
-#### Thematic bundles
-
-| Extra | Covers (`data_source` keys) | Notes |
-|---|---|---|
-| `air-quality` | `airnow`, `eea-aq`, `openaq`, `sensor-community` |  |
-| `biodiversity` | `gbif`, `iucn`, `obis`, `wdpa` |  |
-| `climate` | `climate-indices`, `cmip6`, `ecmwf` |  |
-| `disasters` | `fdsn`, `firms`, `gdacs`, `thinkhazard` |  |
-| `elevation` | `bathymetry`, `dem` |  |
-| `glaciers-cryosphere` | `glaciers` |  |
-| `humanitarian` | `hdx` |  |
-| `hydrology` | `nwm`, `usgs-water` |  |
-| `ocean` | `argo`, `cmems`, `erddap` | Not meant to be combined with `platforms` in the same install — `argo`'s `argopy` needs `xarray>=2025.7`, `platforms`' `openeo` needs `xarray<2025.1.2`. |
-| `platforms` | `amazon-s3`, `earthdata`, `eumetsat`, `gee`, `goes`, `jaxa`, `openeo`, `sentinel-hub`, `stac` |  |
-| `population-settlement` | `ghsl`, `worldpop` |  |
-| `precipitation-drought` | `chc`, `drought` |  |
-| `renewable-energy` | `nrel`, `pvgis`, `solar-wind-atlas` |  |
-| `sar-radar` | `asf` |  |
-| `soil` | `soilgrids` |  |
-| `tropical-cyclones` | `tropycal` |  |
-| `vector-basemaps` | `admin`, `osm`, `overture` | Not meant to be combined with most other bundles — `osm`'s `ohsome` needs `pandas<3.0.0`, conflicting with the rest of the dependency graph. |
-| `weather-forecast` | `nwp` |  |
-| `weather-radar` | `radar` |  |
 
 A bare `pip install earthlens` installs only the core dependencies (numpy, pandas, pyramids-gis,
 requests, …), which is enough for every backend with no extra SDK of its own: **geoBoundaries**, **AirNow**, **GEBCO/ETOPO bathymetry**, **CHC/CHIRPS**, **climate teleconnection indices**, **USDM/EDO/GDO/SPEIbase**, **NASA FIRMS**, **GDACS**, **RGI/GLIMS/WGMS glaciers**, **IUCN Red List**, **NREL/National Laboratory of the Rockies**, **OpenAQ**, **PVGIS**, **ThinkHazard!/INFORM**, **Sensor.Community**, **SoilGrids**, **Global Solar/Wind Atlas**, **Protected Planet**.
 Asking the facade for a backend whose extra is missing (e.g. `data_source="ecmwf"` without
 `earthlens[ecmwf]`) raises a clear `ImportError` naming the extra to install.
+
+### Package layout
+
+`earthlens` is a meta-package. Installing it pulls in `earthlens-core` plus
+five thematic provider packages, each carrying a group of backends:
+
+| Package | Covers | Backends |
+|---------|--------|----------|
+| `earthlens-core` | facade, abstractions, CLI — no provider SDKs | — |
+| `earthlens-atmosphere` | weather · climate · air quality · solar/wind | `chc` `climate_indices` `cmip6` `drought` `ecmwf` `nwp` `amazon-s3` `airnow` `eea_aq` `openaq` `sensor_community` `goes` `radar` `tropycal` `nrel` `pvgis` `solar_wind_atlas` |
+| `earthlens-ocean` | ocean · freshwater · marine life | `argo` `cmems` `erddap` `nwm` `usgs_water` `obis` |
+| `earthlens-imagery` | satellite platforms · SAR · EO catalogs | `asf` `earthdata` `eumetsat` `gee` `jaxa` `openeo` `sentinel_hub` `stac` |
+| `earthlens-land` | terrain · elevation · soil · ecology · population | `bathymetry` `dem` `ghsl` `glaciers` `gbif` `iucn` `soilgrids` `wdpa` `worldpop` |
+| `earthlens-hazards` | hazards · humanitarian · vector basemaps | `fdsn` `firms` `gdacs` `risk_indicators` `admin` `osm` `overture` `hdx` |
+
+This changes nothing about how you use earthlens: the import path is the same
+(`from earthlens.core import EarthLens`, `earthlens.chc`, …), and every extra above
+works exactly as before — `pip install earthlens[gee]` still installs Earth
+Engine and nothing else.
+
+**Installing a single domain.** If you only need one group, install that package
+directly and skip the others' backends entirely:
+
+```bash
+pip install earthlens-imagery[gee]     # Earth Engine, without the other 40 backends
+pip install earthlens-ocean[argo,cmems]
+pip install earthlens-atmosphere[all]  # every atmosphere SDK
+```
+
+A thematic package depends only on `earthlens-core`, so its SDKs stay extras:
+`pip install earthlens-imagery` gives you the imagery backends' code without
+`earthengine-api`, `openeo`, `eumdac` and the rest.
+
+**Why the split.** A few provider SDKs cannot coexist — `argopy` requires
+`xarray >=2025.7` while `openeo <0.48` requires `xarray <2025.1.2`, and no
+version satisfies both. Those extras are therefore excluded from `earthlens[all]`
+(see the note below) and can be installed on their own or alongside their own
+group. Splitting the backends across packages lets you install one domain's
+dependencies without inheriting every other domain's constraints.
 
 > **Dependency note — `openeo` version pin.** openeo `0.48+` hard-caps
 > `pandas<3.0.0`, which would drag the whole environment down to pandas 2.x.
@@ -159,26 +170,52 @@ Or download the tarball:
 curl -OJL https://github.com/serapeum-org/earthlens/tarball/main
 ```
 
-Once you have a copy of the source, you can install it with the
-extras you need:
+The repository is a workspace of seven distributions, so a source install has
+to install the members too — `pip install -e .` on its own installs the
+meta-package, which then looks for `earthlens-core` **on PyPI** at the version
+in the working tree, and an unreleased version is not there:
 
-```bash
-pip install -e ".[ecmwf]"
-# or all backends at once:
-pip install -e ".[all]"
+```text
+ERROR: No matching distribution found for earthlens-core==<version>
 ```
 
-To install directly from GitHub (from the HEAD of the main branch):
+Install the whole workspace instead, naming every member on one command line so
+pip resolves them locally rather than from the index:
 
 ```bash
-pip install "earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git"
+pip install -e libs/core \
+            -e libs/providers/atmosphere \
+            -e libs/providers/ocean \
+            -e libs/providers/imagery \
+            -e libs/providers/land \
+            -e libs/providers/hazards \
+            -e ".[ecmwf]"
 ```
 
-Or from a specific release:
+With [uv](https://docs.astral.sh/uv/) this is a single command — the members are
+declared as a workspace in `pyproject.toml`, so one lock covers them all:
+
+```bash
+uv sync
+```
+
+If you only want one domain from a clone, its package plus core is enough:
+
+```bash
+pip install -e libs/core -e "libs/providers/imagery[gee]"
+```
+
+To install a **published release** directly from GitHub (its members are on PyPI,
+so the meta-package resolves normally):
 
 ```bash
 pip install "earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git@{release}"
 ```
+
+Installing the HEAD of `main` this way does **not** work: `main` carries an
+unreleased version whose members are not on PyPI yet, and pip cannot install a
+workspace's sibling packages out of a single git URL. Clone the repository and
+use the editable workspace install above.
 
 Now you should be able to start Python and try `import earthlens` to verify the installation.
 
@@ -199,15 +236,37 @@ pip install earthlens[ecmwf]
 
 ## Development install
 
-If you are planning to contribute to earthlens, do an editable install
-with the `[all]` extra so the full test suite (which exercises every
-backend) can run:
+If you are planning to contribute to earthlens, install the whole workspace
+editable with the `[all]` extra so the full test suite (which exercises every
+backend) can run. [uv](https://docs.astral.sh/uv/) is the supported path — it
+installs every workspace member from one lockfile (`uv.lock`). `--extra all`
+pulls every backend SDK except the mutually exclusive `argo` / `osm` (which are
+faked in their unit tests):
 
 ```bash
 git clone https://github.com/serapeum-org/earthlens.git
 cd earthlens
-conda activate earthlens
-pip install -e ".[all]"
+uv sync --extra all --group dev
+uv run pytest -m "not e2e"
 ```
+
+The equivalent with pip, which must name every member so they resolve from the
+clone rather than from PyPI:
+
+```bash
+pip install -e libs/core \
+            -e libs/providers/atmosphere \
+            -e libs/providers/ocean \
+            -e libs/providers/imagery \
+            -e libs/providers/land \
+            -e libs/providers/hazards \
+            -e ".[all]"
+```
+
+The tests import earthlens from the **installed** distributions, not from the
+source tree: `earthlens` is a regular package owned by `earthlens-core`, so a
+provider living in a different source tree is only reachable through the finder
+an editable install sets up. Running `pytest` against a clone without installing
+the workspace first will not collect.
 
 More details on conda environments: [Managing environments](https://conda.io/docs/user-guide/tasks/manage-environments.html)

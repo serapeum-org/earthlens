@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import earthlens.risk_indicators
+
 import json
 from pathlib import Path
 
@@ -13,7 +15,7 @@ from earthlens.risk_indicators import AuthenticationError, RiskIndicators
 
 pytestmark = pytest.mark.risk_indicators
 
-SUBPACKAGE = Path(__file__).parents[2] / "src" / "earthlens" / "risk_indicators"
+SUBPACKAGE = Path(earthlens.risk_indicators.__file__).parent
 
 
 def _build(monkeypatch, **kwargs):

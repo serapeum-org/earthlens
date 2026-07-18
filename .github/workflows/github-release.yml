@@ -69,17 +69,17 @@ jobs:
           increment: ${{ github.event.inputs.increment }}
           prerelease-type: ${{ github.event.inputs.prerelease_type }}
           draft: ${{ github.event.inputs.draft }}
-          package-manager: pixi
-          install-groups: "dev"
+          package-manager: uv
+          install-groups: "groups: dev"
 
       - name: Update lockfile after version bump
-        run: pixi lock
+        run: uv lock
 
       - name: Commit and push updated lockfile
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pixi.lock
+          git add uv.lock
           git diff --cached --quiet && echo "No lockfile changes" && exit 0
-          git commit -m "build: sync pixi.lock after version bump"
+          git commit -m "build: sync uv.lock after version bump"
           git push origin ${{ inputs.release-branch }}

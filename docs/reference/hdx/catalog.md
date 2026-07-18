@@ -88,7 +88,7 @@ fallback, mirroring `earthlens.earthdata`'s `_auto.json`. The curated
 filter); membership (`in`) reports only the curated keys.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # A curated key OR any raw HDX id both work:
 EarthLens(data_source="hdx", variables={"kontur-population": []})          # curated

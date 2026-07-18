@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import earthlens.nwm
+
 import datetime as dt
 import sys
 import types
@@ -20,7 +22,7 @@ from tests.nwm.conftest import FakeS3
 
 pytestmark = [pytest.mark.nwm]
 
-_SRC = Path(__file__).resolve().parents[2] / "src" / "earthlens" / "nwm"
+_SRC = Path(earthlens.nwm.__file__).parent
 
 
 # -- enumerate_cycles -------------------------------------------------------

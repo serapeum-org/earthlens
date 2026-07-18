@@ -22,7 +22,7 @@ are **validated** against the chosen family but do not subset the result —
 `phy`), so naming a parameter asserts intent rather than filtering columns:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     "argo",

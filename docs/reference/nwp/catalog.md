@@ -25,9 +25,11 @@ are missing:
 conda install -c conda-forge eccodes libgdal-grib
 ```
 
-In the pixi workspace, `eccodes` is declared on the `nwp` feature (used by
-the `dev` / `notebook` environments), so `pixi run -e dev …` provides it
-automatically — the docs and per-Python test-matrix envs stay lean.
+The `earthlens[nwp]` extra installs only the Python SDKs (`herbie-data`,
+`ecmwf-opendata`); the two binary libraries above are not on PyPI, so install
+them from conda-forge as shown. earthlens' own GRIB read path decodes through
+`pyramids`' bundled GDAL driver, so `eccodes` is needed only to satisfy Herbie's
+`cfgrib` import chain, not by earthlens itself.
 
 !!! note "conda eccodes on Windows"
     On Windows, conda installs the library as `Library\bin\eccodes.dll`,

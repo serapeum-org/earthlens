@@ -698,7 +698,7 @@ class TestS3ProberBranches:
 
     def test_sample_keys_helper_uses_unsigned_client(self, monkeypatch):
         """_s3_sample_keys returns the Contents keys from an unsigned client."""
-        import earthlens.s3.auth as s3_auth
+        import earthlens.base.s3 as s3_auth
 
         class FakeClient:
             def list_objects_v2(self, **kw):

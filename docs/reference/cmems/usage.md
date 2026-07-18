@@ -72,7 +72,7 @@ NetCDF per pair covering the full requested space/time/depth window.
 The same call works through the unified facade:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 earthlens = EarthLens(
     data_source="cmems",
@@ -85,7 +85,7 @@ earthlens = EarthLens(
     service_username="YOUR_CMEMS_USERNAME",
     service_password="YOUR_CMEMS_PASSWORD",
 )
-earthlens.download()
+earthlens.core.download()
 ```
 
 The facade forwards every extra kwarg (`service_username`,
@@ -186,7 +186,7 @@ windowed by the config's `freq`, and one GeoTIFF per
 backend produces.
 
 ```python
-from earthlens import AggregationConfig
+from earthlens.core import AggregationConfig
 
 cmems = CMEMS(
     start="2020-01-01", end="2020-12-31",
@@ -221,7 +221,7 @@ To promote an uncurated id into the bundled catalog without
 hand-writing the stanza, run:
 
 ```bash
-pixi run -e dev python tools/cmems/refresh_cmems_catalog.py add-ids \
+uv run python tools/cmems/refresh_cmems_catalog.py add-ids \
     <new_dataset_id>
 ```
 

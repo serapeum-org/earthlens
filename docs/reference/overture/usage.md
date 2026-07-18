@@ -120,13 +120,13 @@ catalog:
 
 ```bash
 # Rewrite the available_releases index from the live SDK / STAC catalog
-pixi run -e dev python tools/overture/refresh_overture_catalog.py refresh
+uv run python tools/overture/refresh_overture_catalog.py refresh
 
 # Confirm every curated theme/default-type resolves against live data
-pixi run -e dev python tools/overture/refresh_overture_catalog.py validate --strict
+uv run python tools/overture/refresh_overture_catalog.py validate --strict
 
 # Inspect one type's columns when curating a new theme
-pixi run -e dev python tools/overture/refresh_overture_catalog.py probe building
+uv run python tools/overture/refresh_overture_catalog.py probe building
 ```
 
 ## Streaming vs in-memory reads

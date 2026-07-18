@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=80.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "earthlens-imagery"
+version = "0.10.0"
+description = "satellite platform, SAR and EO catalog backends for earthlens"
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+    { name = "Mostafa Farrag", email = "moah.farag@gmail.com" }
+]
+license = "GPL-3.0-only"
+keywords = ["remote sensing", "imagery"]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+]
+
+requires-python = ">=3.11,<4"
+
+# Only the core abstractions. Every provider SDK is an extra, so installing
+# this distribution brings the backends' code without their dependencies —
+# `pip install earthlens-imagery[<backend>]` adds exactly one backend's SDK.
+dependencies = [
+    "earthlens-core ==0.10.0",
+]
+
+[project.optional-dependencies]
+earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
+asf = ["asf_search >=12.2.2", "earthlens-imagery[earthdata]"]
+eumetsat = ["eumdac >=3.1"]
+gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-cloud-storage >=2.0", "Rtree >=1.0.0", "urllib3 >=1.26"]
+jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5"]
+openeo = ["openeo >=0.47,<0.48"]
+sentinel-hub = ["sentinelhub >=3.11.5"]
+stac = ["pyramids-gis[stac] >=0.46.0"]
+
+# This distribution's slice of the facade's data-source table.
+[project.entry-points."earthlens.backends"]
+imagery = "earthlens._imagery:BACKENDS"
+
+[project.urls]
+Homepage = "https://github.com/serapeum-org/earthlens"
+
+# Ships only its own backends plus its registry package. `earthlens` itself is
+# a PEP 420 namespace (no `__init__.py` in any distribution), so no two wheels
+# write the same path.
+[tool.setuptools.packages.find]
+where = ["src"]
+# `earthlens` is a PEP 420 namespace shared across all distributions, so
+# `namespaces = true` lets setuptools discover the __init__-less parent (matches
+# earthlens-core).
+namespaces = true
+include = ["earthlens._imagery*", "earthlens.asf*", "earthlens.earthdata*", "earthlens.eumetsat*", "earthlens.gee*", "earthlens.jaxa*", "earthlens.openeo*", "earthlens.sentinel_hub*", "earthlens.stac*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "catalog/*.yaml"]
+# Sentinel Hub ships its bundled evalscript recipes; read_evalscript() reads
+# these at request time, so they must be in the wheel.
+"earthlens.sentinel_hub" = ["evalscripts/*.js"]
+# earthdata ships its auto-generated dataset index alongside the curated YAML.
+"earthlens.earthdata" = ["catalog/*.json"]
+
+# Resolve the core distribution from the workspace, not PyPI, so this package
+# locks and develops against the local earthlens-core.
+[tool.uv.sources]
+earthlens-core = { workspace = true }

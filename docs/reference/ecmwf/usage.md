@@ -6,7 +6,7 @@ The ECMWF backend takes a `variables` mapping of **dataset short name → list o
 variable codes**, plus a date range, a bbox, and a `temporal_resolution`:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="ecmwf",

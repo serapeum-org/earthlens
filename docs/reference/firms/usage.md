@@ -15,7 +15,7 @@ detection filters, and the output schema. For background see the
 ## 1. A first query
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 fc = EarthLens(
     data_source="firms",

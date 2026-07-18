@@ -17,17 +17,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Pixi
-        uses: serapeum-org/github-actions/actions/python-setup/pixi@cd02ddbe749b77cbafd08bc48c788974fc989db7 # pixi/v1
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
         with:
-          environments: dev
-          activate-environment: dev
-          cache: true
+          python-version: "3.12"
+          verify-lock: true
 
-      - name: Build wheel
-        run: pixi run -e dev python -m build --wheel --outdir dist/
+      - name: Build every distribution's wheel
+        # The workspace publishes seven distributions and the root one is a
+        # meta-package with no modules, so building only it would produce a
+        # wheel that imports nothing. `uv build --all-packages` builds every
+        # workspace member into the same dist/ so the install step can resolve
+        # the whole set locally.
+        run: |
+          set -euo pipefail
+          uv build --all-packages --wheel --out-dir dist/
+          test "$(ls dist/*.whl | wc -l)" -eq 7 || {
+            echo "::error::expected 7 wheels, got $(ls dist/*.whl | wc -l)"; exit 1; }
+          ls -1 dist/*.whl
 
-      - name: Upload wheel artifact
+      - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:
           name: wheel
@@ -70,16 +79,24 @@ jobs:
             "libgdal-netcdf>=3.10.0,<4" \
             "libgdal-hdf4>=3.10.0,<4"
 
-      - name: Install wheel
+      - name: Install wheels
         shell: bash -el {0}
-        # `[all]` pulls every backend's optional SDK
-        # (boto3 / cdsapi / earthengine-api) so the test suite —
-        # which exercises every backend — can import them.
-        run: pip install "$(echo dist/*.whl)[all]"
+        # Install the meta-package, which pulls in core and the five provider
+        # distributions. `--find-links dist` resolves those siblings from the
+        # wheels just built rather than from PyPI, where this version does not
+        # exist yet. `[all]` then pulls every backend's optional SDK (boto3 /
+        # cdsapi / earthengine-api) so the suite — which exercises every
+        # backend — can import them.
+        run: |
+          set -euo pipefail
+          META=$(ls dist/earthlens-[0-9]*.whl)
+          pip install --find-links dist "${META}[all]"
 
       - name: Verify package import
         shell: bash -el {0}
-        run: python -c "import earthlens; print(earthlens.__version__)"
+        # earthlens is a PEP 420 namespace with no attributes; the version and
+        # facade live in earthlens.core.
+        run: python -c "import earthlens.core; print(earthlens.core.__version__)"
 
       - name: Install test dependencies
         shell: bash -el {0}

@@ -11,7 +11,7 @@ pip install earthlens[gbif]
 Fetch a year of bird occurrences over a small bounding box:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 fc = EarthLens(
     data_source="gbif",

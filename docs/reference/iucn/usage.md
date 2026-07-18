@@ -21,7 +21,7 @@ raises `AuthenticationError` naming `IUCN_TOKEN`.
 Fetch a species' Red List assessments:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 frame = EarthLens(
     data_source="iucn",

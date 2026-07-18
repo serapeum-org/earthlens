@@ -45,7 +45,7 @@ environment variables and the registration URL — it never blocks on an
 interactive prompt.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # (a) explicit — handy in a notebook
 EarthLens(
@@ -126,7 +126,7 @@ still serves plain FTP on `ftp.ptree.jaxa.jp:21`, so `paramiko` is
 not required.
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 EarthLens(
     data_source="jaxa",

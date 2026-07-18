@@ -37,7 +37,7 @@ configured (see [Usage](usage.md)).
 ## Where it fits in the facade
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="sentinel-hub",   # alias: "sentinelhub"
