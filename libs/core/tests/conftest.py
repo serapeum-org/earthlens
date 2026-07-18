@@ -1,9 +1,14 @@
 from __future__ import annotations
 
-import os
+import tempfile
 from pathlib import Path
 
 import pytest
+
+#: Scratch root for the download fixtures below. Anchored under the OS temp dir
+#: (not the repo) so an e2e/download test never recreates a stray `tests/` tree
+#: at the working directory after the per-distribution move (#785).
+_SCRATCH = Path(tempfile.gettempdir()) / "earthlens-test-downloads"
 
 
 @pytest.fixture(scope="session")
@@ -67,16 +72,14 @@ def s3_data_source() -> str:
 
 
 @pytest.fixture(scope="module")
-def chirps_data_source_output_dir() -> str:
-    path = "tests/data/delete/chirps-backend"
-    if not os.path.exists(path):
-        os.makedirs(path)
-    return Path(path).absolute()
+def chirps_data_source_output_dir() -> Path:
+    path = _SCRATCH / "chirps-backend"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 @pytest.fixture(scope="module")
-def s3_era5_data_source_output_dir() -> str:
-    path = "tests/data/delete/s3-era5-backend"
-    if not os.path.exists(path):
-        os.makedirs(path)
-    return Path(path).absolute()
+def s3_era5_data_source_output_dir() -> Path:
+    path = _SCRATCH / "s3-era5-backend"
+    path.mkdir(parents=True, exist_ok=True)
+    return path

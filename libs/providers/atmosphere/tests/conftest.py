@@ -1,9 +1,14 @@
 from __future__ import annotations
 
-import os
+import tempfile
 from pathlib import Path
 
 import pytest
+
+#: Scratch root for the download fixture below. Anchored under the OS temp dir
+#: (not the repo) so an e2e/download test never recreates a stray `tests/` tree
+#: at the working directory after the per-distribution move (#785).
+_SCRATCH = Path(tempfile.gettempdir()) / "earthlens-test-downloads"
 
 
 @pytest.fixture(scope="session")
@@ -37,8 +42,7 @@ def chirps_variables() -> list[str]:
 
 
 @pytest.fixture(scope="module")
-def chirps_base_dir() -> str:
-    rpath = Path("tests/data/delete/chirps")
-    if not os.path.exists(rpath):
-        os.makedirs(rpath)
-    return Path(rpath).absolute()
+def chirps_base_dir() -> Path:
+    path = _SCRATCH / "chirps"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
