@@ -92,7 +92,7 @@ you install the meta-package or a thematic distribution directly:
 | `erddap` | [NOAA ERDDAP](https://serapeum-org.github.io/earthlens/reference/erddap/introduction/) | `erddapy >=3.0` |
 | `osm` | [OpenStreetMap](https://serapeum-org.github.io/earthlens/reference/osm/introduction/) | `overpy >=0.7`, `ohsome >=0.4.0` |
 | `osm-pbf` | OpenStreetMap (bulk .osm.pbf extracts) | `pyrosm >=0.11.0`, `osmium >=4.3.1` |
-| `all` | every backend above except `argo`, `osm`, `osm-pbf` (see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)) | — |
+| `all` | every backend above except `argo`, `osm-pbf` (see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)) | — |
 
 
 A bare `pip install earthlens` installs only the core dependencies (numpy, pandas, pyramids-gis,
@@ -145,29 +145,31 @@ one domain's dependencies without inheriting every other domain's constraints.
 ### What `earthlens[all]` excludes, and why
 
 `earthlens[all]` is the union of **every backend extra that can honestly share
-one environment** — that is every extra in the table above **except three**:
-`argo`, `osm`, and `osm-pbf`. Each is left out for a concrete, upstream reason:
+one environment** — that is every extra in the table above **except two**:
+`argo` and `osm-pbf`. Each is left out for a concrete, upstream reason:
 
 | Excluded | SDK | Why it can't join `all` |
 |---|---|---|
 | `argo` | `argopy` | **Two** independent clashes, either one disqualifying. **(1) `xarray`:** `argopy >=1.4` needs `xarray>=2025.7`, but `openeo` (in `all`) caps `xarray<2025.01.2` — disjoint ranges. **(2) `erddapy`:** `argopy 1.4.0` breaks against `erddapy 3.x` — it imports `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed — while the `erddap` extra (in `all`) requires `erddapy>=3.0`. |
-| `osm` | `ohsome` | `ohsome` pins `pandas<3.0.0`, which conflicts with the rest of the resolved dependency graph. |
 | `osm-pbf` | `pyrosm` | `pyrosm` ships no prebuilt wheel for current Python and must compile from source (a heavy C/C++ build), so it is kept out of the one-shot union. |
+
+(`osm` itself **is** in `all` — see the resolution note below for why.)
 
 Each still installs **on its own**, in a separate environment:
 
 ```bash
 pip install earthlens[argo]      # its own env — pulls xarray>=2025.7
-pip install earthlens[osm]       # its own env — pulls pandas<3
 pip install earthlens[osm-pbf]   # compiles pyrosm from source
 ```
 
-> **What an `all` install actually resolves to.** With `argo` and `osm` out,
+> **What an `all` install actually resolves to.** With `argo` out,
 > `earthlens[all]` lands on the `openeo` side of the fork, and `openeo 0.51`
 > caps **both** `xarray<2025.01.2` **and** `pandas<3.0.0` — so an `all`
-> environment runs on `xarray 2025.1.1` and `pandas 2.x`. Every other backend
-> works; asking the facade for an excluded one (e.g. `data_source="argo"`)
-> without its extra raises a clear `ImportError` naming the extra to install.
+> environment runs on `xarray 2025.1.1` and `pandas 2.x`. That pandas-2.x floor
+> is exactly what lets `osm` sit in `all`: `ohsome`'s own `pandas<3.0.0` agrees
+> rather than collides. Every other backend works; asking the facade for an
+> excluded one (e.g. `data_source="argo"`) without its extra raises a clear
+> `ImportError` naming the extra to install.
 
 > **Heads-up — `argo` is currently broken even on its own.** Since `erddapy 3.3`
 > (released 2026-06-30) a plain `pip install earthlens[argo]` pulls `erddapy 3.3`,
@@ -264,9 +266,8 @@ If you are planning to contribute to earthlens, install the whole workspace
 editable with the `[all]` extra so the full test suite (which exercises every
 backend) can run. [uv](https://docs.astral.sh/uv/) is the supported path — it
 installs every workspace member from one lockfile (`uv.lock`). `--extra all`
-pulls every backend SDK except the three extras excluded from `all`
-(`argo` / `osm` / `osm-pbf` — see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why);
-`argo` and `osm` fake their SDK in unit tests):
+pulls every backend SDK except the two extras excluded from `all`
+(`argo` / `osm-pbf` — see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)):
 
 ```bash
 git clone https://github.com/serapeum-org/earthlens.git
