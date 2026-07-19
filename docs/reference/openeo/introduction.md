@@ -20,10 +20,11 @@ JSON, and `aggregate=` is a **native** openEO process
 pip install earthlens[openeo]
 ```
 
-> **Dependency note.** earthlens pins `openeo >=0.47,<0.48`: openeo `0.48+`
-> hard-caps `pandas<3.0.0`, so the pin keeps the repo on **pandas 3** (0.47 is
-> the newest openeo that supports it). openeo `0.47` still caps
-> `xarray<2025.01.2`, so installing `earthlens[openeo]` constrains `xarray`.
+> **Dependency note.** earthlens pins `openeo >=0.47,<0.52` (currently 0.51).
+> openeo 0.51 caps **both** `xarray<2025.01.2` and `pandas<3.0.0`, so
+> installing `earthlens[openeo]` (or `earthlens[all]`) constrains `xarray` and
+> holds the environment to **pandas 2.x** — pandas 3 is published, but openeo's
+> `<3` cap excludes it.
 
 ## Endpoints
 

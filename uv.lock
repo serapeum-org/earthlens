@@ -1891,7 +1891,7 @@ dependencies = [
 [package.optional-dependencies]
 all = [
     { name = "earthlens-atmosphere", extra = ["ecmwf", "ecmwf-modern", "eea-aq", "goes", "nwp", "radar", "s3", "tropycal"] },
-    { name = "earthlens-hazards", extra = ["fdsn", "hdx", "overture"] },
+    { name = "earthlens-hazards", extra = ["fdsn", "hdx", "osm", "overture"] },
     { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac"] },
     { name = "earthlens-imagery", extra = ["openeo"], marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
     { name = "earthlens-land", extra = ["dem", "gbif", "worldpop"] },
@@ -2041,7 +2041,36 @@ notebook = [
 
 [package.metadata]
 requires-dist = [
-    { name = "earthlens", extras = ["asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "jaxa", "nwm", "nwp", "obis", "openeo", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "worldpop"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["asf"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["cmems"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["cmip6"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["dem"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["earthdata"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["ecmwf"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["ecmwf-modern"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["eea-aq"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["erddap"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["eumetsat"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["fdsn"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["gbif"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["gee"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["ghsl"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["goes"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["hdx"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["jaxa"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["nwm"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["nwp"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["obis"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["openeo"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["osm"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["overture"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["radar"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["s3"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["sentinel-hub"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["stac"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["tropycal"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["usgs-water"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["worldpop"], marker = "extra == 'all'" },
     { name = "earthlens-atmosphere", editable = "libs/providers/atmosphere" },
     { name = "earthlens-atmosphere", extras = ["cmip6"], marker = "extra == 'cmip6'", editable = "libs/providers/atmosphere" },
     { name = "earthlens-atmosphere", extras = ["ecmwf"], marker = "extra == 'ecmwf'", editable = "libs/providers/atmosphere" },
@@ -2329,7 +2358,7 @@ requires-dist = [
     { name = "google-cloud-storage", marker = "extra == 'gee'", specifier = ">=2.0" },
     { name = "gportal", marker = "extra == 'jaxa'", specifier = ">=0.4,<0.5" },
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
-    { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.48" },
+    { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
     { name = "pyramids-gis", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.46.0" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
@@ -5494,10 +5523,11 @@ wheels = [
 
 [[package]]
 name = "openeo"
-version = "0.47.0"
+version = "0.51.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecated" },
+    { name = "geopandas" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra == 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "oschmod", marker = "sys_platform == 'win32'" },
@@ -5509,7 +5539,7 @@ dependencies = [
     { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" } },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/3a/50644fb857c2d3f9c349b78a73a3d19a0dbc62159239ab8f6751ce03661a/openeo-0.47.0-py3-none-any.whl", hash = "sha256:d6e504592da9c6e6d8e7b0e7fe9d219df088841fb26921560f462776dcd1f2cc", size = 337843, upload-time = "2025-12-17T20:40:38.139Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/8f/cfcaeaefa88ba2a7f06ac5ece862b272b10645f72e5f3a9a27325c8499fd/openeo-0.51.0-py3-none-any.whl", hash = "sha256:93e62ac67a3741863a796127db85c4336315b050038e9da946b01c718d923e02", size = 349236, upload-time = "2026-07-16T16:02:42.058Z" },
 ]
 
 [[package]]

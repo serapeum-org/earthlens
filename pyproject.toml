@@ -72,7 +72,44 @@ stac = ["earthlens-imagery[stac]"]
 tropycal = ["earthlens-atmosphere[tropycal]"]
 usgs-water = ["earthlens-ocean[usgs-water]"]
 worldpop = ["earthlens-land[worldpop]"]
-all = ["earthlens[asf,cmems,cmip6,dem,earthdata,ecmwf,ecmwf-modern,eea_aq,erddap,eumetsat,fdsn,gbif,gee,ghsl,goes,hdx,jaxa,nwm,nwp,obis,openeo,overture,radar,s3,sentinel-hub,stac,tropycal,usgs-water,worldpop]"]
+
+# The self-referential "everything" extra: each entry re-activates one backend's
+# own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789)
+# and `osm-pbf` (pyrosm builds from source) stay out; `osm` is included because
+# openeo already pins pandas<3, so ohsome's pandas<3 no longer collides.
+all = [
+    "earthlens[asf]",
+    "earthlens[cmems]",
+    "earthlens[cmip6]",
+    "earthlens[dem]",
+    "earthlens[earthdata]",
+    "earthlens[ecmwf]",
+    "earthlens[ecmwf-modern]",
+    "earthlens[eea_aq]",
+    "earthlens[erddap]",
+    "earthlens[eumetsat]",
+    "earthlens[fdsn]",
+    "earthlens[gbif]",
+    "earthlens[gee]",
+    "earthlens[ghsl]",
+    "earthlens[goes]",
+    "earthlens[hdx]",
+    "earthlens[jaxa]",
+    "earthlens[nwm]",
+    "earthlens[nwp]",
+    "earthlens[obis]",
+    "earthlens[openeo]",
+    "earthlens[osm]",
+    "earthlens[overture]",
+    "earthlens[radar]",
+    "earthlens[s3]",
+    "earthlens[sentinel-hub]",
+    "earthlens[stac]",
+    "earthlens[tropycal]",
+    "earthlens[usgs-water]",
+    "earthlens[worldpop]",
+]
+
 [dependency-groups]
 dev = [
     "nbval >=0.11.0",
@@ -123,16 +160,6 @@ docs = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
     "pyramids-gis[viz] >=0.46.0",
-    # cleopatra: notebooks import it directly; add_reference_map /
-    # save_animation(crf=...) landed in 0.22.0, the animate() default
-    # label-clipping fix in 0.23.0, the DATA_STYLES presets / dark-canvas
-    # helper (style=, apply_blank_canvas) in 0.24.0+, and 0.26.0 replaces
-    # animate()'s text_loc kwarg with a FrameLabel(location=, color=)
-    # object (the old kwarg still works as a deprecated alias, but the
-    # showcase notebooks already migrated their existing text_loc= calls,
-    # and the new dark-canvas notebook uses FrameLabel's color= directly
-    # rather than the also-deprecated label_color=) -- floor pinned to
-    # the latest of these, >=0.26.1.
     "cleopatra >=0.26.1",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",

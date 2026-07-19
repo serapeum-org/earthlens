@@ -78,7 +78,7 @@ you install the meta-package or a thematic distribution directly:
 | `dem` | [Copernicus DEM (ESA)](https://serapeum-org.github.io/earthlens/reference/dem/introduction/) | `earthlens[s3]` |
 | `goes` | [NOAA GOES-R](https://serapeum-org.github.io/earthlens/reference/goes/introduction/) | `earthlens[s3]` |
 | `stac` | [STAC (SpatioTemporal Asset Catalog)](https://serapeum-org.github.io/earthlens/reference/stac/introduction/) | `pyramids-gis[stac] >=0.46.0` |
-| `openeo` | [openEO](https://serapeum-org.github.io/earthlens/reference/openeo/introduction/) | `openeo >=0.47,<0.48` |
+| `openeo` | [openEO](https://serapeum-org.github.io/earthlens/reference/openeo/introduction/) | `openeo >=0.47,<0.52` |
 | `sentinel-hub` | [Sentinel Hub](https://serapeum-org.github.io/earthlens/reference/sentinel-hub/introduction/) | `sentinelhub >=3.11.5` |
 | `tropycal` | [Tropycal](https://serapeum-org.github.io/earthlens/reference/tropycal/introduction/) | `tropycal >=1.4`, `cartopy >=0.22` |
 | `overture` | [Overture Maps Foundation](https://serapeum-org.github.io/earthlens/reference/overture/introduction/) | `overturemaps >=1.0.0`, `duckdb >=1.0.0` |
@@ -92,7 +92,7 @@ you install the meta-package or a thematic distribution directly:
 | `erddap` | [NOAA ERDDAP](https://serapeum-org.github.io/earthlens/reference/erddap/introduction/) | `erddapy >=3.0` |
 | `osm` | [OpenStreetMap](https://serapeum-org.github.io/earthlens/reference/osm/introduction/) | `overpy >=0.7`, `ohsome >=0.4.0` |
 | `osm-pbf` | OpenStreetMap (bulk .osm.pbf extracts) | `pyrosm >=0.11.0`, `osmium >=4.3.1` |
-| `all` | every backend above except `argo`, `osm`, `osm-pbf` (pin conflicts — see note below) | — |
+| `all` | every backend above except `argo`, `osm-pbf` (see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)) | — |
 
 
 A bare `pip install earthlens` installs only the core dependencies (numpy, pandas, pyramids-gis,
@@ -132,27 +132,53 @@ A thematic package depends only on `earthlens-core`, so its SDKs stay extras:
 `pip install earthlens-imagery` gives you the imagery backends' code without
 `earthengine-api`, `openeo`, `eumdac` and the rest.
 
-**Why the split.** A few provider SDKs cannot coexist — `argopy` requires
-`xarray >=2025.7` while `openeo <0.48` requires `xarray <2025.1.2`, and no
-version satisfies both. Those extras are therefore excluded from `earthlens[all]`
-(see the note below) and can be installed on their own or alongside their own
-group. Splitting the backends across packages lets you install one domain's
-dependencies without inheriting every other domain's constraints.
+**Why the split.** Two provider SDKs cannot coexist in one environment.
+`argopy` (the `argo` extra) requires `xarray>=2025.7`, while `openeo` — which
+*is* part of `earthlens[all]` — caps `xarray<2025.01.2`, and no single `xarray`
+satisfies both. The root `pyproject.toml` declares those two extras conflicting
+under `[tool.uv] conflicts`, so `uv` **forks** the lockfile: `argopy` and
+`openeo` both live in one `uv.lock` on their own `xarray` (`2025.1.1` for the
+`openeo` / `all` side, `2025.9.0` for the `argo` side), and each side installs
+cleanly on its own. Splitting the backends across packages then lets you install
+one domain's dependencies without inheriting every other domain's constraints.
 
-> **Dependency note — `openeo` version pin.** openeo `0.48+` hard-caps
-> `pandas<3.0.0`, which would drag the whole environment down to pandas 2.x.
-> earthlens therefore pins `openeo >=0.47,<0.48` — the newest openeo that runs
-> on **pandas 3** (validated live against CDSE) — so `earthlens[all]` and
-> `earthlens[openeo]` keep pandas 3 for every backend. openeo `0.47` does still
-> cap `xarray<2025.01.2`, so installing it constrains `xarray` (not `pandas`).
-> The upper bound will be lifted once openeo ships a pandas-3-compatible release.
+### What `earthlens[all]` excludes, and why
 
-> **Dependency note — `argo`, `osm`, `osm-pbf` excluded from `all`.** `argopy` (via `argo`) pins
-> `xarray>=2025.7`, which conflicts with `openeo`'s `xarray<2025.1.2`; `ohsome` (via `osm`) pins
-> `pandas<3.0.0`, which conflicts with the rest of the locked dependency graph; `osm-pbf`'s `pyrosm`
-> has no prebuilt wheel and must compile from source. All three still install fine on their own
-> (`pip install earthlens[argo]`, `earthlens[osm]`, `earthlens[osm-pbf]`) — they're just excluded
-> from the `all` union so it stays installable in one shot.
+`earthlens[all]` is the union of **every backend extra that can honestly share
+one environment** — that is every extra in the table above **except two**:
+`argo` and `osm-pbf`. Each is left out for a concrete, upstream reason:
+
+| Excluded | SDK | Why it can't join `all` |
+|---|---|---|
+| `argo` | `argopy` | **Two** independent problems, either one disqualifying. **(1) `xarray` — a resolution conflict:** `argopy >=1.4` needs `xarray>=2025.7`, but `openeo` (in `all`) caps `xarray<2025.01.2` — disjoint ranges, which is what `[tool.uv] conflicts` declares. **(2) `erddapy` — a runtime break:** `argopy 1.4.0` still *resolves* (it does not cap `erddapy`) but fails at `import` — it imports `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed — while the `erddap` extra (in `all`) requires `erddapy>=3.0`. |
+| `osm-pbf` | `pyrosm` | `pyrosm` ships no prebuilt wheel for current Python and must compile from source (a heavy C/C++ build), so it is kept out of the one-shot union. |
+
+(`osm` itself **is** in `all` — see the resolution note below for why.)
+
+Each still installs **on its own**, in a separate environment:
+
+```bash
+pip install earthlens[argo]      # its own env — pulls xarray>=2025.7
+pip install earthlens[osm-pbf]   # compiles pyrosm from source
+```
+
+> **What an `all` install actually resolves to.** With `argo` out,
+> `earthlens[all]` lands on the `openeo` side of the fork, and `openeo 0.51`
+> caps **both** `xarray<2025.01.2` **and** `pandas<3.0.0` — so an `all`
+> environment runs on `xarray 2025.1.1` and `pandas 2.x`. That pandas-2.x floor
+> is exactly what lets `osm` sit in `all`: `ohsome`'s own `pandas<3.0.0` agrees
+> rather than collides. Every other backend works; asking the facade for an
+> excluded one (e.g. `data_source="argo"`) without its extra raises a clear
+> `ImportError` naming the extra to install.
+
+> **Heads-up — `argo` is currently broken even on its own.** Since `erddapy 3.3`
+> (released 2026-06-30) a plain `pip install earthlens[argo]` pulls `erddapy 3.3`,
+> and `import argopy` then fails with
+> `ImportError: cannot import name '_quote_string_constraints'`. This is an
+> upstream `argopy` bug ([euroargodev/argopy#657](https://github.com/euroargodev/argopy/issues/657)),
+> tracked for earthlens in
+> [serapeum-org/earthlens#789](https://github.com/serapeum-org/earthlens/issues/789);
+> the `argo` backend will work again once `argopy` ships a fix.
 
 ## From Sources
 
@@ -240,8 +266,8 @@ If you are planning to contribute to earthlens, install the whole workspace
 editable with the `[all]` extra so the full test suite (which exercises every
 backend) can run. [uv](https://docs.astral.sh/uv/) is the supported path — it
 installs every workspace member from one lockfile (`uv.lock`). `--extra all`
-pulls every backend SDK except the mutually exclusive `argo` / `osm` (which are
-faked in their unit tests):
+pulls every backend SDK except the two extras excluded from `all`
+(`argo` / `osm-pbf` — see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)):
 
 ```bash
 git clone https://github.com/serapeum-org/earthlens.git
