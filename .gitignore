@@ -150,7 +150,6 @@ conda/
 .idea/*
 examples/data/chirps/*
 *.xml
-tests/mo/*
 
 # Local-only files (kept in worktree, not in git)
 CLAUDE.md
@@ -163,8 +162,6 @@ tools/gee/_gee_stac_cache/
 # notebooks reference these but the actual binary blobs (era5 .tif /
 # .nc, GEE export tifs) are reproduced on demand by running the
 # notebooks against live services. They must NOT enter git.
-# Pyramids reprojection test scratch (reproduced on demand by the tests)
-tests/data/netcdf/era5_repro_pyramids_*
 
 docs/examples/ecmwf/data/
 docs/examples/gee/out/
