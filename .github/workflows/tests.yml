@@ -13,9 +13,10 @@ jobs:
   # One lane per distribution (#785): each member's tests run against its own
   # `pyproject.toml` config and report coverage only for its own `src`, tagged
   # with a Codecov flag. The union of the six members is the whole non-e2e
-  # suite. `extras: all` installs every backend SDK except the mutually
-  # exclusive argo / osm / osm-pbf (excluded from the meta `all` extra and faked
-  # in their unit tests); `verify-lock` is the `uv.lock` up-to-date check.
+  # suite. `extras: all` installs every backend SDK except argo / osm-pbf, which
+  # stay excluded from the meta `all` extra (their unit tests fake the SDK). osm
+  # is now in `all`, so the hazards lane installs overpy/ohsome, though its tests
+  # still fake them via monkeypatch. `verify-lock` is the `uv.lock` up-to-date check.
   test:
     name: ${{ matrix.member.name }} (py${{ matrix.python-version }})
     runs-on: ubuntu-latest
