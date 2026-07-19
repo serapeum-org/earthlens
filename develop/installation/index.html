@@ -632,6 +632,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#what-earthlensall-excludes-and-why" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What earthlens[all] excludes, and why
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -19153,6 +19164,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#what-earthlensall-excludes-and-why" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What earthlens[all] excludes, and why
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -19376,7 +19398,7 @@ you install the meta-package or a thematic distribution directly:
 <tr>
 <td><code>openeo</code></td>
 <td><a href="https://serapeum-org.github.io/earthlens/reference/openeo/introduction/">openEO</a></td>
-<td><code>openeo &gt;=0.47,&lt;0.48</code></td>
+<td><code>openeo &gt;=0.47,&lt;0.52</code></td>
 </tr>
 <tr>
 <td><code>sentinel-hub</code></td>
@@ -19445,7 +19467,7 @@ you install the meta-package or a thematic distribution directly:
 </tr>
 <tr>
 <td><code>all</code></td>
-<td>every backend above except <code>argo</code>, <code>osm</code>, <code>osm-pbf</code> (pin conflicts — see note below)</td>
+<td>every backend above except <code>argo</code>, <code>osm</code>, <code>osm-pbf</code> (see <a href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes</a>)</td>
 <td>—</td>
 </tr>
 </tbody>
@@ -19511,61 +19533,100 @@ directly and skip the others' backends entirely:</p>
 <p>A thematic package depends only on <code>earthlens-core</code>, so its SDKs stay extras:
 <code>pip install earthlens-imagery</code> gives you the imagery backends' code without
 <code>earthengine-api</code>, <code>openeo</code>, <code>eumdac</code> and the rest.</p>
-<p><strong>Why the split.</strong> A few provider SDKs cannot coexist — <code>argopy</code> requires
-<code>xarray &gt;=2025.7</code> while <code>openeo &lt;0.48</code> requires <code>xarray &lt;2025.1.2</code>, and no
-version satisfies both. Those extras are therefore excluded from <code>earthlens[all]</code>
-(see the note below) and can be installed on their own or alongside their own
-group. Splitting the backends across packages lets you install one domain's
-dependencies without inheriting every other domain's constraints.</p>
+<p><strong>Why the split.</strong> A few provider SDKs cannot coexist in one environment.
+<code>argopy</code> (the <code>argo</code> extra) requires <code>xarray&gt;=2025.7</code>, while <code>openeo</code> — which
+<em>is</em> part of <code>earthlens[all]</code> — caps <code>xarray&lt;2025.01.2</code>, and no single <code>xarray</code>
+satisfies both. The root <code>pyproject.toml</code> declares those two extras conflicting
+under <code>[tool.uv] conflicts</code>, so <code>uv</code> <strong>forks</strong> the lockfile: <code>argopy</code> and
+<code>openeo</code> both live in one <code>uv.lock</code> on their own <code>xarray</code> (<code>2025.1.1</code> for the
+<code>openeo</code> / <code>all</code> side, <code>2025.9.0</code> for the <code>argo</code> side), and each side installs
+cleanly on its own. Splitting the backends across packages then lets you install
+one domain's dependencies without inheriting every other domain's constraints.</p>
+<h3 id="what-earthlensall-excludes-and-why"><a class="toclink" href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes, and why</a><a class="headerlink" href="#what-earthlensall-excludes-and-why" title="Permanent link">#</a></h3>
+<p><code>earthlens[all]</code> is the union of <strong>every backend extra that can honestly share
+one environment</strong> — that is every extra in the table above <strong>except three</strong>:
+<code>argo</code>, <code>osm</code>, and <code>osm-pbf</code>. Each is left out for a concrete, upstream reason:</p>
+<table>
+<thead>
+<tr>
+<th>Excluded</th>
+<th>SDK</th>
+<th>Why it can't join <code>all</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>argo</code></td>
+<td><code>argopy</code></td>
+<td><strong>Two</strong> independent clashes, either one disqualifying. <strong>(1) <code>xarray</code>:</strong> <code>argopy &gt;=1.4</code> needs <code>xarray&gt;=2025.7</code>, but <code>openeo</code> (in <code>all</code>) caps <code>xarray&lt;2025.01.2</code> — disjoint ranges. <strong>(2) <code>erddapy</code>:</strong> <code>argopy 1.4.0</code> breaks against <code>erddapy 3.x</code> — it imports <code>erddapy.erddapy._quote_string_constraints</code>, which <code>erddapy 3.3</code> removed — while the <code>erddap</code> extra (in <code>all</code>) requires <code>erddapy&gt;=3.0</code>.</td>
+</tr>
+<tr>
+<td><code>osm</code></td>
+<td><code>ohsome</code></td>
+<td><code>ohsome</code> pins <code>pandas&lt;3.0.0</code>, which conflicts with the rest of the resolved dependency graph.</td>
+</tr>
+<tr>
+<td><code>osm-pbf</code></td>
+<td><code>pyrosm</code></td>
+<td><code>pyrosm</code> ships no prebuilt wheel for current Python and must compile from source (a heavy C/C++ build), so it is kept out of the one-shot union.</td>
+</tr>
+</tbody>
+</table>
+<p>Each still installs <strong>on its own</strong>, in a separate environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>argo<span class="o">]</span><span class="w">      </span><span class="c1"># its own env — pulls xarray&gt;=2025.7</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">       </span><span class="c1"># its own env — pulls pandas&lt;3</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">   </span><span class="c1"># compiles pyrosm from source</span>
+</code></pre></div>
 <blockquote>
-<p><strong>Dependency note — <code>openeo</code> version pin.</strong> openeo <code>0.48+</code> hard-caps
-<code>pandas&lt;3.0.0</code>, which would drag the whole environment down to pandas 2.x.
-earthlens therefore pins <code>openeo &gt;=0.47,&lt;0.48</code> — the newest openeo that runs
-on <strong>pandas 3</strong> (validated live against CDSE) — so <code>earthlens[all]</code> and
-<code>earthlens[openeo]</code> keep pandas 3 for every backend. openeo <code>0.47</code> does still
-cap <code>xarray&lt;2025.01.2</code>, so installing it constrains <code>xarray</code> (not <code>pandas</code>).
-The upper bound will be lifted once openeo ships a pandas-3-compatible release.</p>
-<p><strong>Dependency note — <code>argo</code>, <code>osm</code>, <code>osm-pbf</code> excluded from <code>all</code>.</strong> <code>argopy</code> (via <code>argo</code>) pins
-<code>xarray&gt;=2025.7</code>, which conflicts with <code>openeo</code>'s <code>xarray&lt;2025.1.2</code>; <code>ohsome</code> (via <code>osm</code>) pins
-<code>pandas&lt;3.0.0</code>, which conflicts with the rest of the locked dependency graph; <code>osm-pbf</code>'s <code>pyrosm</code>
-has no prebuilt wheel and must compile from source. All three still install fine on their own
-(<code>pip install earthlens[argo]</code>, <code>earthlens[osm]</code>, <code>earthlens[osm-pbf]</code>) — they're just excluded
-from the <code>all</code> union so it stays installable in one shot.</p>
+<p><strong>What an <code>all</code> install actually resolves to.</strong> With <code>argo</code> and <code>osm</code> out,
+<code>earthlens[all]</code> lands on the <code>openeo</code> side of the fork, and <code>openeo 0.51</code>
+caps <strong>both</strong> <code>xarray&lt;2025.01.2</code> <strong>and</strong> <code>pandas&lt;3.0.0</code> — so an <code>all</code>
+environment runs on <code>xarray 2025.1.1</code> and <code>pandas 2.x</code>. Every other backend
+works; asking the facade for an excluded one (e.g. <code>data_source="argo"</code>)
+without its extra raises a clear <code>ImportError</code> naming the extra to install.</p>
+<p><strong>Heads-up — <code>argo</code> is currently broken even on its own.</strong> Since <code>erddapy 3.3</code>
+(released 2026-06-30) a plain <code>pip install earthlens[argo]</code> pulls <code>erddapy 3.3</code>,
+and <code>import argopy</code> then fails with
+<code>ImportError: cannot import name '_quote_string_constraints'</code>. This is an
+upstream <code>argopy</code> bug (<a href="https://github.com/euroargodev/argopy/issues/657">euroargodev/argopy#657</a>),
+tracked for earthlens in
+<a href="https://github.com/serapeum-org/earthlens/issues/789">serapeum-org/earthlens#789</a>;
+the <code>argo</code> backend will work again once <code>argopy</code> ships a fix.</p>
 </blockquote>
 <h2 id="from-sources"><a class="toclink" href="#from-sources">From Sources</a><a class="headerlink" href="#from-sources" title="Permanent link">#</a></h2>
 <p>The sources for earthlens can be downloaded from the <a href="https://github.com/serapeum-org/earthlens">GitHub repo</a>.</p>
 <p>Clone the public repository:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
 </code></pre></div>
 <p>Or download the tarball:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-OJL<span class="w"> </span>https://github.com/serapeum-org/earthlens/tarball/main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl<span class="w"> </span>-OJL<span class="w"> </span>https://github.com/serapeum-org/earthlens/tarball/main
 </code></pre></div>
 <p>The repository is a workspace of seven distributions, so a source install has
 to install the members too — <code>pip install -e .</code> on its own installs the
 meta-package, which then looks for <code>earthlens-core</code> <strong>on PyPI</strong> at the version
 in the working tree, and an unreleased version is not there:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ERROR: No matching distribution found for earthlens-core==&lt;version&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>ERROR: No matching distribution found for earthlens-core==&lt;version&gt;
 </code></pre></div>
 <p>Install the whole workspace instead, naming every member on one command line so
 pip resolves them locally rather than from the index:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/atmosphere<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/ocean<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/imagery<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/land<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/hazards<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">            </span>-e<span class="w"> </span><span class="s2">&quot;.[ecmwf]&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/atmosphere<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/ocean<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/imagery<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/land<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/hazards<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">            </span>-e<span class="w"> </span><span class="s2">&quot;.[ecmwf]&quot;</span>
 </code></pre></div>
 <p>With <a href="https://docs.astral.sh/uv/">uv</a> this is a single command — the members are
 declared as a workspace in <code>pyproject.toml</code>, so one lock covers them all:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>uv<span class="w"> </span>sync
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>uv<span class="w"> </span>sync
 </code></pre></div>
 <p>If you only want one domain from a clone, its package plus core is enough:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;libs/providers/imagery[gee]&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;libs/providers/imagery[gee]&quot;</span>
 </code></pre></div>
 <p>To install a <strong>published release</strong> directly from GitHub (its members are on PyPI,
 so the meta-package resolves normally):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git@{release}&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;earthlens[ecmwf] @ git+https://github.com/serapeum-org/earthlens.git@{release}&quot;</span>
 </code></pre></div>
 <p>Installing the HEAD of <code>main</code> this way does <strong>not</strong> work: <code>main</code> carries an
 unreleased version whose members are not on PyPI yet, and pip cannot install a
@@ -19574,33 +19635,34 @@ use the editable workspace install above.</p>
 <p>Now you should be able to start Python and try <code>import earthlens</code> to verify the installation.</p>
 <h2 id="install-using-pip"><a class="toclink" href="#install-using-pip">Install using pip</a><a class="headerlink" href="#install-using-pip" title="Permanent link">#</a></h2>
 <p>Besides the recommended conda environment setup, you can also install earthlens with <code>pip</code>. For the more difficult to install Python dependencies, it is best to use conda:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>conda<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>scipy<span class="w"> </span>gdal<span class="w"> </span>pyproj
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>conda<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>scipy<span class="w"> </span>gdal<span class="w"> </span>pyproj
 </code></pre></div>
 <p>Then install earthlens with pip, picking the backend extras you
 need (see "From PyPI" above for the available extras):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>ecmwf<span class="o">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>ecmwf<span class="o">]</span>
 </code></pre></div>
 <h2 id="development-install"><a class="toclink" href="#development-install">Development install</a><a class="headerlink" href="#development-install" title="Permanent link">#</a></h2>
 <p>If you are planning to contribute to earthlens, install the whole workspace
 editable with the <code>[all]</code> extra so the full test suite (which exercises every
 backend) can run. <a href="https://docs.astral.sh/uv/">uv</a> is the supported path — it
 installs every workspace member from one lockfile (<code>uv.lock</code>). <code>--extra all</code>
-pulls every backend SDK except the mutually exclusive <code>argo</code> / <code>osm</code> (which are
-faked in their unit tests):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">cd</span><span class="w"> </span>earthlens
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not e2e&quot;</span>
+pulls every backend SDK except the three extras excluded from <code>all</code>
+(<code>argo</code> / <code>osm</code> / <code>osm-pbf</code> — see <a href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes</a>;
+<code>argo</code> and <code>osm</code> fake their SDK in unit tests):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nb">cd</span><span class="w"> </span>earthlens
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not e2e&quot;</span>
 </code></pre></div>
 <p>The equivalent with pip, which must name every member so they resolve from the
 clone rather than from PyPI:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/atmosphere<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/ocean<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/imagery<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/land<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/hazards<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">            </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/core<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/atmosphere<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/ocean<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/imagery<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/land<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">            </span>-e<span class="w"> </span>libs/providers/hazards<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">            </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
 </code></pre></div>
 <p>The tests import earthlens from the <strong>installed</strong> distributions, not from the
 source tree: <code>earthlens</code> is a PEP 420 namespace shared across all seven
@@ -19611,18 +19673,18 @@ collect.</p>
 <h3 id="running-the-tests"><a class="toclink" href="#running-the-tests">Running the tests</a><a class="headerlink" href="#running-the-tests" title="Permanent link">#</a></h3>
 <p>Tests are co-located with the distribution they cover, under each member's
 <code>tests/</code> directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>libs/core/tests/               # facade, base, CLI, grids, entry-point discovery
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>libs/providers/&lt;theme&gt;/tests/  # each theme&#39;s backend tests
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>                               # (atmosphere, ocean, imagery, land, hazards)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>libs/core/tests/               # facade, base, CLI, grids, entry-point discovery
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>libs/providers/&lt;theme&gt;/tests/  # each theme&#39;s backend tests
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>                               # (atmosphere, ocean, imagery, land, hazards)
 </code></pre></div>
 <p><code>uv run pytest -m "not e2e"</code> from the repo root runs the <strong>whole</strong> suite — the
 root <code>pyproject.toml</code> lists all six member test roots in <code>testpaths</code>. To run (or
 measure coverage for) a <strong>single</strong> distribution, point pytest at that member's
 own config:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># one distribution, standalone</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-c<span class="w"> </span>libs/providers/imagery/pyproject.toml<span class="w"> </span>libs/providers/imagery/tests<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not e2e&quot;</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1"># or, equivalently, from inside the member</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="nb">cd</span><span class="w"> </span>libs/providers/imagery<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not e2e&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># one distribution, standalone</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-c<span class="w"> </span>libs/providers/imagery/pyproject.toml<span class="w"> </span>libs/providers/imagery/tests<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not e2e&quot;</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="c1"># or, equivalently, from inside the member</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="nb">cd</span><span class="w"> </span>libs/providers/imagery<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not e2e&quot;</span>
 </code></pre></div>
 <p>CI mirrors this: <code>tests.yml</code> runs one lane per distribution
 (<code>--cov=libs/&lt;member&gt;/src</code>, uploaded to Codecov under a per-member flag), so a
