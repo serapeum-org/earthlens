@@ -132,7 +132,7 @@ A thematic package depends only on `earthlens-core`, so its SDKs stay extras:
 `pip install earthlens-imagery` gives you the imagery backends' code without
 `earthengine-api`, `openeo`, `eumdac` and the rest.
 
-**Why the split.** A few provider SDKs cannot coexist in one environment.
+**Why the split.** Two provider SDKs cannot coexist in one environment.
 `argopy` (the `argo` extra) requires `xarray>=2025.7`, while `openeo` — which
 *is* part of `earthlens[all]` — caps `xarray<2025.01.2`, and no single `xarray`
 satisfies both. The root `pyproject.toml` declares those two extras conflicting
@@ -150,7 +150,7 @@ one environment** — that is every extra in the table above **except two**:
 
 | Excluded | SDK | Why it can't join `all` |
 |---|---|---|
-| `argo` | `argopy` | **Two** independent clashes, either one disqualifying. **(1) `xarray`:** `argopy >=1.4` needs `xarray>=2025.7`, but `openeo` (in `all`) caps `xarray<2025.01.2` — disjoint ranges. **(2) `erddapy`:** `argopy 1.4.0` breaks against `erddapy 3.x` — it imports `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed — while the `erddap` extra (in `all`) requires `erddapy>=3.0`. |
+| `argo` | `argopy` | **Two** independent problems, either one disqualifying. **(1) `xarray` — a resolution conflict:** `argopy >=1.4` needs `xarray>=2025.7`, but `openeo` (in `all`) caps `xarray<2025.01.2` — disjoint ranges, which is what `[tool.uv] conflicts` declares. **(2) `erddapy` — a runtime break:** `argopy 1.4.0` still *resolves* (it does not cap `erddapy`) but fails at `import` — it imports `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed — while the `erddap` extra (in `all`) requires `erddapy>=3.0`. |
 | `osm-pbf` | `pyrosm` | `pyrosm` ships no prebuilt wheel for current Python and must compile from source (a heavy C/C++ build), so it is kept out of the one-shot union. |
 
 (`osm` itself **is** in `all` — see the resolution note below for why.)
