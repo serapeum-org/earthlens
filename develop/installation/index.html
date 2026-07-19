@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19533,7 +19533,7 @@ directly and skip the others' backends entirely:</p>
 <p>A thematic package depends only on <code>earthlens-core</code>, so its SDKs stay extras:
 <code>pip install earthlens-imagery</code> gives you the imagery backends' code without
 <code>earthengine-api</code>, <code>openeo</code>, <code>eumdac</code> and the rest.</p>
-<p><strong>Why the split.</strong> A few provider SDKs cannot coexist in one environment.
+<p><strong>Why the split.</strong> Two provider SDKs cannot coexist in one environment.
 <code>argopy</code> (the <code>argo</code> extra) requires <code>xarray&gt;=2025.7</code>, while <code>openeo</code> — which
 <em>is</em> part of <code>earthlens[all]</code> — caps <code>xarray&lt;2025.01.2</code>, and no single <code>xarray</code>
 satisfies both. The root <code>pyproject.toml</code> declares those two extras conflicting
@@ -19558,7 +19558,7 @@ one environment</strong> — that is every extra in the table above <strong>exce
 <tr>
 <td><code>argo</code></td>
 <td><code>argopy</code></td>
-<td><strong>Two</strong> independent clashes, either one disqualifying. <strong>(1) <code>xarray</code>:</strong> <code>argopy &gt;=1.4</code> needs <code>xarray&gt;=2025.7</code>, but <code>openeo</code> (in <code>all</code>) caps <code>xarray&lt;2025.01.2</code> — disjoint ranges. <strong>(2) <code>erddapy</code>:</strong> <code>argopy 1.4.0</code> breaks against <code>erddapy 3.x</code> — it imports <code>erddapy.erddapy._quote_string_constraints</code>, which <code>erddapy 3.3</code> removed — while the <code>erddap</code> extra (in <code>all</code>) requires <code>erddapy&gt;=3.0</code>.</td>
+<td><strong>Two</strong> independent problems, either one disqualifying. <strong>(1) <code>xarray</code> — a resolution conflict:</strong> <code>argopy &gt;=1.4</code> needs <code>xarray&gt;=2025.7</code>, but <code>openeo</code> (in <code>all</code>) caps <code>xarray&lt;2025.01.2</code> — disjoint ranges, which is what <code>[tool.uv] conflicts</code> declares. <strong>(2) <code>erddapy</code> — a runtime break:</strong> <code>argopy 1.4.0</code> still <em>resolves</em> (it does not cap <code>erddapy</code>) but fails at <code>import</code> — it imports <code>erddapy.erddapy._quote_string_constraints</code>, which <code>erddapy 3.3</code> removed — while the <code>erddap</code> extra (in <code>all</code>) requires <code>erddapy&gt;=3.0</code>.</td>
 </tr>
 <tr>
 <td><code>osm-pbf</code></td>
