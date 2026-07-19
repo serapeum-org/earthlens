@@ -151,7 +151,7 @@ one environment** — that is every extra in the table above **except two**:
 | Excluded | SDK | Why it can't join `all` |
 |---|---|---|
 | `argo` | `argopy` | **Two** independent problems, either one disqualifying. **(1) `xarray` — a resolution conflict:** `argopy >=1.4` needs `xarray>=2025.7`, but `openeo` (in `all`) caps `xarray<2025.01.2` — disjoint ranges, which is what `[tool.uv] conflicts` declares. **(2) `erddapy` — a runtime break:** `argopy 1.4.0` still *resolves* (it does not cap `erddapy`) but fails at `import` — it imports `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed — while the `erddap` extra (in `all`) requires `erddapy>=3.0`. |
-| `osm-pbf` | `pyrosm` | `pyrosm` ships no prebuilt wheel for current Python and must compile from source (a heavy C/C++ build), so it is kept out of the one-shot union. |
+| `osm-pbf` | `pyrosm` | `pyrosm` (0.11) and `osmium` (4.3.1) both ship wheels, but `pyrosm` pulls the **sdist-only** `cykhash` (no wheels for any Python), so adding `osm-pbf` to `all` would make `pip install earthlens[all]` require a C compiler — it is kept out to keep `all` wheel-only. Reconsidered in #783. |
 
 (`osm` itself **is** in `all` — see the resolution note below for why.)
 
@@ -159,7 +159,7 @@ Each still installs **on its own**, in a separate environment:
 
 ```bash
 pip install earthlens[argo]      # its own env — pulls xarray>=2025.7
-pip install earthlens[osm-pbf]   # compiles pyrosm from source
+pip install earthlens[osm-pbf]   # builds cykhash (a pyrosm dep) from source — needs a C compiler
 ```
 
 > **What an `all` install actually resolves to.** With `argo` out,
