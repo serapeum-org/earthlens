@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19467,7 +19467,7 @@ you install the meta-package or a thematic distribution directly:
 </tr>
 <tr>
 <td><code>all</code></td>
-<td>every backend above except <code>argo</code>, <code>osm</code>, <code>osm-pbf</code> (see <a href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes</a>)</td>
+<td>every backend above except <code>argo</code>, <code>osm-pbf</code> (see <a href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes</a>)</td>
 <td>—</td>
 </tr>
 </tbody>
@@ -19544,8 +19544,8 @@ cleanly on its own. Splitting the backends across packages then lets you install
 one domain's dependencies without inheriting every other domain's constraints.</p>
 <h3 id="what-earthlensall-excludes-and-why"><a class="toclink" href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes, and why</a><a class="headerlink" href="#what-earthlensall-excludes-and-why" title="Permanent link">#</a></h3>
 <p><code>earthlens[all]</code> is the union of <strong>every backend extra that can honestly share
-one environment</strong> — that is every extra in the table above <strong>except three</strong>:
-<code>argo</code>, <code>osm</code>, and <code>osm-pbf</code>. Each is left out for a concrete, upstream reason:</p>
+one environment</strong> — that is every extra in the table above <strong>except two</strong>:
+<code>argo</code> and <code>osm-pbf</code>. Each is left out for a concrete, upstream reason:</p>
 <table>
 <thead>
 <tr>
@@ -19561,29 +19561,26 @@ one environment</strong> — that is every extra in the table above <strong>exce
 <td><strong>Two</strong> independent clashes, either one disqualifying. <strong>(1) <code>xarray</code>:</strong> <code>argopy &gt;=1.4</code> needs <code>xarray&gt;=2025.7</code>, but <code>openeo</code> (in <code>all</code>) caps <code>xarray&lt;2025.01.2</code> — disjoint ranges. <strong>(2) <code>erddapy</code>:</strong> <code>argopy 1.4.0</code> breaks against <code>erddapy 3.x</code> — it imports <code>erddapy.erddapy._quote_string_constraints</code>, which <code>erddapy 3.3</code> removed — while the <code>erddap</code> extra (in <code>all</code>) requires <code>erddapy&gt;=3.0</code>.</td>
 </tr>
 <tr>
-<td><code>osm</code></td>
-<td><code>ohsome</code></td>
-<td><code>ohsome</code> pins <code>pandas&lt;3.0.0</code>, which conflicts with the rest of the resolved dependency graph.</td>
-</tr>
-<tr>
 <td><code>osm-pbf</code></td>
 <td><code>pyrosm</code></td>
 <td><code>pyrosm</code> ships no prebuilt wheel for current Python and must compile from source (a heavy C/C++ build), so it is kept out of the one-shot union.</td>
 </tr>
 </tbody>
 </table>
+<p>(<code>osm</code> itself <strong>is</strong> in <code>all</code> — see the resolution note below for why.)</p>
 <p>Each still installs <strong>on its own</strong>, in a separate environment:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>argo<span class="o">]</span><span class="w">      </span><span class="c1"># its own env — pulls xarray&gt;=2025.7</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">       </span><span class="c1"># its own env — pulls pandas&lt;3</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">   </span><span class="c1"># compiles pyrosm from source</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">   </span><span class="c1"># compiles pyrosm from source</span>
 </code></pre></div>
 <blockquote>
-<p><strong>What an <code>all</code> install actually resolves to.</strong> With <code>argo</code> and <code>osm</code> out,
+<p><strong>What an <code>all</code> install actually resolves to.</strong> With <code>argo</code> out,
 <code>earthlens[all]</code> lands on the <code>openeo</code> side of the fork, and <code>openeo 0.51</code>
 caps <strong>both</strong> <code>xarray&lt;2025.01.2</code> <strong>and</strong> <code>pandas&lt;3.0.0</code> — so an <code>all</code>
-environment runs on <code>xarray 2025.1.1</code> and <code>pandas 2.x</code>. Every other backend
-works; asking the facade for an excluded one (e.g. <code>data_source="argo"</code>)
-without its extra raises a clear <code>ImportError</code> naming the extra to install.</p>
+environment runs on <code>xarray 2025.1.1</code> and <code>pandas 2.x</code>. That pandas-2.x floor
+is exactly what lets <code>osm</code> sit in <code>all</code>: <code>ohsome</code>'s own <code>pandas&lt;3.0.0</code> agrees
+rather than collides. Every other backend works; asking the facade for an
+excluded one (e.g. <code>data_source="argo"</code>) without its extra raises a clear
+<code>ImportError</code> naming the extra to install.</p>
 <p><strong>Heads-up — <code>argo</code> is currently broken even on its own.</strong> Since <code>erddapy 3.3</code>
 (released 2026-06-30) a plain <code>pip install earthlens[argo]</code> pulls <code>erddapy 3.3</code>,
 and <code>import argopy</code> then fails with
@@ -19646,9 +19643,8 @@ need (see "From PyPI" above for the available extras):</p>
 editable with the <code>[all]</code> extra so the full test suite (which exercises every
 backend) can run. <a href="https://docs.astral.sh/uv/">uv</a> is the supported path — it
 installs every workspace member from one lockfile (<code>uv.lock</code>). <code>--extra all</code>
-pulls every backend SDK except the three extras excluded from <code>all</code>
-(<code>argo</code> / <code>osm</code> / <code>osm-pbf</code> — see <a href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes</a>;
-<code>argo</code> and <code>osm</code> fake their SDK in unit tests):</p>
+pulls every backend SDK except the two extras excluded from <code>all</code>
+(<code>argo</code> / <code>osm-pbf</code> — see <a href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes</a>):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/serapeum-org/earthlens.git
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nb">cd</span><span class="w"> </span>earthlens
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev
