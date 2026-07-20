@@ -220,6 +220,10 @@ show_missing = true
 name = "cz_conventional_commits"
 version_provider = "pep621"
 tag_format = "$version"
+# changelog_file is kept above version_files: the release action reads it with a
+# `grep -A 20` window from the [tool.commitizen] header, and the long version_files
+# list would otherwise push it out of that window.
+changelog_file = "docs/change-log.md"
 # The workspace releases in lockstep: one version, one tag, one changelog for
 # all seven distributions. They are split to isolate dependencies, not to
 # release independently -- and since every member pins its siblings with `==`,
@@ -246,7 +250,6 @@ version_files = [
     "libs/providers/land/pyproject.toml:earthlens-core ==",
     "libs/providers/hazards/pyproject.toml:earthlens-core ==",
 ]
-changelog_file = "docs/change-log.md"
 update_changelog_on_bump = true
 major_version_zero = true       # while < 1.0
 style = [
