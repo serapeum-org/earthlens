@@ -35,10 +35,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1
+      - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1.3.0
         with:
           trigger: 'pull_request'
           package-manager: 'uv'
+          package-manager-version: "0.11.29"
           install-groups: "groups: docs"
           deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
 
@@ -49,10 +50,11 @@ jobs:
     - uses: actions/checkout@v5
       with:
         fetch-depth: 0
-    - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1
+    - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1.3.0
       with:
         trigger: 'main'
         package-manager: 'uv'
+        package-manager-version: "0.11.29"
         install-groups: "groups: docs"
         deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
 
@@ -73,10 +75,11 @@ jobs:
         VERSION=$(grep -m1 '^version' pyproject.toml | sed 's/.*"\(.*\)"/\1/')
         echo "tag=$VERSION" >> $GITHUB_OUTPUT
 
-    - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1
+    - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1.3.0
       with:
         trigger: 'release'
         package-manager: 'uv'
+        package-manager-version: "0.11.29"
         install-groups: "groups: docs"
         deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
         release-tag: ${{ github.event.release.tag_name || steps.version.outputs.tag }}

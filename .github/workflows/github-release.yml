@@ -63,11 +63,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release with Commitizen
-        uses: serapeum-org/github-actions/actions/release/github@main
+        uses: serapeum-org/github-actions/actions/release/github@github-release/v1.4.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           increment: ${{ github.event.inputs.increment }}
           prerelease-type: ${{ github.event.inputs.prerelease_type }}
           draft: ${{ github.event.inputs.draft }}
           package-manager: uv
+          package-manager-version: "0.11.29"
           install-groups: "groups: dev"
