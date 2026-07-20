@@ -38,11 +38,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: ${{ matrix.python-version }}
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run ${{ matrix.member.name }} unit + integration suite
         run: >

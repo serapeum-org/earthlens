@@ -33,11 +33,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live CDS e2e tests
         env:
@@ -56,11 +57,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live Google Earth Engine e2e tests
         # The GEE e2e test skips itself when these are unset, so this
@@ -81,13 +83,14 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           # earthaccess >=0.18 requires Python >=3.12, so the Earthdata
           # extra is exercised under the py312 environment.
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live NASA Earthdata e2e tests
         # The Earthdata e2e test skips itself when these are unset, so
@@ -110,11 +113,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live EUMETSAT Data Store e2e tests
         # The EUMETSAT e2e test skips itself when these are unset, so this
@@ -136,11 +140,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live STAC e2e tests
         # Earth Search is anonymous (no creds); MPC runs via planetary-computer
@@ -162,11 +167,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live Sentinel Hub e2e tests
         # The Sentinel Hub e2e tests skip themselves when these are unset, so
@@ -188,11 +194,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live NWP e2e tests
         # This lane installs the `nwp` extra (Herbie / ecmwf-opendata) via the
@@ -214,13 +221,14 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           # asf_search reuses the EDL auth from `earthdata`, which needs
           # Python >=3.12 for earthaccess >=0.18.
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live ASF (InSAR) e2e tests
         # Anonymous search and stack run with no secrets; the authed
@@ -244,11 +252,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live IUCN Red List e2e tests
         # The IUCN e2e test skips itself when IUCN_TOKEN is unset, so this
@@ -269,11 +278,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
           verify-lock: true
+          version: "0.11.29"
 
       - name: Run live Protected Planet (WDPA) e2e tests
         # The WDPA e2e test skips itself when WDPA_TOKEN is unset, so this

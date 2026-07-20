@@ -63,23 +63,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release with Commitizen
-        uses: serapeum-org/github-actions/actions/release/github@github-release/v1
+        uses: serapeum-org/github-actions/actions/release/github@github-release/v1.4.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           increment: ${{ github.event.inputs.increment }}
           prerelease-type: ${{ github.event.inputs.prerelease_type }}
           draft: ${{ github.event.inputs.draft }}
           package-manager: uv
+          package-manager-version: "0.11.29"
           install-groups: "groups: dev"
-
-      - name: Update lockfile after version bump
-        run: uv lock
-
-      - name: Commit and push updated lockfile
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add uv.lock
-          git diff --cached --quiet && echo "No lockfile changes" && exit 0
-          git commit -m "build: sync uv.lock after version bump"
-          git push origin ${{ inputs.release-branch }}
