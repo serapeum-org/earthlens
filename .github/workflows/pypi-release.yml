@@ -44,7 +44,8 @@ jobs:
           ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
       # release/pypi forwards no uv version input, so uv resolves to latest here
-      # (the other lanes pin 0.11.29); the build/test path is pinned via wheel-test.yml.
+      # (the other lanes pin 0.11.29); wheel-test.yml separately validates the
+      # wheels under the pinned uv. uv build output is insensitive to the patch.
       - name: Build and publish to PyPI
         uses: serapeum-org/github-actions/actions/release/pypi@pypi-release/v1.0.2
         with:
