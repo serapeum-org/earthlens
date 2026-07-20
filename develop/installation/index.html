@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19563,7 +19563,7 @@ one environment</strong> — that is every extra in the table above <strong>exce
 <tr>
 <td><code>osm-pbf</code></td>
 <td><code>pyrosm</code></td>
-<td><code>pyrosm</code> (0.11) and <code>osmium</code> (4.3.1) both ship wheels, but <code>pyrosm</code> pulls the <strong>sdist-only</strong> <code>cykhash</code> (no wheels for any Python), so adding <code>osm-pbf</code> to <code>all</code> would make <code>pip install earthlens[all]</code> require a C compiler — it is kept out to keep <code>all</code> wheel-only. Reconsidered in #783.</td>
+<td><code>pyrosm</code> (0.11) and <code>osmium</code> (4.3.1) both ship wheels, but <code>pyrosm</code> pulls the <strong>sdist-only</strong> <code>cykhash</code> (no wheels for any Python), so adding <code>osm-pbf</code> to <code>all</code> would make <code>pip install earthlens[all]</code> require a C compiler — it is kept out to keep <code>all</code> wheel-only. Tracked in #783.</td>
 </tr>
 </tbody>
 </table>
