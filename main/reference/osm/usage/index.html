@@ -19285,8 +19285,8 @@ imports without them):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># overpy + ohsome  (Overpass + ohsome protocols)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">  </span><span class="c1"># pyrosm + osmium  (the pbf protocol)</span>
 </code></pre></div>
-<p><code>[osm-pbf]</code> is <strong>not</strong> in <code>[all]</code> (it is heavy, and <code>pyrosm</code> builds a compiled
-dependency from source), so install it explicitly for bulk PBF work. Note
+<p><code>[osm-pbf]</code> is <strong>not</strong> in <code>[all]</code> because <code>pyrosm</code> pulls the sdist-only <code>cykhash</code>
+(it would need a C compiler), so install it explicitly for bulk PBF work. Note
 <code>pyosmium</code> is published on PyPI as <code>osmium</code>. There are no credentials to
 configure — Overpass, ohsome, and Geofabrik are all public.</p>
 <h2 id="quickstart-current-state-hospitals-overpass"><a class="toclink" href="#quickstart-current-state-hospitals-overpass">Quickstart — current-state hospitals (Overpass)</a><a class="headerlink" href="#quickstart-current-state-hospitals-overpass" title="Permanent link">#</a></h2>

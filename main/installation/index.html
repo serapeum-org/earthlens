@@ -19563,14 +19563,14 @@ one environment</strong> — that is every extra in the table above <strong>exce
 <tr>
 <td><code>osm-pbf</code></td>
 <td><code>pyrosm</code></td>
-<td><code>pyrosm</code> ships no prebuilt wheel for current Python and must compile from source (a heavy C/C++ build), so it is kept out of the one-shot union.</td>
+<td><code>pyrosm</code> (0.11) and <code>osmium</code> (4.3.1) both ship wheels, but <code>pyrosm</code> pulls the <strong>sdist-only</strong> <code>cykhash</code> (no wheels for any Python), so adding <code>osm-pbf</code> to <code>all</code> would make <code>pip install earthlens[all]</code> require a C compiler — it is kept out to keep <code>all</code> wheel-only. Tracked in <a href="https://github.com/serapeum-org/earthlens/issues/783">#783</a>.</td>
 </tr>
 </tbody>
 </table>
 <p>(<code>osm</code> itself <strong>is</strong> in <code>all</code> — see the resolution note below for why.)</p>
 <p>Each still installs <strong>on its own</strong>, in a separate environment:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>argo<span class="o">]</span><span class="w">      </span><span class="c1"># its own env — pulls xarray&gt;=2025.7</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">   </span><span class="c1"># compiles pyrosm from source</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">   </span><span class="c1"># builds cykhash (a pyrosm dep) from source — needs a C compiler</span>
 </code></pre></div>
 <blockquote>
 <p><strong>What an <code>all</code> install actually resolves to.</strong> With <code>argo</code> out,
