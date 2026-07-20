@@ -84,8 +84,8 @@ two extras and are imported lazily, so the package imports fine without them:
 - `pip install earthlens[osm]` → `overpy` + `ohsome` (the live protocols).
 - `pip install earthlens[osm-pbf]` → `pyrosm` + `osmium` (the `pbf` protocol).
   Note `pyosmium` is published on PyPI as `osmium`. This extra is **not** part
-  of `[all]` (it is heavy, and `pyrosm` builds a compiled dependency from
-  source), so install it explicitly for bulk PBF work.
+  of `[all]` because `pyrosm` pulls the sdist-only `cykhash` (it would need a C
+  compiler), so install it explicitly for bulk PBF work.
 
 !!! note "Overpass needs a real User-Agent"
     The canonical `overpass-api.de` endpoint returns HTTP 406 to requests with

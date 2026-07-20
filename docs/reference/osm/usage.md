@@ -14,8 +14,8 @@ pip install earthlens[osm]      # overpy + ohsome  (Overpass + ohsome protocols)
 pip install earthlens[osm-pbf]  # pyrosm + osmium  (the pbf protocol)
 ```
 
-`[osm-pbf]` is **not** in `[all]` (it is heavy, and `pyrosm` builds a compiled
-dependency from source), so install it explicitly for bulk PBF work. Note
+`[osm-pbf]` is **not** in `[all]` because `pyrosm` pulls the sdist-only `cykhash`
+(it would need a C compiler), so install it explicitly for bulk PBF work. Note
 `pyosmium` is published on PyPI as `osmium`. There are no credentials to
 configure — Overpass, ohsome, and Geofabrik are all public.
 
