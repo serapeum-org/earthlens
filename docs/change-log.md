@@ -1,5 +1,26 @@
 # Change Log
 
+## 0.11.0 (2026-07-20)
+
+### BREAKING CHANGE
+
+- `from earthlens import EarthLens` no longer works;
+import from earthlens.core instead (also download, find, search,
+sources, AggregationConfig, aggregate_netcdf, __version__).
+
+### Feat
+
+- **packaging**: split providers into a uv workspace of 7 distributions (earthlens.core namespace) (#784)
+- **osm**: add a third pbf protocol for bulk Geofabrik extracts (#727)
+
+### Fix
+
+- **release**: keep changelog_file within the release action's grep window
+
+### Refactor
+
+- **base**: consolidate duplicated GIS logic and adopt pyramids 0.46.0 (#728)
+
 ## 0.10.0 (2026-07-07)
 
 ### Feat
