@@ -43,6 +43,8 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
+      # release/pypi forwards no uv version input, so uv resolves to latest here
+      # (the other lanes pin 0.11.29); the build/test path is pinned via wheel-test.yml.
       - name: Build and publish to PyPI
         uses: serapeum-org/github-actions/actions/release/pypi@pypi-release/v1.0.2
         with:
