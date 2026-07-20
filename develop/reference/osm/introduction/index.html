@@ -19341,8 +19341,8 @@ two extras and are imported lazily, so the package imports fine without them:</p
 <li><code>pip install earthlens[osm]</code> → <code>overpy</code> + <code>ohsome</code> (the live protocols).</li>
 <li><code>pip install earthlens[osm-pbf]</code> → <code>pyrosm</code> + <code>osmium</code> (the <code>pbf</code> protocol).
   Note <code>pyosmium</code> is published on PyPI as <code>osmium</code>. This extra is <strong>not</strong> part
-  of <code>[all]</code> (it is heavy, and <code>pyrosm</code> builds a compiled dependency from
-  source), so install it explicitly for bulk PBF work.</li>
+  of <code>[all]</code> because <code>pyrosm</code> pulls the sdist-only <code>cykhash</code> (it would need a C
+  compiler), so install it explicitly for bulk PBF work.</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Overpass needs a real User-Agent</p>
