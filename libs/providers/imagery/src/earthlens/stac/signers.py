@@ -273,7 +273,7 @@ class PlanetaryComputerSigner(_BaseSigner):
         request = urllib.request.Request(url)
         if self._subscription_key:
             request.add_header("Ocp-Apim-Subscription-Key", self._subscription_key)
-        with urllib.request.urlopen(request, timeout=self._timeout) as response:
+        with urllib.request.urlopen(request, timeout=self._timeout) as response:  # nosec B310 - fixed http(s) endpoint, not attacker-controlled
             payload = json.loads(response.read().decode("utf-8"))
         token = payload["token"]
         expiry = self._parse_expiry(payload.get("msft:expiry"))
@@ -386,7 +386,7 @@ class EarthdataSigner(_BearerProviderSigner):
     """
 
     name = "earthdata"
-    _TOKEN_URL = "https://urs.earthdata.nasa.gov/api/users/find_or_create_token"
+    _TOKEN_URL = "https://urs.earthdata.nasa.gov/api/users/find_or_create_token"  # nosec B105 - not a secret (public URL / identifier)
 
     def __init__(
         self,
@@ -424,7 +424,7 @@ class EarthdataSigner(_BearerProviderSigner):
         request = urllib.request.Request(self._TOKEN_URL, method="POST")
         request.add_header("Authorization", f"Basic {creds}")
         request.add_header("Accept", "application/json")
-        with urllib.request.urlopen(request, timeout=self._timeout) as response:
+        with urllib.request.urlopen(request, timeout=self._timeout) as response:  # nosec B310 - fixed http(s) endpoint, not attacker-controlled
             payload = json.loads(response.read().decode("utf-8"))
         token = payload["access_token"]
         expiry = self._parse_expiry(payload.get("expiration_date"))
@@ -467,7 +467,7 @@ class CDSESigner(_BearerProviderSigner):
 
     name = "cdse"
     _TOKEN_URL = (
-        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/"
+        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/"  # nosec B105 - not a secret (public URL / identifier)
         "openid-connect/token"
     )
 
@@ -528,7 +528,7 @@ class CDSESigner(_BearerProviderSigner):
         body = urlencode(form).encode("utf-8")
         request = urllib.request.Request(self._TOKEN_URL, data=body, method="POST")
         request.add_header("Content-Type", "application/x-www-form-urlencoded")
-        with urllib.request.urlopen(request, timeout=self._timeout) as response:
+        with urllib.request.urlopen(request, timeout=self._timeout) as response:  # nosec B310 - fixed http(s) endpoint, not attacker-controlled
             payload = json.loads(response.read().decode("utf-8"))
         self._refresh_token = payload.get("refresh_token", self._refresh_token)
         expiry = time.time() + float(payload.get("expires_in", 600))

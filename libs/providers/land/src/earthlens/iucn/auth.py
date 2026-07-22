@@ -25,7 +25,7 @@ from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 #: Where a user signs up for a free IUCN Red List v4 API token.
-_TOKEN_URL = "https://api.iucnredlist.org/users/sign_up"
+_TOKEN_URL = "https://api.iucnredlist.org/users/sign_up"  # nosec B105 - not a secret (public URL / identifier)
 
 
 class AuthenticationError(_BaseAuthenticationError):

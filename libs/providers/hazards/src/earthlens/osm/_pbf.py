@@ -148,7 +148,8 @@ def _md5_of(path: Path) -> str:
     Returns:
         str: The lower-case hex MD5 digest.
     """
-    digest = hashlib.md5()  # noqa: S324 - integrity check vs Geofabrik sidecar, not security
+    # integrity check vs Geofabrik sidecar, not security
+    digest = hashlib.md5(usedforsecurity=False)
     with open(path, "rb") as handle:
         for block in iter(lambda: handle.read(1 << 20), b""):
             digest.update(block)

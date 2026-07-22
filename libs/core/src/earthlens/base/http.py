@@ -207,13 +207,13 @@ class RequestsGet:
         """Issue a `GET` via the current `requests.get`."""
         import requests
 
-        return requests.get(url, **kwargs)
+        return requests.get(url, **kwargs)  # nosec B113 - timeout supplied by callers via kwargs
 
     def post(self, url: str, **kwargs: Any) -> Any:
         """Issue a `POST` via the current `requests.post`."""
         import requests
 
-        return requests.post(url, **kwargs)
+        return requests.post(url, **kwargs)  # nosec B113 - timeout supplied by callers via kwargs
 
 
 class HttpClient:

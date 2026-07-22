@@ -904,7 +904,7 @@ def _close_quietly(cube: Any) -> None:
     """
     try:
         cube.close()
-    except Exception:  # noqa: BLE001 - best-effort handle release
+    except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
         pass
 
 

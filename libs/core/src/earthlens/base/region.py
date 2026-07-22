@@ -46,7 +46,7 @@ DEFAULT_EGRESS_THRESHOLD_BYTES = 1 << 30
 PROBE_TIMEOUT = 1.0
 
 #: AWS IMDSv2 base — a token PUT then a region GET.
-_AWS_TOKEN_URL = "http://169.254.169.254/latest/api/token"
+_AWS_TOKEN_URL = "http://169.254.169.254/latest/api/token"  # nosec B105 - not a secret (public URL / identifier)
 _AWS_REGION_URL = "http://169.254.169.254/latest/meta-data/placement/region"
 
 #: GCP metadata zone endpoint (needs the `Metadata-Flavor: Google` header).
@@ -115,7 +115,7 @@ def _metadata_request(
     """
     request = urllib.request.Request(url, headers=headers, method=method)
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
+        with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
             status = getattr(response, "status", 200) or 200
             if status != 200:
                 return None

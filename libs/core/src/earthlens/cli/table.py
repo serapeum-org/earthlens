@@ -88,7 +88,7 @@ def _facet_token(value: Any) -> str:
             ```
     """
     if value is None or isinstance(value, bool):
-        token = ""
+        token = ""  # nosec B105 - not a secret (public URL / identifier)
     elif isinstance(value, str):
         token = value.strip()
     elif isinstance(value, (int, float)):

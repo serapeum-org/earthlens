@@ -266,7 +266,7 @@ def _close_quietly(handle: Any) -> None:
     """
     try:
         handle.close()
-    except Exception:  # noqa: BLE001 - best-effort handle release
+    except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
         pass
 
 

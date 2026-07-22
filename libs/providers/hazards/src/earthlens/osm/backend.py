@@ -132,11 +132,11 @@ class _RequestsHttp:
 
     def get(self, url: str, **kwargs: Any) -> requests.Response:
         """Issue a GET via the module-level `requests.get`."""
-        return requests.get(url, **kwargs)
+        return requests.get(url, **kwargs)  # nosec B113 - timeout supplied by callers via kwargs
 
     def post(self, url: str, **kwargs: Any) -> requests.Response:
         """Issue a POST via the module-level `requests.post`."""
-        return requests.post(url, **kwargs)
+        return requests.post(url, **kwargs)  # nosec B113 - timeout supplied by callers via kwargs
 
 
 class OSM(AbstractDataSource):

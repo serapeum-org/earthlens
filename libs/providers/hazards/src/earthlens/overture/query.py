@@ -110,7 +110,7 @@ def build_query(
     if where:
         predicate = f"({predicate}) AND ({where})"
     sql = (
-        f"SELECT {_projection(columns)} "
+        f"SELECT {_projection(columns)} "  # nosec B608 - query built from internal identifiers, not user input
         f"FROM read_parquet('{path}', hive_partitioning=1) "
         f"WHERE {predicate}"
     )

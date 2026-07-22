@@ -654,7 +654,7 @@ def _gee_dataset_hrefs() -> list[str]:
         seen.add(url)
         try:
             node = _get_json(url)
-        except Exception:  # noqa: BLE001 — skip an unreachable sub-catalog
+        except Exception:  # noqa: BLE001 — skip an unreachable sub-catalog  # nosec B112
             continue
         for link in node.get("links", []):
             if link.get("rel") != "child":

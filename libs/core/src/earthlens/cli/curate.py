@@ -943,7 +943,7 @@ def _nwp_idx_body(model: Any) -> str:
         url = _nwp_idx_url(models_dir, model, cycle, step)
         try:
             response = requests.get(url, timeout=_TIMEOUT)
-        except Exception:  # noqa: BLE001 — try the previous day
+        except Exception:  # noqa: BLE001 — try the previous day  # nosec B112
             continue
         if response.status_code == 200:
             return response.text

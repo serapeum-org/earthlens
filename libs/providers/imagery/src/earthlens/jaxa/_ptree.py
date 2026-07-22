@@ -25,7 +25,7 @@ letting a bare `450`/`550` FTP error surface to callers.
 from __future__ import annotations
 
 import datetime as dt
-import ftplib
+import ftplib  # nosec B402 - provider serves data over anonymous FTP
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
@@ -176,7 +176,7 @@ class FtplibTransport:
                 traceback at the application boundary if that matters.
         """
         try:
-            self._ftp = ftplib.FTP(self.host, timeout=self.timeout)
+            self._ftp = ftplib.FTP(self.host, timeout=self.timeout)  # nosec B321 - provider serves data over anonymous FTP
         except ftplib.all_errors as exc:
             # `ftplib.FTP.__init__` reaches `getresp()` for the server
             # greeting; a `4xx`/`5xx` greeting raises `ftplib.error_temp`

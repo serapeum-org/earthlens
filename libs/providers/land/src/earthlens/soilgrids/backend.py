@@ -462,5 +462,5 @@ def _close_dataset(dataset: object) -> None:
     if callable(closer):
         try:
             closer()
-        except Exception:  # noqa: BLE001 - best-effort handle release
+        except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
             pass

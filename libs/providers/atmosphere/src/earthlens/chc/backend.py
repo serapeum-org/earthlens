@@ -99,7 +99,7 @@ def _close_ftp_quietly(ftp: FTP) -> None:
     except Exception:  # noqa: BLE001 - best-effort cleanup, never raises
         try:
             ftp.close()
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001  # nosec B110
             pass
 
 
