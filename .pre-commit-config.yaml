@@ -102,10 +102,9 @@ repos:
     hooks:
       # The repo's single secret scanner (replaced detect-secrets). This hook scans
       # staged changes at commit time; CI runs a full-tree `gitleaks dir` in lint.yml.
-      # Both share the ci/gitleaks.toml allowlist.
+      # Both use gitleaks' default ruleset (no custom config).
       - id: gitleaks
         name: "[cred -  check] gitleaks"
-        args: ["--config", "ci/gitleaks.toml"]
 
   - repo: https://github.com/bridgecrewio/checkov
     rev: 3.3.8
