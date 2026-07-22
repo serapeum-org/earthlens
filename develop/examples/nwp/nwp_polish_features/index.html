@@ -19860,17 +19860,15 @@ fastest way to inspect what the polish work added.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span><span class="p">,</span> <span class="n">NWP</span><span class="p">,</span> <span class="n">NWPModel</span><span class="p">,</span> <span class="n">RetentionWarning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">NWP</span><span class="p">,</span> <span class="n">Catalog</span><span class="p">,</span> <span class="n">NWPModel</span><span class="p">,</span> <span class="n">RetentionWarning</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from collections import Counter
+<div class="clipboard-copy-txt" id="cell-1">import warnings
+from collections import Counter
 
-import warnings
-
-from earthlens.nwp import Catalog, NWP, NWPModel, RetentionWarning</div>
+from earthlens.nwp import NWP, Catalog, NWPModel, RetentionWarning</div>
 </div>
 </div>
 </div>
@@ -20115,22 +20113,31 @@ notebook record stays clean.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp.catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">NWPModel</span>
 
-<span class="n">demo_catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="p">{</span>
-    <span class="s1">'icon-demo'</span><span class="p">:</span> <span class="n">NWPModel</span><span class="p">(</span>
-        <span class="n">provider</span><span class="o">=</span><span class="s1">'dwd-opendata'</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'direct-https'</span><span class="p">,</span> <span class="n">cycles_utc</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
-        <span class="n">horizon_h</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mirrors</span><span class="o">=</span><span class="p">[</span><span class="s1">'origin'</span><span class="p">],</span>
-        <span class="n">url_template</span><span class="o">=</span><span class="s1">'https://example.test/</span><span class="si">{var}</span><span class="s1">.bz2'</span><span class="p">,</span>
-        <span class="n">bands</span><span class="o">=</span><span class="p">{</span><span class="s1">'t2m'</span><span class="p">:</span> <span class="s1">'T_2M'</span><span class="p">},</span> <span class="n">retention_days</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="p">),</span>
-<span class="p">})</span>
+<span class="n">demo_catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">(</span>
+    <span class="n">datasets</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">'icon-demo'</span><span class="p">:</span> <span class="n">NWPModel</span><span class="p">(</span>
+            <span class="n">provider</span><span class="o">=</span><span class="s1">'dwd-opendata'</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">=</span><span class="s1">'direct-https'</span><span class="p">,</span>
+            <span class="n">cycles_utc</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+            <span class="n">horizon_h</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+            <span class="n">idx</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">mirrors</span><span class="o">=</span><span class="p">[</span><span class="s1">'origin'</span><span class="p">],</span>
+            <span class="n">url_template</span><span class="o">=</span><span class="s1">'https://example.test/</span><span class="si">{var}</span><span class="s1">.bz2'</span><span class="p">,</span>
+            <span class="n">bands</span><span class="o">=</span><span class="p">{</span><span class="s1">'t2m'</span><span class="p">:</span> <span class="s1">'T_2M'</span><span class="p">},</span>
+            <span class="n">retention_days</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+<span class="p">)</span>
 <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">captured</span><span class="p">:</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">'always'</span><span class="p">)</span>
     <span class="n">NWP</span><span class="p">(</span>
-        <span class="n">start</span><span class="o">=</span><span class="s1">'2020-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2020-01-01'</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="s1">'2020-01-01'</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="s1">'2020-01-01'</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'icon-demo'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'t2m'</span><span class="p">]},</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">48</span><span class="p">,</span> <span class="mi">52</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s1">'out'</span><span class="p">,</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">48</span><span class="p">,</span> <span class="mi">52</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+        <span class="n">path</span><span class="o">=</span><span class="s1">'out'</span><span class="p">,</span>
         <span class="n">catalog</span><span class="o">=</span><span class="n">demo_catalog</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">captured</span><span class="p">:</span>
@@ -20138,22 +20145,31 @@ notebook record stays clean.</p>
         <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">from earthlens.nwp import Catalog
-from earthlens.nwp.catalog import NWPModel
 
-demo_catalog = Catalog(datasets={
-    'icon-demo': NWPModel(
-        provider='dwd-opendata', backend='direct-https', cycles_utc=[0, 12],
-        horizon_h=48, idx=False, mirrors=['origin'],
-        url_template='https://example.test/{var}.bz2',
-        bands={'t2m': 'T_2M'}, retention_days=1,
-    ),
-})
+demo_catalog = Catalog(
+    datasets={
+        'icon-demo': NWPModel(
+            provider='dwd-opendata',
+            backend='direct-https',
+            cycles_utc=[0, 12],
+            horizon_h=48,
+            idx=False,
+            mirrors=['origin'],
+            url_template='https://example.test/{var}.bz2',
+            bands={'t2m': 'T_2M'},
+            retention_days=1,
+        ),
+    }
+)
 with warnings.catch_warnings(record=True) as captured:
     warnings.simplefilter('always')
     NWP(
-        start='2020-01-01', end='2020-01-01',
+        start='2020-01-01',
+        end='2020-01-01',
         variables={'icon-demo': ['t2m']},
-        lat_lim=[48, 52], lon_lim=[6, 12], path='out',
+        lat_lim=[48, 52],
+        lon_lim=[6, 12],
+        path='out',
         catalog=demo_catalog,
     )
 for w in captured:
@@ -20286,26 +20302,34 @@ icosahedral rows: ['icon-d2', 'icon-d2-eps', 'icon-eps', 'icon-eu-eps', 'icon-gl
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
 
 <span class="n">b</span> <span class="o">=</span> <span class="n">NWP</span><span class="p">(</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'icon-global'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'temperature_2m'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s1">'out'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="s1">'out'</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">b</span><span class="o">.</span><span class="n">_aggregate</span><span class="p">([</span><span class="n">Path</span><span class="p">(</span><span class="s1">'placeholder.tif'</span><span class="p">)],</span> <span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">'1D'</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">))</span>
 <span class="k">except</span> <span class="ne">NotImplementedError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">from earthlens.aggregate import AggregationConfig
-from pathlib import Path
+<div class="clipboard-copy-txt" id="cell-7">from pathlib import Path
+
+from earthlens.aggregate import AggregationConfig
 
 b = NWP(
-    start='2024-06-01', end='2024-06-01',
+    start='2024-06-01',
+    end='2024-06-01',
     variables={'icon-global': ['temperature_2m']},
-    lat_lim=[40, 50], lon_lim=[0, 10], path='out',
+    lat_lim=[40, 50],
+    lon_lim=[0, 10],
+    path='out',
 )
 try:
     b._aggregate([Path('placeholder.tif')], AggregationConfig(freq='1D', op='mean'))

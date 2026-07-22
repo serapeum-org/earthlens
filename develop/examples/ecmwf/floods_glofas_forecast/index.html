@@ -20005,21 +20005,21 @@ for reading the file that lands on disk; <code>matplotlib</code> draws the map.<
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf.endpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENDPOINTS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf.endpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENDPOINTS</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from earthlens.core import EarthLens
+from earthlens.ecmwf.endpoints import ENDPOINTS
 from pyramids.netcdf import NetCDF
 
-from earthlens.core import EarthLens
-from earthlens.ecmwf import Catalog
-from earthlens.ecmwf.endpoints import ENDPOINTS</div>
+from earthlens.ecmwf import Catalog</div>
 </div>
 </div>
 </div>
@@ -20332,16 +20332,20 @@ rather than to ERA5's 0.125°.</p>
 <span class="n">discharge_var</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"dis24"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"file:       </span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">nc_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"variables:  </span><span class="si">{</span><span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"grid:       </span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2"> cells, "</span>
-      <span class="sa">f</span><span class="s2">"EPSG:</span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"grid:       </span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2"> cells, "</span>
+    <span class="sa">f</span><span class="s2">"EPSG:</span><span class="si">{</span><span class="n">discharge_var</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">nc_path = out_paths[0]
 nc = NetCDF.read_file(str(nc_path))
 discharge_var = nc.get_variable("dis24")
 print(f"file:       {Path(nc_path).name}")
 print(f"variables:  {nc.variable_names}")
-print(f"grid:       {discharge_var.rows} x {discharge_var.columns} cells, "
-      f"EPSG:{discharge_var.epsg}")</div>
+print(
+    f"grid:       {discharge_var.rows} x {discharge_var.columns} cells, "
+    f"EPSG:{discharge_var.epsg}"
+)</div>
 </div>
 </div>
 </div>
@@ -20422,8 +20426,13 @@ A log-scaled colour ramp keeps the big rivers from washing out the tributaries.<
 <span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_less_equal</span><span class="p">(</span><span class="n">discharge</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span>
-               <span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">max</span><span class="p">())))</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+    <span class="n">field</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">,</span>
+    <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span>
+    <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">max</span><span class="p">())),</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"GloFAS river discharge (dis24) — Ganges-Brahmaputra delta"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"longitude (deg E)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"latitude (deg N)"</span><span class="p">)</span>
@@ -20438,8 +20447,13 @@ extent = [x_min, x_min + cols * cell_size, y_max - rows * cell_size, y_max]
 field = np.ma.masked_less_equal(discharge, 0)
 
 fig, ax = plt.subplots(figsize=(7, 6))
-im = ax.imshow(field, cmap="Blues", origin="upper", extent=extent,
-               norm=LogNorm(vmin=1, vmax=float(field.max())))
+im = ax.imshow(
+    field,
+    cmap="Blues",
+    origin="upper",
+    extent=extent,
+    norm=LogNorm(vmin=1, vmax=float(field.max())),
+)
 ax.set_title("GloFAS river discharge (dis24) — Ganges-Brahmaputra delta")
 ax.set_xlabel("longitude (deg E)")
 ax.set_ylabel("latitude (deg N)")

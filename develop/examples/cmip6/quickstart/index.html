@@ -19883,12 +19883,14 @@ directory for the written NetCDF.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmip6</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 from pathlib import Path
 
 from earthlens.core import EarthLens
+
 from earthlens.cmip6 import Catalog</div>
 </div>
 </div>
@@ -19929,13 +19931,25 @@ just enrich metadata and error messages.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'variable :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'tas'</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span> <span class="s1">'('</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'tas'</span><span class="p">)</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="s1">')'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s1">'variable :'</span><span class="p">,</span>
+    <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'tas'</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span>
+    <span class="s1">'('</span><span class="p">,</span>
+    <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'tas'</span><span class="p">)</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
+    <span class="s1">')'</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'scenario :'</span><span class="p">,</span> <span class="s1">'ssp585 -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_experiment</span><span class="p">(</span><span class="s1">'ssp585'</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'table    :'</span><span class="p">,</span> <span class="s1">'Amon -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s1">'Amon'</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'CSV index:'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">csv_url</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">cat = Catalog()
-print('variable :', cat.get_dataset('tas').long_name, '(', cat.get_dataset('tas').units, ')')
+print(
+    'variable :',
+    cat.get_dataset('tas').long_name,
+    '(',
+    cat.get_dataset('tas').units,
+    ')',
+)
 print('scenario :', 'ssp585 -&gt;', cat.get_experiment('ssp585').description)
 print('table    :', 'Amon -&gt;', cat.get_table('Amon').description)
 print('CSV index:', cat.csv_url)</div>
@@ -20202,16 +20216,30 @@ note.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="s1">'cmip6'</span><span class="p">,</span> <span class="n">source_id</span><span class="o">=</span><span class="s1">'CanESM5'</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="s1">'ssp585'</span><span class="p">,</span> <span class="n">variable_id</span><span class="o">=</span><span class="s1">'tas'</span><span class="p">,</span>
-    <span class="n">table_id</span><span class="o">=</span><span class="s1">'Amon'</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'2050-01-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2050-06-30'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
+    <span class="s1">'cmip6'</span><span class="p">,</span>
+    <span class="n">source_id</span><span class="o">=</span><span class="s1">'CanESM5'</span><span class="p">,</span>
+    <span class="n">experiment_id</span><span class="o">=</span><span class="s1">'ssp585'</span><span class="p">,</span>
+    <span class="n">variable_id</span><span class="o">=</span><span class="s1">'tas'</span><span class="p">,</span>
+    <span class="n">table_id</span><span class="o">=</span><span class="s1">'Amon'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2050-01-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2050-06-30'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
 <span class="p">)</span><span class="o">.</span><span class="n">datasource</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">terms_note</span><span class="p">())</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">backend = EarthLens(
-    'cmip6', source_id='CanESM5', experiment_id='ssp585', variable_id='tas',
-    table_id='Amon', start='2050-01-01', end='2050-06-30',
-    lat_lim=[35.0, 60.0], lon_lim=[-10.0, 30.0], path=str(out_dir),
+    'cmip6',
+    source_id='CanESM5',
+    experiment_id='ssp585',
+    variable_id='tas',
+    table_id='Amon',
+    start='2050-01-01',
+    end='2050-06-30',
+    lat_lim=[35.0, 60.0],
+    lon_lim=[-10.0, 30.0],
+    path=str(out_dir),
 ).datasource
 print(backend.terms_note())</div>
 </div>

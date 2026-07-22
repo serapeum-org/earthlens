@@ -19880,17 +19880,17 @@ if the cycle's not yet published.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp.centres.eccc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECCCCentre</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.nwp.centres.eccc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECCCCentre</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import datetime as dt
 from pathlib import Path
 
 import requests
+from earthlens.nwp.centres.eccc import ECCCCentre
 
-from earthlens.nwp import Catalog
-from earthlens.nwp.centres.eccc import ECCCCentre</div>
+from earthlens.nwp import Catalog</div>
 </div>
 </div>
 </div>
@@ -20034,7 +20034,7 @@ Datamart layout has drifted), the rest of the notebook is skipped cleanly.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">now</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">UTC</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 <span class="n">cycle</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">step</span> <span class="o">=</span> <span class="mi">3</span>   <span class="c1"># 3-hour lead time</span>
+<span class="n">step</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># 3-hour lead time</span>
 <span class="n">url_template</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">url_template</span>
 <span class="n">probe_url</span> <span class="o">=</span> <span class="n">url_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
     <span class="n">cycle</span><span class="o">=</span><span class="n">cycle</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">cycle</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">bands</span><span class="p">[</span><span class="s1">'temperature_2m'</span><span class="p">]</span>
@@ -20047,7 +20047,7 @@ Datamart layout has drifted), the rest of the notebook is skipped cleanly.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">now = dt.datetime.now(dt.UTC).replace(tzinfo=None)
 cycle = now.replace(hour=0, minute=0, second=0, microsecond=0) - dt.timedelta(days=1)
-step = 3   # 3-hour lead time
+step = 3  # 3-hour lead time
 url_template = model.url_template
 probe_url = url_template.format(
     cycle=cycle, date=cycle, step=step, var=model.bands['temperature_2m']
@@ -20131,8 +20131,11 @@ centre downloads the GRIB2 to a temporary directory and returns its path.</p>
 <span class="k">if</span> <span class="n">available</span><span class="p">:</span>
     <span class="n">centre</span> <span class="o">=</span> <span class="n">ECCCCentre</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
     <span class="n">grib_path</span> <span class="o">=</span> <span class="n">centre</span><span class="o">.</span><span class="n">fetch_one</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">cycle</span><span class="o">=</span><span class="n">cycle</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span>
-        <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s1">'temperature_2m'</span><span class="p">],</span> <span class="n">mirror</span><span class="o">=</span><span class="s1">'origin'</span><span class="p">,</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">cycle</span><span class="o">=</span><span class="n">cycle</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s1">'temperature_2m'</span><span class="p">],</span>
+        <span class="n">mirror</span><span class="o">=</span><span class="s1">'origin'</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'wrote </span><span class="si">{</span><span class="n">grib_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">grib_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> KiB)'</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
@@ -20144,8 +20147,11 @@ out_dir.mkdir(parents=True, exist_ok=True)
 if available:
     centre = ECCCCentre(out_dir)
     grib_path = centre.fetch_one(
-        model=model, cycle=cycle, step=step,
-        params=['temperature_2m'], mirror='origin',
+        model=model,
+        cycle=cycle,
+        step=step,
+        params=['temperature_2m'],
+        mirror='origin',
     )
     print(f'wrote {grib_path.name} ({grib_path.stat().st_size / 1024:.1f} KiB)')
 else:
@@ -20234,9 +20240,11 @@ summary statistics in Kelvin.</p>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">'JP2'</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="s1">'JPEG2000'</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="s1">'jpc'</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">'GDAL JPEG2000 plugin missing -- fetched OK,'</span>
-                  <span class="s1">' read step skipped (tracked upstream:'</span>
-                  <span class="s1">' serapeum-org/pyramids#600).'</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s1">'GDAL JPEG2000 plugin missing -- fetched OK,'</span>
+                <span class="s1">' read step skipped (tracked upstream:'</span>
+                <span class="s1">' serapeum-org/pyramids#600).'</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span>
 <span class="k">else</span><span class="p">:</span>
@@ -20264,9 +20272,11 @@ summary statistics in Kelvin.</p>
     except Exception as exc:
         msg = str(exc)
         if 'JP2' in msg or 'JPEG2000' in msg or 'jpc' in msg:
-            print('GDAL JPEG2000 plugin missing -- fetched OK,'
-                  ' read step skipped (tracked upstream:'
-                  ' serapeum-org/pyramids#600).')
+            print(
+                'GDAL JPEG2000 plugin missing -- fetched OK,'
+                ' read step skipped (tracked upstream:'
+                ' serapeum-org/pyramids#600).'
+            )
         else:
             raise
 else:

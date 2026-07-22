@@ -19858,10 +19858,9 @@ past to be sure the granules are already published.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"goes_out"</span><span class="p">)</span>
@@ -19869,10 +19868,9 @@ past to be sure the granules are already published.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
 from earthlens.core import EarthLens
 
 out_dir = Path("goes_out")
@@ -19903,12 +19901,12 @@ out_dir.mkdir(exist_ok=True)</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">now</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="s2">"min"</span><span class="p">)</span>
 <span class="n">start</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>          <span class="c1"># one CONUS scan (5-min cadence)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>  <span class="c1"># one CONUS scan (5-min cadence)</span>
 <span class="n">start</span><span class="p">,</span> <span class="n">end</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">now = pd.Timestamp.utcnow().tz_localize(None).floor("min")
 start = now - pd.Timedelta(hours=3)
-end = start + pd.Timedelta(minutes=6)          # one CONUS scan (5-min cadence)
+end = start + pd.Timedelta(minutes=6)  # one CONUS scan (5-min cadence)
 start, end</div>
 </div>
 </div>
@@ -19969,13 +19967,14 @@ whose scan-start lands in the window, and downloads them whole. It returns the
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="s2">"goes"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"abi-l2-mcmip"</span><span class="p">,</span>                    <span class="c1"># Cloud &amp; Moisture Imagery (16 bands)</span>
-    <span class="n">satellite</span><span class="o">=</span><span class="s2">"east"</span><span class="p">,</span>                          <span class="c1"># -&gt; noaa-goes19</span>
-    <span class="n">domain</span><span class="o">=</span><span class="s2">"C"</span><span class="p">,</span>                                <span class="c1"># CONUS</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"abi-l2-mcmip"</span><span class="p">,</span>  <span class="c1"># Cloud &amp; Moisture Imagery (16 bands)</span>
+    <span class="n">satellite</span><span class="o">=</span><span class="s2">"east"</span><span class="p">,</span>  <span class="c1"># -&gt; noaa-goes19</span>
+    <span class="n">domain</span><span class="o">=</span><span class="s2">"C"</span><span class="p">,</span>  <span class="c1"># CONUS</span>
     <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M"</span><span class="p">),</span>
     <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M"</span><span class="p">),</span>
     <span class="n">fmt</span><span class="o">=</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M"</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">130</span><span class="p">,</span> <span class="o">-</span><span class="mi">60</span><span class="p">],</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">130</span><span class="p">,</span> <span class="o">-</span><span class="mi">60</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -19983,13 +19982,14 @@ whose scan-start lands in the window, and downloads them whole. It returns the
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">lens = EarthLens(
     "goes",
-    dataset="abi-l2-mcmip",                    # Cloud &amp; Moisture Imagery (16 bands)
-    satellite="east",                          # -&gt; noaa-goes19
-    domain="C",                                # CONUS
+    dataset="abi-l2-mcmip",  # Cloud &amp; Moisture Imagery (16 bands)
+    satellite="east",  # -&gt; noaa-goes19
+    domain="C",  # CONUS
     start=start.strftime("%Y-%m-%d %H:%M"),
     end=end.strftime("%Y-%m-%d %H:%M"),
     fmt="%Y-%m-%d %H:%M",
-    lat_lim=[20, 50], lon_lim=[-130, -60],
+    lat_lim=[20, 50],
+    lon_lim=[-130, -60],
     path=str(out_dir),
 )
 paths = lens.download()
@@ -20140,7 +20140,7 @@ cloud channel) and warp it to WGS84.</p>
 <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">granule</span><span class="p">))</span>
 <span class="n">band</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"CMI_C13"</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
 <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">band</span><span class="o">.</span><span class="n">read_array</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>
-<span class="n">image</span><span class="p">[</span><span class="n">image</span> <span class="o">&gt;=</span> <span class="mi">65535</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>                 <span class="c1"># mask the fill value</span>
+<span class="n">image</span><span class="p">[</span><span class="n">image</span> <span class="o">&gt;=</span> <span class="mi">65535</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># mask the fill value</span>
 <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">from pyramids.netcdf import NetCDF
@@ -20148,7 +20148,7 @@ cloud channel) and warp it to WGS84.</p>
 nc = NetCDF.read_file(str(granule))
 band = nc.get_variable("CMI_C13").to_crs(4326)
 image = np.asarray(band.read_array()).astype("float32")
-image[image &gt;= 65535] = np.nan                 # mask the fill value
+image[image &gt;= 65535] = np.nan  # mask the fill value
 image.shape</div>
 </div>
 </div>

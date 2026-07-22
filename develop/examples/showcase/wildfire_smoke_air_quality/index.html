@@ -19970,11 +19970,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
@@ -19982,11 +19980,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="clipboard-copy-txt" id="cell-1">import os
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-from loguru import logger
-
 from earthlens.core import EarthLens
+from loguru import logger
 
 logger.disable("earthlens")
 logger.disable("pyramids")</div>
@@ -20286,15 +20282,15 @@ else:
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">pm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">pm</span><span class="p">):</span>
     <span class="n">peak</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">"peak PM2.5 </span><span class="si">{</span><span class="n">peak</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> µg/m³ = </span><span class="si">{</span><span class="n">peak</span><span class="o">/</span><span class="mi">15</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">x the WHO 24h guideline, "</span>
-        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">peak</span><span class="o">/</span><span class="mi">35</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x the US standard"</span>
+        <span class="sa">f</span><span class="s2">"peak PM2.5 </span><span class="si">{</span><span class="n">peak</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> µg/m³ = </span><span class="si">{</span><span class="n">peak</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">15</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">x the WHO 24h guideline, "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">peak</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">35</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x the US standard"</span>
     <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">if pm is not None and len(pm):
     peak = pm.value.max()
     print(
-        f"peak PM2.5 {peak:.0f} µg/m³ = {peak/15:.0f}x the WHO 24h guideline, "
-        f"{peak/35:.1f}x the US standard"
+        f"peak PM2.5 {peak:.0f} µg/m³ = {peak / 15:.0f}x the WHO 24h guideline, "
+        f"{peak / 35:.1f}x the US standard"
     )</div>
 </div>
 </div>

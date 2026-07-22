@@ -19918,9 +19918,12 @@ cat.available()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="n">d</span><span class="p">,</span> <span class="s1">'source'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
-     <span class="s1">'output_kind'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
-     <span class="s1">'long_name'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span><span class="p">}</span>
+    <span class="p">{</span>
+        <span class="s1">'id'</span><span class="p">:</span> <span class="n">d</span><span class="p">,</span>
+        <span class="s1">'source'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+        <span class="s1">'output_kind'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
+        <span class="s1">'long_name'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span>
+    <span class="p">}</span>
     <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
 <span class="p">]</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
@@ -19928,9 +19931,12 @@ cat.available()</div>
 <div class="clipboard-copy-txt" id="cell-2">import pandas as pd
 
 rows = [
-    {'id': d, 'source': cat.get(d).source,
-     'output_kind': cat.get(d).output_kind,
-     'long_name': cat.get(d).long_name}
+    {
+        'id': d,
+        'source': cat.get(d).source,
+        'output_kind': cat.get(d).output_kind,
+        'long_name': cat.get(d).long_name,
+    }
     for d in cat.available()
 ]
 pd.DataFrame(rows)</div>
@@ -20044,15 +20050,13 @@ pd.DataFrame(rows)</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">region_rows</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-     <span class="s1">'n_boxes'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">bboxes</span><span class="p">)}</span>
+    <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">'n_boxes'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">bboxes</span><span class="p">)}</span>
     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
 <span class="p">]</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">region_rows</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">region_rows = [
-    {'id': r, 'name': cat.regions[r].name,
-     'n_boxes': len(cat.regions[r].bboxes)}
+    {'id': r, 'name': cat.regions[r].name, 'n_boxes': len(cat.regions[r].bboxes)}
     for r in sorted(cat.regions)
 ]
 pd.DataFrame(region_rows)</div>
@@ -20303,18 +20307,14 @@ alps, siberia</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">rgi</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'rgi:outlines'</span><span class="p">],</span>
-                <span class="n">region</span><span class="o">=</span><span class="s1">'11'</span><span class="p">)</span>
-<span class="n">wgms</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span>
-                 <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'wgms:mass_balance'</span><span class="p">])</span>
+<span class="n">rgi</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'rgi:outlines'</span><span class="p">],</span> <span class="n">region</span><span class="o">=</span><span class="s1">'11'</span><span class="p">)</span>
+<span class="n">wgms</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'wgms:mass_balance'</span><span class="p">])</span>
 <span class="n">rgi</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">OUTPUT_KIND</span><span class="p">,</span> <span class="n">wgms</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">OUTPUT_KIND</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">from earthlens.core import EarthLens
 
-rgi = EarthLens(data_source='glaciers', variables=['rgi:outlines'],
-                region='11')
-wgms = EarthLens(data_source='glaciers',
-                 variables=['wgms:mass_balance'])
+rgi = EarthLens(data_source='glaciers', variables=['rgi:outlines'], region='11')
+wgms = EarthLens(data_source='glaciers', variables=['wgms:mass_balance'])
 rgi.datasource.OUTPUT_KIND, wgms.datasource.OUTPUT_KIND</div>
 </div>
 </div>

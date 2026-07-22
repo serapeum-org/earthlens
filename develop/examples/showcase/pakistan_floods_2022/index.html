@@ -19989,31 +19989,25 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_dotenv</span><span class="p">,</span> <span class="n">load_dotenv</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>  <span class="c1"># pyramids' own reading + plotting</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
-import tempfile
 import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
 from dotenv import find_dotenv, load_dotenv
-from loguru import logger
-from pyramids.dataset import Dataset  # pyramids' own reading + plotting
-
 from earthlens.core import EarthLens
+from loguru import logger
 
 warnings.filterwarnings("ignore")
 logger.remove()</div>
@@ -20070,13 +20064,21 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>  <span class="c1"># Earth Engine service-account email (.env)</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>  <span class="c1"># path to the service-account JSON key (.env)</span>
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
+    <span class="s2">"GEE_SERVICE_ACCOUNT"</span>
+<span class="p">]</span>  <span class="c1"># Earth Engine service-account email (.env)</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
+    <span class="s2">"GEE_SERVICE_KEY"</span>
+<span class="p">]</span>  <span class="c1"># path to the service-account JSON key (.env)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">load_dotenv(find_dotenv(usecwd=True))
 
-SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]  # Earth Engine service-account email (.env)
-SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]  # path to the service-account JSON key (.env)</div>
+SERVICE_ACCOUNT = os.environ[
+    "GEE_SERVICE_ACCOUNT"
+]  # Earth Engine service-account email (.env)
+SERVICE_KEY = os.environ[
+    "GEE_SERVICE_KEY"
+]  # path to the service-account JSON key (.env)</div>
 </div>
 </div>
 </div>
@@ -20727,7 +20729,9 @@ print("composites:", bool(before), bool(after))</div>
             <span class="n">scale</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
             <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">window_scene</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
+        <span class="n">window_scene</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
+            <span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span>
+        <span class="p">)</span>
         <span class="n">window_rasters</span> <span class="o">=</span> <span class="n">window_scene</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
         <span class="n">gp</span> <span class="o">=</span> <span class="n">window_rasters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">gp</span><span class="p">:</span>
@@ -20752,7 +20756,9 @@ print("composites:", bool(before), bool(after))</div>
             scale=60,
             reducer="mean",
         )
-        window_scene.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
+        window_scene.authenticate(
+            service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY
+        )
         window_rasters = window_scene.load()
         gp = window_rasters[0]
         if not gp:

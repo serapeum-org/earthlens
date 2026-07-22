@@ -20066,7 +20066,7 @@ Earth Engine <code>Catalog</code>.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=41581e5f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7fb27b941602401d91542211134fc71a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20090,9 +20090,9 @@ Earth Engine <code>Catalog</code>.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">ee</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span><span class="p">,</span> <span class="n">cancel_task</span><span class="p">,</span> <span class="n">list_recent_tasks</span><span class="p">,</span> <span class="n">wait_for_task_id</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
@@ -20101,9 +20101,9 @@ from pathlib import Path
 import ee
 import matplotlib.pyplot as plt
 import numpy as np
+from earthlens.core import EarthLens
 from pyramids.dataset import Dataset as PyramidsDataset
 
-from earthlens.core import EarthLens
 from earthlens.gee import Catalog, cancel_task, list_recent_tasks, wait_for_task_id</div>
 </div>
 </div>
@@ -20469,7 +20469,7 @@ else:
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="s1">'UCSB-CHG/CHIRPS/DAILY'</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="s1">'precipitation'</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'UCSB-CHG/CHIRPS/DAILY'</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="s1">'precipitation'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'x (px)'</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'y (px)'</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
@@ -20480,7 +20480,7 @@ else:
 <div class="clipboard-copy-txt" id="cell-8">if arr is not None:
     fig, ax = plt.subplots(figsize=(6, 5))
     im = ax.imshow(arr, cmap='viridis')
-    ax.set_title(f'{'UCSB-CHG/CHIRPS/DAILY'} / {'precipitation'}')
+    ax.set_title(f"{'UCSB-CHG/CHIRPS/DAILY'} / {'precipitation'}")
     ax.set_xlabel('x (px)')
     ax.set_ylabel('y (px)')
     fig.colorbar(im, ax=ax, shrink=0.8)
@@ -20505,7 +20505,7 @@ else:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a4561714">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=acae54e37e7d407bbb7b55eff062a284">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20518,7 +20518,7 @@ path).</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0abd4957">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9a63283cbaf04dbcab1f6479b197f3a8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20735,7 +20735,7 @@ print(f'           description={task_info.description}')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2e861cf4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8dd0d8092fe74a7c96281538738b07e2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20747,7 +20747,7 @@ current project, so we can confirm ours is queued before waiting on it.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=98dac3af">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=72eea5119410473aa328ad9291626812">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20792,7 +20792,7 @@ else:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=701d6534">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8edb47106e1a46a883d545849b8ab81b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20806,7 +20806,7 @@ cancel-if-still-running so no in-flight task leaks on notebook restart.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dea42f43">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10185d26023b46108eb7d9f57d49d2b3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20900,7 +20900,7 @@ else:
     <span class="n">produced</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">DEMO_FOLDER</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">task_info</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s1">'</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">getAsset</span><span class="p">(</span><span class="n">produced</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asset exists: type=</span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span><span class="si">}</span><span class="s1"> '</span> <span class="sa">f</span><span class="s1">'name=</span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asset exists: type=</span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span><span class="si">}</span><span class="s1"> name=</span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
         <span class="n">ee</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">deleteAsset</span><span class="p">(</span><span class="n">produced</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">'asset deleted'</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -20916,7 +20916,7 @@ else:
     produced = f'{DEMO_FOLDER}/{task_info.description}'
     try:
         meta = ee.data.getAsset(produced)
-        print(f'asset exists: type={meta.get("type")} ' f'name={meta.get("name")}')
+        print(f'asset exists: type={meta.get("type")} name={meta.get("name")}')
         ee.data.deleteAsset(produced)
         print('asset deleted')
     except Exception as exc:

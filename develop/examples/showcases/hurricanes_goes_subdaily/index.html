@@ -19858,12 +19858,11 @@ the copy bundled with <code>imageio-ffmpeg</code> — so no separate install is 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"hurricanes"</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -19875,12 +19874,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from cleopatra.array_glyph import FrameLabel
+from earthlens.core import EarthLens
 from IPython.display import HTML
 from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
 from pyramids.netcdf import NetCDF
-
-from earthlens.core import EarthLens
 
 OUT = Path("out") / "hurricanes"
 OUT.mkdir(parents=True, exist_ok=True)</div>
@@ -19939,7 +19937,10 @@ was fixed upstream) — so we read the full reprojected band and crop it with pl
     <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
     <span class="n">origin_x</span><span class="p">,</span> <span class="n">pixel_w</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">pixel_h</span> <span class="o">=</span> <span class="n">reprojected</span><span class="o">.</span><span class="n">geotransform</span>
     <span class="n">col0</span><span class="p">,</span> <span class="n">col1</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">origin_x</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_w</span><span class="p">),</span> <span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">origin_x</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_w</span><span class="p">)</span>
-    <span class="n">row0</span><span class="p">,</span> <span class="n">row1</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">north</span> <span class="o">-</span> <span class="n">origin_y</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_h</span><span class="p">),</span> <span class="nb">round</span><span class="p">((</span><span class="n">south</span> <span class="o">-</span> <span class="n">origin_y</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_h</span><span class="p">)</span>
+    <span class="n">row0</span><span class="p">,</span> <span class="n">row1</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">round</span><span class="p">((</span><span class="n">north</span> <span class="o">-</span> <span class="n">origin_y</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_h</span><span class="p">),</span>
+        <span class="nb">round</span><span class="p">((</span><span class="n">south</span> <span class="o">-</span> <span class="n">origin_y</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_h</span><span class="p">),</span>
+    <span class="p">)</span>
     <span class="n">cropped</span> <span class="o">=</span> <span class="n">full</span><span class="p">[</span><span class="n">row0</span><span class="p">:</span><span class="n">row1</span><span class="p">,</span> <span class="n">col0</span><span class="p">:</span><span class="n">col1</span><span class="p">]</span>
     <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">pixel_w</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">north</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">pixel_h</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cropped</span><span class="p">,</span> <span class="n">geo</span>
@@ -19947,10 +19948,10 @@ was fixed upstream) — so we read the full reprojected band and crop it with pl
 
 <span class="k">def</span><span class="w"> </span><span class="nf">render_true_colour</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">bbox</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Write a gamma-stretched true-colour RGB GeoTIFF from one MCMIP granule."""</span>
-    <span class="n">red</span><span class="p">,</span> <span class="n">geo</span> <span class="o">=</span> <span class="n">goes_band_to_latlon</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="s2">"CMI_C02"</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>   <span class="c1"># 0.64 um red</span>
+    <span class="n">red</span><span class="p">,</span> <span class="n">geo</span> <span class="o">=</span> <span class="n">goes_band_to_latlon</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="s2">"CMI_C02"</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>  <span class="c1"># 0.64 um red</span>
     <span class="n">veggie</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">goes_band_to_latlon</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="s2">"CMI_C03"</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>  <span class="c1"># 0.86 um near-IR</span>
-    <span class="n">blue</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">goes_band_to_latlon</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="s2">"CMI_C01"</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>    <span class="c1"># 0.47 um blue</span>
-    <span class="n">green</span> <span class="o">=</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">red</span> <span class="o">+</span> <span class="mf">0.10</span> <span class="o">*</span> <span class="n">veggie</span> <span class="o">+</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">blue</span>           <span class="c1"># CIMSS synthetic green</span>
+    <span class="n">blue</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">goes_band_to_latlon</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="s2">"CMI_C01"</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>  <span class="c1"># 0.47 um blue</span>
+    <span class="n">green</span> <span class="o">=</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">red</span> <span class="o">+</span> <span class="mf">0.10</span> <span class="o">*</span> <span class="n">veggie</span> <span class="o">+</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">blue</span>  <span class="c1"># CIMSS synthetic green</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">2.2</span><span class="p">)</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">rgb</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"uint8"</span><span class="p">)</span>
     <span class="n">scene</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">rgb</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -19967,7 +19968,10 @@ was fixed upstream) — so we read the full reprojected band and crop it with pl
     west, south, east, north = bbox
     origin_x, pixel_w, _, origin_y, _, pixel_h = reprojected.geotransform
     col0, col1 = round((west - origin_x) / pixel_w), round((east - origin_x) / pixel_w)
-    row0, row1 = round((north - origin_y) / pixel_h), round((south - origin_y) / pixel_h)
+    row0, row1 = (
+        round((north - origin_y) / pixel_h),
+        round((south - origin_y) / pixel_h),
+    )
     cropped = full[row0:row1, col0:col1]
     geo = (west, pixel_w, 0.0, north, 0.0, pixel_h)
     return cropped, geo
@@ -19975,10 +19979,10 @@ was fixed upstream) — so we read the full reprojected band and crop it with pl
 
 def render_true_colour(nc_path, dst, bbox):
     """Write a gamma-stretched true-colour RGB GeoTIFF from one MCMIP granule."""
-    red, geo = goes_band_to_latlon(nc_path, "CMI_C02", bbox)   # 0.64 um red
+    red, geo = goes_band_to_latlon(nc_path, "CMI_C02", bbox)  # 0.64 um red
     veggie, _ = goes_band_to_latlon(nc_path, "CMI_C03", bbox)  # 0.86 um near-IR
-    blue, _ = goes_band_to_latlon(nc_path, "CMI_C01", bbox)    # 0.47 um blue
-    green = 0.45 * red + 0.10 * veggie + 0.45 * blue           # CIMSS synthetic green
+    blue, _ = goes_band_to_latlon(nc_path, "CMI_C01", bbox)  # 0.47 um blue
+    green = 0.45 * red + 0.10 * veggie + 0.45 * blue  # CIMSS synthetic green
     rgb = np.power(np.clip([red, green, blue], 0.0, 1.0), 1 / 2.2)
     rgb = np.nan_to_num(rgb * 255.0).astype("uint8")
     scene = Dataset.create_from_array(arr=rgb, geo=geo, epsg=4326, no_data_value=0)
@@ -20043,14 +20047,18 @@ advances past frame 0 (see the code comment below).</p>
 <span class="c1"># clipping content or leaving a mismatched border.</span>
 <span class="n">STORMS</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Ida"</span><span class="p">,</span> <span class="s2">"satellite"</span><span class="p">:</span> <span class="s2">"16"</span><span class="p">,</span>
-        <span class="s2">"days"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2021-08-24"</span><span class="p">,</span> <span class="s2">"2021-09-02"</span><span class="p">),</span> <span class="s2">"hours"</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Ida"</span><span class="p">,</span>
+        <span class="s2">"satellite"</span><span class="p">:</span> <span class="s2">"16"</span><span class="p">,</span>
+        <span class="s2">"days"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2021-08-24"</span><span class="p">,</span> <span class="s2">"2021-09-02"</span><span class="p">),</span>
+        <span class="s2">"hours"</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
         <span class="s2">"bbox"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">66.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">],</span>
         <span class="s2">"crop"</span><span class="p">:</span> <span class="s2">"crop=1796:1724:202:310"</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Milton"</span><span class="p">,</span> <span class="s2">"satellite"</span><span class="p">:</span> <span class="s2">"16"</span><span class="p">,</span>
-        <span class="s2">"days"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2024-10-04"</span><span class="p">,</span> <span class="s2">"2024-10-11"</span><span class="p">),</span> <span class="s2">"hours"</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Milton"</span><span class="p">,</span>
+        <span class="s2">"satellite"</span><span class="p">:</span> <span class="s2">"16"</span><span class="p">,</span>
+        <span class="s2">"days"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2024-10-04"</span><span class="p">,</span> <span class="s2">"2024-10-11"</span><span class="p">),</span>
+        <span class="s2">"hours"</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
         <span class="s2">"bbox"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">98.0</span><span class="p">,</span> <span class="mf">16.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">64.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
         <span class="s2">"crop"</span><span class="p">:</span> <span class="s2">"crop=1794:1124:203:184"</span><span class="p">,</span>
     <span class="p">},</span>
@@ -20093,7 +20101,9 @@ advances past frame 0 (see the code comment below).</p>
     <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="n">fig_w</span><span class="p">,</span> <span class="n">fig_w</span> <span class="o">*</span> <span class="p">(</span><span class="n">north</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">east</span> <span class="o">-</span> <span class="n">west</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.905</span> <span class="o">+</span> <span class="mf">0.32</span><span class="p">)</span>
 
     <span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span>
+    <span class="p">)</span>
 
     <span class="c1"># Float the per-frame scan-time label above the frame instead of riding on the</span>
     <span class="c1"># map. An explicit FrameLabel location switches to data coordinates and is</span>
@@ -20107,7 +20117,12 @@ advances past frame 0 (see the code comment below).</p>
     <span class="c1"># advances -- reproduced against both cleopatra 0.25.0 and 0.26.0, filed</span>
     <span class="c1"># upstream. Swapping the call order (animate() first) avoids it.</span>
     <span class="n">label_location</span> <span class="o">=</span> <span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">north</span> <span class="o">+</span> <span class="mf">0.02</span> <span class="o">*</span> <span class="p">(</span><span class="n">north</span> <span class="o">-</span> <span class="n">south</span><span class="p">)]</span>
-    <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">label_location</span><span class="p">),</span> <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">19</span><span class="p">)</span>
+    <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+        <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">label_location</span><span class="p">),</span>
+        <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># Dress the frames as an ECMWF-style reference map in one call (cleopatra &gt;=0.22):</span>
     <span class="c1"># grey Natural Earth coastlines + borders, a dashed lon/lat graticule, °W/°N</span>
@@ -20138,13 +20153,17 @@ advances past frame 0 (see the code comment below).</p>
     <span class="p">)</span>
     <span class="n">ax_box</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>  <span class="c1"># figure-fraction, y=0 at the bottom</span>
     <span class="n">ax_left</span><span class="p">,</span> <span class="n">ax_top</span><span class="p">,</span> <span class="n">ax_right</span><span class="p">,</span> <span class="n">ax_bottom</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">ax_box</span><span class="o">.</span><span class="n">x0</span> <span class="o">*</span> <span class="n">frame_w</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="n">frame_h</span><span class="p">,</span>
-        <span class="n">ax_box</span><span class="o">.</span><span class="n">x1</span> <span class="o">*</span> <span class="n">frame_w</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">y0</span><span class="p">)</span> <span class="o">*</span> <span class="n">frame_h</span><span class="p">,</span>
+        <span class="n">ax_box</span><span class="o">.</span><span class="n">x0</span> <span class="o">*</span> <span class="n">frame_w</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="n">frame_h</span><span class="p">,</span>
+        <span class="n">ax_box</span><span class="o">.</span><span class="n">x1</span> <span class="o">*</span> <span class="n">frame_w</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">y0</span><span class="p">)</span> <span class="o">*</span> <span class="n">frame_h</span><span class="p">,</span>
     <span class="p">)</span>  <span class="c1"># image pixel coordinates, y=0 at the top</span>
     <span class="n">fits_frame</span> <span class="o">=</span> <span class="n">crop_x</span> <span class="o">+</span> <span class="n">crop_w</span> <span class="o">&lt;=</span> <span class="n">frame_w</span> <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">+</span> <span class="n">crop_h</span> <span class="o">&lt;=</span> <span class="n">frame_h</span>
     <span class="n">contains_axes</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">crop_x</span> <span class="o">&lt;=</span> <span class="n">ax_left</span> <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">&lt;=</span> <span class="n">ax_top</span>
-        <span class="ow">and</span> <span class="n">crop_x</span> <span class="o">+</span> <span class="n">crop_w</span> <span class="o">&gt;=</span> <span class="n">ax_right</span> <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">+</span> <span class="n">crop_h</span> <span class="o">&gt;=</span> <span class="n">ax_bottom</span>
+        <span class="n">crop_x</span> <span class="o">&lt;=</span> <span class="n">ax_left</span>
+        <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">&lt;=</span> <span class="n">ax_top</span>
+        <span class="ow">and</span> <span class="n">crop_x</span> <span class="o">+</span> <span class="n">crop_w</span> <span class="o">&gt;=</span> <span class="n">ax_right</span>
+        <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">+</span> <span class="n">crop_h</span> <span class="o">&gt;=</span> <span class="n">ax_bottom</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">fits_frame</span> <span class="ow">and</span> <span class="n">contains_axes</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -20162,7 +20181,11 @@ advances past frame 0 (see the code comment below).</p>
     <span class="c1"># a wide grey mat.</span>
     <span class="n">mp4_path</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">storm</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.mp4"</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
-        <span class="nb">str</span><span class="p">(</span><span class="n">mp4_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">DPI</span><span class="p">,</span> <span class="n">crf</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">preset</span><span class="o">=</span><span class="s2">"slow"</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">mp4_path</span><span class="p">),</span>
+        <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="n">DPI</span><span class="p">,</span>
+        <span class="n">crf</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">preset</span><span class="o">=</span><span class="s2">"slow"</span><span class="p">,</span>
         <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="n">storm</span><span class="p">[</span><span class="s2">"crop"</span><span class="p">]],</span>
     <span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
@@ -20182,14 +20205,18 @@ advances past frame 0 (see the code comment below).</p>
 # clipping content or leaving a mismatched border.
 STORMS = [
     {
-        "name": "Ida", "satellite": "16",
-        "days": ("2021-08-24", "2021-09-02"), "hours": [14, 16, 18, 20],
+        "name": "Ida",
+        "satellite": "16",
+        "days": ("2021-08-24", "2021-09-02"),
+        "hours": [14, 16, 18, 20],
         "bbox": [-99.0, 15.0, -66.0, 46.0],
         "crop": "crop=1796:1724:202:310",
     },
     {
-        "name": "Milton", "satellite": "16",
-        "days": ("2024-10-04", "2024-10-11"), "hours": [14, 16, 18, 20],
+        "name": "Milton",
+        "satellite": "16",
+        "days": ("2024-10-04", "2024-10-11"),
+        "hours": [14, 16, 18, 20],
         "bbox": [-98.0, 16.0, -64.0, 36.0],
         "crop": "crop=1794:1124:203:184",
     },
@@ -20232,7 +20259,9 @@ for storm in STORMS:
     figsize = (fig_w, fig_w * (north - south) / (east - west) / 0.905 + 0.32)
 
     cube = DatasetCollection.read_multiple_files(paths, date=False)
-    glyph = cube.plot(rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 255}, figsize=figsize)
+    glyph = cube.plot(
+        rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 255}, figsize=figsize
+    )
 
     # Float the per-frame scan-time label above the frame instead of riding on the
     # map. An explicit FrameLabel location switches to data coordinates and is
@@ -20246,7 +20275,12 @@ for storm in STORMS:
     # advances -- reproduced against both cleopatra 0.25.0 and 0.26.0, filed
     # upstream. Swapping the call order (animate() first) avoids it.
     label_location = [west, north + 0.02 * (north - south)]
-    glyph.animate(labels, interval=250, frame_label=FrameLabel(location=label_location), cbar_label_size=19)
+    glyph.animate(
+        labels,
+        interval=250,
+        frame_label=FrameLabel(location=label_location),
+        cbar_label_size=19,
+    )
 
     # Dress the frames as an ECMWF-style reference map in one call (cleopatra &gt;=0.22):
     # grey Natural Earth coastlines + borders, a dashed lon/lat graticule, °W/°N
@@ -20277,13 +20311,17 @@ for storm in STORMS:
     )
     ax_box = glyph.ax.get_position()  # figure-fraction, y=0 at the bottom
     ax_left, ax_top, ax_right, ax_bottom = (
-        ax_box.x0 * frame_w, (1 - ax_box.y1) * frame_h,
-        ax_box.x1 * frame_w, (1 - ax_box.y0) * frame_h,
+        ax_box.x0 * frame_w,
+        (1 - ax_box.y1) * frame_h,
+        ax_box.x1 * frame_w,
+        (1 - ax_box.y0) * frame_h,
     )  # image pixel coordinates, y=0 at the top
     fits_frame = crop_x + crop_w &lt;= frame_w and crop_y + crop_h &lt;= frame_h
     contains_axes = (
-        crop_x &lt;= ax_left and crop_y &lt;= ax_top
-        and crop_x + crop_w &gt;= ax_right and crop_y + crop_h &gt;= ax_bottom
+        crop_x &lt;= ax_left
+        and crop_y &lt;= ax_top
+        and crop_x + crop_w &gt;= ax_right
+        and crop_y + crop_h &gt;= ax_bottom
     )
     if not (fits_frame and contains_axes):
         raise ValueError(
@@ -20301,7 +20339,11 @@ for storm in STORMS:
     # a wide grey mat.
     mp4_path = out_dir / f"{storm['name'].lower()}.mp4"
     glyph.save_animation(
-        str(mp4_path), fps=2, dpi=DPI, crf=20, preset="slow",
+        str(mp4_path),
+        fps=2,
+        dpi=DPI,
+        crf=20,
+        preset="slow",
         extra_args=["-vf", storm["crop"]],
     )
     plt.close("all")

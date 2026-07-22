@@ -19720,7 +19720,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=29a99f8d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7fb27b941602401d91542211134fc71a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19734,7 +19734,7 @@ characterise a basin — modal depth, spread, deepest point.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6382750f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=acae54e37e7d407bbb7b55eff062a284">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19756,24 +19756,22 @@ characterise a basin — modal depth, spread, deepest point.</p>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pyramids.dataset import Dataset
-
-from earthlens.core import EarthLens</div>
+from earthlens.core import EarthLens
+from pyramids.dataset import Dataset</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d8ad746e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9a63283cbaf04dbcab1f6479b197f3a8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19804,7 +19802,13 @@ from earthlens.core import EarthLens</div>
 <span class="n">depths</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">arr</span> <span class="o">!=</span> <span class="mi">32767</span><span class="p">)]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'cells'</span><span class="p">,</span> <span class="n">depths</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'median depth'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">depths</span><span class="p">))),</span> <span class="s1">'m'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'deepest'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">depths</span><span class="o">.</span><span class="n">min</span><span class="p">())),</span> <span class="s1">'m | shallowest'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">depths</span><span class="o">.</span><span class="n">max</span><span class="p">())),</span> <span class="s1">'m'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s1">'deepest'</span><span class="p">,</span>
+    <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">depths</span><span class="o">.</span><span class="n">min</span><span class="p">())),</span>
+    <span class="s1">'m | shallowest'</span><span class="p">,</span>
+    <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">depths</span><span class="o">.</span><span class="n">max</span><span class="p">())),</span>
+    <span class="s1">'m'</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">out = tempfile.mkdtemp()
 paths = EarthLens(
@@ -19819,14 +19823,20 @@ arr = arr[0] if arr.ndim == 3 else arr
 depths = arr[np.isfinite(arr) &amp; (arr != 32767)]
 print('cells', depths.size)
 print('median depth', round(float(np.median(depths))), 'm')
-print('deepest', round(float(depths.min())), 'm | shallowest', round(float(depths.max())), 'm')</div>
+print(
+    'deepest',
+    round(float(depths.min())),
+    'm | shallowest',
+    round(float(depths.max())),
+    'm',
+)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=43ca40fc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8dd0d8092fe74a7c96281538738b07e2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19838,7 +19848,7 @@ curve (right axis) reads off the fraction of the area shallower than a depth.</p
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3cc0c67b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=72eea5119410473aa328ad9291626812">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

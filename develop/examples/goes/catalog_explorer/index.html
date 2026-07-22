@@ -20359,13 +20359,9 @@ catalog because East/West rotate as new GOES satellites commission.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">satellites</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"satellite"</span><span class="p">,</span> <span class="s2">"bucket"</span><span class="p">]</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">satellites</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"satellite"</span><span class="p">,</span> <span class="s2">"bucket"</span><span class="p">])</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">pd.DataFrame(
-    sorted(cat.satellites.items()), columns=["satellite", "bucket"]
-)</div>
+<div class="clipboard-copy-txt" id="cell-4">pd.DataFrame(sorted(cat.satellites.items()), columns=["satellite", "bucket"])</div>
 </div>
 </div>
 </div>
@@ -20721,9 +20717,13 @@ prefix the backend will list per hour of the requested window.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.goes</span><span class="w"> </span><span class="kn">import</span> <span class="n">GOES</span>
 
 <span class="n">goes</span> <span class="o">=</span> <span class="n">GOES</span><span class="p">(</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2026-07-03 12:00"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2026-07-03 12:10"</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">130</span><span class="p">,</span> <span class="o">-</span><span class="mi">60</span><span class="p">],</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"abi-l2-mcmip"</span><span class="p">,</span> <span class="n">satellite</span><span class="o">=</span><span class="s2">"east"</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s2">"C"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2026-07-03 12:00"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2026-07-03 12:10"</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">130</span><span class="p">,</span> <span class="o">-</span><span class="mi">60</span><span class="p">],</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"abi-l2-mcmip"</span><span class="p">,</span>
+    <span class="n">satellite</span><span class="o">=</span><span class="s2">"east"</span><span class="p">,</span>
+    <span class="n">domain</span><span class="o">=</span><span class="s2">"C"</span><span class="p">,</span>
     <span class="n">fmt</span><span class="o">=</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"bucket:"</span><span class="p">,</span> <span class="n">goes</span><span class="o">.</span><span class="n">_bucket</span><span class="p">)</span>
@@ -20733,9 +20733,13 @@ prefix the backend will list per hour of the requested window.</p>
 <div class="clipboard-copy-txt" id="cell-7">from earthlens.goes import GOES
 
 goes = GOES(
-    start="2026-07-03 12:00", end="2026-07-03 12:10",
-    lat_lim=[20, 50], lon_lim=[-130, -60],
-    dataset="abi-l2-mcmip", satellite="east", domain="C",
+    start="2026-07-03 12:00",
+    end="2026-07-03 12:10",
+    lat_lim=[20, 50],
+    lon_lim=[-130, -60],
+    dataset="abi-l2-mcmip",
+    satellite="east",
+    domain="C",
     fmt="%Y-%m-%d %H:%M",
 )
 print("bucket:", goes._bucket)

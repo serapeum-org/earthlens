@@ -19786,7 +19786,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=473a6d39">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7fb27b941602401d91542211134fc71a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19804,7 +19804,7 @@ notebook below is a <strong>recipe</strong>: it constructs the request, but only
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=09f091d6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=acae54e37e7d407bbb7b55eff062a284">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19815,7 +19815,7 @@ notebook below is a <strong>recipe</strong>: it constructs the request, but only
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ae76836d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9a63283cbaf04dbcab1f6479b197f3a8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19840,7 +19840,11 @@ notebook below is a <strong>recipe</strong>: it constructs the request, but only
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"url   : </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"signer: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">signer</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"region: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">region</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"usgs-landsat/landsat-c2l2-sr"</span><span class="p">,</span> <span class="s2">"usgs-landsat/landsat-c2l2-st"</span><span class="p">,</span> <span class="s2">"usgs-landsat/landsat-c2l1"</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span>
+    <span class="s2">"usgs-landsat/landsat-c2l2-sr"</span><span class="p">,</span>
+    <span class="s2">"usgs-landsat/landsat-c2l2-st"</span><span class="p">,</span>
+    <span class="s2">"usgs-landsat/landsat-c2l1"</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="n">col</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">  signer=</span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">signer</span><span class="si">}</span><span class="s2">  default=</span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">default_assets</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
@@ -19851,7 +19855,11 @@ e = cat.endpoints["usgs-landsat"]
 print(f"url   : {e.url}")
 print(f"signer: {e.signer}")
 print(f"region: {e.region}")
-for key in ("usgs-landsat/landsat-c2l2-sr", "usgs-landsat/landsat-c2l2-st", "usgs-landsat/landsat-c2l1"):
+for key in (
+    "usgs-landsat/landsat-c2l2-sr",
+    "usgs-landsat/landsat-c2l2-st",
+    "usgs-landsat/landsat-c2l1",
+):
     col = cat.get_collection(key)
     print(f"  {key}  signer={col.signer}  default={col.default_assets}")</div>
 </div>
@@ -19860,7 +19868,7 @@ for key in ("usgs-landsat/landsat-c2l2-sr", "usgs-landsat/landsat-c2l2-st", "usg
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0f883af7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8dd0d8092fe74a7c96281538738b07e2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19873,7 +19881,7 @@ single Landsat-9 surface-reflectance scene as a 4-band COG.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8dea3f17">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=72eea5119410473aa328ad9291626812">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19897,15 +19905,18 @@ single Landsat-9 surface-reflectance scene as a 4-band COG.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">request</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"usgs-landsat"</span><span class="p">,</span>          <span class="c1"># alias 'landsat' works too</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-08-31"</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"usgs-landsat"</span><span class="p">,</span>  <span class="c1"># alias 'landsat' works too</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-06-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2024-08-31"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"usgs-landsat/landsat-c2l2-sr"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"red"</span><span class="p">,</span> <span class="s2">"green"</span><span class="p">,</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="s2">"nir08"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">122.5</span><span class="p">,</span> <span class="mf">37.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>     <span class="c1"># SF Bay</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">122.5</span><span class="p">,</span> <span class="mf">37.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>  <span class="c1"># SF Bay</span>
     <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
     <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">have_aws</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AWS_ACCESS_KEY_ID"</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AWS_SECRET_ACCESS_KEY"</span><span class="p">))</span>
+<span class="n">have_aws</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AWS_ACCESS_KEY_ID"</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AWS_SECRET_ACCESS_KEY"</span><span class="p">)</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"AWS creds present:"</span><span class="p">,</span> <span class="n">have_aws</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">have_aws</span><span class="p">:</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="o">**</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -19920,15 +19931,18 @@ import tempfile
 from earthlens.earthlens import EarthLens
 
 request = dict(
-    data_source="usgs-landsat",          # alias 'landsat' works too
-    start="2024-06-01", end="2024-08-31",
+    data_source="usgs-landsat",  # alias 'landsat' works too
+    start="2024-06-01",
+    end="2024-08-31",
     dataset="usgs-landsat/landsat-c2l2-sr",
     variables=["red", "green", "blue", "nir08"],
-    aoi=[-122.5, 37.5, -122.0, 38.0],     # SF Bay
+    aoi=[-122.5, 37.5, -122.0, 38.0],  # SF Bay
     path=tempfile.mkdtemp(),
     max_items=1,
 )
-have_aws = bool(os.environ.get("AWS_ACCESS_KEY_ID")) and bool(os.environ.get("AWS_SECRET_ACCESS_KEY"))
+have_aws = bool(os.environ.get("AWS_ACCESS_KEY_ID")) and bool(
+    os.environ.get("AWS_SECRET_ACCESS_KEY")
+)
 print("AWS creds present:", have_aws)
 if have_aws:
     paths = EarthLens(**request).download()
@@ -19942,7 +19956,7 @@ else:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c44b26af">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8edb47106e1a46a883d545849b8ab81b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19953,7 +19967,7 @@ else:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a47b94ae">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10185d26023b46108eb7d9f57d49d2b3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19988,7 +20002,7 @@ else:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4be1d93e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8763a12b2bbd4a93a75aff182afb95dc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

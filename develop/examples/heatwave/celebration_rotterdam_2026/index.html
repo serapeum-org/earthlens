@@ -19953,9 +19953,8 @@ environment.</p>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
@@ -19967,9 +19966,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from pyramids.dataset import Dataset
-
 from earthlens.core import EarthLens
+from pyramids.dataset import Dataset
 
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
@@ -20030,13 +20028,15 @@ polders around. This is the human landscape a night of fireworks and crowds play
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2026-06-17"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2026-06-27"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2026-06-17"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2026-06-27"</span><span class="p">,</span>
     <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
     <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
     <span class="n">scale</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"truecolor"</span><span class="p">,</span>
     <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.85</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">],</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.85</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -20047,13 +20047,15 @@ polders around. This is the human landscape a night of fireworks and crowds play
     data_source="gee",
     dataset="COPERNICUS/S2_SR_HARMONIZED",
     variables=["B4", "B3", "B2"],
-    start="2026-06-17", end="2026-06-27",
+    start="2026-06-17",
+    end="2026-06-27",
     temporal_resolution="raw",
     reducer="median",
     scale=30.0,
     path=OUT / "truecolor",
     export_via="url",
-    lat_lim=[51.85, 52.0], lon_lim=[4.0, 4.6],
+    lat_lim=[51.85, 52.0],
+    lon_lim=[4.0, 4.6],
 )
 scene.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
 paths = scene.download(progress_bar=False)
@@ -20106,15 +20108,19 @@ scene_path.name</div>
 <span class="n">image</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">scene_path</span><span class="p">)</span>
 <span class="n">image</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3000</span><span class="p">},</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Rotterdam — Sentinel-2 true colour, late June 2026"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">fig, ax = plt.subplots(figsize=(11, 4))
 image = Dataset.read_file(scene_path)
 image.plot(rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3000}, ax=ax, fig=fig)
 ax.set_title("Rotterdam — Sentinel-2 true colour, late June 2026")
-ax.set_xlabel("lon"); ax.set_ylabel("lat")
-plt.tight_layout(); plt.show()</div>
+ax.set_xlabel("lon")
+ax.set_ylabel("lat")
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>
@@ -20170,8 +20176,10 @@ daily) resolution is essential — a fireworks spike lives in a two-to-three-hou
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"openaq"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">pollutant</span><span class="p">],</span>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"hourly"</span><span class="p">,</span>
-        <span class="n">start</span><span class="o">=</span><span class="s2">"2026-07-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2026-07-06"</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.85</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.3</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">],</span>
+        <span class="n">start</span><span class="o">=</span><span class="s2">"2026-07-01"</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="s2">"2026-07-06"</span><span class="p">,</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.85</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.3</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
         <span class="n">max_locations</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
     <span class="p">)</span>
@@ -20184,8 +20192,10 @@ for pollutant in ["pm10", "pm25"]:
         data_source="openaq",
         variables=[pollutant],
         temporal_resolution="hourly",
-        start="2026-07-01", end="2026-07-06",
-        lat_lim=[51.85, 52.0], lon_lim=[4.3, 4.6],
+        start="2026-07-01",
+        end="2026-07-06",
+        lat_lim=[51.85, 52.0],
+        lon_lim=[4.3, 4.6],
         path=OUT,
         max_locations=15,
     )
@@ -20254,16 +20264,26 @@ for pollutant in ["pm10", "pm25"]:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">hourly_mean</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># drop negative / nodata sentinels</span>
-    <span class="n">local</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">valid</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="s2">"Europe/Amsterdam"</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">local</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">valid</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="s2">"Europe/Amsterdam"</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">valid</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">local</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"t"</span><span class="p">)[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
 
 <span class="n">pm10_h</span><span class="p">,</span> <span class="n">pm25_h</span> <span class="o">=</span> <span class="n">hourly_mean</span><span class="p">(</span><span class="n">celeb</span><span class="p">[</span><span class="s2">"pm10"</span><span class="p">]),</span> <span class="n">hourly_mean</span><span class="p">(</span><span class="n">celeb</span><span class="p">[</span><span class="s2">"pm25"</span><span class="p">])</span>
 <span class="n">pm10_h</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"2026-07-04 22:00"</span><span class="p">:</span><span class="s2">"2026-07-05 02:00"</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def hourly_mean(df):
     valid = df[df["value"] &gt; 0]  # drop negative / nodata sentinels
-    local = pd.to_datetime(valid["datetime_utc"]).dt.tz_convert("Europe/Amsterdam").dt.tz_localize(None)
+    local = (
+        pd.to_datetime(valid["datetime_utc"])
+        .dt.tz_convert("Europe/Amsterdam")
+        .dt.tz_localize(None)
+    )
     return valid.assign(t=local).groupby("t")["value"].mean()
+
 
 pm10_h, pm25_h = hourly_mean(celeb["pm10"]), hourly_mean(celeb["pm25"])
 pm10_h.loc["2026-07-04 22:00":"2026-07-05 02:00"].round(1)</div>
@@ -20325,26 +20345,44 @@ night that the <em>previous</em> night does not show?</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pm10_h</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">pm10_h</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#8c6bb1"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"PM10"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pm25_h</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">pm25_h</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#2166ac"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"PM2.5"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">"2026-07-04 21:00"</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">"2026-07-05 03:00"</span><span class="p">),</span>
-           <span class="n">color</span><span class="o">=</span><span class="s2">"#c1440e"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.12</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"celebration night"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">"2026-07-04 21:00"</span><span class="p">),</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">"2026-07-05 03:00"</span><span class="p">),</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"#c1440e"</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.12</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"celebration night"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">"2026-07-03 00:00"</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">"2026-07-05 12:00"</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"hourly PM (µg/m³)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"local time"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"hourly PM (µg/m³)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"local time"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Rotterdam PM — the night of the 4 July celebration (shaded)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">fig, ax = plt.subplots(figsize=(10, 4.5))
 ax.plot(pm10_h.index, pm10_h.values, color="#8c6bb1", marker=".", label="PM10")
 ax.plot(pm25_h.index, pm25_h.values, color="#2166ac", marker=".", label="PM2.5")
-ax.axvspan(pd.Timestamp("2026-07-04 21:00"), pd.Timestamp("2026-07-05 03:00"),
-           color="#c1440e", alpha=0.12, label="celebration night")
+ax.axvspan(
+    pd.Timestamp("2026-07-04 21:00"),
+    pd.Timestamp("2026-07-05 03:00"),
+    color="#c1440e",
+    alpha=0.12,
+    label="celebration night",
+)
 ax.set_xlim(pd.Timestamp("2026-07-03 00:00"), pd.Timestamp("2026-07-05 12:00"))
 ax.set_ylim(0, 30)
-ax.set_ylabel("hourly PM (µg/m³)"); ax.set_xlabel("local time")
+ax.set_ylabel("hourly PM (µg/m³)")
+ax.set_xlabel("local time")
 ax.set_title("Rotterdam PM — the night of the 4 July celebration (shaded)")
-ax.legend(loc="upper left"); ax.grid(alpha=0.3)
-fig.autofmt_xdate(); plt.tight_layout(); plt.show()</div>
+ax.legend(loc="upper left")
+ax.grid(alpha=0.3)
+fig.autofmt_xdate()
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>

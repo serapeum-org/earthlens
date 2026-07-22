@@ -19840,32 +19840,34 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"bavi2020"</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">BAVI</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">18.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">116.0</span><span class="p">,</span> <span class="mf">138.0</span><span class="p">])</span>  <span class="c1"># East China Sea -&gt; Korea, the whole track</span>
+<span class="n">BAVI</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">18.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">116.0</span><span class="p">,</span> <span class="mf">138.0</span><span class="p">]</span>
+<span class="p">)</span>  <span class="c1"># East China Sea -&gt; Korea, the whole track</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import base64
 import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from earthlens.core import EarthLens
 from IPython.display import HTML
 from pyramids.dataset.collection import DatasetCollection
-
-from earthlens.core import EarthLens
 
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
 OUT = Path("out") / "bavi2020"
 OUT.mkdir(parents=True, exist_ok=True)
-BAVI = dict(lat_lim=[18.0, 43.0], lon_lim=[116.0, 138.0])  # East China Sea -&gt; Korea, the whole track</div>
+BAVI = dict(
+    lat_lim=[18.0, 43.0], lon_lim=[116.0, 138.0]
+)  # East China Sea -&gt; Korea, the whole track</div>
 </div>
 </div>
 </div>
@@ -19923,7 +19925,8 @@ the spiral. We keep them in chronological order.</p>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="s2">"MODIS/061/MOD09GA"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"sur_refl_b01"</span><span class="p">,</span> <span class="s2">"sur_refl_b04"</span><span class="p">,</span> <span class="s2">"sur_refl_b03"</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">day</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">day</span><span class="p">,</span>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
         <span class="n">scale</span><span class="o">=</span><span class="mf">3000.0</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="n">day</span><span class="p">,</span>
@@ -19942,7 +19945,8 @@ for day in days:
         data_source="gee",
         dataset="MODIS/061/MOD09GA",
         variables=["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"],
-        start=day, end=day,
+        start=day,
+        end=day,
         temporal_resolution="daily",
         scale=3000.0,
         path=OUT / day,
@@ -20063,22 +20067,30 @@ GIF plays in any viewer with no JavaScript.</p>
 <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">]</span>
 
 <span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3200</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">))</span>
+<span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3200</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">)</span>
+<span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>  <span class="c1"># stamp each frame with its date</span>
 
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"bavi_2020_timelapse.gif"</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># save_animation() also accepts a Path directly; str() here just keeps the call explicit</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
+    <span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span>
+<span class="p">)</span>  <span class="c1"># save_animation() also accepts a Path directly; str() here just keeps the call explicit</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">labels = [label for label, _ in frames]
 paths = [path for _, path in frames]
 
 cube = DatasetCollection.read_multiple_files(paths, date=False)
-glyph = cube.plot(rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3200}, figsize=(6, 5.5))
+glyph = cube.plot(
+    rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3200}, figsize=(6, 5.5)
+)
 glyph.animate(labels, interval=350)  # stamp each frame with its date
 
 gif_path = OUT / "bavi_2020_timelapse.gif"
-glyph.save_animation(str(gif_path), fps=3)  # save_animation() also accepts a Path directly; str() here just keeps the call explicit
+glyph.save_animation(
+    str(gif_path), fps=3
+)  # save_animation() also accepts a Path directly; str() here just keeps the call explicit
 plt.close("all")</div>
 </div>
 </div>
@@ -20116,10 +20128,14 @@ plt.close("all")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">gif_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-<span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s1">'&lt;img src="data:image/gif;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">" alt="Typhoon Bavi 2020 true-colour time-lapse" /&gt;'</span><span class="p">)</span>
+<span class="n">HTML</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'&lt;img src="data:image/gif;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">" alt="Typhoon Bavi 2020 true-colour time-lapse" /&gt;'</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">encoded = base64.b64encode(gif_path.read_bytes()).decode()
-HTML(f'&lt;img src="data:image/gif;base64,{encoded}" alt="Typhoon Bavi 2020 true-colour time-lapse" /&gt;')</div>
+HTML(
+    f'&lt;img src="data:image/gif;base64,{encoded}" alt="Typhoon Bavi 2020 true-colour time-lapse" /&gt;'
+)</div>
 </div>
 </div>
 </div>

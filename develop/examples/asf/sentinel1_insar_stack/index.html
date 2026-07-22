@@ -19856,7 +19856,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">scout</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'asf'</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'sentinel-1-slc'</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-30'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-30'</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.0</span><span class="p">,</span> <span class="mf">37.5</span><span class="p">],</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">122.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'asf_out'</span><span class="p">,</span>
@@ -19872,7 +19873,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 scout = EarthLens(
     data_source='asf',
     variables=['sentinel-1-slc'],
-    start='2024-06-01', end='2024-06-30',
+    start='2024-06-01',
+    end='2024-06-30',
     lat_lim=[37.0, 37.5],
     lon_lim=[-122.5, -122.0],
     path='asf_out',
@@ -19917,24 +19919,24 @@ print(f'reference granule: {REFERENCE}')</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s1">'insar'</span><span class="p">,</span>                       <span class="c1"># alias for 'asf'</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'insar'</span><span class="p">,</span>  <span class="c1"># alias for 'asf'</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'sentinel-1-slc'</span><span class="p">],</span>
-    <span class="n">reference</span><span class="o">=</span><span class="n">REFERENCE</span><span class="p">,</span>                       <span class="c1"># &lt;-- switches to stack mode</span>
-    <span class="n">perpendicular_baseline</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>    <span class="c1"># metres, (min, max)</span>
-    <span class="n">temporal_baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>                 <span class="c1"># whole days, (min, max)</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>                        <span class="c1"># advisory in stack mode</span>
+    <span class="n">reference</span><span class="o">=</span><span class="n">REFERENCE</span><span class="p">,</span>  <span class="c1"># &lt;-- switches to stack mode</span>
+    <span class="n">perpendicular_baseline</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>  <span class="c1"># metres, (min, max)</span>
+    <span class="n">temporal_baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>  <span class="c1"># whole days, (min, max)</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>  <span class="c1"># advisory in stack mode</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2024-12-31'</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'insar_stack'</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">el</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_mode</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">el = EarthLens(
-    data_source='insar',                       # alias for 'asf'
+    data_source='insar',  # alias for 'asf'
     variables=['sentinel-1-slc'],
-    reference=REFERENCE,                       # &lt;-- switches to stack mode
-    perpendicular_baseline=(-100.0, 100.0),    # metres, (min, max)
-    temporal_baseline=(0, 60),                 # whole days, (min, max)
-    start='2024-01-01',                        # advisory in stack mode
+    reference=REFERENCE,  # &lt;-- switches to stack mode
+    perpendicular_baseline=(-100.0, 100.0),  # metres, (min, max)
+    temporal_baseline=(0, 60),  # whole days, (min, max)
+    start='2024-01-01',  # advisory in stack mode
     end='2024-12-31',
     path='insar_stack',
 )
@@ -20054,7 +20056,7 @@ for product in products:
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'sentinel-1-slc'</span><span class="p">],</span>
     <span class="n">reference</span><span class="o">=</span><span class="n">REFERENCE</span><span class="p">,</span>
     <span class="n">perpendicular_baseline</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">),</span>  <span class="c1"># tighter than before</span>
-    <span class="n">temporal_baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">),</span>             <span class="c1"># 24-day repeat cycle</span>
+    <span class="n">temporal_baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">),</span>  <span class="c1"># 24-day repeat cycle</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2024-12-31'</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'insar_stack_tight'</span><span class="p">,</span>
@@ -20067,7 +20069,7 @@ for product in products:
     variables=['sentinel-1-slc'],
     reference=REFERENCE,
     perpendicular_baseline=(-50.0, 50.0),  # tighter than before
-    temporal_baseline=(0, 24),             # 24-day repeat cycle
+    temporal_baseline=(0, 24),  # 24-day repeat cycle
     start='2024-01-01',
     end='2024-12-31',
     path='insar_stack_tight',

@@ -20143,12 +20143,11 @@ entry point. <code>scipy.ndimage</code> powers the CFAR vessel detector further 
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>  <span class="c1"># pyramids' own IO + plotting</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndimage</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
@@ -20160,12 +20159,11 @@ import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
+from earthlens.core import EarthLens
 from IPython.display import Image, display
 from loguru import logger
 from pyramids.dataset import Dataset, DatasetCollection  # pyramids' own IO + plotting
 from scipy import ndimage
-
-from earthlens.core import EarthLens
 
 warnings.filterwarnings("ignore")
 logger.remove()</div>
@@ -20267,15 +20265,23 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 
 <span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>  <span class="c1"># Earth Engine service-account email (.env)</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>  <span class="c1"># path to the service-account JSON key (.env)</span>
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
+    <span class="s2">"GEE_SERVICE_ACCOUNT"</span>
+<span class="p">]</span>  <span class="c1"># Earth Engine service-account email (.env)</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
+    <span class="s2">"GEE_SERVICE_KEY"</span>
+<span class="p">]</span>  <span class="c1"># path to the service-account JSON key (.env)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv(usecwd=True))
 
-SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]  # Earth Engine service-account email (.env)
-SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]  # path to the service-account JSON key (.env)</div>
+SERVICE_ACCOUNT = os.environ[
+    "GEE_SERVICE_ACCOUNT"
+]  # Earth Engine service-account email (.env)
+SERVICE_KEY = os.environ[
+    "GEE_SERVICE_KEY"
+]  # path to the service-account JSON key (.env)</div>
 </div>
 </div>
 </div>
@@ -20569,7 +20575,9 @@ and saves the result to a GIF in a temporary directory.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">dc</span><span class="p">:</span>
     <span class="n">gif</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="s2">"vv.gif"</span><span class="p">)</span>
-    <span class="n">dc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Strait of Hormuz - Sentinel-1 VV"</span><span class="p">)</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="n">gif</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Strait of Hormuz - Sentinel-1 VV"</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="n">gif</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
     <span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">gif</span><span class="p">))</span>
 <span class="k">else</span><span class="p">:</span>
@@ -20577,7 +20585,9 @@ and saves the result to a GIF in a temporary directory.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">if dc:
     gif = os.path.join(tempfile.mkdtemp(), "vv.gif")
-    dc.plot(band=0, cmap="gray", title="Strait of Hormuz - Sentinel-1 VV").save_animation(gif, fps=1)
+    dc.plot(
+        band=0, cmap="gray", title="Strait of Hormuz - Sentinel-1 VV"
+    ).save_animation(gif, fps=1)
     plt.close("all")
     display(Image(filename=gif))
 else:

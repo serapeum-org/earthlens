@@ -19847,13 +19847,9 @@ back a time series.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import matplotlib.pyplot as plt
-import pandas as pd
-
 from earthlens.earthlens import EarthLens</div>
 </div>
 </div>
@@ -20367,10 +20363,22 @@ wide.tail()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'0.6'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">wide</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wide</span><span class="p">[</span><span class="s1">'oni'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">color</span><span class="o">=</span><span class="s1">'tab:red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'El Nino (ONI &gt; 0)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">wide</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wide</span><span class="p">[</span><span class="s1">'oni'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">color</span><span class="o">=</span><span class="s1">'tab:blue'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'La Nina (ONI &lt; 0)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+    <span class="n">wide</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">,</span>
+    <span class="n">wide</span><span class="p">[</span><span class="s1">'oni'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">color</span><span class="o">=</span><span class="s1">'tab:red'</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">'El Nino (ONI &gt; 0)'</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+    <span class="n">wide</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">,</span>
+    <span class="n">wide</span><span class="p">[</span><span class="s1">'oni'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">color</span><span class="o">=</span><span class="s1">'tab:blue'</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">'La Nina (ONI &lt; 0)'</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Oceanic Nino Index (ONI), monthly'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'degC anomaly'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'upper left'</span><span class="p">)</span>
@@ -20378,10 +20386,22 @@ wide.tail()</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">fig, ax = plt.subplots(figsize=(11, 4))
 ax.axhline(0.0, color='0.6', lw=0.8)
-ax.fill_between(wide.index, 0, wide['oni'].clip(lower=0),
-                color='tab:red', alpha=0.6, label='El Nino (ONI &gt; 0)')
-ax.fill_between(wide.index, 0, wide['oni'].clip(upper=0),
-                color='tab:blue', alpha=0.6, label='La Nina (ONI &lt; 0)')
+ax.fill_between(
+    wide.index,
+    0,
+    wide['oni'].clip(lower=0),
+    color='tab:red',
+    alpha=0.6,
+    label='El Nino (ONI &gt; 0)',
+)
+ax.fill_between(
+    wide.index,
+    0,
+    wide['oni'].clip(upper=0),
+    color='tab:blue',
+    alpha=0.6,
+    label='La Nina (ONI &lt; 0)',
+)
 ax.set_title('Oceanic Nino Index (ONI), monthly')
 ax.set_ylabel('degC anomaly')
 ax.legend(loc='upper left')

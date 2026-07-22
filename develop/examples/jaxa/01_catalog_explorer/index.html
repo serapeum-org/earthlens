@@ -20834,15 +20834,27 @@ Every gportal key:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="p">[</span>
-    <span class="s1">'elevation'</span><span class="p">,</span> <span class="s1">'dem'</span><span class="p">,</span> <span class="s1">'precipitation'</span><span class="p">,</span> <span class="s1">'lccs'</span><span class="p">,</span> <span class="s1">'forest-non-forest'</span><span class="p">,</span>
-    <span class="s1">'palsar2'</span><span class="p">,</span> <span class="s1">'earthcare'</span><span class="p">,</span> <span class="s1">'gpm'</span><span class="p">,</span>
+    <span class="s1">'elevation'</span><span class="p">,</span>
+    <span class="s1">'dem'</span><span class="p">,</span>
+    <span class="s1">'precipitation'</span><span class="p">,</span>
+    <span class="s1">'lccs'</span><span class="p">,</span>
+    <span class="s1">'forest-non-forest'</span><span class="p">,</span>
+    <span class="s1">'palsar2'</span><span class="p">,</span>
+    <span class="s1">'earthcare'</span><span class="p">,</span>
+    <span class="s1">'gpm'</span><span class="p">,</span>
 <span class="p">]:</span>
     <span class="n">row</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alias</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">alias</span><span class="si">:</span><span class="s1">18s</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">key</span><span class="si">:</span><span class="s1">25s</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">protocol</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">for alias in [
-    'elevation', 'dem', 'precipitation', 'lccs', 'forest-non-forest',
-    'palsar2', 'earthcare', 'gpm',
+    'elevation',
+    'dem',
+    'precipitation',
+    'lccs',
+    'forest-non-forest',
+    'palsar2',
+    'earthcare',
+    'gpm',
 ]:
     row = cat.get(alias)
     print(f'{alias:18s} -&gt; {row.key:25s} ({row.protocol})')</div>
@@ -20903,17 +20915,13 @@ gpm                -&gt; gpm-dpr-kupr-l1b          (gportal)
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
 
-<span class="n">families</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span>
-    <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'-'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">by_protocol</span><span class="p">(</span><span class="s1">'jaxa-earth'</span><span class="p">)</span>
-<span class="p">)</span>
+<span class="n">families</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'-'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">by_protocol</span><span class="p">(</span><span class="s1">'jaxa-earth'</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">family</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">families</span><span class="o">.</span><span class="n">most_common</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">family</span><span class="si">:</span><span class="s1">10s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">count</span><span class="si">:</span><span class="s1">3d</span><span class="si">}</span><span class="s1"> collection(s)'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">from collections import Counter
 
-families = Counter(
-    k.split('-', 1)[0] for k in cat.by_protocol('jaxa-earth')
-)
+families = Counter(k.split('-', 1)[0] for k in cat.by_protocol('jaxa-earth'))
 for family, count in families.most_common():
     print(f'  {family:10s} {count:3d} collection(s)')</div>
 </div>

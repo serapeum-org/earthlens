@@ -19832,7 +19832,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">workdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'glaciers-'</span><span class="p">))</span>
@@ -19842,7 +19841,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-
 from earthlens.core import EarthLens
 
 workdir = Path(tempfile.mkdtemp(prefix='glaciers-'))
@@ -19898,7 +19896,7 @@ workdir</div>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'rgi:outlines'</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">45.8</span><span class="p">,</span> <span class="mf">46.05</span><span class="p">],</span>
-    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">6.8</span><span class="p">,</span> <span class="mf">7.2</span><span class="p">],</span>   <span class="c1"># a small box over the Mont Blanc area</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">6.8</span><span class="p">,</span> <span class="mf">7.2</span><span class="p">],</span>  <span class="c1"># a small box over the Mont Blanc area</span>
     <span class="n">path</span><span class="o">=</span><span class="n">workdir</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 
@@ -19908,7 +19906,7 @@ workdir</div>
     data_source='glaciers',
     variables=['rgi:outlines'],
     lat_lim=[45.8, 46.05],
-    lon_lim=[6.8, 7.2],   # a small box over the Mont Blanc area
+    lon_lim=[6.8, 7.2],  # a small box over the Mont Blanc area
     path=workdir,
 ).download()
 
@@ -20100,8 +20098,11 @@ type(fc).__name__, len(fc), str(fc.crs)</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">'area_km2'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'0.4'</span><span class="p">,</span>
-    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="n">column</span><span class="o">=</span><span class="s1">'area_km2'</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'0.4'</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'RGI 7.0 glacier outlines — Mont Blanc area'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Longitude'</span><span class="p">)</span>
@@ -20110,8 +20111,11 @@ type(fc).__name__, len(fc), str(fc.crs)</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">ax = fc.plot(
-    column='area_km2', cmap='Blues', edgecolor='0.4',
-    legend=True, figsize=(8, 6),
+    column='area_km2',
+    cmap='Blues',
+    edgecolor='0.4',
+    legend=True,
+    figsize=(8, 6),
 )
 ax.set_title('RGI 7.0 glacier outlines — Mont Blanc area')
 ax.set_xlabel('Longitude')

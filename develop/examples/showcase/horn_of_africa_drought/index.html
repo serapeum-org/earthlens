@@ -20275,11 +20275,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_dotenv</span><span class="p">,</span> <span class="n">load_dotenv</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
@@ -20290,11 +20288,9 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from dotenv import find_dotenv, load_dotenv
-from loguru import logger
-
 from earthlens.core import EarthLens
+from loguru import logger
 
 logger.disable("earthlens")
 logger.disable("pyramids")</div>
@@ -20899,12 +20895,12 @@ plt.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"mean MAM rainfall  2018: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">wet</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> mm   2022: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dry</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> mm   "</span>
-    <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dry</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">wet</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">+.0f</span><span class="si">}</span><span class="s2">%)"</span>
+    <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dry</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">wet</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">:</span><span class="s2">+.0f</span><span class="si">}</span><span class="s2">%)"</span>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-11">print(
     f"mean MAM rainfall  2018: {np.nanmean(wet):.0f} mm   2022: {np.nanmean(dry):.0f} mm   "
-    f"({(np.nanmean(dry)/np.nanmean(wet)-1)*100:+.0f}%)"
+    f"({(np.nanmean(dry) / np.nanmean(wet) - 1) * 100:+.0f}%)"
 )</div>
 </div>
 </div>
@@ -21145,7 +21141,7 @@ except Exception as exc:
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">"mean NDVI  2018 </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd18</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> -&gt; 2022 </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd22</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> "</span>
-        <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd22</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd18</span><span class="p">))</span><span class="si">:</span><span class="s2">+.3f</span><span class="si">}</span><span class="s2">) - vegetation browning under the drought"</span>
+        <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd22</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">nd18</span><span class="p">))</span><span class="si">:</span><span class="s2">+.3f</span><span class="si">}</span><span class="s2">) - vegetation browning under the drought"</span>
     <span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no NDVI - set GEE credentials and rerun"</span><span class="p">)</span>
@@ -21168,7 +21164,7 @@ except Exception as exc:
     plt.show()
     print(
         f"mean NDVI  2018 {np.nanmean(nd18):.3f} -&gt; 2022 {np.nanmean(nd22):.3f} "
-        f"({(np.nanmean(nd22)-np.nanmean(nd18)):+.3f}) - vegetation browning under the drought"
+        f"({(np.nanmean(nd22) - np.nanmean(nd18)):+.3f}) - vegetation browning under the drought"
     )
 else:
     print("no NDVI - set GEE credentials and rerun")</div>

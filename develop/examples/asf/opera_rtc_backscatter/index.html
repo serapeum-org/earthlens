@@ -19897,9 +19897,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'asf_opera_output'</span><span class="p">)</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -19908,9 +19907,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pyramids.dataset import Dataset
-
 from earthlens.earthlens import EarthLens
+from pyramids.dataset import Dataset
 
 OUT_DIR = Path('asf_opera_output')
 OUT_DIR.mkdir(exist_ok=True)</div>
@@ -19951,9 +19949,10 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'asf'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'opera-rtc-s1'</span><span class="p">],</span>            <span class="c1"># alias 'opera-rtc' also works</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-08'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.2</span><span class="p">,</span> <span class="mf">37.3</span><span class="p">],</span>                  <span class="c1"># SF Bay, ~10 km × 10 km</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'opera-rtc-s1'</span><span class="p">],</span>  <span class="c1"># alias 'opera-rtc' also works</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-08'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.2</span><span class="p">,</span> <span class="mf">37.3</span><span class="p">],</span>  <span class="c1"># SF Bay, ~10 km × 10 km</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">122.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.2</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">),</span>
     <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -19961,14 +19960,21 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 <span class="p">[</span><span class="n">scene</span><span class="p">]</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'scene  :'</span><span class="p">,</span> <span class="n">scene</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'file   :'</span><span class="p">,</span> <span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'fileName'</span><span class="p">])</span>
-<span class="n">size_mb</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'product'</span><span class="p">]</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'fileName'</span><span class="p">],</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e6</span>
+<span class="n">size_mb</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'product'</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">'fileName'</span><span class="p">],</span> <span class="p">{})</span>
+    <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="o">/</span> <span class="mf">1e6</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'size   : </span><span class="si">{</span><span class="n">size_mb</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">el = EarthLens(
     data_source='asf',
-    variables=['opera-rtc-s1'],            # alias 'opera-rtc' also works
-    start='2024-06-01', end='2024-06-08',
-    lat_lim=[37.2, 37.3],                  # SF Bay, ~10 km × 10 km
+    variables=['opera-rtc-s1'],  # alias 'opera-rtc' also works
+    start='2024-06-01',
+    end='2024-06-08',
+    lat_lim=[37.2, 37.3],  # SF Bay, ~10 km × 10 km
     lon_lim=[-122.3, -122.2],
     path=str(OUT_DIR),
     max_results=1,
@@ -19976,7 +19982,13 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 [scene] = el.datasource._search()
 print('scene  :', scene.id)
 print('file   :', scene.metadata['fileName'])
-size_mb = scene.metadata['product'].properties.get('bytes', {}).get(scene.metadata['fileName'], {}).get('bytes', 0) / 1e6
+size_mb = (
+    scene.metadata['product']
+    .properties.get('bytes', {})
+    .get(scene.metadata['fileName'], {})
+    .get('bytes', 0)
+    / 1e6
+)
 print(f'size   : {size_mb:.1f} MB')</div>
 </div>
 </div>
@@ -20061,13 +20073,17 @@ for p in paths:
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">vh_path</span><span class="p">))</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float32'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'shape: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">, dtype: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'value range: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> .. </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (linear power, unitless)'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'value range: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> .. </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (linear power, unitless)'</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">vh_path = paths[0]
 ds = Dataset.read_file(str(vh_path))
 arr = ds.read_array().astype('float32')
 print(f'shape: {arr.shape}, dtype: {arr.dtype}')
-print(f'value range: {np.nanmin(arr):.4f} .. {np.nanmax(arr):.4f}  (linear power, unitless)')</div>
+print(
+    f'value range: {np.nanmin(arr):.4f} .. {np.nanmax(arr):.4f}  (linear power, unitless)'
+)</div>
 </div>
 </div>
 </div>
@@ -20109,7 +20125,7 @@ print(f'value range: {np.nanmin(arr):.4f} .. {np.nanmax(arr):.4f}  (linear power
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">arr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>         <span class="c1"># mask non-positive samples</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">arr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>  <span class="c1"># mask non-positive samples</span>
 <span class="n">db</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
@@ -20120,7 +20136,7 @@ print(f'value range: {np.nanmin(arr):.4f} .. {np.nanmax(arr):.4f}  (linear power
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">arr = np.where(arr &gt; 0, arr, np.nan)         # mask non-positive samples
+<div class="clipboard-copy-txt" id="cell-5">arr = np.where(arr &gt; 0, arr, np.nan)  # mask non-positive samples
 db = 10 * np.log10(arr)
 
 fig, ax = plt.subplots(figsize=(8, 7))
@@ -20169,13 +20185,13 @@ plt.show()</div>
 <span class="k">for</span> <span class="n">fname</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">bundle</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="n">sz</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bytes'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">fmt</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'format'</span><span class="p">,</span> <span class="s1">'?'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">fname</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">:</span><span class="s1">80s</span><span class="si">}</span><span class="s1">  </span><span class="si">{</span><span class="n">sz</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s1">&gt;6.2f</span><span class="si">}</span><span class="s1"> MB  </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">fname</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">:</span><span class="s1">80s</span><span class="si">}</span><span class="s1">  </span><span class="si">{</span><span class="n">sz</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s1">&gt;6.2f</span><span class="si">}</span><span class="s1"> MB  </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">bundle = scene.metadata['product'].properties.get('bytes', {})
 for fname, info in bundle.items():
     sz = info.get('bytes', 0)
     fmt = info.get('format', '?')
-    print(f'  {fname[:80]:80s}  {sz/1e6:&gt;6.2f} MB  {fmt}')</div>
+    print(f'  {fname[:80]:80s}  {sz / 1e6:&gt;6.2f} MB  {fmt}')</div>
 </div>
 </div>
 </div>

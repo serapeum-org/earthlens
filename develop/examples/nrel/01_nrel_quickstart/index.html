@@ -19847,9 +19847,7 @@ the returned <code>pandas.DataFrame</code>s.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="c1"># Credentials come from the environment; they are never printed.</span>
@@ -19861,9 +19859,7 @@ the returned <code>pandas.DataFrame</code>s.</p>
 <div class="clipboard-copy-txt" id="cell-1">import os
 import tempfile
 
-import pandas as pd
 import matplotlib.pyplot as plt
-
 from earthlens.earthlens import EarthLens
 
 # Credentials come from the environment; they are never printed.
@@ -19914,7 +19910,7 @@ the hourly table and writes it to <code>path</code> as CSV.</p>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"ghi"</span><span class="p">,</span> <span class="s2">"dni"</span><span class="p">,</span> <span class="s2">"dhi"</span><span class="p">,</span> <span class="s2">"air_temperature"</span><span class="p">],</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2020-01-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2020-12-31"</span><span class="p">,</span>
-    <span class="n">point</span><span class="o">=</span><span class="p">(</span><span class="mf">39.74</span><span class="p">,</span> <span class="o">-</span><span class="mf">105.18</span><span class="p">),</span>     <span class="c1"># Denver, Colorado</span>
+    <span class="n">point</span><span class="o">=</span><span class="p">(</span><span class="mf">39.74</span><span class="p">,</span> <span class="o">-</span><span class="mf">105.18</span><span class="p">),</span>  <span class="c1"># Denver, Colorado</span>
     <span class="n">api_key</span><span class="o">=</span><span class="n">API_KEY</span><span class="p">,</span>
     <span class="n">email</span><span class="o">=</span><span class="n">EMAIL</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
@@ -19928,7 +19924,7 @@ the hourly table and writes it to <code>path</code> as CSV.</p>
     variables=["ghi", "dni", "dhi", "air_temperature"],
     start="2020-01-01",
     end="2020-12-31",
-    point=(39.74, -105.18),     # Denver, Colorado
+    point=(39.74, -105.18),  # Denver, Colorado
     api_key=API_KEY,
     email=EMAIL,
     path=OUT,

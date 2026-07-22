@@ -19798,20 +19798,13 @@ air density at 100 m for a small box near DTU (Denmark) and compare them.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
-
-import numpy as np
-from pyramids.dataset import Dataset
-
+<div class="clipboard-copy-txt" id="cell-1">import numpy as np
 from earthlens.earthlens import EarthLens
-</div>
+from pyramids.dataset import Dataset</div>
 </div>
 </div>
 </div>
@@ -19882,8 +19875,7 @@ paths = EarthLens(
     path="wind_layers_out",
 ).download(progress_bar=False)
 for layer, path in zip(layers, paths):
-    print(f"{layer:22s} -&gt; {path.name}")
-</div>
+    print(f"{layer:22s} -&gt; {path.name}")</div>
 </div>
 </div>
 </div>
@@ -19968,9 +19960,19 @@ three share the same EPSG:4326 grid and AOI; only the quantity differs.</p>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64'</span><span class="p">)</span>
     <span class="n">finite</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">a</span><span class="p">)]</span>
-    <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">layer</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">finite</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">finite</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">finite</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span> <span class="mi">3</span><span class="p">)))</span>
+    <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">layer</span><span class="p">,</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span>
+            <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">finite</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">finite</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">finite</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'layer'</span><span class="p">,</span> <span class="s1">'cols'</span><span class="p">,</span> <span class="s1">'rows'</span><span class="p">,</span> <span class="s1">'min'</span><span class="p">,</span> <span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'max'</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">rows = []
@@ -19978,11 +19980,20 @@ for layer, path in zip(layers, paths):
     ds = Dataset.read_file(str(path))
     a = np.asarray(ds.read_array(), dtype='float64')
     finite = a[np.isfinite(a)]
-    rows.append((layer, ds.columns, ds.rows, round(float(finite.min()), 3), round(float(finite.mean()), 3), round(float(finite.max()), 3)))
+    rows.append(
+        (
+            layer,
+            ds.columns,
+            ds.rows,
+            round(float(finite.min()), 3),
+            round(float(finite.mean()), 3),
+            round(float(finite.max()), 3),
+        )
+    )
 
 import pandas as pd
-pd.DataFrame(rows, columns=['layer', 'cols', 'rows', 'min', 'mean', 'max'])
-</div>
+
+pd.DataFrame(rows, columns=['layer', 'cols', 'rows', 'min', 'mean', 'max'])</div>
 </div>
 </div>
 </div>

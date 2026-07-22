@@ -19799,8 +19799,7 @@ small area returns in seconds — no whole-file download.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens.earthlens import EarthLens
-</div>
+<div class="clipboard-copy-txt" id="cell-1">from earthlens.earthlens import EarthLens</div>
 </div>
 </div>
 </div>
@@ -19852,8 +19851,7 @@ small area returns in seconds — no whole-file download.</p>
     lon_lim=[12.0, 12.5],
     path="swa_out",
 ).download(progress_bar=False)
-paths
-</div>
+paths</div>
 </div>
 </div>
 </div>
@@ -19929,7 +19927,9 @@ paths
 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64'</span><span class="p">)</span>
 <span class="n">finite</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">)]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'grid     :'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="s1">'EPSG'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'wind m/s : min </span><span class="si">%.2f</span><span class="s1">  mean </span><span class="si">%.2f</span><span class="s1">  max </span><span class="si">%.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">finite</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">finite</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">finite</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'wind m/s : min </span><span class="si">{</span><span class="n">finite</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">  mean </span><span class="si">{</span><span class="n">finite</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">  max </span><span class="si">{</span><span class="n">finite</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">'</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import numpy as np
 from pyramids.dataset import Dataset
@@ -19938,8 +19938,9 @@ ds = Dataset.read_file(str(paths[0]))
 arr = np.asarray(ds.read_array(), dtype='float64')
 finite = arr[np.isfinite(arr)]
 print('grid     :', ds.columns, 'x', ds.rows, 'EPSG', ds.epsg)
-print('wind m/s : min %.2f  mean %.2f  max %.2f' % (finite.min(), finite.mean(), finite.max()))
-</div>
+print(
+    f'wind m/s : min {finite.min():.2f}  mean {finite.mean():.2f}  max {finite.max():.2f}'
+)</div>
 </div>
 </div>
 </div>

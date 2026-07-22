@@ -20231,11 +20231,15 @@ pd.DataFrame(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="n">eligible</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">tailor_product_type</span><span class="p">}</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">eligible</span><span class="p">)</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated collections are Data-Tailor-eligible"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">eligible</span><span class="p">)</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated collections are Data-Tailor-eligible"</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">cat = Catalog()
 eligible = {k: c for k, c in cat.datasets.items() if c.tailor_product_type}
-print(f"{len(eligible)} of {len(cat.datasets)} curated collections are Data-Tailor-eligible")</div>
+print(
+    f"{len(eligible)} of {len(cat.datasets)} curated collections are Data-Tailor-eligible"
+)</div>
 </div>
 </div>
 </div>
@@ -20517,9 +20521,13 @@ pd.DataFrame(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"s5p-l2-no2 tailor_product_type:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s2">"s5p-l2-no2"</span><span class="p">)</span><span class="o">.</span><span class="n">tailor_product_type</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"s5p-l2-no2 tailor_product_type:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s2">"s5p-l2-no2"</span><span class="p">)</span><span class="o">.</span><span class="n">tailor_product_type</span>
+<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">print("s5p-l2-no2 tailor_product_type:", cat.get_dataset("s5p-l2-no2").tailor_product_type)</div>
+<div class="clipboard-copy-txt" id="cell-7">print(
+    "s5p-l2-no2 tailor_product_type:", cat.get_dataset("s5p-l2-no2").tailor_product_type
+)</div>
 </div>
 </div>
 </div>

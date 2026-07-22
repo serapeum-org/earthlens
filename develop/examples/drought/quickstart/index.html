@@ -19904,11 +19904,13 @@ everything we need.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.drought</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import datetime as dt
 
 from earthlens.core import EarthLens
+
 from earthlens.drought import Catalog</div>
 </div>
 </div>
@@ -19954,12 +19956,26 @@ independently of when it is run.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">WINDOW_END</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">23</span><span class="p">)</span>  <span class="c1"># known-valid USDM week</span>
 <span class="n">WINDOW_START</span> <span class="o">=</span> <span class="n">WINDOW_END</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
 <span class="n">TODAY</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># well past WINDOW_END's release Thursday</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'window:'</span><span class="p">,</span> <span class="n">WINDOW_START</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="s1">'to'</span><span class="p">,</span> <span class="n">WINDOW_END</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="s1">'today:'</span><span class="p">,</span> <span class="n">TODAY</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s1">'window:'</span><span class="p">,</span>
+    <span class="n">WINDOW_START</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="s1">'to'</span><span class="p">,</span>
+    <span class="n">WINDOW_END</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="s1">'today:'</span><span class="p">,</span>
+    <span class="n">TODAY</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">WINDOW_END = dt.date(2025, 6, 23)  # known-valid USDM week
 WINDOW_START = WINDOW_END - dt.timedelta(days=14)
 TODAY = dt.date(2025, 7, 1)  # well past WINDOW_END's release Thursday
-print('window:', WINDOW_START.isoformat(), 'to', WINDOW_END.isoformat(), 'today:', TODAY.isoformat())</div>
+print(
+    'window:',
+    WINDOW_START.isoformat(),
+    'to',
+    WINDOW_END.isoformat(),
+    'today:',
+    TODAY.isoformat(),
+)</div>
 </div>
 </div>
 </div>
@@ -20228,17 +20244,17 @@ ISO date is the <strong>Tuesday valid date</strong>, not the Thursday release da
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">summary</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">fc</span><span class="p">[[</span><span class="s1">'release_date'</span><span class="p">,</span> <span class="s1">'DM'</span><span class="p">,</span> <span class="s1">'Shape_Area'</span><span class="p">]]</span>
-      <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">'release_date'</span><span class="p">,</span> <span class="s1">'DM'</span><span class="p">])</span>
-      <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">area</span><span class="o">=</span><span class="p">(</span><span class="s1">'Shape_Area'</span><span class="p">,</span> <span class="s1">'sum'</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="p">(</span><span class="s1">'DM'</span><span class="p">,</span> <span class="s1">'size'</span><span class="p">))</span>
-      <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">'release_date'</span><span class="p">,</span> <span class="s1">'DM'</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">area</span><span class="o">=</span><span class="p">(</span><span class="s1">'Shape_Area'</span><span class="p">,</span> <span class="s1">'sum'</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="p">(</span><span class="s1">'DM'</span><span class="p">,</span> <span class="s1">'size'</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 <span class="p">)</span>
 <span class="n">summary</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">summary = (
     fc[['release_date', 'DM', 'Shape_Area']]
-      .groupby(['release_date', 'DM'])
-      .agg(area=('Shape_Area', 'sum'), n=('DM', 'size'))
-      .reset_index()
+    .groupby(['release_date', 'DM'])
+    .agg(area=('Shape_Area', 'sum'), n=('DM', 'size'))
+    .reset_index()
 )
 summary</div>
 </div>
@@ -20432,7 +20448,8 @@ USDM colours. We use the most recent snapped release so the map shows one consis
     <span class="n">color</span><span class="o">=</span><span class="n">latest</span><span class="p">[</span><span class="s1">'color'</span><span class="p">],</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'#444'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'USDM drought classes — release </span><span class="si">{</span><span class="n">latest_release</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'longitude'</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'latitude'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'longitude'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'latitude'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -20447,7 +20464,8 @@ ax = latest.plot(
     color=latest['color'], edgecolor='#444', linewidth=0.4, figsize=(10, 5)
 )
 ax.set_title(f'USDM drought classes — release {latest_release}')
-ax.set_xlabel('longitude'); ax.set_ylabel('latitude')
+ax.set_xlabel('longitude')
+ax.set_ylabel('latitude')
 plt.tight_layout()
 plt.show()</div>
 </div>

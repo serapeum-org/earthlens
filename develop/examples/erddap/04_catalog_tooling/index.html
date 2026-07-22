@@ -19871,9 +19871,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cli.adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_backends</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cli.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_one</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cli.refresh</span><span class="w"> </span><span class="kn">import</span> <span class="n">coverage_one</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cli.stanza</span><span class="w"> </span><span class="kn">import</span> <span class="n">emit_stanza</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cli.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_one</span>
 
 <span class="n">info</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">list_backends</span><span class="p">()</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">provider</span> <span class="o">==</span> <span class="s1">'erddap'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'provider:'</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">provider</span><span class="p">)</span>
@@ -19881,9 +19881,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="nb">print</span><span class="p">(</span><span class="s1">'aliases: '</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">aliases</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.cli.adapter import list_backends
-from earthlens.cli.validate import validate_one
 from earthlens.cli.refresh import coverage_one
 from earthlens.cli.stanza import emit_stanza
+from earthlens.cli.validate import validate_one
 
 info = next(b for b in list_backends() if b.provider == 'erddap')
 print('provider:', info.provider)

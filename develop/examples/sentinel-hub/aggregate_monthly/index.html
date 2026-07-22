@@ -19783,7 +19783,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">has_sh_credentials</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -19814,7 +19813,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="k">return</span> <span class="n">results</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
-from pathlib import Path
 
 
 def has_sh_credentials() -&gt; bool:
@@ -19878,8 +19876,8 @@ def run_or_skip(facade, **download_kwargs):
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'sentinel-hub'</span><span class="p">,</span>
@@ -19894,8 +19892,8 @@ def run_or_skip(facade, **download_kwargs):
 <span class="n">paths</span> <span class="o">=</span> <span class="n">run_or_skip</span><span class="p">(</span><span class="n">facade</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">'1MS'</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">))</span>
 <span class="n">paths</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from earthlens.core import EarthLens
-from earthlens.aggregate import AggregationConfig
+<div class="clipboard-copy-txt" id="cell-2">from earthlens.aggregate import AggregationConfig
+from earthlens.core import EarthLens
 
 facade = EarthLens(
     data_source='sentinel-hub',

@@ -19801,8 +19801,7 @@ the no-network companion to the live wind quickstart.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import pandas as pd
 
-from earthlens.solar_wind_atlas import Catalog
-</div>
+from earthlens.solar_wind_atlas import Catalog</div>
 </div>
 </div>
 </div>
@@ -19863,8 +19862,7 @@ rows = [
     }
     for lid in catalog.available()
 ]
-pd.DataFrame(rows)
-</div>
+pd.DataFrame(rows)</div>
 </div>
 </div>
 </div>
@@ -20083,8 +20081,7 @@ locally.</li>
 <div class="clipboard-copy-txt" id="cell-3">by_transport = {}
 for lid in catalog.available():
     by_transport.setdefault(catalog.get(lid).transport, []).append(lid)
-by_transport
-</div>
+by_transport</div>
 </div>
 </div>
 </div>
@@ -20151,8 +20148,7 @@ by_transport
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gho"</span><span class="p">)</span>  <span class="c1"># unknown id -&gt; ValueError with a did-you-mean hint</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">catalog.get("gho")  # unknown id -&gt; ValueError with a did-you-mean hint
-</div>
+<div class="clipboard-copy-txt" id="cell-4">catalog.get("gho")  # unknown id -&gt; ValueError with a did-you-mean hint</div>
 </div>
 </div>
 </div>

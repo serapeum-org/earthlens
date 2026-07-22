@@ -19819,11 +19819,10 @@ embeds it as an in-browser player. Earth Engine needs a service account, read fr
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">animation</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">PillowWriter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
@@ -19836,11 +19835,10 @@ from pathlib import Path
 
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+from earthlens.core import EarthLens
 from IPython.display import HTML
 from matplotlib.animation import PillowWriter
 from pyramids.dataset import Dataset
-
-from earthlens.core import EarthLens
 
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
@@ -19900,12 +19898,14 @@ are part of the picture: they <em>are</em> the weather moving.)</p>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"MODIS/061/MOD09GA"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"sur_refl_b01"</span><span class="p">,</span> <span class="s2">"sur_refl_b04"</span><span class="p">,</span> <span class="s2">"sur_refl_b03"</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2026-06-17"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2026-06-27"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2026-06-17"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2026-06-27"</span><span class="p">,</span>
     <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
     <span class="n">scale</span><span class="o">=</span><span class="mf">4000.0</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
     <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">38.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">14.0</span><span class="p">],</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">38.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">14.0</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="n">job</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
 <span class="n">frame_paths</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -19915,12 +19915,14 @@ are part of the picture: they <em>are</em> the weather moving.)</p>
     data_source="gee",
     dataset="MODIS/061/MOD09GA",
     variables=["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"],
-    start="2026-06-17", end="2026-06-27",
+    start="2026-06-17",
+    end="2026-06-27",
     temporal_resolution="daily",
     scale=4000.0,
     path=OUT,
     export_via="url",
-    lat_lim=[38.0, 54.0], lon_lim=[-10.0, 14.0],
+    lat_lim=[38.0, 54.0],
+    lon_lim=[-10.0, 14.0],
 )
 job.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
 frame_paths = job.download(progress_bar=False)
@@ -20059,11 +20061,15 @@ often shows up blank).</p>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mf">4.3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">draw_frame</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-    <span class="n">datasets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3200</span><span class="p">},</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">)</span>
+    <span class="n">datasets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3200</span><span class="p">},</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span>
+    <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"MODIS true colour — </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
+
 
 <span class="n">anim</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">draw_frame</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">))</span>
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heatwave_timelapse.gif"</span>
@@ -20075,11 +20081,15 @@ dates = [p.stem.split("_")[-1] for p in frame_paths]
 
 fig, ax = plt.subplots(figsize=(6, 4.3), dpi=64)
 
+
 def draw_frame(i):
     ax.clear()
-    datasets[i].plot(rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3200}, ax=ax, fig=fig)
+    datasets[i].plot(
+        rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3200}, ax=ax, fig=fig
+    )
     ax.set_title(f"MODIS true colour — {dates[i]}")
     ax.axis("off")
+
 
 anim = animation.FuncAnimation(fig, draw_frame, frames=len(datasets))
 gif_path = OUT / "heatwave_timelapse.gif"
@@ -20121,10 +20131,14 @@ plt.close(fig)</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">gif_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-<span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s1">'&lt;img src="data:image/gif;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">" alt="MODIS true-colour time-lapse" /&gt;'</span><span class="p">)</span>
+<span class="n">HTML</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'&lt;img src="data:image/gif;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">" alt="MODIS true-colour time-lapse" /&gt;'</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">encoded = base64.b64encode(gif_path.read_bytes()).decode()
-HTML(f'&lt;img src="data:image/gif;base64,{encoded}" alt="MODIS true-colour time-lapse" /&gt;')</div>
+HTML(
+    f'&lt;img src="data:image/gif;base64,{encoded}" alt="MODIS true-colour time-lapse" /&gt;'
+)</div>
 </div>
 </div>
 </div>

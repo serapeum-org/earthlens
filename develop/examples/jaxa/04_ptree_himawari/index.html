@@ -19811,7 +19811,7 @@ by_protocol("ptree"): ['himawari-ahi-fldk']
 <span class="c1"># Match the notebook's example: one 10-min slot -&gt; start == end (floored).</span>
 <span class="n">end</span> <span class="o">=</span> <span class="n">start</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'window: </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1"> .. </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s1"> (UTC)'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import datetime as dt
 
@@ -19821,7 +19821,7 @@ start = slot.strftime('%Y-%m-%d %H:%M')
 # Match the notebook's example: one 10-min slot -&gt; start == end (floored).
 end = start
 print(f'window: {start} .. {end} (UTC)')
-print(f'expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)')</div>
+print('expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)')</div>
 </div>
 </div>
 </div>
@@ -19879,12 +19879,17 @@ expected: 10 files (all segments S01/10..S10/10 of B03 at that slot)
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'ptree_out'</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
 
-<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'JAXA_PTREE_USERNAME'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'JAXA_PTREE_PASSWORD'</span><span class="p">)):</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'JAXA_PTREE_USERNAME'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'JAXA_PTREE_PASSWORD'</span><span class="p">)</span>
+<span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">'SKIP: $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD not set.'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'Register at https://www.eorc.jaxa.jp/ptree/registration_top.html and re-run.'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s1">'Register at https://www.eorc.jaxa.jp/ptree/registration_top.html and re-run.'</span>
+    <span class="p">)</span>
     <span class="n">written</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
     <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'jaxa'</span><span class="p">,</span>
@@ -19908,12 +19913,17 @@ from pathlib import Path
 
 OUT_DIR = Path('ptree_out').resolve()
 
-if not (os.environ.get('JAXA_PTREE_USERNAME') and os.environ.get('JAXA_PTREE_PASSWORD')):
+if not (
+    os.environ.get('JAXA_PTREE_USERNAME') and os.environ.get('JAXA_PTREE_PASSWORD')
+):
     print('SKIP: $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD not set.')
-    print('Register at https://www.eorc.jaxa.jp/ptree/registration_top.html and re-run.')
+    print(
+        'Register at https://www.eorc.jaxa.jp/ptree/registration_top.html and re-run.'
+    )
     written = []
 else:
     from earthlens.core import EarthLens
+
     OUT_DIR.mkdir(exist_ok=True)
     lens = EarthLens(
         data_source='jaxa',
@@ -19993,8 +20003,11 @@ else:
     <span class="nb">print</span><span class="p">(</span><span class="s1">'No file to inspect — re-run the previous cell with creds set.'</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
     <span class="n">total_bytes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">written</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'total downloaded: </span><span class="si">{</span><span class="n">total_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="p">)</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s1"> files'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'total downloaded: </span><span class="si">{</span><span class="n">total_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">)</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> MB across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s1"> files'</span>
+    <span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
     <span class="c1"># Parse one filename and print its fields.</span>
     <span class="n">sample</span> <span class="o">=</span> <span class="n">written</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -20018,8 +20031,11 @@ else:
     print('No file to inspect — re-run the previous cell with creds set.')
 else:
     import re
+
     total_bytes = sum(p.stat().st_size for p in written)
-    print(f'total downloaded: {total_bytes / (1024*1024):.1f} MB across {len(written)} files')
+    print(
+        f'total downloaded: {total_bytes / (1024 * 1024):.1f} MB across {len(written)} files'
+    )
     print()
     # Parse one filename and print its fields.
     sample = written[0]

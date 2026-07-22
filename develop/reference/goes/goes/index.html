@@ -21765,8 +21765,7 @@ need the downstream reader.</p>
 <span class="normal"><a href="#__codelineno-0-542">542</a></span>
 <span class="normal"><a href="#__codelineno-0-543">543</a></span>
 <span class="normal"><a href="#__codelineno-0-544">544</a></span>
-<span class="normal"><a href="#__codelineno-0-545">545</a></span>
-<span class="normal"><a href="#__codelineno-0-546">546</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">class</span><span class="w"> </span><span class="nc">GOES</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-545">545</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">class</span><span class="w"> </span><span class="nc">GOES</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NOAA GOES-R ABI backend (raw geostationary NetCDF granules).</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Wraps the unsigned `noaa-goes*` buckets so a user pulls a</span>
@@ -22024,68 +22023,67 @@ need the downstream reader.</p>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a>                <span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bucket</span><span class="si">}</span><span class="s2"> (not yet published or an outage).&quot;</span>
 <a id="__codelineno-0-483" name="__codelineno-0-483"></a>            <span class="p">)</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>            <span class="sa">f</span><span class="s2">&quot;goes: planned </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> granule(s) for </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> on &quot;</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bucket</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="p">)</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">return</span> <span class="n">products</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download each granule whole to `self.root_dir` (unsigned boto3).</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            products: The granules from :meth:`_search`.</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            list[Path]: The written NetCDF paths, in order.</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>            <span class="n">products</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;goes&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;granule&quot;</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>        <span class="p">):</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="n">dest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">download_key</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">],</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>        <span class="k">return</span> <span class="n">out</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        :meth:`_fetch` (whole-granule download). The granules are raw,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        undecoded NetCDF — reading / cropping / band extraction is a</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        downstream pyramids (or `satpy`) step.</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">            progress_bar: Show a per-granule progress bar. Defaults to</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            aggregate: Must be `None`. GOES granules are raw geostationary</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">                NetCDF served whole, so a time-window reduce would need</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">                the downstream reader; aggregation is unsupported here.</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            list[Path]: The written granule paths, or an empty list when</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">                nothing in the window was available.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>                <span class="s2">&quot;GOES.download(aggregate=...) is not supported — the granules &quot;</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>                <span class="s2">&quot;are raw, undecoded geostationary NetCDF; read and reduce them &quot;</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>                <span class="s2">&quot;downstream with pyramids / satpy.&quot;</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>            <span class="p">)</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>            <span class="sa">f</span><span class="s2">&quot;goes: planned </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> granule(s) for </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bucket</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="p">)</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="k">return</span> <span class="n">products</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download each granule whole to `self.root_dir` (unsigned boto3).</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            products: The granules from :meth:`_search`.</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            list[Path]: The written NetCDF paths, in order.</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="n">products</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;goes&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;granule&quot;</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="p">):</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="n">dest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="n">download_key</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">],</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>        <span class="k">return</span> <span class="n">out</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        :meth:`_fetch` (whole-granule download). The granules are raw,</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        undecoded NetCDF — reading / cropping / band extraction is a</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        downstream pyramids (or `satpy`) step.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            progress_bar: Show a per-granule progress bar. Defaults to</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            aggregate: Must be `None`. GOES granules are raw geostationary</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">                NetCDF served whole, so a time-window reduce would need</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">                the downstream reader; aggregation is unsupported here.</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">            list[Path]: The written granule paths, or an empty list when</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">                nothing in the window was available.</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>                <span class="s2">&quot;GOES.download(aggregate=...) is not supported — the granules &quot;</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>                <span class="s2">&quot;are raw, undecoded geostationary NetCDF; read and reduce them &quot;</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>                <span class="s2">&quot;downstream with pyramids / satpy.&quot;</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>            <span class="p">)</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22680,7 +22678,8 @@ nothing in the window was available.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-513">513</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-512">512</a></span>
+<span class="normal"><a href="#__codelineno-0-513">513</a></span>
 <span class="normal"><a href="#__codelineno-0-514">514</a></span>
 <span class="normal"><a href="#__codelineno-0-515">515</a></span>
 <span class="normal"><a href="#__codelineno-0-516">516</a></span>
@@ -22712,41 +22711,40 @@ nothing in the window was available.</p>
 <span class="normal"><a href="#__codelineno-0-542">542</a></span>
 <span class="normal"><a href="#__codelineno-0-543">543</a></span>
 <span class="normal"><a href="#__codelineno-0-544">544</a></span>
-<span class="normal"><a href="#__codelineno-0-545">545</a></span>
-<span class="normal"><a href="#__codelineno-0-546">546</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    :meth:`_fetch` (whole-granule download). The granules are raw,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">    undecoded NetCDF — reading / cropping / band extraction is a</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">    downstream pyramids (or `satpy`) step.</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        progress_bar: Show a per-granule progress bar. Defaults to</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">        aggregate: Must be `None`. GOES granules are raw geostationary</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            NetCDF served whole, so a time-window reduce would need</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">            the downstream reader; aggregation is unsupported here.</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        list[Path]: The written granule paths, or an empty list when</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            nothing in the window was available.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>            <span class="s2">&quot;GOES.download(aggregate=...) is not supported — the granules &quot;</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>            <span class="s2">&quot;are raw, undecoded geostationary NetCDF; read and reduce them &quot;</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>            <span class="s2">&quot;downstream with pyramids / satpy.&quot;</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="p">)</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-545">545</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">    :meth:`_fetch` (whole-granule download). The granules are raw,</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    undecoded NetCDF — reading / cropping / band extraction is a</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">    downstream pyramids (or `satpy`) step.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">        progress_bar: Show a per-granule progress bar. Defaults to</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        aggregate: Must be `None`. GOES granules are raw geostationary</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            NetCDF served whole, so a time-window reduce would need</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            the downstream reader; aggregation is unsupported here.</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        list[Path]: The written granule paths, or an empty list when</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            nothing in the window was available.</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="s2">&quot;GOES.download(aggregate=...) is not supported — the granules &quot;</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>            <span class="s2">&quot;are raw, undecoded geostationary NetCDF; read and reduce them &quot;</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>            <span class="s2">&quot;downstream with pyramids / satpy.&quot;</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>        <span class="p">)</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23810,8 +23808,7 @@ need the downstream reader.</p>
 <span class="normal"><a href="#__codelineno-0-542">542</a></span>
 <span class="normal"><a href="#__codelineno-0-543">543</a></span>
 <span class="normal"><a href="#__codelineno-0-544">544</a></span>
-<span class="normal"><a href="#__codelineno-0-545">545</a></span>
-<span class="normal"><a href="#__codelineno-0-546">546</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">class</span><span class="w"> </span><span class="nc">GOES</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-545">545</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">class</span><span class="w"> </span><span class="nc">GOES</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NOAA GOES-R ABI backend (raw geostationary NetCDF granules).</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Wraps the unsigned `noaa-goes*` buckets so a user pulls a</span>
@@ -24069,68 +24066,67 @@ need the downstream reader.</p>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a>                <span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bucket</span><span class="si">}</span><span class="s2"> (not yet published or an outage).&quot;</span>
 <a id="__codelineno-0-483" name="__codelineno-0-483"></a>            <span class="p">)</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>            <span class="sa">f</span><span class="s2">&quot;goes: planned </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> granule(s) for </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> on &quot;</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bucket</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="p">)</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">return</span> <span class="n">products</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download each granule whole to `self.root_dir` (unsigned boto3).</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            products: The granules from :meth:`_search`.</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            list[Path]: The written NetCDF paths, in order.</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>            <span class="n">products</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;goes&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;granule&quot;</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>        <span class="p">):</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="n">dest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">download_key</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">],</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>        <span class="k">return</span> <span class="n">out</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        :meth:`_fetch` (whole-granule download). The granules are raw,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        undecoded NetCDF — reading / cropping / band extraction is a</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        downstream pyramids (or `satpy`) step.</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">            progress_bar: Show a per-granule progress bar. Defaults to</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            aggregate: Must be `None`. GOES granules are raw geostationary</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">                NetCDF served whole, so a time-window reduce would need</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">                the downstream reader; aggregation is unsupported here.</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            list[Path]: The written granule paths, or an empty list when</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">                nothing in the window was available.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>                <span class="s2">&quot;GOES.download(aggregate=...) is not supported — the granules &quot;</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>                <span class="s2">&quot;are raw, undecoded geostationary NetCDF; read and reduce them &quot;</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>                <span class="s2">&quot;downstream with pyramids / satpy.&quot;</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>            <span class="p">)</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>            <span class="sa">f</span><span class="s2">&quot;goes: planned </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> granule(s) for </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bucket</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="p">)</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="k">return</span> <span class="n">products</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download each granule whole to `self.root_dir` (unsigned boto3).</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            products: The granules from :meth:`_search`.</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            list[Path]: The written NetCDF paths, in order.</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="n">products</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;goes&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;granule&quot;</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="p">):</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="n">dest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="n">download_key</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">],</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>        <span class="k">return</span> <span class="n">out</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        :meth:`_fetch` (whole-granule download). The granules are raw,</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        undecoded NetCDF — reading / cropping / band extraction is a</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        downstream pyramids (or `satpy`) step.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            progress_bar: Show a per-granule progress bar. Defaults to</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            aggregate: Must be `None`. GOES granules are raw geostationary</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">                NetCDF served whole, so a time-window reduce would need</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">                the downstream reader; aggregation is unsupported here.</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">            list[Path]: The written granule paths, or an empty list when</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">                nothing in the window was available.</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>                <span class="s2">&quot;GOES.download(aggregate=...) is not supported — the granules &quot;</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>                <span class="s2">&quot;are raw, undecoded geostationary NetCDF; read and reduce them &quot;</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>                <span class="s2">&quot;downstream with pyramids / satpy.&quot;</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>            <span class="p">)</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24725,7 +24721,8 @@ nothing in the window was available.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-513">513</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-512">512</a></span>
+<span class="normal"><a href="#__codelineno-0-513">513</a></span>
 <span class="normal"><a href="#__codelineno-0-514">514</a></span>
 <span class="normal"><a href="#__codelineno-0-515">515</a></span>
 <span class="normal"><a href="#__codelineno-0-516">516</a></span>
@@ -24757,41 +24754,40 @@ nothing in the window was available.</p>
 <span class="normal"><a href="#__codelineno-0-542">542</a></span>
 <span class="normal"><a href="#__codelineno-0-543">543</a></span>
 <span class="normal"><a href="#__codelineno-0-544">544</a></span>
-<span class="normal"><a href="#__codelineno-0-545">545</a></span>
-<span class="normal"><a href="#__codelineno-0-546">546</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    :meth:`_fetch` (whole-granule download). The granules are raw,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">    undecoded NetCDF — reading / cropping / band extraction is a</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">    downstream pyramids (or `satpy`) step.</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        progress_bar: Show a per-granule progress bar. Defaults to</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">        aggregate: Must be `None`. GOES granules are raw geostationary</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            NetCDF served whole, so a time-window reduce would need</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">            the downstream reader; aggregation is unsupported here.</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        list[Path]: The written granule paths, or an empty list when</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            nothing in the window was available.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>            <span class="s2">&quot;GOES.download(aggregate=...) is not supported — the granules &quot;</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>            <span class="s2">&quot;are raw, undecoded geostationary NetCDF; read and reduce them &quot;</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>            <span class="s2">&quot;downstream with pyramids / satpy.&quot;</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="p">)</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-545">545</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">    :meth:`_fetch` (whole-granule download). The granules are raw,</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    undecoded NetCDF — reading / cropping / band extraction is a</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">    downstream pyramids (or `satpy`) step.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">        progress_bar: Show a per-granule progress bar. Defaults to</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        aggregate: Must be `None`. GOES granules are raw geostationary</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            NetCDF served whole, so a time-window reduce would need</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            the downstream reader; aggregation is unsupported here.</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        list[Path]: The written granule paths, or an empty list when</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            nothing in the window was available.</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="s2">&quot;GOES.download(aggregate=...) is not supported — the granules &quot;</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>            <span class="s2">&quot;are raw, undecoded geostationary NetCDF; read and reduce them &quot;</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>            <span class="s2">&quot;downstream with pyramids / satpy.&quot;</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>        <span class="p">)</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

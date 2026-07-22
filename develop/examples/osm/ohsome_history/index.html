@@ -19889,7 +19889,6 @@ ODbL <code>LicenseWarning</code>. Unlike Overpass, an ohsome query <strong>needs
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'osm_output'</span><span class="p">)</span>
@@ -19900,7 +19899,6 @@ ODbL <code>LicenseWarning</code>. Unlike Overpass, an ohsome query <strong>needs
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
 import matplotlib.pyplot as plt
-
 from earthlens.core import EarthLens
 
 OUT_DIR = Path('osm_output')
@@ -20055,14 +20053,20 @@ len(buildings_2018), buildings_2018['@snapshotTimestamp'].iloc[0]</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">buildings_2018</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">'#9ecae1'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'#3182bd'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">buildings_2018</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">facecolor</span><span class="o">=</span><span class="s1">'#9ecae1'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'#3182bd'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">buildings_2018</span><span class="p">)</span><span class="si">}</span><span class="s1"> building footprints — 2018-01-01 (ohsome)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'longitude'</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'latitude'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'longitude'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'latitude'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">ax = buildings_2018.plot(facecolor='#9ecae1', edgecolor='#3182bd', linewidth=0.3, figsize=(7, 6))
+<div class="clipboard-copy-txt" id="cell-3">ax = buildings_2018.plot(
+    facecolor='#9ecae1', edgecolor='#3182bd', linewidth=0.3, figsize=(7, 6)
+)
 ax.set_title(f'{len(buildings_2018)} building footprints — 2018-01-01 (ohsome)')
-ax.set_xlabel('longitude'); ax.set_ylabel('latitude')
+ax.set_xlabel('longitude')
+ax.set_ylabel('latitude')
 plt.show()</div>
 </div>
 </div>

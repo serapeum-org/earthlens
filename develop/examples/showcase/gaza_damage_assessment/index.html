@@ -20158,11 +20158,10 @@ lists).</li>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthEngineAuth</span>  <span class="c1"># service-account -&gt; ee.Initialize</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>  <span class="c1"># pyramids' own IO + plotting</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthEngineAuth</span>  <span class="c1"># service-account -&gt; ee.Initialize</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>  <span class="c1"># silence earthlens / pyramids / GDAL log chatter</span>
@@ -20178,11 +20177,10 @@ import ee
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from earthlens.gee.auth import EarthEngineAuth  # service-account -&gt; ee.Initialize
 from IPython.display import Image, display
 from loguru import logger
 from pyramids.dataset import Dataset, DatasetCollection  # pyramids' own IO + plotting
-
-from earthlens.gee.auth import EarthEngineAuth  # service-account -&gt; ee.Initialize
 
 warnings.filterwarnings("ignore")
 logger.remove()  # silence earthlens / pyramids / GDAL log chatter
@@ -20229,7 +20227,9 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 
 <span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>  <span class="c1"># Earth Engine service-account email</span>
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
+    <span class="s2">"GEE_SERVICE_ACCOUNT"</span>
+<span class="p">]</span>  <span class="c1"># Earth Engine service-account email</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>  <span class="c1"># path to the service-account JSON key</span>
 <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">SERVICE_KEY</span><span class="p">)):</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Missing credentials in .env"</span><span class="p">)</span>
@@ -20238,7 +20238,9 @@ GEE_SERVICE_KEY="/path/to/your/service-account-key.json"
 
 load_dotenv(find_dotenv(usecwd=True))
 
-SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]  # Earth Engine service-account email
+SERVICE_ACCOUNT = os.environ[
+    "GEE_SERVICE_ACCOUNT"
+]  # Earth Engine service-account email
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]  # path to the service-account JSON key
 if any(x is None for x in (SERVICE_ACCOUNT, SERVICE_KEY)):
     raise ValueError("Missing credentials in .env")</div>
@@ -20479,7 +20481,9 @@ the true-colour composite into <code>rgb_dir</code>, derive the NDVI raster, and
     <span class="n">tag</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span> <span class="s2">"."</span><span class="p">)</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rgb_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"rgb_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">.tif"</span><span class="p">))</span>
     <span class="n">ndvi</span><span class="p">,</span> <span class="n">src</span> <span class="o">=</span> <span class="n">ndvi_from_nir</span><span class="p">(</span><span class="n">nir</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">ndvi</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
+        <span class="n">arr</span><span class="o">=</span><span class="n">ndvi</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span>
+    <span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ndvi_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"ndvi_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">.tif"</span><span class="p">))</span>  <span class="c1"># persist derived NDVI</span>
     <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
 
@@ -20492,7 +20496,9 @@ for label, start, end in WINDOWS:
     tag = label.replace("-", ".")
     shutil.copy(rgb, os.path.join(rgb_dir, f"rgb_{tag}.tif"))
     ndvi, src = ndvi_from_nir(nir)
-    out = Dataset.create_from_array(arr=ndvi[None, :, :], geo=src.geotransform, epsg=src.epsg)
+    out = Dataset.create_from_array(
+        arr=ndvi[None, :, :], geo=src.geotransform, epsg=src.epsg
+    )
     out.to_file(os.path.join(ndvi_dir, f"ndvi_{tag}.tif"))  # persist derived NDVI
     dates.append(label)
 

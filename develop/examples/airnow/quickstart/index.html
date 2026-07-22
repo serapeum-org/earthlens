@@ -19906,16 +19906,16 @@ clean end-to-end (e.g. under <code>pytest --nbval-lax</code>).</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.airnow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">%matplotlib inline
 import os
 
 import matplotlib.pyplot as plt
-
 from earthlens.core import EarthLens
+
 from earthlens.airnow import Catalog</div>
 </div>
 </div>
@@ -20003,11 +20003,11 @@ This cell needs no network.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bbox_lat</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.3</span><span class="p">]</span>   <span class="c1"># Los Angeles basin</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bbox_lat</span> <span class="o">=</span> <span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">34.3</span><span class="p">]</span>  <span class="c1"># Los Angeles basin</span>
 <span class="n">bbox_lon</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">118.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.1</span><span class="p">]</span>
 <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s2">"2026-01-01"</span><span class="p">,</span> <span class="s2">"2026-01-01"</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">bbox_lat = [34.0, 34.3]   # Los Angeles basin
+<div class="clipboard-copy-txt" id="cell-3">bbox_lat = [34.0, 34.3]  # Los Angeles basin
 bbox_lon = [-118.5, -118.1]
 start, end = "2026-01-01", "2026-01-01"</div>
 </div>
@@ -20056,7 +20056,7 @@ downloading run inside the key check — the notebook stays runnable without a k
         <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
         <span class="n">lat_lim</span><span class="o">=</span><span class="n">bbox_lat</span><span class="p">,</span>
         <span class="n">lon_lim</span><span class="o">=</span><span class="n">bbox_lon</span><span class="p">,</span>
-        <span class="n">data_type</span><span class="o">=</span><span class="s2">"B"</span><span class="p">,</span>          <span class="c1"># both concentration and AQI</span>
+        <span class="n">data_type</span><span class="o">=</span><span class="s2">"B"</span><span class="p">,</span>  <span class="c1"># both concentration and AQI</span>
         <span class="n">path</span><span class="o">=</span><span class="s2">"out/airnow"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -20073,7 +20073,7 @@ if os.environ.get("AIRNOW_API_KEY"):
         end=end,
         lat_lim=bbox_lat,
         lon_lim=bbox_lon,
-        data_type="B",          # both concentration and AQI
+        data_type="B",  # both concentration and AQI
         path="out/airnow",
     )
     df = client.download(progress_bar=False)

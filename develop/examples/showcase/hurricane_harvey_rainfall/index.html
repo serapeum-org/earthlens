@@ -19912,29 +19912,25 @@ accumulation of the downloaded granules; <code>earthlens</code> provides the uni
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span>
 
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="s2">"pyramids"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os
-import tempfile
+<div class="clipboard-copy-txt" id="cell-1">import tempfile
 
 import matplotlib.pyplot as plt
-import numpy as np
 import xarray as xr
+from earthlens.core import EarthLens
 from loguru import logger
 
-from earthlens.core import EarthLens
 from earthlens.base import AuthenticationError
 
 logger.disable("earthlens")
@@ -20117,7 +20113,7 @@ C:\python-environments\pixi\envs\earthlens-7782220113782294872\envs\dev\Lib\site
     <span class="n">total</span> <span class="o">=</span> <span class="n">total</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">,</span> <span class="s2">"lon"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">"storm-total rainfall: peak </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> mm "</span>
-        <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="o">/</span><span class="mf">25.4</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> in) over the cropped box"</span>
+        <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">25.4</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> in) over the cropped box"</span>
     <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">total = None
@@ -20129,7 +20125,7 @@ if paths:
     total = total.transpose("lat", "lon")
     print(
         f"storm-total rainfall: peak {float(total.max()):.0f} mm "
-        f"({float(total.max())/25.4:.0f} in) over the cropped box"
+        f"({float(total.max()) / 25.4:.0f} in) over the cropped box"
     )</div>
 </div>
 </div>

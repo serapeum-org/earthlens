@@ -19939,8 +19939,8 @@ point; <code>Catalog</code> lists the available Geofabrik regions; <code>matplot
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.osm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'osm_pbf_output'</span><span class="p">)</span>
@@ -19949,8 +19949,8 @@ point; <code>Catalog</code> lists the available Geofabrik regions; <code>matplot
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
 import matplotlib.pyplot as plt
-
 from earthlens.core import EarthLens
+
 from earthlens.osm import Catalog
 
 OUT_DIR = Path('osm_pbf_output')
@@ -20258,10 +20258,18 @@ OSM tags pyrosm parsed.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'osm_id'</span><span class="p">,</span> <span class="s1">'osm_type'</span><span class="p">,</span> <span class="s1">'building'</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">,</span> <span class="s1">'geometry'</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">buildings</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">c</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'osm_id'</span><span class="p">,</span> <span class="s1">'osm_type'</span><span class="p">,</span> <span class="s1">'building'</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">,</span> <span class="s1">'geometry'</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">buildings</span><span class="o">.</span><span class="n">columns</span>
+<span class="p">]</span>
 <span class="n">buildings</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">cols = [c for c in ['osm_id', 'osm_type', 'building', 'name', 'geometry'] if c in buildings.columns]
+<div class="clipboard-copy-txt" id="cell-5">cols = [
+    c
+    for c in ['osm_id', 'osm_type', 'building', 'name', 'geometry']
+    if c in buildings.columns
+]
 buildings[cols].head()</div>
 </div>
 </div>

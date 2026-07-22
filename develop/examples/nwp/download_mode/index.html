@@ -19901,18 +19901,24 @@ suite (<code>pytest -m "nwp and e2e"</code>).</p>
 
 <span class="c1"># A tiny request skeleton reused across the cells below.</span>
 <span class="n">REQ</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">'gfs'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'temperature_2m'</span><span class="p">]},</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s1">'out/mode-demo'</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="s1">'out/mode-demo'</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.nwp import NWP
 
 # A tiny request skeleton reused across the cells below.
 REQ = dict(
-    start='2024-06-01', end='2024-06-01',
+    start='2024-06-01',
+    end='2024-06-01',
     variables={'gfs': ['temperature_2m']},
-    lat_lim=[40, 45], lon_lim=[-80, -75], path='out/mode-demo',
+    lat_lim=[40, 45],
+    lon_lim=[-80, -75],
+    path='out/mode-demo',
 )</div>
 </div>
 </div>

@@ -20112,13 +20112,21 @@ interval. Every property offers the same five statistical <strong>layers</strong
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">depth_rows</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">"property"</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s2">"n_depths"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">depths</span><span class="p">),</span> <span class="s2">"depths"</span><span class="p">:</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">depths</span><span class="p">)}</span>
+    <span class="p">{</span>
+        <span class="s2">"property"</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span>
+        <span class="s2">"n_depths"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">depths</span><span class="p">),</span>
+        <span class="s2">"depths"</span><span class="p">:</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">depths</span><span class="p">),</span>
+    <span class="p">}</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span>
 <span class="p">]</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">depth_rows</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"property"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">depth_rows = [
-    {"property": p, "n_depths": len(catalog.get(p).depths), "depths": ", ".join(catalog.get(p).depths)}
+    {
+        "property": p,
+        "n_depths": len(catalog.get(p).depths),
+        "depths": ", ".join(catalog.get(p).depths),
+    }
     for p in catalog.parameters()
 ]
 pd.DataFrame(depth_rows).set_index("property")</div>

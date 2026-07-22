@@ -19990,6 +19990,7 @@ for p in list(result.products())[:3]:
     <span class="n">written</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
     <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'earthlens-jaxa-sgli-'</span><span class="p">))</span>
     <span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'jaxa'</span><span class="p">,</span>
@@ -20015,6 +20016,7 @@ if not (os.environ.get('GPORTAL_USERNAME') and os.environ.get('GPORTAL_PASSWORD'
     written = []
 else:
     from earthlens.core import EarthLens
+
     out_dir = Path(tempfile.mkdtemp(prefix='earthlens-jaxa-sgli-'))
     lens = EarthLens(
         data_source='jaxa',
@@ -20094,8 +20096,13 @@ Register at https://gportal.jaxa.jp/gpr/user/regist1 and re-run.
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'    /</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">()</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">'  selected global attributes:'</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'Satellite'</span><span class="p">,</span> <span class="s1">'Sensor'</span><span class="p">,</span> <span class="s1">'Observation_start_date'</span><span class="p">,</span>
-                         <span class="s1">'Observation_end_date'</span><span class="p">,</span> <span class="s1">'Granule_ID'</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="s1">'Satellite'</span><span class="p">,</span>
+                <span class="s1">'Sensor'</span><span class="p">,</span>
+                <span class="s1">'Observation_start_date'</span><span class="p">,</span>
+                <span class="s1">'Observation_end_date'</span><span class="p">,</span>
+                <span class="s1">'Granule_ID'</span><span class="p">,</span>
+            <span class="p">):</span>
                 <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'    </span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">h</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
@@ -20115,8 +20122,13 @@ else:
                 print(f'    /{k}')
             print()
             print('  selected global attributes:')
-            for attr in ('Satellite', 'Sensor', 'Observation_start_date',
-                         'Observation_end_date', 'Granule_ID'):
+            for attr in (
+                'Satellite',
+                'Sensor',
+                'Observation_start_date',
+                'Observation_end_date',
+                'Granule_ID',
+            ):
                 if attr in h.attrs:
                     print(f'    {attr}: {h.attrs[attr]}')</div>
 </div>
