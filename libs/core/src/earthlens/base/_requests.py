@@ -85,8 +85,8 @@ def normalize_dataset_variables(
             ```
     """
     if dataset is None:
-        result = {"variables": variables}
-    elif "dataset" in inspect.signature(backend_cls.__init__).parameters:
+        result: dict[str, Any] = {"variables": variables}
+    elif "dataset" in inspect.signature(backend_cls).parameters:
         result = {"dataset": dataset, "variables": variables}
     elif isinstance(variables, dict):
         raise ValueError(

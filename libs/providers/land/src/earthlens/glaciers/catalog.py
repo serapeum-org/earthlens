@@ -25,7 +25,7 @@ monkey-patch it at a temporary directory or a single YAML file.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
@@ -433,7 +433,7 @@ class Catalog(AbstractCatalog):
                 the catalog kind and, when a close match exists, adds a
                 did-you-mean hint.
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))
 
     def available(self) -> list[str]:
         """Return the sorted list of shipped dataset ids.

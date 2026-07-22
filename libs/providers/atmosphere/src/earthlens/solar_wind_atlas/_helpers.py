@@ -19,10 +19,16 @@ import math
 import os
 import zipfile
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 from urllib.parse import urlsplit
 
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
+
+if TYPE_CHECKING:
+    import requests
+
+    from earthlens.base import SpatialExtent
 
 #: GDAL `/vsicurl` HTTP settings applied (via `setdefault`) before the first
 #: remote read. `GDAL_DISABLE_READDIR_ON_OPEN` stops GDAL listing the "directory"
@@ -73,7 +79,7 @@ def vsicurl(url: str) -> str:
     return f"/vsicurl/{url}"
 
 
-def bbox_from_extent(space: object) -> list[float]:
+def bbox_from_extent(space: SpatialExtent) -> list[float]:
     """Return the `[west, south, east, north]` bbox of a spatial extent.
 
     Args:
@@ -230,7 +236,11 @@ def download_zip(url: str, cache_dir: Path, *, timeout: float = 600.0) -> Path:
     target = zip_cache_path(url, cache_dir)
     if target.exists() and target.stat().st_size > 0:
         return target
-    client = HttpClient(session=_RequestsGet(), status_forcelist=(), max_backoff=None)
+    client = HttpClient(
+        session=cast("requests.Session | None", _RequestsGet()),
+        status_forcelist=(),
+        max_backoff=None,
+    )
     return client.download(
         url, target, chunk=_DOWNLOAD_CHUNK, progress=False, timeout=timeout
     )

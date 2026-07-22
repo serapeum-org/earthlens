@@ -502,7 +502,9 @@ class NWP(AbstractDataSource):
                     )
         return out
 
-    def _fetch_one(self, product: RemoteProduct, bbox, open_grib, write_cog) -> Path:
+    def _fetch_one(  # type: ignore[override]
+        self, product: RemoteProduct, bbox, open_grib, write_cog
+    ) -> Path:
         """Fetch + crop + write the COG for one product (no error handling).
 
         Args:

@@ -45,7 +45,7 @@ from __future__ import annotations
 import datetime as dt
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 import requests
@@ -278,8 +278,8 @@ class OSM(AbstractDataSource):
         self._cache_dir = Path(cache_dir) if cache_dir else DEFAULT_PBF_CACHE_DIR
         self._catalog = Catalog()
         super().__init__(
-            start=start,
-            end=end,
+            start=cast("str", start),
+            end=cast("str", end),
             variables=list(variables),
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim,
@@ -485,7 +485,7 @@ class OSM(AbstractDataSource):
                 "it with `pip install earthlens[osm]`."
             ) from exc
 
-        template = self._query or dataset.query_template
+        template = cast("str", self._query or dataset.query_template)
         south, west, north, east = bbox_swne(self.space)
         bbox_str = f"{south},{west},{north},{east}"
         # Substitute only the known placeholders — never `str.format` the whole
@@ -496,7 +496,7 @@ class OSM(AbstractDataSource):
         )
         logger.info(f"Querying Overpass for {query_id!r} over bbox ({bbox_str})")
         http = HttpClient(
-            session=_RequestsHttp(),
+            session=cast("requests.Session | None", _RequestsHttp()),
             user_agent=self._user_agent,
             timeout=self._timeout,
             max_retries=0,
@@ -578,7 +578,7 @@ class OSM(AbstractDataSource):
             ValueError: If `self._region` is not a known region / raw path, or
                 a `pyrosm` read is attempted on an oversized extract.
         """
-        region_path = self._catalog.region_path(self._region)
+        region_path = self._catalog.region_path(cast("str", self._region))
         logger.info(
             f"Reading {query_id!r} from Geofabrik region {region_path!r} via the "
             f"{self._engine} engine"
@@ -601,7 +601,7 @@ class OSM(AbstractDataSource):
         path = download_extract(region_path, self._cache_dir, http=http)
         return read_pbf(
             path,
-            pyrosm_method=dataset.pyrosm_method,
+            pyrosm_method=cast("str", dataset.pyrosm_method),
             network_type=dataset.network_type,
             bbox=self._pbf_bbox(),
             engine=self._engine,
@@ -644,7 +644,7 @@ class OSM(AbstractDataSource):
                 "end=), or time=, e.g. start='2020-01-01'."
             )
         if end is None or end == start:
-            return start.strftime("%Y-%m-%d")
+            return cast("str", start.strftime("%Y-%m-%d"))
         return f"{start:%Y-%m-%d}/{end:%Y-%m-%d}"
 
     def _api(self) -> list[FeatureCollection]:

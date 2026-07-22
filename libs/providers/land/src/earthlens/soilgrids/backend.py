@@ -335,7 +335,9 @@ class SoilGrids(AbstractDataSource):
             )
         return plan
 
-    def _fetch_one(self, product: RemoteProduct, tmp_dir: Path) -> Path:
+    def _fetch_one(  # type: ignore[override]
+        self, product: RemoteProduct, tmp_dir: Path
+    ) -> Path:
         """Fetch one coverage's bbox window as a GeoTIFF over WCS.
 
         Uses `pyramids.dataset.Dataset.from_wcs` — GDAL's WCS driver inside

@@ -85,9 +85,9 @@ Examples:
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -218,6 +218,7 @@ def _resolve_pressure_level(
             "`level=1000`). 4-D aggregation across all levels at "
             "once is not supported."
         )
+    assert level_dim is not None  # narrowed by the branches above
     return nc.sel(**{level_dim: level})
 
 
@@ -288,7 +289,7 @@ def _window_groups(
 OperationLiteral = Literal["mean", "sum", "min", "max", "std", "auto"]
 
 
-_REDUCERS_SKIPNA: dict[str, np.ufunc | callable] = {
+_REDUCERS_SKIPNA: dict[str, Callable[..., Any]] = {
     "mean": np.nanmean,
     "sum": np.nansum,
     "min": np.nanmin,
@@ -296,7 +297,7 @@ _REDUCERS_SKIPNA: dict[str, np.ufunc | callable] = {
     "std": np.nanstd,
 }
 
-_REDUCERS_STRICT: dict[str, np.ufunc | callable] = {
+_REDUCERS_STRICT: dict[str, Callable[..., Any]] = {
     "mean": np.mean,
     "sum": np.sum,
     "min": np.min,
@@ -387,7 +388,7 @@ def _reduce(
     if min_count is not None:
         non_nan_count = np.count_nonzero(~np.isnan(arr), axis=0)
         result = np.where(non_nan_count >= min_count, result, np.nan)
-    return result
+    return np.asarray(result)
 
 
 def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:

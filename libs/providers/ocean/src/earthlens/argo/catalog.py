@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import difflib
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -186,7 +186,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `name` is not a registered family.
         """
-        return self.get_dataset(name)
+        return cast("Family", self.get_dataset(name))
 
     def parameters_for(self, family: str) -> set[str]:
         """Return the valid parameter names for a family.

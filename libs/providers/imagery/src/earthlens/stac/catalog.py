@@ -24,7 +24,7 @@ single YAML file.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -404,7 +404,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(collection_key)
+        return cast("Collection", self.get_dataset(collection_key))
 
     def get_endpoint(self, endpoint_key: str) -> Endpoint:
         """Return the :class:`Endpoint` for `endpoint_key`.

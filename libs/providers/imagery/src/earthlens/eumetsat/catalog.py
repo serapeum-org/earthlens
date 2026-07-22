@@ -33,7 +33,7 @@ from __future__ import annotations
 import datetime as _dt
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import (
@@ -468,7 +468,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        dataset = self.get_dataset(key)
+        dataset = cast("EumetsatDataset", self.get_dataset(key))
         if group is not None:
             wanted = group.value if isinstance(group, DataStoreGroup) else str(group)
             if dataset.group.value != wanted:

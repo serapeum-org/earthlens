@@ -15,7 +15,7 @@ Ported (and renamed for the in-`filters` namespace) from
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, cast
 
 import ee
 
@@ -35,7 +35,10 @@ def by_year(collection: ee.ImageCollection, year: int) -> ee.ImageCollection:
         A new `ImageCollection` containing images with
         `system:time_start` inside `[year-01-01, year+1-01-01)`.
     """
-    return collection.filterDate(f"{year}-01-01", f"{year + 1}-01-01")
+    return cast(
+        "ee.ImageCollection",
+        collection.filterDate(f"{year}-01-01", f"{year + 1}-01-01"),
+    )
 
 
 def by_bounds(

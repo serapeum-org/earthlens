@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from earthlens.nwp._helpers import grib_name, valid_time
 from earthlens.nwp.centres.base import _NWPCentre
@@ -41,6 +41,7 @@ from earthlens.base import AuthenticationError
 if TYPE_CHECKING:
     import datetime as dt
 
+    import requests
     from earthlens.nwp.catalog import NWPModel
 
 #: Environment variables checked (in order) for the MF portal API key.
@@ -123,7 +124,7 @@ class MeteoFranceAPICentre(_NWPCentre):
             )
         from earthlens.base.http import HttpClient, RequestsGet
 
-        client = HttpClient(session=RequestsGet())
+        client = HttpClient(session=cast("requests.Session | None", RequestsGet()))
         headers = {"apikey": resolve_api_key()}
         url = f"{api_base}/wcs/{coverage_service}/GetCoverage"
         valid = valid_time(cycle, step)

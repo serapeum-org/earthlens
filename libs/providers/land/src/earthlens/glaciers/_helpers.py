@@ -24,7 +24,7 @@ import io
 import time
 import zipfile
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 import requests
@@ -156,7 +156,10 @@ def _stream_download(
         requests.HTTPError: If every attempt fails (the last error re-raised).
     """
     http = HttpClient(
-        session=session if session is not None else _RequestsGet(),
+        session=cast(
+            "requests.Session | None",
+            session if session is not None else _RequestsGet(),
+        ),
         retry_on_exceptions=(requests.RequestException, OSError),
         status_forcelist=(429, 500, 502, 503, 504),
         raise_for_status=True,
@@ -318,7 +321,12 @@ def fetch_glims(
     # Route the single WFS GET through the shared HttpClient so it gains the
     # 429/5xx Retry-After/back-off policy; a passed `session` is reused for
     # connection pooling, else a fresh connection per call.
-    client = HttpClient(session=session if session is not None else RequestsGet())
+    client = HttpClient(
+        session=cast(
+            "requests.Session | None",
+            session if session is not None else RequestsGet(),
+        )
+    )
     resp = client.get(url, params=params, timeout=timeout)
     dest_path.parent.mkdir(parents=True, exist_ok=True)
     dest_path.write_text(resp.text, encoding="utf-8")

@@ -27,7 +27,7 @@ import contextlib
 import os
 from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from earthlens.cmip6.resolver import ResolvedStore
@@ -304,6 +304,6 @@ def _date_token(value: Any) -> str:
         str: The `%Y%m%d` token, or `""`.
     """
     try:
-        return value.strftime("%Y%m%d")
+        return cast("str", value.strftime("%Y%m%d"))
     except AttributeError:
         return ""

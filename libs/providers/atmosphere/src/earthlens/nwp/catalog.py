@@ -22,7 +22,7 @@ attribute to redirect the loader at a temporary file.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -337,7 +337,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(model_key)
+        return cast("NWPModel", self.get_dataset(model_key))
 
     def resolve(self, model_key: str) -> NWPModel:
         """Alias for :meth:`get_model` (matches the other backends' surface)."""

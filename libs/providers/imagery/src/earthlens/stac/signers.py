@@ -172,7 +172,7 @@ class PlanetaryComputerSigner(_BaseSigner):
             blob URL, otherwise `href` unchanged.
         """
         account, container = self._parse_blob(href)
-        if account is None or self._already_signed(href):
+        if account is None or container is None or self._already_signed(href):
             return href
         token = self._token(account, container)
         sep = "&" if urlparse(href).query else "?"
@@ -246,12 +246,14 @@ class PlanetaryComputerSigner(_BaseSigner):
 
         cached = self._cache.get(key)
         if fresh(cached):
+            assert cached is not None  # fresh() is False for a None entry
             return cached[0]
         # Double-checked locking: serialise the fetch so concurrent callers for
         # the same (account, container) do not each mint a token.
         with self._lock:
             cached = self._cache.get(key)
             if fresh(cached):
+                assert cached is not None  # fresh() is False for a None entry
                 return cached[0]
             token, expiry = self._fetch_token(account, container)
             self._cache[key] = (token, expiry)
@@ -337,11 +339,13 @@ class _BearerProviderSigner(_BaseSigner):
             )
 
         if fresh():
+            assert self._cache is not None  # fresh() is False when _cache is None
             return self._cache[0]
         # Double-checked locking: serialise the mint so concurrent callers do
         # not each fetch a token.
         with self._lock:
             if fresh():
+                assert self._cache is not None  # fresh() is False when _cache is None
                 return self._cache[0]
             token, expiry = self._fetch_token()
             self._cache = (token, expiry)

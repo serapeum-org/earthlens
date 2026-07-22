@@ -44,7 +44,7 @@ from __future__ import annotations
 import datetime as dt
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 from earthlens.eea_aq._helpers import (
@@ -335,7 +335,7 @@ class EEA_AQ(AbstractDataSource):
                 "the EEA download service; returning an empty frame."
             )
             return empty_frame()
-        polls = self._catalog.polls_for(self.vars)
+        polls = self._catalog.polls_for(cast("list[str]", self.vars))
         # Restrict the code -> name map to the requested pollutants so a
         # Parquet that happens to carry extra pollutants never leaks rows the
         # caller did not ask for.

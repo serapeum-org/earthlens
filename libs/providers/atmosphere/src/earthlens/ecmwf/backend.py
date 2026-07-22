@@ -315,14 +315,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 `"daily"` nor `"monthly"`, or if the parsed
                 `start` is later than the parsed `end`.
         """
-        start = to_datetime(start, fmt)
-        end = to_datetime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
 
         if temporal_resolution == "daily":
-            dates = date_windows(start, end, "D")
+            dates = date_windows(start_dt, end_dt, "D")
             resolution = "D"
         elif temporal_resolution == "monthly":
-            dates = date_windows(start, end, "MS")
+            dates = date_windows(start_dt, end_dt, "MS")
             resolution = "MS"
         else:
             raise ValueError(
@@ -330,8 +330,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             )
 
         return TemporalExtent(
-            start_date=start,
-            end_date=end,
+            start_date=start_dt,
+            end_date=end_dt,
             resolution=resolution,
             dates=dates,
         )
@@ -692,6 +692,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             else:
                 effective_aggregate = aggregate
 
+        assert isinstance(self.vars, dict)  # ECMWF requires a {dataset: [vars]} mapping
         for dataset_name, var_codes in self.vars.items():
             for var in var_codes:
                 start = self.time.start_date
@@ -745,7 +746,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         return out_paths
 
-    def _download_dataset(
+    def _download_dataset(  # type: ignore[override]
         self,
         var_info: Variable,
         progress_bar: bool = True,

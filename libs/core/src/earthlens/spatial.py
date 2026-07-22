@@ -455,6 +455,7 @@ def split_points(
         return [samples]
 
     target_crs = output_crs if output_crs is not None else samples.crs
+    assert grid is not None  # non-None whenever was_split is True
     grid_in_samples = grid.to_crs(samples.crs)
 
     claimed = pd.Series(False, index=samples.index)

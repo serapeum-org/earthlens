@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import difflib
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pandas as pd
 import requests
@@ -308,7 +308,7 @@ class Bathymetry(AbstractDataSource):
                 out-of-coverage or oversize bbox.
         """
         http = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             timeout=self._timeout,
             max_retries=0,
             status_forcelist=(),

@@ -228,6 +228,9 @@ def feature_collection_to_gdf(
         A `GeoDataFrame` of the FC's features (one row per feature).
     """
     payload = fc.getInfo()
+    assert (
+        payload is not None
+    )  # getInfo() on a FeatureCollection returns a GeoJSON dict
     rows = []
     for feature in payload.get("features", []):
         row = dict(feature.get("properties", {}))

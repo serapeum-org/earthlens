@@ -18,7 +18,7 @@ ids with `available`.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
@@ -267,4 +267,4 @@ class Catalog(AbstractCatalog):
                 catalog kind and, when a close match exists, a did-you-mean
                 hint.
         """
-        return self.get_dataset(product)
+        return cast("Product", self.get_dataset(product))

@@ -25,7 +25,7 @@ from __future__ import annotations
 import datetime as dt
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 import requests
@@ -335,8 +335,10 @@ class ClimateIndices(AbstractDataSource):
             ValueError: When the GET still fails after the retries, naming
                 the index and URL (`G8`).
         """
+        if url is None:
+            raise ValueError(f"climate index {index_id!r}: no URL to fetch.")
         http = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             timeout=_HTTP_TIMEOUT,
             max_retries=_HTTP_RETRIES,
             backoff_factor=_HTTP_RETRY_BACKOFF,

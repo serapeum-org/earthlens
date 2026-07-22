@@ -37,6 +37,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -243,8 +244,8 @@ class Earthdata(AbstractDataSource):
         """
         creds = EarthdataCredentials(
             username=self._username,
-            password=self._password,
-            token=self._token,
+            password=SecretStr(self._password) if self._password is not None else None,
+            token=SecretStr(self._token) if self._token is not None else None,
             netrc_path=self._netrc_path,
         )
         self._auth = EarthdataAuth(creds)

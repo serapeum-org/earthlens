@@ -48,7 +48,7 @@ import datetime as dt
 import os
 from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import ee
 import pandas as pd
@@ -334,7 +334,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.auto_split = bool(auto_split)
         self.discover_extent = bool(discover_extent)
         self.wait_for_export = bool(wait_for_export)
-        self._ee_geometry = None  # lazily built in `_ee_region`
+        self._ee_geometry: Any = None  # lazily built in `_ee_region`
 
         super().__init__(
             start=start,
@@ -673,11 +673,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
         outputs: list[Path | str | TaskInfo] = []
+        assert isinstance(
+            self.vars, dict
+        )  # GEE always uses the {asset_id: [band]} form
         for asset_id, bands in self.vars.items():
             outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))
         return outputs
 
-    def _download_dataset(
+    def _download_dataset(  # type: ignore[override]  # base is a loose template
         self, asset_id: str, bands: list[str], progress_bar: bool = True
     ) -> list[Path | str | TaskInfo]:
         """Download one dataset's requested bands across the time buckets.
@@ -714,6 +717,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
             return []
 
+        assert end is not None  # _clamp_window_to_extent returns both bounds or neither
         collection = self._build_collection(var_info, bands, start, end)
         buckets = list(self._composite(collection, var_info, start, end))
         iterator: Iterable = buckets
@@ -885,6 +889,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         expected to have already verified that the request fits the
         Earth Engine synchronous limit.
         """
+        import requests
         from earthlens.base.http import HttpClient, RequestsGet
 
         url = image.getDownloadURL(
@@ -894,7 +899,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Route the (single-shot, expiring) getDownloadURL fetch through the
         # shared HttpClient so a transient 429/5xx is retried with back-off
         # instead of failing the tile outright.
-        client = HttpClient(session=RequestsGet(), timeout=self.http_timeout)
+        client = HttpClient(
+            session=cast("requests.Session | None", RequestsGet()),
+            timeout=self.http_timeout,
+        )
         response = client.get(url)
         body = response.content
         if body[:4] == _ZIP_MAGIC:
@@ -982,6 +990,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         else:
             # The asset sink uses `assetId` instead of `fileNamePrefix` —
             # each export creates one asset at `<self.asset_id>/<prefix>`.
+            assert (
+                self.asset_id is not None
+            )  # constructor requires it for export_via='asset'
             target_asset = f"{self.asset_id.rstrip('/')}/{prefix}"
             task = ee.batch.Export.image.toAsset(assetId=target_asset, **common)
             destination = f"ee://{target_asset}"

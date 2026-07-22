@@ -31,13 +31,14 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 import requests
 from earthlens.nrel.auth import NrelAuth, NrelCredentials
 from earthlens.nrel.catalog import Catalog, Product
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -200,7 +201,11 @@ class NREL(AbstractDataSource):
         self._max_requests = max_requests
         self._knobs = dict(knobs)
         self._requested_variables = list(variables) if variables else []
-        self._auth = NrelAuth(NrelCredentials(api_key=api_key, email=email))
+        self._auth = NrelAuth(
+            NrelCredentials(
+                api_key=None if api_key is None else SecretStr(api_key), email=email
+            )
+        )
         self._product: Product | None = None
         self._attributes: list[str] = []
         self._show_progress = True
@@ -294,12 +299,14 @@ class NREL(AbstractDataSource):
             list[Any]: `["tmy"]` for the TMY product, else one entry per
                 calendar year in the `[start, end]` window.
         """
+        assert self._product is not None  # set by _initialize
         if self._product.names_kind == "tmy":
             return ["tmy"]
         return list(range(self.time.start_date.year, self.time.end_date.year + 1))
 
     def _interval(self) -> int:
         """The data resolution in minutes (override or product default)."""
+        assert self._product is not None  # set by _initialize
         return (
             self._interval_override
             if self._interval_override is not None
@@ -371,6 +378,7 @@ class NREL(AbstractDataSource):
                 "raster, so there is no meaningful gridded reduction. NREL "
                 "already returns the resolved hourly / TMY series."
             )
+        assert self._product is not None  # set by _initialize
         self._show_progress = progress_bar
         frames = [frame for frame in self._api() if frame is not None]
         if frames:
@@ -467,6 +475,7 @@ class NREL(AbstractDataSource):
             ValueError: When a single explicit point is out of coverage; the
                 message names the coordinate and the NREL error.
         """
+        assert self._product is not None  # set by _initialize
         lat = product.metadata["lat"]
         lon = product.metadata["lon"]
         name = product.metadata["name"]
@@ -522,7 +531,7 @@ class NREL(AbstractDataSource):
         try:
             payload = resp.json()
         except ValueError:
-            return resp.text[:200]
+            return cast("str", resp.text[:200])
         if isinstance(payload, dict):
             errors = payload.get("errors") or payload.get("error")
             if errors:

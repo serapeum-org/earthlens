@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 from earthlens.base.raster import netcdf_variable_to_raster
@@ -43,6 +43,9 @@ from earthlens.base import (
     to_datetime,
     warn_if_egress,
 )
+
+if TYPE_CHECKING:
+    from earthlens.ecmwf import Variable
 
 __all__ = ["S3"]
 
@@ -242,8 +245,8 @@ class S3(AbstractDataSource):
 
     def _search(self) -> list[RemoteProduct]:
         """Plan the S3 products satisfying this request (no bulk transfer)."""
-        keys = self.vars if isinstance(self.vars, list) else [self.vars]
-        variables = self._dataset.resolve_variables(keys)
+        assert isinstance(self.vars, list)  # S3 variables is a list of tokens
+        variables = self._dataset.resolve_variables(self.vars)
         products = plan_products(
             self._dataset,
             variables,
@@ -274,6 +277,7 @@ class S3(AbstractDataSource):
         it is never silently swallowed.
         """
         default_ext = ".nc" if self._dataset.format == "netcdf" else ".tif"
+        assert product.href is not None  # S3 products always carry a key/URL
         ext = Path(product.href).suffix or default_ext
         raw = raw_dir / f"{_safe_name(product.id)}{ext}"
         if raw.exists():
@@ -476,10 +480,10 @@ class S3(AbstractDataSource):
         """
         names = list(nc.variable_names)
         if len(names) == 1:
-            return names[0]
+            return cast("str", names[0])
         variable = self._variable_for_native(product.metadata.get("variable"))
         if variable and variable.nc_variable and variable.nc_variable in names:
-            return variable.nc_variable
+            return cast("str", variable.nc_variable)
 
         def _rank(name: str) -> tuple[int, int]:
             # Rank by dimensionality, then de-prioritise known auxiliary
@@ -494,7 +498,7 @@ class S3(AbstractDataSource):
                 ndim = 0
             return (ndim, 0 if auxiliary else 1)
 
-        return max(names, key=_rank)
+        return cast("str", max(names, key=_rank))
 
     def _resolve_nc_variable(self, raw: Path, product: RemoteProduct) -> str:
         """In-file NetCDF variable for `product`, opening the granule only if unpinned.
@@ -504,7 +508,7 @@ class S3(AbstractDataSource):
         """
         variable = self._variable_for_native(product.metadata.get("variable"))
         if variable and variable.nc_variable:
-            return variable.nc_variable
+            return cast("str", variable.nc_variable)
         from pyramids.netcdf import NetCDF
 
         return self._nc_variable_name(NetCDF.read_file(str(raw)), product)
@@ -584,7 +588,7 @@ class S3(AbstractDataSource):
                 is_flux=False,
             )
             try:
-                windows = aggregate_netcdf(raw, var_info, config)
+                windows = aggregate_netcdf(raw, cast("Variable", var_info), config)
             except Exception as exc:  # noqa: BLE001 - log + continue like ECMWF
                 logger.error(f"aggregation failed for {raw}: {exc}")
                 continue
@@ -604,7 +608,7 @@ class S3(AbstractDataSource):
 def _error_code(exc: BaseException) -> str:
     """Return the S3 error code from a botocore exception, or `""`."""
     response = getattr(exc, "response", None)
-    return (response or {}).get("Error", {}).get("Code", "")
+    return cast("str", (response or {}).get("Error", {}).get("Code", ""))
 
 
 def _is_missing_object(exc: BaseException) -> bool:

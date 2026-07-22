@@ -25,7 +25,7 @@ curated rows only enrich metadata and error messages.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -337,7 +337,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `key` is not a curated experiment.
         """
-        return self._get_from(self.experiments, key, "experiment")
+        return cast("Experiment", self._get_from(self.experiments, key, "experiment"))
 
     def get_table(self, key: str) -> Table:
         """Return the :class:`Table` for `key`, with a did-you-mean hint.
@@ -351,7 +351,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `key` is not a curated table.
         """
-        return self._get_from(self.tables, key, "table")
+        return cast("Table", self._get_from(self.tables, key, "table"))
 
     def get_source(self, key: str) -> Source:
         """Return the :class:`Source` for `key`, with a did-you-mean hint.
@@ -365,7 +365,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `key` is not a curated source.
         """
-        return self._get_from(self.sources, key, "source")
+        return cast("Source", self._get_from(self.sources, key, "source"))
 
     def terms_note(self, source_id: str) -> str:
         """Return the attribution note for `source_id`.

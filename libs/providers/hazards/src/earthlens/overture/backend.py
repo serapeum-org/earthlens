@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 from earthlens.overture.catalog import Catalog, Theme
@@ -204,8 +204,8 @@ class Overture(AbstractDataSource):
         self._columns = columns
         self._catalog = Catalog()
         super().__init__(
-            start=start,
-            end=end,
+            start=cast("str", start),
+            end=cast("str", end),
             variables=variables,
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim,
@@ -296,7 +296,7 @@ class Overture(AbstractDataSource):
             ValueError: If a theme name or a requested type is unknown.
         """
         plan: list[tuple[str, Theme, str]] = []
-        for name, requested in self.vars.items():
+        for name, requested in cast("dict[str, list[str]]", self.vars).items():
             theme = self._catalog.get_theme(name)
             for overture_type in theme.resolve_types(requested):
                 plan.append((name, theme, overture_type))
@@ -320,7 +320,7 @@ class Overture(AbstractDataSource):
             return indexed
         from overturemaps.core import get_latest_release
 
-        return get_latest_release()
+        return cast("str", get_latest_release())
 
     def _guard_bbox(self, theme_names: list[str]) -> None:
         """Reject an oversized / whole-Earth bbox for the guarded themes.

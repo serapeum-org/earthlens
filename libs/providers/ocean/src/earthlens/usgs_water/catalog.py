@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
@@ -327,7 +327,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(name)
+        return cast("Parameter", self.get_dataset(name))
 
     def resolve(self, code_or_name: str) -> str:
         """Resolve a friendly name or a raw 5-digit code to a code.

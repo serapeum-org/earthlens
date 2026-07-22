@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 from earthlens.base.http import HttpClient
@@ -49,6 +49,7 @@ from earthlens.base import (
 from earthlens.gdacs import events
 
 if TYPE_CHECKING:
+    import requests
     from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
 
@@ -310,7 +311,7 @@ class GDACS(AbstractDataSource):
             f"(levels {params['alertlevel']})"
         )
         http = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             timeout=self._timeout,
             max_retries=0,
             status_forcelist=(),

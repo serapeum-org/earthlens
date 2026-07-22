@@ -23,7 +23,7 @@ a pyramids `FeatureCollection`.
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, cast
 
 import geopandas as gpd
 import pandas as pd
@@ -145,7 +145,7 @@ def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
             f"Protected Planet returned HTTP {status} for /{path} "
             "(the WDPA token has been redacted from this error)."
         )
-    return response.json()
+    return cast("dict[Any, Any]", response.json())
 
 
 def _row(area: dict) -> dict[str, Any] | None:

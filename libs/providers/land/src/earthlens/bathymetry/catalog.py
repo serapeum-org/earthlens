@@ -20,7 +20,7 @@ endpoint without a model change, but none ships today.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
@@ -281,4 +281,4 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))

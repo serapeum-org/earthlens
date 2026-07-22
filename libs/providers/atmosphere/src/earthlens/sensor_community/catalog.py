@@ -26,7 +26,7 @@ and is monkey-patchable in tests.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
@@ -237,7 +237,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `name` is not a known pollutant.
         """
-        return self.get_dataset(name)
+        return cast("Pollutant", self.get_dataset(name))
 
     def sensor_types_for(self, names: list[str]) -> set[str]:
         """Return the union of serving sensor-type slugs for `names`.

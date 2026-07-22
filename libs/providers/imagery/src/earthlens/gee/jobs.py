@@ -46,7 +46,7 @@ import re
 import time
 from collections.abc import Callable, Iterable
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 from urllib.parse import unquote
 
 import ee
@@ -583,7 +583,7 @@ def _pull_drive_file(file_id: str, dest_dir: Path) -> Path:
     creds = ee.data.get_persistent_credentials()
     drive = build("drive", "v3", credentials=creds, cache_discovery=False)
     meta = drive.files().get(fileId=file_id, fields="name").execute()
-    target = dest_dir / meta["name"]
+    target: Path = dest_dir / meta["name"]
     request = drive.files().get_media(fileId=file_id)
     with target.open("wb") as out:
         downloader = MediaIoBaseDownload(out, request)
@@ -866,7 +866,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = _build_argparser()
     args = parser.parse_args(argv)
     _maybe_initialize_ee()
-    return args.func(args)
+    return cast("int", args.func(args))
 
 
 if __name__ == "__main__":  # pragma: no cover - exercised via subprocess in M5 tests

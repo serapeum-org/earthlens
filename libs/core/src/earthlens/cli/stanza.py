@@ -21,7 +21,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import quote
 
 import yaml
@@ -101,10 +101,13 @@ class StanzaResult:
         """
         if not self.row:
             return ""
-        return yaml.safe_dump(
-            {"datasets": {self.key: self.row}},
-            sort_keys=False,
-            allow_unicode=True,
+        return cast(
+            "str",
+            yaml.safe_dump(
+                {"datasets": {self.key: self.row}},
+                sort_keys=False,
+                allow_unicode=True,
+            ),
         )
 
 
@@ -354,10 +357,16 @@ def _gee_live_bands(asset_id: str) -> tuple[str, dict[str, dict[str, Any]]]:
     Returns:
         `(ee_type, {band: {}})` — the asset type (lowercased) and its bands.
     """
-    import ee
-    from earthlens.gee.auth import EarthEngineAuth, EarthEngineCredentials
+    import os
 
-    EarthEngineAuth(EarthEngineCredentials()).configure()
+    import ee
+    from earthlens.gee.auth import EarthEngineAuth
+
+    EarthEngineAuth.initialize(
+        os.environ.get("GEE_SERVICE_ACCOUNT", ""),
+        os.environ.get("GEE_SERVICE_KEY", ""),
+        os.environ.get("GEE_PROJECT"),
+    )
     ee_type = (ee.data.getAsset(asset_id).get("type") or "IMAGE_COLLECTION").lower()
     image = (
         ee.Image(asset_id)
@@ -395,12 +404,12 @@ def _emit_gee(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
             "bands": {},
         }
     if opts.get("hydrate"):
-        ee_type, bands = _gee_live_bands(upstream_id)
+        ee_type, live_bands = _gee_live_bands(upstream_id)
         return {
             "title": upstream_id,
             "ee_type": ee_type,
             "default_reducer": "median",
-            "bands": bands,
+            "bands": live_bands,
         }
     doc = _gee_stac_doc(upstream_id)
     extent = doc.get("extent", {})
@@ -533,7 +542,7 @@ def _erddap_info_rows(server_url: str, dataset_id: str) -> list[list[Any]]:
     """
     base = server_url.rstrip("/")
     body = _get_json(f"{base}/info/{dataset_id}/index.json")
-    return body["table"]["rows"]
+    return cast("list[list[Any]]", body["table"]["rows"])
 
 
 def _erddap_global_attr(rows: list[list[Any]], name: str) -> str:

@@ -45,7 +45,7 @@ from __future__ import annotations
 import difflib
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -771,7 +771,7 @@ class Catalog(AbstractCatalog):
             get_variable: Identical; provided for naming parity with
                 `earthlens.ecmwf.Catalog.get_variable`.
         """
-        return self.get_dataset(dataset_id).get_band(band_id)
+        return cast("Band", self.get_dataset(dataset_id).get_band(band_id))
 
     def get_variable(self, dataset_id: str, band_id: str) -> Band:
         """Alias of :meth:`get_band` (name parity with the ECMWF catalog).

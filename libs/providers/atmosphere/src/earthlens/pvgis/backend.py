@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 import requests
@@ -256,6 +256,7 @@ class PVGIS(AbstractDataSource):
             dict[str, Any]: The query params (excluding `lat`/`lon`/
                 `outputformat`, which `build_url` supplies).
         """
+        assert self._product is not None  # set by _initialize
         params: dict[str, Any] = dict(self._product.default_params)
         if self._product.tool == "seriescalc":
             params["startyear"] = self.time.start_date.year
@@ -321,6 +322,7 @@ class PVGIS(AbstractDataSource):
                 "gridded raster, so there is no meaningful gridded reduction. "
                 "PVGIS already returns the resolved hourly / TMY series."
             )
+        assert self._product is not None  # set by _initialize
         self._show_progress = progress_bar
         frames = [frame for frame in self._api() if frame is not None]
         if frames:
@@ -354,6 +356,7 @@ class PVGIS(AbstractDataSource):
         Raises:
             ValueError: If the grid exceeds `max_points` (`G5`).
         """
+        assert self._product is not None  # set by _initialize
         params = self._resolved_params()
         return [
             RemoteProduct(
@@ -418,6 +421,7 @@ class PVGIS(AbstractDataSource):
             ValueError: When a single explicit point is out of coverage; the
                 message names the coordinate and the PVGIS error.
         """
+        assert self._product is not None  # set by _initialize
         lat = product.metadata["lat"]
         lon = product.metadata["lon"]
         params = product.metadata["params"]
@@ -454,9 +458,9 @@ class PVGIS(AbstractDataSource):
                 (truncated).
         """
         try:
-            return _helpers.error_message(resp.json()) or resp.text[:200]
+            return cast("str", _helpers.error_message(resp.json()) or resp.text[:200])
         except ValueError:
-            return resp.text[:200]
+            return cast("str", resp.text[:200])
 
     def _write_table(self, df: pd.DataFrame) -> Path:
         """Write the long-format table to `root_dir` and return the path.
@@ -471,6 +475,7 @@ class PVGIS(AbstractDataSource):
             ImportError: When `output_format="parquet"` but `pyarrow` is
                 missing.
         """
+        assert self._product is not None  # set by _initialize
         ext = "parquet" if self._output_format == "parquet" else "csv"
         out_path = self.root_dir / f"pvgis_{self._product.tool}.{ext}"
         if self._output_format == "parquet":

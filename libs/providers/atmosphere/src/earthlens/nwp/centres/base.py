@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     import datetime as dt
@@ -137,4 +137,4 @@ def resolve_centre(backend: str, save_dir: Path | str) -> _NWPCentre:
 
     module = importlib.import_module(module_name)
     centre_cls = getattr(module, class_name)
-    return centre_cls(save_dir)
+    return cast("_NWPCentre", centre_cls(save_dir))

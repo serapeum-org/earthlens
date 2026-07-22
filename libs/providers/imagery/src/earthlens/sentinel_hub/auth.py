@@ -102,15 +102,15 @@ class SentinelHubCredentials(BaseModel):
         Returns:
             The credentials object built from the environment.
         """
+        client_secret = os.environ.get("SENTINELHUB_CLIENT_SECRET") or os.environ.get(
+            "SH_CLIENT_SECRET"
+        )
         return cls(
             client_id=(
                 os.environ.get("SENTINELHUB_CLIENT_ID")
                 or os.environ.get("SH_CLIENT_ID")
             ),
-            client_secret=(
-                os.environ.get("SENTINELHUB_CLIENT_SECRET")
-                or os.environ.get("SH_CLIENT_SECRET")
-            ),
+            client_secret=SecretStr(client_secret) if client_secret else None,
             profile=(
                 os.environ.get("SENTINELHUB_PROFILE") or os.environ.get("SH_PROFILE")
             ),

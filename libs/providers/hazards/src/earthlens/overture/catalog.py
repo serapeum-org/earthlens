@@ -31,7 +31,7 @@ the path to the bundled YAML.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -320,7 +320,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(name)
+        return cast("Theme", self.get_dataset(name))
 
     def themes(self) -> list[str]:
         """Return the registered theme names, sorted.

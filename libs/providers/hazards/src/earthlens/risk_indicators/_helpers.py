@@ -25,6 +25,7 @@ Endpoints / response shapes were live-verified 2026-06-27 (see
 from __future__ import annotations
 
 import time
+from typing import cast
 
 import geopandas as gpd
 import pandas as pd
@@ -110,7 +111,7 @@ def _request_json(
             (the last error is re-raised; a 4xx fails fast without retrying).
     """
     client = HttpClient(
-        session=_RequestsGet(),
+        session=cast("requests.Session | None", _RequestsGet()),
         user_agent=_USER_AGENT,
         timeout=timeout,
         max_retries=_HTTP_RETRIES,
@@ -120,7 +121,7 @@ def _request_json(
         raise_for_status=True,
         sleep=lambda seconds: time.sleep(seconds),
     )
-    return client.get_json(url, params=params, headers=headers)
+    return cast("dict | list", client.get_json(url, params=params, headers=headers))
 
 
 #: Canonical column order for a ThinkHazard hazard-level table.
@@ -219,7 +220,9 @@ def inform_query(
     """
     url = f"{base}/countries/Scores/"
     params = {"WorkflowId": workflow_id, "IndicatorId": indicator_id}
-    return _request_json(url, params=params, headers=_headers(), timeout=timeout)
+    return cast(
+        "list", _request_json(url, params=params, headers=_headers(), timeout=timeout)
+    )
 
 
 def gfw_query(
@@ -249,8 +252,11 @@ def gfw_query(
             403 from GFW).
     """
     url = f"{base}/dataset/{dataset}/{version}/query/json"
-    return _request_json(
-        url, params={"sql": sql}, headers=_headers(api_key), timeout=timeout
+    return cast(
+        "dict",
+        _request_json(
+            url, params={"sql": sql}, headers=_headers(api_key), timeout=timeout
+        ),
     )
 
 
@@ -281,7 +287,10 @@ def gfw_geostore(
     """
     parts = "/".join((iso, *admin))
     url = f"{base}/geostore/admin/{parts}"
-    return _request_json(url, params=None, headers=_headers(api_key), timeout=timeout)
+    return cast(
+        "dict",
+        _request_json(url, params=None, headers=_headers(api_key), timeout=timeout),
+    )
 
 
 def to_frame(payload: dict | list, columns: list[str] | None = None) -> pd.DataFrame:
@@ -354,7 +363,7 @@ def thinkhazard_to_frame(
             {
                 "hazard": hazard,
                 "hazard_type": category.get("hazard_type"),
-                "level": _LEVEL_TITLE_TO_MNEMONIC.get(title, title),
+                "level": _LEVEL_TITLE_TO_MNEMONIC.get(cast("str", title), title),
                 "level_title": title,
             }
         )

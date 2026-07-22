@@ -24,7 +24,7 @@ from __future__ import annotations
 import difflib
 import warnings
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -328,7 +328,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `alias` is not a curated product.
         """
-        return self.get_dataset(alias)
+        return cast("Product", self.get_dataset(alias))
 
     def resolve(self, key: str) -> str:
         """Resolve a product key or friendly alias to its canonical alias.
@@ -484,7 +484,7 @@ class Catalog(AbstractCatalog):
             f"have {[s.id for s in self.datasets[code].subaliases]}."
         )
 
-    def validate(
+    def validate(  # type: ignore[override]
         self,
         product: str,
         *,

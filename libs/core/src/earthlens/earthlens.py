@@ -24,7 +24,7 @@ import warnings
 from collections.abc import Iterator, Mapping
 from datetime import date, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from earthlens._backends import discover_backends
 from earthlens.base.spatial import resolve_aoi
@@ -40,11 +40,11 @@ if TYPE_CHECKING:
 
 #: Default longitude bounds used when `lon_lim` is not supplied
 #: (whole-Earth coverage).
-DEFAULT_LONGITUDE_LIMIT = [-180, 180]
+DEFAULT_LONGITUDE_LIMIT = [-180.0, 180.0]
 
 #: Default latitude bounds used when `lat_lim` is not supplied
 #: (whole-Earth coverage).
-DEFAULT_LATITUDE_LIMIT = [-90, 90]
+DEFAULT_LATITUDE_LIMIT = [-90.0, 90.0]
 
 #: Raster file suffixes that :func:`_load_path` reads into a pyramids object.
 #: A `.nc` is read as a `NetCDF`; every other suffix as a `Dataset`.
@@ -263,7 +263,7 @@ class _LazyRegistry(Mapping):
                 f"Backend {key!r} is unavailable — its runtime "
                 f"dependency is not installed.{hint}"
             ) from exc
-        return getattr(module, class_name)
+        return cast("type[AbstractDataSource]", getattr(module, class_name))
 
 
 class EarthLens:
@@ -830,7 +830,7 @@ class EarthLens:
         # Per-key defaults (e.g. the STAC endpoint aliases pre-bind
         # `endpoint=`) are merged *under* the user's kwargs, so an
         # explicit value always wins.
-        merged_kwargs = {
+        merged_kwargs: dict[str, Any] = {
             **self.DataSources.default_kwargs(data_source),
             **backend_kwargs,
         }
@@ -853,8 +853,11 @@ class EarthLens:
         )
 
         self.datasource = backend_cls(
-            start=start,
-            end=end,
+            # The facade accepts str/datetime/date/None and the concrete
+            # backends' `_check_input_dates` parse the broader forms; the base
+            # signature only declares `str`.
+            start=cast("str", start),
+            end=cast("str", end),
             lat_lim=lat_lim,
             lon_lim=lon_lim,
             temporal_resolution=temporal_resolution,
@@ -1025,7 +1028,7 @@ class EarthLens:
             raise NotImplementedError(
                 f"the {data_source!r} backend ships no catalog to query"
             )
-        return catalog_cls()
+        return cast("AbstractCatalog", catalog_cls())
 
     @classmethod
     def list_datasets(cls, data_source: str) -> list[str]:
@@ -1506,9 +1509,13 @@ class EarthLens:
                 )
             kwargs["aggregate"] = aggregate
 
-        return self.datasource.download(*args, progress_bar=progress_bar, **kwargs)
+        # The base `download(self)` is a minimal placeholder; every concrete
+        # backend override accepts `progress_bar` (and its own extra kwargs).
+        return self.datasource.download(  # type: ignore[call-arg]
+            *args, progress_bar=progress_bar, **kwargs
+        )
 
-    def load(self, *args: object, **kwargs: object) -> Any:
+    def load(self, *args: object, **kwargs: Any) -> Any:
         """Download and return the data in memory instead of only on disk.
 
         The lazy-stack convenience: runs :meth:`download` and hands back the

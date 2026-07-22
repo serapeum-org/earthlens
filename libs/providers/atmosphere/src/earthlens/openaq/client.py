@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Iterator
-from typing import Any
+from typing import Any, cast
 
 import requests
 from earthlens.base.http import HttpClient
@@ -140,7 +140,9 @@ class OpenaqClient:
             requests.HTTPError: On a non-`429` error status, or after
                 `max_retries` exhausted `429` responses.
         """
-        return self._http.get_json(f"{BASE_URL}/{path}", params=params)
+        return cast(
+            "dict[str, Any]", self._http.get_json(f"{BASE_URL}/{path}", params=params)
+        )
 
     def paginate(
         self,

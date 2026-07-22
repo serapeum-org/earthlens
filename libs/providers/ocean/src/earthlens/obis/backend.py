@@ -238,6 +238,8 @@ class OBIS(AbstractDataSource):
                 `size`).
         """
         if name is None:
+            # OBIS carries `variables` as a flat list of species selectors.
+            assert isinstance(self.vars, list)
             name = self._catalog.resolve_scientific_name(self.vars[0])
         return {
             "scientificname": name,
@@ -247,7 +249,7 @@ class OBIS(AbstractDataSource):
             "size": self._size,
         }
 
-    def _fetch(self) -> FeatureCollection:
+    def _fetch(self) -> FeatureCollection:  # type: ignore[override]
         """Search every requested species and map the rows to a FeatureCollection.
 
         Imports `pyobis` lazily (so the package imports without the

@@ -445,14 +445,11 @@ class TestGeeLiveBands:
         monkeypatch.setitem(sys.modules, "ee", fake_ee)
 
         class FakeAuth:
-            def __init__(self, creds):
-                pass
-
-            def configure(self):
+            @staticmethod
+            def initialize(service_account, service_key, project=None):
                 pass
 
         monkeypatch.setattr(auth_mod, "EarthEngineAuth", FakeAuth)
-        monkeypatch.setattr(auth_mod, "EarthEngineCredentials", lambda: None)
         ee_type, bands = stanza_mod._gee_live_bands("projects/x/y")
         assert ee_type == "image_collection", "asset type lowercased"
         assert sorted(bands) == ["B1", "B2"], "live band names read"

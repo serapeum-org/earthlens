@@ -44,7 +44,7 @@ from __future__ import annotations
 import datetime as dt
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeGuard
 
 import pandas as pd
 from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
@@ -757,6 +757,8 @@ class NWM(AbstractDataSource):
                 continue
             product = self._catalog.get_product(rp.metadata["product"])
             if product.output_kind == "tabular":
+                # reader is built whenever OUTPUT_KIND == "tabular" (above).
+                assert reader is not None
                 cube = reader.read_file(
                     str(downloaded), variables=self._requested[product.product]
                 )
@@ -793,7 +795,9 @@ class NWM(AbstractDataSource):
             "s3", region_name=self._region, config=Config(signature_version=UNSIGNED)
         )
 
-    def _fetch_one(self, client: Any, product: RemoteProduct) -> Path | None:
+    def _fetch_one(  # type: ignore[override]
+        self, client: Any, product: RemoteProduct
+    ) -> Path | None:
         """Download one product's NetCDF file (atomic `.part` rename).
 
         The output name flattens the **full** S3 key (date prefix +
@@ -813,6 +817,7 @@ class NWM(AbstractDataSource):
                 published (logged and skipped).
         """
         key = product.href
+        assert key is not None  # NWM products always carry an S3 key href
         target = self.root_dir / key.replace("/", "_")
         tmp = target.with_name(target.name + ".part")
         try:
@@ -878,7 +883,7 @@ class NWM(AbstractDataSource):
         return self._api_via_search_fetch()
 
 
-def _is_int(value: Any) -> bool:
+def _is_int(value: Any) -> TypeGuard[int]:
     """Return whether `value` is a genuine integer (and not a `bool`).
 
     `bool` is a subclass of `int`, so a plain `isinstance(value, int)`

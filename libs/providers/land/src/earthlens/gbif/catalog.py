@@ -20,7 +20,7 @@ dict-like surface (`len(cat)`, `name in cat`, `cat[name]`, `iter(cat)`,
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -279,4 +279,4 @@ class Catalog(AbstractCatalog):
             return int(text)
         if text.lower().startswith(TAXON_PREFIX):
             return _name_backbone_key(text[len(TAXON_PREFIX) :].strip())
-        return self.get_dataset(text).taxon_key
+        return cast("int", self.get_dataset(text).taxon_key)

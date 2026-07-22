@@ -26,6 +26,7 @@ import datetime as dt
 import re
 import time
 from pathlib import Path
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -301,14 +302,16 @@ class WorldPop(AbstractDataSource):
         if isinstance(aoi, str):
             return [normalise_iso3(aoi)]
         if isinstance(aoi, list) and aoi and isinstance(aoi[0], str):
-            return sorted({normalise_iso3(code) for code in aoi})
+            codes = cast("list[str]", aoi)
+            return sorted({normalise_iso3(code) for code in codes})
         if isinstance(aoi, list) and len(aoi) == 4 and isinstance(aoi[0], (int, float)):
             bbox = [float(x) for x in aoi]
         elif aoi is not None and hasattr(aoi, "total_bounds"):  # a GeoDataFrame
-            crs = getattr(aoi, "crs", None)
+            gdf: Any = aoi
+            crs = getattr(gdf, "crs", None)
             if crs is not None and crs.to_epsg() != 4326:
-                aoi = aoi.to_crs(4326)
-            bbox = [float(x) for x in aoi.total_bounds]
+                gdf = gdf.to_crs(4326)
+            bbox = [float(x) for x in gdf.total_bounds]
         else:
             bbox = [lon_lim[0], lat_lim[0], lon_lim[1], lat_lim[1]]
         return iso3_for_bbox(bbox, load_iso3_bbox())
@@ -515,7 +518,7 @@ class WorldPop(AbstractDataSource):
         if dest.exists() and dest.stat().st_size > 0:
             return dest
         http = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
             status_forcelist=(),
             max_retries=_MAX_RETRIES - 1,
@@ -546,13 +549,14 @@ class WorldPop(AbstractDataSource):
         """
         raw = self._raw_dir()
         paths = Parallel(n_jobs=_DOWNLOAD_JOBS, prefer="threads")(
-            delayed(self._http_get)(rp.href, raw / Path(rp.href).name)
+            delayed(self._http_get)(rp.href, raw / Path(cast("str", rp.href)).name)
             for rp in products
         )
         groups: dict[
             tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
         ] = {}
         for path, rp in zip(paths, products):
+            assert rp.href is not None  # worldpop products always carry a URL
             key = (rp.metadata["product"], rp.metadata["year"], cohort_of(rp.href))
             groups.setdefault(key, []).append((path, rp))
         return groups
@@ -810,6 +814,7 @@ class WorldPop(AbstractDataSource):
 
         tifs = [str(path) for path, _ in group]
         rp = group[0][1]
+        assert rp.href is not None  # worldpop products always carry a URL
         product = rp.metadata["product"]
         year = rp.metadata["year"]
         dst_crs = self._output_epsg if self._output_epsg != 4326 else None

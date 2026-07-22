@@ -39,7 +39,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from ftplib import FTP, error_perm  # nosec B402  # noqa: S402
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import requests
 import yaml
@@ -133,7 +133,7 @@ def _get_json(
     """
     response = requests.get(url, headers=headers, params=params, timeout=_TIMEOUT)
     response.raise_for_status()
-    return response.json()
+    return cast("dict[str, Any]", response.json())
 
 
 def _redact(text: str, secret: str) -> str:
@@ -263,7 +263,7 @@ def _index_path(info: BackendInfo) -> Path:
         single `<pkg>_data_catalog.yaml` file.
     """
     base = importlib.import_module(f"{info.module}.catalog").CATALOG_PATH
-    return base / "_index.yaml" if base.is_dir() else base
+    return cast("Path", base / "_index.yaml" if base.is_dir() else base)
 
 
 def _replace_index_block(path: Path, block_key: str, payload: Any) -> None:
@@ -487,9 +487,10 @@ def _cmr_page(provider: str, search_after: str | None) -> tuple[list[str], str |
         names and the cursor for the next page (`None` when exhausted).
     """
     headers = {"CMR-Search-After": search_after} if search_after else {}
+    params: dict[str, str | int] = {"provider": provider, "page_size": 2000}
     response = requests.get(
         _CMR_COLLECTIONS_URL,
-        params={"provider": provider, "page_size": 2000},
+        params=params,
         headers=headers,
         timeout=_TIMEOUT,
     )
@@ -1339,7 +1340,7 @@ def _nwm_latest_complete_day(client: Any) -> str:
     )
     if not days:
         raise RuntimeError(f"no nwm.YYYYMMDD/ prefixes found on {BUCKET}")
-    return days[-2] if len(days) > 1 else days[-1]
+    return cast("str", days[-2] if len(days) > 1 else days[-1])
 
 
 def _nwm_config_dirs(client: Any, day: str) -> list[str]:

@@ -33,7 +33,7 @@ from __future__ import annotations
 
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -311,7 +311,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `query_id` is not a registered named query.
         """
-        return self.get_dataset(query_id)
+        return cast("Dataset", self.get_dataset(query_id))
 
     def query_ids(self) -> list[str]:
         """Return the registered named-query ids, sorted.

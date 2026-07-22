@@ -19,7 +19,7 @@ Holds the small stateless helpers used by `backend.py`:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from shapely.geometry import box
 
@@ -55,12 +55,15 @@ def wkt_from_extent(space: SpatialExtent) -> str:
 
             ```
     """
-    return box(
-        space.longitude_min,
-        space.latitude_min,
-        space.longitude_max,
-        space.latitude_max,
-    ).wkt
+    return cast(
+        "str",
+        box(
+            space.longitude_min,
+            space.latitude_min,
+            space.longitude_max,
+            space.latitude_max,
+        ).wkt,
+    )
 
 
 def _in_window(value: float | int | None, window: tuple[float, float] | None) -> bool:

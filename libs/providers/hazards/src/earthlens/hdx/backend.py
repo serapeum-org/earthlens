@@ -43,10 +43,11 @@ bypassed.
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar, cast
 
 import pandas as pd
 from earthlens.hdx._helpers import match_resource
@@ -383,7 +384,7 @@ class HDX(AbstractDataSource):
         products: list[RemoteProduct] = []
         for hdx_id, filters in self._targets:
             dataset = _with_retries(
-                lambda hdx_id=hdx_id: Dataset.read_from_hdx(hdx_id),
+                functools.partial(Dataset.read_from_hdx, hdx_id),
                 attempts=self._max_retries,
             )
             if dataset is None:
@@ -450,7 +451,7 @@ class HDX(AbstractDataSource):
             f"HDX download summary: {len(out_paths)} resource file(s) written "
             f"to {self.root_dir}"
         )
-        return out_paths
+        return cast("list[Path]", out_paths)
 
     def _download_one(self, product: RemoteProduct) -> Path:
         """Download one product's resource into its per-dataset subdir.

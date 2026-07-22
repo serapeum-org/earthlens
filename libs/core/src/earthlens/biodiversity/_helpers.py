@@ -24,6 +24,7 @@ import datetime as dt
 import warnings
 from collections.abc import Iterable, Mapping
 from email.utils import parsedate_to_datetime
+from typing import cast
 
 import geopandas as gpd
 import pandas as pd
@@ -95,7 +96,7 @@ def wkt_from_bbox(space) -> str:
 
             ```
     """
-    return box(space.west, space.south, space.east, space.north).wkt
+    return cast("str", box(space.west, space.south, space.east, space.north).wkt)
 
 
 def occurrences_to_fc(

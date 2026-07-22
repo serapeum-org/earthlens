@@ -26,7 +26,7 @@ it maps to the Statistical `aggregation_interval`), so demoting the instance to
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
 from earthlens.sentinel_hub._helpers import (
@@ -40,6 +40,7 @@ from earthlens.sentinel_hub._helpers import (
 )
 from earthlens.sentinel_hub.auth import SentinelHubAuth, SentinelHubCredentials
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -157,7 +158,9 @@ class SentinelHub(AbstractDataSource):
         env_creds = SentinelHubCredentials.from_env()
         self._credentials = SentinelHubCredentials(
             client_id=client_id or env_creds.client_id,
-            client_secret=client_secret or env_creds.client_secret,
+            client_secret=(
+                SecretStr(client_secret) if client_secret else env_creds.client_secret
+            ),
             profile=profile or env_creds.profile,
         )
         # Stored before super().__init__ because the base constructor calls
@@ -273,6 +276,19 @@ class SentinelHub(AbstractDataSource):
             crs=sentinelhub.CRS.WGS84,
         )
 
+    def _config(self) -> Any:
+        """Return the authenticated `sentinelhub.SHConfig`.
+
+        The auth wrapper is created in :meth:`_initialize` (run by the base
+        constructor), so it is always present by the time any fetch method
+        needs the SDK config.
+
+        Returns:
+            The `sentinelhub.SHConfig` from the configured auth wrapper.
+        """
+        assert self._auth is not None  # set in _initialize before any fetch
+        return self._auth.config()
+
     def _request_size(self) -> tuple[int, int]:
         """Compute the render size in pixels via `bbox_to_dimensions`.
 
@@ -280,7 +296,10 @@ class SentinelHub(AbstractDataSource):
             `(width_px, height_px)` for the request bbox at `resolution`.
         """
         sentinelhub = import_sentinelhub()
-        return sentinelhub.bbox_to_dimensions(self._bbox(), resolution=self._resolution)
+        return cast(
+            "tuple[int, int]",
+            sentinelhub.bbox_to_dimensions(self._bbox(), resolution=self._resolution),
+        )
 
     def _resolve_plane(self) -> str:
         """Resolve the request plane: explicit `api=`, else auto by size / geometry.
@@ -346,7 +365,7 @@ class SentinelHub(AbstractDataSource):
             One product per catalog item (id + datetime + geometry on metadata).
         """
         sentinelhub = import_sentinelhub()
-        cfg = self._auth.config()
+        cfg = self._config()
         catalog = sentinelhub.SentinelHubCatalog(config=cfg)
         sh_bbox = self._bbox()
         time_interval = self._time_interval()
@@ -393,7 +412,7 @@ class SentinelHub(AbstractDataSource):
             "statistical": self._fetch_statistical,
             "batch-statistical": self._fetch_batch_statistical,
         }
-        return fetchers[plane](products)
+        return cast("list[Any]", fetchers[plane](products))
 
     def _read_evalscript(self, resolved: ResolvedRequest) -> str:
         """Resolve the evalscript source for one request row.
@@ -455,7 +474,7 @@ class SentinelHub(AbstractDataSource):
         Returns:
             The `input_data` dict (collection, window, mosaicking order, maxcc).
         """
-        cfg = self._auth.config()
+        cfg = self._config()
         collection = cdse_collection(resolved.sh_collection, cfg.sh_base_url)
         kwargs: dict[str, Any] = {
             "data_collection": collection,
@@ -464,7 +483,9 @@ class SentinelHub(AbstractDataSource):
         }
         if self._maxcc is not None:
             kwargs["maxcc"] = self._maxcc
-        return sentinelhub.SentinelHubRequest.input_data(**kwargs)
+        return cast(
+            "dict[Any, Any]", sentinelhub.SentinelHubRequest.input_data(**kwargs)
+        )
 
     def _fetch_process(self, products: list[RemoteProduct]) -> list[Path]:
         """Render each product synchronously via the Process API → GeoTIFF on disk.
@@ -531,10 +552,10 @@ class SentinelHub(AbstractDataSource):
             bbox=bbox,
             size=size,
             data_folder=data_folder,
-            config=self._auth.config(),
+            config=self._config(),
         )
         request.get_data(save_data=True)
-        return Path(data_folder) / request.get_filename_list()[0]
+        return cast("Path", Path(data_folder) / request.get_filename_list()[0])
 
     def _require_s3_delivery(self, sentinelhub: Any) -> Any:
         """Build the S3 `AccessSpecification` from `batch_output`, or error.
@@ -601,8 +622,9 @@ class SentinelHub(AbstractDataSource):
                 10000 px Async ceiling.
         """
         sentinelhub = import_sentinelhub()
-        cfg = self._auth.config()
+        cfg = self._config()
         delivery = self._require_s3_delivery(sentinelhub)
+        assert self._batch_output is not None  # _require_s3_delivery raises when unset
         bucket_uri = self._batch_output.get("bucket") or self._batch_output.get("url")
         sh_bbox = self._bbox()
         size = self._request_size()
@@ -736,7 +758,7 @@ class SentinelHub(AbstractDataSource):
                 "batch_output={'bucket': 's3://…', 'iam_role_arn': '…', "
                 "'grid_id': <int>}."
             )
-        cfg = self._auth.config()
+        cfg = self._config()
         client = sentinelhub.BatchProcessClient(config=cfg)
         spec = dict(self._batch_output)
         grid_id = spec.pop("grid_id", 0)
@@ -853,7 +875,7 @@ class SentinelHub(AbstractDataSource):
                 "needs geometry= (a shapely geometry, a GeoJSON mapping, or a "
                 "FeatureCollection)."
             )
-        cfg = self._auth.config()
+        cfg = self._config()
         interval = self._statistical_interval()
         geometries = _iter_geometries(self._geometry)
         out: list[Path] = []
@@ -946,7 +968,7 @@ class SentinelHub(AbstractDataSource):
                 "batch-statistical needs batch_output['input_features'] (the S3 "
                 "GeoPackage of features) and an output bucket."
             )
-        cfg = self._auth.config()
+        cfg = self._config()
         interval = self._statistical_interval()
         client = sentinelhub.SentinelHubBatchStatistical(config=cfg)
         out: list[Path] = []

@@ -136,6 +136,13 @@ class CMIP6(AbstractDataSource):
                 "start='2050-01-01', end='2050-12-31'."
             )
 
+        # The loop above raised on any empty required id; narrow for the type
+        # checker so the downstream str-typed uses see non-optional values.
+        assert source_id is not None
+        assert experiment_id is not None
+        assert variable_id is not None
+        assert table_id is not None
+
         self._catalog = catalog if catalog is not None else Catalog()
         self._resolver = (
             resolver

@@ -44,6 +44,7 @@ from earthlens.firms._helpers import chunk_windows, classify_body, firms_get
 from earthlens.firms.auth import AuthenticationError, FirmsAuth, FirmsCredentials
 from earthlens.firms.catalog import Catalog
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -267,7 +268,11 @@ class FIRMS(AbstractDataSource):
 
                 ```
         """
-        auth = FirmsAuth(FirmsCredentials(api_key=api_key))
+        auth = FirmsAuth(
+            FirmsCredentials(
+                api_key=SecretStr(api_key) if api_key is not None else None
+            )
+        )
         auth.configure()
         self.client = auth
         return self

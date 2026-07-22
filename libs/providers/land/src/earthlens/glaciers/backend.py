@@ -32,7 +32,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -164,8 +164,11 @@ class Glaciers(AbstractDataSource):
         self._validate_selector()
 
         super().__init__(
-            start=start,
-            end=end,
+            # Glaciers permits a None window (outlines are an inventory); its
+            # _check_input_dates override accepts str | None, though the base
+            # signature is typed str.
+            start=cast("str", start),
+            end=cast("str", end),
             variables=ids,
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim if lat_lim is not None else _GLOBAL_LAT,
@@ -325,9 +328,12 @@ class Glaciers(AbstractDataSource):
         """
         dataset = self._dataset
         if dataset.source == "rgi":
+            assert product.href is not None  # rgi products always carry an href
             zip_path = _helpers.download_zip(product.href, self._cache_dir)
             return _helpers.read_outlines(zip_path, self._bbox)
         if dataset.source == "glims":
+            # A glims row guarantees both WFS fields (catalog model validator).
+            assert dataset.wfs_url is not None and dataset.wfs_typename is not None
             dest = self._cache_dir / "glims_query.geojson"
             return _helpers.fetch_glims(
                 dataset.wfs_url,
@@ -337,6 +343,8 @@ class Glaciers(AbstractDataSource):
                 max_features=self._max_features,
             )
         # source == "wgms"
+        # A wgms row guarantees archive_url + table (catalog model validator).
+        assert dataset.archive_url is not None and dataset.table is not None
         zip_path = _helpers.download_zip(dataset.archive_url, self._cache_dir)
         table = _helpers.parse_wgms_csv(zip_path, dataset.table)
         glaciers = _helpers.wgms_glacier_table(zip_path)

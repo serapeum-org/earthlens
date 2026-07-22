@@ -25,7 +25,7 @@ and skipped, never fatal (`G6`).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 from earthlens.base.s3 import S3Auth, S3Credentials
@@ -249,7 +249,9 @@ class DEM(AbstractDataSource):
             )
         return written
 
-    def _fetch_one(self, client: Any, product: RemoteProduct) -> Path | None:
+    def _fetch_one(  # type: ignore[override]
+        self, client: Any, product: RemoteProduct
+    ) -> Path | None:
         """Head + download one candidate tile; return `None` if absent.
 
         Args:
@@ -335,7 +337,7 @@ def _error_code(exc: BaseException) -> str:
         str: The `Error.Code` string, or `""` when absent.
     """
     response = getattr(exc, "response", None)
-    return (response or {}).get("Error", {}).get("Code", "")
+    return cast("str", (response or {}).get("Error", {}).get("Code", ""))
 
 
 def _is_missing_object(exc: BaseException) -> bool:

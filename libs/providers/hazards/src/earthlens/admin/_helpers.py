@@ -19,9 +19,14 @@ gate are applied by the per-provider URL builders so the backend hands
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, cast
+
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
 from pyramids.feature.collection import FeatureCollection
+
+if TYPE_CHECKING:
+    import requests
 
 #: geoBoundaries gbOpen API base — `"{base}/{ISO3}/{ADM}/"` returns the metadata
 #: whose `gjDownloadURL` is the GeoJSON to read (`geoboundaries_resolve`).
@@ -75,7 +80,7 @@ def geoboundaries_resolve(iso: str, adm: str, timeout: float = 60.0) -> str:
         KeyError: If the metadata carries no `gjDownloadURL`.
     """
     http = HttpClient(
-        session=_RequestsGet(),
+        session=cast("requests.Session | None", _RequestsGet()),
         timeout=timeout,
         max_retries=0,
         status_forcelist=(),
@@ -89,7 +94,7 @@ def geoboundaries_resolve(iso: str, adm: str, timeout: float = 60.0) -> str:
                 "country may not publish that ADM level."
             )
         meta = meta[0]
-    return meta["gjDownloadURL"]
+    return cast("str", meta["gjDownloadURL"])
 
 
 def cgaz_url(level: str) -> str:

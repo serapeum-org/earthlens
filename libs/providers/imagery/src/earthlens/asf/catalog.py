@@ -24,7 +24,7 @@ tool would not pay for itself (mirrors the fdsn / openaq pattern).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
@@ -393,7 +393,7 @@ class Catalog(AbstractCatalog):
                 names the catalog kind and, when a close match
                 exists, adds a did-you-mean hint.
         """
-        return self.get_dataset(key)
+        return cast("Product", self.get_dataset(key))
 
     def resolve(self, key_or_alias: str) -> str:
         """Resolve a curated key or an alias to the curated key.

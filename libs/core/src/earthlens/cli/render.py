@@ -11,10 +11,14 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterable, Sequence
+from typing import TYPE_CHECKING
 
 from earthlens.cli.table import CatalogRow, LoadError
 from rich.console import Console
 from rich.table import Table
+
+if TYPE_CHECKING:
+    from rich.console import JustifyMethod
 
 #: Header label for each :class:`~earthlens.cli.table.CatalogRow` column.
 _COLUMN_HEADERS: dict[str, str] = {
@@ -52,7 +56,7 @@ def err_console() -> Console:
     return Console(stderr=True)
 
 
-def row_to_dict(row: CatalogRow) -> dict[str, str]:
+def row_to_dict(row: CatalogRow) -> dict[str, str | bool]:
     """Project a row to a JSON-friendly dict (drops the pydantic record).
 
     Args:
@@ -317,7 +321,9 @@ def record_table(row: CatalogRow) -> Table:
     return table
 
 
-def kv_table(header_a: str, header_b: str, pairs, justify_b: str = "left") -> Table:
+def kv_table(
+    header_a: str, header_b: str, pairs, justify_b: JustifyMethod = "left"
+) -> Table:
     """Build a simple two-column table from `(a, b)` pairs.
 
     Args:

@@ -22,6 +22,8 @@ than executing arbitrary input through the EE attribute lookup.
 
 from __future__ import annotations
 
+from typing import cast
+
 import ee
 import geopandas as gpd
 from earthlens.gee.features import create_feature
@@ -138,7 +140,7 @@ def sample_points(
                 )
             )
         )
-    return collection
+    return cast("ee.FeatureCollection", collection)
 
 
 def sample_points_to_gdf(

@@ -36,7 +36,7 @@ Two GHSL quirks the model captures:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pandas import DataFrame
@@ -511,7 +511,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `code` is not a curated product.
         """
-        return self.get_dataset(code)
+        return cast("Product", self.get_dataset(code))
 
     def resolve(self, key: str) -> str:
         """Resolve a product key or friendly alias to its canonical code.
@@ -560,7 +560,7 @@ class Catalog(AbstractCatalog):
         """
         return sorted(self.datasets)
 
-    def validate(
+    def validate(  # type: ignore[override]
         self,
         product: str,
         release: str,

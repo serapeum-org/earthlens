@@ -29,7 +29,7 @@ import time
 from collections.abc import Callable
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlsplit
 
 import requests
@@ -730,5 +730,5 @@ class HttpClient:
         """
         verb = getattr(self._session, method.lower(), None)
         if callable(verb):
-            return verb(url, **kwargs)
+            return cast("requests.Response", verb(url, **kwargs))
         return self._session.request(method, url, **kwargs)

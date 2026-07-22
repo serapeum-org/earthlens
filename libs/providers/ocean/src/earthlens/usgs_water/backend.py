@@ -36,6 +36,7 @@ works at lower rate limits. See :class:`earthlens.usgs_water.auth`.
 from __future__ import annotations
 
 import datetime as dt
+import importlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -43,6 +44,7 @@ import pandas as pd
 from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
 from earthlens.usgs_water.catalog import Catalog
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -269,7 +271,13 @@ class USGSWater(AbstractDataSource):
         Returns `None` (the SDK has no global client object; the token,
         when present, is exported to `API_USGS_PAT` by the auth).
         """
-        self._auth = UsgsWaterAuth(UsgsWaterCredentials(api_token=self._api_token))
+        self._auth = UsgsWaterAuth(
+            UsgsWaterCredentials(
+                api_token=(
+                    SecretStr(self._api_token) if self._api_token is not None else None
+                )
+            )
+        )
         self._auth.configure()
         return None
 
@@ -483,11 +491,8 @@ class USGSWater(AbstractDataSource):
                 the `earthlens[usgs-water]` extra).
         """
         _import_dataretrieval()
-        if flavour == "waterdata":
-            import dataretrieval.waterdata as mod
-        else:
-            import dataretrieval.nwis as mod
-        return mod
+        submodule = "waterdata" if flavour == "waterdata" else "nwis"
+        return importlib.import_module(f"dataretrieval.{submodule}")
 
     def _invoke(
         self, flavour: str, codes: list[str], sites: list[str] | None
@@ -505,7 +510,10 @@ class USGSWater(AbstractDataSource):
                 tuple).
         """
         module = self._module(flavour)
-        function = getattr(module, _helpers.service_function(self._service, flavour))
+        fn_name = _helpers.service_function(self._service, flavour)
+        # _call_with_fallback only routes to a flavour that has a function.
+        assert fn_name is not None
+        function = getattr(module, fn_name)
         kwargs = _helpers.query_kwargs(
             service=self._service,
             flavour=flavour,

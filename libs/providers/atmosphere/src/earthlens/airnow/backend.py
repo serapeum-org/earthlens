@@ -28,13 +28,14 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 from earthlens.airnow.auth import AirnowAuth, AirnowCredentials, AuthenticationError
 from earthlens.airnow.catalog import Catalog
 from earthlens.airnow.client import AirnowClient
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -210,7 +211,11 @@ class AirNow(AbstractDataSource):
             AuthenticationError: When `AirnowAuth.configure` finds no key
                 (no `api_key=` and no `AIRNOW_API_KEY`).
         """
-        self._auth = AirnowAuth(AirnowCredentials(api_key=self._api_key))
+        self._auth = AirnowAuth(
+            AirnowCredentials(
+                api_key=None if self._api_key is None else SecretStr(self._api_key)
+            )
+        )
         self._auth.configure()
         return None
 
@@ -336,7 +341,9 @@ class AirNow(AbstractDataSource):
         start_date, end_date = self._date_bounds()
         return {
             "BBOX": self._bbox(),
-            "parameters": ",".join(self._catalog.codes_for(self.vars)),
+            "parameters": ",".join(
+                self._catalog.codes_for(cast("list[str]", self.vars))
+            ),
             "startDate": start_date,
             "endDate": end_date,
             "dataType": self._data_type,

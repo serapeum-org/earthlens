@@ -36,7 +36,7 @@ import datetime as dt
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 import requests
@@ -60,6 +60,8 @@ from earthlens.erddap.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
+
+    from earthlens.ecmwf import Variable
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -404,7 +406,7 @@ class ERDDAP(AbstractDataSource):
         dest = self.root_dir / f"{row.dataset_id}.nc"
         logger.info(f"ERDDAP griddap {row.dataset_id}: GET {url}")
         http = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             timeout=self._timeout,
             max_retries=0,
             status_forcelist=(),
@@ -538,7 +540,7 @@ class ERDDAP(AbstractDataSource):
                 var_info = _GridVarInfo(
                     nc_variable=var, cds_variable=var, is_flux=var in flux
                 )
-                agg = aggregate_netcdf(nc_path, var_info, effective)
+                agg = aggregate_netcdf(nc_path, cast("Variable", var_info), effective)
                 out_paths.extend(p for _, _, p in agg if p is not None)
         return out_paths
 

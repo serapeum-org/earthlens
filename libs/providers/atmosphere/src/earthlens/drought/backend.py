@@ -31,7 +31,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 from earthlens.base._dates import to_datetime
@@ -54,6 +54,7 @@ from earthlens.base import (
 from earthlens.drought.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
+    import requests
     from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
 
@@ -189,8 +190,11 @@ class Drought(AbstractDataSource):
             )
 
         super().__init__(
-            start=start,
-            end=end,
+            # Drought accepts str/date/datetime; the overridden
+            # `_check_input_dates` normalises all three via `to_datetime`,
+            # so bridge the base template's narrower `str` here.
+            start=cast("str", start),
+            end=cast("str", end),
             variables=[dataset],
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim,
@@ -360,6 +364,7 @@ class Drought(AbstractDataSource):
         frames: list[gpd.GeoDataFrame] = []
         for product in products:
             period: dt.date = product.metadata["period"]
+            assert product.href is not None  # USDM products always carry a URL template
             url = self._render_usdm_url(product.href, period)
             payload = _http_get_json(url)
             frame = self._geojson_to_gdf(payload, period)
@@ -876,7 +881,7 @@ def _http_get_json(url: str) -> dict[str, Any]:
     Raises:
         requests.HTTPError: For non-2xx responses.
     """
-    return _http_client().get_json(url, timeout=_HTTP_TIMEOUT)
+    return cast("dict[str, Any]", _http_client().get_json(url, timeout=_HTTP_TIMEOUT))
 
 
 def _http_client() -> HttpClient:
@@ -889,7 +894,7 @@ def _http_client() -> HttpClient:
     retry, and consistent User-Agent.
     """
     return HttpClient(
-        session=_RequestsGet(),
+        session=cast("requests.Session | None", _RequestsGet()),
         user_agent=_USER_AGENT,
         status_forcelist=(),
         max_backoff=None,

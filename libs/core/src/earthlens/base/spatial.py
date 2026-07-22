@@ -11,7 +11,7 @@ that's already pyramids-compatible.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, cast
 
 from loguru import logger
 from pyramids.feature import bbox as _pyramids_bbox
@@ -84,7 +84,10 @@ def estimate_pixel_dims(
         raise ValueError(f"east ({east}) < west ({west})")
     if north < south:
         raise ValueError(f"north ({north}) < south ({south})")
-    return _pyramids_bbox.estimate_pixel_dims((west, south, east, north), scale_m)
+    return cast(
+        "tuple[int, int]",
+        _pyramids_bbox.estimate_pixel_dims((west, south, east, north), scale_m),
+    )
 
 
 #: Accepted spellings for each edge of a bounding-box mapping are owned by
@@ -195,7 +198,7 @@ def _bbox_dict_bounds(obj: Mapping[str, Any]) -> tuple[float, float, float, floa
             The message names the missing edge by its compass spelling
             (`'north'`), whichever convention the caller used for the keys.
     """
-    return _pyramids_bbox.read_bbox_dict(obj)
+    return cast("tuple[float, float, float, float]", _pyramids_bbox.read_bbox_dict(obj))
 
 
 _POLYGONAL_GEOM_TYPES = frozenset({"Polygon", "MultiPolygon"})

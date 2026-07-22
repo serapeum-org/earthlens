@@ -25,7 +25,7 @@ the loader at another directory or a single YAML file.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -343,4 +343,4 @@ class Catalog(AbstractCatalog):
                 lists the closest known ids via the shipped
                 `AbstractCatalog.get_dataset` did-you-mean helper.
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))

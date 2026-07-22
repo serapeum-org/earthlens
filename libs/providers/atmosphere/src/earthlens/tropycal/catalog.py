@@ -28,7 +28,7 @@ YAML and is monkey-patchable in tests.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -265,7 +265,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `code` is not a registered basin.
         """
-        return self.get_dataset(code)
+        return cast("Basin", self.get_dataset(code))
 
     def get_field(self, code: str, field: str) -> TrackField:
         """Return one track field of one basin.

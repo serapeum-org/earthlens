@@ -27,7 +27,7 @@ from __future__ import annotations
 
 import threading
 import time
-from typing import Any
+from typing import Any, cast
 
 import requests
 from earthlens.iucn.auth import AuthenticationError
@@ -207,7 +207,7 @@ def _get(
             continue
         if status is None or status >= 400:
             raise RuntimeError(f"IUCN Red List returned HTTP {status} for /{path}.")
-        return response.json()
+        return cast("dict[Any, Any]", response.json())
     # Defensive: unreachable today (every iteration above returns or raises).
     # Kept so a future edit that breaks the invariant fails loudly instead of
     # silently exiting the loop.
@@ -230,8 +230,8 @@ def _category(assessment: dict) -> str | None:
     """
     nested = assessment.get("red_list_category")
     if isinstance(nested, dict) and nested.get("code"):
-        return nested["code"]
-    return assessment.get("red_list_category_code")
+        return cast("str | None", nested["code"])
+    return cast("str | None", assessment.get("red_list_category_code"))
 
 
 def _flatten_label(value: Any) -> str | None:
@@ -261,7 +261,7 @@ def _flatten_label(value: Any) -> str | None:
         if isinstance(description, dict):
             english = description.get("en")
             if english:
-                return english
+                return cast("str | None", english)
         if isinstance(description, str) and description:
             return description
         code = value.get("code")

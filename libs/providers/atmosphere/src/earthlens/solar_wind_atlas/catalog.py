@@ -18,7 +18,7 @@ download-then-localise for the solar layers — see the A1 gate,
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
@@ -273,7 +273,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(layer_id)
+        return cast("Layer", self.get_dataset(layer_id))
 
     def available(self) -> list[str]:
         """Return the curated layer ids, sorted.
