@@ -88,17 +88,17 @@ def _facet_token(value: Any) -> str:
             ```
     """
     if value is None or isinstance(value, bool):
-        token = ""  # nosec B105 - not a secret (public URL / identifier)
+        text = ""
     elif isinstance(value, str):
-        token = value.strip()
+        text = value.strip()
     elif isinstance(value, (int, float)):
-        token = _format_number(value)
+        text = _format_number(value)
     else:
-        token = _cadence_token(value)
-        if not token and isinstance(value, (list, tuple, set)):
+        text = _cadence_token(value)
+        if not text and isinstance(value, (list, tuple, set)):
             tokens = [t for t in (_facet_token(v) for v in value) if t]
-            token = ", ".join(dict.fromkeys(tokens))
-    return token
+            text = ", ".join(dict.fromkeys(tokens))
+    return text
 
 
 def _first_token(record: Any, attrs: tuple[str, ...]) -> str:
