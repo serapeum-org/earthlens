@@ -22,12 +22,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 from urllib.parse import urlsplit
 
+import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
-    import requests
-
     from earthlens.base import SpatialExtent
 
 #: GDAL `/vsicurl` HTTP settings applied (via `setdefault`) before the first

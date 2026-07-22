@@ -19,14 +19,12 @@ gate are applied by the per-provider URL builders so the backend hands
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
+import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
 from pyramids.feature.collection import FeatureCollection
-
-if TYPE_CHECKING:
-    import requests
 
 #: geoBoundaries gbOpen API base — `"{base}/{ISO3}/{ADM}/"` returns the metadata
 #: whose `gjDownloadURL` is the GeoJSON to read (`geoboundaries_resolve`).

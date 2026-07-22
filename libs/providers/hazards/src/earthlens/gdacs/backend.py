@@ -34,6 +34,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
+import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.gdacs.catalog import Catalog
@@ -49,7 +50,6 @@ from earthlens.base import (
 from earthlens.gdacs import events
 
 if TYPE_CHECKING:
-    import requests
     from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
 
