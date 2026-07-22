@@ -20362,7 +20362,7 @@ index of every operational configuration on the bucket.</p>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            ValueError: If `key` is not a registered NWM product.</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWMProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWMConfig</span><span class="p">:</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`NWMConfig` for `key`, with a did-you-mean hint.</span>
@@ -20742,7 +20742,7 @@ index of every operational configuration on the bucket.</p>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        ValueError: If `key` is not a registered NWM product.</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWMProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21866,7 +21866,12 @@ for both. The class default is <code>"raster"</code>.</p>
 <span class="normal"><a href="#__codelineno-0-875">875</a></span>
 <span class="normal"><a href="#__codelineno-0-876">876</a></span>
 <span class="normal"><a href="#__codelineno-0-877">877</a></span>
-<span class="normal"><a href="#__codelineno-0-878">878</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-878">878</a></span>
+<span class="normal"><a href="#__codelineno-0-879">879</a></span>
+<span class="normal"><a href="#__codelineno-0-880">880</a></span>
+<span class="normal"><a href="#__codelineno-0-881">881</a></span>
+<span class="normal"><a href="#__codelineno-0-882">882</a></span>
+<span class="normal"><a href="#__codelineno-0-883">883</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NOAA National Water Model backend (operational NetCDF output).</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Wraps the unsigned `noaa-nwm-pds` bucket so a user pulls a</span>
@@ -22449,125 +22454,130 @@ for both. The class default is <code>"raster"</code>.</p>
 <a id="__codelineno-0-757" name="__codelineno-0-757"></a>                <span class="k">continue</span>
 <a id="__codelineno-0-758" name="__codelineno-0-758"></a>            <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">])</span>
 <a id="__codelineno-0-759" name="__codelineno-0-759"></a>            <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">output_kind</span> <span class="o">==</span> <span class="s2">&quot;tabular&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a>                <span class="n">cube</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">downloaded</span><span class="p">),</span> <span class="n">variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested</span><span class="p">[</span><span class="n">product</span><span class="o">.</span><span class="n">product</span><span class="p">]</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a>                <span class="p">)</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_select_and_write</span><span class="p">(</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>                        <span class="n">cube</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">downloaded</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">slice_time</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>                <span class="p">)</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a>                <span class="n">_close_quietly</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a>                <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subset_gridded_file</span><span class="p">(</span><span class="n">downloaded</span><span class="p">,</span> <span class="n">product</span><span class="p">))</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="k">return</span> <span class="n">out</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an unsigned `boto3` S3 client for the public NWM bucket.</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">            An anonymous `boto3` S3 client.</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">            ImportError: When `boto3` is not installed (names</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">                `earthlens[nwm]`).</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">botocore</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNSIGNED</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">botocore.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>                <span class="s2">&quot;the National Water Model backend needs `boto3`; install &quot;</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>                <span class="s2">&quot;`pip install earthlens[nwm]`.&quot;</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="k">return</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>            <span class="s2">&quot;s3&quot;</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">)</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="p">)</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download one product&#39;s NetCDF file (atomic `.part` rename).</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">        The output name flattens the **full** S3 key (date prefix +</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">        configuration directory + basename), so it is unique per</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">        `(date, configuration, cycle, step, product, member)` — the NWM</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        basename alone omits the date, so two days with the same</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">        cycle/step would otherwise collide and overwrite. The body is</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        streamed to disk in chunks rather than buffered whole in memory</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">        (a `land` file can be ~220 MB).</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">            client: The unsigned boto3 client.</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a>                <span class="c1"># reader is built whenever OUTPUT_KIND == &quot;tabular&quot; (above).</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>                <span class="k">assert</span> <span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>                <span class="n">cube</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">downloaded</span><span class="p">),</span> <span class="n">variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested</span><span class="p">[</span><span class="n">product</span><span class="o">.</span><span class="n">product</span><span class="p">]</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>                <span class="p">)</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_select_and_write</span><span class="p">(</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>                        <span class="n">cube</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">downloaded</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">slice_time</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>                <span class="p">)</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>                <span class="n">_close_quietly</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a>                <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subset_gridded_file</span><span class="p">(</span><span class="n">downloaded</span><span class="p">,</span> <span class="n">product</span><span class="p">))</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>        <span class="k">return</span> <span class="n">out</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an unsigned `boto3` S3 client for the public NWM bucket.</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">            An anonymous `boto3` S3 client.</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">            ImportError: When `boto3` is not installed (names</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">                `earthlens[nwm]`).</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">botocore</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNSIGNED</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">botocore.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>                <span class="s2">&quot;the National Water Model backend needs `boto3`; install &quot;</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>                <span class="s2">&quot;`pip install earthlens[nwm]`.&quot;</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="k">return</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>            <span class="s2">&quot;s3&quot;</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">)</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="p">)</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span>  <span class="c1"># type: ignore[override]</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download one product&#39;s NetCDF file (atomic `.part` rename).</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">        The output name flattens the **full** S3 key (date prefix +</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        configuration directory + basename), so it is unique per</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">        `(date, configuration, cycle, step, product, member)` — the NWM</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        basename alone omits the date, so two days with the same</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        cycle/step would otherwise collide and overwrite. The body is</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">        streamed to disk in chunks rather than buffered whole in memory</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">        (a `land` file can be ~220 MB).</span>
 <a id="__codelineno-0-810" name="__codelineno-0-810"></a>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">            Path | None: The written path, or `None` when the key was not</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">                published (logged and skipped).</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a>        <span class="n">key</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>            <span class="n">body</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">BUCKET</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)[</span><span class="s2">&quot;Body&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>            <span class="k">if</span> <span class="n">_is_missing_key</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nwm: skipping </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> — not published (</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>                <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested NWM data and return the written paths.</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        :meth:`_fetch`, which routes by mode and subset:</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">        * a plain operational request downloads the whole-CONUS NetCDFs;</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">        * a `sites=`/bbox subset or `mode=&quot;retrospective&quot;` reads + slices</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">          the tabular products (`chrtout`, `lakeout`, `coastal`) through</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">          the pyramids `LabeledDataset` reader and writes Parquet tables;</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">        * a subset / retrospective request for a gridded product raises</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">          `NotImplementedError`.</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">            progress_bar: Show a per-item progress bar. Defaults to</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">            aggregate: Must be `None`. NWM `chrtout` is feature-id</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">                indexed (not griddable) and a gridded reduce needs a</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">                separate reader, so aggregation is unsupported. The</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">                facade already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">                non-raster backend; this guards direct callers.</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">            list[Path]: The written paths — whole-CONUS NetCDFs for a</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">                plain operational request, or Parquet tables for a</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">                subset / retrospective read. Empty when nothing in the</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">                window was available.</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`, or for a</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">                subset / retrospective request against a gridded product.</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>                <span class="s2">&quot;NWM.download(aggregate=...) is not supported — chrtout is &quot;</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>                <span class="s2">&quot;feature-id indexed (not griddable) and a gridded reduce needs a &quot;</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>                <span class="s2">&quot;separate gridded reader.&quot;</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a>            <span class="p">)</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">            client: The unsigned boto3 client.</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">            Path | None: The written path, or `None` when the key was not</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">                published (logged and skipped).</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a>        <span class="n">key</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a>        <span class="k">assert</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># NWM products always carry an S3 key href</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>            <span class="n">body</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">BUCKET</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)[</span><span class="s2">&quot;Body&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a>            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a>        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>            <span class="k">if</span> <span class="n">_is_missing_key</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nwm: skipping </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> — not published (</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a>                <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested NWM data and return the written paths.</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">        :meth:`_fetch`, which routes by mode and subset:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">        * a plain operational request downloads the whole-CONUS NetCDFs;</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">        * a `sites=`/bbox subset or `mode=&quot;retrospective&quot;` reads + slices</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">          the tabular products (`chrtout`, `lakeout`, `coastal`) through</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">          the pyramids `LabeledDataset` reader and writes Parquet tables;</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">        * a subset / retrospective request for a gridded product raises</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">          `NotImplementedError`.</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">            progress_bar: Show a per-item progress bar. Defaults to</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">            aggregate: Must be `None`. NWM `chrtout` is feature-id</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">                indexed (not griddable) and a gridded reduce needs a</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">                separate reader, so aggregation is unsupported. The</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">                facade already rejects a non-`None` `aggregate=` for a</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">                non-raster backend; this guards direct callers.</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">            list[Path]: The written paths — whole-CONUS NetCDFs for a</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">                plain operational request, or Parquet tables for a</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">                subset / retrospective read. Empty when nothing in the</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">                window was available.</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`, or for a</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">                subset / retrospective request against a gridded product.</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>                <span class="s2">&quot;NWM.download(aggregate=...) is not supported — chrtout is &quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>                <span class="s2">&quot;feature-id indexed (not griddable) and a gridded reduce needs a &quot;</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a>                <span class="s2">&quot;separate gridded reader.&quot;</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>            <span class="p">)</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23317,12 +23327,7 @@ subset / retrospective request against a gridded product.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/nwm/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-835">835</a></span>
-<span class="normal"><a href="#__codelineno-0-836">836</a></span>
-<span class="normal"><a href="#__codelineno-0-837">837</a></span>
-<span class="normal"><a href="#__codelineno-0-838">838</a></span>
-<span class="normal"><a href="#__codelineno-0-839">839</a></span>
-<span class="normal"><a href="#__codelineno-0-840">840</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-840">840</a></span>
 <span class="normal"><a href="#__codelineno-0-841">841</a></span>
 <span class="normal"><a href="#__codelineno-0-842">842</a></span>
 <span class="normal"><a href="#__codelineno-0-843">843</a></span>
@@ -23360,50 +23365,55 @@ subset / retrospective request against a gridded product.</p>
 <span class="normal"><a href="#__codelineno-0-875">875</a></span>
 <span class="normal"><a href="#__codelineno-0-876">876</a></span>
 <span class="normal"><a href="#__codelineno-0-877">877</a></span>
-<span class="normal"><a href="#__codelineno-0-878">878</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested NWM data and return the written paths.</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">    :meth:`_fetch`, which routes by mode and subset:</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">    * a plain operational request downloads the whole-CONUS NetCDFs;</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">    * a `sites=`/bbox subset or `mode=&quot;retrospective&quot;` reads + slices</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">      the tabular products (`chrtout`, `lakeout`, `coastal`) through</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">      the pyramids `LabeledDataset` reader and writes Parquet tables;</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">    * a subset / retrospective request for a gridded product raises</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">      `NotImplementedError`.</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">        progress_bar: Show a per-item progress bar. Defaults to</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">        aggregate: Must be `None`. NWM `chrtout` is feature-id</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">            indexed (not griddable) and a gridded reduce needs a</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">            separate reader, so aggregation is unsupported. The</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">            facade already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">            non-raster backend; this guards direct callers.</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        list[Path]: The written paths — whole-CONUS NetCDFs for a</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">            plain operational request, or Parquet tables for a</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">            subset / retrospective read. Empty when nothing in the</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">            window was available.</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`, or for a</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            subset / retrospective request against a gridded product.</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>            <span class="s2">&quot;NWM.download(aggregate=...) is not supported — chrtout is &quot;</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>            <span class="s2">&quot;feature-id indexed (not griddable) and a gridded reduce needs a &quot;</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>            <span class="s2">&quot;separate gridded reader.&quot;</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a>        <span class="p">)</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-878">878</a></span>
+<span class="normal"><a href="#__codelineno-0-879">879</a></span>
+<span class="normal"><a href="#__codelineno-0-880">880</a></span>
+<span class="normal"><a href="#__codelineno-0-881">881</a></span>
+<span class="normal"><a href="#__codelineno-0-882">882</a></span>
+<span class="normal"><a href="#__codelineno-0-883">883</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested NWM data and return the written paths.</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">    :meth:`_fetch`, which routes by mode and subset:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">    * a plain operational request downloads the whole-CONUS NetCDFs;</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">    * a `sites=`/bbox subset or `mode=&quot;retrospective&quot;` reads + slices</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">      the tabular products (`chrtout`, `lakeout`, `coastal`) through</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">      the pyramids `LabeledDataset` reader and writes Parquet tables;</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">    * a subset / retrospective request for a gridded product raises</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">      `NotImplementedError`.</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">        progress_bar: Show a per-item progress bar. Defaults to</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">        aggregate: Must be `None`. NWM `chrtout` is feature-id</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">            indexed (not griddable) and a gridded reduce needs a</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">            separate reader, so aggregation is unsupported. The</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">            facade already rejects a non-`None` `aggregate=` for a</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">            non-raster backend; this guards direct callers.</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">        list[Path]: The written paths — whole-CONUS NetCDFs for a</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">            plain operational request, or Parquet tables for a</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            subset / retrospective read. Empty when nothing in the</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">            window was available.</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`, or for a</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">            subset / retrospective request against a gridded product.</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>            <span class="s2">&quot;NWM.download(aggregate=...) is not supported — chrtout is &quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>            <span class="s2">&quot;feature-id indexed (not griddable) and a gridded reduce needs a &quot;</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a>            <span class="s2">&quot;separate gridded reader.&quot;</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>        <span class="p">)</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25027,7 +25037,12 @@ for both. The class default is <code>"raster"</code>.</p>
 <span class="normal"><a href="#__codelineno-0-875">875</a></span>
 <span class="normal"><a href="#__codelineno-0-876">876</a></span>
 <span class="normal"><a href="#__codelineno-0-877">877</a></span>
-<span class="normal"><a href="#__codelineno-0-878">878</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-878">878</a></span>
+<span class="normal"><a href="#__codelineno-0-879">879</a></span>
+<span class="normal"><a href="#__codelineno-0-880">880</a></span>
+<span class="normal"><a href="#__codelineno-0-881">881</a></span>
+<span class="normal"><a href="#__codelineno-0-882">882</a></span>
+<span class="normal"><a href="#__codelineno-0-883">883</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NOAA National Water Model backend (operational NetCDF output).</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Wraps the unsigned `noaa-nwm-pds` bucket so a user pulls a</span>
@@ -25610,125 +25625,130 @@ for both. The class default is <code>"raster"</code>.</p>
 <a id="__codelineno-0-757" name="__codelineno-0-757"></a>                <span class="k">continue</span>
 <a id="__codelineno-0-758" name="__codelineno-0-758"></a>            <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">])</span>
 <a id="__codelineno-0-759" name="__codelineno-0-759"></a>            <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">output_kind</span> <span class="o">==</span> <span class="s2">&quot;tabular&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a>                <span class="n">cube</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">downloaded</span><span class="p">),</span> <span class="n">variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested</span><span class="p">[</span><span class="n">product</span><span class="o">.</span><span class="n">product</span><span class="p">]</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a>                <span class="p">)</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_select_and_write</span><span class="p">(</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>                        <span class="n">cube</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">downloaded</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">slice_time</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>                <span class="p">)</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a>                <span class="n">_close_quietly</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a>                <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subset_gridded_file</span><span class="p">(</span><span class="n">downloaded</span><span class="p">,</span> <span class="n">product</span><span class="p">))</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="k">return</span> <span class="n">out</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an unsigned `boto3` S3 client for the public NWM bucket.</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">            An anonymous `boto3` S3 client.</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">            ImportError: When `boto3` is not installed (names</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">                `earthlens[nwm]`).</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">botocore</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNSIGNED</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">botocore.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>                <span class="s2">&quot;the National Water Model backend needs `boto3`; install &quot;</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>                <span class="s2">&quot;`pip install earthlens[nwm]`.&quot;</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="k">return</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>            <span class="s2">&quot;s3&quot;</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">)</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="p">)</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download one product&#39;s NetCDF file (atomic `.part` rename).</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">        The output name flattens the **full** S3 key (date prefix +</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">        configuration directory + basename), so it is unique per</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">        `(date, configuration, cycle, step, product, member)` — the NWM</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        basename alone omits the date, so two days with the same</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">        cycle/step would otherwise collide and overwrite. The body is</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        streamed to disk in chunks rather than buffered whole in memory</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">        (a `land` file can be ~220 MB).</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">            client: The unsigned boto3 client.</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a>                <span class="c1"># reader is built whenever OUTPUT_KIND == &quot;tabular&quot; (above).</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>                <span class="k">assert</span> <span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>                <span class="n">cube</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">downloaded</span><span class="p">),</span> <span class="n">variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested</span><span class="p">[</span><span class="n">product</span><span class="o">.</span><span class="n">product</span><span class="p">]</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>                <span class="p">)</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_select_and_write</span><span class="p">(</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>                        <span class="n">cube</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">downloaded</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">slice_time</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>                <span class="p">)</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>                <span class="n">_close_quietly</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a>                <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subset_gridded_file</span><span class="p">(</span><span class="n">downloaded</span><span class="p">,</span> <span class="n">product</span><span class="p">))</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>        <span class="k">return</span> <span class="n">out</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an unsigned `boto3` S3 client for the public NWM bucket.</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">            An anonymous `boto3` S3 client.</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">            ImportError: When `boto3` is not installed (names</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">                `earthlens[nwm]`).</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">botocore</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNSIGNED</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">botocore.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>                <span class="s2">&quot;the National Water Model backend needs `boto3`; install &quot;</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>                <span class="s2">&quot;`pip install earthlens[nwm]`.&quot;</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="k">return</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>            <span class="s2">&quot;s3&quot;</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">)</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="p">)</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span>  <span class="c1"># type: ignore[override]</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download one product&#39;s NetCDF file (atomic `.part` rename).</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">        The output name flattens the **full** S3 key (date prefix +</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        configuration directory + basename), so it is unique per</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">        `(date, configuration, cycle, step, product, member)` — the NWM</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        basename alone omits the date, so two days with the same</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        cycle/step would otherwise collide and overwrite. The body is</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">        streamed to disk in chunks rather than buffered whole in memory</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">        (a `land` file can be ~220 MB).</span>
 <a id="__codelineno-0-810" name="__codelineno-0-810"></a>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">            Path | None: The written path, or `None` when the key was not</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">                published (logged and skipped).</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a>        <span class="n">key</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>            <span class="n">body</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">BUCKET</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)[</span><span class="s2">&quot;Body&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>            <span class="k">if</span> <span class="n">_is_missing_key</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nwm: skipping </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> — not published (</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>                <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested NWM data and return the written paths.</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        :meth:`_fetch`, which routes by mode and subset:</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">        * a plain operational request downloads the whole-CONUS NetCDFs;</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">        * a `sites=`/bbox subset or `mode=&quot;retrospective&quot;` reads + slices</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">          the tabular products (`chrtout`, `lakeout`, `coastal`) through</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">          the pyramids `LabeledDataset` reader and writes Parquet tables;</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">        * a subset / retrospective request for a gridded product raises</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">          `NotImplementedError`.</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">            progress_bar: Show a per-item progress bar. Defaults to</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">            aggregate: Must be `None`. NWM `chrtout` is feature-id</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">                indexed (not griddable) and a gridded reduce needs a</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">                separate reader, so aggregation is unsupported. The</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">                facade already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">                non-raster backend; this guards direct callers.</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">            list[Path]: The written paths — whole-CONUS NetCDFs for a</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">                plain operational request, or Parquet tables for a</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">                subset / retrospective read. Empty when nothing in the</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">                window was available.</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`, or for a</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">                subset / retrospective request against a gridded product.</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>                <span class="s2">&quot;NWM.download(aggregate=...) is not supported — chrtout is &quot;</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>                <span class="s2">&quot;feature-id indexed (not griddable) and a gridded reduce needs a &quot;</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>                <span class="s2">&quot;separate gridded reader.&quot;</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a>            <span class="p">)</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">            client: The unsigned boto3 client.</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">            Path | None: The written path, or `None` when the key was not</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">                published (logged and skipped).</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a>        <span class="n">key</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a>        <span class="k">assert</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># NWM products always carry an S3 key href</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>            <span class="n">body</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">BUCKET</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">key</span><span class="p">)[</span><span class="s2">&quot;Body&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a>            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a>        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>            <span class="k">if</span> <span class="n">_is_missing_key</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nwm: skipping </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> — not published (</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a>                <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical C3 shape.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested NWM data and return the written paths.</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">        :meth:`_fetch`, which routes by mode and subset:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">        * a plain operational request downloads the whole-CONUS NetCDFs;</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">        * a `sites=`/bbox subset or `mode=&quot;retrospective&quot;` reads + slices</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">          the tabular products (`chrtout`, `lakeout`, `coastal`) through</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">          the pyramids `LabeledDataset` reader and writes Parquet tables;</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">        * a subset / retrospective request for a gridded product raises</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">          `NotImplementedError`.</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">            progress_bar: Show a per-item progress bar. Defaults to</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">            aggregate: Must be `None`. NWM `chrtout` is feature-id</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">                indexed (not griddable) and a gridded reduce needs a</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">                separate reader, so aggregation is unsupported. The</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">                facade already rejects a non-`None` `aggregate=` for a</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">                non-raster backend; this guards direct callers.</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">            list[Path]: The written paths — whole-CONUS NetCDFs for a</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">                plain operational request, or Parquet tables for a</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">                subset / retrospective read. Empty when nothing in the</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">                window was available.</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`, or for a</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">                subset / retrospective request against a gridded product.</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>                <span class="s2">&quot;NWM.download(aggregate=...) is not supported — chrtout is &quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>                <span class="s2">&quot;feature-id indexed (not griddable) and a gridded reduce needs a &quot;</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a>                <span class="s2">&quot;separate gridded reader.&quot;</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>            <span class="p">)</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26478,12 +26498,7 @@ subset / retrospective request against a gridded product.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/nwm/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-835">835</a></span>
-<span class="normal"><a href="#__codelineno-0-836">836</a></span>
-<span class="normal"><a href="#__codelineno-0-837">837</a></span>
-<span class="normal"><a href="#__codelineno-0-838">838</a></span>
-<span class="normal"><a href="#__codelineno-0-839">839</a></span>
-<span class="normal"><a href="#__codelineno-0-840">840</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-840">840</a></span>
 <span class="normal"><a href="#__codelineno-0-841">841</a></span>
 <span class="normal"><a href="#__codelineno-0-842">842</a></span>
 <span class="normal"><a href="#__codelineno-0-843">843</a></span>
@@ -26521,50 +26536,55 @@ subset / retrospective request against a gridded product.</p>
 <span class="normal"><a href="#__codelineno-0-875">875</a></span>
 <span class="normal"><a href="#__codelineno-0-876">876</a></span>
 <span class="normal"><a href="#__codelineno-0-877">877</a></span>
-<span class="normal"><a href="#__codelineno-0-878">878</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested NWM data and return the written paths.</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">    :meth:`_fetch`, which routes by mode and subset:</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">    * a plain operational request downloads the whole-CONUS NetCDFs;</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">    * a `sites=`/bbox subset or `mode=&quot;retrospective&quot;` reads + slices</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">      the tabular products (`chrtout`, `lakeout`, `coastal`) through</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">      the pyramids `LabeledDataset` reader and writes Parquet tables;</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">    * a subset / retrospective request for a gridded product raises</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">      `NotImplementedError`.</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">        progress_bar: Show a per-item progress bar. Defaults to</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">        aggregate: Must be `None`. NWM `chrtout` is feature-id</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">            indexed (not griddable) and a gridded reduce needs a</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">            separate reader, so aggregation is unsupported. The</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">            facade already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">            non-raster backend; this guards direct callers.</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        list[Path]: The written paths — whole-CONUS NetCDFs for a</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">            plain operational request, or Parquet tables for a</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">            subset / retrospective read. Empty when nothing in the</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">            window was available.</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`, or for a</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            subset / retrospective request against a gridded product.</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>            <span class="s2">&quot;NWM.download(aggregate=...) is not supported — chrtout is &quot;</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>            <span class="s2">&quot;feature-id indexed (not griddable) and a gridded reduce needs a &quot;</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>            <span class="s2">&quot;separate gridded reader.&quot;</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a>        <span class="p">)</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-878">878</a></span>
+<span class="normal"><a href="#__codelineno-0-879">879</a></span>
+<span class="normal"><a href="#__codelineno-0-880">880</a></span>
+<span class="normal"><a href="#__codelineno-0-881">881</a></span>
+<span class="normal"><a href="#__codelineno-0-882">882</a></span>
+<span class="normal"><a href="#__codelineno-0-883">883</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested NWM data and return the written paths.</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">    :meth:`_fetch`, which routes by mode and subset:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">    * a plain operational request downloads the whole-CONUS NetCDFs;</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">    * a `sites=`/bbox subset or `mode=&quot;retrospective&quot;` reads + slices</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">      the tabular products (`chrtout`, `lakeout`, `coastal`) through</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">      the pyramids `LabeledDataset` reader and writes Parquet tables;</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">    * a subset / retrospective request for a gridded product raises</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">      `NotImplementedError`.</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">        progress_bar: Show a per-item progress bar. Defaults to</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">        aggregate: Must be `None`. NWM `chrtout` is feature-id</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">            indexed (not griddable) and a gridded reduce needs a</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">            separate reader, so aggregation is unsupported. The</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">            facade already rejects a non-`None` `aggregate=` for a</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">            non-raster backend; this guards direct callers.</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">        list[Path]: The written paths — whole-CONUS NetCDFs for a</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">            plain operational request, or Parquet tables for a</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            subset / retrospective read. Empty when nothing in the</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">            window was available.</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`, or for a</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">            subset / retrospective request against a gridded product.</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>            <span class="s2">&quot;NWM.download(aggregate=...) is not supported — chrtout is &quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>            <span class="s2">&quot;feature-id indexed (not griddable) and a gridded reduce needs a &quot;</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a>            <span class="s2">&quot;separate gridded reader.&quot;</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>        <span class="p">)</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27541,7 +27561,7 @@ index of every operational configuration on the bucket.</p>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            ValueError: If `key` is not a registered NWM product.</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWMProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWMConfig</span><span class="p">:</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`NWMConfig` for `key`, with a did-you-mean hint.</span>
@@ -27921,7 +27941,7 @@ index of every operational configuration on the bucket.</p>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        ValueError: If `key` is not a registered NWM product.</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWMProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

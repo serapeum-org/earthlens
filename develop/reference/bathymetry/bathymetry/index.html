@@ -20403,7 +20403,7 @@ are static).</p>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                out-of-coverage or oversize bbox.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">http</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="n">session</span><span class="o">=</span><span class="n">_RequestsGet</span><span class="p">(),</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="n">session</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;requests.Session | None&quot;</span><span class="p">,</span> <span class="n">_RequestsGet</span><span class="p">()),</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">,</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">max_retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="n">status_forcelist</span><span class="o">=</span><span class="p">(),</span>
@@ -21391,7 +21391,7 @@ curated keys.</p>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21562,7 +21562,7 @@ lists the known ids with a did-you-mean hint.</p>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22815,7 +22815,7 @@ are static).</p>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                out-of-coverage or oversize bbox.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">http</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="n">session</span><span class="o">=</span><span class="n">_RequestsGet</span><span class="p">(),</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="n">session</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;requests.Session | None&quot;</span><span class="p">,</span> <span class="n">_RequestsGet</span><span class="p">()),</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">,</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">max_retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="n">status_forcelist</span><span class="o">=</span><span class="p">(),</span>
@@ -23859,7 +23859,7 @@ curated keys.</p>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24030,7 +24030,7 @@ lists the known ids with a did-you-mean hint.</p>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

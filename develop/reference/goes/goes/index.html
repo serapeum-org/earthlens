@@ -20450,7 +20450,7 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ValueError: If `key` is not a registered GOES product.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
@@ -20989,7 +20989,7 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        ValueError: If `key` is not a registered GOES product.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26078,7 +26078,7 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ValueError: If `key` is not a registered GOES product.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
@@ -26617,7 +26617,7 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        ValueError: If `key` is not a registered GOES product.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

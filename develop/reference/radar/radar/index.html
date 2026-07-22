@@ -19766,7 +19766,7 @@ as a typed <code>dict[str, Station]</code>. Instantiate with no arguments
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            ValueError: When `site_id` is unknown (with a did-you-mean</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">                hint from the base class).</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">site_id</span><span class="p">)</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Station&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">site_id</span><span class="p">))</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">in_bbox</span><span class="p">(</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">west</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">south</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">east</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">north</span><span class="p">:</span> <span class="nb">float</span>
@@ -19960,7 +19960,7 @@ hint from the base class).</p>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">        ValueError: When `site_id` is unknown (with a did-you-mean</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            hint from the base class).</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">site_id</span><span class="p">)</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Station&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">site_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23296,7 +23296,7 @@ as a typed <code>dict[str, Station]</code>. Instantiate with no arguments
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            ValueError: When `site_id` is unknown (with a did-you-mean</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">                hint from the base class).</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">site_id</span><span class="p">)</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Station&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">site_id</span><span class="p">))</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">in_bbox</span><span class="p">(</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">west</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">south</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">east</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">north</span><span class="p">:</span> <span class="nb">float</span>
@@ -23490,7 +23490,7 @@ hint from the base class).</p>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">        ValueError: When `site_id` is unknown (with a did-you-mean</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            hint from the base class).</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">site_id</span><span class="p">)</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Station&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">site_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

@@ -20079,7 +20079,7 @@ curated keys (there is no larger auto-discovered universe).</p>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">property_id</span><span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Property&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">property_id</span><span class="p">))</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated property ids, sorted.</span>
@@ -20258,7 +20258,7 @@ lists the known ids with a did-you-mean hint.</p>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">property_id</span><span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Property&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">property_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21316,7 +21316,9 @@ temporal axis).</p>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
 <span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">class</span><span class="w"> </span><span class="nc">SoilGrids</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">class</span><span class="w"> </span><span class="nc">SoilGrids</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;ISRIC SoilGrids 2.0 soil properties, bbox-subset to GeoTIFF over WCS.</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Resolves each requested property id against the bundled catalog, expands the</span>
@@ -21600,118 +21602,120 @@ temporal axis).</p>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="p">)</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">return</span> <span class="n">plan</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one coverage&#39;s bbox window as a GeoTIFF over WCS.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Uses `pyramids.dataset.Dataset.from_wcs` — GDAL&#39;s WCS driver inside</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        pyramids does the transport, handed `coverage_crs` so SoilGrids&#39; custom</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        IGH grid resolves and `output_crs` for the lon/lat reprojection. The WCS</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        subset is rectangular; when the request carried a polygon `aoi=` (stored</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        on `self.space.geometry`), the fetched coverage is masked to that exact</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        shape before writing, matching the peer raster backends. The</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        scaled-integer unit metadata is logged (never applied — the pixels stay</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        as stored integers, `G2`).</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        The coverage is fetched in-memory (`from_wcs(output=None)`), written into</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        `tmp_dir` (the per-download scratch dir owned by `_api`), then atomically</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        renamed onto its final path only after a fully successful write. Because</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        the final path is touched only by that rename, any failure leaves a</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        pre-existing GeoTIFF from a prior run untouched and never leaves a partial</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        behind — only the temp file is cleaned up.</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            product: The `RemoteProduct` whose `metadata` carries the resolved</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">                property row + the `(depth, quantile)` cell.</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            tmp_dir: The scratch directory to stage the write in before the</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                atomic rename (created + removed by :meth:`_api`).</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            Path: The written GeoTIFF at</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                `&lt;root_dir&gt;/&lt;property&gt;_&lt;depth&gt;_&lt;quantile&gt;.tif`.</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">row</span><span class="p">:</span> <span class="n">Property</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;row&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.tif&quot;</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="sa">f</span><span class="s2">&quot;soilgrids </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: WCS subset </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="sa">f</span><span class="s2">&quot;(values are scaled integers in </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">mapped_units</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;native units&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="sa">f</span><span class="s2">&quot;; divide by </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">scale_factor</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">unit</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;the unit&#39;</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="p">)</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">has_mask</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="c1"># The temp keeps the `.tif` suffix — pyramids picks the GDAL driver from</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="c1"># the extension, so a driver-less suffix like `.part` would raise</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="c1"># DriverNotExistError.</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">tmp_dir</span> <span class="o">/</span> <span class="n">out_path</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_wcs</span><span class="p">(</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="n">coverage</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_from_extent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">),</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="n">coverage_crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coverage_crs</span><span class="p">,</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="n">output_crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_crs</span><span class="p">,</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="n">resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="p">,</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">,</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">mask_to_geometry</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">)</span> <span class="k">if</span> <span class="n">has_mask</span> <span class="k">else</span> <span class="n">dataset</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="c1"># Release the GDAL write handles before the rename (Windows file</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="c1"># lock), then promote the temp atomically. `_close_dataset` is</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>            <span class="c1"># best-effort and never raises, so it is safe here inside the try;</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="c1"># keeping `os.replace` in the try means a rename failure is cleaned</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="c1"># up rather than orphaning a fully-written temp in the output tree.</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>                <span class="n">_close_dataset</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>            <span class="n">_close_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>            <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>                <span class="n">_close_dataset</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>            <span class="n">_close_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>                <span class="n">tmp_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                <span class="k">pass</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="k">return</span> <span class="n">out_path</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every requested coverage&#39;s bbox subset as a written GeoTIFF.</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">            progress_bar: Show a per-coverage `tqdm` bar (a request can expand to</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">                many coverages). Defaults to `True`.</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">            aggregate: Must be `None`. SoilGrids is a single static prediction</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">                with no temporal axis, so a non-`None` value raises</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">                `NotImplementedError`. The facade forwards `aggregate=` to raster</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                backends without pre-rejecting it, so this guard is the actual</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">                gate, not a secondary check.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            list[Path]: The written GeoTIFF path(s), one per</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">                `(property, depth, quantile)` coverage requested.</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                <span class="s2">&quot;SoilGrids.download(aggregate=...) is not supported: SoilGrids &quot;</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>                <span class="s2">&quot;is a static soil-property map with no temporal axis, so there &quot;</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="s2">&quot;is nothing to reduce. Call download() without aggregate=.&quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="p">)</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;soilgrids attribution: </span><span class="si">{</span><span class="n">SOILGRIDS_ATTRIBUTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="k">return</span> <span class="n">paths</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span>  <span class="c1"># type: ignore[override]</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Path</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one coverage&#39;s bbox window as a GeoTIFF over WCS.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        Uses `pyramids.dataset.Dataset.from_wcs` — GDAL&#39;s WCS driver inside</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        pyramids does the transport, handed `coverage_crs` so SoilGrids&#39; custom</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        IGH grid resolves and `output_crs` for the lon/lat reprojection. The WCS</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        subset is rectangular; when the request carried a polygon `aoi=` (stored</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        on `self.space.geometry`), the fetched coverage is masked to that exact</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        shape before writing, matching the peer raster backends. The</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        scaled-integer unit metadata is logged (never applied — the pixels stay</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        as stored integers, `G2`).</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        The coverage is fetched in-memory (`from_wcs(output=None)`), written into</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        `tmp_dir` (the per-download scratch dir owned by `_api`), then atomically</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        renamed onto its final path only after a fully successful write. Because</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        the final path is touched only by that rename, any failure leaves a</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        pre-existing GeoTIFF from a prior run untouched and never leaves a partial</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        behind — only the temp file is cleaned up.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            product: The `RemoteProduct` whose `metadata` carries the resolved</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                property row + the `(depth, quantile)` cell.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            tmp_dir: The scratch directory to stage the write in before the</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                atomic rename (created + removed by :meth:`_api`).</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            Path: The written GeoTIFF at</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                `&lt;root_dir&gt;/&lt;property&gt;_&lt;depth&gt;_&lt;quantile&gt;.tif`.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="n">row</span><span class="p">:</span> <span class="n">Property</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;row&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="sa">f</span><span class="s2">&quot;soilgrids </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: WCS subset </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="sa">f</span><span class="s2">&quot;(values are scaled integers in </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">mapped_units</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;native units&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="sa">f</span><span class="s2">&quot;; divide by </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">scale_factor</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">unit</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;the unit&#39;</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">has_mask</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="c1"># The temp keeps the `.tif` suffix — pyramids picks the GDAL driver from</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="c1"># the extension, so a driver-less suffix like `.part` would raise</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="c1"># DriverNotExistError.</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">tmp_dir</span> <span class="o">/</span> <span class="n">out_path</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_wcs</span><span class="p">(</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="n">coverage</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_from_extent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">),</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="n">coverage_crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coverage_crs</span><span class="p">,</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="n">output_crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_crs</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="n">resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>                <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">,</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="p">)</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">mask_to_geometry</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">)</span> <span class="k">if</span> <span class="n">has_mask</span> <span class="k">else</span> <span class="n">dataset</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>            <span class="c1"># Release the GDAL write handles before the rename (Windows file</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="c1"># lock), then promote the temp atomically. `_close_dataset` is</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="c1"># best-effort and never raises, so it is safe here inside the try;</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="c1"># keeping `os.replace` in the try means a rename failure is cleaned</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>            <span class="c1"># up rather than orphaning a fully-written temp in the output tree.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>                <span class="n">_close_dataset</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="n">_close_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>                <span class="n">_close_dataset</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>            <span class="n">_close_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                <span class="n">tmp_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>                <span class="k">pass</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every requested coverage&#39;s bbox subset as a written GeoTIFF.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">            progress_bar: Show a per-coverage `tqdm` bar (a request can expand to</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">                many coverages). Defaults to `True`.</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            aggregate: Must be `None`. SoilGrids is a single static prediction</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                with no temporal axis, so a non-`None` value raises</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">                `NotImplementedError`. The facade forwards `aggregate=` to raster</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">                backends without pre-rejecting it, so this guard is the actual</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">                gate, not a secondary check.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            list[Path]: The written GeoTIFF path(s), one per</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">                `(property, depth, quantile)` coverage requested.</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="s2">&quot;SoilGrids.download(aggregate=...) is not supported: SoilGrids &quot;</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>                <span class="s2">&quot;is a static soil-property map with no temporal axis, so there &quot;</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>                <span class="s2">&quot;is nothing to reduce. Call download() without aggregate=.&quot;</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>            <span class="p">)</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;soilgrids attribution: </span><span class="si">{</span><span class="n">SOILGRIDS_ATTRIBUTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22401,9 +22405,7 @@ gate, not a secondary check.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/land/src/earthlens/soilgrids/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-417">417</a></span>
-<span class="normal"><a href="#__codelineno-0-418">418</a></span>
-<span class="normal"><a href="#__codelineno-0-419">419</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-419">419</a></span>
 <span class="normal"><a href="#__codelineno-0-420">420</a></span>
 <span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
@@ -22433,39 +22435,41 @@ gate, not a secondary check.</p>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
 <span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every requested coverage&#39;s bbox subset as a written GeoTIFF.</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        progress_bar: Show a per-coverage `tqdm` bar (a request can expand to</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">            many coverages). Defaults to `True`.</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        aggregate: Must be `None`. SoilGrids is a single static prediction</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            with no temporal axis, so a non-`None` value raises</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            `NotImplementedError`. The facade forwards `aggregate=` to raster</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            backends without pre-rejecting it, so this guard is the actual</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            gate, not a secondary check.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        list[Path]: The written GeoTIFF path(s), one per</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">            `(property, depth, quantile)` coverage requested.</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="s2">&quot;SoilGrids.download(aggregate=...) is not supported: SoilGrids &quot;</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="s2">&quot;is a static soil-property map with no temporal axis, so there &quot;</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="s2">&quot;is nothing to reduce. Call download() without aggregate=.&quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="p">)</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;soilgrids attribution: </span><span class="si">{</span><span class="n">SOILGRIDS_ATTRIBUTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="k">return</span> <span class="n">paths</span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every requested coverage&#39;s bbox subset as a written GeoTIFF.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        progress_bar: Show a per-coverage `tqdm` bar (a request can expand to</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            many coverages). Defaults to `True`.</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        aggregate: Must be `None`. SoilGrids is a single static prediction</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            with no temporal axis, so a non-`None` value raises</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            `NotImplementedError`. The facade forwards `aggregate=` to raster</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            backends without pre-rejecting it, so this guard is the actual</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            gate, not a secondary check.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        list[Path]: The written GeoTIFF path(s), one per</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            `(property, depth, quantile)` coverage requested.</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="s2">&quot;SoilGrids.download(aggregate=...) is not supported: SoilGrids &quot;</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="s2">&quot;is a static soil-property map with no temporal axis, so there &quot;</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="s2">&quot;is nothing to reduce. Call download() without aggregate=.&quot;</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="p">)</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;soilgrids attribution: </span><span class="si">{</span><span class="n">SOILGRIDS_ATTRIBUTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>    <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23573,7 +23577,9 @@ temporal axis).</p>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
 <span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">class</span><span class="w"> </span><span class="nc">SoilGrids</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">class</span><span class="w"> </span><span class="nc">SoilGrids</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;ISRIC SoilGrids 2.0 soil properties, bbox-subset to GeoTIFF over WCS.</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Resolves each requested property id against the bundled catalog, expands the</span>
@@ -23857,118 +23863,120 @@ temporal axis).</p>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="p">)</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">return</span> <span class="n">plan</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one coverage&#39;s bbox window as a GeoTIFF over WCS.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Uses `pyramids.dataset.Dataset.from_wcs` — GDAL&#39;s WCS driver inside</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        pyramids does the transport, handed `coverage_crs` so SoilGrids&#39; custom</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        IGH grid resolves and `output_crs` for the lon/lat reprojection. The WCS</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        subset is rectangular; when the request carried a polygon `aoi=` (stored</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        on `self.space.geometry`), the fetched coverage is masked to that exact</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        shape before writing, matching the peer raster backends. The</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        scaled-integer unit metadata is logged (never applied — the pixels stay</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        as stored integers, `G2`).</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        The coverage is fetched in-memory (`from_wcs(output=None)`), written into</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        `tmp_dir` (the per-download scratch dir owned by `_api`), then atomically</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        renamed onto its final path only after a fully successful write. Because</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        the final path is touched only by that rename, any failure leaves a</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        pre-existing GeoTIFF from a prior run untouched and never leaves a partial</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        behind — only the temp file is cleaned up.</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            product: The `RemoteProduct` whose `metadata` carries the resolved</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">                property row + the `(depth, quantile)` cell.</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            tmp_dir: The scratch directory to stage the write in before the</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                atomic rename (created + removed by :meth:`_api`).</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            Path: The written GeoTIFF at</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                `&lt;root_dir&gt;/&lt;property&gt;_&lt;depth&gt;_&lt;quantile&gt;.tif`.</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">row</span><span class="p">:</span> <span class="n">Property</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;row&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.tif&quot;</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="sa">f</span><span class="s2">&quot;soilgrids </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: WCS subset </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="sa">f</span><span class="s2">&quot;(values are scaled integers in </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">mapped_units</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;native units&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="sa">f</span><span class="s2">&quot;; divide by </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">scale_factor</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">unit</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;the unit&#39;</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="p">)</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">has_mask</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="c1"># The temp keeps the `.tif` suffix — pyramids picks the GDAL driver from</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="c1"># the extension, so a driver-less suffix like `.part` would raise</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="c1"># DriverNotExistError.</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">tmp_dir</span> <span class="o">/</span> <span class="n">out_path</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_wcs</span><span class="p">(</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="n">coverage</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_from_extent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">),</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="n">coverage_crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coverage_crs</span><span class="p">,</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="n">output_crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_crs</span><span class="p">,</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="n">resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="p">,</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">,</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">mask_to_geometry</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">)</span> <span class="k">if</span> <span class="n">has_mask</span> <span class="k">else</span> <span class="n">dataset</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="c1"># Release the GDAL write handles before the rename (Windows file</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="c1"># lock), then promote the temp atomically. `_close_dataset` is</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>            <span class="c1"># best-effort and never raises, so it is safe here inside the try;</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="c1"># keeping `os.replace` in the try means a rename failure is cleaned</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="c1"># up rather than orphaning a fully-written temp in the output tree.</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>                <span class="n">_close_dataset</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>            <span class="n">_close_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>            <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>                <span class="n">_close_dataset</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>            <span class="n">_close_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>                <span class="n">tmp_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                <span class="k">pass</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="k">return</span> <span class="n">out_path</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every requested coverage&#39;s bbox subset as a written GeoTIFF.</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">            progress_bar: Show a per-coverage `tqdm` bar (a request can expand to</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">                many coverages). Defaults to `True`.</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">            aggregate: Must be `None`. SoilGrids is a single static prediction</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">                with no temporal axis, so a non-`None` value raises</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">                `NotImplementedError`. The facade forwards `aggregate=` to raster</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                backends without pre-rejecting it, so this guard is the actual</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">                gate, not a secondary check.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            list[Path]: The written GeoTIFF path(s), one per</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">                `(property, depth, quantile)` coverage requested.</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                <span class="s2">&quot;SoilGrids.download(aggregate=...) is not supported: SoilGrids &quot;</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>                <span class="s2">&quot;is a static soil-property map with no temporal axis, so there &quot;</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="s2">&quot;is nothing to reduce. Call download() without aggregate=.&quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="p">)</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;soilgrids attribution: </span><span class="si">{</span><span class="n">SOILGRIDS_ATTRIBUTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="k">return</span> <span class="n">paths</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span>  <span class="c1"># type: ignore[override]</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">:</span> <span class="n">Path</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one coverage&#39;s bbox window as a GeoTIFF over WCS.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        Uses `pyramids.dataset.Dataset.from_wcs` — GDAL&#39;s WCS driver inside</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        pyramids does the transport, handed `coverage_crs` so SoilGrids&#39; custom</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        IGH grid resolves and `output_crs` for the lon/lat reprojection. The WCS</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        subset is rectangular; when the request carried a polygon `aoi=` (stored</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        on `self.space.geometry`), the fetched coverage is masked to that exact</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        shape before writing, matching the peer raster backends. The</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        scaled-integer unit metadata is logged (never applied — the pixels stay</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        as stored integers, `G2`).</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        The coverage is fetched in-memory (`from_wcs(output=None)`), written into</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        `tmp_dir` (the per-download scratch dir owned by `_api`), then atomically</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        renamed onto its final path only after a fully successful write. Because</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        the final path is touched only by that rename, any failure leaves a</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        pre-existing GeoTIFF from a prior run untouched and never leaves a partial</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        behind — only the temp file is cleaned up.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            product: The `RemoteProduct` whose `metadata` carries the resolved</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                property row + the `(depth, quantile)` cell.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            tmp_dir: The scratch directory to stage the write in before the</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                atomic rename (created + removed by :meth:`_api`).</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            Path: The written GeoTIFF at</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                `&lt;root_dir&gt;/&lt;property&gt;_&lt;depth&gt;_&lt;quantile&gt;.tif`.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="n">row</span><span class="p">:</span> <span class="n">Property</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;row&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="sa">f</span><span class="s2">&quot;soilgrids </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: WCS subset </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="sa">f</span><span class="s2">&quot;(values are scaled integers in </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">mapped_units</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;native units&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="sa">f</span><span class="s2">&quot;; divide by </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">scale_factor</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">unit</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;the unit&#39;</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">has_mask</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="c1"># The temp keeps the `.tif` suffix — pyramids picks the GDAL driver from</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="c1"># the extension, so a driver-less suffix like `.part` would raise</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="c1"># DriverNotExistError.</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">tmp_dir</span> <span class="o">/</span> <span class="n">out_path</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_wcs</span><span class="p">(</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="n">coverage</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_from_extent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">),</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="n">coverage_crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coverage_crs</span><span class="p">,</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="n">output_crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_crs</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="n">resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>                <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span><span class="p">,</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="p">)</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">mask_to_geometry</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">)</span> <span class="k">if</span> <span class="n">has_mask</span> <span class="k">else</span> <span class="n">dataset</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">))</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>            <span class="c1"># Release the GDAL write handles before the rename (Windows file</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="c1"># lock), then promote the temp atomically. `_close_dataset` is</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="c1"># best-effort and never raises, so it is safe here inside the try;</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="c1"># keeping `os.replace` in the try means a rename failure is cleaned</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>            <span class="c1"># up rather than orphaning a fully-written temp in the output tree.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>                <span class="n">_close_dataset</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="n">_close_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dataset</span><span class="p">:</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>                <span class="n">_close_dataset</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>            <span class="n">_close_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                <span class="n">tmp_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>                <span class="k">pass</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every requested coverage&#39;s bbox subset as a written GeoTIFF.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">            progress_bar: Show a per-coverage `tqdm` bar (a request can expand to</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">                many coverages). Defaults to `True`.</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            aggregate: Must be `None`. SoilGrids is a single static prediction</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                with no temporal axis, so a non-`None` value raises</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">                `NotImplementedError`. The facade forwards `aggregate=` to raster</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">                backends without pre-rejecting it, so this guard is the actual</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">                gate, not a secondary check.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            list[Path]: The written GeoTIFF path(s), one per</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">                `(property, depth, quantile)` coverage requested.</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="s2">&quot;SoilGrids.download(aggregate=...) is not supported: SoilGrids &quot;</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>                <span class="s2">&quot;is a static soil-property map with no temporal axis, so there &quot;</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>                <span class="s2">&quot;is nothing to reduce. Call download() without aggregate=.&quot;</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>            <span class="p">)</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;soilgrids attribution: </span><span class="si">{</span><span class="n">SOILGRIDS_ATTRIBUTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24658,9 +24666,7 @@ gate, not a secondary check.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/land/src/earthlens/soilgrids/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-417">417</a></span>
-<span class="normal"><a href="#__codelineno-0-418">418</a></span>
-<span class="normal"><a href="#__codelineno-0-419">419</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-419">419</a></span>
 <span class="normal"><a href="#__codelineno-0-420">420</a></span>
 <span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
@@ -24690,39 +24696,41 @@ gate, not a secondary check.</p>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
 <span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every requested coverage&#39;s bbox subset as a written GeoTIFF.</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        progress_bar: Show a per-coverage `tqdm` bar (a request can expand to</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">            many coverages). Defaults to `True`.</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        aggregate: Must be `None`. SoilGrids is a single static prediction</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            with no temporal axis, so a non-`None` value raises</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            `NotImplementedError`. The facade forwards `aggregate=` to raster</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            backends without pre-rejecting it, so this guard is the actual</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            gate, not a secondary check.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        list[Path]: The written GeoTIFF path(s), one per</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">            `(property, depth, quantile)` coverage requested.</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="s2">&quot;SoilGrids.download(aggregate=...) is not supported: SoilGrids &quot;</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="s2">&quot;is a static soil-property map with no temporal axis, so there &quot;</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="s2">&quot;is nothing to reduce. Call download() without aggregate=.&quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="p">)</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;soilgrids attribution: </span><span class="si">{</span><span class="n">SOILGRIDS_ATTRIBUTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="k">return</span> <span class="n">paths</span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every requested coverage&#39;s bbox subset as a written GeoTIFF.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        progress_bar: Show a per-coverage `tqdm` bar (a request can expand to</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            many coverages). Defaults to `True`.</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        aggregate: Must be `None`. SoilGrids is a single static prediction</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            with no temporal axis, so a non-`None` value raises</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            `NotImplementedError`. The facade forwards `aggregate=` to raster</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            backends without pre-rejecting it, so this guard is the actual</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            gate, not a secondary check.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        list[Path]: The written GeoTIFF path(s), one per</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            `(property, depth, quantile)` coverage requested.</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="s2">&quot;SoilGrids.download(aggregate=...) is not supported: SoilGrids &quot;</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="s2">&quot;is a static soil-property map with no temporal axis, so there &quot;</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="s2">&quot;is nothing to reduce. Call download() without aggregate=.&quot;</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="p">)</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;soilgrids attribution: </span><span class="si">{</span><span class="n">SOILGRIDS_ATTRIBUTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>    <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25066,7 +25074,7 @@ curated keys (there is no larger auto-discovered universe).</p>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">property_id</span><span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Property&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">property_id</span><span class="p">))</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated property ids, sorted.</span>
@@ -25245,7 +25253,7 @@ lists the known ids with a did-you-mean hint.</p>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">property_id</span><span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Property&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">property_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

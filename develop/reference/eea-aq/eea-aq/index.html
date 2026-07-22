@@ -20310,7 +20310,7 @@ the numeric-code reverse map with <code>code_to_name</code>.</p>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">                adds a did-you-mean hint.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">polls_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to their airbase `poll` notations, order-stable.</span>
@@ -20661,7 +20661,7 @@ adds a did-you-mean hint.</p>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            adds a did-you-mean hint.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21750,7 +21750,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="s2">&quot;the EEA download service; returning an empty frame.&quot;</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="p">)</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="k">return</span> <span class="n">empty_frame</span><span class="p">()</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">polls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">polls_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">polls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">polls_for</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[str]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">))</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="c1"># Restrict the code -&gt; name map to the requested pollutants so a</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="c1"># Parquet that happens to carry extra pollutants never leaks rows the</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="c1"># caller did not ask for.</span>
@@ -23441,7 +23441,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="s2">&quot;the EEA download service; returning an empty frame.&quot;</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="p">)</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="k">return</span> <span class="n">empty_frame</span><span class="p">()</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">polls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">polls_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">polls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">polls_for</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[str]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">))</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="c1"># Restrict the code -&gt; name map to the requested pollutants so a</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="c1"># Parquet that happens to carry extra pollutants never leaks rows the</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="c1"># caller did not ask for.</span>
@@ -24625,7 +24625,7 @@ the numeric-code reverse map with <code>code_to_name</code>.</p>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">                adds a did-you-mean hint.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">polls_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to their airbase `poll` notations, order-stable.</span>
@@ -24976,7 +24976,7 @@ adds a did-you-mean hint.</p>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            adds a did-you-mean hint.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
