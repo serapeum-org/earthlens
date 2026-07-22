@@ -24937,8 +24937,7 @@ sidecar.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/_pbf.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-184">184</a></span>
-<span class="normal"><a href="#__codelineno-0-185">185</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-185">185</a></span>
 <span class="normal"><a href="#__codelineno-0-186">186</a></span>
 <span class="normal"><a href="#__codelineno-0-187">187</a></span>
 <span class="normal"><a href="#__codelineno-0-188">188</a></span>
@@ -25000,70 +24999,71 @@ sidecar.</p>
 <span class="normal"><a href="#__codelineno-0-244">244</a></span>
 <span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_extract</span><span class="p">(</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">region_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">http</span><span class="p">:</span> <span class="n">HttpClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="n">verify_md5</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch (and cache) a Geofabrik `.osm.pbf` extract for a region (`G13`).</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    The extract is written under `cache_dir` as</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    `&lt;continent&gt;_&lt;region&gt;-latest.osm.pbf`. Caching is **presence-based**: an</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    existing, non-empty cached file is reused as-is — no per-call sidecar fetch</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    and no re-hashing of a (potentially multi-GB) local file, which the download</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    already verified. To pick up a newer Geofabrik extract, delete the cached</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    file (it is re-fetched on the next call). A fresh download streams</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    atomically (via :class:`~earthlens.base.http.HttpClient`, which follows the</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    Geofabrik `302` redirect and writes a `.part` renamed on success) and, when</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    `verify_md5` is set, is checked once against the `.osm.pbf.md5` sidecar — a</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    mismatch removes the file and raises. An extract larger than</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    `LARGE_FILE_WARN_BYTES` logs a warning before the fetch.</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        region_path: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        cache_dir: Directory the extract is cached in (created if absent).</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        http: HTTP client to use. Defaults to a fresh</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            :class:`~earthlens.base.http.HttpClient` (retry/back-off on</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            `5xx`/`429`).</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        progress: Show a `tqdm` download progress bar.</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        verify_md5: Verify a **freshly-downloaded** file against Geofabrik&#39;s</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            `.osm.pbf.md5` sidecar. `False` skips the check. It does not affect</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            a cache hit (the cached file is trusted).</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        Path: The path to the cached `.osm.pbf` file.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        ValueError: If a freshly-downloaded file&#39;s MD5 does not match the</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            sidecar.</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        requests.HTTPError: If the download fails with a non-retryable status.</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="n">http</span> <span class="o">=</span> <span class="n">http</span> <span class="k">if</span> <span class="n">http</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">HttpClient</span><span class="p">()</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">geofabrik_url</span><span class="p">(</span><span class="n">region_path</span><span class="p">)</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="n">dest</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">_cache_name</span><span class="p">(</span><span class="n">region_path</span><span class="p">)</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="k">if</span> <span class="n">dest</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OSM PBF cache hit: </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="k">return</span> <span class="n">dest</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">_warn_large_extract</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">http</span><span class="p">)</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading Geofabrik extract </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">http</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">atomic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">if</span> <span class="n">verify_md5</span><span class="p">:</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">expected</span> <span class="o">=</span> <span class="n">_expected_md5</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">http</span><span class="p">)</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_md5_of</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected</span><span class="p">:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>            <span class="n">dest</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>                <span class="sa">f</span><span class="s2">&quot;MD5 mismatch for </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">: the downloaded file does not match the &quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                <span class="s2">&quot;Geofabrik .osm.pbf.md5 sidecar (removed). Retry the download, or &quot;</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>                <span class="s2">&quot;pass verify_md5=False to skip the check.&quot;</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>            <span class="p">)</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="k">return</span> <span class="n">dest</span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_extract</span><span class="p">(</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="n">region_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="n">http</span><span class="p">:</span> <span class="n">HttpClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="n">verify_md5</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch (and cache) a Geofabrik `.osm.pbf` extract for a region (`G13`).</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    The extract is written under `cache_dir` as</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    `&lt;continent&gt;_&lt;region&gt;-latest.osm.pbf`. Caching is **presence-based**: an</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    existing, non-empty cached file is reused as-is — no per-call sidecar fetch</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    and no re-hashing of a (potentially multi-GB) local file, which the download</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    already verified. To pick up a newer Geofabrik extract, delete the cached</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    file (it is re-fetched on the next call). A fresh download streams</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    atomically (via :class:`~earthlens.base.http.HttpClient`, which follows the</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    Geofabrik `302` redirect and writes a `.part` renamed on success) and, when</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    `verify_md5` is set, is checked once against the `.osm.pbf.md5` sidecar — a</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    mismatch removes the file and raises. An extract larger than</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    `LARGE_FILE_WARN_BYTES` logs a warning before the fetch.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        region_path: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        cache_dir: Directory the extract is cached in (created if absent).</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        http: HTTP client to use. Defaults to a fresh</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            :class:`~earthlens.base.http.HttpClient` (retry/back-off on</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            `5xx`/`429`).</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        progress: Show a `tqdm` download progress bar.</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        verify_md5: Verify a **freshly-downloaded** file against Geofabrik&#39;s</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            `.osm.pbf.md5` sidecar. `False` skips the check. It does not affect</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            a cache hit (the cached file is trusted).</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        Path: The path to the cached `.osm.pbf` file.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        ValueError: If a freshly-downloaded file&#39;s MD5 does not match the</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">            sidecar.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        requests.HTTPError: If the download fails with a non-retryable status.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="n">http</span> <span class="o">=</span> <span class="n">http</span> <span class="k">if</span> <span class="n">http</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">HttpClient</span><span class="p">()</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">geofabrik_url</span><span class="p">(</span><span class="n">region_path</span><span class="p">)</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="n">dest</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">_cache_name</span><span class="p">(</span><span class="n">region_path</span><span class="p">)</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">if</span> <span class="n">dest</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OSM PBF cache hit: </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="k">return</span> <span class="n">dest</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">_warn_large_extract</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">http</span><span class="p">)</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading Geofabrik extract </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="n">http</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">atomic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="k">if</span> <span class="n">verify_md5</span><span class="p">:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="n">expected</span> <span class="o">=</span> <span class="n">_expected_md5</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">http</span><span class="p">)</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_md5_of</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected</span><span class="p">:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="n">dest</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                <span class="sa">f</span><span class="s2">&quot;MD5 mismatch for </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">: the downloaded file does not match the &quot;</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>                <span class="s2">&quot;Geofabrik .osm.pbf.md5 sidecar (removed). Retry the download, or &quot;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>                <span class="s2">&quot;pass verify_md5=False to skip the check.&quot;</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>            <span class="p">)</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">return</span> <span class="n">dest</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25716,8 +25716,7 @@ time; the <code>pyosmium</code> path clips the built geometry.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/_pbf.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-274">274</a></span>
-<span class="normal"><a href="#__codelineno-0-275">275</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-275">275</a></span>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
@@ -25757,48 +25756,49 @@ time; the <code>pyosmium</code> path clips the built geometry.</p>
 <span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_pbf</span><span class="p">(</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="n">pyrosm_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="n">network_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">Engine</span> <span class="o">=</span> <span class="s2">&quot;pyrosm&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one layer from a local `.osm.pbf` into a `FeatureCollection` (`G14`).</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    Routes on `engine`: `&quot;pyrosm&quot;` (default) reads the whole extract in memory</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    and calls the named `pyrosm.OSM` method; `&quot;pyosmium&quot;` streams the file with</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    bounded memory (for planet-scale, or a file too large for `pyrosm`). Both</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    return a WGS84 `~pyramids.feature.collection.FeatureCollection`; an empty</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    layer yields a schema-only collection.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        path: Local path to the `.osm.pbf` extract.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        pyrosm_method: The `pyrosm.OSM` reader method for the layer</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">            (`get_buildings`, `get_network`, `get_pois`, `get_landuse`,</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            `get_natural`, `get_boundaries`).</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        network_type: The `get_network(network_type=...)` argument (e.g.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            `&quot;driving&quot;`); used only when `pyrosm_method` is `get_network`.</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        bbox: Optional `(west, south, east, north)` clip. `pyrosm` clips at read</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            time; the `pyosmium` path clips the built geometry.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        engine: `&quot;pyrosm&quot;` (in-memory, default) or `&quot;pyosmium&quot;` (streaming).</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        FeatureCollection: The layer&#39;s features, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ImportError: If the selected engine&#39;s SDK is not installed</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            (`earthlens[osm-pbf]`).</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        ValueError: If `engine=&quot;pyrosm&quot;` is used on a file larger than</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            `MAX_PYROSM_BYTES`, or `engine` is not a known value.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;pyrosm&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">return</span> <span class="n">_read_pyrosm</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pyrosm_method</span><span class="p">,</span> <span class="n">network_type</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;pyosmium&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="k">return</span> <span class="n">_read_pyosmium</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pyrosm_method</span><span class="p">,</span> <span class="n">network_type</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;engine must be &#39;pyrosm&#39; or &#39;pyosmium&#39;, got </span><span class="si">{</span><span class="n">engine</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_pbf</span><span class="p">(</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="n">pyrosm_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="n">network_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">Engine</span> <span class="o">=</span> <span class="s2">&quot;pyrosm&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one layer from a local `.osm.pbf` into a `FeatureCollection` (`G14`).</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    Routes on `engine`: `&quot;pyrosm&quot;` (default) reads the whole extract in memory</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    and calls the named `pyrosm.OSM` method; `&quot;pyosmium&quot;` streams the file with</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    bounded memory (for planet-scale, or a file too large for `pyrosm`). Both</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    return a WGS84 `~pyramids.feature.collection.FeatureCollection`; an empty</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    layer yields a schema-only collection.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        path: Local path to the `.osm.pbf` extract.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        pyrosm_method: The `pyrosm.OSM` reader method for the layer</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            (`get_buildings`, `get_network`, `get_pois`, `get_landuse`,</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            `get_natural`, `get_boundaries`).</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        network_type: The `get_network(network_type=...)` argument (e.g.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            `&quot;driving&quot;`); used only when `pyrosm_method` is `get_network`.</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        bbox: Optional `(west, south, east, north)` clip. `pyrosm` clips at read</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            time; the `pyosmium` path clips the built geometry.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        engine: `&quot;pyrosm&quot;` (in-memory, default) or `&quot;pyosmium&quot;` (streaming).</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        FeatureCollection: The layer&#39;s features, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        ImportError: If the selected engine&#39;s SDK is not installed</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            (`earthlens[osm-pbf]`).</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        ValueError: If `engine=&quot;pyrosm&quot;` is used on a file larger than</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            `MAX_PYROSM_BYTES`, or `engine` is not a known value.</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;pyrosm&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">_read_pyrosm</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pyrosm_method</span><span class="p">,</span> <span class="n">network_type</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;pyosmium&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">return</span> <span class="n">_read_pyosmium</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pyrosm_method</span><span class="p">,</span> <span class="n">network_type</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;engine must be &#39;pyrosm&#39; or &#39;pyosmium&#39;, got </span><span class="si">{</span><span class="n">engine</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -31579,8 +31579,7 @@ sidecar.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/_pbf.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-184">184</a></span>
-<span class="normal"><a href="#__codelineno-0-185">185</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-185">185</a></span>
 <span class="normal"><a href="#__codelineno-0-186">186</a></span>
 <span class="normal"><a href="#__codelineno-0-187">187</a></span>
 <span class="normal"><a href="#__codelineno-0-188">188</a></span>
@@ -31642,70 +31641,71 @@ sidecar.</p>
 <span class="normal"><a href="#__codelineno-0-244">244</a></span>
 <span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_extract</span><span class="p">(</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">region_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">http</span><span class="p">:</span> <span class="n">HttpClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="n">verify_md5</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch (and cache) a Geofabrik `.osm.pbf` extract for a region (`G13`).</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    The extract is written under `cache_dir` as</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    `&lt;continent&gt;_&lt;region&gt;-latest.osm.pbf`. Caching is **presence-based**: an</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    existing, non-empty cached file is reused as-is — no per-call sidecar fetch</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    and no re-hashing of a (potentially multi-GB) local file, which the download</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    already verified. To pick up a newer Geofabrik extract, delete the cached</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    file (it is re-fetched on the next call). A fresh download streams</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    atomically (via :class:`~earthlens.base.http.HttpClient`, which follows the</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    Geofabrik `302` redirect and writes a `.part` renamed on success) and, when</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    `verify_md5` is set, is checked once against the `.osm.pbf.md5` sidecar — a</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    mismatch removes the file and raises. An extract larger than</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    `LARGE_FILE_WARN_BYTES` logs a warning before the fetch.</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        region_path: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        cache_dir: Directory the extract is cached in (created if absent).</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        http: HTTP client to use. Defaults to a fresh</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            :class:`~earthlens.base.http.HttpClient` (retry/back-off on</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            `5xx`/`429`).</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        progress: Show a `tqdm` download progress bar.</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        verify_md5: Verify a **freshly-downloaded** file against Geofabrik&#39;s</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            `.osm.pbf.md5` sidecar. `False` skips the check. It does not affect</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            a cache hit (the cached file is trusted).</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        Path: The path to the cached `.osm.pbf` file.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        ValueError: If a freshly-downloaded file&#39;s MD5 does not match the</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            sidecar.</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        requests.HTTPError: If the download fails with a non-retryable status.</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="n">http</span> <span class="o">=</span> <span class="n">http</span> <span class="k">if</span> <span class="n">http</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">HttpClient</span><span class="p">()</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">geofabrik_url</span><span class="p">(</span><span class="n">region_path</span><span class="p">)</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="n">dest</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">_cache_name</span><span class="p">(</span><span class="n">region_path</span><span class="p">)</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="k">if</span> <span class="n">dest</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OSM PBF cache hit: </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="k">return</span> <span class="n">dest</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">_warn_large_extract</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">http</span><span class="p">)</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading Geofabrik extract </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">http</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">atomic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">if</span> <span class="n">verify_md5</span><span class="p">:</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">expected</span> <span class="o">=</span> <span class="n">_expected_md5</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">http</span><span class="p">)</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_md5_of</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected</span><span class="p">:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>            <span class="n">dest</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>                <span class="sa">f</span><span class="s2">&quot;MD5 mismatch for </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">: the downloaded file does not match the &quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                <span class="s2">&quot;Geofabrik .osm.pbf.md5 sidecar (removed). Retry the download, or &quot;</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>                <span class="s2">&quot;pass verify_md5=False to skip the check.&quot;</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>            <span class="p">)</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="k">return</span> <span class="n">dest</span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_extract</span><span class="p">(</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="n">region_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="n">http</span><span class="p">:</span> <span class="n">HttpClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="n">verify_md5</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch (and cache) a Geofabrik `.osm.pbf` extract for a region (`G13`).</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    The extract is written under `cache_dir` as</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    `&lt;continent&gt;_&lt;region&gt;-latest.osm.pbf`. Caching is **presence-based**: an</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    existing, non-empty cached file is reused as-is — no per-call sidecar fetch</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    and no re-hashing of a (potentially multi-GB) local file, which the download</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    already verified. To pick up a newer Geofabrik extract, delete the cached</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    file (it is re-fetched on the next call). A fresh download streams</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    atomically (via :class:`~earthlens.base.http.HttpClient`, which follows the</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    Geofabrik `302` redirect and writes a `.part` renamed on success) and, when</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    `verify_md5` is set, is checked once against the `.osm.pbf.md5` sidecar — a</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    mismatch removes the file and raises. An extract larger than</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    `LARGE_FILE_WARN_BYTES` logs a warning before the fetch.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        region_path: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        cache_dir: Directory the extract is cached in (created if absent).</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        http: HTTP client to use. Defaults to a fresh</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            :class:`~earthlens.base.http.HttpClient` (retry/back-off on</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            `5xx`/`429`).</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        progress: Show a `tqdm` download progress bar.</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        verify_md5: Verify a **freshly-downloaded** file against Geofabrik&#39;s</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            `.osm.pbf.md5` sidecar. `False` skips the check. It does not affect</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            a cache hit (the cached file is trusted).</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        Path: The path to the cached `.osm.pbf` file.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        ValueError: If a freshly-downloaded file&#39;s MD5 does not match the</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">            sidecar.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        requests.HTTPError: If the download fails with a non-retryable status.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="n">http</span> <span class="o">=</span> <span class="n">http</span> <span class="k">if</span> <span class="n">http</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">HttpClient</span><span class="p">()</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">geofabrik_url</span><span class="p">(</span><span class="n">region_path</span><span class="p">)</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="n">dest</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">_cache_name</span><span class="p">(</span><span class="n">region_path</span><span class="p">)</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">if</span> <span class="n">dest</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OSM PBF cache hit: </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="k">return</span> <span class="n">dest</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">_warn_large_extract</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">http</span><span class="p">)</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading Geofabrik extract </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="n">http</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">atomic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="k">if</span> <span class="n">verify_md5</span><span class="p">:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="n">expected</span> <span class="o">=</span> <span class="n">_expected_md5</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">http</span><span class="p">)</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="k">if</span> <span class="n">expected</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_md5_of</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected</span><span class="p">:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="n">dest</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                <span class="sa">f</span><span class="s2">&quot;MD5 mismatch for </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">: the downloaded file does not match the &quot;</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>                <span class="s2">&quot;Geofabrik .osm.pbf.md5 sidecar (removed). Retry the download, or &quot;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>                <span class="s2">&quot;pass verify_md5=False to skip the check.&quot;</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>            <span class="p">)</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">return</span> <span class="n">dest</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32016,8 +32016,7 @@ time; the <code>pyosmium</code> path clips the built geometry.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/_pbf.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-274">274</a></span>
-<span class="normal"><a href="#__codelineno-0-275">275</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-275">275</a></span>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
 <span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
@@ -32057,48 +32056,49 @@ time; the <code>pyosmium</code> path clips the built geometry.</p>
 <span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_pbf</span><span class="p">(</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="n">pyrosm_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="n">network_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">Engine</span> <span class="o">=</span> <span class="s2">&quot;pyrosm&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one layer from a local `.osm.pbf` into a `FeatureCollection` (`G14`).</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    Routes on `engine`: `&quot;pyrosm&quot;` (default) reads the whole extract in memory</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    and calls the named `pyrosm.OSM` method; `&quot;pyosmium&quot;` streams the file with</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    bounded memory (for planet-scale, or a file too large for `pyrosm`). Both</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    return a WGS84 `~pyramids.feature.collection.FeatureCollection`; an empty</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    layer yields a schema-only collection.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        path: Local path to the `.osm.pbf` extract.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        pyrosm_method: The `pyrosm.OSM` reader method for the layer</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">            (`get_buildings`, `get_network`, `get_pois`, `get_landuse`,</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            `get_natural`, `get_boundaries`).</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        network_type: The `get_network(network_type=...)` argument (e.g.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            `&quot;driving&quot;`); used only when `pyrosm_method` is `get_network`.</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        bbox: Optional `(west, south, east, north)` clip. `pyrosm` clips at read</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            time; the `pyosmium` path clips the built geometry.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        engine: `&quot;pyrosm&quot;` (in-memory, default) or `&quot;pyosmium&quot;` (streaming).</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        FeatureCollection: The layer&#39;s features, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ImportError: If the selected engine&#39;s SDK is not installed</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            (`earthlens[osm-pbf]`).</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        ValueError: If `engine=&quot;pyrosm&quot;` is used on a file larger than</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            `MAX_PYROSM_BYTES`, or `engine` is not a known value.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;pyrosm&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">return</span> <span class="n">_read_pyrosm</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pyrosm_method</span><span class="p">,</span> <span class="n">network_type</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;pyosmium&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="k">return</span> <span class="n">_read_pyosmium</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pyrosm_method</span><span class="p">,</span> <span class="n">network_type</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;engine must be &#39;pyrosm&#39; or &#39;pyosmium&#39;, got </span><span class="si">{</span><span class="n">engine</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_pbf</span><span class="p">(</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="n">pyrosm_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="n">network_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">Engine</span> <span class="o">=</span> <span class="s2">&quot;pyrosm&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one layer from a local `.osm.pbf` into a `FeatureCollection` (`G14`).</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    Routes on `engine`: `&quot;pyrosm&quot;` (default) reads the whole extract in memory</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    and calls the named `pyrosm.OSM` method; `&quot;pyosmium&quot;` streams the file with</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    bounded memory (for planet-scale, or a file too large for `pyrosm`). Both</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    return a WGS84 `~pyramids.feature.collection.FeatureCollection`; an empty</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    layer yields a schema-only collection.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        path: Local path to the `.osm.pbf` extract.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        pyrosm_method: The `pyrosm.OSM` reader method for the layer</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            (`get_buildings`, `get_network`, `get_pois`, `get_landuse`,</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            `get_natural`, `get_boundaries`).</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        network_type: The `get_network(network_type=...)` argument (e.g.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            `&quot;driving&quot;`); used only when `pyrosm_method` is `get_network`.</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        bbox: Optional `(west, south, east, north)` clip. `pyrosm` clips at read</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            time; the `pyosmium` path clips the built geometry.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        engine: `&quot;pyrosm&quot;` (in-memory, default) or `&quot;pyosmium&quot;` (streaming).</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        FeatureCollection: The layer&#39;s features, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        ImportError: If the selected engine&#39;s SDK is not installed</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            (`earthlens[osm-pbf]`).</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        ValueError: If `engine=&quot;pyrosm&quot;` is used on a file larger than</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            `MAX_PYROSM_BYTES`, or `engine` is not a known value.</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;pyrosm&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">_read_pyrosm</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pyrosm_method</span><span class="p">,</span> <span class="n">network_type</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;pyosmium&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">return</span> <span class="n">_read_pyosmium</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pyrosm_method</span><span class="p">,</span> <span class="n">network_type</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;engine must be &#39;pyrosm&#39; or &#39;pyosmium&#39;, got </span><span class="si">{</span><span class="n">engine</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
