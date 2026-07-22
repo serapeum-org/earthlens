@@ -6,14 +6,14 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
-
-from earthlens.goes import GOES
 from earthlens.goes.backend import (
     end_is_date_only,
     enumerate_hours,
     expand_bare_date_end,
     normalize_channel,
 )
+
+from earthlens.goes import GOES
 
 from .conftest import FakeS3
 
@@ -95,7 +95,13 @@ class TestNormalizeChannel:
 
     @pytest.mark.parametrize(
         "token, expected",
-        [("C2", "C02"), ("2", "C02"), ("02", "C02"), ("cmi_c13", "C13"), ("C16", "C16")],
+        [
+            ("C2", "C02"),
+            ("2", "C02"),
+            ("02", "C02"),
+            ("cmi_c13", "C13"),
+            ("C16", "C16"),
+        ],
     )
     def test_normalises_spellings(self, token, expected):
         """Several channel spellings collapse to the canonical C<nn> token."""
@@ -169,7 +175,9 @@ class TestSearch:
         goes = make_goes()
         patch_client(
             goes,
-            FakeS3(pages={HOUR_C: [_mcmipc("20261841201180"), _mcmipc("20261841240000")]}),
+            FakeS3(
+                pages={HOUR_C: [_mcmipc("20261841201180"), _mcmipc("20261841240000")]}
+            ),
         )
         products = goes._search()
         assert [p.id for p in products] == [
@@ -370,9 +378,7 @@ class TestClient:
             calls["n"] += 1
             return FakeS3()
 
-        monkeypatch.setattr(
-            "earthlens.goes.backend.unsigned_s3_client", _fake_builder
-        )
+        monkeypatch.setattr("earthlens.goes.backend.unsigned_s3_client", _fake_builder)
         goes = make_goes()
         first = goes._client()
         second = goes._client()

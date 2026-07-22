@@ -30,15 +30,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import requests
-from joblib import Parallel, delayed
-
-from earthlens.base import OutputKind, RemoteProduct, date_windows, window_labels
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.base.spatial import crop_to_aoi, resolve_aoi
 from earthlens.worldpop._helpers import (
     cohort_of,
@@ -58,7 +56,9 @@ from earthlens.worldpop.rest import (
     record_archive_files,
     rest_records,
 )
-from earthlens.base.http import RequestsGet as _RequestsGet
+from joblib import Parallel, delayed
+
+from earthlens.base import OutputKind, RemoteProduct, date_windows, window_labels
 
 #: Sub-directory under the output path where raw per-country GeoTIFFs land.
 _RAW_DIRNAME: str = ".worldpop_raw"
@@ -82,6 +82,8 @@ _RESOLUTIONS: frozenset[str] = frozenset({"100m", "1km"})
 _SCOPES: frozenset[str] = frozenset({"countries", "global"})
 #: Allowed values for the `level=` selector (only `pwd` offers both).
 _LEVELS: frozenset[str] = frozenset({"national", "subnational"})
+
+
 class WorldPop(AbstractDataSource):
     """Download WorldPop population + demographic products, localised via pyramids.
 
@@ -710,9 +712,7 @@ class WorldPop(AbstractDataSource):
             geo, epsg = template.geotransform, template.epsg
             tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
             for label, array in reduced.items():
-                target = (
-                    Path(self.path) / f"{product}{tag}_{cfg.freq}_{label}_{op}.tif"
-                )
+                target = Path(self.path) / f"{product}{tag}_{cfg.freq}_{label}_{op}.tif"
                 Dataset.create_from_array(arr=array, geo=geo, epsg=epsg).to_file(
                     str(target)
                 )

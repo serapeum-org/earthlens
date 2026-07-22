@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import earthlens.risk_indicators
-
 import json
 from pathlib import Path
 
@@ -11,6 +9,7 @@ import pandas as pd
 import pytest
 from pyramids.feature.collection import FeatureCollection
 
+import earthlens.risk_indicators
 from earthlens.risk_indicators import AuthenticationError, RiskIndicators
 
 pytestmark = pytest.mark.risk_indicators

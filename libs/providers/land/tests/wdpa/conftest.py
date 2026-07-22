@@ -67,9 +67,7 @@ class _FakeState:
 
     def __init__(self):
         """Start with one empty search page and no recorded calls."""
-        self.responses: list[_FakeResponse] = [
-            _FakeResponse({"protected_areas": []})
-        ]
+        self.responses: list[_FakeResponse] = [_FakeResponse({"protected_areas": []})]
         self.calls: list[dict] = []
 
     def set_responses(self, responses: list[_FakeResponse]) -> None:

@@ -19,10 +19,7 @@ import math
 import os
 import zipfile
 from pathlib import Path
-from typing import Any
 from urllib.parse import urlsplit
-
-import requests
 
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
@@ -206,6 +203,8 @@ def zip_cache_path(url: str, cache_dir: Path) -> Path:
     """
     name = Path(urlsplit(url).path).name or "download.zip"
     return cache_dir / name
+
+
 def download_zip(url: str, cache_dir: Path, *, timeout: float = 600.0) -> Path:
     """Download a ZIP archive into the cache once, reusing it if present.
 

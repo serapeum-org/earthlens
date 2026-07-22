@@ -6,9 +6,10 @@ from typing import Any, Callable
 
 import pandas as pd
 import pytest
-
 from earthlens.core import EarthLens
+
 from earthlens.argo import ARGO
+
 from .conftest import FakeArgo
 
 pytestmark = pytest.mark.argo
@@ -31,9 +32,7 @@ def test_aliases_collapse_to_canonical():
     assert "argopy" not in keys
 
 
-def test_facade_routes_download(
-    fake_argopy: FakeArgo, tmp_path
-):
+def test_facade_routes_download(fake_argopy: FakeArgo, tmp_path):
     """EarthLens('argo', ...).download() routes through the backend to a DataFrame."""
     result = EarthLens(
         "argo",

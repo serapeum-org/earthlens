@@ -44,6 +44,7 @@ from earthlens.base import (
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
+
     from earthlens.stac.catalog import Catalog, Endpoint
 
 
@@ -166,8 +167,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 are not all served by the chosen endpoint (one endpoint per
                 request).
         """
-        from earthlens.stac.catalog import Catalog
         from earthlens.stac.signers import build_signer
+
+        from earthlens.stac.catalog import Catalog
 
         if not self._variables:
             raise ValueError(

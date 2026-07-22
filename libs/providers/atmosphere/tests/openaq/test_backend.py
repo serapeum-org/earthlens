@@ -7,15 +7,15 @@ from typing import Any
 
 import pandas as pd
 import pytest
-
-from earthlens.base import RemoteProduct
-from earthlens.openaq import OpenAQ
 from earthlens.openaq.backend import (
     _SCHEMA,
     _empty_frame,
     _measurement_datetime,
     _measurement_row,
 )
+
+from earthlens.base import RemoteProduct
+from earthlens.openaq import OpenAQ
 
 from .conftest import _FakeOpenaq, _location, _measurement, _sensor
 

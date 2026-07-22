@@ -17,7 +17,6 @@ import urllib.error
 import urllib.request
 
 import pytest
-
 from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.e2e, pytest.mark.admin]

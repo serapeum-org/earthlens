@@ -99,16 +99,6 @@ from __future__ import annotations
 
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
 from earthlens.gee.backend import GEE
-from earthlens.gee.catalog import (
-    CATALOG_PATH,
-    PROVIDERS_PATH,
-    Band,
-    Cadence,
-    Catalog,
-    Dataset,
-    Extent,
-    Provider,
-)
 from earthlens.gee.features import create_feature, create_geometry
 from earthlens.gee.io import (
     feature_collection_to_dataframe,
@@ -124,6 +114,17 @@ from earthlens.gee.jobs import (
     wait_for_task_id,
 )
 from earthlens.gee.sampling import sample_points, sample_points_to_gdf
+
+from earthlens.gee.catalog import (
+    CATALOG_PATH,
+    PROVIDERS_PATH,
+    Band,
+    Cadence,
+    Catalog,
+    Dataset,
+    Extent,
+    Provider,
+)
 
 __all__ = [
     "GEE",

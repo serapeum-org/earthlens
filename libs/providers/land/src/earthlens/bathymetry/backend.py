@@ -26,6 +26,13 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 import requests
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.bathymetry._helpers import (
+    bbox_from_extent,
+    estimate_grid_pixels,
+    griddap_subset_url,
+)
 from loguru import logger
 
 from earthlens.base import (
@@ -36,14 +43,7 @@ from earthlens.base import (
     TemporalExtent,
     mask_to_geometry,
 )
-from earthlens.base.http import HttpClient
-from earthlens.bathymetry._helpers import (
-    bbox_from_extent,
-    estimate_grid_pixels,
-    griddap_subset_url,
-)
 from earthlens.bathymetry.catalog import Catalog, Dataset
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -58,6 +58,8 @@ _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HD
 #: (≈ a 0.25-gigapixel grid). The server enforces the hard cap; this is an
 #: early heads-up for the user.
 _LARGE_PIXEL_THRESHOLD = 250_000_000
+
+
 class Bathymetry(AbstractDataSource):
     """Global topography / bathymetry DEM backend (raster GeoTIFF output).
 

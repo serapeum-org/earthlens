@@ -39,10 +39,9 @@ from __future__ import annotations
 import os
 from typing import Literal, NamedTuple
 
-from pydantic import BaseModel, ConfigDict, SecretStr
-
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 #: Where a user registers for a free G-Portal account.
 _GPORTAL_REGISTER_URL = "https://gportal.jaxa.jp/gpr/user/regist1"

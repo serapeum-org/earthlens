@@ -34,6 +34,11 @@ from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
+from earthlens.cmems.auth import (
+    AuthenticationError,
+    CmemsAuth,
+    CmemsCredentials,
+)
 from loguru import logger
 
 from earthlens.base import (
@@ -46,16 +51,10 @@ from earthlens.base import (
     safe_filename,
     window_labels,
 )
-from earthlens.cmems.auth import (
-    AuthenticationError,
-    CmemsAuth,
-    CmemsCredentials,
-)
 
 if TYPE_CHECKING:
-    from pyramids.netcdf import NetCDF
-
     from earthlens.aggregate import AggregationConfig
+    from pyramids.netcdf import NetCDF
 
 
 FileFormat = Literal["netcdf", "zarr"]
@@ -332,7 +331,7 @@ class CMEMS(AbstractDataSource):
             # Reached only for an empty request — total failure raises
             # inside _fetch_with_progress before we get here.
             logger.warning(
-                "CMEMS download summary: no datasets requested, " "nothing written"
+                "CMEMS download summary: no datasets requested, nothing written"
             )
         return out_paths
 
@@ -427,16 +426,14 @@ class CMEMS(AbstractDataSource):
         Raises:
             ValueError: When the file has no `time` dimension to window.
         """
-        from pyramids.netcdf import NetCDF
-
         from earthlens.base.raster import array_to_raster
+        from pyramids.netcdf import NetCDF
 
         nc = NetCDF.read_file(str(nc_path))
         dims = tuple(nc.dimension_names or ())
         if "time" not in dims:
             raise ValueError(
-                f"{nc_path.name} has no `time` dimension to aggregate "
-                f"(dims={dims})."
+                f"{nc_path.name} has no `time` dimension to aggregate (dims={dims})."
             )
 
         # Compute the window labels from the freshly-read container, before any
@@ -469,9 +466,9 @@ class CMEMS(AbstractDataSource):
                 target = out_dir / (
                     f"{nc_path.stem}_{var_name}_{config.freq}_{window}.tif"
                 )
-                array_to_raster(
-                    arr[i], var.geotransform, epsg=var.epsg
-                ).to_file(str(target))
+                array_to_raster(arr[i], var.geotransform, epsg=var.epsg).to_file(
+                    str(target)
+                )
                 written.append(target)
 
         logger.info(

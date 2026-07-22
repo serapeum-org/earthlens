@@ -245,8 +245,7 @@ def snap_to_cadence(
         snapper = _SNAPPERS[cadence]
     except KeyError as exc:
         raise ValueError(
-            f"unknown cadence {cadence!r}; expected one of "
-            f"{sorted(_SNAPPERS)}"
+            f"unknown cadence {cadence!r}; expected one of {sorted(_SNAPPERS)}"
         ) from exc
     if cadence == "weekly":
         snapped = {snapper(_to_date(d), today=today) for d in dates}

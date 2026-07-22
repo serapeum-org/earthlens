@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.sentinel_hub._dispatch import (
     auto_select_api,
     resolve_api,

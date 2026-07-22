@@ -2,22 +2,22 @@
 
 from __future__ import annotations
 
-import earthlens.nwm
-
 import datetime as dt
 import sys
 import types
 from pathlib import Path
 
 import pytest
-
-from earthlens.nwm import BUCKET, NWM
 from earthlens.nwm.backend import (
     _is_int,
     _is_missing_key,
     build_key,
     enumerate_cycles,
 )
+
+import earthlens.nwm
+from earthlens.nwm import BUCKET, NWM
+
 from .conftest import FakeS3
 
 pytestmark = [pytest.mark.nwm]

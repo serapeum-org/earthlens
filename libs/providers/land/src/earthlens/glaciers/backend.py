@@ -398,8 +398,7 @@ class Glaciers(AbstractDataSource):
         out_path = self._write_table(df)
         if len(df):
             logger.info(
-                f"Glaciers {self._dataset.id}: {len(df)} row(s) written to "
-                f"{out_path}."
+                f"Glaciers {self._dataset.id}: {len(df)} row(s) written to {out_path}."
             )
         else:
             logger.warning(

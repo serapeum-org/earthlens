@@ -41,10 +41,9 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, SecretStr
-
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 _KEY_MGMT_URL = "https://api.eumetsat.int/api-key/"
 _DOCS_URL = (

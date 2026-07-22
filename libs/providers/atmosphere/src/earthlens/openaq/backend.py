@@ -35,6 +35,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
+from earthlens.openaq.auth import AuthenticationError, OpenaqAuth, OpenaqCredentials
+from earthlens.openaq.catalog import Catalog
+from earthlens.openaq.client import OpenaqClient
 from loguru import logger
 
 from earthlens.base import (
@@ -44,9 +47,6 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.openaq.auth import AuthenticationError, OpenaqAuth, OpenaqCredentials
-from earthlens.openaq.catalog import Catalog
-from earthlens.openaq.client import OpenaqClient
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -311,8 +311,7 @@ class OpenAQ(AbstractDataSource):
     def _bbox(self) -> str:
         """Return the request bbox as OpenAQ's `"west,south,east,north"`."""
         return (
-            f"{self.space.west},{self.space.south},"
-            f"{self.space.east},{self.space.north}"
+            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
         )
 
     def _search(self) -> list[RemoteProduct]:

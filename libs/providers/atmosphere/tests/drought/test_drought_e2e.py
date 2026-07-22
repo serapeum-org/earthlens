@@ -24,7 +24,6 @@ import urllib.request
 from pathlib import Path
 
 import pytest
-
 from earthlens.earthlens import EarthLens
 
 # A recent USDM week: snap to a Tuesday whose Thursday release has rolled out.
@@ -120,7 +119,9 @@ class TestEdoLive:
             "coverageID=spaST&CRS", "coverageID=smand&CRS"
         ).replace("TIME=2025-12-21", "TIME=2024-06-21")
         if not _reachable(probe, want_binary=True):
-            pytest.skip("Copernicus EDO/GDO WCS endpoint unreachable / not serving data")
+            pytest.skip(
+                "Copernicus EDO/GDO WCS endpoint unreachable / not serving data"
+            )
         paths = EarthLens(
             data_source="drought",
             dataset="gdo-smand",

@@ -32,10 +32,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 EVALSCRIPTS_PATH: Path = Path(__file__).parent / "evalscripts"

@@ -19,13 +19,9 @@ gate are applied by the per-provider URL builders so the backend hands
 
 from __future__ import annotations
 
-from typing import Any
-
-import requests
-from pyramids.feature.collection import FeatureCollection
-
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
+from pyramids.feature.collection import FeatureCollection
 
 #: geoBoundaries gbOpen API base — `"{base}/{ISO3}/{ADM}/"` returns the metadata
 #: whose `gjDownloadURL` is the GeoJSON to read (`geoboundaries_resolve`).
@@ -39,6 +35,8 @@ NE_BASE = "https://naciscdn.org/naturalearth"
 
 #: US Census TIGER base — the GENZ cartographic-boundary (`cb_`) shapefile tree.
 TIGER_BASE = "https://www2.census.gov/geo/tiger"
+
+
 def vsicurl(url: str) -> str:
     """Wrap an HTTP(S) URL in GDAL's `/vsicurl/` virtual-filesystem prefix.
 

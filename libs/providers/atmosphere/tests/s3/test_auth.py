@@ -5,9 +5,9 @@ from __future__ import annotations
 import builtins
 
 import pytest
+from earthlens.base.s3 import S3Auth, S3Credentials
 
 from earthlens.base import AbstractAuth
-from earthlens.base.s3 import S3Auth, S3Credentials
 
 pytestmark = [pytest.mark.s3]
 

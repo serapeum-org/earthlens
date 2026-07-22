@@ -47,14 +47,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
-from loguru import logger
-
-from earthlens.base import (
-    AbstractDataSource,
-    OutputKind,
-    SpatialExtent,
-    TemporalExtent,
-)
 from earthlens.eea_aq._helpers import (
     countries_in_bbox,
     datasets_for_years,
@@ -63,6 +55,14 @@ from earthlens.eea_aq._helpers import (
     shape_frame,
 )
 from earthlens.eea_aq.catalog import Catalog
+from loguru import logger
+
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    SpatialExtent,
+    TemporalExtent,
+)
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

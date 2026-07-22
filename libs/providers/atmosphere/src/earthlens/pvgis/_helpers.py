@@ -13,11 +13,11 @@ layer.
 from __future__ import annotations
 
 import time
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 from urllib.parse import urlencode
 
 import pandas as pd
-
 from earthlens.base.http import HttpClient
 
 #: Base URL of the keyless PVGIS 5.3 non-interactive REST service.

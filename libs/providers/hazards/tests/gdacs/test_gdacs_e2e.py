@@ -15,10 +15,10 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
-
 from earthlens.earthlens import EarthLens
-from earthlens.gdacs import GDACS
 from earthlens.gdacs.events import ATTRIBUTE_COLUMNS
+
+from earthlens.gdacs import GDACS
 
 # A recent ~30-day window: GDACS is a live alert feed, so very old
 # windows can be sparse. Earthquakes are the most frequent hazard, so a
@@ -69,6 +69,6 @@ class TestGdacsLiveQuery:
                 lon_lim=[-180.0, 180.0],
                 path=str(tmp_path),
             ).download(progress_bar=False)
-        assert (
-            spy.call_count == 1
-        ), f"expected a single SEARCH request, got {spy.call_count}"
+        assert spy.call_count == 1, (
+            f"expected a single SEARCH request, got {spy.call_count}"
+        )

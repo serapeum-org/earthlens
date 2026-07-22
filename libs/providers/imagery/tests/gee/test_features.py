@@ -11,10 +11,10 @@ from types import SimpleNamespace
 
 import geopandas as gpd
 import pytest
+from earthlens.gee.features import create_feature, create_geometry
 from shapely.geometry import LineString, MultiPoint, MultiPolygon, Point, Polygon
 
 from earthlens.gee import features as features_module
-from earthlens.gee.features import create_feature, create_geometry
 
 _SQUARE = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
 _SQUARE_2 = Polygon([(2, 2), (3, 2), (3, 3), (2, 3)])

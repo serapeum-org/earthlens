@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
-from earthlens.base import SpatialExtent
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
     reduce_collection,
@@ -13,6 +11,8 @@ from earthlens.gee._helpers import (
     task_state_name,
     wait_for_task,
 )
+
+from earthlens.base import SpatialExtent
 
 
 class _FakeTask:

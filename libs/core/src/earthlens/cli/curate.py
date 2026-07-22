@@ -24,7 +24,6 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import requests
-
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _TIMEOUT, _get_json, _redact
 
@@ -703,9 +702,10 @@ def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
     are fetched from their own catalogue host rather than the CDS host (which
     would 404 and silently return no rows).
     """
-    from earthlens.ecmwf.catalog import Catalog
     from earthlens.ecmwf.constraints import fetch_constraints
     from earthlens.ecmwf.endpoints import constraints_base_url
+
+    from earthlens.ecmwf.catalog import Catalog
 
     record = Catalog().datasets.get(dataset)
     endpoint = record.endpoint if record is not None else "cds"
@@ -1027,7 +1027,6 @@ def _earthdata_deep_sample(
     import datetime as dt
 
     import earthaccess
-
     from earthlens.cli.stanza import _format_from_extension, _infer_output_kind
 
     earthaccess.login(strategy="environment")

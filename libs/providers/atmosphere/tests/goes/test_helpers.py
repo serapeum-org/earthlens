@@ -5,7 +5,6 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
-
 from earthlens.goes._helpers import (
     BUCKET_REGION,
     download_key,

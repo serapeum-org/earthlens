@@ -40,7 +40,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import parse_qs, urlencode, urlparse
 
@@ -293,7 +293,7 @@ class PlanetaryComputerSigner(_BaseSigner):
         except ValueError:
             return 0.0
         if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=timezone.utc)
+            parsed = parsed.replace(tzinfo=UTC)
         return parsed.timestamp()
 
 
@@ -439,7 +439,7 @@ class EarthdataSigner(_BearerProviderSigner):
             except ValueError:
                 return time.time() + 3600.0
             if parsed.tzinfo is None:
-                parsed = parsed.replace(tzinfo=timezone.utc)
+                parsed = parsed.replace(tzinfo=UTC)
             return parsed.timestamp()
         return time.time() + 3600.0
 
@@ -721,12 +721,18 @@ class BdcTokenSigner(_BaseSigner):
         `"?" in href` check would mistake a fragment for a query and append
         after `#`, where the server never sees it).
         """
-        from urllib.parse import urlsplit, urlunsplit, quote
+        from urllib.parse import quote, urlsplit, urlunsplit
 
         token = quote(self._token(), safe="")
         parts = urlsplit(href)
-        new_query = f"{parts.query}&access_token={token}" if parts.query else f"access_token={token}"
-        return urlunsplit((parts.scheme, parts.netloc, parts.path, new_query, parts.fragment))
+        new_query = (
+            f"{parts.query}&access_token={token}"
+            if parts.query
+            else f"access_token={token}"
+        )
+        return urlunsplit(
+            (parts.scheme, parts.netloc, parts.path, new_query, parts.fragment)
+        )
 
 
 def build_signer(signer_type: str, **creds: Any) -> Any:

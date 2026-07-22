@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from earthlens.fdsn.auth import resolve_earthscope_token
 
 from earthlens.fdsn import auth
-from earthlens.fdsn.auth import resolve_earthscope_token
 
 
 @pytest.mark.fdsn

@@ -26,8 +26,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
+
 from earthlens.jaxa.catalog import Dataset
 
 
@@ -169,8 +169,10 @@ def fetch_jaxa_earth(
             f"dataset {dataset.key!r} has no collection — bad catalog row."
         )
 
-    target_bands = bands if bands is not None else (
-        [dataset.default_band] if dataset.default_band else []
+    target_bands = (
+        bands
+        if bands is not None
+        else ([dataset.default_band] if dataset.default_band else [])
     )
     if not target_bands:
         raise ValueError(

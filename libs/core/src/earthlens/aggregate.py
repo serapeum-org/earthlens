@@ -85,8 +85,9 @@ Examples:
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterator, Literal
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 import pandas as pd
@@ -625,7 +626,7 @@ def aggregate_netcdf(
         target: Path | None = None
         if out_dir is not None:
             target = out_dir / (
-                f"{var_info.cds_variable}_{config.freq}_" f"{window_label:%Y%m%d}.tif"
+                f"{var_info.cds_variable}_{config.freq}_{window_label:%Y%m%d}.tif"
             )
             Dataset.create_from_array(arr=reduced, geo=geo, epsg=4326).to_file(
                 str(target)

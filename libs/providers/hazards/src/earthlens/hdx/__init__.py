@@ -33,6 +33,7 @@ surfaces as a friendly `ImportError` naming `earthlens[hdx]`.
 from __future__ import annotations
 
 from earthlens.hdx.backend import HDX
+
 from earthlens.hdx.catalog import CATALOG_PATH, Catalog, HdxDataset
 
 __all__ = [

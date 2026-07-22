@@ -55,9 +55,8 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
-from earthlens.chc.catalog import Catalog
+from earthlens.chc.catalog import Catalog, Variable
 from earthlens.chc.catalog import Dataset as ChcDataset
-from earthlens.chc.catalog import Variable
 
 __all__ = ["CHIRPS"]
 
@@ -486,9 +485,7 @@ class CHIRPS(AbstractDataSource):
                             cores=cores,
                         )
                     )
-                except (
-                    Exception
-                ) as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
+                except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
                     logger.error(
                         f"CHIRPS download for {ds_key}/{var_name} failed: "
                         f"{type(exc).__name__}: {exc}"
@@ -743,9 +740,7 @@ class CHIRPS(AbstractDataSource):
         local_compressed = self.root_dir / remote_filename
         try:
             self._fetch_ftp(remote_dir, remote_filename, local_compressed, ftp=ftp)
-        except (
-            Exception
-        ):  # noqa: BLE001 - clean up the partial download on any FTP-stack failure, then re-raise unchanged
+        except Exception:  # noqa: BLE001 - clean up the partial download on any FTP-stack failure, then re-raise unchanged
             if local_compressed.exists():
                 try:
                     local_compressed.unlink()
@@ -1021,9 +1016,7 @@ class CHIRPS(AbstractDataSource):
         }:
             date_str = f"{date.year}.{date.month:02d}"
         elif granularity == "6-hourly":
-            date_str = (
-                f"{date.year}.{date.month:02d}.{date.day:02d}." f"{date.hour:02d}"
-            )
+            date_str = f"{date.year}.{date.month:02d}.{date.day:02d}.{date.hour:02d}"
         else:
             date_str = f"{date.year}.{date.month:02d}.{date.day:02d}"
         return f"{ds_key}_{var.name}_{date_str}.tif"

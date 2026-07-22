@@ -5,8 +5,6 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
-
-from earthlens.base import SpatialExtent
 from earthlens.drought._helpers import (
     EDO_ATTRIBUTION,
     SPEIBASE_ATTRIBUTION,
@@ -15,6 +13,8 @@ from earthlens.drought._helpers import (
     bbox_from_extent,
     snap_to_cadence,
 )
+
+from earthlens.base import SpatialExtent
 
 
 def test_weekly_snap_idempotent_on_released_tuesday():
@@ -43,9 +43,7 @@ def test_weekly_snap_walks_back_from_other_weekday():
         (dt.date(2026, 6, 25), dt.date(2026, 6, 23)),  # Thu → same-week Tue
         (dt.date(2026, 6, 22), dt.date(2026, 6, 16)),  # Mon → prior Tue
     ):
-        assert snap_to_cadence(
-            [queried], "weekly", today=queried
-        ) == [expected]
+        assert snap_to_cadence([queried], "weekly", today=queried) == [expected]
 
 
 def test_weekly_snap_does_not_overshoot_historical_query():
@@ -97,9 +95,7 @@ def test_10day_snap_picks_dekad_start(day, expected_day):
 
 def test_monthly_snap_returns_first_of_month():
     """Any day inside a month snaps to its first."""
-    assert snap_to_cadence([dt.date(2026, 6, 25)], "monthly") == [
-        dt.date(2026, 6, 1)
-    ]
+    assert snap_to_cadence([dt.date(2026, 6, 25)], "monthly") == [dt.date(2026, 6, 1)]
 
 
 def test_snap_accepts_string_dates():
@@ -109,9 +105,9 @@ def test_snap_accepts_string_dates():
 
 def test_snap_accepts_datetime():
     """A `datetime` is reduced to its `date` first."""
-    assert snap_to_cadence(
-        [dt.datetime(2026, 6, 25, 14, 30)], "monthly"
-    ) == [dt.date(2026, 6, 1)]
+    assert snap_to_cadence([dt.datetime(2026, 6, 25, 14, 30)], "monthly") == [
+        dt.date(2026, 6, 1)
+    ]
 
 
 def test_snap_rejects_unknown_cadence():

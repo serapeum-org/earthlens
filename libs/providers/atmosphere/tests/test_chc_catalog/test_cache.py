@@ -96,9 +96,9 @@ class TestCatalogCache:
         bumped = alpha.stat().st_mtime + 60.0
         os.utime(alpha, (bumped, bumped))
         cat2 = Catalog.load(catalog_path=catalog_dir)
-        assert (
-            cat1.datasets["alpha"] is not cat2.datasets["alpha"]
-        ), "cache failed to invalidate after one file mtime changed"
+        assert cat1.datasets["alpha"] is not cat2.datasets["alpha"], (
+            "cache failed to invalidate after one file mtime changed"
+        )
 
     def test_single_file_cache_hits_and_misses(self, tmp_path: Path):
         """The legacy single-file branch caches and invalidates on touch."""

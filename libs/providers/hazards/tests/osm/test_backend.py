@@ -6,9 +6,9 @@ import sys
 from pathlib import Path
 
 import pytest
+from earthlens.osm._helpers import LicenseWarning
 
 from earthlens.osm import OSM
-from earthlens.osm._helpers import LicenseWarning
 
 pytestmark = pytest.mark.osm
 

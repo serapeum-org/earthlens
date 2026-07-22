@@ -6,7 +6,6 @@ from typing import Any
 
 import pytest
 import requests
-
 from earthlens.base.http import (
     DEFAULT_STATUS_FORCELIST,
     HttpClient,

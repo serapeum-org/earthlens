@@ -22,10 +22,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "gbif_data_catalog.yaml"
 
@@ -85,7 +85,9 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Taxon], list[str]]:
         try:
             rows[name] = Taxon(**dict(body or {}))
         except ValidationError as exc:
-            raise ValueError(f"{path} taxon {name!r} failed validation:\n{exc}") from exc
+            raise ValueError(
+                f"{path} taxon {name!r} failed validation:\n{exc}"
+            ) from exc
 
     available = [str(item) for item in (data.get("available_datasets") or [])]
     _CATALOG_CACHE[key] = (rows, available)

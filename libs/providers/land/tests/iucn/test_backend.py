@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
+from earthlens.iucn._rest import IUCN_COLUMNS
 
 from earthlens.biodiversity import LicenseWarning
 from earthlens.iucn import IUCN, AuthenticationError
-from earthlens.iucn._rest import IUCN_COLUMNS
 
 
 def _backend(tmp_path, variables=None, token="test-token", **kwargs):
@@ -110,7 +110,9 @@ class TestFetchAndDownload:
             f"got calls: {assessment_calls}"
         )
 
-    def test_latest_without_assessment_id_skips_detail_enrichment(self, tmp_path, fake_iucn):
+    def test_latest_without_assessment_id_skips_detail_enrichment(
+        self, tmp_path, fake_iucn
+    ):
         """A latest assessment lacking an id is also skipped (no `assessment/None` GET)."""
         fake_iucn.state.route(
             "taxa/scientific_name",
@@ -148,7 +150,15 @@ class TestFetchAndDownload:
         """A country query hits countries/{code} with the ISO alpha-2 code."""
         fake_iucn.state.route(
             "countries/KE",
-            {"assessments": [{"assessment_id": 7, "taxon": {"scientific_name": "Acinonyx jubatus"}, "red_list_category_code": "VU"}]},
+            {
+                "assessments": [
+                    {
+                        "assessment_id": 7,
+                        "taxon": {"scientific_name": "Acinonyx jubatus"},
+                        "red_list_category_code": "VU",
+                    }
+                ]
+            },
         )
         frame = _backend(tmp_path, variables=["country:KE"]).download()
         assert fake_iucn.state.calls[0]["url"].endswith("/countries/KE")
@@ -214,7 +224,9 @@ class TestFetchAndDownload:
     def test_api_returns_dataframe(self, tmp_path, fake_iucn):
         """`_api` returns the assessment DataFrame."""
         fake_iucn.state.route("countries/KE", {"assessments": []})
-        assert isinstance(_backend(tmp_path, variables=["country:KE"])._api(), pd.DataFrame)
+        assert isinstance(
+            _backend(tmp_path, variables=["country:KE"])._api(), pd.DataFrame
+        )
 
     def test_aggregate_rejected(self, tmp_path, fake_iucn):
         """A non-None aggregate raises NotImplementedError mentioning tabular."""
@@ -242,9 +254,7 @@ class TestFetchAndDownload:
         """An empty country result does not emit the LicenseWarning."""
         fake_iucn.state.route("countries/KE", {"assessments": []})
         _backend(tmp_path, variables=["country:KE"]).download()
-        assert not [
-            w for w in recwarn.list if issubclass(w.category, LicenseWarning)
-        ]
+        assert not [w for w in recwarn.list if issubclass(w.category, LicenseWarning)]
 
 
 @pytest.mark.iucn
@@ -276,7 +286,9 @@ class TestRestRetry:
             ],
         )
         _backend(tmp_path, variables=["country:KE"]).download()
-        assert len([c for c in fake_iucn.state.calls if "countries/KE" in c["url"]]) == 3
+        assert (
+            len([c for c in fake_iucn.state.calls if "countries/KE" in c["url"]]) == 3
+        )
         assert fake_iucn.sleeps == [1.0, 1.0, 2.0]
 
     def test_retries_on_429_honours_retry_after(self, tmp_path, fake_iucn):

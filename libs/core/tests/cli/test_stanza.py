@@ -5,10 +5,10 @@ from __future__ import annotations
 from urllib.parse import urlparse
 
 import pytest
-
-from earthlens.cli import stanza as stanza_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.stanza import StanzaResult, emit_stanza, supported_providers
+
+from earthlens.cli import stanza as stanza_mod
 
 pytestmark = pytest.mark.cli
 
@@ -309,9 +309,9 @@ class TestWriteStanza:
         import importlib
 
         import yaml
+        from earthlens.cli.adapter import load_catalog
 
         from earthlens.cli import stanza as sm
-        from earthlens.cli.adapter import load_catalog
 
         info = _info("usgs_water")
         module = importlib.import_module(f"{info.module}.catalog")
@@ -357,8 +357,9 @@ class TestWriteStanza:
         import importlib
         import shutil
 
-        from earthlens.cli import stanza as sm
         from earthlens.cli.adapter import load_catalog
+
+        from earthlens.cli import stanza as sm
 
         info = _info("usgs_water")
         module = importlib.import_module(f"{info.module}.catalog")
@@ -462,7 +463,9 @@ class TestBiodiversityEmitters:
 
     def test_gbif_seeds_taxon_row(self):
         """`emit_stanza` for gbif seeds taxon_key + title + rank from args."""
-        result = emit_stanza(_info("gbif"), "212", key="birds", title="Aves", rank="class")
+        result = emit_stanza(
+            _info("gbif"), "212", key="birds", title="Aves", rank="class"
+        )
         assert result.status == "ok", f"emit ran: {result.detail}"
         assert result.row == {"taxon_key": 212, "title": "Aves", "rank": "class"}
 
@@ -476,13 +479,17 @@ class TestBiodiversityEmitters:
 
     def test_wdpa_seeds_country_row(self):
         """`emit_stanza` for wdpa seeds name + region from args."""
-        result = emit_stanza(_info("wdpa"), "KEN", key="KEN", name="Kenya", region="Africa")
+        result = emit_stanza(
+            _info("wdpa"), "KEN", key="KEN", name="Kenya", region="Africa"
+        )
         assert result.status == "ok", f"emit ran: {result.detail}"
         assert result.row == {"name": "Kenya", "region": "Africa"}
 
     def test_iucn_seeds_country_row(self):
         """`emit_stanza` for iucn seeds name + region from args."""
-        result = emit_stanza(_info("iucn"), "KE", key="KE", name="Kenya", region="Africa")
+        result = emit_stanza(
+            _info("iucn"), "KE", key="KE", name="Kenya", region="Africa"
+        )
         assert result.status == "ok", f"emit ran: {result.detail}"
         assert result.row == {"name": "Kenya", "region": "Africa"}
 

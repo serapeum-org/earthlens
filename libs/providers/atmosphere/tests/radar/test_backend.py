@@ -6,10 +6,10 @@ import datetime as dt
 import sys
 
 import pytest
+from earthlens.radar.backend import _volume_start
 
 from earthlens.base import SpatialExtent
 from earthlens.radar import Radar
-from earthlens.radar.backend import _volume_start
 
 pytestmark = [pytest.mark.radar, pytest.mark.unit]
 

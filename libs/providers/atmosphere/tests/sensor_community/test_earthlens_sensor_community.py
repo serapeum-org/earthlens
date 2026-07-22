@@ -8,10 +8,10 @@ from typing import Any
 
 import pandas as pd
 import pytest
-
-import earthlens.sensor_community
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
+
+import earthlens.sensor_community
 
 
 def _facade(client, tmp_path: Path, **overrides: Any) -> EarthLens:
@@ -48,9 +48,7 @@ class TestFacadeRouting:
     def test_facade_builds_backend(self, tmp_path, fake_client):
         """The facade binds a SensorCommunity instance."""
         facade = _facade(fake_client, tmp_path)
-        assert isinstance(
-            facade.datasource, earthlens.sensor_community.SensorCommunity
-        )
+        assert isinstance(facade.datasource, earthlens.sensor_community.SensorCommunity)
 
 
 @pytest.mark.sensor_community

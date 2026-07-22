@@ -7,8 +7,6 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-
-from earthlens.gee import jobs as jobs_module
 from earthlens.gee.jobs import (
     TERMINAL_TASK_STATES,
     TaskInfo,
@@ -21,6 +19,8 @@ from earthlens.gee.jobs import (
     resolve_destination,
     wait_for_task_id,
 )
+
+from earthlens.gee import jobs as jobs_module
 
 # -- fixtures ---------------------------------------------------------------
 
@@ -467,9 +467,9 @@ class TestCancelTask:
         finally:
             _loguru.remove(sink_id)
         joined = "".join(buffer)
-        assert (
-            "already terminal" in joined
-        ), f"expected an INFO log mentioning 'already terminal'; got {joined!r}"
+        assert "already terminal" in joined, (
+            f"expected an INFO log mentioning 'already terminal'; got {joined!r}"
+        )
 
     def test_failed_precondition_in_message_is_swallowed(self, monkeypatch):
         """A non-HttpError carrying `FAILED_PRECONDITION` text is also swallowed."""

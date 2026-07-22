@@ -5,15 +5,15 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
-
-from earthlens.asf import Catalog, Product
 from earthlens.asf.catalog import (
-    CATALOG_PATH,
     _CATALOG_CACHE,
+    CATALOG_PATH,
     _load_catalog_data,
     clear_catalog_cache,
 )
+from pydantic import ValidationError
+
+from earthlens.asf import Catalog, Product
 
 
 @pytest.mark.asf
@@ -228,12 +228,8 @@ def test_dotted_alias_resolves_to_canonical_key() -> None:
 @pytest.mark.unit
 def test_catalog_rejects_duplicate_aliases_across_rows() -> None:
     """An alias reused across two product rows fails at construction."""
-    duplicated = Product(
-        platform="SENTINEL1", product_type="SLC", aliases=["shared"]
-    )
-    other = Product(
-        platform="ALOS", product_type="L1_1", aliases=["shared"]
-    )
+    duplicated = Product(platform="SENTINEL1", product_type="SLC", aliases=["shared"])
+    other = Product(platform="ALOS", product_type="L1_1", aliases=["shared"])
     with pytest.raises(ValueError, match="alias 'shared'"):
         Catalog(products={"one": duplicated, "two": other})
 

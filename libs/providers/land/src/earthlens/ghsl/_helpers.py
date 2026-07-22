@@ -30,10 +30,9 @@ from functools import lru_cache
 from pathlib import Path
 
 import requests
-
 from earthlens.base.archive import extract_members
-
 from earthlens.base.http import HttpClient, RequestsGet
+
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
 
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).
@@ -353,6 +352,8 @@ def download_and_extract(
     extracted = extract_members(zip_path, dest_dir, include=())
     zip_path.unlink(missing_ok=True)
     return extracted
+
+
 def _download(
     url: str,
     zip_path: Path,

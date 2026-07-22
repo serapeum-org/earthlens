@@ -60,7 +60,6 @@ if TYPE_CHECKING:
     # strings at runtime, so the forward reference is free.
     from earthlens.gee.jobs import TaskInfo
 
-from earthlens.base import AbstractCatalog
 from earthlens.base.providers import (
     Provider,
 )
@@ -69,6 +68,8 @@ from earthlens.base.providers import (
 )
 from earthlens.base.providers import load_providers as _load_providers_base
 from earthlens.base.yaml_loader import load_yaml_strict
+
+from earthlens.base import AbstractCatalog
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"

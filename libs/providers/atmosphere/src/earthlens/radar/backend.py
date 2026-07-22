@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
+from earthlens.radar.catalog import Catalog, Station
 from loguru import logger
 from tqdm import tqdm
 
@@ -42,7 +43,6 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.radar.catalog import Catalog, Station
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -158,8 +158,7 @@ class Radar(AbstractDataSource):
         """
         if not variables:
             raise ValueError(
-                "Radar requires a non-empty `variables` mapping of "
-                "{station_id: [...]}."
+                "Radar requires a non-empty `variables` mapping of {station_id: [...]}."
             )
         self._region = region
         self._catalog = catalog if catalog is not None else Catalog()

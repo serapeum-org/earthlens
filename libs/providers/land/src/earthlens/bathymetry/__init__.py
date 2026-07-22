@@ -15,6 +15,7 @@ backend and the :class:`~earthlens.bathymetry.catalog.Catalog` of DEM rows.
 from __future__ import annotations
 
 from earthlens.bathymetry.backend import Bathymetry
+
 from earthlens.bathymetry.catalog import Catalog, Dataset
 
 __all__ = ["Bathymetry", "Catalog", "Dataset"]

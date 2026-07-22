@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from earthlens.fdsn.catalog import CATALOG_PATH
 
 from earthlens.fdsn import Catalog, Provider
-from earthlens.fdsn.catalog import CATALOG_PATH
 
 
 @pytest.mark.fdsn

@@ -10,11 +10,10 @@ from __future__ import annotations
 import json
 
 import typer
-from rich.table import Table
-
 from earthlens.cli.adapter import BackendInfo, list_backends, load_catalog
 from earthlens.cli.render import out_console
 from earthlens.earthlens import EarthLens
+from rich.table import Table
 
 #: Typer sub-application mounted at `earthlens providers`.
 providers_app = typer.Typer(

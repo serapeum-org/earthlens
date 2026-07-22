@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from earthlens._backends import ENTRY_POINT_GROUP, discover_backends
 from earthlens.earthlens import EarthLens
 
@@ -120,7 +119,9 @@ class TestThemeTables:
         for theme in THEMES:
             table = importlib.import_module(f"earthlens._{theme}").BACKENDS
             for key in table:
-                assert key not in seen, f"{key} published by {seen.get(key)} and {theme}"
+                assert key not in seen, (
+                    f"{key} published by {seen.get(key)} and {theme}"
+                )
                 seen[key] = theme
 
     def test_themes_account_for_every_registered_key(self) -> None:

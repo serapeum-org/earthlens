@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from earthlens.usgs_water import _helpers
+
 from .conftest import legacy_wide_frame, modern_long_frame
 
 pytestmark = pytest.mark.usgs_water

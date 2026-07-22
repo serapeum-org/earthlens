@@ -28,10 +28,9 @@ from pathlib import Path
 from typing import Any
 
 import ee
-from pydantic import BaseModel, ConfigDict
-
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from pydantic import BaseModel, ConfigDict
 
 _REGISTER_URL = "https://code.earthengine.google.com/register"
 _SERVICE_ACCOUNT_DOCS = (

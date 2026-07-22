@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key, tile_name
 
 pytestmark = [pytest.mark.dem, pytest.mark.unit]
@@ -96,10 +95,10 @@ class TestBboxToTiles:
     @pytest.mark.parametrize(
         "low, high, expected",
         [
-            (0.0, 1.0, [0]),          # both integer → closed-open drops tile 1
-            (0.5, 1.0, [0]),          # low fractional, high integer → same
-            (0.0, 1.5, [0, 1]),       # low integer, high fractional
-            (0.5, 1.5, [0, 1]),       # both fractional
+            (0.0, 1.0, [0]),  # both integer → closed-open drops tile 1
+            (0.5, 1.0, [0]),  # low fractional, high integer → same
+            (0.0, 1.5, [0, 1]),  # low integer, high fractional
+            (0.5, 1.5, [0, 1]),  # both fractional
         ],
     )
     def test_closed_open_boundary_semantics(self, low, high, expected):

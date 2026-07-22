@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.hdx._helpers import match_resource
 
 pytestmark = pytest.mark.hdx

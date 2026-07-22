@@ -18,10 +18,10 @@ from types import SimpleNamespace
 import pandas as pd
 import pytest
 import requests
+from earthlens.gee.backend import GEE
 
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.gee import backend as backend_module
-from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
 
 # -- fakes ------------------------------------------------------------------
@@ -383,9 +383,9 @@ class TestInit:
                 path=str(tmp_path),
                 export_via="ftp",
             )
-        assert (
-            loads == 0
-        ), "Catalog() should not be constructed when export_via is invalid"
+        assert loads == 0, (
+            "Catalog() should not be constructed when export_via is invalid"
+        )
 
     @pytest.mark.parametrize(
         "kwargs, match",
@@ -803,9 +803,9 @@ class TestDiscoverExtent:
         )
         gee_b._maybe_discover_ee_extent(ds)
 
-        assert calls == [
-            "UCSB-CHG/CHIRPS/DAILY"
-        ], f"second instance should hit the shared cache; got {calls}"
+        assert calls == ["UCSB-CHG/CHIRPS/DAILY"], (
+            f"second instance should hit the shared cache; got {calls}"
+        )
 
     def test_clear_extent_cache_drops_every_entry(self, make_gee, monkeypatch):
         """`clear_extent_cache()` forces the next call to re-query EE."""

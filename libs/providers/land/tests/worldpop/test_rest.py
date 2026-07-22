@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 import requests
-
 from earthlens.worldpop.rest import (
     BASE_URL,
     files_for_year,
@@ -14,6 +13,7 @@ from earthlens.worldpop.rest import (
     record_files,
     rest_records,
 )
+
 from .conftest import _FakeResponse, pop_records
 
 pytestmark = pytest.mark.worldpop

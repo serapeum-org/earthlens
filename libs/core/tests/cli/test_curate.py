@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
-from earthlens.cli import curate as curate_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.curate import (
     ProbeResult,
@@ -13,6 +11,8 @@ from earthlens.cli.curate import (
     probe_dataset,
     supported_providers,
 )
+
+from earthlens.cli import curate as curate_mod
 
 pytestmark = pytest.mark.cli
 
@@ -655,7 +655,9 @@ class TestEcmwfProberBranches:
         import earthlens.ecmwf.constraints as constraints
 
         monkeypatch.setattr(
-            constraints, "fetch_constraints", lambda d, base_url=None: [{"variable": []}]
+            constraints,
+            "fetch_constraints",
+            lambda d, base_url=None: [{"variable": []}],
         )
         assert curate_mod._ecmwf_constraints("x") == [{"variable": []}]
 
@@ -1275,7 +1277,9 @@ class TestBiodiversityProbers:
         from earthlens.gbif import Catalog as G
 
         result = curate_mod._gbif_probe(G(), "birds")
-        assert result == {"birds": {"taxon_key": 212, "title": "Aves — birds", "rank": "class"}}
+        assert result == {
+            "birds": {"taxon_key": 212, "title": "Aves — birds", "rank": "class"}
+        }
 
     def test_gbif_raises_on_unknown_taxon(self):
         """An unknown taxon raises with a clear message."""

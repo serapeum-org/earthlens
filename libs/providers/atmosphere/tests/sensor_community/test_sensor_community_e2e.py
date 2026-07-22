@@ -16,8 +16,8 @@ import warnings
 from pathlib import Path
 
 import pytest
-
 from earthlens.earthlens import EarthLens
+
 from earthlens.sensor_community import LicenseWarning
 
 # Central Stuttgart — the densest Sensor.Community region.

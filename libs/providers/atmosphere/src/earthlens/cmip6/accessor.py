@@ -25,8 +25,9 @@ from __future__ import annotations
 
 import contextlib
 import os
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from earthlens.cmip6.resolver import ResolvedStore
@@ -187,12 +188,16 @@ def resolve_time_window(
                 0
                 if start is None
                 else total
-                - int(dataset.select_time(start=start, time_dim=time_dim).sizes[time_dim])
+                - int(
+                    dataset.select_time(start=start, time_dim=time_dim).sizes[time_dim]
+                )
             )
             i1 = (
                 total
                 if end is None
-                else int(dataset.select_time(end=end, time_dim=time_dim).sizes[time_dim])
+                else int(
+                    dataset.select_time(end=end, time_dim=time_dim).sizes[time_dim]
+                )
             )
         except ValueError as exc:
             raise ValueError(

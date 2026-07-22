@@ -6,9 +6,10 @@ import warnings
 from pathlib import Path
 
 import pytest
+from earthlens.sensor_community._helpers import LicenseWarning
 
 from earthlens.sensor_community import SensorCommunity
-from earthlens.sensor_community._helpers import LicenseWarning
+
 from .conftest import DHT_CSV, _FakeClient, _record
 
 
@@ -39,7 +40,9 @@ class TestDaysAndSearch:
     def test_search_discovers_bbox_sensors(self, tmp_path, fake_client):
         """`_search` returns the SDS011 sensor active in the bbox."""
         products = _backend(fake_client, tmp_path)._search()
-        assert [(p.id, p.metadata["sensor_type"]) for p in products] == [("140", "sds011")]
+        assert [(p.id, p.metadata["sensor_type"]) for p in products] == [
+            ("140", "sds011")
+        ]
 
     def test_search_type_filtered(self, tmp_path):
         """A DHT22-only snapshot yields no products for a PM request."""
@@ -93,7 +96,11 @@ class TestFetchAndDownload:
         )
         client = _FakeClient(archive={("2026-06-30", "sds011", "140"): csv})
         df = _backend(
-            client, tmp_path, start="2026-06-30T00", end="2026-06-30T12", fmt="%Y-%m-%dT%H"
+            client,
+            tmp_path,
+            start="2026-06-30T00",
+            end="2026-06-30T12",
+            fmt="%Y-%m-%dT%H",
         ).download(progress_bar=False)
         pm25 = df[df["parameter"] == "pm25"]
         assert len(pm25) == 1
@@ -109,12 +116,14 @@ class TestFetchAndDownload:
     def test_temperature_from_dht(self, tmp_path):
         """A temperature request reads the DHT22 `temperature` column."""
         client = _FakeClient(
-            snapshot=[_record(sensor_id=108, sensor_type="DHT22", lat="48.53", lon="9.2")],
+            snapshot=[
+                _record(sensor_id=108, sensor_type="DHT22", lat="48.53", lon="9.2")
+            ],
             archive={("2026-06-30", "dht22", "108"): DHT_CSV},
         )
-        df = _backend(
-            client, tmp_path, variables=["temperature"]
-        ).download(progress_bar=False)
+        df = _backend(client, tmp_path, variables=["temperature"]).download(
+            progress_bar=False
+        )
         assert set(df["parameter"]) == {"temperature"}
         assert df.loc[0, "value"] == 24.9
 

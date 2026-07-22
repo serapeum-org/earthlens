@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import earthlens.nrel
-
 from pathlib import Path
 
 import pytest
-
-from earthlens.nrel import NREL
 from earthlens.nrel.auth import AuthenticationError
+
+import earthlens.nrel
+from earthlens.nrel import NREL
 
 from .conftest import FakeResponse
 

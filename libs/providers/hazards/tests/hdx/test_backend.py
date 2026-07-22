@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from earthlens.hdx.backend import _as_filter_list
 
 from earthlens.hdx import HDX
-from earthlens.hdx.backend import _as_filter_list
 
 from .conftest import FakeHdx, FakeResource
 

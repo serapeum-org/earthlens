@@ -55,9 +55,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
-
-from earthlens.base import AbstractCatalog, FluxableLeaf, Provider
 from earthlens.base.providers import (
     clear_providers_cache as _clear_providers_cache_base,
 )
@@ -74,6 +71,9 @@ from earthlens.ecmwf.constraints import fetch_constraints
 from earthlens.ecmwf.jobs import download_job as _download_job_impl
 from earthlens.ecmwf.jobs import list_recent_jobs as _list_recent_jobs_impl
 from earthlens.ecmwf.jobs import read_cdsapirc as _read_cdsapirc  # noqa: F401
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+
+from earthlens.base import AbstractCatalog, FluxableLeaf, Provider
 
 _LEGACY_MARS_KEYS: frozenset[str] = frozenset(
     {"number_para", "download type", "var_name"}
@@ -282,7 +282,7 @@ def _build_dataset_map(
                 ds_vars[code] = Variable(**merged)
             except ValidationError as exc:
                 raise ValueError(
-                    f"{catalog_path} entry {code!r} failed " f"validation:\n{exc}"
+                    f"{catalog_path} entry {code!r} failed validation:\n{exc}"
                 ) from exc
             total_vars += 1
         structural[ds_name] = Dataset(

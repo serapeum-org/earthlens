@@ -69,11 +69,10 @@ import geopandas as gpd
 import pandas as pd
 from geopandas import GeoDataFrame
 from pyproj.exceptions import CRSError
+from pyramids.utm import project_to_utm
 from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
-
-from pyramids.utm import project_to_utm
 
 _WGS84_CODE: int = 4326
 

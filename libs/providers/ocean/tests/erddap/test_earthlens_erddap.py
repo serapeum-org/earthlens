@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
+
 from earthlens.erddap import ERDDAP
 
 pytestmark = [pytest.mark.erddap, pytest.mark.integration]

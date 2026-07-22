@@ -28,11 +28,11 @@ from typing import Any
 import geopandas as gpd
 import pandas as pd
 import requests
+from earthlens.base.http import HttpClient
+from earthlens.wdpa.auth import AuthenticationError
 from shapely.geometry import shape
 
-from earthlens.base.http import HttpClient
 from earthlens.biodiversity import parse_retry_after
-from earthlens.wdpa.auth import AuthenticationError
 
 #: Base URL of the current Protected Planet API (v3 retires 2026-05-01).
 BASE_URL = "https://api.protectedplanet.net/v4"
@@ -168,16 +168,18 @@ def _row(area: dict) -> dict[str, Any] | None:
     countries = area.get("countries") or []
     first_country = countries[0] if countries else None
     iso3 = (
-        first_country.get("iso_3")
-        if isinstance(first_country, dict)
-        else first_country
+        first_country.get("iso_3") if isinstance(first_country, dict) else first_country
     ) or area.get("iso3")
     return {
         "wdpa_id": str(area.get("wdpa_id") or area.get("id") or ""),
         "name": area.get("name"),
         "iso3": iso3,
-        "designation": designation.get("name") if isinstance(designation, dict) else designation,
-        "iucn_category": category.get("name") if isinstance(category, dict) else category,
+        "designation": designation.get("name")
+        if isinstance(designation, dict)
+        else designation,
+        "iucn_category": category.get("name")
+        if isinstance(category, dict)
+        else category,
         "marine": area.get("marine"),
         "geometry": shape(geometry),
     }
@@ -195,7 +197,9 @@ def _to_gdf(rows: list[dict]) -> gpd.GeoDataFrame:
             input yields a schema-correct empty frame.
     """
     if not rows:
-        frame = pd.DataFrame({c: pd.Series([], dtype=t) for c, t in WDPA_COLUMNS.items()})
+        frame = pd.DataFrame(
+            {c: pd.Series([], dtype=t) for c, t in WDPA_COLUMNS.items()}
+        )
         return gpd.GeoDataFrame(frame, geometry=gpd.GeoSeries([], crs=CRS), crs=CRS)
     # Read geometry without mutating the caller's rows (no `.pop`): a future
     # caller may want to inspect the original records after the GeoDataFrame
@@ -246,7 +250,9 @@ def fetch_country(
             "per_page": PER_PAGE,
             "page": page,
         }
-        areas = _get(http, "protected_areas/search", params).get("protected_areas") or []
+        areas = (
+            _get(http, "protected_areas/search", params).get("protected_areas") or []
+        )
         rows.extend(row for area in areas if (row := _row(area)) is not None)
         if len(areas) < PER_PAGE:
             break

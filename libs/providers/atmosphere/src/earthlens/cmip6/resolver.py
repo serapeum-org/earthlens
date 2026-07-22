@@ -25,8 +25,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import requests
-
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
 
@@ -139,6 +137,8 @@ class ResolvedStore:
             self.grid_label,
         ]
         return "_".join(str(p).replace("/", "-") for p in parts if p)
+
+
 class StoreResolver:
     """Resolve CMIP6 facet tuples to `zstore` URIs over the consolidated CSV.
 
@@ -379,7 +379,9 @@ class StoreResolver:
         return ", ".join(applied) if applied else "no prior facets"
 
     @staticmethod
-    def _available_hint(facet: str, value: str, available: list[str], limit: int = 20) -> str:
+    def _available_hint(
+        facet: str, value: str, available: list[str], limit: int = 20
+    ) -> str:
         """Build a concise "available values" hint with a did-you-mean.
 
         Keeps the miss message readable on a high-cardinality facet (a

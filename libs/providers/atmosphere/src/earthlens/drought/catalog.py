@@ -27,17 +27,17 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 """Path to the bundled `catalog/` directory of per-source YAML files plus
 the `_index.yaml` informational index. Reassign this attribute to redirect
 the loader at another directory or a single YAML file."""
 
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 TransportLiteral = Literal["usdm-geojson", "edo-wcs", "netcdf-url"]
 """The three live transports the drought backend dispatches on. `_fetch`
@@ -94,7 +94,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
 
 def _load_catalog_data(
     path: Path,
-) -> tuple[list[str], dict[str, "Dataset"]]:
+) -> tuple[list[str], dict[str, Dataset]]:
     """Parse, validate, and cache the drought catalog at `path`.
 
     When `path` is a directory, every `*.yaml` is merged: `available_datasets:`

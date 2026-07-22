@@ -50,6 +50,7 @@ from earthlens.ecmwf.backend import (
     ERA5_GRID_DEGREES,
     AuthenticationError,
 )
+
 from earthlens.ecmwf.catalog import CATALOG_PATH, Catalog, Dataset, Variable
 
 __all__ = [

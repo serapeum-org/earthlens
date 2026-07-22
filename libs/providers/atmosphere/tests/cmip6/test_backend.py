@@ -38,18 +38,33 @@ def stub_accessor(monkeypatch):
 def backend(resolver, tmp_path):
     """A CMIP6 backend over the fixture resolver, writing to tmp_path."""
     return CMIP6(
-        "2050-01-01", "2050-12-31", source_id="CanESM5", experiment_id="ssp585",
-        variable_id="tas", table_id="Amon", member_id="r1i1p1f1", grid_label="gn",
-        lat_lim=[35, 60], lon_lim=[-10, 30], path=tmp_path, resolver=resolver,
+        "2050-01-01",
+        "2050-12-31",
+        source_id="CanESM5",
+        experiment_id="ssp585",
+        variable_id="tas",
+        table_id="Amon",
+        member_id="r1i1p1f1",
+        grid_label="gn",
+        lat_lim=[35, 60],
+        lon_lim=[-10, 30],
+        path=tmp_path,
+        resolver=resolver,
     )
 
 
 def _make(resolver, tmp_path, **kwargs):
     """Build a CMIP6 backend with defaults filled in for a facet request."""
     params = dict(
-        source_id="CanESM5", experiment_id="ssp585", variable_id="tas",
-        table_id="Amon", grid_label="gn", lat_lim=[35, 60], lon_lim=[-10, 30],
-        path=tmp_path, resolver=resolver,
+        source_id="CanESM5",
+        experiment_id="ssp585",
+        variable_id="tas",
+        table_id="Amon",
+        grid_label="gn",
+        lat_lim=[35, 60],
+        lon_lim=[-10, 30],
+        path=tmp_path,
+        resolver=resolver,
     )
     params.update(kwargs)
     return CMIP6("2050-01-01", "2050-12-31", **params)
@@ -69,9 +84,16 @@ def test_missing_dates_raise_friendly(resolver, tmp_path, start, end):
     """Omitting start or end raises a clear ValueError, not a strptime error."""
     with pytest.raises(ValueError, match="requires a start and end date"):
         CMIP6(
-            start, end, source_id="CanESM5", experiment_id="ssp585",
-            variable_id="tas", table_id="Amon", lat_lim=[35, 60], lon_lim=[-10, 30],
-            path=tmp_path, resolver=resolver,
+            start,
+            end,
+            source_id="CanESM5",
+            experiment_id="ssp585",
+            variable_id="tas",
+            table_id="Amon",
+            lat_lim=[35, 60],
+            lon_lim=[-10, 30],
+            path=tmp_path,
+            resolver=resolver,
         )
 
 

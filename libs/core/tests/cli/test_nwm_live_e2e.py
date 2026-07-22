@@ -14,7 +14,6 @@ Run with:
 from __future__ import annotations
 
 import pytest
-
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.refresh import audit_one, refresh_one
 from earthlens.cli.validate import validate_one

@@ -12,9 +12,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 import earthlens.pvgis.backend as backend
+import pytest
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

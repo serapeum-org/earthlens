@@ -20,6 +20,7 @@ from pydantic import ValidationError
 
 from earthlens.ecmwf import Variable
 from earthlens.ecmwf import constraints as constraints_module
+
 from ._fakes import captured_request
 
 pytestmark = [pytest.mark.unit]
@@ -50,18 +51,18 @@ class TestApi:
         """`client.retrieve` is called with three positional args."""
         target = ecmwf_stub._api(single_level_var_info)
         args, kwargs = ecmwf_stub.client.retrieve.call_args
-        assert (
-            kwargs == {}
-        ), f"retrieve must be called positionally; got kwargs={kwargs}"
+        assert kwargs == {}, (
+            f"retrieve must be called positionally; got kwargs={kwargs}"
+        )
         assert len(args) == 3, f"Expected 3 positional args, got {len(args)}: {args}"
-        assert (
-            args[0] == single_level_var_info.cds_dataset
-        ), f"First arg must be dataset name, got {args[0]!r}"
-        assert isinstance(
-            args[1], dict
-        ), f"Second arg must be a request dict, got {type(args[1])}"
+        assert args[0] == single_level_var_info.cds_dataset, (
+            f"First arg must be dataset name, got {args[0]!r}"
+        )
+        assert isinstance(args[1], dict), (
+            f"Second arg must be a request dict, got {type(args[1])}"
+        )
         assert args[2] == str(target), (
-            f"Third arg must equal str(target); " f"got {args[2]!r} vs {str(target)!r}"
+            f"Third arg must equal str(target); got {args[2]!r} vs {str(target)!r}"
         )
 
     def test_request_carries_required_default_keys(
@@ -562,12 +563,12 @@ class TestBuildRequest:
         """Monthly resolution omits `day` and pins `time=['00:00']`."""
         ecmwf_stub.temporal_resolution = "monthly"
         request = ecmwf_stub._build_request(single_level_var_info)
-        assert (
-            "day" not in request
-        ), f"monthly branch must omit `day` (CDS rejects it); got {request}"
-        assert request["time"] == [
-            "00:00"
-        ], f"monthly branch should pin single 00:00 slot; got {request['time']!r}"
+        assert "day" not in request, (
+            f"monthly branch must omit `day` (CDS rejects it); got {request}"
+        )
+        assert request["time"] == ["00:00"], (
+            f"monthly branch should pin single 00:00 slot; got {request['time']!r}"
+        )
 
     def test_pressure_level_forwarded_to_request(
         self, ecmwf_stub, pressure_level_var_info
@@ -607,9 +608,9 @@ class TestBuildRequest:
         )
         request = ecmwf_stub._build_request(spec)
         for stripped in ("day", "time", "area"):
-            assert (
-                stripped not in request
-            ), f"`oceanic_monthly` should strip {stripped!r}; got {request}"
+            assert stripped not in request, (
+                f"`oceanic_monthly` should strip {stripped!r}; got {request}"
+            )
 
     def test_extras_re_introduce_a_stripped_key(self, ecmwf_stub):
         """An explicit `extras[area]` survives the request_kind strip."""

@@ -11,10 +11,10 @@ import cdsapi
 import numpy as np
 import pandas as pd
 import pytest
-
 from earthlens.aggregate import AggregationConfig
-from earthlens.chc import CHIRPS
 from earthlens.earthlens import EarthLens
+
+from earthlens.chc import CHIRPS
 from earthlens.ecmwf import ECMWF
 from earthlens.s3 import S3
 
@@ -79,7 +79,6 @@ class TestChirpsBackend:
 
 @pytest.mark.s3
 class TestS3Backend:
-
     @pytest.fixture(scope="module")
     def test_s3_data_source_instantiate_object(
         self,
@@ -138,8 +137,7 @@ class TestECMWFBackend:
     def test_ecmwf_is_registered_in_data_sources(self):
         """`EarthLens.DataSources` maps `"ecmwf"` to :class:`ECMWF`."""
         assert "ecmwf" in EarthLens.DataSources, (
-            f"'ecmwf' missing from DataSources keys: "
-            f"{sorted(EarthLens.DataSources)}"
+            f"'ecmwf' missing from DataSources keys: {sorted(EarthLens.DataSources)}"
         )
         assert EarthLens.DataSources["ecmwf"] is ECMWF, (
             f"DataSources['ecmwf'] should be the ECMWF class; got "
@@ -212,9 +210,9 @@ class TestECMWFBackend:
             f"temporal_resolution should be 'monthly'; got "
             f"{ecmwf.temporal_resolution!r}"
         )
-        assert (
-            ecmwf.root_dir == tmp_path.resolve()
-        ), f"root_dir should be the tmp path; got {ecmwf.root_dir}"
+        assert ecmwf.root_dir == tmp_path.resolve(), (
+            f"root_dir should be the tmp path; got {ecmwf.root_dir}"
+        )
 
     def test_dataset_arg_composes_variables_dict(self, tmp_path, monkeypatch):
         """`dataset=` + a list yields the same vars as the nested-dict form."""
@@ -292,7 +290,7 @@ class TestECMWFBackend:
         earthlens.download(progress_bar=False)
 
         assert len(retrieved) == 2, (
-            f"Expected 2 retrieve calls (one per variable); " f"got {len(retrieved)}"
+            f"Expected 2 retrieve calls (one per variable); got {len(retrieved)}"
         )
         datasets = [args[0] for args in retrieved]
         variables = [args[1]["variable"] for args in retrieved]
@@ -371,12 +369,12 @@ class TestEarthLensDownloadAggregate:
         cfg = AggregationConfig(freq="1D")
         stub_facade.download(progress_bar=False, aggregate=cfg)
         _, kwargs = stub_facade.datasource.download.call_args
-        assert (
-            kwargs.get("progress_bar") is False
-        ), f"`progress_bar` should still be forwarded; got kwargs={kwargs!r}"
-        assert (
-            kwargs.get("aggregate") is cfg
-        ), f"`aggregate` should be forwarded alongside; got kwargs={kwargs!r}"
+        assert kwargs.get("progress_bar") is False, (
+            f"`progress_bar` should still be forwarded; got kwargs={kwargs!r}"
+        )
+        assert kwargs.get("aggregate") is cfg, (
+            f"`aggregate` should be forwarded alongside; got kwargs={kwargs!r}"
+        )
 
     def test_extra_kwargs_pass_through_unchanged(self, stub_facade):
         """Backend-specific kwargs (e.g. CHIRPS `cores=`) still pass through."""
@@ -395,6 +393,7 @@ class TestTopLevelReExports:
     def test_earthlens_facade_importable_from_package_root(self):
         """`from earthlens.core import EarthLens` resolves to the facade class."""
         import earthlens.core
+
         assert earthlens.core.EarthLens is EarthLens, (
             f"Top-level re-export should be the facade class; got "
             f"{earthlens.core.EarthLens!r}"
@@ -403,9 +402,10 @@ class TestTopLevelReExports:
     def test_aggregate_symbols_importable_from_package_root(self):
         """`AggregationConfig` and `aggregate_netcdf` resolve at top level."""
         import earthlens.core
-        assert (
-            earthlens.core.AggregationConfig is AggregationConfig
-        ), f"Top-level AggregationConfig drift: {earthlens.core.AggregationConfig!r}"
+
+        assert earthlens.core.AggregationConfig is AggregationConfig, (
+            f"Top-level AggregationConfig drift: {earthlens.core.AggregationConfig!r}"
+        )
         assert callable(earthlens.core.aggregate_netcdf), (
             f"Top-level aggregate_netcdf must be callable; got "
             f"{earthlens.core.aggregate_netcdf!r}"
@@ -414,6 +414,7 @@ class TestTopLevelReExports:
     def test_all_lists_only_sdk_free_symbols(self):
         """`__all__` excludes the per-backend classes (each needs an extra)."""
         import earthlens.core
+
         assert sorted(earthlens.core.__all__) == [
             "AggregationConfig",
             "EarthLens",
@@ -431,11 +432,13 @@ class TestFunctionalDownload:
     def test_download_is_exported(self):
         """earthlens.core.download is a callable on the package surface."""
         import earthlens.core
+
         assert callable(earthlens.core.download), "download should be callable"
 
     def test_download_delegates_to_facade(self, monkeypatch):
         """download() builds an EarthLens and forwards the run-time args."""
         import earthlens.core
+
         from earthlens import earthlens as facade_module
 
         captured = {}
@@ -474,9 +477,9 @@ class TestFunctionalDownload:
         sentinel = [tmp_path / "a.tif", tmp_path / "b.tif"]
         monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: sentinel)
         result = facade.download(progress_bar=False)
-        assert (
-            result is sentinel
-        ), f"facade must forward the backend paths; got {result}"
+        assert result is sentinel, (
+            f"facade must forward the backend paths; got {result}"
+        )
 
 
 def _write_ones_tif(path):
@@ -528,9 +531,8 @@ class TestFacadeLoad:
 
     def test_load_leaves_non_raster_paths_alone(self, tmp_path):
         """A mixed result reads rasters but leaves a .csv table as a Path."""
-        from pyramids.dataset import Dataset
-
         from earthlens.earthlens import _load_result
+        from pyramids.dataset import Dataset
 
         tif = tmp_path / "ones.tif"
         _write_ones_tif(tif)
@@ -543,10 +545,9 @@ class TestFacadeLoad:
     def test_load_reads_netcdf_into_netcdf(self, tmp_path):
         """A written .nc path is read into a pyramids NetCDF, not a Dataset."""
         import numpy as np
+        from earthlens.earthlens import _load_result
         from pyramids.dataset import Dataset
         from pyramids.netcdf import NetCDF
-
-        from earthlens.earthlens import _load_result
 
         nc = tmp_path / "cube.nc"
         Dataset.create_from_array(
@@ -555,13 +556,14 @@ class TestFacadeLoad:
             epsg=4326,
         ).to_file(str(nc))
         out = _load_result([nc])
-        assert isinstance(
-            out[0], NetCDF
-        ), f"a .nc should read as NetCDF; got {out[0]!r}"
+        assert isinstance(out[0], NetCDF), (
+            f"a .nc should read as NetCDF; got {out[0]!r}"
+        )
 
     def test_module_download_load_true_calls_load(self, monkeypatch):
         """earthlens.core.download(load=True) routes to EarthLens.load()."""
         import earthlens.core
+
         from earthlens import earthlens as facade_module
 
         calls = {}
@@ -592,6 +594,7 @@ class TestTopLevelDiscovery:
     def test_sources_lists_registered_keys(self):
         """sources() returns the sorted registered data_source keys."""
         import earthlens.core
+
         keys = earthlens.core.sources()
         assert keys == sorted(keys), "sources() should be sorted"
         assert "chc" in keys and "gee" in keys, f"missing core keys: {keys[:5]}"
@@ -599,6 +602,7 @@ class TestTopLevelDiscovery:
     def test_sources_collapses_aliases_to_canonical(self):
         """sources() lists one canonical key per backend, not the aliases."""
         import earthlens.core
+
         keys = earthlens.core.sources()
         assert "chirps" not in keys, "the chirps alias should collapse to chc"
         assert "google-earth-engine" not in keys, "the gee alias should collapse"
@@ -609,13 +613,16 @@ class TestTopLevelDiscovery:
     def test_sources_is_exported(self):
         """sources / search / find are on the package surface."""
         import earthlens.core
+
         assert all(
-            callable(getattr(earthlens.core, name)) for name in ("sources", "search", "find")
+            callable(getattr(earthlens.core, name))
+            for name in ("sources", "search", "find")
         ), "sources/search/find must be callable package attributes"
 
     def test_search_delegates_to_facade(self, monkeypatch):
         """search() builds an EarthLens and returns its .search()."""
         import earthlens.core
+
         from earthlens import earthlens as facade_module
 
         captured = {}
@@ -637,6 +644,7 @@ class TestTopLevelDiscovery:
     def test_find_aggregates_guess_dataset(self, monkeypatch):
         """find() collects guess_dataset hits and skips sources that raise."""
         import earthlens.core
+
         from earthlens import earthlens as facade_module
 
         monkeypatch.setattr(facade_module, "sources", lambda: ["chc", "gee", "broken"])
@@ -797,9 +805,9 @@ class TestFacadePath:
         monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
         facade.download(progress_bar=False)
         expected = Path.cwd() / "earthlens-data" / "chc"
-        assert (
-            facade.datasource.root_dir == expected
-        ), f"got {facade.datasource.root_dir}"
+        assert facade.datasource.root_dir == expected, (
+            f"got {facade.datasource.root_dir}"
+        )
         assert expected.is_dir(), "download() should keep the default directory"
 
     def test_omitted_path_load_uses_tempdir(self, tmp_path, monkeypatch):
@@ -824,9 +832,9 @@ class TestFacadePath:
         monkeypatch.setattr(facade.datasource, "download", _capture)
         facade.load(progress_bar=False)
         default = Path.cwd() / "earthlens-data" / "chc"
-        assert (
-            facade.datasource.root_dir != default
-        ), "load() should redirect off the default"
+        assert facade.datasource.root_dir != default, (
+            "load() should redirect off the default"
+        )
         assert not default.exists(), "load() should remove the empty default dir"
         # An empty result holds no handle into the temp dir, so it is gone at once.
         assert not Path(temp_dir).exists(), "load() leaked its temp dir"

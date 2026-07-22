@@ -8,10 +8,10 @@ from types import SimpleNamespace
 
 import pytest
 import yaml
-
-from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.refresh import _curated_releases, coverage_one
+
+from earthlens.cli import refresh as refresh_mod
 
 pytestmark = pytest.mark.cli
 

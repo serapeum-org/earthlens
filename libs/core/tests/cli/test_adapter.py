@@ -5,8 +5,6 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
-
-from earthlens.cli import adapter
 from earthlens.cli.adapter import (
     BackendInfo,
     LoadError,
@@ -19,6 +17,8 @@ from earthlens.cli.adapter import (
     record_title,
 )
 from earthlens.earthlens import EarthLens
+
+from earthlens.cli import adapter
 
 pytestmark = pytest.mark.cli
 

@@ -16,7 +16,6 @@ from pathlib import Path
 
 import pytest
 import requests
-
 from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.e2e, pytest.mark.osm]

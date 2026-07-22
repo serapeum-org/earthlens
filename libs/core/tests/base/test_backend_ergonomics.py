@@ -66,9 +66,9 @@ class TestBackendDirectErgonomics:
         """The wrapper keeps the backend's real signature for introspection."""
         params = inspect.signature(CHIRPS.__init__).parameters
         assert "variables" in params and "lat_lim" in params
-        assert not any(
-            p.kind == p.VAR_KEYWORD for p in params.values()
-        ), "wrapped __init__ must still expose the real (no **kwargs) signature"
+        assert not any(p.kind == p.VAR_KEYWORD for p in params.values()), (
+            "wrapped __init__ must still expose the real (no **kwargs) signature"
+        )
 
 
 class TestBackendPolygonMask:
@@ -219,9 +219,9 @@ class TestAuthenticate:
             lon_lim=[-75, -74],
             path=str(tmp_path),
         )
-        assert (
-            chc.authenticate() is chc
-        ), "authenticate() should return self for chaining"
+        assert chc.authenticate() is chc, (
+            "authenticate() should return self for chaining"
+        )
 
     def test_authentication_errors_share_a_base(self):
         """Every backend's AuthenticationError subclasses the shared base."""

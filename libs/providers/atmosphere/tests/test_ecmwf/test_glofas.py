@@ -9,11 +9,11 @@ variable's endpoint. No network.
 from __future__ import annotations
 
 import pytest
+from earthlens.ecmwf.backend import ECMWF
 from pydantic import ValidationError
 
 from earthlens.ecmwf import Catalog, Variable
 from earthlens.ecmwf import constraints as constraints_mod
-from earthlens.ecmwf.backend import ECMWF
 
 pytestmark = [pytest.mark.unit]
 
@@ -54,7 +54,12 @@ def _capturing_fetch_constraints(dataset, base_url=None):
     """Record the `base_url` a constraints fetch was asked to use."""
     _FETCH_CAPTURE["dataset"] = dataset
     _FETCH_CAPTURE["base_url"] = base_url
-    return [{"variable": [_GLOFAS_CODE.replace("-", "_")], "system_version": ["operational"]}]
+    return [
+        {
+            "variable": [_GLOFAS_CODE.replace("-", "_")],
+            "system_version": ["operational"],
+        }
+    ]
 
 
 class _FakeCatalog:
@@ -219,12 +224,15 @@ class TestGridResolution:
 
     def test_coarse_dataset_keeps_its_native_resolution(self, tmp_path, monkeypatch):
         """A dataset coarser than ERA5 (0.25°) is not capped at 0.125°."""
-        from earthlens.ecmwf.catalog import Dataset
         import earthlens.ecmwf.backend as backend_module
+
+        from earthlens.ecmwf.catalog import Dataset
 
         backend = _glofas_backend(tmp_path)
         backend.vars = {"coarse-ds": ["v"]}
-        fake = _FakeCatalog({"coarse-ds": Dataset(endpoint="ewds", grid_resolution=0.25)})
+        fake = _FakeCatalog(
+            {"coarse-ds": Dataset(endpoint="ewds", grid_resolution=0.25)}
+        )
         monkeypatch.setattr(backend_module, "Catalog", lambda: fake)
         assert backend._grid_resolution_for_request() == pytest.approx(0.25)
 
@@ -263,7 +271,9 @@ class TestGlofasConstraints:
         monkeypatch.setattr(backend_module, "RequestValidator", _CapturingValidator)
         ecmwf_stub.skip_constraints = False
         ecmwf_stub._api(Catalog().get_variable(_GLOFAS, _GLOFAS_CODE))
-        assert _VALIDATOR_CAPTURE["base_url"] == "https://ewds.climate.copernicus.eu/api"
+        assert (
+            _VALIDATOR_CAPTURE["base_url"] == "https://ewds.climate.copernicus.eu/api"
+        )
 
     def test_minimal_valid_request_uses_ewds_host(self, monkeypatch):
         """`minimal_valid_request` fetches an EWDS dataset from the EWDS host."""
@@ -295,7 +305,9 @@ class TestApiRoutesByEndpoint:
         )
         captured: list[str] = []
         real_client = ecmwf_stub.client
-        ecmwf_stub._client_for = lambda endpoint: captured.append(endpoint) or real_client
+        ecmwf_stub._client_for = lambda endpoint: (
+            captured.append(endpoint) or real_client
+        )
         ecmwf_stub._api(glofas)
         assert captured == ["ewds"]
         assert real_client.retrieve.call_count == 1

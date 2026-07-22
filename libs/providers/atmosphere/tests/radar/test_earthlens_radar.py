@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from earthlens.earthlens import EarthLens
 
 import earthlens.radar
-from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.radar, pytest.mark.unit]
 

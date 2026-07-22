@@ -152,9 +152,7 @@ def test_clear_catalog_cache_drops_entries(tmp_path, monkeypatch):
     assert catalog_module._CATALOG_CACHE == {}
 
 
-def test_catalog_dir_with_missing_index_in_available_raises(
-    tmp_path, monkeypatch
-):
+def test_catalog_dir_with_missing_index_in_available_raises(tmp_path, monkeypatch):
     """A curated id missing from `available_datasets:` is an error."""
     (tmp_path / "a.yaml").write_text(
         """

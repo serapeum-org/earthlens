@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.nrel.auth import (
     AuthenticationError,
     NrelAuth,

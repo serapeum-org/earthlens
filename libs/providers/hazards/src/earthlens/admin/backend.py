@@ -31,8 +31,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
-from loguru import logger
-
 from earthlens.admin._helpers import (
     cgaz_url,
     empty_fc,
@@ -42,6 +40,9 @@ from earthlens.admin._helpers import (
     tiger_url,
     vsicurl,
 )
+from loguru import logger
+from pyramids.feature.collection import FeatureCollection
+
 from earthlens.admin.catalog import Catalog, Dataset
 from earthlens.base import (
     AbstractDataSource,
@@ -50,7 +51,6 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from pyramids.feature.collection import FeatureCollection
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -176,8 +176,7 @@ class AdminBoundaries(AbstractDataSource):
         """
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         ids = list(variables.keys()) if isinstance(variables, dict) else list(variables)
         if not ids:

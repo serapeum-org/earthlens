@@ -1,1 +1,112 @@
-[{"hazardtype": {"mnemonic": "FL", "hazardtype": "River flood"}, "hazardlevel": {"mnemonic": "HIG", "title": "High"}}, {"hazardtype": {"mnemonic": "UF", "hazardtype": "Urban flood"}, "hazardlevel": {"mnemonic": "HIG", "title": "High"}}, {"hazardtype": {"mnemonic": "CF", "hazardtype": "Coastal flood"}, "hazardlevel": {"mnemonic": "HIG", "title": "High"}}, {"hazardtype": {"mnemonic": "EQ", "hazardtype": "Earthquake"}, "hazardlevel": {"mnemonic": "MED", "title": "Medium"}}, {"hazardtype": {"mnemonic": "LS", "hazardtype": "Landslide"}, "hazardlevel": {"mnemonic": "HIG", "title": "High"}}, {"hazardtype": {"mnemonic": "TS", "hazardtype": "Tsunami"}, "hazardlevel": {"mnemonic": "MED", "title": "Medium"}}, {"hazardtype": {"mnemonic": "VA", "hazardtype": "Volcano"}, "hazardlevel": {"mnemonic": "HIG", "title": "High"}}, {"hazardtype": {"mnemonic": "CY", "hazardtype": "Cyclone"}, "hazardlevel": {"mnemonic": "VLO", "title": "Very low"}}, {"hazardtype": {"mnemonic": "DG", "hazardtype": "Water scarcity"}, "hazardlevel": {"mnemonic": "MED", "title": "Medium"}}, {"hazardtype": {"mnemonic": "EH", "hazardtype": "Extreme heat"}, "hazardlevel": {"mnemonic": "MED", "title": "Medium"}}, {"hazardtype": {"mnemonic": "WF", "hazardtype": "Wildfire"}, "hazardlevel": {"mnemonic": "HIG", "title": "High"}}]
+[
+    {
+        "hazardtype": {
+            "mnemonic": "FL",
+            "hazardtype": "River flood"
+        },
+        "hazardlevel": {
+            "mnemonic": "HIG",
+            "title": "High"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "UF",
+            "hazardtype": "Urban flood"
+        },
+        "hazardlevel": {
+            "mnemonic": "HIG",
+            "title": "High"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "CF",
+            "hazardtype": "Coastal flood"
+        },
+        "hazardlevel": {
+            "mnemonic": "HIG",
+            "title": "High"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "EQ",
+            "hazardtype": "Earthquake"
+        },
+        "hazardlevel": {
+            "mnemonic": "MED",
+            "title": "Medium"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "LS",
+            "hazardtype": "Landslide"
+        },
+        "hazardlevel": {
+            "mnemonic": "HIG",
+            "title": "High"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "TS",
+            "hazardtype": "Tsunami"
+        },
+        "hazardlevel": {
+            "mnemonic": "MED",
+            "title": "Medium"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "VA",
+            "hazardtype": "Volcano"
+        },
+        "hazardlevel": {
+            "mnemonic": "HIG",
+            "title": "High"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "CY",
+            "hazardtype": "Cyclone"
+        },
+        "hazardlevel": {
+            "mnemonic": "VLO",
+            "title": "Very low"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "DG",
+            "hazardtype": "Water scarcity"
+        },
+        "hazardlevel": {
+            "mnemonic": "MED",
+            "title": "Medium"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "EH",
+            "hazardtype": "Extreme heat"
+        },
+        "hazardlevel": {
+            "mnemonic": "MED",
+            "title": "Medium"
+        }
+    },
+    {
+        "hazardtype": {
+            "mnemonic": "WF",
+            "hazardtype": "Wildfire"
+        },
+        "hazardlevel": {
+            "mnemonic": "HIG",
+            "title": "High"
+        }
+    }
+]

@@ -33,9 +33,10 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from earthlens.base import AuthenticationError
 from earthlens.nwp._helpers import grib_name, valid_time
 from earthlens.nwp.centres.base import _NWPCentre
+
+from earthlens.base import AuthenticationError
 
 if TYPE_CHECKING:
     import datetime as dt

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.base.leaves import FluxableLeaf
 
 

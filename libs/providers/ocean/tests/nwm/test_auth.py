@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.nwm.auth import requires_auth
 
 pytestmark = [pytest.mark.nwm, pytest.mark.unit]

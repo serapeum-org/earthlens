@@ -214,9 +214,7 @@ def test_empty_variables_raises() -> None:
 def test_dict_variables_raises_typeerror() -> None:
     """A mapping variables raises TypeError (G5 — flat list only)."""
     with pytest.raises(TypeError, match="not a mapping"):
-        ClimateIndices(
-            start="2000-01-01", end="2001-12-31", variables={"oni": []}
-        )
+        ClimateIndices(start="2000-01-01", end="2001-12-31", variables={"oni": []})
 
 
 def test_unknown_index_did_you_mean(fake_http, tmp_path: Path) -> None:

@@ -17,8 +17,8 @@ from pathlib import Path
 
 import geopandas as gpd
 import pytest
-
 from earthlens.earthlens import EarthLens
+
 from earthlens.overture import LicenseWarning
 
 #: A tiny bbox over a dense Manhattan block (Times Square), small enough to
@@ -66,9 +66,9 @@ class TestOvertureLiveFetch:
         assert "license_id" in gdf.columns
         odbl = (gdf["license_id"] == "ODbL-1.0").sum()
         if odbl:
-            assert [
-                w for w in record if issubclass(w.category, LicenseWarning)
-            ], "ODbL rows present but no LicenseWarning emitted"
+            assert [w for w in record if issubclass(w.category, LicenseWarning)], (
+                "ODbL rows present but no LicenseWarning emitted"
+            )
 
     def test_places_geojson_nested_roundtrip(self, tmp_path: Path):
         """A `places` GeoJSON write round-trips Overture's nested struct columns."""

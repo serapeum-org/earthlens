@@ -26,14 +26,15 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from earthlens._backends import discover_backends
+from earthlens.base.spatial import resolve_aoi
 from loguru import logger
 
-from earthlens._backends import discover_backends
 from earthlens.base import split_time
-from earthlens.base.spatial import resolve_aoi
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
+
     from earthlens.base import AbstractCatalog, AbstractDataSource, RemoteProduct
 
 
@@ -1827,9 +1828,7 @@ def find(text: str) -> dict[str, list[str]]:
     for source in sources():
         try:
             hits = EarthLens.guess_dataset(source, text)
-        except (
-            Exception
-        ) as exc:  # noqa: BLE001 - skip uninstalled / catalog-less backends
+        except Exception as exc:  # noqa: BLE001 - skip uninstalled / catalog-less backends
             # Log (rather than silently drop) so a real `guess_dataset`
             # bug is traceable instead of just under-reporting.
             logger.debug(f"find(): skipping {source!r}: {type(exc).__name__}: {exc}")

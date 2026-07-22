@@ -9,9 +9,6 @@ import urllib.request
 from types import SimpleNamespace
 
 import pytest
-
-from earthlens.base import AuthenticationError
-from earthlens.stac import auth_cdse
 from earthlens.stac.signers import (
     BdcTokenSigner,
     CdseS3Signer,
@@ -21,6 +18,9 @@ from earthlens.stac.signers import (
     _BearerProviderSigner,
     build_signer,
 )
+
+from earthlens.base import AuthenticationError
+from earthlens.stac import auth_cdse
 
 from .conftest import make_item
 
@@ -474,7 +474,10 @@ class TestBuildSigner:
         """build_signer('bdc-token') without kwargs falls back to $BDC_ACCESS_TOKEN."""
         monkeypatch.setenv("BDC_ACCESS_TOKEN", "env-tok")
         signer = build_signer("bdc-token")
-        assert signer.sign_href("https://x/y.tif") == "https://x/y.tif?access_token=env-tok"
+        assert (
+            signer.sign_href("https://x/y.tif")
+            == "https://x/y.tif?access_token=env-tok"
+        )
 
     def test_unknown_signer_raises(self):
         """An unknown signer name raises ValueError naming the choices."""

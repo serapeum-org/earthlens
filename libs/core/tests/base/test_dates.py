@@ -4,9 +4,9 @@ import datetime as dt
 
 import pandas as pd
 import pytest
+from earthlens.base._dates import _strip_tz
 
 from earthlens.base import split_time, to_datetime
-from earthlens.base._dates import _strip_tz
 
 
 class TestToDatetime:
@@ -62,7 +62,9 @@ class TestToDatetime:
 
     def test_aware_datetime_normalized_to_naive_utc(self):
         """An aware datetime is converted to UTC and stripped of tzinfo."""
-        aware = dt.datetime(2022, 1, 1, 6, 30, tzinfo=dt.timezone(dt.timedelta(hours=2)))
+        aware = dt.datetime(
+            2022, 1, 1, 6, 30, tzinfo=dt.timezone(dt.timedelta(hours=2))
+        )
         result = to_datetime(aware)
         assert result == dt.datetime(2022, 1, 1, 4, 30)
         assert result.tzinfo is None
@@ -90,7 +92,9 @@ class TestStripTz:
 
     def test_aware_converted_to_utc_and_stripped(self):
         """An aware datetime is shifted to UTC and loses its tzinfo."""
-        aware = dt.datetime(2022, 1, 1, 9, 15, tzinfo=dt.timezone(dt.timedelta(hours=-3)))
+        aware = dt.datetime(
+            2022, 1, 1, 9, 15, tzinfo=dt.timezone(dt.timedelta(hours=-3))
+        )
         result = _strip_tz(aware)
         assert result == dt.datetime(2022, 1, 1, 12, 15)
         assert result.tzinfo is None

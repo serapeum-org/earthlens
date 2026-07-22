@@ -37,6 +37,7 @@ Public surface:
 from __future__ import annotations
 
 from earthlens.chc.backend import CHIRPS
+
 from earthlens.chc.catalog import CATALOG_PATH, Catalog, Dataset, Variable
 
 __all__ = [

@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
+from earthlens.obis.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -35,12 +36,10 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.biodiversity import occurrences_to_fc, warn_license, wkt_from_bbox
-from earthlens.obis.catalog import Catalog
 
 if TYPE_CHECKING:
-    from pyramids.feature.collection import FeatureCollection
-
     from earthlens.aggregate import AggregationConfig
+    from pyramids.feature.collection import FeatureCollection
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 
@@ -271,7 +270,9 @@ class OBIS(AbstractDataSource):
             frames.append(frame)
             if "license" in frame.columns:
                 licenses.update(frame["license"].dropna())
-        combined = pd.concat(frames, ignore_index=True) if len(frames) > 1 else frames[0]
+        combined = (
+            pd.concat(frames, ignore_index=True) if len(frames) > 1 else frames[0]
+        )
         collection = occurrences_to_fc(
             combined,
             lat_field="decimalLatitude",

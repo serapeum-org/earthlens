@@ -35,6 +35,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
+from earthlens.sensor_community._helpers import (
+    LicenseWarning,
+    SensorCommunityClient,
+    empty_frame,
+    frame_from_csv,
+    sensors_in_bbox,
+)
+from earthlens.sensor_community.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -44,18 +52,9 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.sensor_community._helpers import (
-    LicenseWarning,
-    SensorCommunityClient,
-    empty_frame,
-    frame_from_csv,
-    sensors_in_bbox,
-)
-from earthlens.sensor_community.catalog import Catalog
 
 if TYPE_CHECKING:
     import requests
-
     from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]
@@ -233,7 +232,10 @@ class SensorCommunity(AbstractDataSource):
         start = self.time.start_date.date()
         end = self.time.end_date.date()
         span = (end - start).days
-        return [(start + dt.timedelta(days=offset)).isoformat() for offset in range(span + 1)]
+        return [
+            (start + dt.timedelta(days=offset)).isoformat()
+            for offset in range(span + 1)
+        ]
 
     def _column_map(self) -> dict[str, str]:
         """CSV column -> pollutant name for the requested pollutants (cached)."""
@@ -272,7 +274,9 @@ class SensorCommunity(AbstractDataSource):
                 "type(s) is currently reporting in the bbox; historical "
                 "coverage is limited to sensors active now."
             )
-        return [RemoteProduct(id=sensor["sensor_id"], metadata=sensor) for sensor in sensors]
+        return [
+            RemoteProduct(id=sensor["sensor_id"], metadata=sensor) for sensor in sensors
+        ]
 
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Fetch one sensor's per-day archive CSVs over the date window.

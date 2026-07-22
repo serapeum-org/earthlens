@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-
-from earthlens.admin import _helpers
 from earthlens.admin._helpers import (
     cgaz_url,
     empty_fc,
@@ -16,6 +14,8 @@ from earthlens.admin._helpers import (
     tiger_url,
     vsicurl,
 )
+
+from earthlens.admin import _helpers
 
 pytestmark = pytest.mark.admin
 

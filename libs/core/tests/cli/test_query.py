@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.cli.query import (
     DEFAULT_PROVIDER_PRIORITY,
     PRIORITY_ENV_VAR,

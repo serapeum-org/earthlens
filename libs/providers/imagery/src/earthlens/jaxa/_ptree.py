@@ -35,6 +35,7 @@ if TYPE_CHECKING:
 
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa.auth import AuthenticationError, JaxaAuth
+
 from earthlens.jaxa.catalog import Dataset
 
 #: The active Himawari satellite currently populating the P-Tree
@@ -238,9 +239,7 @@ class FtplibTransport:
                 self._ftp.retrbinary(f"RETR {remote_path}", handle.write)
         except (ftplib.error_perm, ftplib.error_temp) as exc:
             partial.unlink(missing_ok=True)
-            raise FileNotFoundError(
-                f"P-Tree rejected {remote_path}: {exc}"
-            ) from exc
+            raise FileNotFoundError(f"P-Tree rejected {remote_path}: {exc}") from exc
         except ftplib.all_errors as exc:
             partial.unlink(missing_ok=True)
             raise ConnectionError(
@@ -280,7 +279,8 @@ def _floor_to_slot(when: dt.datetime) -> dt.datetime:
 
 
 def _iter_slots(
-    start: dt.datetime, end: dt.datetime,
+    start: dt.datetime,
+    end: dt.datetime,
 ) -> Iterator[dt.datetime]:
     """Yield every HSD 10-minute observation timestamp in `[start, end]`.
 
@@ -313,7 +313,9 @@ def _as_utc(when: dt.datetime) -> dt.datetime:
 
 
 def _guard_retention(
-    time: TemporalExtent, *, now: dt.datetime | None = None,
+    time: TemporalExtent,
+    *,
+    now: dt.datetime | None = None,
 ) -> None:
     """Raise :class:`RetentionError` if the window is outside the archive.
 
@@ -383,7 +385,9 @@ def _resolve_bands(dataset: Dataset, bands_override: list[str] | None) -> list[s
 
 
 def _segment_paths(
-    slot: dt.datetime, band: str, satellite: str,
+    slot: dt.datetime,
+    band: str,
+    satellite: str,
 ) -> list[str]:
     """Return the 10 segment paths for `(slot, band)` under `/jma/hsd/`.
 

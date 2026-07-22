@@ -5,7 +5,6 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
-
 from earthlens.nwp._helpers import (
     cog_name,
     ensure_dir,
@@ -163,7 +162,9 @@ class TestParseIdx:
         """NOAA and ECMWF parsers collapse to the same frame shape."""
         from earthlens.nwp._helpers import _parse_idx
 
-        assert list(_parse_idx(_NOAA_IDX).columns) == list(_parse_idx(_ECMWF_INDEX).columns)
+        assert list(_parse_idx(_NOAA_IDX).columns) == list(
+            _parse_idx(_ECMWF_INDEX).columns
+        )
 
     def test_empty_input_returns_empty_frame(self):
         """Whitespace-only input gives the empty canonical frame."""
@@ -297,11 +298,7 @@ class TestParseIdx:
         """A duplicate offset does not collapse a row to length=0."""
         from earthlens.nwp._helpers import _parse_idx
 
-        body = (
-            "1:0:d=:HGT:sfc:anl\n"
-            "2:8192:d=:TMP:sfc:anl\n"
-            "3:8192:d=:UGRD:sfc:anl\n"
-        )
+        body = "1:0:d=:HGT:sfc:anl\n2:8192:d=:TMP:sfc:anl\n3:8192:d=:UGRD:sfc:anl\n"
         frame = _parse_idx(body)
         # Only the first row at offset 8192 is kept; the dup is dropped.
         assert len(frame) == 2
@@ -458,7 +455,6 @@ class TestIdxCachePath:
     def test_cache_root_under_platformdirs(self):
         """The default cache root lives under `platformdirs.user_cache_dir('earthlens')`."""
         import platformdirs
-
         from earthlens.nwp._helpers import _idx_cache_root
 
         root = _idx_cache_root()

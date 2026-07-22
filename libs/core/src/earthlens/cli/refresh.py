@@ -43,7 +43,6 @@ from typing import Any
 
 import requests
 import yaml
-
 from earthlens.cli.adapter import BackendInfo, load_catalog
 
 #: HTTP timeout (seconds) for a single live-listing request.
@@ -1222,8 +1221,8 @@ def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
         `{"jaxa-earth": [STAC collection ids], "gportal": [numeric
         ids], "ptree": [product tokens]}`.
     """
-    from jaxa.earth import je as _je  # type: ignore[import-not-found]
     import gportal as _gportal  # type: ignore[import-not-found]
+    from jaxa.earth import je as _je  # type: ignore[import-not-found]
 
     je_ids, _ = _je.ImageCollectionList().filter_name()
     gp_tree = _gportal.datasets()
@@ -1236,10 +1235,13 @@ def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
             stack.extend(node.values())
         elif isinstance(node, list):
             gp_ids.extend(str(x) for x in node)
-    ptree_ids = sorted({
-        row.short_name for row in catalog.datasets.values()
-        if row.protocol == "ptree" and row.short_name
-    })
+    ptree_ids = sorted(
+        {
+            row.short_name
+            for row in catalog.datasets.values()
+            if row.protocol == "ptree" and row.short_name
+        }
+    )
     return {
         "jaxa-earth": sorted(set(str(c) for c in je_ids)),
         "gportal": sorted(set(gp_ids)),

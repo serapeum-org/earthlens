@@ -15,7 +15,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
 from earthlens.worldpop.rest import BASE_URL

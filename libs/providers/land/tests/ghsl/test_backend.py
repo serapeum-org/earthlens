@@ -7,10 +7,11 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from earthlens.aggregate import AggregationConfig
-from earthlens.ghsl import backend as backend_mod
 from earthlens.ghsl.backend import GHSL, _close_dataset, _epsg_int
+
+from earthlens.ghsl import backend as backend_mod
+
 from .conftest import make_tiny_tif
 
 
@@ -374,9 +375,9 @@ class TestReviewFixes:
         _build(tmp_path, ["GHS_POP"]).download(progress_bar=False)
         merges = len(patched_io)
         _build(tmp_path, ["GHS_POP"]).download(progress_bar=False)
-        assert (
-            len(patched_io) == merges
-        ), "second download must not re-run merge_rasters"
+        assert len(patched_io) == merges, (
+            "second download must not re-run merge_rasters"
+        )
 
     def test_aggregate_honors_out_dir_and_skipna(self, tmp_path, patched_io):
         """aggregate= writes under config.out_dir and respects skipna (L2)."""
@@ -388,9 +389,9 @@ class TestReviewFixes:
                 freq="100YS", op="mean", out_dir=str(odir), skipna=False
             ),
         )
-        assert out and all(
-            p.parent == odir for p in out
-        ), f"outputs not under {odir}: {out}"
+        assert out and all(p.parent == odir for p in out), (
+            f"outputs not under {odir}: {out}"
+        )
 
     def test_aggregate_passes_tabular_through(self, tmp_path, patched_io, monkeypatch):
         """A mixed raster+tabular aggregate keeps the tabular output (M3)."""
@@ -415,9 +416,9 @@ class TestReviewFixes:
         )
         names = [p.name for p in out]
         assert "GHS_DUC" in names, f"tabular output dropped: {names}"
-        assert any(
-            n.startswith("GHS_POP_mean_") for n in names
-        ), f"missing aggregate: {names}"
+        assert any(n.startswith("GHS_POP_mean_") for n in names), (
+            f"missing aggregate: {names}"
+        )
 
     def test_aggregate_mismatched_grids_raise(self, tmp_path):
         """Per-epoch grids that differ in shape raise a clear error (M1)."""
@@ -466,9 +467,9 @@ class TestReviewFixes:
 
         monkeypatch.setattr(backend_mod, "download_and_extract", fake_extract)
         _build(tmp_path, ["GHS_DUC"]).download(progress_bar=False)
-        assert captured["url"].endswith(
-            "a_V2_0.zip"
-        ), f"expected sorted-first zip, got {captured}"
+        assert captured["url"].endswith("a_V2_0.zip"), (
+            f"expected sorted-first zip, got {captured}"
+        )
 
     def test_close_dataset_swallows_close_error(self):
         """_close_dataset never raises when close() fails."""

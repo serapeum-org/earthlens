@@ -35,10 +35,10 @@ from difflib import get_close_matches
 from pathlib import Path
 from typing import Any, Literal
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "osm_data_catalog.yaml"
 
@@ -170,8 +170,7 @@ class Dataset(BaseModel):
                 )
             if self.query_template is not None or self.ohsome_filter is not None:
                 raise ValueError(
-                    "a 'pbf' row must not carry a 'query_template' or "
-                    "'ohsome_filter'"
+                    "a 'pbf' row must not carry a 'query_template' or 'ohsome_filter'"
                 )
 
 
@@ -284,8 +283,7 @@ class Catalog(AbstractCatalog):
                     f"{catalog_path} query {query_id!r} failed validation:\n{exc}"
                 ) from exc
         regions: dict[str, str] = {
-            str(name): str(path)
-            for name, path in (data.get("regions") or {}).items()
+            str(name): str(path) for name, path in (data.get("regions") or {}).items()
         }
         _CATALOG_CACHE[key] = (datasets, regions)
         return cls(datasets=dict(datasets), regions=dict(regions))

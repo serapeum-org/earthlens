@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.overture.query import _dataset_path, _projection, build_query
 
 
@@ -15,8 +14,7 @@ class TestDatasetPath:
         """The path embeds the bucket, release, theme, and type partitions."""
         path = _dataset_path("places", "place", "2026-05-20.0")
         assert path == (
-            "s3://overturemaps-us-west-2/release/2026-05-20.0/"
-            "theme=places/type=place/*"
+            "s3://overturemaps-us-west-2/release/2026-05-20.0/theme=places/type=place/*"
         )
 
 
@@ -122,7 +120,6 @@ class TestQueryOverture:
     def test_decodes_wkb_to_geodataframe(self, monkeypatch):
         """A populated result becomes an EPSG:4326 GeoDataFrame with geometry."""
         import duckdb
-
         from earthlens.overture.query import query_overture
 
         monkeypatch.setattr(
@@ -137,7 +134,6 @@ class TestQueryOverture:
     def test_empty_result_returns_empty(self, monkeypatch):
         """A zero-row result yields an empty GeoDataFrame."""
         import duckdb
-
         from earthlens.overture.query import query_overture
 
         monkeypatch.setattr(

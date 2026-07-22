@@ -32,10 +32,9 @@ from __future__ import annotations
 
 import os
 
-from pydantic import BaseModel, ConfigDict, SecretStr
-
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 #: Where a user creates a free GFW API key (MyGFW account -> token -> key).
 _CREATE_KEY_URL = (

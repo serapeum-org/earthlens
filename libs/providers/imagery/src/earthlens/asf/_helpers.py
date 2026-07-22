@@ -178,7 +178,5 @@ def apply_baseline_windows(
         if _in_window(
             product.properties.get("perpendicularBaseline"), perpendicular_baseline
         )
-        and _in_window(
-            product.properties.get("temporalBaseline"), temporal_baseline
-        )
+        and _in_window(product.properties.get("temporalBaseline"), temporal_baseline)
     ]

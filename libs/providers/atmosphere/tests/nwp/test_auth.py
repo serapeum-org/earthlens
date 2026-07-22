@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.nwp.auth import requires_auth
 
 pytestmark = [pytest.mark.nwp, pytest.mark.unit]

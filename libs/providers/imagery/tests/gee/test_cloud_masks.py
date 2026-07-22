@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.gee.cloud_masks import _QA_PIXEL_CLEAR_BIT, landsat_sr
 
 

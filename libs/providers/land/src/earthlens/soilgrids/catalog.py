@@ -27,10 +27,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 #: Path to the bundled catalog directory of per-group `*.yaml` files plus the
 #: `_index.yaml` informational index. Override this attribute to redirect the

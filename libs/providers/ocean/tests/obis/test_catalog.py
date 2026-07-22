@@ -23,7 +23,9 @@ class TestCatalogLoad:
         catalog_module.clear_catalog_cache()
         first = Catalog.load()
         second = Catalog.load()
-        assert first["blue-whale"].scientific_name == second["blue-whale"].scientific_name
+        assert (
+            first["blue-whale"].scientific_name == second["blue-whale"].scientific_name
+        )
 
     def test_supplied_datasets_skip_disk(self):
         """Passing `datasets=` skips the disk read."""
@@ -43,7 +45,9 @@ class TestCatalogLoad:
     def test_invalid_row_raises(self, tmp_path, monkeypatch):
         """A species row missing its name raises a validation ValueError."""
         bad = tmp_path / "bad.yaml"
-        bad.write_text("species:\n  blue-whale:\n    title: no name\n", encoding="utf-8")
+        bad.write_text(
+            "species:\n  blue-whale:\n    title: no name\n", encoding="utf-8"
+        )
         monkeypatch.setattr(catalog_module, "CATALOG_PATH", bad)
         catalog_module.clear_catalog_cache()
         with pytest.raises(ValueError, match="failed validation"):
@@ -66,7 +70,9 @@ class TestResolveScientificName:
 
     def test_friendly_key(self):
         """A friendly key resolves via the catalog."""
-        assert Catalog().resolve_scientific_name("common-dolphin") == "Delphinus delphis"
+        assert (
+            Catalog().resolve_scientific_name("common-dolphin") == "Delphinus delphis"
+        )
 
     def test_species_prefix_passthrough(self):
         """A `species:<name>` selector is passed through verbatim."""
@@ -101,4 +107,3 @@ class TestModelPostInitSkipsLoadWhenProvided:
         cat = Catalog(available_datasets=["preset:held"])
         assert cat.available_datasets == ["preset:held"], "preset survived YAML load"
         assert len(cat.datasets) > 0, "YAML still loaded for datasets"
-

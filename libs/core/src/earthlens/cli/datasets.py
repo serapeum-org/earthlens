@@ -12,7 +12,6 @@ import difflib
 import json
 
 import typer
-
 from earthlens.cli.adapter import BackendInfo, known_provider_keys, list_backends
 from earthlens.cli.curate import probe_dataset
 from earthlens.cli.query import (
@@ -714,8 +713,7 @@ def curate(
         typer.echo(json.dumps(result.to_dict(), indent=2))
     else:
         out_console().print(
-            f"[dim]# paste into the curated datasets: block "
-            f"({result.provider})[/dim]"
+            f"[dim]# paste into the curated datasets: block ({result.provider})[/dim]"
         )
         typer.echo(result.to_yaml())
 

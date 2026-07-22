@@ -5,13 +5,14 @@ from __future__ import annotations
 import sys
 
 import pytest
-
-from earthlens.openeo import auth as auth_mod
 from earthlens.openeo.auth import (
     AuthenticationError,
     OpeneoAuth,
     OpeneoCredentials,
 )
+
+from earthlens.openeo import auth as auth_mod
+
 from .conftest import FakeConnection, FakeOpeneoModule
 
 

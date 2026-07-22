@@ -224,7 +224,7 @@ def _parse_iso(ts: str | None) -> dt.datetime | None:
     # from Python 3.11 onwards but not the bare `Z` suffix.
     return (
         dt.datetime.fromisoformat(ts.replace("Z", "+00:00"))
-        .astimezone(dt.timezone.utc)
+        .astimezone(dt.UTC)
         .replace(tzinfo=None)
     )
 
@@ -237,9 +237,7 @@ def _parse_ms(ms: int | float | None) -> dt.datetime | None:
     """
     if not ms:
         return None
-    return dt.datetime.fromtimestamp(int(ms) / 1000.0, tz=dt.timezone.utc).replace(
-        tzinfo=None
-    )
+    return dt.datetime.fromtimestamp(int(ms) / 1000.0, tz=dt.UTC).replace(tzinfo=None)
 
 
 def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
@@ -307,7 +305,7 @@ def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
     if create_time is None:
         # Both shapes should always carry a create-time; fall back to
         # `now()` rather than crashing on an EE-side schema surprise.
-        create_time = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+        create_time = dt.datetime.now(dt.UTC).replace(tzinfo=None)
     if update_time is None:
         update_time = create_time
 
@@ -408,7 +406,7 @@ def list_recent_tasks(
     if description_prefix is not None:
         tasks = [t for t in tasks if description_prefix in t.description]
     if max_age_min is not None:
-        now = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+        now = dt.datetime.now(dt.UTC).replace(tzinfo=None)
         cutoff = now - dt.timedelta(minutes=max_age_min)
         tasks = [t for t in tasks if t.create_time >= cutoff]
 

@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from earthlens.aggregate import AggregationConfig
+
 from earthlens.s3 import S3
 
 pytestmark = [pytest.mark.s3]
@@ -576,6 +576,7 @@ def test_aggregate_skips_missing_and_failed(
 ):
     """_aggregate skips a missing granule and a granule whose aggregation raises."""
     import earthlens.aggregate as agg
+
     from earthlens.base import RemoteProduct
 
     patch_auth(fake_client_factory())
@@ -612,6 +613,7 @@ def test_aggregate_resolves_in_file_variable_and_runs(
 ):
     """_aggregate resolves the in-file NetCDF variable (VAR_2T, not the native token) (M2)."""
     import earthlens.aggregate as agg
+
     from earthlens.base import RemoteProduct
 
     patch_auth(fake_client_factory())

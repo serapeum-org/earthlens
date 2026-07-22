@@ -12,7 +12,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from earthlens.base.s3 import S3Auth
 
 

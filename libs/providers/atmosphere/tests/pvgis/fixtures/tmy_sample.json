@@ -1,453 +1,453 @@
 {
- "inputs": {
-  "location": {
-   "latitude": 45.0,
-   "longitude": 8.0,
-   "elevation": 250.0,
-   "irradiance_time_offset": 0.1761
-  },
-  "meteo_data": {
-   "radiation_db": "PVGIS-SARAH3",
-   "meteo_db": "ERA5",
-   "year_min": 2005,
-   "year_max": 2023,
-   "use_horizon": true,
-   "horizon_db": "DEM-calculated"
-  }
- },
- "outputs": {
-  "months_selected": [
-   {
-    "month": 1,
-    "year": 2018
-   },
-   {
-    "month": 2,
-    "year": 2007
-   },
-   {
-    "month": 3,
-    "year": 2009
-   },
-   {
-    "month": 4,
-    "year": 2013
-   },
-   {
-    "month": 5,
-    "year": 2008
-   },
-   {
-    "month": 6,
-    "year": 2006
-   },
-   {
-    "month": 7,
-    "year": 2011
-   },
-   {
-    "month": 8,
-    "year": 2010
-   },
-   {
-    "month": 9,
-    "year": 2020
-   },
-   {
-    "month": 10,
-    "year": 2006
-   },
-   {
-    "month": 11,
-    "year": 2007
-   },
-   {
-    "month": 12,
-    "year": 2016
-   }
-  ],
-  "tmy_hourly": [
-   {
-    "time(UTC)": "20180101:0000",
-    "T2m": 2.04,
-    "RH": 94.38,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 283.58,
-    "WS10m": 0.75,
-    "WD10m": 257.0,
-    "SP": 99870.0
-   },
-   {
-    "time(UTC)": "20180101:0100",
-    "T2m": 1.98,
-    "RH": 95.45,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 291.44,
-    "WS10m": 0.78,
-    "WD10m": 258.0,
-    "SP": 99800.0
-   },
-   {
-    "time(UTC)": "20180101:0200",
-    "T2m": 1.92,
-    "RH": 96.51,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 299.3,
-    "WS10m": 0.81,
-    "WD10m": 274.0,
-    "SP": 99740.0
-   },
-   {
-    "time(UTC)": "20180101:0300",
-    "T2m": 1.85,
-    "RH": 97.57,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 307.17,
-    "WS10m": 0.84,
-    "WD10m": 279.0,
-    "SP": 99710.0
-   },
-   {
-    "time(UTC)": "20180101:0400",
-    "T2m": 1.79,
-    "RH": 98.64,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 315.03,
-    "WS10m": 0.87,
-    "WD10m": 272.0,
-    "SP": 99650.0
-   },
-   {
-    "time(UTC)": "20180101:0500",
-    "T2m": 1.73,
-    "RH": 99.7,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 322.89,
-    "WS10m": 0.9,
-    "WD10m": 252.0,
-    "SP": 99630.0
-   },
-   {
-    "time(UTC)": "20180101:0600",
-    "T2m": 1.67,
-    "RH": 100.0,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 330.75,
-    "WS10m": 0.93,
-    "WD10m": 225.0,
-    "SP": 99600.0
-   },
-   {
-    "time(UTC)": "20180101:0700",
-    "T2m": 1.6,
-    "RH": 100.0,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 338.61,
-    "WS10m": 0.96,
-    "WD10m": 201.0,
-    "SP": 99620.0
-   },
-   {
-    "time(UTC)": "20180101:0800",
-    "T2m": 2.1,
-    "RH": 99.4,
-    "G(h)": 32.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 32.0,
-    "IR(h)": 286.6,
-    "WS10m": 0.55,
-    "WD10m": 212.0,
-    "SP": 99580.0
-   },
-   {
-    "time(UTC)": "20180101:0900",
-    "T2m": 3.23,
-    "RH": 99.4,
-    "G(h)": 149.0,
-    "Gb(n)": 125.3,
-    "Gd(h)": 117.0,
-    "IR(h)": 289.1,
-    "WS10m": 0.97,
-    "WD10m": 238.0,
-    "SP": 99600.0
-   },
-   {
-    "time(UTC)": "20180101:1000",
-    "T2m": 4.27,
-    "RH": 95.75,
-    "G(h)": 165.0,
-    "Gb(n)": 47.85,
-    "Gd(h)": 149.0,
-    "IR(h)": 286.2,
-    "WS10m": 1.24,
-    "WD10m": 232.0,
-    "SP": 99580.0
-   },
-   {
-    "time(UTC)": "20180101:1100",
-    "T2m": 5.97,
-    "RH": 85.7,
-    "G(h)": 140.0,
-    "Gb(n)": 8.07,
-    "Gd(h)": 137.0,
-    "IR(h)": 275.4,
-    "WS10m": 1.59,
-    "WD10m": 228.0,
-    "SP": 99540.0
-   },
-   {
-    "time(UTC)": "20180101:1200",
-    "T2m": 7.8,
-    "RH": 79.7,
-    "G(h)": 133.0,
-    "Gb(n)": 5.48,
-    "Gd(h)": 131.0,
-    "IR(h)": 271.9,
-    "WS10m": 1.52,
-    "WD10m": 225.0,
-    "SP": 99450.0
-   },
-   {
-    "time(UTC)": "20180101:1300",
-    "T2m": 9.16,
-    "RH": 71.4,
-    "G(h)": 79.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 79.0,
-    "IR(h)": 265.3,
-    "WS10m": 1.52,
-    "WD10m": 226.0,
-    "SP": 99340.0
-   },
-   {
-    "time(UTC)": "20180101:1400",
-    "T2m": 9.71,
-    "RH": 68.9,
-    "G(h)": 80.0,
-    "Gb(n)": 8.94,
-    "Gd(h)": 78.0,
-    "IR(h)": 249.05,
-    "WS10m": 1.31,
-    "WD10m": 224.0,
-    "SP": 99250.0
-   },
-   {
-    "time(UTC)": "20180101:1500",
-    "T2m": 8.98,
-    "RH": 71.4,
-    "G(h)": 30.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 30.0,
-    "IR(h)": 243.25,
-    "WS10m": 1.24,
-    "WD10m": 180.0,
-    "SP": 99190.0
-   },
-   {
-    "time(UTC)": "20180101:1600",
-    "T2m": 6.84,
-    "RH": 76.65,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 252.15,
-    "WS10m": 1.86,
-    "WD10m": 151.0,
-    "SP": 99090.0
-   },
-   {
-    "time(UTC)": "20180101:1700",
-    "T2m": 4.98,
-    "RH": 85.6,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 277.9,
-    "WS10m": 1.1,
-    "WD10m": 118.0,
-    "SP": 99020.0
-   },
-   {
-    "time(UTC)": "20180101:1800",
-    "T2m": 5.11,
-    "RH": 82.4,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 275.6,
-    "WS10m": 0.62,
-    "WD10m": 20.0,
-    "SP": 99000.0
-   },
-   {
-    "time(UTC)": "20180101:1900",
-    "T2m": 3.17,
-    "RH": 99.4,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 284.3,
-    "WS10m": 1.1,
-    "WD10m": 359.0,
-    "SP": 99070.0
-   },
-   {
-    "time(UTC)": "20180101:2000",
-    "T2m": 3.38,
-    "RH": 99.4,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 250.4,
-    "WS10m": 0.62,
-    "WD10m": 70.0,
-    "SP": 99010.0
-   },
-   {
-    "time(UTC)": "20180101:2100",
-    "T2m": 3.06,
-    "RH": 95.7,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 258.35,
-    "WS10m": 0.28,
-    "WD10m": 32.0,
-    "SP": 99030.0
-   },
-   {
-    "time(UTC)": "20180101:2200",
-    "T2m": 2.04,
-    "RH": 95.65,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 256.05,
-    "WS10m": 0.48,
-    "WD10m": 332.0,
-    "SP": 99030.0
-   },
-   {
-    "time(UTC)": "20180101:2300",
-    "T2m": 0.88,
-    "RH": 99.35,
-    "G(h)": 0.0,
-    "Gb(n)": 0.0,
-    "Gd(h)": 0.0,
-    "IR(h)": 259.7,
-    "WS10m": 0.48,
-    "WD10m": 297.0,
-    "SP": 99090.0
-   }
-  ]
- },
- "meta": {
-  "inputs": {
-   "location": {
-    "description": "Selected location",
-    "variables": {
-     "latitude": {
-      "description": "Latitude",
-      "units": "decimal degree"
-     },
-     "longitude": {
-      "description": "Longitude",
-      "units": "decimal degree"
-     },
-     "elevation": {
-      "description": "Elevation",
-      "units": "m"
-     }
+    "inputs": {
+        "location": {
+            "latitude": 45.0,
+            "longitude": 8.0,
+            "elevation": 250.0,
+            "irradiance_time_offset": 0.1761
+        },
+        "meteo_data": {
+            "radiation_db": "PVGIS-SARAH3",
+            "meteo_db": "ERA5",
+            "year_min": 2005,
+            "year_max": 2023,
+            "use_horizon": true,
+            "horizon_db": "DEM-calculated"
+        }
+    },
+    "outputs": {
+        "months_selected": [
+            {
+                "month": 1,
+                "year": 2018
+            },
+            {
+                "month": 2,
+                "year": 2007
+            },
+            {
+                "month": 3,
+                "year": 2009
+            },
+            {
+                "month": 4,
+                "year": 2013
+            },
+            {
+                "month": 5,
+                "year": 2008
+            },
+            {
+                "month": 6,
+                "year": 2006
+            },
+            {
+                "month": 7,
+                "year": 2011
+            },
+            {
+                "month": 8,
+                "year": 2010
+            },
+            {
+                "month": 9,
+                "year": 2020
+            },
+            {
+                "month": 10,
+                "year": 2006
+            },
+            {
+                "month": 11,
+                "year": 2007
+            },
+            {
+                "month": 12,
+                "year": 2016
+            }
+        ],
+        "tmy_hourly": [
+            {
+                "time(UTC)": "20180101:0000",
+                "T2m": 2.04,
+                "RH": 94.38,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 283.58,
+                "WS10m": 0.75,
+                "WD10m": 257.0,
+                "SP": 99870.0
+            },
+            {
+                "time(UTC)": "20180101:0100",
+                "T2m": 1.98,
+                "RH": 95.45,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 291.44,
+                "WS10m": 0.78,
+                "WD10m": 258.0,
+                "SP": 99800.0
+            },
+            {
+                "time(UTC)": "20180101:0200",
+                "T2m": 1.92,
+                "RH": 96.51,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 299.3,
+                "WS10m": 0.81,
+                "WD10m": 274.0,
+                "SP": 99740.0
+            },
+            {
+                "time(UTC)": "20180101:0300",
+                "T2m": 1.85,
+                "RH": 97.57,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 307.17,
+                "WS10m": 0.84,
+                "WD10m": 279.0,
+                "SP": 99710.0
+            },
+            {
+                "time(UTC)": "20180101:0400",
+                "T2m": 1.79,
+                "RH": 98.64,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 315.03,
+                "WS10m": 0.87,
+                "WD10m": 272.0,
+                "SP": 99650.0
+            },
+            {
+                "time(UTC)": "20180101:0500",
+                "T2m": 1.73,
+                "RH": 99.7,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 322.89,
+                "WS10m": 0.9,
+                "WD10m": 252.0,
+                "SP": 99630.0
+            },
+            {
+                "time(UTC)": "20180101:0600",
+                "T2m": 1.67,
+                "RH": 100.0,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 330.75,
+                "WS10m": 0.93,
+                "WD10m": 225.0,
+                "SP": 99600.0
+            },
+            {
+                "time(UTC)": "20180101:0700",
+                "T2m": 1.6,
+                "RH": 100.0,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 338.61,
+                "WS10m": 0.96,
+                "WD10m": 201.0,
+                "SP": 99620.0
+            },
+            {
+                "time(UTC)": "20180101:0800",
+                "T2m": 2.1,
+                "RH": 99.4,
+                "G(h)": 32.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 32.0,
+                "IR(h)": 286.6,
+                "WS10m": 0.55,
+                "WD10m": 212.0,
+                "SP": 99580.0
+            },
+            {
+                "time(UTC)": "20180101:0900",
+                "T2m": 3.23,
+                "RH": 99.4,
+                "G(h)": 149.0,
+                "Gb(n)": 125.3,
+                "Gd(h)": 117.0,
+                "IR(h)": 289.1,
+                "WS10m": 0.97,
+                "WD10m": 238.0,
+                "SP": 99600.0
+            },
+            {
+                "time(UTC)": "20180101:1000",
+                "T2m": 4.27,
+                "RH": 95.75,
+                "G(h)": 165.0,
+                "Gb(n)": 47.85,
+                "Gd(h)": 149.0,
+                "IR(h)": 286.2,
+                "WS10m": 1.24,
+                "WD10m": 232.0,
+                "SP": 99580.0
+            },
+            {
+                "time(UTC)": "20180101:1100",
+                "T2m": 5.97,
+                "RH": 85.7,
+                "G(h)": 140.0,
+                "Gb(n)": 8.07,
+                "Gd(h)": 137.0,
+                "IR(h)": 275.4,
+                "WS10m": 1.59,
+                "WD10m": 228.0,
+                "SP": 99540.0
+            },
+            {
+                "time(UTC)": "20180101:1200",
+                "T2m": 7.8,
+                "RH": 79.7,
+                "G(h)": 133.0,
+                "Gb(n)": 5.48,
+                "Gd(h)": 131.0,
+                "IR(h)": 271.9,
+                "WS10m": 1.52,
+                "WD10m": 225.0,
+                "SP": 99450.0
+            },
+            {
+                "time(UTC)": "20180101:1300",
+                "T2m": 9.16,
+                "RH": 71.4,
+                "G(h)": 79.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 79.0,
+                "IR(h)": 265.3,
+                "WS10m": 1.52,
+                "WD10m": 226.0,
+                "SP": 99340.0
+            },
+            {
+                "time(UTC)": "20180101:1400",
+                "T2m": 9.71,
+                "RH": 68.9,
+                "G(h)": 80.0,
+                "Gb(n)": 8.94,
+                "Gd(h)": 78.0,
+                "IR(h)": 249.05,
+                "WS10m": 1.31,
+                "WD10m": 224.0,
+                "SP": 99250.0
+            },
+            {
+                "time(UTC)": "20180101:1500",
+                "T2m": 8.98,
+                "RH": 71.4,
+                "G(h)": 30.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 30.0,
+                "IR(h)": 243.25,
+                "WS10m": 1.24,
+                "WD10m": 180.0,
+                "SP": 99190.0
+            },
+            {
+                "time(UTC)": "20180101:1600",
+                "T2m": 6.84,
+                "RH": 76.65,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 252.15,
+                "WS10m": 1.86,
+                "WD10m": 151.0,
+                "SP": 99090.0
+            },
+            {
+                "time(UTC)": "20180101:1700",
+                "T2m": 4.98,
+                "RH": 85.6,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 277.9,
+                "WS10m": 1.1,
+                "WD10m": 118.0,
+                "SP": 99020.0
+            },
+            {
+                "time(UTC)": "20180101:1800",
+                "T2m": 5.11,
+                "RH": 82.4,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 275.6,
+                "WS10m": 0.62,
+                "WD10m": 20.0,
+                "SP": 99000.0
+            },
+            {
+                "time(UTC)": "20180101:1900",
+                "T2m": 3.17,
+                "RH": 99.4,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 284.3,
+                "WS10m": 1.1,
+                "WD10m": 359.0,
+                "SP": 99070.0
+            },
+            {
+                "time(UTC)": "20180101:2000",
+                "T2m": 3.38,
+                "RH": 99.4,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 250.4,
+                "WS10m": 0.62,
+                "WD10m": 70.0,
+                "SP": 99010.0
+            },
+            {
+                "time(UTC)": "20180101:2100",
+                "T2m": 3.06,
+                "RH": 95.7,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 258.35,
+                "WS10m": 0.28,
+                "WD10m": 32.0,
+                "SP": 99030.0
+            },
+            {
+                "time(UTC)": "20180101:2200",
+                "T2m": 2.04,
+                "RH": 95.65,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 256.05,
+                "WS10m": 0.48,
+                "WD10m": 332.0,
+                "SP": 99030.0
+            },
+            {
+                "time(UTC)": "20180101:2300",
+                "T2m": 0.88,
+                "RH": 99.35,
+                "G(h)": 0.0,
+                "Gb(n)": 0.0,
+                "Gd(h)": 0.0,
+                "IR(h)": 259.7,
+                "WS10m": 0.48,
+                "WD10m": 297.0,
+                "SP": 99090.0
+            }
+        ]
+    },
+    "meta": {
+        "inputs": {
+            "location": {
+                "description": "Selected location",
+                "variables": {
+                    "latitude": {
+                        "description": "Latitude",
+                        "units": "decimal degree"
+                    },
+                    "longitude": {
+                        "description": "Longitude",
+                        "units": "decimal degree"
+                    },
+                    "elevation": {
+                        "description": "Elevation",
+                        "units": "m"
+                    }
+                }
+            },
+            "meteo_data": {
+                "description": "Sources of meteorological data",
+                "variables": {
+                    "radiation_db": {
+                        "description": "Solar radiation database"
+                    },
+                    "meteo_db": {
+                        "description": "Database used for meteorological variables other than solar radiation"
+                    },
+                    "year_min": {
+                        "description": "First year of the calculations"
+                    },
+                    "year_max": {
+                        "description": "Last year of the calculations"
+                    },
+                    "use_horizon": {
+                        "description": "Include horizon shadows"
+                    },
+                    "horizon_db": {
+                        "description": "Source of horizon data"
+                    }
+                }
+            }
+        },
+        "outputs": {
+            "months_selected": {
+                "type": "time series",
+                "timestamp": "monthly",
+                "description": "months selected for the TMY"
+            },
+            "tmy_hourly": {
+                "type": "time series",
+                "timestamp": "hourly",
+                "variables": {
+                    "T2m": {
+                        "description": "2-m air temperature",
+                        "units": "degree Celsius"
+                    },
+                    "RH": {
+                        "description": "relative humidity",
+                        "units": "%"
+                    },
+                    "G(h)": {
+                        "description": "Global irradiance on the horizontal plane",
+                        "units": "W/m2"
+                    },
+                    "Gb(n)": {
+                        "description": "Beam/direct irradiance on a plane always normal to sun rays",
+                        "units": "W/m2"
+                    },
+                    "Gd(h)": {
+                        "description": "Diffuse irradiance on the horizontal plane",
+                        "units": "W/m2"
+                    },
+                    "IR(h)": {
+                        "description": "Surface infrared (thermal) irradiance on a horizontal plane",
+                        "units": "W/m2"
+                    },
+                    "WS10m": {
+                        "description": "10-m total wind speed",
+                        "units": "m/s"
+                    },
+                    "WD10m": {
+                        "description": "10-m wind direction (0 = N, 90 = E)",
+                        "units": "degree"
+                    },
+                    "SP": {
+                        "description": "Surface (air) pressure",
+                        "units": "Pa"
+                    }
+                }
+            }
+        }
     }
-   },
-   "meteo_data": {
-    "description": "Sources of meteorological data",
-    "variables": {
-     "radiation_db": {
-      "description": "Solar radiation database"
-     },
-     "meteo_db": {
-      "description": "Database used for meteorological variables other than solar radiation"
-     },
-     "year_min": {
-      "description": "First year of the calculations"
-     },
-     "year_max": {
-      "description": "Last year of the calculations"
-     },
-     "use_horizon": {
-      "description": "Include horizon shadows"
-     },
-     "horizon_db": {
-      "description": "Source of horizon data"
-     }
-    }
-   }
-  },
-  "outputs": {
-   "months_selected": {
-    "type": "time series",
-    "timestamp": "monthly",
-    "description": "months selected for the TMY"
-   },
-   "tmy_hourly": {
-    "type": "time series",
-    "timestamp": "hourly",
-    "variables": {
-     "T2m": {
-      "description": "2-m air temperature",
-      "units": "degree Celsius"
-     },
-     "RH": {
-      "description": "relative humidity",
-      "units": "%"
-     },
-     "G(h)": {
-      "description": "Global irradiance on the horizontal plane",
-      "units": "W/m2"
-     },
-     "Gb(n)": {
-      "description": "Beam/direct irradiance on a plane always normal to sun rays",
-      "units": "W/m2"
-     },
-     "Gd(h)": {
-      "description": "Diffuse irradiance on the horizontal plane",
-      "units": "W/m2"
-     },
-     "IR(h)": {
-      "description": "Surface infrared (thermal) irradiance on a horizontal plane",
-      "units": "W/m2"
-     },
-     "WS10m": {
-      "description": "10-m total wind speed",
-      "units": "m/s"
-     },
-     "WD10m": {
-      "description": "10-m wind direction (0 = N, 90 = E)",
-      "units": "degree"
-     },
-     "SP": {
-      "description": "Surface (air) pressure",
-      "units": "Pa"
-     }
-    }
-   }
-  }
- }
 }

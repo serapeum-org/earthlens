@@ -24,11 +24,10 @@ from __future__ import annotations
 
 import ee
 import geopandas as gpd
-from geopandas.geodataframe import GeoDataFrame
-from rtree import index
-
 from earthlens.gee.features import create_feature
 from earthlens.gee.io import feature_collection_to_gdf as _fc_to_gdf
+from geopandas.geodataframe import GeoDataFrame
+from rtree import index
 
 _REDUCER_WHITELIST: frozenset[str] = frozenset(
     {

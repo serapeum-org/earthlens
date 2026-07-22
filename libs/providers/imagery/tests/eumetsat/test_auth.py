@@ -5,13 +5,13 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 import pytest
-
-from earthlens.base import AuthenticationError as BaseAuthenticationError
 from earthlens.eumetsat.auth import (
     AuthenticationError,
     EumetsatAuth,
     EumetsatCredentials,
 )
+
+from earthlens.base import AuthenticationError as BaseAuthenticationError
 
 pytestmark = pytest.mark.eumetsat
 

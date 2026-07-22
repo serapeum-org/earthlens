@@ -5,14 +5,14 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from loguru import logger
-
-from earthlens.base import region as region_mod
 from earthlens.base.region import (
     _normalize_gcp_zone,
     region_affinity,
     warn_if_egress,
 )
+from loguru import logger
+
+from earthlens.base import region as region_mod
 
 
 @pytest.fixture(autouse=True)

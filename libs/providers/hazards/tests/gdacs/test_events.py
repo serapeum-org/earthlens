@@ -6,8 +6,6 @@ from typing import Any, Callable
 
 import pandas as pd
 import pytest
-from geopandas import GeoDataFrame
-
 from earthlens.gdacs.events import (
     ATTRIBUTE_COLUMNS,
     EVENT_CRS,
@@ -15,6 +13,7 @@ from earthlens.gdacs.events import (
     empty_fc,
     geojson_to_fc,
 )
+from geopandas import GeoDataFrame
 
 
 @pytest.mark.gdacs
@@ -167,9 +166,9 @@ class TestEmptyFc:
         fc = empty_fc()
         for column, dtype in ATTRIBUTE_COLUMNS.items():
             assert column in fc.columns, f"missing column {column!r}"
-            assert (
-                str(fc[column].dtype) == dtype
-            ), f"{column!r} dtype {fc[column].dtype} != declared {dtype}"
+            assert str(fc[column].dtype) == dtype, (
+                f"{column!r} dtype {fc[column].dtype} != declared {dtype}"
+            )
 
     def test_crs_is_wgs84(self):
         """The empty collection is tagged EPSG:4326."""

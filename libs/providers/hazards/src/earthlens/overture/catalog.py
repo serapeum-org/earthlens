@@ -33,10 +33,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
 
@@ -44,9 +44,9 @@ CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Stores the
 #: `(themes, available_releases, available_datasets)` triple. Mirrors the
 #: FDSN / NWP / radar loaders.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Theme], list[str], list[str]]] = (
-    {}
-)
+_CATALOG_CACHE: dict[
+    tuple[str, int], tuple[dict[str, Theme], list[str], list[str]]
+] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -116,8 +116,7 @@ class Theme(BaseModel):
         """
         if self.default_type not in self.types:
             raise ValueError(
-                f"default_type {self.default_type!r} is not one of types "
-                f"{self.types}"
+                f"default_type {self.default_type!r} is not one of types {self.types}"
             )
 
     def resolve_types(self, requested: list[str] | None) -> list[str]:

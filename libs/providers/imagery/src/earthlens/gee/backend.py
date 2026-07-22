@@ -46,11 +46,22 @@ from __future__ import annotations
 
 import datetime as dt
 import os
+from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterable, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import ee
 import pandas as pd
+from earthlens.gee._helpers import (
+    EE_MAX_DIMENSION,
+    reduce_collection,
+    slug_asset_id,
+    split_aoi_for_url,
+    wait_for_task,
+)
+from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
+from earthlens.gee.features import create_feature
+from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from loguru import logger
 from pyramids.dataset import Dataset as PyramidsDataset
 from pyramids.dataset.merge import merge_rasters
@@ -65,17 +76,7 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
-from earthlens.gee._helpers import (
-    EE_MAX_DIMENSION,
-    reduce_collection,
-    slug_asset_id,
-    split_aoi_for_url,
-    wait_for_task,
-)
-from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
 from earthlens.gee.catalog import Catalog, Dataset
-from earthlens.gee.features import create_feature
-from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
@@ -519,12 +520,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     "https://code.earthengine.google.com/register, then retry."
                 ) from exc
             raise AuthenticationError(
-                f"Earth Engine initialisation failed for project "
-                f"{project!r}: {message}"
+                f"Earth Engine initialisation failed for project {project!r}: {message}"
             ) from exc
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
             raise AuthenticationError(
-                f"Earth Engine initialisation failed for project " f"{project!r}: {exc}"
+                f"Earth Engine initialisation failed for project {project!r}: {exc}"
             ) from exc
         self.project = project
         return ee
@@ -1093,9 +1093,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         # `now()` would be local-naive; the rest of the path is naive
         # UTC, so use a naive UTC value.
-        ds_end_excl = dt.datetime.now(dt.timezone.utc).replace(
-            tzinfo=None
-        ) + dt.timedelta(days=1)
+        ds_end_excl = dt.datetime.now(dt.UTC).replace(tzinfo=None) + dt.timedelta(
+            days=1
+        )
         return ds_start, ds_end_excl
 
     def _maybe_discover_ee_extent(
@@ -1157,10 +1157,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if min_ms is None or max_ms is None:
             return None, None
         return (
-            dt.datetime.fromtimestamp(min_ms / 1000.0, tz=dt.timezone.utc).replace(
-                tzinfo=None
-            ),
-            dt.datetime.fromtimestamp(max_ms / 1000.0, tz=dt.timezone.utc).replace(
-                tzinfo=None
-            ),
+            dt.datetime.fromtimestamp(min_ms / 1000.0, tz=dt.UTC).replace(tzinfo=None),
+            dt.datetime.fromtimestamp(max_ms / 1000.0, tz=dt.UTC).replace(tzinfo=None),
         )

@@ -31,10 +31,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
-
+from earthlens.asf._helpers import apply_baseline_windows, wkt_from_extent
 from earthlens.asf.auth import ASFAuth, ASFCredentials
 from earthlens.asf.catalog import Catalog, Product
-from earthlens.asf._helpers import apply_baseline_windows, wkt_from_extent
+
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
@@ -248,9 +248,7 @@ class ASF(AbstractDataSource):
         self._auth = ASFAuth(self._creds_arg or ASFCredentials())
         return None
 
-    def _create_grid(
-        self, lat_lim: list[float], lon_lim: list[float]
-    ) -> SpatialExtent:
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
 
         Args:
@@ -394,9 +392,7 @@ class ASF(AbstractDataSource):
                 if self._product.dataset is not None
                 else None
             )
-            product_type_value = getattr(
-                asf.PRODUCT_TYPE, self._product.product_type
-            )
+            product_type_value = getattr(asf.PRODUCT_TYPE, self._product.product_type)
             search_kwargs: dict[str, Any] = {
                 "intersectsWith": wkt_from_extent(self.space),
                 "processingLevel": product_type_value,
@@ -478,9 +474,7 @@ class ASF(AbstractDataSource):
         out_dir = Path(self.path)
         out_dir.mkdir(parents=True, exist_ok=True)
         missing = [
-            remote.id
-            for remote in products
-            if not remote.metadata.get("fileName")
+            remote.id for remote in products if not remote.metadata.get("fileName")
         ]
         if missing:
             raise ValueError(
@@ -488,13 +482,9 @@ class ASF(AbstractDataSource):
                 f"{missing!r}. This points at an asf_search regression "
                 "or an unsupported product class; report it upstream."
             )
-        targets = [
-            out_dir / remote.metadata["fileName"] for remote in products
-        ]
+        targets = [out_dir / remote.metadata["fileName"] for remote in products]
         to_fetch = [
-            remote
-            for remote, target in zip(products, targets)
-            if not target.exists()
+            remote for remote, target in zip(products, targets) if not target.exists()
         ]
         if to_fetch:
             session = self._auth.session()

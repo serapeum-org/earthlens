@@ -5,7 +5,6 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
-
 from earthlens.cli.table import (
     FACET_NAMES,
     CatalogRow,

@@ -27,10 +27,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 #: Path to the bundled sharded catalog directory (`rgi.yaml` / `glims.yaml` /
 #: `wgms.yaml` + the `_index.yaml` informational index). Tests can monkey-patch
@@ -43,9 +43,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: per-source file invalidates the entry without re-parsing on an unchanged
 #: tree. The value is the `(datasets, regions, available)` triple the fields are
 #: built from.
-_CATALOG_CACHE: dict[
-    Any, tuple[dict[str, "Dataset"], dict[str, "Region"], list[str]]
-] = {}
+_CATALOG_CACHE: dict[Any, tuple[dict[str, Dataset], dict[str, Region], list[str]]] = {}
 
 #: The three glacier sources a :class:`Dataset` row can name.
 Source = Literal["rgi", "glims", "wgms"]
@@ -147,8 +145,7 @@ def _load_catalog_data(
         for region_id, body in (data.get("regions") or {}).items():
             if region_id in regions_yaml:
                 raise ValueError(
-                    f"region {region_id!r} declared twice in the catalog "
-                    f"({file_path})."
+                    f"region {region_id!r} declared twice in the catalog ({file_path})."
                 )
             regions_yaml[region_id] = body
 
@@ -165,8 +162,7 @@ def _load_catalog_data(
             datasets[dataset_id] = Dataset(id=dataset_id, **dict(body or {}))
         except ValidationError as exc:
             raise ValueError(
-                f"{origin[dataset_id]} dataset {dataset_id!r} failed "
-                f"validation:\n{exc}"
+                f"{origin[dataset_id]} dataset {dataset_id!r} failed validation:\n{exc}"
             ) from exc
         if available and dataset_id not in available:
             raise ValueError(

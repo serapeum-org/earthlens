@@ -5,11 +5,10 @@ from __future__ import annotations
 import json
 
 import pytest
-from typer.testing import CliRunner
-
 from earthlens.cli.adapter import BackendInfo, list_backends
 from earthlens.cli.app import app
 from earthlens.cli.providers import _dataset_count, _sdk_available
+from typer.testing import CliRunner
 
 pytestmark = pytest.mark.cli
 

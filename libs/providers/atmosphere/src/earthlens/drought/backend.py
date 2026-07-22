@@ -34,6 +34,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
+from earthlens.base._dates import to_datetime
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.drought._helpers import (
+    attribution_for,
+    bbox_from_extent,
+    snap_to_cadence,
+)
 from loguru import logger
 
 from earthlens.base import (
@@ -43,20 +51,11 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.base._dates import to_datetime
-from earthlens.base.http import HttpClient
-from earthlens.drought._helpers import (
-    attribution_for,
-    bbox_from_extent,
-    snap_to_cadence,
-)
 from earthlens.drought.catalog import Catalog, Dataset
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
-    from pyramids.feature.collection import FeatureCollection
-
     from earthlens.aggregate import AggregationConfig
+    from pyramids.feature.collection import FeatureCollection
 
 #: Pinned epoch month for SPEIbase v2.x — every shipped version starts at
 #: January 1901 (CRU TS lineage). The per-month positional index into the
@@ -210,9 +209,7 @@ class Drought(AbstractDataSource):
         """
         return None
 
-    def _create_grid(
-        self, lat_lim: list[float], lon_lim: list[float]
-    ) -> SpatialExtent:
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Wrap the WGS84 bbox into a frozen `SpatialExtent` (no snapping).
 
         Args:
@@ -262,9 +259,7 @@ class Drought(AbstractDataSource):
         # second tick and yield only [Jun 30 23:59], silently dropping
         # July 1 (and therefore the July monthly snap) from the request.
         # Always range over calendar days.
-        raw = pd.date_range(
-            start=start_dt.date(), end=end_dt.date(), freq="D"
-        )
+        raw = pd.date_range(start=start_dt.date(), end=end_dt.date(), freq="D")
         # `pd.date_range(start, end)` with `end_dt >= start_dt` always yields
         # at least one element, and `snap_to_cadence` is total over non-empty
         # input, so `snapped` is guaranteed non-empty here. Resist adding a
@@ -399,9 +394,7 @@ class Drought(AbstractDataSource):
         # against. A future maintainer who edits the block between line
         # `gdf = gdf.to_crs(...)` and this wrap must keep `within.crs`
         # consistent rather than relying on a re-stamp.
-        return FeatureCollection(
-            gpd.GeoDataFrame(within, geometry="geometry")
-        )
+        return FeatureCollection(gpd.GeoDataFrame(within, geometry="geometry"))
 
     @staticmethod
     def _render_usdm_url(template: str, period: dt.date) -> str:
@@ -531,8 +524,7 @@ class Drought(AbstractDataSource):
                     crs=4326,
                 )
                 out_path = (
-                    self.root_dir
-                    / f"{self._dataset.id}_{period.strftime('%Y%m')}.tif"
+                    self.root_dir / f"{self._dataset.id}_{period.strftime('%Y%m')}.tif"
                 )
                 try:
                     subset.to_file(str(out_path))
@@ -577,8 +569,7 @@ class Drought(AbstractDataSource):
         for product in products:
             period: dt.date = product.metadata["period"]
             out_path = (
-                self.root_dir
-                / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
+                self.root_dir / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
             )
             # Write to a sibling temp first and rename only on success, so a
             # failed write (full disk, GDAL error mid-write) never leaves a
@@ -886,6 +877,8 @@ def _http_get_json(url: str) -> dict[str, Any]:
         requests.HTTPError: For non-2xx responses.
     """
     return _http_client().get_json(url, timeout=_HTTP_TIMEOUT)
+
+
 def _http_client() -> HttpClient:
     """Build the drought `HttpClient`: fresh-connection GETs, no status retry.
 

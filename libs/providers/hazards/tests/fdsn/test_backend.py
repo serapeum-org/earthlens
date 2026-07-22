@@ -35,9 +35,9 @@ class TestFDSNConstruction:
 
     def test_output_kind_is_vector(self):
         """FDSN declares vector output (point features, not gridded)."""
-        assert (
-            FDSN.OUTPUT_KIND == "vector"
-        ), f"FDSN.OUTPUT_KIND must be 'vector', got {FDSN.OUTPUT_KIND!r}"
+        assert FDSN.OUTPUT_KIND == "vector", (
+            f"FDSN.OUTPUT_KIND must be 'vector', got {FDSN.OUTPUT_KIND!r}"
+        )
 
     def test_space_captured(self, tmp_path: Path):
         """The bbox lands on `self.space` as a SpatialExtent."""
@@ -50,9 +50,9 @@ class TestFDSNConstruction:
         """The temporal resolution is the FDSN 'all' sentinel."""
         backend = _make_backend(tmp_path)
         assert isinstance(backend.time, TemporalExtent)
-        assert (
-            backend.time.resolution == "all"
-        ), f"expected 'all' sentinel, got {backend.time.resolution!r}"
+        assert backend.time.resolution == "all", (
+            f"expected 'all' sentinel, got {backend.time.resolution!r}"
+        )
 
     def test_empty_variables_defaults_to_usgs(self, tmp_path: Path):
         """An empty `variables` list defaults to ['USGS']."""
@@ -150,9 +150,9 @@ class TestFDSNFetch:
         backend = _make_backend(tmp_path, earthscope_token="tok")
         backend._fetch(backend._search())
         _, ctor_kwargs = fake_fdsn.constructions[0]
-        assert (
-            "eida_token" not in ctor_kwargs
-        ), "public USGS network must not receive a token"
+        assert "eida_token" not in ctor_kwargs, (
+            "public USGS network must not receive a token"
+        )
 
     def test_token_passed_when_provider_needs_it(
         self, tmp_path: Path, fake_fdsn: _FakeFdsn
@@ -164,18 +164,18 @@ class TestFDSNFetch:
         )
         backend._fetch(backend._search())
         _, ctor_kwargs = fake_fdsn.constructions[0]
-        assert (
-            ctor_kwargs.get("eida_token") == "tok"
-        ), "token-gated network should receive the resolved token"
+        assert ctor_kwargs.get("eida_token") == "tok", (
+            "token-gated network should receive the resolved token"
+        )
 
     def test_versioned_user_agent(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
         """The obspy client is built with a versioned earthlens user-agent."""
         backend = _make_backend(tmp_path)
         backend._fetch(backend._search())
         _, ctor_kwargs = fake_fdsn.constructions[0]
-        assert ctor_kwargs["user_agent"].startswith(
-            "earthlens/"
-        ), f"user_agent should be versioned, got {ctor_kwargs.get('user_agent')!r}"
+        assert ctor_kwargs["user_agent"].startswith("earthlens/"), (
+            f"user_agent should be versioned, got {ctor_kwargs.get('user_agent')!r}"
+        )
 
     @pytest.mark.parametrize(
         "provider, expected_floor",
@@ -188,9 +188,9 @@ class TestFDSNFetch:
         backend = _make_backend(tmp_path, variables=[provider], min_magnitude=None)
         backend._fetch(backend._search())
         _, query_kwargs = fake_fdsn.calls[0]
-        assert (
-            query_kwargs["minmagnitude"] == expected_floor
-        ), f"{provider} should fall back to {expected_floor}, got {query_kwargs['minmagnitude']}"
+        assert query_kwargs["minmagnitude"] == expected_floor, (
+            f"{provider} should fall back to {expected_floor}, got {query_kwargs['minmagnitude']}"
+        )
 
     def test_explicit_min_magnitude_overrides_floor(
         self, tmp_path: Path, fake_fdsn: _FakeFdsn
@@ -237,9 +237,9 @@ class TestFDSNDownload:
         fc = backend.download()
         assert len(fc) == 1, "the healthy USGS network's event is returned"
         written = sorted(p.name for p in tmp_path.glob("*.gpkg"))
-        assert written == [
-            "usgs.gpkg"
-        ], f"only the healthy network is written: {written}"
+        assert written == ["usgs.gpkg"], (
+            f"only the healthy network is written: {written}"
+        )
 
     def test_aggregate_rejected(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
         """A non-None aggregate is rejected (vector output)."""

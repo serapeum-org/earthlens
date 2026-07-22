@@ -26,8 +26,8 @@ import os
 from pathlib import Path
 
 import pytest
-
 from earthlens.earthlens import EarthLens
+
 from earthlens.eumetsat import TailorConfig
 
 _HAVE_CREDS = bool(

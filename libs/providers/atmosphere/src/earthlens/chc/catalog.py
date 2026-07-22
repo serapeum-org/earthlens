@@ -63,10 +63,10 @@ from pathlib import Path
 from typing import Any, Literal
 
 import pandas as pd
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf
-from earthlens.base.yaml_loader import load_yaml_strict
 
 #: Canonical `temporal_resolution` vocabulary for CHC datasets (M1).
 #:
@@ -476,7 +476,7 @@ def _build_chc_dataset(
         )
     except (ValidationError, KeyError) as exc:
         raise ValueError(
-            f"{source_path.name} dataset {ds_key!r} " f"failed validation:\n{exc}"
+            f"{source_path.name} dataset {ds_key!r} failed validation:\n{exc}"
         ) from exc
     return ds, len(ds_vars)
 

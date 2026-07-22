@@ -17,10 +17,10 @@ import datetime
 from pathlib import Path
 from typing import Any
 
-import requests
-
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
+
+
 def read_cdsapirc() -> dict[str, str]:
     """Parse `~/.cdsapirc` into a `{url, key}` dict.
 
@@ -79,7 +79,7 @@ def list_recent_jobs(
         headers={"PRIVATE-TOKEN": cfg["key"]},
         params=params,
     )
-    now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+    now = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
     out: list[dict[str, Any]] = []
     for job in body.get("jobs", []):
         created = job.get("created", "")
@@ -136,7 +136,7 @@ def download_job(
     href = body.get("asset", {}).get("value", {}).get("href")
     if not href:
         raise ValueError(
-            f"job {job_id!r} has no downloadable asset href in its " "results record"
+            f"job {job_id!r} has no downloadable asset href in its results record"
         )
     target_path.parent.mkdir(parents=True, exist_ok=True)
     # `href` comes from CDS server JSON; reject anything that is not

@@ -10,11 +10,11 @@ import geopandas as gpd
 import pandas as pd
 import pytest
 import requests
+from earthlens.glaciers.backend import Glaciers
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import box
 
 from earthlens.glaciers import _helpers
-from earthlens.glaciers.backend import Glaciers
 from earthlens.glaciers.catalog import Catalog, clear_catalog_cache
 
 pytestmark = pytest.mark.glaciers

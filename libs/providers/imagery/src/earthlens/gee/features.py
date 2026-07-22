@@ -173,7 +173,7 @@ def create_feature(
             ee_geom_list.append(create_geometry(geom))
         except NotImplementedError as exc:
             raise ValueError(
-                f"create_feature cannot convert row {i} " f"({geom.geom_type}): {exc}"
+                f"create_feature cannot convert row {i} ({geom.geom_type}): {exc}"
             ) from exc
     records_df = pd.DataFrame(gdf.drop("geometry", axis=1))
     if columns:

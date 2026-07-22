@@ -51,6 +51,7 @@ intentionally absent from `pyproject.toml`.
 from __future__ import annotations
 
 from earthlens.drought.backend import Drought
+
 from earthlens.drought.catalog import (
     CATALOG_PATH,
     Catalog,

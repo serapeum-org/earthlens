@@ -5,8 +5,6 @@ from __future__ import annotations
 import json
 
 import pytest
-from rich.console import Console
-
 from earthlens.cli.render import (
     COMPACT_COLUMNS,
     FULL_COLUMNS,
@@ -22,6 +20,7 @@ from earthlens.cli.render import (
     rows_to_json,
 )
 from earthlens.cli.table import CatalogRow, LoadError
+from rich.console import Console
 
 pytestmark = pytest.mark.cli
 

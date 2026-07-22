@@ -37,6 +37,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
+from earthlens.tropycal.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -47,12 +48,10 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.tropycal import events
-from earthlens.tropycal.catalog import Catalog
 
 if TYPE_CHECKING:
-    from pyramids.feature.collection import FeatureCollection
-
     from earthlens.aggregate import AggregationConfig
+    from pyramids.feature.collection import FeatureCollection
 
 FileFormat = Literal["gpkg", "geojson"]
 Geometry = Literal["point", "track"]
@@ -202,8 +201,7 @@ class TropicalCyclone(AbstractDataSource):
         """
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         if source not in _SOURCES:
             raise ValueError(
@@ -476,8 +474,7 @@ class TropicalCyclone(AbstractDataSource):
             return track_dataset.get_storm(storm_id)
         except Exception as exc:  # noqa: BLE001
             logger.warning(
-                f"tropycal storm {storm_id!r} not resolved: "
-                f"{type(exc).__name__}: {exc}"
+                f"tropycal storm {storm_id!r} not resolved: {type(exc).__name__}: {exc}"
             )
             return None
 
@@ -803,8 +800,7 @@ class TropicalCyclone(AbstractDataSource):
                 written.append(self._write_table(product.id, init, df))
         if not frames:
             logger.warning(
-                "Tropycal ships: no SHIPS guidance matched the request, "
-                "nothing written"
+                "Tropycal ships: no SHIPS guidance matched the request, nothing written"
             )
             return pd.DataFrame(columns=["storm_id", "forecast_init", "fhr"])
         combined = pd.concat(frames, ignore_index=True)

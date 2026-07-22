@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from earthlens.sentinel_hub.backend import SentinelHub
+
 from .conftest import FakeSentinelHubCatalog
 
 pytestmark = pytest.mark.sentinel_hub

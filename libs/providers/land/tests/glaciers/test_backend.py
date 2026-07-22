@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from earthlens.glaciers.backend import Glaciers
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.glaciers import _helpers
-from earthlens.glaciers.backend import Glaciers
 
 pytestmark = pytest.mark.glaciers
 

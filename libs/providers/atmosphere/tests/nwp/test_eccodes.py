@@ -41,11 +41,17 @@ def test_noop_when_ecmwflibs_absent(monkeypatch):
     monkeypatch.setattr(os, "name", "nt")
     fake_findlibs = types.SimpleNamespace(find=lambda name: None)
     monkeypatch.setitem(sys.modules, "findlibs", fake_findlibs)
-    monkeypatch.setitem(sys.modules, "ecmwflibs", None)  # import yields None -> treated as absent
+    monkeypatch.setitem(
+        sys.modules, "ecmwflibs", None
+    )  # import yields None -> treated as absent
     monkeypatch.delitem(sys.modules, "ecmwflibs", raising=False)
     monkeypatch.setattr(_eccodes, "_done", False)
     # Force `import ecmwflibs` to raise ImportError.
-    real_import = __builtins__["__import__"] if isinstance(__builtins__, dict) else __builtins__.__import__
+    real_import = (
+        __builtins__["__import__"]
+        if isinstance(__builtins__, dict)
+        else __builtins__.__import__
+    )
 
     def _no_ecmwflibs(name, *args, **kwargs):
         if name == "ecmwflibs":

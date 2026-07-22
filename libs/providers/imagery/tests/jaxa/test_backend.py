@@ -99,10 +99,7 @@ def test_ptree_credentials_reach_the_auth_object(monkeypatch, base_kwargs) -> No
     backend.auth.configure()
     assert backend.auth.username == "alice@example.org"
     assert backend.auth.password is not None
-    assert (
-        backend.auth.password.get_secret_value()
-        == "pytest-fixture-not-a-real-pw"
-    )
+    assert backend.auth.password.get_secret_value() == "pytest-fixture-not-a-real-pw"
 
 
 @pytest.mark.jaxa

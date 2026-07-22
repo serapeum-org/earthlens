@@ -29,14 +29,14 @@ from typing import TYPE_CHECKING
 
 import geopandas as gpd
 import pandas as pd
-from pyramids.feature.collection import FeatureCollection
-from shapely.geometry import LineString, Point, Polygon, box
 
 # `LicenseWarning` is shared across the ODbL / restrictive-license backends; it
 # lives in the biodiversity cluster's helper module (overture re-exports the same
 # class object) and is re-exported here so the backend imports it from its own
 # subpackage.
 from earthlens.biodiversity._helpers import LicenseWarning  # noqa: F401
+from pyramids.feature.collection import FeatureCollection
+from shapely.geometry import LineString, Point, Polygon, box
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent

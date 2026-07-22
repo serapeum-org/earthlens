@@ -5,7 +5,6 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import pytest
-
 from earthlens.overture._helpers import (
     CDLA_PERMISSIVE,
     ODBL,

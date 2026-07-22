@@ -40,6 +40,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
+from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
+from earthlens.usgs_water.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -50,8 +52,6 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.usgs_water import _helpers
-from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
-from earthlens.usgs_water.catalog import Catalog
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

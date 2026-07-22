@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from earthlens.goes.catalog import CATALOG_PATH, clear_catalog_cache
 
 from earthlens.goes import Catalog, GOESChannel, GOESDomain, GOESProduct
-from earthlens.goes.catalog import CATALOG_PATH, clear_catalog_cache
 
 pytestmark = pytest.mark.goes
 
@@ -65,8 +65,7 @@ class TestCatalogLoad:
         """A domain row missing prefix_suffix fails validation with the key named."""
         bad = tmp_path / "bad.yaml"
         bad.write_text(
-            "products:\n  x:\n    product_group: G\n"
-            "domains:\n  C:\n    name: CONUS\n",
+            "products:\n  x:\n    product_group: G\ndomains:\n  C:\n    name: CONUS\n",
             encoding="utf-8",
         )
         with pytest.raises(ValueError, match="domain 'C' failed validation"):

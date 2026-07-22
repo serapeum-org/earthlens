@@ -7,11 +7,11 @@ from pathlib import Path
 
 import geopandas as gpd
 import pytest
+from earthlens.overture._helpers import ODBL, LicenseWarning
+from earthlens.overture.backend import _require_overturemaps, _stream_to_geodataframe
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.overture import Overture
-from earthlens.overture._helpers import ODBL, LicenseWarning
-from earthlens.overture.backend import _require_overturemaps, _stream_to_geodataframe
 
 from .conftest import OSM_SOURCES, PERMISSIVE_SOURCES
 
@@ -371,9 +371,9 @@ class TestFetchAndDownload:
         backend = _make_backend(tmp_path, variables={"places": []}, stream=True)
         gdf = gpd.read_parquet(backend.download()[0])
         assert len(fake_overture.reader_calls) == 1, "should stream"
-        assert (
-            fake_overture.calls == []
-        ), "geodataframe must not be called when streaming"
+        assert fake_overture.calls == [], (
+            "geodataframe must not be called when streaming"
+        )
         assert list(gdf["license_id"]) == ["Apache-2.0; CDLA-Permissive-2.0", ODBL]
 
     def test_max_features_streams_with_early_stop(
@@ -392,9 +392,9 @@ class TestFetchAndDownload:
         backend = _make_backend(tmp_path, variables={"places": []})
         backend.download()
         assert len(fake_overture.calls) == 1, "geodataframe materialise path"
-        assert (
-            fake_overture.reader_calls == []
-        ), "no streaming without stream/max_features"
+        assert fake_overture.reader_calls == [], (
+            "no streaming without stream/max_features"
+        )
 
     def test_download_rejects_aggregate(self, tmp_path: Path):
         """A non-None aggregate is rejected at the backend."""

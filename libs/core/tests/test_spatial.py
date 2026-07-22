@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import geopandas as gpd
 import pytest
-from shapely.geometry import MultiPoint, Point, Polygon
-
 from earthlens.spatial import (
     convex_hull_from_points,
     count_cells_convex_hull_from_points,
@@ -15,6 +13,7 @@ from earthlens.spatial import (
     split_polygon,
     union_of_convex_hulls,
 )
+from shapely.geometry import MultiPoint, Point, Polygon
 
 
 def _wgs84_box(

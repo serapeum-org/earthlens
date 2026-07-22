@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from earthlens.earthlens import EarthLens
 
 import earthlens.nwm
-from earthlens.earthlens import EarthLens
 from earthlens.nwm import NWM
 
 pytestmark = [pytest.mark.nwm, pytest.mark.unit]

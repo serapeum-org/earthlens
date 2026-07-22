@@ -25,10 +25,13 @@ from __future__ import annotations
 import datetime as dt
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 import requests
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.climate_indices.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -39,10 +42,7 @@ from earthlens.base import (
     TemporalExtent,
     date_windows,
 )
-from earthlens.base.http import HttpClient
 from earthlens.climate_indices import _helpers
-from earthlens.climate_indices.catalog import Catalog
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -75,6 +75,8 @@ _MAX_STEM_IDS: int = 6
 #: spatial extent is the whole globe (`G4`).
 _GLOBAL_LAT: list[float] = [-90.0, 90.0]
 _GLOBAL_LON: list[float] = [-180.0, 180.0]
+
+
 class ClimateIndices(AbstractDataSource):
     """Climate / teleconnection index backend (long-format tabular output).
 
@@ -285,8 +287,10 @@ class ClimateIndices(AbstractDataSource):
                 message names the index id and URL (`G8`).
         """
         text = self._get_text(product.href, product.id)
-        parser = _helpers.parse_psl if product.metadata["dialect"] == "psl" else (
-            _helpers.parse_climexp
+        parser = (
+            _helpers.parse_psl
+            if product.metadata["dialect"] == "psl"
+            else (_helpers.parse_climexp)
         )
         parsed = parser(text)
         if parsed.empty:

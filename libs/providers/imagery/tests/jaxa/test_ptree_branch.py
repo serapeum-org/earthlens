@@ -7,24 +7,24 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from pydantic import SecretStr
-
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
-from earthlens.jaxa import AuthenticationError, JaxaAuth, JaxaCredentials
 from earthlens.jaxa._ptree import (
+    _HIMAWARI_BAND_RESOLUTION,
+    _HSD_FILENAME_RE,
+    FtplibTransport,
+    PtreeTransport,
     RetentionError,
     _floor_to_slot,
     _guard_retention,
-    _HIMAWARI_BAND_RESOLUTION,
-    _HSD_FILENAME_RE,
     _iter_slots,
     _local_target,
     _resolve_bands,
     _segment_paths,
     fetch_ptree,
-    FtplibTransport,
-    PtreeTransport,
 )
+from pydantic import SecretStr
+
+from earthlens.jaxa import AuthenticationError, JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Dataset
 
 pytestmark = [pytest.mark.jaxa, pytest.mark.unit]
@@ -75,6 +75,7 @@ def _make_extent(start: dt.datetime, end: dt.datetime) -> TemporalExtent:
 def himawari_row() -> Dataset:
     """The bundled Himawari catalog row (loaded via the real Catalog)."""
     from earthlens.jaxa import Catalog
+
     return Catalog().get("himawari-ahi-fldk")
 
 
@@ -114,8 +115,7 @@ class TestSegmentPaths:
         slot = dt.datetime(2026, 7, 4, 0, 0, tzinfo=dt.UTC)
         first = _segment_paths(slot, "B03", "H09")[0]
         assert first == (
-            "/jma/hsd/202607/04/00/"
-            "HS_H09_20260704_0000_B03_FLDK_R05_S0110.DAT.bz2"
+            "/jma/hsd/202607/04/00/HS_H09_20260704_0000_B03_FLDK_R05_S0110.DAT.bz2"
         )
 
     def test_segment_codes_are_S0110_through_S1010(self) -> None:
@@ -158,17 +158,27 @@ class TestFloorAndSlots:
         """Any minute floors down to the previous 10-minute observation."""
         when = dt.datetime(2026, 7, 4, 12, 47, 33, tzinfo=dt.UTC)
         assert _floor_to_slot(when) == dt.datetime(
-            2026, 7, 4, 12, 40, tzinfo=dt.UTC,
+            2026,
+            7,
+            4,
+            12,
+            40,
+            tzinfo=dt.UTC,
         )
 
     def test_iter_slots_yields_every_10_minutes_inclusive(self) -> None:
         """`[00:04, 00:32]` yields the four floored 10-minute marks."""
-        slots = list(_iter_slots(
-            dt.datetime(2026, 7, 4, 0, 4, tzinfo=dt.UTC),
-            dt.datetime(2026, 7, 4, 0, 32, tzinfo=dt.UTC),
-        ))
+        slots = list(
+            _iter_slots(
+                dt.datetime(2026, 7, 4, 0, 4, tzinfo=dt.UTC),
+                dt.datetime(2026, 7, 4, 0, 32, tzinfo=dt.UTC),
+            )
+        )
         assert [s.strftime("%H:%M") for s in slots] == [
-            "00:00", "00:10", "00:20", "00:30",
+            "00:00",
+            "00:10",
+            "00:20",
+            "00:30",
         ]
 
     def test_iter_slots_empty_when_start_after_end(self) -> None:
@@ -184,14 +194,20 @@ class TestResolveBands:
     def test_override_wins_over_default(self) -> None:
         """An explicit override is used verbatim, ignoring `default_band`."""
         row = Dataset(
-            key="k", protocol="ptree", short_name="s", default_band="B03",
+            key="k",
+            protocol="ptree",
+            short_name="s",
+            default_band="B03",
         )
         assert _resolve_bands(row, ["B13", "B14"]) == ["B13", "B14"]
 
     def test_default_band_used_when_no_override(self) -> None:
         """Without an override, the row's `default_band` becomes the request."""
         row = Dataset(
-            key="k", protocol="ptree", short_name="s", default_band="B03",
+            key="k",
+            protocol="ptree",
+            short_name="s",
+            default_band="B03",
         )
         assert _resolve_bands(row, None) == ["B03"]
 
@@ -204,7 +220,10 @@ class TestResolveBands:
     def test_unknown_band_rejected(self) -> None:
         """A non-Himawari band code fails fast, before any FTP call."""
         row = Dataset(
-            key="k", protocol="ptree", short_name="s", default_band="B03",
+            key="k",
+            protocol="ptree",
+            short_name="s",
+            default_band="B03",
         )
         with pytest.raises(ValueError, match="B99"):
             _resolve_bands(row, ["B99"])
@@ -212,7 +231,10 @@ class TestResolveBands:
     def test_empty_bands_override_rejected(self) -> None:
         """An explicit empty `bands=[]` list is a caller error, not a default recovery."""
         row = Dataset(
-            key="k", protocol="ptree", short_name="s", default_band="B03",
+            key="k",
+            protocol="ptree",
+            short_name="s",
+            default_band="B03",
         )
         with pytest.raises(ValueError, match="empty list"):
             _resolve_bands(row, [])
@@ -256,7 +278,8 @@ class TestRetentionGuard:
         """A window that extends past `now` is rejected up-front."""
         now = dt.datetime(2026, 7, 4, tzinfo=dt.UTC)
         te = _make_extent(
-            now - dt.timedelta(days=1), now + dt.timedelta(days=3),
+            now - dt.timedelta(days=1),
+            now + dt.timedelta(days=3),
         )
         with pytest.raises(RetentionError, match="in the future"):
             _guard_retention(te, now=now)
@@ -284,10 +307,14 @@ class TestFetchPtree:
         slot = now - dt.timedelta(hours=1)
         window = _make_extent(slot, slot)
         paths = fetch_ptree(
-            dataset=himawari_row, space=bbox, time=window,
-            auth=configured_auth, out_dir=tmp_path,
+            dataset=himawari_row,
+            space=bbox,
+            time=window,
+            auth=configured_auth,
+            out_dir=tmp_path,
             bands=["B03"],
-            transport_factory=lambda: transport, now=now,
+            transport_factory=lambda: transport,
+            now=now,
         )
         assert len(paths) == 10
         assert all(p.exists() for p in paths)
@@ -307,10 +334,14 @@ class TestFetchPtree:
         end = start + dt.timedelta(minutes=20)  # 00, 10, 20 → 3 slots
         window = _make_extent(start, end)
         paths = fetch_ptree(
-            dataset=himawari_row, space=bbox, time=window,
-            auth=configured_auth, out_dir=tmp_path,
+            dataset=himawari_row,
+            space=bbox,
+            time=window,
+            auth=configured_auth,
+            out_dir=tmp_path,
             bands=["B03", "B13"],
-            transport_factory=lambda: transport, now=now,
+            transport_factory=lambda: transport,
+            now=now,
         )
         assert len(paths) == 3 * 2 * 10
         # Confirm ordering matches the docstring claim.
@@ -337,13 +368,18 @@ class TestFetchPtree:
         slot = now - dt.timedelta(hours=1)
         window = _make_extent(slot, slot)
         fetch_ptree(
-            dataset=himawari_row, space=bbox, time=window,
-            auth=configured_auth, out_dir=tmp_path,
+            dataset=himawari_row,
+            space=bbox,
+            time=window,
+            auth=configured_auth,
+            out_dir=tmp_path,
             bands=["B03"],
-            transport_factory=lambda: transport, now=now,
+            transport_factory=lambda: transport,
+            now=now,
         )
         assert transport.logged_in == (
-            "alice@example.org", "pytest-fixture-not-a-real-pw",
+            "alice@example.org",
+            "pytest-fixture-not-a-real-pw",
         )
 
     def test_transport_close_always_called(
@@ -365,10 +401,14 @@ class TestFetchPtree:
         window = _make_extent(slot, slot)
         with pytest.raises(FileNotFoundError, match="gone:"):
             fetch_ptree(
-                dataset=himawari_row, space=bbox, time=window,
-                auth=configured_auth, out_dir=tmp_path,
+                dataset=himawari_row,
+                space=bbox,
+                time=window,
+                auth=configured_auth,
+                out_dir=tmp_path,
                 bands=["B03"],
-                transport_factory=lambda: transport, now=now,
+                transport_factory=lambda: transport,
+                now=now,
             )
         assert transport.closed
 
@@ -386,10 +426,14 @@ class TestFetchPtree:
         window = _make_extent(old_start, old_start)
         with pytest.raises(RetentionError):
             fetch_ptree(
-                dataset=himawari_row, space=bbox, time=window,
-                auth=configured_auth, out_dir=tmp_path,
+                dataset=himawari_row,
+                space=bbox,
+                time=window,
+                auth=configured_auth,
+                out_dir=tmp_path,
                 bands=["B03"],
-                transport_factory=lambda: transport, now=now,
+                transport_factory=lambda: transport,
+                now=now,
             )
         assert transport.logged_in is None
         assert transport.remote_paths == []
@@ -410,10 +454,14 @@ class TestFetchPtree:
         window = _make_extent(slot, slot)
         with pytest.raises(AuthenticationError, match="not resolved"):
             fetch_ptree(
-                dataset=himawari_row, space=bbox, time=window,
-                auth=auth, out_dir=tmp_path,
+                dataset=himawari_row,
+                space=bbox,
+                time=window,
+                auth=auth,
+                out_dir=tmp_path,
                 bands=["B03"],
-                transport_factory=_RecordingTransport, now=now,
+                transport_factory=_RecordingTransport,
+                now=now,
             )
 
     def test_local_path_mirrors_server_layout(
@@ -429,10 +477,14 @@ class TestFetchPtree:
         slot = now - dt.timedelta(hours=1)
         window = _make_extent(slot, slot)
         paths = fetch_ptree(
-            dataset=himawari_row, space=bbox, time=window,
-            auth=configured_auth, out_dir=tmp_path,
+            dataset=himawari_row,
+            space=bbox,
+            time=window,
+            auth=configured_auth,
+            out_dir=tmp_path,
             bands=["B03"],
-            transport_factory=lambda: transport, now=now,
+            transport_factory=lambda: transport,
+            now=now,
         )
         for p in paths:
             rel = p.relative_to(tmp_path)
@@ -447,7 +499,8 @@ class TestLocalTargetFallback:
     """Tests for `_local_target` when the remote path is unusually shaped."""
 
     def test_flat_remote_path_falls_back_to_out_dir_root(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """A non-HSD remote (fewer than 6 segments) lands at `out_dir / filename`."""
         assert _local_target("/pub/README.txt", tmp_path) == tmp_path / "README.txt"
@@ -459,14 +512,17 @@ class TestNoSatpyImport:
     def test_ptree_module_source_has_no_decode_imports(self) -> None:
         """Grep the module source for banned import statements."""
         import re
+
         from earthlens.jaxa import _ptree as ptree_module
+
         source = Path(ptree_module.__file__).read_text(encoding="utf-8")
         for line in source.splitlines():
             stripped = line.strip()
             if not stripped or stripped.startswith("#"):
                 continue
             if re.match(
-                r"^\s*(from|import)\s+(satpy|xarray|cfgrib)\b", stripped,
+                r"^\s*(from|import)\s+(satpy|xarray|cfgrib)\b",
+                stripped,
             ):
                 pytest.fail(f"banned import in _ptree.py: {stripped!r}")
 
@@ -534,7 +590,8 @@ class TestDefaultFactory:
         assert transport.host == "ftp.ptree.jaxa.jp"
 
     def test_ftplib_transport_download_before_login_raises(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """`download_file` before `login` fails with a clear runtime error."""
         transport = FtplibTransport()
@@ -550,10 +607,13 @@ class TestFtplibTransportBehaviour:
     """`FtplibTransport` end-to-end with a fake `ftplib.FTP`."""
 
     def test_login_success_then_download_and_close(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
     ) -> None:
         """Happy path: login, download writes bytes, close QUITs the session."""
         import ftplib
+
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
         transport.login("alice", "secret")
@@ -566,30 +626,36 @@ class TestFtplibTransportBehaviour:
         assert transport._ftp is None
 
     def test_login_wraps_connect_oserror_as_connection_error(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """A DNS / TCP failure surfaces as `ConnectionError`."""
         import ftplib
+
         _FakeFTP.connect_raises = OSError("dns down")
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         with pytest.raises(ConnectionError, match="ftp.ptree.jaxa.jp"):
             FtplibTransport().login("u", "p")
 
     def test_login_wraps_greeting_error_as_connection_error(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """A `4xx`/`5xx` greeting raises `ftplib.error_temp` / `error_perm` — not `OSError`."""
         import ftplib
+
         _FakeFTP.connect_raises = ftplib.error_temp("421 Server busy")
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         with pytest.raises(ConnectionError, match="could not connect"):
             FtplibTransport().login("u", "p")
 
     def test_login_wraps_bad_creds_as_authentication_error(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """A `530 Login incorrect` (error_perm) becomes `AuthenticationError`."""
         import ftplib
+
         _FakeFTP.login_raises = ftplib.error_perm("530 Login incorrect.")
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
@@ -598,10 +664,13 @@ class TestFtplibTransportBehaviour:
         assert transport._ftp is None
 
     def test_download_translates_perm_error_to_file_not_found(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
     ) -> None:
         """A `550` on `RETR` surfaces as `FileNotFoundError`, no local file left."""
         import ftplib
+
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
         transport.login("u", "p")
@@ -612,10 +681,13 @@ class TestFtplibTransportBehaviour:
         assert not local.exists()
 
     def test_download_translates_temp_error_to_file_not_found(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
     ) -> None:
         """A `450` on `RETR` (retention rejection) also becomes `FileNotFoundError`."""
         import ftplib
+
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
         transport.login("u", "p")
@@ -625,10 +697,12 @@ class TestFtplibTransportBehaviour:
             transport.download_file("/old", local)
 
     def test_close_falls_back_to_socket_close_on_quit_error(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """When `QUIT` raises, `close()` bare-closes the socket and clears state."""
         import ftplib
+
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
         transport.login("u", "p")
@@ -637,10 +711,12 @@ class TestFtplibTransportBehaviour:
         assert transport._ftp is None
 
     def test_login_wraps_temp_error_as_connection_error(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """A `421 too many users` (error_temp) surfaces as `ConnectionError`, no leak."""
         import ftplib
+
         _FakeFTP.login_raises = ftplib.error_temp("421 too many users")
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
@@ -649,10 +725,12 @@ class TestFtplibTransportBehaviour:
         assert transport._ftp is None
 
     def test_login_wraps_eof_error_as_connection_error(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """An `EOFError` mid-handshake surfaces as `ConnectionError`, no leak."""
         import ftplib
+
         _FakeFTP.login_raises = EOFError("server closed")
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
@@ -661,10 +739,12 @@ class TestFtplibTransportBehaviour:
         assert transport._ftp is None
 
     def test_login_error_message_omits_raw_ftp_reply(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """The bad-creds error does not echo the raw server reply / username."""
         import ftplib
+
         _FakeFTP.login_raises = ftplib.error_perm(
             "530 Login incorrect for alice@example.org.",
         )
@@ -675,10 +755,13 @@ class TestFtplibTransportBehaviour:
         assert "alice@example.org" not in str(excinfo.value)
 
     def test_download_translates_generic_oserror_to_connection_error(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
     ) -> None:
         """`OSError` on `RETR` -> `ConnectionError`, no partial file left."""
         import ftplib
+
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
         transport.login("u", "p")
@@ -691,10 +774,13 @@ class TestFtplibTransportBehaviour:
         assert not partial.exists()
 
     def test_download_writes_via_part_file_rename(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
     ) -> None:
         """A successful transfer leaves the final path, not the .part file."""
         import ftplib
+
         monkeypatch.setattr(ftplib, "FTP", _FakeFTP)
         transport = FtplibTransport()
         transport.login("u", "p")

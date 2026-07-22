@@ -100,5 +100,3 @@ class _FakeSession:
         timeout: float | None = None,
     ) -> _FakeResponse:
         return self._state.respond(dict(params or {}))
-
-

@@ -51,8 +51,14 @@ class TestBundledCatalog:
         """The 8 bundled per-endpoint yaml files merge under the duplicate-key loader."""
         cat = Catalog()
         assert set(cat.endpoints) == {
-            "planetary-computer", "cdse", "earth-search",
-            "deafrica", "dea", "veda", "usgs-landsat", "bdc",
+            "planetary-computer",
+            "cdse",
+            "earth-search",
+            "deafrica",
+            "dea",
+            "veda",
+            "usgs-landsat",
+            "bdc",
         }
         # available_collections holds a per-endpoint live index for each of the 8;
         # source-coop is documentation-only (no endpoint, no collections).
@@ -65,14 +71,22 @@ class TestBundledCatalog:
         cat = Catalog()
         wofs = cat.get_collection("deafrica/wofs_ls")
         assert wofs.endpoint == "deafrica"
-        assert wofs.signer is None  # no per-collection override → endpoint default (anonymous)
+        assert (
+            wofs.signer is None
+        )  # no per-collection override → endpoint default (anonymous)
         assert wofs.default_assets == ["water"]
         # the 10 confirmed roadmap collections all load
         for key in (
-            "deafrica/wofs_ls", "deafrica/wofs_ls_summary_annual",
-            "deafrica/fc_ls", "deafrica/crop_mask",
-            "deafrica/gm_ls8_ls9_annual", "deafrica/ls8_sr", "deafrica/ls9_sr",
-            "deafrica/s2_l2a", "deafrica/dem_cop_30", "deafrica/dem_cop_90",
+            "deafrica/wofs_ls",
+            "deafrica/wofs_ls_summary_annual",
+            "deafrica/fc_ls",
+            "deafrica/crop_mask",
+            "deafrica/gm_ls8_ls9_annual",
+            "deafrica/ls8_sr",
+            "deafrica/ls9_sr",
+            "deafrica/s2_l2a",
+            "deafrica/dem_cop_30",
+            "deafrica/dem_cop_90",
         ):
             assert cat.get_collection(key).endpoint == "deafrica", key
 
@@ -84,11 +98,22 @@ class TestBundledCatalog:
         ard = cat.get_collection("dea/ga_ls8c_ard_3")
         assert ard.endpoint == "dea"
         assert ard.signer is None
-        assert ard.default_assets == ["nbart_red", "nbart_green", "nbart_blue", "nbart_nir"]
+        assert ard.default_assets == [
+            "nbart_red",
+            "nbart_green",
+            "nbart_blue",
+            "nbart_nir",
+        ]
         for key in (
-            "dea/ga_ls8c_ard_3", "dea/ga_ls9c_ard_3", "dea/ga_s2am_ard_3", "dea/ga_s2bm_ard_3",
-            "dea/ga_ls_wo_3", "dea/ga_ls_fc_3", "dea/ga_ls8c_nbart_gm_cyear_3",
-            "dea/ga_s2ls_intertidal_cyear_3", "dea/ga_ls_mangrove_cover_cyear_3",
+            "dea/ga_ls8c_ard_3",
+            "dea/ga_ls9c_ard_3",
+            "dea/ga_s2am_ard_3",
+            "dea/ga_s2bm_ard_3",
+            "dea/ga_ls_wo_3",
+            "dea/ga_ls_fc_3",
+            "dea/ga_ls8c_nbart_gm_cyear_3",
+            "dea/ga_s2ls_intertidal_cyear_3",
+            "dea/ga_ls_mangrove_cover_cyear_3",
             "dea/ga_srtm_dem1sv1_0",
         ):
             assert cat.get_collection(key).endpoint == "dea", key
@@ -103,9 +128,12 @@ class TestBundledCatalog:
         assert nldas.signer is None
         assert nldas.default_assets == ["cog_default"]
         for key in (
-            "veda/nldas3", "veda/delta-disasters-hd-blackmarble-nightlights",
-            "veda/CMIP245-winter-median-pr", "veda/CMIP585-winter-median-pr",
-            "veda/caldor-fire-burn-severity", "veda/hls-ndvi",
+            "veda/nldas3",
+            "veda/delta-disasters-hd-blackmarble-nightlights",
+            "veda/CMIP245-winter-median-pr",
+            "veda/CMIP585-winter-median-pr",
+            "veda/caldor-fire-burn-severity",
+            "veda/hls-ndvi",
             "veda/EPA-annual-emissions-1A-Combustion-Mobile",
         ):
             assert cat.get_collection(key).endpoint == "veda", key
@@ -139,9 +167,13 @@ class TestBundledCatalog:
         assert ndvi.signer is None
         assert ndvi.requires_token is False
         for key in (
-            "bdc/CBERS4-WFI-16D-2", "bdc/CB4A-WFI-L4-SR-1", "bdc/CB4A-WPM-L4-DN-1",
-            "bdc/AMZ1-WFI-L4-SR-1", "bdc/S2_L2A-1",
-            "bdc/mod13q1-6.1", "bdc/myd13q1-6.1",
+            "bdc/CBERS4-WFI-16D-2",
+            "bdc/CB4A-WFI-L4-SR-1",
+            "bdc/CB4A-WPM-L4-DN-1",
+            "bdc/AMZ1-WFI-L4-SR-1",
+            "bdc/S2_L2A-1",
+            "bdc/mod13q1-6.1",
+            "bdc/myd13q1-6.1",
         ):
             col = cat.get_collection(key)
             assert col.endpoint == "bdc", key
@@ -170,9 +202,9 @@ class TestBundledCatalog:
     def test_bulk_cog_collections_curated(self):
         """The bulk COG-imagery curation populated many endpoint-namespaced entries."""
         cat = Catalog()
-        assert (
-            len(cat.datasets) > 100
-        ), f"expected the bulk COG curation, got {len(cat.datasets)}"
+        assert len(cat.datasets) > 100, (
+            f"expected the bulk COG curation, got {len(cat.datasets)}"
+        )
         namespaced = [k for k in cat.datasets if "/" in k]
         assert namespaced, "expected endpoint-namespaced <endpoint>/<id> bulk entries"
         # every namespaced key's endpoint prefix matches its collection's endpoint
@@ -358,8 +390,7 @@ class TestLoaderRules:
         """A collection naming an undeclared endpoint is rejected."""
         _write(
             tmp_path / "a.yaml",
-            "endpoints:\n  e:\n    url: u\n"
-            "collections:\n  c:\n    endpoint: missing\n",
+            "endpoints:\n  e:\n    url: u\ncollections:\n  c:\n    endpoint: missing\n",
         )
         with pytest.raises(ValueError, match="not declared in"):
             _load_catalog_data(tmp_path)

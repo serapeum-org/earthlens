@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.earthlens import EarthLens
 
 
 @pytest.mark.jaxa
 @pytest.mark.unit
 @pytest.mark.parametrize(
-    "key", ["jaxa", "jaxa-earth", "g-portal", "ptree", "himawari"],
+    "key",
+    ["jaxa", "jaxa-earth", "g-portal", "ptree", "himawari"],
 )
 def test_jaxa_keys_registered(key) -> None:
     """Every registered JAXA facade key resolves through `EarthLens.DataSources`."""

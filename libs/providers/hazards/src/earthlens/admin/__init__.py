@@ -28,6 +28,7 @@ The public surface is the
 from __future__ import annotations
 
 from earthlens.admin.backend import AdminBoundaries
+
 from earthlens.admin.catalog import Catalog, Dataset
 
 __all__ = ["AdminBoundaries", "Catalog", "Dataset"]

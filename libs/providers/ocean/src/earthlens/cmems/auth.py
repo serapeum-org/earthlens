@@ -46,10 +46,9 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, ConfigDict, SecretStr
-
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 if TYPE_CHECKING:
     pass

@@ -13,8 +13,8 @@ import types
 
 import numpy as np
 import pytest
-
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
+
 from earthlens.jaxa.catalog import Dataset
 
 
@@ -31,7 +31,9 @@ def fake_jaxa_earth(monkeypatch):
     calls: list[str] = []
 
     class _Raster:
-        img = np.array([[[[1.0], [2.0], [3.0]], [[4.0], [5.0], [6.0]]]], dtype=np.float32)
+        img = np.array(
+            [[[[1.0], [2.0], [3.0]], [[4.0], [5.0], [6.0]]]], dtype=np.float32
+        )
         # latlim/lonlim arrive as 2-D `(1, 2)` arrays — see A1 capture.
         latlim = np.array([[35.0, 36.0]])
         lonlim = np.array([[138.0, 139.5]])
@@ -103,9 +105,8 @@ def extents():
 @pytest.mark.integration
 def test_jaxa_earth_writes_a_cog(tmp_path, fake_jaxa_earth, extents) -> None:
     """A jaxa-earth fetch writes a real COG via pyramids on the fake array."""
-    from pyramids.dataset import Dataset as PyrDataset
-
     from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
+    from pyramids.dataset import Dataset as PyrDataset
 
     space, time = extents
     ds = Dataset(

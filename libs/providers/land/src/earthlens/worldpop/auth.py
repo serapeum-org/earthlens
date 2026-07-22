@@ -17,9 +17,8 @@ metadata / a sidecar.
 
 from __future__ import annotations
 
-from pydantic import BaseModel
-
 from earthlens.base.auth import AbstractAuth
+from pydantic import BaseModel
 
 #: The attribution every WorldPop product (CC-BY-4.0) must carry downstream.
 WORLDPOP_ATTRIBUTION: str = (

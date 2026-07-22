@@ -28,11 +28,10 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import requests
-from pyramids.feature.collection import FeatureCollection
-from shapely.geometry import box
-
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
+from pyramids.feature.collection import FeatureCollection
+from shapely.geometry import box
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
@@ -121,6 +120,8 @@ def download_zip(
         return zip_path
     _stream_download(url, zip_path, session, retries, backoff, timeout, chunk_size)
     return zip_path
+
+
 def _stream_download(
     url: str,
     dest_path: Path,

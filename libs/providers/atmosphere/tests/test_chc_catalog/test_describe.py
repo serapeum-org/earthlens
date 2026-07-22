@@ -135,9 +135,9 @@ class TestDescribeContract:
                 continue
             if set(info) != _DESCRIBE_KEYS:
                 bad.append((key, f"keys differ: {set(info) ^ _DESCRIBE_KEYS}"))
-        assert (
-            not missing
-        ), f"available_datasets entries with no Dataset record: {missing}"
+        assert not missing, (
+            f"available_datasets entries with no Dataset record: {missing}"
+        )
         assert not bad, f"describe() returned malformed records: {bad}"
 
     def test_exactly_one_of_file_patterns_or_discrete_files_is_set(

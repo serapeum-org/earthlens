@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.cli.table import build_table, clear_table_cache
 
 

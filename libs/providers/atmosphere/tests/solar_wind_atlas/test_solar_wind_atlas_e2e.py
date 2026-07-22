@@ -23,7 +23,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.e2e, pytest.mark.solar_wind_atlas]

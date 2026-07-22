@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 
 pytestmark = pytest.mark.eumetsat

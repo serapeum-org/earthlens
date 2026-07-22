@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
 from earthlens.chc.backend import CHIRPS
 
 pytestmark = [pytest.mark.chc]

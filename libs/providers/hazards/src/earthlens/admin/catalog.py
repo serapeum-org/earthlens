@@ -24,10 +24,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 #: Path to the bundled catalog directory of per-provider `*.yaml` files plus the
 #: `_index.yaml` informational index. Tests can monkey-patch this attribute to
@@ -37,7 +37,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: Module-level cache of parsed catalog data, keyed on the resolved path plus a
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-provider file invalidates the entry without re-parsing an unchanged tree.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 #: The four administrative-boundary providers a catalog row may declare.
 Provider = Literal["geoboundaries", "cgaz", "tiger", "natural_earth"]

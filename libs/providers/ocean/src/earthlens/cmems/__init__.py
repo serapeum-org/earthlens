@@ -57,6 +57,7 @@ from earthlens.cmems.auth import (
     CmemsCredentials,
 )
 from earthlens.cmems.backend import CMEMS
+
 from earthlens.cmems.catalog import CATALOG_PATH, Catalog, Dataset, Variable
 
 __all__ = [

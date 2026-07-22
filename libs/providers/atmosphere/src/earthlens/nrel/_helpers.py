@@ -18,12 +18,12 @@ from __future__ import annotations
 
 import io
 import time
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 from urllib.parse import urlencode
 
 import pandas as pd
 import requests
-
 from earthlens.base.http import HttpClient
 
 #: Base host of the keyed NREL/NLR Developer Network REST service. The legacy

@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from earthlens.aggregate import AggregationConfig
-from earthlens.cmems import CMEMS
 from earthlens.earthlens import EarthLens
+
+from earthlens.cmems import CMEMS
 
 
 class _FakeCmems(types.ModuleType):
@@ -51,15 +51,15 @@ class TestEarthLensCmemsRouting:
 
     def test_facade_registry_contains_cmems(self):
         """`cmems` is a registered key."""
-        assert (
-            "cmems" in EarthLens.DataSources
-        ), f"expected 'cmems' in DataSources, got {sorted(EarthLens.DataSources)!r}"
+        assert "cmems" in EarthLens.DataSources, (
+            f"expected 'cmems' in DataSources, got {sorted(EarthLens.DataSources)!r}"
+        )
 
     def test_facade_resolves_cmems_class(self):
         """The key resolves to the `CMEMS` class."""
-        assert (
-            EarthLens.DataSources["cmems"] is CMEMS
-        ), "DataSources['cmems'] should resolve to earthlens.cmems.CMEMS"
+        assert EarthLens.DataSources["cmems"] is CMEMS, (
+            "DataSources['cmems'] should resolve to earthlens.cmems.CMEMS"
+        )
 
     def test_facade_constructs_cmems(self, fake_cmems: _FakeCmems, tmp_path: Path):
         """`EarthLens(data_source='cmems', ...)` instantiates the backend."""
@@ -74,9 +74,9 @@ class TestEarthLensCmemsRouting:
             service_username="u",
             service_password="p",
         )
-        assert isinstance(
-            el.datasource, CMEMS
-        ), f"el.datasource must be a CMEMS instance, got {type(el.datasource).__name__}"
+        assert isinstance(el.datasource, CMEMS), (
+            f"el.datasource must be a CMEMS instance, got {type(el.datasource).__name__}"
+        )
         assert el.datasource.OUTPUT_KIND == "raster"
 
 

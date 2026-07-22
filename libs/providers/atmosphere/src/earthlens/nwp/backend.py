@@ -29,7 +29,14 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
+from earthlens.nwp._helpers import (
+    cog_name,
+    enumerate_cycles,
+    parse_cog_valid_time,
+    window_labels,
+)
+from earthlens.nwp._warnings import RetentionWarning
+from earthlens.nwp.catalog import KNOWN_BACKENDS, Catalog, NWPModel
 from loguru import logger
 
 from earthlens.base import (
@@ -41,14 +48,6 @@ from earthlens.base import (
     crop_to_aoi,
     date_windows,
 )
-from earthlens.nwp._helpers import (
-    cog_name,
-    enumerate_cycles,
-    parse_cog_valid_time,
-    window_labels,
-)
-from earthlens.nwp._warnings import RetentionWarning
-from earthlens.nwp.catalog import KNOWN_BACKENDS, Catalog, NWPModel
 from earthlens.nwp.centres import resolve_centre
 
 if TYPE_CHECKING:
@@ -383,8 +382,7 @@ class NWP(AbstractDataSource):
             unknown = [m for m in self._members_arg if m not in model.members]
             if unknown:
                 raise ValueError(
-                    f"members {unknown} are not in the model's members "
-                    f"{model.members}."
+                    f"members {unknown} are not in the model's members {model.members}."
                 )
             return list(self._members_arg)
         return [model.members[0]]

@@ -11,14 +11,14 @@ import json
 from urllib.error import HTTPError
 
 import pytest
-
-from earthlens.ecmwf import constraints as constraints_module
 from earthlens.ecmwf.constraints import (
     Area,
     Dates,
     RequestValidator,
     fetch_constraints,
 )
+
+from earthlens.ecmwf import constraints as constraints_module
 
 pytestmark = [pytest.mark.unit]
 

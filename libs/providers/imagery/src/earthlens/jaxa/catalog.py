@@ -34,10 +34,10 @@ import re
 from pathlib import Path
 from typing import Any
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -56,6 +56,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     if path.is_dir():
         return sorted(path.glob("*.yaml"))
     return [path]
+
 
 #: G-Portal dataset ids are 7- to 9-digit numeric strings (e.g. `11001002`).
 _GPORTAL_ID_RE = re.compile(r"^\d{7,9}$")

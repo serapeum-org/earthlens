@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
+
 from earthlens.sentinel_hub import SentinelHub
 
 pytestmark = pytest.mark.sentinel_hub

@@ -21,14 +21,13 @@ from __future__ import annotations
 
 import geopandas as gpd
 import pandas as pd
-from loguru import logger
-from pyramids.feature.collection import FeatureCollection
-
 from earthlens.overture._helpers import (
     CDLA_PERMISSIVE,
     derive_license_ids,
     warn_if_odbl,
 )
+from loguru import logger
+from pyramids.feature.collection import FeatureCollection
 
 #: WGS84 — the CRS every Overture FeatureCollection is tagged with. The
 #: SDK omits it from the returned GeoDataFrame, so it is set explicitly.

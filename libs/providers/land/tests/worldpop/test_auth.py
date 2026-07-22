@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.base.auth import AbstractAuth
+
 from earthlens.worldpop import (
     WORLDPOP_ATTRIBUTION,
     WorldPopAuth,

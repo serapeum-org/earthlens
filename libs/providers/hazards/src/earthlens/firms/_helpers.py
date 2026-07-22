@@ -25,7 +25,8 @@ from __future__ import annotations
 
 import datetime as dt
 import time
-from typing import Any, Callable, Literal
+from collections.abc import Callable
+from typing import Any, Literal
 
 from earthlens.base.http import HttpClient
 

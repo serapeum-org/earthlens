@@ -28,6 +28,9 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from earthlens.base.s3 import S3Auth, S3Credentials
+from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key
+from earthlens.dem.catalog import Catalog, DEMDataset
 from loguru import logger
 from tqdm import tqdm
 
@@ -37,9 +40,6 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key
-from earthlens.dem.catalog import Catalog, DEMDataset
-from earthlens.base.s3 import S3Auth, S3Credentials
 
 __all__ = ["DEM"]
 
@@ -136,9 +136,7 @@ class DEM(AbstractDataSource):
         )
         return None
 
-    def _create_grid(
-        self, lat_lim: list[float], lon_lim: list[float]
-    ) -> SpatialExtent:
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Wrap the user bbox into a :class:`SpatialExtent` (no snapping)."""
         return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
@@ -271,9 +269,7 @@ class DEM(AbstractDataSource):
             client.head_object(Bucket=bucket, Key=key)
         except Exception as exc:  # noqa: BLE001 - classify below
             if _is_missing_object(exc):
-                logger.warning(
-                    f"dem: tile absent, skipping: s3://{bucket}/{key}"
-                )
+                logger.warning(f"dem: tile absent, skipping: s3://{bucket}/{key}")
                 return None
             raise
         tmp = target.with_name(target.name + ".part")

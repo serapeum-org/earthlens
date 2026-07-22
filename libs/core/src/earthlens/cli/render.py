@@ -12,10 +12,9 @@ from __future__ import annotations
 import json
 from collections.abc import Iterable, Sequence
 
+from earthlens.cli.table import CatalogRow, LoadError
 from rich.console import Console
 from rich.table import Table
-
-from earthlens.cli.table import CatalogRow, LoadError
 
 #: Header label for each :class:`~earthlens.cli.table.CatalogRow` column.
 _COLUMN_HEADERS: dict[str, str] = {

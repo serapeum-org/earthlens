@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.core import EarthLens
+
 from earthlens.s3 import S3
 
 pytestmark = [pytest.mark.s3]

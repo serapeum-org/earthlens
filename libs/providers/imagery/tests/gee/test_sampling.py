@@ -6,18 +6,18 @@ import inspect
 from types import SimpleNamespace
 
 import ee
-import geopandas as gpd
 import geopandas as _gpd
+import geopandas as gpd
 import pytest
-from shapely.geometry import Point
-
-from earthlens.gee import sampling
 from earthlens.gee.sampling import (
     _REDUCER_WHITELIST,
     _resolve_reducer,
     sample_points,
     sample_points_to_gdf,
 )
+from shapely.geometry import Point
+
+from earthlens.gee import sampling
 
 
 class _FakeFeatureCollection:

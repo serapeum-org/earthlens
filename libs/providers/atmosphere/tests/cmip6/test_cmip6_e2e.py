@@ -14,8 +14,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from earthlens.core import EarthLens
+
 from earthlens.cmip6 import Catalog, StoreResolver
 
 pytestmark = [pytest.mark.e2e, pytest.mark.cmip6]

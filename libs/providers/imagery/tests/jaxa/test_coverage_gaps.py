@@ -21,9 +21,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from pydantic import SecretStr
 
-from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa import JAXA, AuthenticationError, JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Catalog, Dataset, clear_catalog_cache
 
@@ -82,10 +82,7 @@ def test_catalog_load_wraps_row_validation_error(tmp_path) -> None:
     """A row that fails pydantic validation surfaces as a friendly ValueError."""
     path = tmp_path / "bad.yaml"
     path.write_text(
-        "datasets:\n"
-        "  bad-row:\n"
-        "    protocol: jaxa-earth\n"
-        "    short_name: 'oops'\n",
+        "datasets:\n  bad-row:\n    protocol: jaxa-earth\n    short_name: 'oops'\n",
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="failed validation"):
@@ -269,9 +266,7 @@ def test_gportal_branch_friendly_import_error(
     ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
     auth = JaxaAuth(JaxaCredentials(), protocol="gportal")
     with pytest.raises(ImportError, match=r"earthlens\[jaxa\]"):
-        fetch_gportal(
-            dataset=ds, space=space, time=time, auth=auth, out_dir=tmp_path
-        )
+        fetch_gportal(dataset=ds, space=space, time=time, auth=auth, out_dir=tmp_path)
 
 
 @pytest.mark.jaxa
@@ -333,9 +328,10 @@ def test_gportal_branch_empty_products_returns_empty(
         protocol="gportal",
     )
     auth.configure()
-    assert fetch_gportal(
-        dataset=ds, space=space, time=time, auth=auth, out_dir=tmp_path
-    ) == []
+    assert (
+        fetch_gportal(dataset=ds, space=space, time=time, auth=auth, out_dir=tmp_path)
+        == []
+    )
 
 
 def _fake_jaxa_earth(monkeypatch):

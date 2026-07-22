@@ -7,15 +7,15 @@ import sys
 import types
 
 import pytest
-
 from earthlens.nwp.catalog import NWPModel
-from earthlens.nwp.centres import resolve_centre
 from earthlens.nwp.centres.base import CENTRE_REGISTRY, _NWPCentre
 from earthlens.nwp.centres.dwd import DWDCentre
 from earthlens.nwp.centres.ecmwf import ECMWFCentre, _group_params, _source_for
 from earthlens.nwp.centres.meteofrance import MeteoFranceCentre
 from earthlens.nwp.centres.meteofrance_api import MeteoFranceAPICentre, resolve_api_key
 from earthlens.nwp.centres.noaa import NOAACentre, _import_herbie, _priority
+
+from earthlens.nwp.centres import resolve_centre
 
 pytestmark = [pytest.mark.nwp, pytest.mark.unit]
 
@@ -1027,7 +1027,9 @@ class TestECCCCentre:
 
         module = types.ModuleType("requests")
         module.Session = _FailingSession
-        module.get = lambda url, **kw: (_ for _ in ()).throw(RuntimeError("network down"))
+        module.get = lambda url, **kw: (_ for _ in ()).throw(
+            RuntimeError("network down")
+        )
         monkeypatch.setitem(sys.modules, "requests", module)
 
         from earthlens.nwp.centres.eccc import ECCCCentre
@@ -1050,8 +1052,12 @@ def test_base_centre_fetch_one_raises_not_implemented(tmp_path):
     from earthlens.nwp.centres.base import _NWPCentre
 
     class _Bare(_NWPCentre):
-        def fetch_one(self, model, cycle, step, params, mirror, member=None, *, whole=False):
-            return super().fetch_one(model, cycle, step, params, mirror, member, whole=whole)
+        def fetch_one(
+            self, model, cycle, step, params, mirror, member=None, *, whole=False
+        ):
+            return super().fetch_one(
+                model, cycle, step, params, mirror, member, whole=whole
+            )
 
     with pytest.raises(NotImplementedError):
         _Bare(tmp_path).fetch_one(None, dt.datetime(2026, 1, 1), 0, [], "auto")

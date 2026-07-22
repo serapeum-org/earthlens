@@ -30,10 +30,10 @@ import time
 from typing import Any
 
 import requests
+from earthlens.iucn.auth import AuthenticationError
 from loguru import logger
 
 from earthlens.biodiversity import parse_retry_after
-from earthlens.iucn.auth import AuthenticationError
 
 #: Base URL of the IUCN Red List v4 API (v3 is retired).
 BASE_URL = "https://api.iucnredlist.org/api/v4"
@@ -165,7 +165,9 @@ def _get(
     for attempt in range(MAX_RETRIES + 1):
         _throttle()
         try:
-            response = session.get(url, params=params or {}, headers=headers, timeout=60)
+            response = session.get(
+                url, params=params or {}, headers=headers, timeout=60
+            )
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES:
                 wait = BACKOFF_FACTOR * (2**attempt)
@@ -204,9 +206,7 @@ def _get(
             time.sleep(wait)
             continue
         if status is None or status >= 400:
-            raise RuntimeError(
-                f"IUCN Red List returned HTTP {status} for /{path}."
-            )
+            raise RuntimeError(f"IUCN Red List returned HTTP {status} for /{path}.")
         return response.json()
     # Defensive: unreachable today (every iteration above returns or raises).
     # Kept so a future edit that breaks the invariant fails loudly instead of
@@ -323,7 +323,10 @@ def fetch_species(
     """
     http = _session(session)
     summary = _get(
-        http, token, "taxa/scientific_name", {"genus_name": genus, "species_name": species}
+        http,
+        token,
+        "taxa/scientific_name",
+        {"genus_name": genus, "species_name": species},
     )
     taxon = summary.get("taxon") or {}
     scientific_name = taxon.get("scientific_name") or f"{genus} {species}"
@@ -335,7 +338,8 @@ def fetch_species(
             row["category"] = _category(detail) or row["category"]
             row["criteria"] = _flatten_label(detail.get("criteria")) or row["criteria"]
             row["population_trend"] = (
-                _flatten_label(detail.get("population_trend")) or row["population_trend"]
+                _flatten_label(detail.get("population_trend"))
+                or row["population_trend"]
             )
         rows.append(row)
     return rows

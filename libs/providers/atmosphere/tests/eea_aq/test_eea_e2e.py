@@ -15,7 +15,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from earthlens.earthlens import EarthLens
 
 pytest.importorskip("airbase", reason="install earthlens[eea_aq] to run live EEA e2e")

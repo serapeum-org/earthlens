@@ -186,6 +186,7 @@ def _default_user_agent() -> str:
         `"earthlens/unknown"` when the package metadata is unavailable).
     """
     from earthlens.core import __version__
+
     return f"earthlens/{__version__}"
 
 

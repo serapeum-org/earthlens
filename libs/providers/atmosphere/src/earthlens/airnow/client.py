@@ -27,7 +27,6 @@ from collections.abc import Callable
 from typing import Any
 
 import requests
-
 from earthlens.base.http import HttpClient
 
 #: AirNow bounding-box observations endpoint.

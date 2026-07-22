@@ -6,9 +6,9 @@ import textwrap
 from pathlib import Path
 
 import pytest
+from earthlens.firms.catalog import Temporal
 
 from earthlens.firms import Catalog, Sensor, SensorColumn
-from earthlens.firms.catalog import Temporal
 
 pytestmark = pytest.mark.firms
 
@@ -76,14 +76,16 @@ def test_temporal_quality_recorded():
 def test_extra_keys_rejected(tmp_path: Path):
     """A typo'd top-level sensor key is rejected by extra='forbid'."""
     bad = tmp_path / "firms.yaml"
-    bad.write_text(textwrap.dedent("""
+    bad.write_text(
+        textwrap.dedent("""
             sensors:
               MODIS_NRT:
                 code: MODIS_NRT
                 family: MODIS
                 resolution_m: 1000
                 typo_field: oops
-            """).strip())
+            """).strip()
+    )
     with pytest.raises(ValueError, match="failed validation"):
         Catalog.load(bad)
 

@@ -31,11 +31,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
-from loguru import logger
-
 from earthlens.airnow.auth import AirnowAuth, AirnowCredentials, AuthenticationError
 from earthlens.airnow.catalog import Catalog
 from earthlens.airnow.client import AirnowClient
+from loguru import logger
+
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
@@ -45,7 +45,6 @@ from earthlens.base import (
 
 if TYPE_CHECKING:
     import requests
-
     from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]
@@ -296,8 +295,7 @@ class AirNow(AbstractDataSource):
     def _bbox(self) -> str:
         """Return the request bbox as AirNow's `"minLon,minLat,maxLon,maxLat"`."""
         return (
-            f"{self.space.west},{self.space.south},"
-            f"{self.space.east},{self.space.north}"
+            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
         )
 
     def _date_bounds(self) -> tuple[str, str]:

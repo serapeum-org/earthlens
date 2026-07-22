@@ -6,7 +6,6 @@ import textwrap
 
 import pytest
 import yaml
-
 from earthlens.base.yaml_loader import _StrictSafeLoader, load_yaml_strict
 
 

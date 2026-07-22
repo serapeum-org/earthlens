@@ -30,11 +30,10 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, SecretStr
-
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
 from earthlens.sentinel_hub._helpers import import_sentinelhub, resolve_endpoint
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 #: The CDSE Dashboard page where OAuth client-credentials are minted (Create →
 #: name the client → Grant Type `Client Credentials`).

@@ -365,7 +365,9 @@ def _parse_idx_noaa(text: str) -> pd.DataFrame:
     # Sort by offset and drop duplicate offsets — keep the first occurrence
     # so a sub-message sharing an envelope offset does not yield `length=0`.
     frame = (
-        frame.sort_values("offset").drop_duplicates("offset", keep="first").reset_index(drop=True)
+        frame.sort_values("offset")
+        .drop_duplicates("offset", keep="first")
+        .reset_index(drop=True)
     )
     # Compute `length` directly in the loop to avoid the float intermediate
     # `(nxt - frame["offset"]).fillna(-1).astype("int64")` would produce.
@@ -512,7 +514,9 @@ def get_idx(
     # Write through a sibling temp file and atomically replace on success.
     # A downloader exception leaves the existing cache (if any) untouched;
     # the temp file is unlinked in the cleanup path.
-    fd, tmp_name = tempfile.mkstemp(prefix=path.name + ".", suffix=".part", dir=path.parent)
+    fd, tmp_name = tempfile.mkstemp(
+        prefix=path.name + ".", suffix=".part", dir=path.parent
+    )
     os.close(fd)
     tmp_path = Path(tmp_name)
     try:

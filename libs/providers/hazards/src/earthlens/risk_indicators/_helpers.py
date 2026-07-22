@@ -25,15 +25,13 @@ Endpoints / response shapes were live-verified 2026-06-27 (see
 from __future__ import annotations
 
 import time
-from typing import Any
 
 import geopandas as gpd
 import pandas as pd
 import requests
-from pyramids.feature.collection import FeatureCollection
-
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
+from pyramids.feature.collection import FeatureCollection
 
 #: ThinkHazard! public REST base (no auth). Hazard reports live under
 #: `/report/{division_code}.json` and `/report/{division_code}/{hazard}.json`.
@@ -81,6 +79,8 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
     requests.exceptions.ChunkedEncodingError,
     requests.exceptions.ContentDecodingError,
 )
+
+
 def _request_json(
     url: str,
     *,

@@ -31,10 +31,11 @@ directory or a single YAML file.
 from __future__ import annotations
 
 import datetime as _dt
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -44,7 +45,6 @@ from pydantic import (
 )
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -78,7 +78,7 @@ CadenceLiteral = Literal[
 TimelinessLiteral = Literal["nrt", "reprocessed", "offline"]
 
 
-class DataStoreGroup(str, Enum):
+class DataStoreGroup(StrEnum):
     """The EUMETSAT Data Store collection groups (mission families).
 
     Each value is the human-readable group label carried on a catalog
@@ -209,7 +209,7 @@ def _load_catalog_data(
             )
         except ValidationError as exc:
             raise ValueError(
-                f"{origin[ds_key]} dataset {ds_key!r} failed " f"validation:\n{exc}"
+                f"{origin[ds_key]} dataset {ds_key!r} failed validation:\n{exc}"
             ) from exc
 
     _CATALOG_CACHE[key] = (merged_available, structural)

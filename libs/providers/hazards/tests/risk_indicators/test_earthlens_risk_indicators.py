@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from earthlens.earthlens import EarthLens
 from pyramids.feature.collection import FeatureCollection
 
 import earthlens.risk_indicators
-from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.risk_indicators
 

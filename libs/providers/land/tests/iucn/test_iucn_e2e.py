@@ -16,7 +16,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-
 from earthlens.earthlens import EarthLens
 
 _HAVE_TOKEN = bool(os.environ.get("IUCN_TOKEN"))

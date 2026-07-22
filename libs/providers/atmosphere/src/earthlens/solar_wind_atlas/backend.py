@@ -27,6 +27,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from earthlens.solar_wind_atlas._helpers import (
+    bbox_from_extent,
+    download_cache_crop,
+    window_crop,
+)
 from loguru import logger
 
 from earthlens.base import (
@@ -35,11 +40,6 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
-)
-from earthlens.solar_wind_atlas._helpers import (
-    bbox_from_extent,
-    download_cache_crop,
-    window_crop,
 )
 from earthlens.solar_wind_atlas.catalog import Catalog, Layer
 

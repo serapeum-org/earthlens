@@ -24,10 +24,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
 
 __all__ = ["Catalog", "Dataset", "Variable", "CATALOG_PATH"]
 

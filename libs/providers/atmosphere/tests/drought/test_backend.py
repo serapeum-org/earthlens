@@ -11,8 +11,6 @@ network-free.
 
 from __future__ import annotations
 
-import earthlens.drought
-
 import datetime as dt
 import re
 from pathlib import Path
@@ -20,11 +18,11 @@ from typing import Any
 
 import numpy as np
 import pytest
-
-from earthlens.drought import Drought
-from earthlens.drought import backend as backend_module
 from earthlens.drought.backend import SPEIBASE_EPOCH_YEAR
 
+import earthlens.drought
+from earthlens.drought import Drought
+from earthlens.drought import backend as backend_module
 
 _USDM_PAYLOAD: dict[str, Any] = {
     "type": "FeatureCollection",
@@ -281,9 +279,7 @@ def test_usdm_render_url_uses_tuesday_valid_date():
 
 def test_usdm_fetch_builds_feature_collection_in_4326(monkeypatch, tmp_path):
     """Mock the HTTP layer; verify the FeatureCollection schema + CRS."""
-    monkeypatch.setattr(
-        backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD
-    )
+    monkeypatch.setattr(backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD)
     backend = Drought(
         start="2026-06-23",
         end="2026-06-23",
@@ -304,9 +300,7 @@ def test_usdm_fetch_builds_feature_collection_in_4326(monkeypatch, tmp_path):
 
 def test_usdm_fetch_clips_to_bbox(monkeypatch, tmp_path):
     """Polygons outside the bbox are dropped; the schema is preserved."""
-    monkeypatch.setattr(
-        backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD
-    )
+    monkeypatch.setattr(backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD)
     backend = Drought(
         start="2026-06-23",
         end="2026-06-23",
@@ -361,9 +355,7 @@ def test_usdm_honours_payload_crs_member(monkeypatch, tmp_path):
             }
         ],
     }
-    monkeypatch.setattr(
-        backend_module, "_http_get_json", lambda url: mercator_payload
-    )
+    monkeypatch.setattr(backend_module, "_http_get_json", lambda url: mercator_payload)
     backend = Drought(
         start="2026-06-23",
         end="2026-06-23",
@@ -382,10 +374,19 @@ def test_usdm_honours_payload_crs_member(monkeypatch, tmp_path):
 def test_crs_from_geojson_handles_variants():
     """Each accepted `crs` member shape returns an EPSG:NNNN string."""
     f = backend_module._crs_from_geojson
-    assert f({"crs": {"type": "name", "properties": {"name": "EPSG:5070"}}}) == "EPSG:5070"
+    assert (
+        f({"crs": {"type": "name", "properties": {"name": "EPSG:5070"}}}) == "EPSG:5070"
+    )
     assert f({"crs": {"type": "EPSG", "properties": {"code": 4326}}}) == "EPSG:4326"
     assert (
-        f({"crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:EPSG::5070"}}})
+        f(
+            {
+                "crs": {
+                    "type": "name",
+                    "properties": {"name": "urn:ogc:def:crs:EPSG::5070"},
+                }
+            }
+        )
         == "EPSG:5070"
     )
     # Missing crs member → RFC 7946 default.
@@ -411,6 +412,7 @@ def test_usdm_aggregate_rejected(tmp_path):
     )
     with pytest.raises(NotImplementedError, match="vector"):
         backend.download(aggregate=object())
+
 
 def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
     """The EDO route fetches one coverage per period over WCS and crops it."""
@@ -831,9 +833,7 @@ def test_speibase_rejects_missing_time_axis(monkeypatch, tmp_path, fake_netcdf):
     # `fake_netcdf` IS the `_FakeNetCDF` class object — patch the property
     # on the class itself, and restore it in `finally` so the rest of the
     # suite sees the fixture's default `n_time` axis again.
-    monkeypatch.setattr(
-        fake_netcdf, "dimension_sizes", property(lambda self: {})
-    )
+    monkeypatch.setattr(fake_netcdf, "dimension_sizes", property(lambda self: {}))
     backend = Drought(
         start="2026-06-01",
         end="2026-06-01",
@@ -906,10 +906,7 @@ def _scan_for_leaky_imports(src_dir: Path) -> list[tuple[Path, str]]:
         text = py_file.read_text(encoding="utf-8")
         for line in text.splitlines():
             stripped = line.lstrip()
-            if not (
-                stripped.startswith("import ")
-                or stripped.startswith("from ")
-            ):
+            if not (stripped.startswith("import ") or stripped.startswith("from ")):
                 continue
             if _LEAK_PATTERN.search(line):
                 offenders.append((py_file, line.strip()))
@@ -1043,6 +1040,7 @@ def test_http_download_streams_to_target(monkeypatch, tmp_path):
     assert target.read_bytes() == body
     assert not (target.with_suffix(target.suffix + ".partial").exists())
 
+
 def test_usdm_reprojects_non_4326_payload(monkeypatch, tmp_path):
     """A payload arriving in EPSG:3857 is reprojected to 4326."""
     # Inject a payload through a custom `_geojson_to_gdf` shim that hands
@@ -1061,9 +1059,7 @@ def test_usdm_reprojects_non_4326_payload(monkeypatch, tmp_path):
         "_geojson_to_gdf",
         staticmethod(_wrap),
     )
-    monkeypatch.setattr(
-        backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD
-    )
+    monkeypatch.setattr(backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD)
     backend = Drought(
         start="2026-06-23",
         end="2026-06-23",
@@ -1107,9 +1103,7 @@ def test_unknown_transport_on_row_raises(monkeypatch, tmp_path):
         dataset="usdm",
         path=str(tmp_path),
     )
-    rogue = backend._dataset.model_copy(
-        update={"transport": "future-tx"}, deep=False
-    )
+    rogue = backend._dataset.model_copy(update={"transport": "future-tx"}, deep=False)
     monkeypatch.setattr(backend, "_dataset", rogue)
     with pytest.raises(ValueError, match="unknown drought transport"):
         backend._fetch(backend._search())

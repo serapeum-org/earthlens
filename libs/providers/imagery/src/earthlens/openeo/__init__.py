@@ -35,6 +35,7 @@ from earthlens.openeo.auth import (
     OpeneoCredentials,
 )
 from earthlens.openeo.backend import OpenEO
+
 from earthlens.openeo.catalog import (
     CATALOG_PATH,
     Band,

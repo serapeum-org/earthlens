@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.cli._gee_categories import _RULES, CATEGORIES, categorise_asset
 
 pytestmark = pytest.mark.cli

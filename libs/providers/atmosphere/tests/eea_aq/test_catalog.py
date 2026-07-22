@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from earthlens.eea_aq.catalog import clear_catalog_cache
 
 from earthlens.eea_aq import CATALOG_PATH, Catalog, Pollutant
-from earthlens.eea_aq.catalog import clear_catalog_cache
 
 
 @pytest.fixture(autouse=True)
@@ -22,7 +22,14 @@ class TestCatalog:
 
     def test_six_criteria_pollutants(self):
         """The shipped catalog lists the six criteria pollutants."""
-        assert sorted(Catalog().pollutants) == ["co", "no2", "o3", "pm10", "pm25", "so2"]
+        assert sorted(Catalog().pollutants) == [
+            "co",
+            "no2",
+            "o3",
+            "pm10",
+            "pm25",
+            "so2",
+        ]
 
     def test_polls_for_maps_and_dedupes(self):
         """`polls_for` maps names to airbase notations, de-duplicated."""

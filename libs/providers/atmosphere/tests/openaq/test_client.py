@@ -6,7 +6,6 @@ from typing import Any
 
 import pytest
 import requests
-
 from earthlens.base.http import _parse_retry_after
 from earthlens.openaq.client import BASE_URL, OpenaqClient
 
@@ -235,8 +234,8 @@ class TestListEndpoints:
         )
         params = session.calls[0]["params"]
         assert session.calls[0]["url"] == f"{BASE_URL}/sensors/10/{rollup}"
-        assert (
-            params["date_from"] == "2024-01-01"
-        ), "date should be truncated to YYYY-MM-DD"
+        assert params["date_from"] == "2024-01-01", (
+            "date should be truncated to YYYY-MM-DD"
+        )
         assert params["date_to"] == "2024-01-07"
         assert "datetime_from" not in params

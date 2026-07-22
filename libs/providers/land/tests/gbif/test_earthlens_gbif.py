@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from earthlens.earthlens import EarthLens
 from geopandas import GeoDataFrame
 
 import earthlens.gbif
-from earthlens.earthlens import EarthLens
 
 
 def _make_facade(tmp_path: Path, **overrides) -> EarthLens:

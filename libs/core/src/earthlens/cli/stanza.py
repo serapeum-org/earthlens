@@ -25,7 +25,6 @@ from typing import Any
 from urllib.parse import quote
 
 import yaml
-
 from earthlens.cli._gee_categories import categorise_asset
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _get_json
@@ -356,7 +355,6 @@ def _gee_live_bands(asset_id: str) -> tuple[str, dict[str, dict[str, Any]]]:
         `(ee_type, {band: {}})` — the asset type (lowercased) and its bands.
     """
     import ee
-
     from earthlens.gee.auth import EarthEngineAuth, EarthEngineCredentials
 
     EarthEngineAuth(EarthEngineCredentials()).configure()
@@ -611,10 +609,14 @@ def _emit_erddap(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
     row["title"] = _erddap_global_attr(rows, "title")
     row["license_note"] = _erddap_global_attr(rows, "license")
     return row
+
+
 # --------------------------------------------------------------------------- #
 # biodiversity cluster — gbif / obis / wdpa / iucn (no live emit).
 # --------------------------------------------------------------------------- #
-def _emit_gbif(catalog: Any, upstream_id: str, *, key: str, **opts: Any) -> dict[str, Any]:
+def _emit_gbif(
+    catalog: Any, upstream_id: str, *, key: str, **opts: Any
+) -> dict[str, Any]:
     """Seed a GBIF `taxa:` row from a backbone `taxonKey` (no network).
 
     The `Taxon` row carries `taxon_key` / `title` / `rank`; the maintainer
@@ -636,7 +638,9 @@ def _emit_gbif(catalog: Any, upstream_id: str, *, key: str, **opts: Any) -> dict
     }
 
 
-def _emit_obis(catalog: Any, upstream_id: str, *, key: str, **opts: Any) -> dict[str, Any]:
+def _emit_obis(
+    catalog: Any, upstream_id: str, *, key: str, **opts: Any
+) -> dict[str, Any]:
     """Seed an OBIS `species:` row from a scientific name (no network).
 
     Args:
@@ -654,7 +658,9 @@ def _emit_obis(catalog: Any, upstream_id: str, *, key: str, **opts: Any) -> dict
     }
 
 
-def _emit_wdpa(catalog: Any, upstream_id: str, *, key: str, **opts: Any) -> dict[str, Any]:
+def _emit_wdpa(
+    catalog: Any, upstream_id: str, *, key: str, **opts: Any
+) -> dict[str, Any]:
     """Seed a WDPA `countries:` row from an ISO3 code (no network).
 
     Args:
@@ -672,7 +678,9 @@ def _emit_wdpa(catalog: Any, upstream_id: str, *, key: str, **opts: Any) -> dict
     }
 
 
-def _emit_iucn(catalog: Any, upstream_id: str, *, key: str, **opts: Any) -> dict[str, Any]:
+def _emit_iucn(
+    catalog: Any, upstream_id: str, *, key: str, **opts: Any
+) -> dict[str, Any]:
     """Seed an IUCN `countries:` row from an ISO2 code (no network).
 
     Args:

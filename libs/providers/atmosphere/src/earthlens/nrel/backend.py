@@ -35,6 +35,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import requests
+from earthlens.nrel.auth import NrelAuth, NrelCredentials
+from earthlens.nrel.catalog import Catalog, Product
 from loguru import logger
 
 from earthlens.base import (
@@ -45,8 +47,6 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.nrel import _helpers
-from earthlens.nrel.auth import NrelAuth, NrelCredentials
-from earthlens.nrel.catalog import Catalog, Product
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -181,7 +181,7 @@ class NREL(AbstractDataSource):
             # identically through the facade and directly.
             if not isinstance(point, (tuple, list)) or len(point) != 2:
                 raise ValueError(
-                    "NREL `point` must be a 2-tuple (lat, lon); got " f"{point!r}."
+                    f"NREL `point` must be a 2-tuple (lat, lon); got {point!r}."
                 )
             lat_lim = [float(point[0]), float(point[0])]
             lon_lim = [float(point[1]), float(point[1])]
@@ -491,8 +491,7 @@ class NREL(AbstractDataSource):
                     f"{self._product.source.upper()} coverage)."
                 )
             logger.warning(
-                f"NREL skipped point (lat={lat}, lon={lon}, names={name}): "
-                f"{message}"
+                f"NREL skipped point (lat={lat}, lon={lon}, names={name}): {message}"
             )
             return None
         # Auto-detect the data-table header offset (the `Year,Month,Day,...`

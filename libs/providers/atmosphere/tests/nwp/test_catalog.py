@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import pytest
+from earthlens.nwp.catalog import KNOWN_BACKENDS, clear_catalog_cache
 from pydantic import ValidationError
 
 from earthlens.nwp import Catalog, NWPModel
 from earthlens.nwp import catalog as catalog_mod
-from earthlens.nwp.catalog import KNOWN_BACKENDS, clear_catalog_cache
 
 pytestmark = [pytest.mark.nwp, pytest.mark.unit]
 
@@ -171,7 +171,9 @@ class TestNWPModel:
 
     def test_license_round_trips(self):
         """A populated `license` survives construction."""
-        assert NWPModel(provider="noaa-nodd", license="PD-US-GOV").license == "PD-US-GOV"
+        assert (
+            NWPModel(provider="noaa-nodd", license="PD-US-GOV").license == "PD-US-GOV"
+        )
 
 
 class TestBundledTitles:
@@ -199,9 +201,13 @@ class TestBundledTitles:
     def test_cli_title_resolves_from_the_row(self):
         """The federated CLI title column reads the row's `title`."""
         from earthlens.cli.adapter import record_title
+
         from earthlens.nwp import Catalog
 
-        assert record_title(Catalog().datasets["gfs"]) == "NOAA GFS (Global Forecast System)"
+        assert (
+            record_title(Catalog().datasets["gfs"])
+            == "NOAA GFS (Global Forecast System)"
+        )
 
 
 class TestBundledLicenses:

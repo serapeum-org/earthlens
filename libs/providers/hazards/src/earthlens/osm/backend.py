@@ -49,15 +49,6 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import requests
-from loguru import logger
-
-from earthlens.base import (
-    AbstractDataSource,
-    OutputKind,
-    RemoteProduct,
-    SpatialExtent,
-    TemporalExtent,
-)
 from earthlens.base.http import HttpClient
 from earthlens.osm._helpers import (
     LicenseWarning,
@@ -69,11 +60,19 @@ from earthlens.osm._helpers import (
 )
 from earthlens.osm._pbf import Engine, download_extract, read_pbf
 from earthlens.osm.catalog import Catalog, Dataset
+from loguru import logger
+
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    RemoteProduct,
+    SpatialExtent,
+    TemporalExtent,
+)
 
 if TYPE_CHECKING:
-    from pyramids.feature.collection import FeatureCollection
-
     from earthlens.aggregate import AggregationConfig
+    from pyramids.feature.collection import FeatureCollection
 
 #: Canonical public Overpass endpoint. Overridable via `endpoint=`.
 OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter"
@@ -263,13 +262,10 @@ class OSM(AbstractDataSource):
             )
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         if engine not in ("pyrosm", "pyosmium"):
-            raise ValueError(
-                f"engine must be 'pyrosm' or 'pyosmium', got {engine!r}."
-            )
+            raise ValueError(f"engine must be 'pyrosm' or 'pyosmium', got {engine!r}.")
         self._query = query
         self._filter = filter
         self._endpoint = endpoint
@@ -704,8 +700,7 @@ class OSM(AbstractDataSource):
             )
         else:
             logger.warning(
-                "OSM download summary: no features matched the request, nothing "
-                "written"
+                "OSM download summary: no features matched the request, nothing written"
             )
         return collection
 

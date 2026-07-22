@@ -10,9 +10,9 @@ needs a configured Copernicus token and the GloFAS licence accepted.
 from __future__ import annotations
 
 import pytest
+from earthlens.ecmwf.backend import ECMWF
 
 from earthlens.ecmwf import Catalog
-from earthlens.ecmwf.backend import ECMWF
 
 pytestmark = [pytest.mark.e2e]
 

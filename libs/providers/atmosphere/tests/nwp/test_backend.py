@@ -50,7 +50,9 @@ class _CountingCentre:
         self.save_dir = save_dir
         self.calls = []
 
-    def fetch_one(self, model, cycle, step, params, mirror, member=None, *, whole=False):
+    def fetch_one(
+        self, model, cycle, step, params, mirror, member=None, *, whole=False
+    ):
         """Record the call (incl. `whole`) and return a fabricated GRIB path."""
         self.calls.append((cycle, step, tuple(params), mirror, member, whole))
         suffix = f"_m{member}" if member is not None else ""
@@ -67,11 +69,15 @@ class _FlakyCentre(_CountingCentre):
         super().__init__(save_dir)
         self.fail_step = fail_step
 
-    def fetch_one(self, model, cycle, step, params, mirror, member=None, *, whole=False):
+    def fetch_one(
+        self, model, cycle, step, params, mirror, member=None, *, whole=False
+    ):
         """Raise for `fail_step`; otherwise behave like the counting centre."""
         if step == self.fail_step:
             raise RuntimeError(f"f{step:03d} not published")
-        return super().fetch_one(model, cycle, step, params, mirror, member, whole=whole)
+        return super().fetch_one(
+            model, cycle, step, params, mirror, member, whole=whole
+        )
 
 
 class TestConstruction:
@@ -474,7 +480,9 @@ class TestNormaliseLongitudeRealPyramids:
         out = b._normalise_longitude(ds)
         assert out is ds and out.geotransform[0] == 0.0
 
-    def test_negative_bbox_real_regional_swallows_valueerror(self, mini_catalog, tmp_path):
+    def test_negative_bbox_real_regional_swallows_valueerror(
+        self, mini_catalog, tmp_path
+    ):
         """A real non-global grid raises inside pyramids and is returned as-is."""
         b = _make(mini_catalog, tmp_path, lon_lim=[-100, -50])
         ds = _real_dataset(global_360=False)
@@ -644,8 +652,9 @@ class TestAggregate:
 
 def test_unknown_backend_raises(tmp_path):
     """A catalog model with an unrecognised backend is rejected at construction."""
-    from earthlens.nwp import Catalog
     from earthlens.nwp.catalog import NWPModel
+
+    from earthlens.nwp import Catalog
 
     # backend is a pydantic Literal, so a normal NWPModel cannot hold an unknown
     # value — model_construct bypasses validation to exercise the runtime guard.
@@ -719,9 +728,9 @@ class TestRetentionWarning:
         from earthlens.nwp import RetentionWarning
 
         cat = self._short_window_catalog()
-        old = (dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(days=30)).strftime(
-            "%Y-%m-%d"
-        )
+        old = (
+            dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(days=30)
+        ).strftime("%Y-%m-%d")
         with pytest.warns(RetentionWarning, match="retains"):
             self._build(cat, "icon", tmp_path, old)
 

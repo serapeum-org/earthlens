@@ -15,9 +15,8 @@ import importlib.util
 from pathlib import Path
 
 import pytest
-from geopandas import GeoDataFrame
-
 from earthlens.earthlens import EarthLens
+from geopandas import GeoDataFrame
 
 _HAVE_PYOBIS = importlib.util.find_spec("pyobis") is not None
 

@@ -6,10 +6,10 @@ import sys
 import types
 
 import pytest
-
 from earthlens.cli.curate import _PROBERS
 from earthlens.cli.stanza import _EMITTERS
 from earthlens.cli.validate import _VALIDATORS
+
 from earthlens.jaxa.catalog import Catalog
 
 pytestmark = [pytest.mark.jaxa, pytest.mark.unit]
@@ -44,7 +44,8 @@ def test_validate_clean_catalog_has_no_issues(catalog: Catalog) -> None:
 
 
 def test_probe_jaxa_earth_returns_band_roles(
-    catalog: Catalog, monkeypatch: pytest.MonkeyPatch,
+    catalog: Catalog,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A jaxa-earth row probe returns one entry per band, role='band'."""
     key, row = next(
@@ -66,6 +67,7 @@ def test_probe_jaxa_earth_returns_band_roles(
 
 def test_emit_jaxa_earth_seeds_default_band(monkeypatch: pytest.MonkeyPatch) -> None:
     """A STAC name seeds protocol=jaxa-earth with the first band as default."""
+
     class _FakeList:
         def filter_name(self):  # noqa: D401
             return ["JAXA.AW3D30.v3.2"], [["DSM", "MSK"]]

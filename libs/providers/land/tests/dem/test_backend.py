@@ -213,9 +213,7 @@ class TestApiComposition:
 class TestErrorPaths:
     """Non-404 S3 errors propagate — only ocean 404s are silenced."""
 
-    def test_head_object_other_error_propagates(
-        self, tmp_path: Path, make_fake_client
-    ):
+    def test_head_object_other_error_propagates(self, tmp_path: Path, make_fake_client):
         """A 500 / AccessDenied on head_object surfaces to the caller."""
         from botocore.exceptions import ClientError
 
@@ -318,6 +316,7 @@ class TestNoDecodeImports:
         calls whose argument is a string literal.
         """
         import ast
+
         import earthlens.dem
 
         root = Path(earthlens.dem.__file__).parent
@@ -336,9 +335,7 @@ class TestNoDecodeImports:
                 elif isinstance(node, ast.ImportFrom):
                     head = (node.module or "").split(".", 1)[0]
                     if head in banned:
-                        offending.append(
-                            (relative, node.lineno, f"from {node.module}")
-                        )
+                        offending.append((relative, node.lineno, f"from {node.module}"))
                 elif isinstance(node, ast.Call):
                     target = None
                     if (
@@ -358,9 +355,7 @@ class TestNoDecodeImports:
                     ):
                         target = node.args[0].value
                     if target and target.split(".", 1)[0] in banned:
-                        offending.append(
-                            (relative, node.lineno, f"dynamic:{target}")
-                        )
+                        offending.append((relative, node.lineno, f"dynamic:{target}"))
         assert offending == [], (
             f"earthlens.dem must not import decode libraries: {offending}"
         )

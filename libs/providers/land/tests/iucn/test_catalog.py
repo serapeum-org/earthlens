@@ -109,4 +109,3 @@ class TestModelPostInitSkipsLoadWhenProvided:
         cat = Catalog(available_datasets=["preset:held"])
         assert cat.available_datasets == ["preset:held"], "preset survived YAML load"
         assert len(cat.datasets) > 0, "YAML still loaded for datasets"
-

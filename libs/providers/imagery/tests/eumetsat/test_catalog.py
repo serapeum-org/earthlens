@@ -141,10 +141,7 @@ def test_load_from_single_file(tmp_path):
     """Catalog.load() accepts a single YAML file as well as a directory."""
     single = tmp_path / "one.yaml"
     single.write_text(
-        "datasets:\n"
-        "  demo:\n"
-        "    collection_id: 'EO:EUM:DAT:DEMO'\n"
-        "    group: MSG\n",
+        "datasets:\n  demo:\n    collection_id: 'EO:EUM:DAT:DEMO'\n    group: MSG\n",
         encoding="utf-8",
     )
     clear_catalog_cache()

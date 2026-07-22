@@ -7,10 +7,11 @@ import sys
 import pandas as pd
 import pytest
 import requests
+from earthlens.aggregate import AggregationConfig
 from pyramids.dataset import Dataset
 
-from earthlens.aggregate import AggregationConfig
 from earthlens.worldpop import WorldPop
+
 from .conftest import _FakeResponse, age_records, pop_records
 
 pytestmark = pytest.mark.worldpop

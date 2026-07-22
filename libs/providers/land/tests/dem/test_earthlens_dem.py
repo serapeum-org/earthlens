@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from earthlens.earthlens import EarthLens
 
 import earthlens.dem
-from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.dem
 

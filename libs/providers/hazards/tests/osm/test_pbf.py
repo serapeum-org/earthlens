@@ -17,14 +17,14 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from shapely.geometry import LineString, Point, Polygon, box
-
-from earthlens.osm import _pbf
 from earthlens.osm._pbf import (
     download_extract,
     geofabrik_url,
     read_pbf,
 )
+from shapely.geometry import LineString, Point, Polygon, box
+
+from earthlens.osm import _pbf
 
 #: The fixed extract payload the fake `download` writes; the fake md5 sidecar
 #: serves its digest so a fresh download verifies clean.
@@ -402,7 +402,10 @@ class TestReadPyosmium:
 
     def test_point_layer(self, tmp_path, fake_osmium):
         """A point layer (`get_pois`) yields `Point`s from tagged nodes."""
-        fake_osmium.objects = [FakeNode(1, 14.5, 35.9), FakeNode(2, 0.0, 0.0, valid=False)]
+        fake_osmium.objects = [
+            FakeNode(1, 14.5, 35.9),
+            FakeNode(2, 0.0, 0.0, valid=False),
+        ]
         pbf = tmp_path / "x.osm.pbf"
         pbf.write_bytes(b"x")
         fc = read_pbf(pbf, pyrosm_method="get_pois", engine="pyosmium")

@@ -5,9 +5,9 @@ from __future__ import annotations
 import math
 
 import pytest
+from earthlens.base.spatial import METRES_PER_DEGREE, estimate_pixel_dims
 
 from earthlens.base import SpatialExtent
-from earthlens.base.spatial import METRES_PER_DEGREE, estimate_pixel_dims
 
 
 class TestEstimatePixelDims:

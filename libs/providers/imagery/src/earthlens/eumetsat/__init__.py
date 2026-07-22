@@ -45,6 +45,8 @@ from earthlens.eumetsat.auth import (
     EumetsatCredentials,
 )
 from earthlens.eumetsat.backend import EUMETSAT
+from earthlens.eumetsat.tailor import TailorConfig
+
 from earthlens.eumetsat.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -54,7 +56,6 @@ from earthlens.eumetsat.catalog import (
     TemporalCoverage,
     clear_catalog_cache,
 )
-from earthlens.eumetsat.tailor import TailorConfig
 
 __all__ = [
     "AuthenticationError",

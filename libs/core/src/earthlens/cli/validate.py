@@ -21,7 +21,6 @@ from typing import Any
 from urllib.parse import urlsplit
 
 import requests
-
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _TIMEOUT, _get_json
 
@@ -464,9 +463,7 @@ def _validate_goes(catalog: Any) -> tuple[int, list[str]]:
             issues.append(f"{key}: unknown domain(s) {unknown}")
         default = getattr(product, "default_domain", None)
         if domains and default not in domains:
-            issues.append(
-                f"{key}: default_domain {default!r} not in domains {domains}"
-            )
+            issues.append(f"{key}: default_domain {default!r} not in domains {domains}")
         if getattr(product, "band_split", False) and not getattr(
             product, "bands", None
         ):

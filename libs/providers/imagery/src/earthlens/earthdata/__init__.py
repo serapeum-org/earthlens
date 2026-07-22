@@ -44,6 +44,7 @@ from earthlens.earthdata.auth import (
     EarthdataCredentials,
 )
 from earthlens.earthdata.backend import EarthData, Earthdata
+
 from earthlens.earthdata.catalog import (
     CATALOG_PATH,
     PROVIDERS_PATH,

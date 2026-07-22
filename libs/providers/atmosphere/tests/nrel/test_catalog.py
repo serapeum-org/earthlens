@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from earthlens.nrel.catalog import CATALOG_PATH, _load_catalog_data, clear_catalog_cache
 
 from earthlens.nrel import Catalog, Product
-from earthlens.nrel.catalog import CATALOG_PATH, _load_catalog_data, clear_catalog_cache
 
 pytestmark = pytest.mark.nrel
 

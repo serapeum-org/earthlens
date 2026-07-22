@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pyramids.dataset.merge as merge_mod
 import pytest
-
 from earthlens.sentinel_hub.backend import SentinelHub
 
 pytestmark = pytest.mark.sentinel_hub

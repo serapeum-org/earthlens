@@ -44,10 +44,12 @@ from __future__ import annotations
 
 import datetime as dt
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import pandas as pd
+from earthlens.hdx._helpers import match_resource
 from loguru import logger
 
 from earthlens.base import (
@@ -57,7 +59,6 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.hdx._helpers import match_resource
 from earthlens.hdx.catalog import Catalog
 
 if TYPE_CHECKING:

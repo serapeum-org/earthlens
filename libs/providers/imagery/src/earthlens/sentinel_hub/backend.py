@@ -28,16 +28,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from loguru import logger
-
-from earthlens.base import (
-    AbstractDataSource,
-    OutputKind,
-    RemoteProduct,
-    SpatialExtent,
-    TemporalExtent,
-    date_windows,
-)
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
 from earthlens.sentinel_hub._helpers import (
     ASYNC_MAX_DIMENSION,
@@ -49,10 +39,21 @@ from earthlens.sentinel_hub._helpers import (
     tile_bbox,
 )
 from earthlens.sentinel_hub.auth import SentinelHubAuth, SentinelHubCredentials
+from loguru import logger
+
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    RemoteProduct,
+    SpatialExtent,
+    TemporalExtent,
+    date_windows,
+)
 from earthlens.sentinel_hub.catalog import read_evalscript
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
+
     from earthlens.sentinel_hub.catalog import Catalog, ResolvedRequest
 
 #: The per-pixel scene-selection orders accepted by `mosaicking_order=`
@@ -245,8 +246,6 @@ class SentinelHub(AbstractDataSource):
             ValueError: When `start` or `end` is `None`.
         """
         import datetime as dt
-
-        import pandas as pd
 
         if start is None or end is None:
             raise ValueError(

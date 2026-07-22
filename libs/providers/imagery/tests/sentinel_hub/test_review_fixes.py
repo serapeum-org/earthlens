@@ -13,7 +13,6 @@ import types
 from pathlib import Path
 
 import pytest
-
 from earthlens.aggregate import AggregationConfig
 from earthlens.sentinel_hub.backend import (
     SentinelHub,
@@ -172,9 +171,9 @@ class TestAggregateEdges:
         )
         paths = backend.download(aggregate=AggregationConfig(freq="1MS", op="mean"))
         stamps = sorted(Path(p).name.split("_")[-1] for p in paths)
-        assert (
-            stamps[0] == "20200615.tiff"
-        ), f"first window not stamped at start: {stamps}"
+        assert stamps[0] == "20200615.tiff", (
+            f"first window not stamped at start: {stamps}"
+        )
 
     def test_async_aggregate_passes_uris_through(self, fake_sh, output_dir):
         """Windowed aggregate on the async (S3) plane returns the URIs unchanged."""

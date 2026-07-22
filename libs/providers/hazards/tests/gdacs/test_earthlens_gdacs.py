@@ -10,10 +10,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from earthlens.earthlens import EarthLens
 from geopandas import GeoDataFrame
 
 import earthlens.gdacs
-from earthlens.earthlens import EarthLens
 
 from .conftest import _FakeGdacs
 
@@ -65,9 +65,9 @@ class TestFacadeAggregateRejection:
         facade = _make_facade(tmp_path)
         with pytest.raises(NotImplementedError) as exc:
             facade.download(aggregate=object())
-        assert "vector" in str(
-            exc.value
-        ), f"rejection message should mention 'vector', got: {exc.value}"
+        assert "vector" in str(exc.value), (
+            f"rejection message should mention 'vector', got: {exc.value}"
+        )
 
     def test_aggregate_none_is_allowed(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
         """`aggregate=None` is fine and a normal download runs."""

@@ -32,6 +32,7 @@ import argparse
 from pathlib import Path
 
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
+
 from earthlens.ecmwf import Catalog
 
 

@@ -36,10 +36,17 @@ import datetime as dt
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 import requests
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.erddap._helpers import (
+    build_constraints,
+    build_griddap_url,
+    empty_canonical,
+)
 from loguru import logger
 
 from earthlens.base import (
@@ -49,14 +56,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.base.http import HttpClient
-from earthlens.erddap._helpers import (
-    build_constraints,
-    build_griddap_url,
-    empty_canonical,
-)
 from earthlens.erddap.catalog import Catalog, Dataset
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -78,6 +78,8 @@ _NO_MATCH_MARKER = "produced no matching results"
 #: body that does not start with one of these is an error page (ERDDAP serves
 #: those as HTML, sometimes with a 200), not data.
 _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HDF")
+
+
 @dataclass(frozen=True)
 class _GridVarInfo:
     """Minimal `var_info` adapter for :func:`earthlens.aggregate.aggregate_netcdf`.

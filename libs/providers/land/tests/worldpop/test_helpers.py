@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from earthlens.worldpop._helpers import (
     cohort_of,
     continent_for_bbox,

@@ -108,10 +108,14 @@ class TestDeafricaE2E:
     def test_wofs_writes_cog(self, tmp_path: Path):
         """A one-item WOfS pull over Johannesburg writes a readable COG."""
         stac = STAC(
-            start="2024-01-01", end="2024-12-31",
+            start="2024-01-01",
+            end="2024-12-31",
             variables={"deafrica/wofs_ls": ["water"]},
-            lat_lim=[-26.5, -26.0], lon_lim=[28.0, 28.5],
-            path=str(tmp_path), endpoint="deafrica", max_items=1,
+            lat_lim=[-26.5, -26.0],
+            lon_lim=[28.0, 28.5],
+            path=str(tmp_path),
+            endpoint="deafrica",
+            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"
@@ -126,10 +130,14 @@ class TestDeaE2E:
     def test_wofs_writes_cog(self, tmp_path: Path):
         """A one-item WOfS pull over Canberra writes a readable COG."""
         stac = STAC(
-            start="2024-01-01", end="2024-12-31",
+            start="2024-01-01",
+            end="2024-12-31",
             variables={"dea/ga_ls_wo_3": ["water"]},
-            lat_lim=[-35.5, -35.0], lon_lim=[149.0, 149.5],
-            path=str(tmp_path), endpoint="dea", max_items=1,
+            lat_lim=[-35.5, -35.0],
+            lon_lim=[149.0, 149.5],
+            path=str(tmp_path),
+            endpoint="dea",
+            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"
@@ -144,10 +152,14 @@ class TestVedaE2E:
     def test_nldas3_writes_cog(self, tmp_path: Path):
         """A one-item NLDAS-3 pull writes a readable COG."""
         stac = STAC(
-            start="2020-01-01", end="2024-12-31",
+            start="2020-01-01",
+            end="2024-12-31",
             variables={"veda/nldas3": ["cog_default"]},
-            lat_lim=[35.0, 45.0], lon_lim=[-100.0, -90.0],
-            path=str(tmp_path), endpoint="veda", max_items=1,
+            lat_lim=[35.0, 45.0],
+            lon_lim=[-100.0, -90.0],
+            path=str(tmp_path),
+            endpoint="veda",
+            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"
@@ -162,10 +174,14 @@ class TestBdcE2E:
     def test_cbers4_wfi_writes_cog(self, tmp_path: Path):
         """A one-item CBERS-4 WFI 16-day composite over São Paulo writes a readable COG."""
         stac = STAC(
-            start="2024-01-01", end="2024-12-31",
+            start="2024-01-01",
+            end="2024-12-31",
             variables={"bdc/CBERS4-WFI-16D-2": ["NDVI"]},
-            lat_lim=[-23.7, -23.2], lon_lim=[-46.8, -46.3],
-            path=str(tmp_path), endpoint="bdc", max_items=1,
+            lat_lim=[-23.7, -23.2],
+            lon_lim=[-46.8, -46.3],
+            path=str(tmp_path),
+            endpoint="bdc",
+            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"
@@ -186,10 +202,14 @@ class TestUsgsLandsatE2E:
     def test_c2l2_sr_writes_cog(self, tmp_path: Path):
         """A one-item Landsat C2 L2 SR pull over SF Bay writes a readable COG."""
         stac = STAC(
-            start="2024-06-01", end="2024-08-31",
+            start="2024-06-01",
+            end="2024-08-31",
             variables={"usgs-landsat/landsat-c2l2-sr": ["red"]},
-            lat_lim=[37.5, 38.0], lon_lim=[-122.5, -122.0],
-            path=str(tmp_path), endpoint="usgs-landsat", max_items=1,
+            lat_lim=[37.5, 38.0],
+            lon_lim=[-122.5, -122.0],
+            path=str(tmp_path),
+            endpoint="usgs-landsat",
+            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"

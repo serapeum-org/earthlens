@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from earthlens.openaq.catalog import CATALOG_PATH
 
 from earthlens.openaq import Catalog, Parameter
-from earthlens.openaq.catalog import CATALOG_PATH
 
 
 @pytest.mark.openaq

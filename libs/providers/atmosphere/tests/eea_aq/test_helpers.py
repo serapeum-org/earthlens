@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-
 from earthlens.eea_aq._helpers import (
     countries_in_bbox,
     datasets_for_years,
@@ -20,7 +19,9 @@ from earthlens.eea_aq._helpers import (
 class _LoopRequest:
     """Stand-in airbase request that writes a marker file on download."""
 
-    def download(self, dir: str, skip_existing: bool = True, raise_for_status: bool = True) -> None:
+    def download(
+        self, dir: str, skip_existing: bool = True, raise_for_status: bool = True
+    ) -> None:
         Path(dir, "ok.txt").write_text("x", encoding="utf-8")
 
 
@@ -124,7 +125,9 @@ class TestShapeFrame:
         from loguru import logger
 
         messages: list[str] = []
-        sink = logger.add(lambda m: messages.append(m.record["message"]), level="WARNING")
+        sink = logger.add(
+            lambda m: messages.append(m.record["message"]), level="WARNING"
+        )
         shape_frame(self._raw(), "Verified", {123: "xx"})  # no code matches
         logger.remove(sink)
         assert any("schema drift" in message.lower() for message in messages)

@@ -30,7 +30,10 @@ def _write_era5_like_cube(path):
     ds = xr.Dataset(
         {
             "t2m": (("valid_time", "latitude", "longitude"), t2m),
-            "expver": (("valid_time",), np.array(["0001", "0001", "0005"], dtype="<U4")),
+            "expver": (
+                ("valid_time",),
+                np.array(["0001", "0001", "0005"], dtype="<U4"),
+            ),
         },
         coords={"valid_time": times, "latitude": lat, "longitude": lon},
     )
@@ -56,5 +59,7 @@ def test_polygon_mask_real_pyramids_carries_aux_var(ecmwf_stub, tmp_path):
     _write_era5_like_cube(target)
     ecmwf_stub.space = _polygon_space(ecmwf_stub.space)
     ecmwf_stub._mask_netcdf_to_geometry(target)  # must NOT raise (pyramids#514)
-    assert target.exists() and target.stat().st_size > 0, "masked NetCDF must be written"
+    assert target.exists() and target.stat().st_size > 0, (
+        "masked NetCDF must be written"
+    )
     assert not (tmp_path / "t2m.masked.nc").exists(), "temp file must be replaced"

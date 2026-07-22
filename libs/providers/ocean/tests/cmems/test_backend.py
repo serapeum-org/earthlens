@@ -10,11 +10,11 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import pytest
-
 from earthlens.aggregate import AggregationConfig
+from earthlens.cmems.backend import _safe_filename, _unique_output_names
+
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.cmems import CMEMS, AuthenticationError, CmemsAuth
-from earthlens.cmems.backend import _safe_filename, _unique_output_names
 
 
 class _FakeResponse:
@@ -59,9 +59,9 @@ class _FakeCmems(types.ModuleType):
             raise per_ds
         if self.subset_raises is not None:
             raise self.subset_raises
-        assert (
-            self.subset_response is not None
-        ), "test forgot to set `subset_response` on the fake module"
+        assert self.subset_response is not None, (
+            "test forgot to set `subset_response` on the fake module"
+        )
         return self.subset_response
 
 
@@ -190,9 +190,9 @@ class TestCMEMSConstruction:
 
     def test_init_captures_space(self, cmems_instance: CMEMS):
         """The user bbox is captured onto `self.space` via `SpatialExtent`."""
-        assert isinstance(
-            cmems_instance.space, SpatialExtent
-        ), "self.space must be a SpatialExtent instance"
+        assert isinstance(cmems_instance.space, SpatialExtent), (
+            "self.space must be a SpatialExtent instance"
+        )
         assert cmems_instance.space.south == 40.0
         assert cmems_instance.space.north == 42.0
         assert cmems_instance.space.west == -10.0
@@ -210,12 +210,12 @@ class TestCMEMSConstruction:
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
     ):
         """Construction stores the auth offline but does not log in."""
-        assert (
-            len(fake_cmems.login_calls) == 0
-        ), f"construction must not authenticate, got {len(fake_cmems.login_calls)}"
-        assert (
-            cmems_instance._auth is not None
-        ), "CmemsAuth must be stored on the instance"
+        assert len(fake_cmems.login_calls) == 0, (
+            f"construction must not authenticate, got {len(fake_cmems.login_calls)}"
+        )
+        assert cmems_instance._auth is not None, (
+            "CmemsAuth must be stored on the instance"
+        )
         assert isinstance(cmems_instance._auth, CmemsAuth)
         cmems_instance._auth.configure()
         assert len(fake_cmems.login_calls) == 1, "first configure() authenticates once"
@@ -324,9 +324,9 @@ class TestCMEMSFetch:
         cm._fetch(cm._search())
         filename = fake_cmems.subset_calls[0]["output_filename"]
         for bad in ("/", "\\", ":", "*", "?", '"', "<", ">", "|"):
-            assert (
-                bad not in filename
-            ), f"unsafe character {bad!r} leaked into output_filename: {filename!r}"
+            assert bad not in filename, (
+                f"unsafe character {bad!r} leaked into output_filename: {filename!r}"
+            )
 
     def test_total_failure_raises(self, fake_cmems: _FakeCmems, cmems_instance: CMEMS):
         """When every subset fails, _fetch raises rather than returning []."""
@@ -357,9 +357,9 @@ class TestCMEMSFetch:
             service_password="secret",
         )
         paths = cm._fetch(cm._search())
-        assert paths == [
-            good
-        ], f"partial failure should return only the survivor; got {paths!r}"
+        assert paths == [good], (
+            f"partial failure should return only the survivor; got {paths!r}"
+        )
 
     def test_subset_missing_file_path_raises(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
@@ -581,9 +581,9 @@ class TestSafeFilename:
     )
     def test_safe_filename(self, raw: str, expected: str):
         """Illegal characters are uniformly replaced with `_`."""
-        assert (
-            _safe_filename(raw) == expected
-        ), f"_safe_filename({raw!r}) should be {expected!r}, got {_safe_filename(raw)!r}"
+        assert _safe_filename(raw) == expected, (
+            f"_safe_filename({raw!r}) should be {expected!r}, got {_safe_filename(raw)!r}"
+        )
 
 
 @pytest.mark.cmems
@@ -603,29 +603,29 @@ class TestUniqueOutputNames:
     def test_collision_is_disambiguated_and_unique(self):
         """Two ids normalising to the same stem get distinct hash-suffixed names."""
         names = _unique_output_names(["a/b", "a_b"], "nc")
-        assert (
-            len(set(names.values())) == 2
-        ), f"colliding ids must get unique filenames, got {names!r}"
+        assert len(set(names.values())) == 2, (
+            f"colliding ids must get unique filenames, got {names!r}"
+        )
         for value in names.values():
-            assert value.startswith("a_b_") and value.endswith(
-                ".nc"
-            ), f"disambiguated name should keep the stem + suffix, got {value!r}"
+            assert value.startswith("a_b_") and value.endswith(".nc"), (
+                f"disambiguated name should keep the stem + suffix, got {value!r}"
+            )
 
     def test_disambiguation_is_deterministic(self):
         """The hash suffix is stable across calls (same id -> same name)."""
         first = _unique_output_names(["a/b", "a_b"], "nc")
         second = _unique_output_names(["a/b", "a_b"], "nc")
-        assert (
-            first == second
-        ), f"output names must be deterministic: {first} != {second}"
+        assert first == second, (
+            f"output names must be deterministic: {first} != {second}"
+        )
 
     @pytest.mark.parametrize("ext", ["nc", "zarr"])
     def test_extension_applied(self, ext: str):
         """The supplied extension is appended to every filename."""
         names = _unique_output_names(["ds-1"], ext)
-        assert (
-            names["ds-1"] == f"ds-1.{ext}"
-        ), f"expected ds-1.{ext}, got {names['ds-1']!r}"
+        assert names["ds-1"] == f"ds-1.{ext}", (
+            f"expected ds-1.{ext}, got {names['ds-1']!r}"
+        )
 
     def test_empty_input(self):
         """No dataset ids yields an empty map."""

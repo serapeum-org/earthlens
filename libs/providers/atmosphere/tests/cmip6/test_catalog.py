@@ -5,9 +5,9 @@ from __future__ import annotations
 import textwrap
 
 import pytest
+from earthlens.cmip6.catalog import CATALOG_PATH, clear_catalog_cache
 
 from earthlens.cmip6 import Catalog, Cmip6Variable, Experiment, Source, Table
-from earthlens.cmip6.catalog import CATALOG_PATH, clear_catalog_cache
 
 pytestmark = [pytest.mark.cmip6, pytest.mark.unit]
 

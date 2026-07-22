@@ -5,7 +5,6 @@ from __future__ import annotations
 import geopandas as gpd
 import pandas as pd
 import pytest
-
 from earthlens.firms.events import (
     ATTRIBUTE_COLUMNS,
     concat,

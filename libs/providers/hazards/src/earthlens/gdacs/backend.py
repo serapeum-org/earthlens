@@ -31,10 +31,12 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
-import requests
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.gdacs.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -44,15 +46,11 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.base.http import HttpClient
 from earthlens.gdacs import events
-from earthlens.gdacs.catalog import Catalog
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
-    from pyramids.feature.collection import FeatureCollection
-
     from earthlens.aggregate import AggregationConfig
+    from pyramids.feature.collection import FeatureCollection
 
 
 #: GDACS SEARCH endpoint — returns the whole event list for a window in
@@ -83,6 +81,8 @@ _DRIVERS: dict[str, tuple[str, str]] = {
     "gpkg": ("GPKG", "gpkg"),
     "geojson": ("GeoJSON", "geojson"),
 }
+
+
 class GDACS(AbstractDataSource):
     """GDACS multi-hazard alert backend (vector point-feature output).
 
@@ -153,8 +153,7 @@ class GDACS(AbstractDataSource):
         """
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         if isinstance(variables, dict):
             raise TypeError(
@@ -388,8 +387,7 @@ class GDACS(AbstractDataSource):
             )
         else:
             logger.warning(
-                "GDACS download summary: no alerts matched the request, "
-                "nothing written"
+                "GDACS download summary: no alerts matched the request, nothing written"
             )
         return collection
 

@@ -24,9 +24,8 @@ from typing import Any
 
 import pandas as pd
 import requests
-from loguru import logger
-
 from earthlens.base.http import HttpClient
+from loguru import logger
 
 #: Live JSON API: the last ~5 minutes of every sensor, globally.
 LIVE_URL = "https://data.sensor.community/static/v2/data.json"
@@ -137,9 +136,7 @@ class SensorCommunityClient:
         payload = self._http.get_json(LIVE_URL)
         return payload if isinstance(payload, list) else []
 
-    def archive_csv(
-        self, date: str, sensor_type: str, sensor_id: str
-    ) -> str | None:
+    def archive_csv(self, date: str, sensor_type: str, sensor_id: str) -> str | None:
         """Fetch one per-sensor daily archive CSV, or `None` when absent.
 
         Args:

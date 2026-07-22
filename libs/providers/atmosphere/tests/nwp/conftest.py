@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from earthlens.nwp.catalog import Catalog, NWPModel
 
 
