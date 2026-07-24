@@ -142,7 +142,7 @@ dev = [
     "build>=1.0.0",
     "twine>=5.0.0",
     "pip",
-    "jupyterlab",
+    "jupyterlab>=4.6.2",
     "notebook",
     "jupyter",
     "commitizen>=4.8.4",
@@ -170,7 +170,7 @@ docs = [
 
 notebook = [
     "pip",
-    "jupyterlab",
+    "jupyterlab>=4.6.2",
     "notebook",
     "jupyter",
     "ipykernel",
