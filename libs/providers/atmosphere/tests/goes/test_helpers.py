@@ -53,7 +53,7 @@ class TestParseScanStart:
 
     def test_parses_scan_start_with_tenths(self):
         """The _s token parses to a naive-UTC datetime including tenths of a second."""
-        key = "OR_ABI-L2-MCMIPC-M6_G19_s20261841201185_e1_c1.nc"
+        key = "OR_ABI-L2-MCMIPC-M6_G19_s20261841201185_e1_c1.nc"  # gitleaks:allow - GOES product filename, not a secret
         assert parse_scan_start(key) == dt.datetime(2026, 7, 3, 12, 1, 18, 500000), (
             "day-of-year 184 = 2026-07-03, tenths digit 5 -> 500000 us"
         )
