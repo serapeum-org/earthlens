@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.iucn._rest import _category, _flatten_label
 
 

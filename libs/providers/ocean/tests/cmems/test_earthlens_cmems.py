@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from earthlens.aggregate import AggregationConfig
-from earthlens.earthlens import EarthLens
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.cmems import CMEMS
+from earthlens.earthlens import EarthLens
 
 
 class _FakeCmems(types.ModuleType):

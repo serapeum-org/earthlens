@@ -35,14 +35,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
-from earthlens.sensor_community._helpers import (
-    LicenseWarning,
-    SensorCommunityClient,
-    empty_frame,
-    frame_from_csv,
-    sensors_in_bbox,
-)
-from earthlens.sensor_community.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -52,9 +44,18 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.sensor_community._helpers import (
+    LicenseWarning,
+    SensorCommunityClient,
+    empty_frame,
+    frame_from_csv,
+    sensors_in_bbox,
+)
+from earthlens.sensor_community.catalog import Catalog
 
 if TYPE_CHECKING:
     import requests
+
     from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]

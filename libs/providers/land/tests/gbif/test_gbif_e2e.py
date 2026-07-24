@@ -15,8 +15,9 @@ import importlib.util
 from pathlib import Path
 
 import pytest
-from earthlens.earthlens import EarthLens
 from geopandas import GeoDataFrame
+
+from earthlens.earthlens import EarthLens
 
 _HAVE_PYGBIF = importlib.util.find_spec("pygbif") is not None
 

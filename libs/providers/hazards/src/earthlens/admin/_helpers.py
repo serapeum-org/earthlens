@@ -22,9 +22,10 @@ from __future__ import annotations
 from typing import cast
 
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
+from pyramids.feature.collection import FeatureCollection
+
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
-from pyramids.feature.collection import FeatureCollection
 
 #: geoBoundaries gbOpen API base — `"{base}/{ISO3}/{ADM}/"` returns the metadata
 #: whose `gjDownloadURL` is the GeoJSON to read (`geoboundaries_resolve`).

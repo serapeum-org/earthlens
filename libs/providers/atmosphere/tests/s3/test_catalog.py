@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.s3.catalog import Catalog, Dataset, Variable, clear_catalog_cache
 
 pytestmark = [pytest.mark.s3]

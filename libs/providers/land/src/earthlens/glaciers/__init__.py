@@ -42,7 +42,6 @@ from earthlens.glaciers._helpers import (
     wgms_glacier_table,
 )
 from earthlens.glaciers.backend import Glaciers
-
 from earthlens.glaciers.catalog import Catalog, Dataset, Region
 
 __all__ = [

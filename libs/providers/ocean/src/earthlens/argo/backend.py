@@ -36,6 +36,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
+from loguru import logger
+
+from earthlens.argo import _helpers
 from earthlens.argo._helpers import (
     ARGO_ACKNOWLEDGEMENT,
     ARGO_COLUMNS,
@@ -44,9 +47,6 @@ from earthlens.argo._helpers import (
     region_box,
 )
 from earthlens.argo.catalog import Catalog
-from loguru import logger
-
-from earthlens.argo import _helpers
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,

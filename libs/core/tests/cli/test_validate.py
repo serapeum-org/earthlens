@@ -5,6 +5,8 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
+
+from earthlens.cli import validate as validate_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.validate import (
     ValidateResult,
@@ -23,8 +25,6 @@ from earthlens.cli.validate import (
     supported_providers,
     validate_one,
 )
-
-from earthlens.cli import validate as validate_mod
 
 pytestmark = pytest.mark.cli
 
@@ -695,9 +695,8 @@ class TestLiveValidators:
 
     def test_nwm_live_clean_when_tokens_present(self, monkeypatch):
         """Every product's token appearing under a carrier config clears live."""
-        from earthlens.cli.adapter import load_catalog
-
         from earthlens.cli import refresh as refresh_mod
+        from earthlens.cli.adapter import load_catalog
 
         all_tokens = {
             product.s3_token for product in load_catalog(_info("nwm")).datasets.values()
@@ -914,9 +913,8 @@ class TestOfflineValidatorBranches:
 
     def test_sentinel_hub_bad_evalscript_flagged(self, monkeypatch):
         """A recipe whose evalscript lacks //VERSION=3 + dataMask is flagged."""
-        from earthlens.cli.validate import _validate_sentinel_hub
-
         from earthlens.cli import validate as vm
+        from earthlens.cli.validate import _validate_sentinel_hub
 
         monkeypatch.setattr(
             "earthlens.sentinel_hub.read_evalscript",
@@ -1011,6 +1009,7 @@ class TestLivePrimitives:
     def test_overture_live_sample_reports_sources(self, monkeypatch):
         """_overture_live_sample returns (row_count, has_sources_column)."""
         import overturemaps.core as core
+
         from earthlens.cli.validate import _overture_live_sample
 
         class FakeFrame:

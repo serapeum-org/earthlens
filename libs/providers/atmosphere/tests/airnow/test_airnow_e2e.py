@@ -17,6 +17,7 @@ import os
 from pathlib import Path
 
 import pytest
+
 from earthlens.earthlens import EarthLens
 
 _HAVE_KEY = bool(os.environ.get("AIRNOW_API_KEY"))

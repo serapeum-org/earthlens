@@ -18,10 +18,10 @@ from types import SimpleNamespace
 import pandas as pd
 import pytest
 import requests
-from earthlens.gee.backend import GEE
 
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.gee import backend as backend_module
+from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
 
 # -- fakes ------------------------------------------------------------------

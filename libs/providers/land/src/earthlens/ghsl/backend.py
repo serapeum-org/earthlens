@@ -27,8 +27,10 @@ from loguru import logger
 
 if TYPE_CHECKING:
     import numpy as np
+
     from earthlens.aggregate import AggregationConfig
 
+from earthlens.base import OutputKind, date_windows
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     RemoteProduct,
@@ -46,8 +48,6 @@ from earthlens.ghsl._helpers import (
     tiles_for_bbox,
 )
 from earthlens.ghsl.auth import GhslAuth
-
-from earthlens.base import OutputKind, date_windows
 from earthlens.ghsl.catalog import Catalog, native_source_crs
 
 #: Allowed values for the `api=` access-path selector.
@@ -404,8 +404,9 @@ class GHSL(AbstractDataSource):
         from collections import defaultdict
 
         import numpy as np
-        from earthlens.aggregate import _reduce, _window_groups
         from pyramids.dataset import Dataset
+
+        from earthlens.aggregate import _reduce, _window_groups
 
         op = "mean" if config.op == "auto" else config.op
         out_dir = (

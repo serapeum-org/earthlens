@@ -34,11 +34,6 @@ from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-from earthlens.cmems.auth import (
-    AuthenticationError,
-    CmemsAuth,
-    CmemsCredentials,
-)
 from loguru import logger
 from pydantic import SecretStr
 
@@ -52,10 +47,16 @@ from earthlens.base import (
     safe_filename,
     window_labels,
 )
+from earthlens.cmems.auth import (
+    AuthenticationError,
+    CmemsAuth,
+    CmemsCredentials,
+)
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
     from pyramids.netcdf import NetCDF
+
+    from earthlens.aggregate import AggregationConfig
 
 
 FileFormat = Literal["netcdf", "zarr"]
@@ -432,8 +433,9 @@ class CMEMS(AbstractDataSource):
         Raises:
             ValueError: When the file has no `time` dimension to window.
         """
-        from earthlens.base.raster import array_to_raster
         from pyramids.netcdf import NetCDF
+
+        from earthlens.base.raster import array_to_raster
 
         nc = NetCDF.read_file(str(nc_path))
         dims = tuple(nc.dimension_names or ())

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.earthlens import EarthLens
 
+from earthlens.earthlens import EarthLens
 from earthlens.goes import GOES
 
 pytestmark = pytest.mark.goes

@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import Callable
 
 import pytest
+from geopandas import GeoDataFrame
+from obspy.core.event import Catalog, Event
+
 from earthlens.fdsn.events import (
     ATTRIBUTE_COLUMNS,
     EVENT_CRS,
@@ -12,8 +15,6 @@ from earthlens.fdsn.events import (
     concat_fcs,
     empty_fc,
 )
-from geopandas import GeoDataFrame
-from obspy.core.event import Catalog, Event
 
 
 @pytest.mark.fdsn

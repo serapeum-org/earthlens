@@ -6,9 +6,9 @@ import warnings
 from pathlib import Path
 
 import pytest
-from earthlens.sensor_community._helpers import LicenseWarning
 
 from earthlens.sensor_community import SensorCommunity
+from earthlens.sensor_community._helpers import LicenseWarning
 
 from .conftest import DHT_CSV, _FakeClient, _record
 

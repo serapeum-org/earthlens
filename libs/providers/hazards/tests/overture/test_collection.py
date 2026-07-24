@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.overture._helpers import CDLA_PERMISSIVE, ODBL, LicenseWarning
 from earthlens.overture.collection import (
     DEFAULT_LICENSE,

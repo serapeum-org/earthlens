@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.overture.query import _dataset_path, _projection, build_query
 
 
@@ -120,6 +121,7 @@ class TestQueryOverture:
     def test_decodes_wkb_to_geodataframe(self, monkeypatch):
         """A populated result becomes an EPSG:4326 GeoDataFrame with geometry."""
         import duckdb
+
         from earthlens.overture.query import query_overture
 
         monkeypatch.setattr(
@@ -134,6 +136,7 @@ class TestQueryOverture:
     def test_empty_result_returns_empty(self, monkeypatch):
         """A zero-row result yields an empty GeoDataFrame."""
         import duckdb
+
         from earthlens.overture.query import query_overture
 
         monkeypatch.setattr(

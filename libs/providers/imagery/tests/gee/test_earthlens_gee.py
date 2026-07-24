@@ -12,12 +12,12 @@ import importlib
 from unittest.mock import MagicMock
 
 import pytest
+
+import earthlens.gee
 from earthlens.earthlens import (
     EarthLens,
     _LazyRegistry,  # noqa: F401 - imported for completeness
 )
-
-import earthlens.gee
 
 
 @pytest.fixture(scope="function")

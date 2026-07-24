@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.earthlens import EarthLens
 
 import earthlens.cmip6
+from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.cmip6, pytest.mark.unit]
 

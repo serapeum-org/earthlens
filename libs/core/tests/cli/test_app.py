@@ -8,10 +8,10 @@ import sys
 from functools import partial
 
 import pytest
-from earthlens.cli.app import _provider_backend_hint, app, main
 from typer.testing import CliRunner
 
 from earthlens.cli import app as cli_app
+from earthlens.cli.app import _provider_backend_hint, app, main
 
 pytestmark = pytest.mark.cli
 

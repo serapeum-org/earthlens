@@ -7,10 +7,10 @@ from typing import Any
 
 import pandas as pd
 import pytest
-from earthlens.aggregate import AggregationConfig
-from earthlens.earthlens import EarthLens
 
 import earthlens.usgs_water
+from earthlens.aggregate import AggregationConfig
+from earthlens.earthlens import EarthLens
 
 from .conftest import FakeUSGS
 

@@ -21,6 +21,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 import requests
+
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _TIMEOUT, _get_json
 

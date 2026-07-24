@@ -6,6 +6,8 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
+
+from earthlens.cmip6 import accessor
 from earthlens.cmip6.accessor import (
     GS_NO_SIGN_ENV,
     anonymous_gcs,
@@ -15,8 +17,6 @@ from earthlens.cmip6.accessor import (
     zstore_to_vsi,
 )
 from earthlens.cmip6.resolver import ResolvedStore
-
-from earthlens.cmip6 import accessor
 
 from .conftest import FakeContainer, FakeLabeled
 

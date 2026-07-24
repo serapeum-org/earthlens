@@ -8,15 +8,15 @@ import types
 from pathlib import Path
 
 import pytest
+
+import earthlens.nwm
+from earthlens.nwm import BUCKET, NWM
 from earthlens.nwm.backend import (
     _is_int,
     _is_missing_key,
     build_key,
     enumerate_cycles,
 )
-
-import earthlens.nwm
-from earthlens.nwm import BUCKET, NWM
 
 from .conftest import FakeS3
 

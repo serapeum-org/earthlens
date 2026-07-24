@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 import requests
+
 from earthlens.airnow.client import AirnowClient
 
 from .conftest import _FakeAirnow, _FakeResponse, _FakeSession

@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.radar.catalog import clear_catalog_cache
 from pydantic import ValidationError
 
 from earthlens.radar import Station, StationCatalog
 from earthlens.radar import catalog as catalog_mod
+from earthlens.radar.catalog import clear_catalog_cache
 
 pytestmark = [pytest.mark.radar, pytest.mark.unit]
 

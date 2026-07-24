@@ -35,7 +35,6 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 import requests
-from earthlens.pvgis.catalog import Catalog, Product
 from loguru import logger
 
 from earthlens.base import (
@@ -46,6 +45,7 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.pvgis import _helpers
+from earthlens.pvgis.catalog import Catalog, Product
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

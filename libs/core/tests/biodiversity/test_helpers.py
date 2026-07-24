@@ -133,9 +133,8 @@ class TestLicenseWarningPromotion:
 
     def test_identity_across_import_paths(self):
         """Overture's helper and public re-exports resolve to the shared class."""
-        from earthlens.overture._helpers import LicenseWarning as overture_helper
-
         from earthlens.overture import LicenseWarning as overture_public
+        from earthlens.overture._helpers import LicenseWarning as overture_helper
 
         assert overture_helper is LicenseWarning
         assert overture_public is LicenseWarning
@@ -185,10 +184,9 @@ class TestParseRetryAfter:
 
     def test_both_shims_reach_the_same_function(self):
         """The IUCN and WDPA shims re-export the shared helper as the same object."""
+        from earthlens.biodiversity import parse_retry_after
         from earthlens.iucn._rest import _parse_retry_after as iucn_alias
         from earthlens.wdpa._rest import _parse_retry_after as wdpa_alias
-
-        from earthlens.biodiversity import parse_retry_after
 
         assert iucn_alias is parse_retry_after
         assert wdpa_alias is parse_retry_after

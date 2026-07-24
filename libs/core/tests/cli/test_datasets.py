@@ -5,9 +5,6 @@ from __future__ import annotations
 import json
 
 import pytest
-from earthlens.cli.app import app
-from earthlens.cli.refresh import CoverageOutcome
-from earthlens.cli.table import build_table
 from typer.testing import CliRunner
 
 from earthlens.cli import _gee_hydrate as hydrate_mod
@@ -15,6 +12,9 @@ from earthlens.cli import curate as curate_mod
 from earthlens.cli import datasets as datasets_mod
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli import stanza as stanza_mod
+from earthlens.cli.app import app
+from earthlens.cli.refresh import CoverageOutcome
+from earthlens.cli.table import build_table
 
 pytestmark = pytest.mark.cli
 
@@ -261,10 +261,10 @@ class TestRefresh:
 
     def test_tiles_regenerates_ghsl_geojson(self, tmp_path, monkeypatch):
         """--tiles regenerates the GHSL tile artefact and reports it (mocked)."""
-        import earthlens.ghsl._helpers as ghsl_helpers
         import geopandas as gpd
         from shapely.geometry import box
 
+        import earthlens.ghsl._helpers as ghsl_helpers
         from earthlens.cli import refresh as refresh_mod
 
         frame = gpd.GeoDataFrame(

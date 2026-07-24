@@ -18,8 +18,9 @@ metadata / a sidecar.
 
 from __future__ import annotations
 
-from earthlens.base.auth import AbstractAuth
 from pydantic import BaseModel
+
+from earthlens.base.auth import AbstractAuth
 
 #: The attribution the GHSL licence requires downstream products to carry.
 GHSL_ATTRIBUTION: str = (

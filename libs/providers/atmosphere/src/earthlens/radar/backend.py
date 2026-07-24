@@ -32,7 +32,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
-from earthlens.radar.catalog import Catalog, Station
 from loguru import logger
 from tqdm import tqdm
 
@@ -43,6 +42,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.radar.catalog import Catalog, Station
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

@@ -32,8 +32,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
-from earthlens.cmip6.catalog import Catalog
-from earthlens.cmip6.resolver import ResolvedStore, StoreResolver
 from loguru import logger
 from tqdm import tqdm
 
@@ -45,6 +43,8 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.cmip6 import accessor
+from earthlens.cmip6.catalog import Catalog
+from earthlens.cmip6.resolver import ResolvedStore, StoreResolver
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

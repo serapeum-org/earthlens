@@ -28,17 +28,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
-from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
-from earthlens.sentinel_hub._helpers import (
-    ASYNC_MAX_DIMENSION,
-    RASTER_APIS,
-    SH_MAX_DIMENSION,
-    cdse_collection,
-    import_sentinelhub,
-    interval_for,
-    tile_bbox,
-)
-from earthlens.sentinel_hub.auth import SentinelHubAuth, SentinelHubCredentials
 from loguru import logger
 from pydantic import SecretStr
 
@@ -50,11 +39,21 @@ from earthlens.base import (
     TemporalExtent,
     date_windows,
 )
+from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
+from earthlens.sentinel_hub._helpers import (
+    ASYNC_MAX_DIMENSION,
+    RASTER_APIS,
+    SH_MAX_DIMENSION,
+    cdse_collection,
+    import_sentinelhub,
+    interval_for,
+    tile_bbox,
+)
+from earthlens.sentinel_hub.auth import SentinelHubAuth, SentinelHubCredentials
 from earthlens.sentinel_hub.catalog import read_evalscript
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-
     from earthlens.sentinel_hub.catalog import Catalog, ResolvedRequest
 
 #: The per-pixel scene-selection orders accepted by `mosaicking_order=`

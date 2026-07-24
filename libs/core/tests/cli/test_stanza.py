@@ -5,10 +5,10 @@ from __future__ import annotations
 from urllib.parse import urlparse
 
 import pytest
-from earthlens.cli.adapter import list_backends
-from earthlens.cli.stanza import StanzaResult, emit_stanza, supported_providers
 
 from earthlens.cli import stanza as stanza_mod
+from earthlens.cli.adapter import list_backends
+from earthlens.cli.stanza import StanzaResult, emit_stanza, supported_providers
 
 pytestmark = pytest.mark.cli
 
@@ -309,9 +309,9 @@ class TestWriteStanza:
         import importlib
 
         import yaml
-        from earthlens.cli.adapter import load_catalog
 
         from earthlens.cli import stanza as sm
+        from earthlens.cli.adapter import load_catalog
 
         info = _info("usgs_water")
         module = importlib.import_module(f"{info.module}.catalog")
@@ -357,9 +357,8 @@ class TestWriteStanza:
         import importlib
         import shutil
 
-        from earthlens.cli.adapter import load_catalog
-
         from earthlens.cli import stanza as sm
+        from earthlens.cli.adapter import load_catalog
 
         info = _info("usgs_water")
         module = importlib.import_module(f"{info.module}.catalog")

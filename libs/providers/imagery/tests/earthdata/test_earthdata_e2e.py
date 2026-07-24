@@ -19,6 +19,7 @@ import os
 from pathlib import Path
 
 import pytest
+
 from earthlens.earthlens import EarthLens
 
 # A non-interactive matplotlib backend so the notebooks' plot cells run headless.

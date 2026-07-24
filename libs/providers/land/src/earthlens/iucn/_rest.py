@@ -30,10 +30,10 @@ import time
 from typing import Any, cast
 
 import requests
-from earthlens.iucn.auth import AuthenticationError
 from loguru import logger
 
 from earthlens.biodiversity import parse_retry_after
+from earthlens.iucn.auth import AuthenticationError
 
 #: Base URL of the IUCN Red List v4 API (v3 is retired).
 BASE_URL = "https://api.iucnredlist.org/api/v4"

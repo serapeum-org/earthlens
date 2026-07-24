@@ -25,10 +25,10 @@ import re
 from pathlib import Path
 from typing import Any, Literal, cast
 
-from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "usgs_water_data_catalog.yaml"
 

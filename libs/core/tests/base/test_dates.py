@@ -4,9 +4,9 @@ import datetime as dt
 
 import pandas as pd
 import pytest
-from earthlens.base._dates import _strip_tz
 
 from earthlens.base import split_time, to_datetime
+from earthlens.base._dates import _strip_tz
 
 
 class TestToDatetime:

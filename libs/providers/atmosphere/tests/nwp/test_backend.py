@@ -652,9 +652,8 @@ class TestAggregate:
 
 def test_unknown_backend_raises(tmp_path):
     """A catalog model with an unrecognised backend is rejected at construction."""
-    from earthlens.nwp.catalog import NWPModel
-
     from earthlens.nwp import Catalog
+    from earthlens.nwp.catalog import NWPModel
 
     # backend is a pydantic Literal, so a normal NWPModel cannot hold an unknown
     # value — model_construct bypasses validation to exercise the runtime guard.

@@ -6,10 +6,10 @@ import sys
 import types
 
 import pytest
+
 from earthlens.cli.curate import _PROBERS
 from earthlens.cli.stanza import _EMITTERS
 from earthlens.cli.validate import _VALIDATORS
-
 from earthlens.jaxa.catalog import Catalog
 
 pytestmark = [pytest.mark.jaxa, pytest.mark.unit]

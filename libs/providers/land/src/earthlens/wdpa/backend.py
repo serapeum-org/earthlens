@@ -25,8 +25,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
-from earthlens.wdpa.auth import WdpaAuth, WdpaCredentials
-from earthlens.wdpa.catalog import Catalog
 from loguru import logger
 from pydantic import SecretStr
 from pyramids.feature.collection import FeatureCollection
@@ -39,6 +37,8 @@ from earthlens.base import (
 )
 from earthlens.biodiversity import WDPA_LICENSE, warn_license
 from earthlens.wdpa import _rest
+from earthlens.wdpa.auth import WdpaAuth, WdpaCredentials
+from earthlens.wdpa.catalog import Catalog
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

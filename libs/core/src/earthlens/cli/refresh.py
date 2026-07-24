@@ -43,6 +43,7 @@ from typing import Any, cast
 
 import requests
 import yaml
+
 from earthlens.cli.adapter import BackendInfo, load_catalog
 
 #: HTTP timeout (seconds) for a single live-listing request.

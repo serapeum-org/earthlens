@@ -48,9 +48,6 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
-from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
-from earthlens.eumetsat.tailor import TailorConfig
 from loguru import logger
 from pydantic import SecretStr
 
@@ -62,7 +59,10 @@ from earthlens.base import (
     TemporalExtent,
     date_windows,
 )
+from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
+from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
 from earthlens.eumetsat.catalog import Catalog, DataStoreGroup, EumetsatDataset
+from earthlens.eumetsat.tailor import TailorConfig
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

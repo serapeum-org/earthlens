@@ -47,7 +47,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeGuard
 
 import pandas as pd
-from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
 from loguru import logger
 from tqdm import tqdm
 
@@ -59,6 +58,7 @@ from earthlens.base import (
     TemporalExtent,
     date_windows,
 )
+from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

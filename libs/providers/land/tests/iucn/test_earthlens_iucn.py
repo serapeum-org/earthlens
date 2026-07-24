@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from earthlens.earthlens import EarthLens
 
 import earthlens.iucn
+from earthlens.earthlens import EarthLens
 
 
 def _make_facade(tmp_path: Path, **overrides) -> EarthLens:

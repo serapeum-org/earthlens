@@ -10,6 +10,7 @@ friendly install hint (see `_provider_backend_hint`).
 from __future__ import annotations
 
 import typer
+
 from earthlens.cli.datasets import datasets_app
 from earthlens.cli.providers import providers_app
 

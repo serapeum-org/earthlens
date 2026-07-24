@@ -35,8 +35,6 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 import requests
-from earthlens.nrel.auth import NrelAuth, NrelCredentials
-from earthlens.nrel.catalog import Catalog, Product
 from loguru import logger
 from pydantic import SecretStr
 
@@ -48,6 +46,8 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.nrel import _helpers
+from earthlens.nrel.auth import NrelAuth, NrelCredentials
+from earthlens.nrel.catalog import Catalog, Product
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

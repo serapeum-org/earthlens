@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-from earthlens.iucn._rest import IUCN_COLUMNS
 
 from earthlens.biodiversity import LicenseWarning
 from earthlens.iucn import IUCN, AuthenticationError
+from earthlens.iucn._rest import IUCN_COLUMNS
 
 
 def _backend(tmp_path, variables=None, token="test-token", **kwargs):

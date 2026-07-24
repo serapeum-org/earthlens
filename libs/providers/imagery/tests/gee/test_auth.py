@@ -13,9 +13,9 @@ from unittest.mock import MagicMock
 
 import ee
 import pytest
-from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _load_key_dict
 
 from earthlens.gee import auth as auth_module
+from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _load_key_dict
 
 
 def _key_text(**extra) -> str:

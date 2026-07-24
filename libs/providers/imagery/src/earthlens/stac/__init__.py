@@ -30,17 +30,8 @@ The STAC SDK (`pystac-client` — the `[stac]` extra) is imported lazily, so the
 
 from __future__ import annotations
 
-from earthlens.stac.backend import STAC
-from earthlens.stac.signers import (
-    BdcTokenSigner,
-    CdseS3Signer,
-    CDSESigner,
-    EarthdataSigner,
-    PlanetaryComputerSigner,
-    build_signer,
-)
-
 from earthlens.base import AuthenticationError
+from earthlens.stac.backend import STAC
 from earthlens.stac.catalog import (
     CATALOG_PATH,
     Asset,
@@ -48,6 +39,14 @@ from earthlens.stac.catalog import (
     Collection,
     Endpoint,
     Extent,
+)
+from earthlens.stac.signers import (
+    BdcTokenSigner,
+    CdseS3Signer,
+    CDSESigner,
+    EarthdataSigner,
+    PlanetaryComputerSigner,
+    build_signer,
 )
 
 __all__ = [

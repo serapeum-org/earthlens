@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from earthlens.earthlens import EarthLens
 
 import earthlens.firms
+from earthlens.earthlens import EarthLens
 
 
 def _facade_kwargs(tmp_path: Path) -> dict[str, object]:

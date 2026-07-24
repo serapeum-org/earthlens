@@ -27,7 +27,6 @@ from earthlens.soilgrids._helpers import (
     expand_request,
 )
 from earthlens.soilgrids.backend import SoilGrids
-
 from earthlens.soilgrids.catalog import CATALOG_PATH, Catalog, Property
 
 __all__ = [

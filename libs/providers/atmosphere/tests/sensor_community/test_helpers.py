@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 import requests
+
 from earthlens.sensor_community._helpers import (
     LicenseWarning,
     SensorCommunityClient,

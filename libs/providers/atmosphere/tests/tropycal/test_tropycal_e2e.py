@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
+
 from earthlens.earthlens import EarthLens
 from earthlens.tropycal.events import POINT_COLUMNS, RECON_COLUMNS
 

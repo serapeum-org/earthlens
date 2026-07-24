@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.earthlens import EarthLens
 
 import earthlens.asf
+from earthlens.earthlens import EarthLens
 
 
 @pytest.mark.asf

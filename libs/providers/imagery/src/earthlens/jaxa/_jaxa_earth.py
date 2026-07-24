@@ -26,8 +26,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 
+from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa.catalog import Dataset
 
 

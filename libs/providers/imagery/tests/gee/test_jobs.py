@@ -7,6 +7,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
+from earthlens.gee import jobs as jobs_module
 from earthlens.gee.jobs import (
     TERMINAL_TASK_STATES,
     TaskInfo,
@@ -19,8 +21,6 @@ from earthlens.gee.jobs import (
     resolve_destination,
     wait_for_task_id,
 )
-
-from earthlens.gee import jobs as jobs_module
 
 # -- fixtures ---------------------------------------------------------------
 

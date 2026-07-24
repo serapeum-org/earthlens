@@ -6,9 +6,9 @@ from typing import Any, Callable
 
 import pandas as pd
 import pytest
-from earthlens.core import EarthLens
 
 from earthlens.argo import ARGO
+from earthlens.core import EarthLens
 
 from .conftest import FakeArgo
 

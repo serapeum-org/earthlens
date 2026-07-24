@@ -31,8 +31,9 @@ from __future__ import annotations
 
 import os
 
-from earthlens.base.auth import AbstractAuth
 from pydantic import BaseModel, ConfigDict, SecretStr
+
+from earthlens.base.auth import AbstractAuth
 
 #: Environment variable the `dataretrieval` SDK reads for the PAT, and
 #: where a registered token can be obtained.

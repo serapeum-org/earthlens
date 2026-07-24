@@ -28,11 +28,11 @@ from typing import Any, cast
 import geopandas as gpd
 import pandas as pd
 import requests
-from earthlens.base.http import HttpClient
-from earthlens.wdpa.auth import AuthenticationError
 from shapely.geometry import shape
 
+from earthlens.base.http import HttpClient
 from earthlens.biodiversity import parse_retry_after
+from earthlens.wdpa.auth import AuthenticationError
 
 #: Base URL of the current Protected Planet API (v3 retires 2026-05-01).
 BASE_URL = "https://api.protectedplanet.net/v4"

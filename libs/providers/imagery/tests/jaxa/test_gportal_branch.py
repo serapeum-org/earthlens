@@ -15,9 +15,9 @@ import types
 from pathlib import Path
 
 import pytest
-from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from pydantic import SecretStr
 
+from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa import JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Dataset
 

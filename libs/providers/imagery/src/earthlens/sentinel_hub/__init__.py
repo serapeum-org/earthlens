@@ -40,7 +40,6 @@ from earthlens.sentinel_hub.auth import (
     SentinelHubCredentials,
 )
 from earthlens.sentinel_hub.backend import SentinelHub
-
 from earthlens.sentinel_hub.catalog import (
     CATALOG_PATH,
     EVALSCRIPTS_PATH,

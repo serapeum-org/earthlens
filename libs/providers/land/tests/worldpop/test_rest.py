@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 import requests
+
 from earthlens.worldpop.rest import (
     BASE_URL,
     files_for_year,

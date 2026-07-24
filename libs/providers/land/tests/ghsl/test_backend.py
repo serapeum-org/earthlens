@@ -7,10 +7,10 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from earthlens.aggregate import AggregationConfig
-from earthlens.ghsl.backend import GHSL, _close_dataset, _epsg_int
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.ghsl import backend as backend_mod
+from earthlens.ghsl.backend import GHSL, _close_dataset, _epsg_int
 
 from .conftest import make_tiny_tif
 

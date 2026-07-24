@@ -24,6 +24,7 @@ from urllib.parse import urlencode
 
 import pandas as pd
 import requests
+
 from earthlens.base.http import HttpClient
 
 #: Base host of the keyed NREL/NLR Developer Network REST service. The legacy

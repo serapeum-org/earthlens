@@ -7,11 +7,11 @@ from typing import Any, Callable
 
 import pytest
 import requests
-from earthlens.gdacs.backend import SEARCH_URL
 from geopandas import GeoDataFrame
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.gdacs import GDACS
+from earthlens.gdacs.backend import SEARCH_URL
 
 from .conftest import _FakeGdacs
 

@@ -7,11 +7,11 @@ from pathlib import Path
 
 import geopandas as gpd
 import pytest
-from earthlens.overture._helpers import ODBL, LicenseWarning
-from earthlens.overture.backend import _require_overturemaps, _stream_to_geodataframe
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.overture import Overture
+from earthlens.overture._helpers import ODBL, LicenseWarning
+from earthlens.overture.backend import _require_overturemaps, _stream_to_geodataframe
 
 from .conftest import OSM_SOURCES, PERMISSIVE_SOURCES
 

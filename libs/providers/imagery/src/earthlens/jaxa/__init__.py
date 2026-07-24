@@ -40,7 +40,6 @@ from earthlens.jaxa.auth import (
     JaxaProtocol,
 )
 from earthlens.jaxa.backend import JAXA
-
 from earthlens.jaxa.catalog import CATALOG_PATH, Catalog, Dataset, clear_catalog_cache
 
 __all__ = [

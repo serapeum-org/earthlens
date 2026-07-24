@@ -12,6 +12,7 @@ import difflib
 import json
 
 import typer
+
 from earthlens.cli.adapter import BackendInfo, known_provider_keys, list_backends
 from earthlens.cli.curate import probe_dataset
 from earthlens.cli.query import (

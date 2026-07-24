@@ -8,10 +8,10 @@ from pathlib import Path
 import pandas as pd
 import pytest
 import requests
-from earthlens.aggregate import AggregationConfig
-from earthlens.erddap._helpers import build_constraints
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.erddap import ERDDAP
+from earthlens.erddap._helpers import build_constraints
 
 pytestmark = pytest.mark.erddap
 

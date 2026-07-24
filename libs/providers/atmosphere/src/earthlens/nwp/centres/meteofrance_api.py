@@ -33,15 +33,15 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
+from earthlens.base import AuthenticationError
 from earthlens.nwp._helpers import grib_name, valid_time
 from earthlens.nwp.centres.base import _NWPCentre
-
-from earthlens.base import AuthenticationError
 
 if TYPE_CHECKING:
     import datetime as dt
 
     import requests
+
     from earthlens.nwp.catalog import NWPModel
 
 #: Environment variables checked (in order) for the MF portal API key.

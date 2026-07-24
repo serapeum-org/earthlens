@@ -6,6 +6,8 @@ from typing import Any, Callable
 
 import pandas as pd
 import pytest
+from geopandas import GeoDataFrame
+
 from earthlens.gdacs.events import (
     ATTRIBUTE_COLUMNS,
     EVENT_CRS,
@@ -13,7 +15,6 @@ from earthlens.gdacs.events import (
     empty_fc,
     geojson_to_fc,
 )
-from geopandas import GeoDataFrame
 
 
 @pytest.mark.gdacs

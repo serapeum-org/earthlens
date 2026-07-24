@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.radar.auth import requires_auth
 
 pytestmark = [pytest.mark.radar, pytest.mark.unit]

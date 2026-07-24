@@ -9,6 +9,9 @@ import urllib.request
 from types import SimpleNamespace
 
 import pytest
+
+from earthlens.base import AuthenticationError
+from earthlens.stac import auth_cdse
 from earthlens.stac.signers import (
     BdcTokenSigner,
     CdseS3Signer,
@@ -18,9 +21,6 @@ from earthlens.stac.signers import (
     _BearerProviderSigner,
     build_signer,
 )
-
-from earthlens.base import AuthenticationError
-from earthlens.stac import auth_cdse
 
 from .conftest import make_item
 

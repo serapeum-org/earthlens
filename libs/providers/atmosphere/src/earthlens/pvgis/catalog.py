@@ -20,10 +20,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, cast
 
-from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.yaml_loader import load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "pvgis_data_catalog.yaml"
 

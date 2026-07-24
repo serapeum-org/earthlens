@@ -15,8 +15,8 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-from earthlens.aggregate import AggregationConfig
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.ecmwf import ECMWF
 
 pytestmark = [pytest.mark.unit]

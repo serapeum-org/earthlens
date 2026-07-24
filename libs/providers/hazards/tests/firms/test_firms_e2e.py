@@ -23,6 +23,7 @@ import os
 from pathlib import Path
 
 import pytest
+
 from earthlens.earthlens import EarthLens
 from earthlens.firms.events import ATTRIBUTE_COLUMNS
 

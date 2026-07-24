@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 
 import pytest
+
+from earthlens.openeo import _helpers
 from earthlens.openeo._helpers import (
     DEFAULT_ENDPOINT,
     import_openeo,
@@ -12,8 +14,6 @@ from earthlens.openeo._helpers import (
     reducer_for,
     resolve_endpoint,
 )
-
-from earthlens.openeo import _helpers
 
 
 @pytest.mark.openeo

@@ -7,12 +7,9 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from earthlens.aggregate import AggregationConfig, aggregate_netcdf
-from earthlens.ecmwf.constraints import RequestValidator
-from earthlens.ecmwf.endpoints import constraints_base_url, endpoint_url
-from earthlens.ecmwf.endpoints import open_client as _open_endpoint_client
 from loguru import logger
 
+from earthlens.aggregate import AggregationConfig, aggregate_netcdf
 from earthlens.base import (
     AbstractDataSource,
     LazyClientMixin,
@@ -24,6 +21,9 @@ from earthlens.base import (
 )
 from earthlens.base import AuthenticationError as _BaseAuthenticationError
 from earthlens.ecmwf.catalog import Catalog, Variable
+from earthlens.ecmwf.constraints import RequestValidator
+from earthlens.ecmwf.endpoints import constraints_base_url, endpoint_url
+from earthlens.ecmwf.endpoints import open_client as _open_endpoint_client
 
 __all__ = ["AuthenticationError", "ECMWF", "ERA5_GRID_DEGREES"]
 

@@ -28,6 +28,7 @@ from collections.abc import Callable, Iterator
 from typing import Any, cast
 
 import requests
+
 from earthlens.base.http import HttpClient
 
 #: OpenAQ v3 API base URL. All endpoint paths are joined onto this.

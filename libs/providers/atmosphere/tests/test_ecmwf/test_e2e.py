@@ -9,8 +9,8 @@ small. CDS queue times are real — expect each test to block.
 from __future__ import annotations
 
 import pytest
-from earthlens.earthlens import EarthLens
 
+from earthlens.earthlens import EarthLens
 from earthlens.ecmwf import ECMWF, Catalog
 
 pytestmark = [pytest.mark.e2e]

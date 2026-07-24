@@ -49,6 +49,15 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 import requests
+from loguru import logger
+
+from earthlens.base import (
+    AbstractDataSource,
+    OutputKind,
+    RemoteProduct,
+    SpatialExtent,
+    TemporalExtent,
+)
 from earthlens.base.http import DEFAULT_TIMEOUT, HttpClient
 from earthlens.osm._helpers import (
     LicenseWarning,
@@ -60,19 +69,11 @@ from earthlens.osm._helpers import (
 )
 from earthlens.osm._pbf import Engine, download_extract, read_pbf
 from earthlens.osm.catalog import Catalog, Dataset
-from loguru import logger
-
-from earthlens.base import (
-    AbstractDataSource,
-    OutputKind,
-    RemoteProduct,
-    SpatialExtent,
-    TemporalExtent,
-)
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
+
+    from earthlens.aggregate import AggregationConfig
 
 #: Canonical public Overpass endpoint. Overridable via `endpoint=`.
 OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter"

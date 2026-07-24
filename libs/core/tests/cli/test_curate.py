@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import pytest
+
+from earthlens.cli import curate as curate_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.curate import (
     ProbeResult,
@@ -11,8 +13,6 @@ from earthlens.cli.curate import (
     probe_dataset,
     supported_providers,
 )
-
-from earthlens.cli import curate as curate_mod
 
 pytestmark = pytest.mark.cli
 

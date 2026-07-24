@@ -18,6 +18,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+
 from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.e2e, pytest.mark.erddap]

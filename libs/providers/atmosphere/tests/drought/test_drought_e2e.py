@@ -24,6 +24,7 @@ import urllib.request
 from pathlib import Path
 
 import pytest
+
 from earthlens.earthlens import EarthLens
 
 # A recent USDM week: snap to a Tuesday whose Thursday release has rolled out.

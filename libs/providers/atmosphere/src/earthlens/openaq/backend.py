@@ -35,9 +35,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
-from earthlens.openaq.auth import AuthenticationError, OpenaqAuth, OpenaqCredentials
-from earthlens.openaq.catalog import Catalog
-from earthlens.openaq.client import OpenaqClient
 from loguru import logger
 from pydantic import SecretStr
 
@@ -48,6 +45,9 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.openaq.auth import AuthenticationError, OpenaqAuth, OpenaqCredentials
+from earthlens.openaq.catalog import Catalog
+from earthlens.openaq.client import OpenaqClient
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

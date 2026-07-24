@@ -5,6 +5,8 @@ from __future__ import annotations
 import zipfile
 
 import pytest
+
+from earthlens.ghsl import _helpers
 from earthlens.ghsl._helpers import (
     download_and_extract,
     download_and_unzip,
@@ -13,8 +15,6 @@ from earthlens.ghsl._helpers import (
     list_remote_dir,
     tiles_for_bbox,
 )
-
-from earthlens.ghsl import _helpers
 
 from .conftest import make_tiny_tif, zip_with_tif
 

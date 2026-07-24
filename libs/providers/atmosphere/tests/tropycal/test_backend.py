@@ -7,9 +7,9 @@ import sys
 import geopandas as gpd
 import pandas as pd
 import pytest
-from earthlens.tropycal.events import POINT_COLUMNS, RECON_COLUMNS, TRACK_COLUMNS
 
 from earthlens.tropycal import TropicalCyclone
+from earthlens.tropycal.events import POINT_COLUMNS, RECON_COLUMNS, TRACK_COLUMNS
 
 pytestmark = pytest.mark.tropycal
 

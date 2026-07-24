@@ -27,6 +27,8 @@ from __future__ import annotations
 import os
 from typing import Any
 
+from pydantic import BaseModel, ConfigDict, SecretStr
+
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
 from earthlens.openeo._helpers import (
@@ -34,7 +36,6 @@ from earthlens.openeo._helpers import (
     import_openeo,
     resolve_endpoint,
 )
-from pydantic import BaseModel, ConfigDict, SecretStr
 
 _CDSE_ACCOUNT_URL = "https://dataspace.copernicus.eu"
 

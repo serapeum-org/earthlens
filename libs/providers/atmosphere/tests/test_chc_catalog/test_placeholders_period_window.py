@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-from earthlens.chc.backend import CHIRPS
 
 from earthlens.chc import Catalog
+from earthlens.chc.backend import CHIRPS
 
 pytestmark = [pytest.mark.chc]
 

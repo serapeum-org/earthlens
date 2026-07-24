@@ -5,6 +5,8 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
+
+from earthlens.base import SpatialExtent
 from earthlens.drought._helpers import (
     EDO_ATTRIBUTION,
     SPEIBASE_ATTRIBUTION,
@@ -13,8 +15,6 @@ from earthlens.drought._helpers import (
     bbox_from_extent,
     snap_to_cadence,
 )
-
-from earthlens.base import SpatialExtent
 
 
 def test_weekly_snap_idempotent_on_released_tuesday():

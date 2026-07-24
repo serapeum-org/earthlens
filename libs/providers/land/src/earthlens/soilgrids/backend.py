@@ -28,14 +28,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
-from earthlens.base.spatial import mask_to_geometry
-from earthlens.soilgrids._helpers import (
-    IGH_PROJ4,
-    SOILGRIDS_ATTRIBUTION,
-    bbox_from_extent,
-    coverage_id,
-    expand_request,
-)
 from loguru import logger
 
 from earthlens.base import (
@@ -44,6 +36,14 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+)
+from earthlens.base.spatial import mask_to_geometry
+from earthlens.soilgrids._helpers import (
+    IGH_PROJ4,
+    SOILGRIDS_ATTRIBUTION,
+    bbox_from_extent,
+    coverage_id,
+    expand_request,
 )
 from earthlens.soilgrids.catalog import Catalog, Property
 

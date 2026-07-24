@@ -25,6 +25,7 @@ from typing import Any, cast
 from urllib.parse import quote
 
 import yaml
+
 from earthlens.cli._gee_categories import categorise_asset
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _get_json
@@ -360,6 +361,7 @@ def _gee_live_bands(asset_id: str) -> tuple[str, dict[str, dict[str, Any]]]:
     import os
 
     import ee
+
     from earthlens.gee.auth import EarthEngineAuth
 
     EarthEngineAuth.initialize(

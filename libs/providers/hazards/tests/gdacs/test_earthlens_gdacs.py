@@ -10,10 +10,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from earthlens.earthlens import EarthLens
 from geopandas import GeoDataFrame
 
 import earthlens.gdacs
+from earthlens.earthlens import EarthLens
 
 from .conftest import _FakeGdacs
 

@@ -31,6 +31,9 @@ from typing import Any, cast
 import numpy as np
 import pandas as pd
 import requests
+from joblib import Parallel, delayed
+
+from earthlens.base import OutputKind, RemoteProduct, date_windows, window_labels
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
@@ -57,9 +60,6 @@ from earthlens.worldpop.rest import (
     record_archive_files,
     rest_records,
 )
-from joblib import Parallel, delayed
-
-from earthlens.base import OutputKind, RemoteProduct, date_windows, window_labels
 
 #: Sub-directory under the output path where raw per-country GeoTIFFs land.
 _RAW_DIRNAME: str = ".worldpop_raw"

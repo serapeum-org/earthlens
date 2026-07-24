@@ -35,7 +35,6 @@ if TYPE_CHECKING:
 
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa.auth import AuthenticationError, JaxaAuth
-
 from earthlens.jaxa.catalog import Dataset
 
 #: The active Himawari satellite currently populating the P-Tree

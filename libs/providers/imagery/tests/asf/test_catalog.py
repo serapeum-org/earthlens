@@ -5,15 +5,15 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
+
+from earthlens.asf import Catalog, Product
 from earthlens.asf.catalog import (
     _CATALOG_CACHE,
     CATALOG_PATH,
     _load_catalog_data,
     clear_catalog_cache,
 )
-from pydantic import ValidationError
-
-from earthlens.asf import Catalog, Product
 
 
 @pytest.mark.asf

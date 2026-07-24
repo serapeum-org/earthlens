@@ -15,10 +15,10 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
-from earthlens.earthlens import EarthLens
-from earthlens.gdacs.events import ATTRIBUTE_COLUMNS
 
+from earthlens.earthlens import EarthLens
 from earthlens.gdacs import GDACS
+from earthlens.gdacs.events import ATTRIBUTE_COLUMNS
 
 # A recent ~30-day window: GDACS is a live alert feed, so very old
 # windows can be sparse. Earthquakes are the most frequent hazard, so a

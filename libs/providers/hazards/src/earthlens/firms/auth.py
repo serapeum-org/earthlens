@@ -32,9 +32,10 @@ from __future__ import annotations
 
 import os
 
+from pydantic import BaseModel, ConfigDict, SecretStr
+
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
-from pydantic import BaseModel, ConfigDict, SecretStr
 
 #: Where a user requests a free FIRMS MAP_KEY.
 _MAP_KEY_URL = "https://firms.modaps.eosdis.nasa.gov/api/map_key/"

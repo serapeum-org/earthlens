@@ -25,8 +25,6 @@ from pathlib import Path
 from typing import Literal
 
 import pandas as pd
-from earthlens.iucn.auth import IucnAuth, IucnCredentials
-from earthlens.iucn.catalog import Catalog
 from loguru import logger
 from pydantic import SecretStr
 
@@ -38,6 +36,8 @@ from earthlens.base import (
 )
 from earthlens.biodiversity import IUCN_LICENSE, warn_license
 from earthlens.iucn import _rest
+from earthlens.iucn.auth import IucnAuth, IucnCredentials
+from earthlens.iucn.catalog import Catalog
 
 FileFormat = Literal["csv", "parquet"]
 

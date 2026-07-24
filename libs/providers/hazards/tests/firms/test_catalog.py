@@ -6,9 +6,9 @@ import textwrap
 from pathlib import Path
 
 import pytest
-from earthlens.firms.catalog import Temporal
 
 from earthlens.firms import Catalog, Sensor, SensorColumn
+from earthlens.firms.catalog import Temporal
 
 pytestmark = pytest.mark.firms
 

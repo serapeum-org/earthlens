@@ -26,10 +26,11 @@ from typing import cast
 
 import ee
 import geopandas as gpd
-from earthlens.gee.features import create_feature
-from earthlens.gee.io import feature_collection_to_gdf as _fc_to_gdf
 from geopandas.geodataframe import GeoDataFrame
 from rtree import index
+
+from earthlens.gee.features import create_feature
+from earthlens.gee.io import feature_collection_to_gdf as _fc_to_gdf
 
 _REDUCER_WHITELIST: frozenset[str] = frozenset(
     {

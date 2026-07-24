@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.nwp.catalog import KNOWN_BACKENDS, clear_catalog_cache
 from pydantic import ValidationError
 
 from earthlens.nwp import Catalog, NWPModel
 from earthlens.nwp import catalog as catalog_mod
+from earthlens.nwp.catalog import KNOWN_BACKENDS, clear_catalog_cache
 
 pytestmark = [pytest.mark.nwp, pytest.mark.unit]
 
@@ -201,7 +201,6 @@ class TestBundledTitles:
     def test_cli_title_resolves_from_the_row(self):
         """The federated CLI title column reads the row's `title`."""
         from earthlens.cli.adapter import record_title
-
         from earthlens.nwp import Catalog
 
         assert (

@@ -15,10 +15,10 @@ from typing import get_args
 from unittest.mock import MagicMock
 
 import pytest
-from earthlens.earthlens import EarthLens
 
 from earthlens.base import AbstractDataSource, OutputKind
 from earthlens.chc import CHIRPS
+from earthlens.earthlens import EarthLens
 from earthlens.ecmwf import ECMWF
 from earthlens.s3 import S3
 

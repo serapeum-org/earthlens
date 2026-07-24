@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.sentinel_hub.auth import (
     AuthenticationError,
     SentinelHubAuth,

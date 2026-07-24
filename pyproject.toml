@@ -220,6 +220,12 @@ ignore = ["E203", "E266", "E501", "E722", "C901", "E741", "E731"]
 # before imports — both legitimately trip E402, which stays enforced for real modules.
 "*.ipynb" = ["E402"]
 
+[tool.ruff.lint.isort]
+# `earthlens` is a PEP 420 namespace split across libs/*/src, so ruff's src-layout
+# auto-detection classifies it as first-party inconsistently across environments
+# (local vs CI), producing spurious import-group churn. Pin it explicitly.
+known-first-party = ["earthlens"]
+
 [tool.bandit]
 # Non-shipped tooling and fixtures (build/CI scripts, tests, docs, planning notes):
 # excluded from the security scan.

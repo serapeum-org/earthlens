@@ -40,9 +40,6 @@ from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 import requests
-from earthlens.firms._helpers import chunk_windows, classify_body, firms_get
-from earthlens.firms.auth import AuthenticationError, FirmsAuth, FirmsCredentials
-from earthlens.firms.catalog import Catalog
 from loguru import logger
 from pydantic import SecretStr
 
@@ -54,10 +51,14 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.firms import events
+from earthlens.firms._helpers import chunk_windows, classify_body, firms_get
+from earthlens.firms.auth import AuthenticationError, FirmsAuth, FirmsCredentials
+from earthlens.firms.catalog import Catalog
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
+
+    from earthlens.aggregate import AggregationConfig
 
 #: FIRMS area-CSV endpoint. Filled with the MAP_KEY, sensor, bbox
 #: (W,S,E,N), day_range, and start_date path segments.

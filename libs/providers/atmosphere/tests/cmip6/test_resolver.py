@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-from earthlens.cmip6.resolver import default_cache_path
 
 from earthlens.cmip6 import ResolvedStore, StoreResolver
+from earthlens.cmip6.resolver import default_cache_path
 
 pytestmark = [pytest.mark.cmip6, pytest.mark.unit]
 

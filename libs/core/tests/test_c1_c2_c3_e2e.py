@@ -18,10 +18,10 @@ import os
 import shutil
 
 import pytest
-from earthlens.aggregate import AggregationConfig
-from earthlens.earthlens import EarthLens
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.base import AbstractAuth, AuthenticationError, RemoteProduct
+from earthlens.earthlens import EarthLens
 
 
 @pytest.mark.e2e

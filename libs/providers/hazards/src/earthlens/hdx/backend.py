@@ -50,7 +50,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar, cast
 
 import pandas as pd
-from earthlens.hdx._helpers import match_resource
 from loguru import logger
 
 from earthlens.base import (
@@ -60,6 +59,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.hdx._helpers import match_resource
 from earthlens.hdx.catalog import Catalog
 
 if TYPE_CHECKING:

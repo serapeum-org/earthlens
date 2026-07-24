@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
+
 from earthlens.firms._helpers import (
     chunk_windows,
     classify_body,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.worldpop.catalog import Catalog, _years_set
 
 pytestmark = pytest.mark.worldpop
@@ -139,8 +140,9 @@ def test_validate_bad_year_raises(catalog):
 
 def test_extra_keys_forbidden():
     """The Product model forbids unknown keys."""
-    from earthlens.worldpop.catalog import Product
     from pydantic import ValidationError
+
+    from earthlens.worldpop.catalog import Product
 
     with pytest.raises(ValidationError):
         Product(alias="x", bogus=1)

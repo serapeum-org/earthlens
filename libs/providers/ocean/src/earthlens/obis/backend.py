@@ -26,7 +26,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
-from earthlens.obis.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -36,10 +35,12 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.biodiversity import occurrences_to_fc, warn_license, wkt_from_bbox
+from earthlens.obis.catalog import Catalog
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
+
+    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 

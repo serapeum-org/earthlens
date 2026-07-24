@@ -25,10 +25,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
-from earthlens.base.raster import netcdf_variable_to_raster
-from earthlens.base.s3 import S3Auth, S3Credentials
-from earthlens.s3.catalog import Catalog, Dataset
-from earthlens.s3.layouts import plan_products
 from loguru import logger
 from tqdm import tqdm
 
@@ -43,6 +39,10 @@ from earthlens.base import (
     to_datetime,
     warn_if_egress,
 )
+from earthlens.base.raster import netcdf_variable_to_raster
+from earthlens.base.s3 import S3Auth, S3Credentials
+from earthlens.s3.catalog import Catalog, Dataset
+from earthlens.s3.layouts import plan_products
 
 if TYPE_CHECKING:
     from earthlens.ecmwf import Variable

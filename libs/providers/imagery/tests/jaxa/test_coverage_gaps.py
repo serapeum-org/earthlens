@@ -21,9 +21,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from pydantic import SecretStr
 
+from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa import JAXA, AuthenticationError, JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Catalog, Dataset, clear_catalog_cache
 

@@ -6,10 +6,10 @@ import sys
 from pathlib import Path
 
 import pytest
-from earthlens.sentinel_hub._helpers import import_sentinelhub
-from earthlens.sentinel_hub.backend import SentinelHub
 
 from earthlens.sentinel_hub import Catalog
+from earthlens.sentinel_hub._helpers import import_sentinelhub
+from earthlens.sentinel_hub.backend import SentinelHub
 from earthlens.sentinel_hub.catalog import clear_catalog_cache
 
 pytestmark = pytest.mark.sentinel_hub

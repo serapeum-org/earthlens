@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
 from earthlens._backends import ENTRY_POINT_GROUP, discover_backends
 from earthlens.earthlens import EarthLens
 

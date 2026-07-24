@@ -27,10 +27,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal, cast
 
-from earthlens.base.yaml_loader import load_yaml_strict
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.yaml_loader import load_yaml_strict
 
 #: Path to the bundled sharded catalog directory (`rgi.yaml` / `glims.yaml` /
 #: `wgms.yaml` + the `_index.yaml` informational index). Tests can monkey-patch

@@ -31,10 +31,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
+
 from earthlens.asf._helpers import apply_baseline_windows, wkt_from_extent
 from earthlens.asf.auth import ASFAuth, ASFCredentials
 from earthlens.asf.catalog import Catalog, Product
-
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,

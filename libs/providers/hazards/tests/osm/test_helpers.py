@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import geopandas as gpd
 import pytest
+from shapely.geometry import LineString, Point, Polygon
+
+from earthlens.base import SpatialExtent
 from earthlens.osm._helpers import (
     OSM_CRS,
     bbox_swne,
@@ -13,9 +16,6 @@ from earthlens.osm._helpers import (
     shapely_bbox,
     to_fc,
 )
-from shapely.geometry import LineString, Point, Polygon
-
-from earthlens.base import SpatialExtent
 
 from .conftest import FakeResult, make_result
 

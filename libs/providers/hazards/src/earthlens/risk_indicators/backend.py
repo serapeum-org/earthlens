@@ -31,8 +31,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
-from earthlens.risk_indicators.auth import GfwAuth, GfwCredentials
-from earthlens.risk_indicators.catalog import Catalog, Dataset
 from loguru import logger
 from pydantic import SecretStr
 
@@ -44,6 +42,8 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.risk_indicators import _helpers
+from earthlens.risk_indicators.auth import GfwAuth, GfwCredentials
+from earthlens.risk_indicators.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

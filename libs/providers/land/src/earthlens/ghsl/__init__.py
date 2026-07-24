@@ -21,7 +21,6 @@ from __future__ import annotations
 from earthlens.base.auth import AuthenticationError
 from earthlens.ghsl.auth import GHSL_ATTRIBUTION, GhslAuth, GhslCredentials
 from earthlens.ghsl.backend import GHSL
-
 from earthlens.ghsl.catalog import CATALOG_PATH, Availability, Catalog, Product
 
 __all__ = [

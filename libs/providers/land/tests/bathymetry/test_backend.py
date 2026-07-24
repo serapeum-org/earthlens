@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 import requests
-from earthlens.bathymetry.backend import Bathymetry
 
 from earthlens.bathymetry import backend as backend_module
+from earthlens.bathymetry.backend import Bathymetry
 from earthlens.bathymetry.catalog import Catalog, Dataset
 
 pytestmark = pytest.mark.bathymetry

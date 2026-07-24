@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from earthlens.gdacs.catalog import CATALOG_PATH
 
 from earthlens.gdacs import Catalog, HazardType
+from earthlens.gdacs.catalog import CATALOG_PATH
 
 _EXPECTED_CODES = ["DR", "EQ", "FL", "TC", "VO", "WF"]
 

@@ -17,14 +17,14 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from shapely.geometry import LineString, Point, Polygon, box
+
+from earthlens.osm import _pbf
 from earthlens.osm._pbf import (
     download_extract,
     geofabrik_url,
     read_pbf,
 )
-from shapely.geometry import LineString, Point, Polygon, box
-
-from earthlens.osm import _pbf
 
 #: The fixed extract payload the fake `download` writes; the fake md5 sidecar
 #: serves its digest so a fresh download verifies clean.

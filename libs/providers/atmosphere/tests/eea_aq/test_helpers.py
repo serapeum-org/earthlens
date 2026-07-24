@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+
 from earthlens.eea_aq._helpers import (
     countries_in_bbox,
     datasets_for_years,

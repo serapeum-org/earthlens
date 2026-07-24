@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import pytest
+
+from earthlens.base import SpatialExtent
 from earthlens.bathymetry._helpers import (
     bbox_from_extent,
     estimate_grid_pixels,
     griddap_subset_url,
     resolution_degrees,
 )
-
-from earthlens.base import SpatialExtent
 
 pytestmark = pytest.mark.bathymetry
 

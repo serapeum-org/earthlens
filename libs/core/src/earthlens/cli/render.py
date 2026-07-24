@@ -13,9 +13,10 @@ import json
 from collections.abc import Iterable, Sequence
 from typing import TYPE_CHECKING
 
-from earthlens.cli.table import CatalogRow, LoadError
 from rich.console import Console
 from rich.table import Table
+
+from earthlens.cli.table import CatalogRow, LoadError
 
 if TYPE_CHECKING:
     from rich.console import JustifyMethod

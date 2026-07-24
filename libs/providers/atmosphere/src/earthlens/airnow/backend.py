@@ -31,12 +31,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
-from earthlens.airnow.auth import AirnowAuth, AirnowCredentials, AuthenticationError
-from earthlens.airnow.catalog import Catalog
-from earthlens.airnow.client import AirnowClient
 from loguru import logger
 from pydantic import SecretStr
 
+from earthlens.airnow.auth import AirnowAuth, AirnowCredentials, AuthenticationError
+from earthlens.airnow.catalog import Catalog
+from earthlens.airnow.client import AirnowClient
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
@@ -46,6 +46,7 @@ from earthlens.base import (
 
 if TYPE_CHECKING:
     import requests
+
     from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]

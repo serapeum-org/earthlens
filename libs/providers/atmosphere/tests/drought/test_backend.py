@@ -18,11 +18,11 @@ from typing import Any
 
 import numpy as np
 import pytest
-from earthlens.drought.backend import SPEIBASE_EPOCH_YEAR
 
 import earthlens.drought
 from earthlens.drought import Drought
 from earthlens.drought import backend as backend_module
+from earthlens.drought.backend import SPEIBASE_EPOCH_YEAR
 
 _USDM_PAYLOAD: dict[str, Any] = {
     "type": "FeatureCollection",

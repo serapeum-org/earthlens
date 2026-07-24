@@ -17,11 +17,11 @@ import datetime as dt
 import io
 
 import pytest
+
 from earthlens.earthlens import EarthLens
+from earthlens.nwp import Catalog
 from earthlens.nwp.centres.dwd import DWDCentre
 from earthlens.nwp.centres.noaa import NOAACentre
-
-from earthlens.nwp import Catalog
 
 pytestmark = [pytest.mark.nwp, pytest.mark.e2e]
 

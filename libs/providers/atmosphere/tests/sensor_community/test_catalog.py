@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.sensor_community.catalog import clear_catalog_cache
 
 from earthlens.sensor_community import CATALOG_PATH, Catalog, Pollutant
+from earthlens.sensor_community.catalog import clear_catalog_cache
 
 
 @pytest.fixture(autouse=True)

@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.usgs_water.backend import SERVICES
 from pydantic import ValidationError
 
 from earthlens.usgs_water import Catalog, Parameter
 from earthlens.usgs_water import catalog as catalog_module
+from earthlens.usgs_water.backend import SERVICES
 
 pytestmark = pytest.mark.usgs_water
 

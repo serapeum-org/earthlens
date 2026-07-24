@@ -38,7 +38,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
-from earthlens.overture.catalog import Catalog, Theme
 from loguru import logger
 
 from earthlens.base import (
@@ -48,10 +47,12 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.overture.catalog import Catalog, Theme
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
+
+    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 

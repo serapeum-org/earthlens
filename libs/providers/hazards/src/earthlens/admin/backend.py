@@ -31,6 +31,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
+from loguru import logger
+from pyramids.feature.collection import FeatureCollection
+
 from earthlens.admin._helpers import (
     cgaz_url,
     empty_fc,
@@ -40,9 +43,6 @@ from earthlens.admin._helpers import (
     tiger_url,
     vsicurl,
 )
-from loguru import logger
-from pyramids.feature.collection import FeatureCollection
-
 from earthlens.admin.catalog import Catalog, Dataset
 from earthlens.base import (
     AbstractDataSource,

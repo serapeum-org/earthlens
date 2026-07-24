@@ -8,10 +8,10 @@ from typing import Any, Callable
 
 import pandas as pd
 import pytest
-from earthlens.argo._helpers import ARGO_COLUMNS, region_box
 
 import earthlens.argo
 from earthlens.argo import ARGO
+from earthlens.argo._helpers import ARGO_COLUMNS, region_box
 
 from .conftest import DataNotFound, FakeArgo
 

@@ -16,8 +16,8 @@ import socket
 from pathlib import Path
 
 import pytest
-from earthlens.earthlens import EarthLens
 
+from earthlens.earthlens import EarthLens
 from earthlens.hdx import HDX
 
 pytestmark = [pytest.mark.e2e, pytest.mark.hdx]

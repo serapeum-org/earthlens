@@ -15,9 +15,10 @@ import os
 from pathlib import Path
 
 import pytest
-from earthlens.earthlens import EarthLens
 from geopandas import GeoDataFrame
 from shapely.geometry import MultiPolygon, Polygon
+
+from earthlens.earthlens import EarthLens
 
 _HAVE_TOKEN = bool(os.environ.get("WDPA_TOKEN"))
 

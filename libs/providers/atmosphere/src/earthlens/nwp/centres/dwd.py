@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     import datetime as dt
 
     import requests
+
     from earthlens.nwp.catalog import NWPModel
 
 #: HTTP timeout (seconds) for one per-variable `.bz2` download.

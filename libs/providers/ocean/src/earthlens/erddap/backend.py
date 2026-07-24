@@ -40,13 +40,6 @@ from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 import requests
-from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
-from earthlens.erddap._helpers import (
-    build_constraints,
-    build_griddap_url,
-    empty_canonical,
-)
 from loguru import logger
 
 from earthlens.base import (
@@ -56,11 +49,17 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.erddap._helpers import (
+    build_constraints,
+    build_griddap_url,
+    empty_canonical,
+)
 from earthlens.erddap.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-
     from earthlens.ecmwf import Variable
 
 OutputFormat = Literal["csv", "parquet"]

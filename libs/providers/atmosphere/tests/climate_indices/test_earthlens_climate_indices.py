@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from earthlens.earthlens import EarthLens
 
 import earthlens.climate_indices
 from earthlens.climate_indices import backend
+from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.climate_indices
 

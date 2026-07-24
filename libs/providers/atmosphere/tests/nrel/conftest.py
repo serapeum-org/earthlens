@@ -13,9 +13,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 import earthlens.nrel._helpers as helpers
 import earthlens.nrel.backend as backend
-import pytest
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

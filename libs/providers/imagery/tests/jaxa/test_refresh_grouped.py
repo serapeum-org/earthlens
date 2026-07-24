@@ -7,6 +7,7 @@ import types
 from types import SimpleNamespace
 
 import pytest
+
 from earthlens.cli.refresh import _jaxa_grouped
 
 pytestmark = [pytest.mark.jaxa, pytest.mark.unit]

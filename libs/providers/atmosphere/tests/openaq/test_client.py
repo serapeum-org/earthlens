@@ -6,6 +6,7 @@ from typing import Any
 
 import pytest
 import requests
+
 from earthlens.base.http import _parse_retry_after
 from earthlens.openaq.client import BASE_URL, OpenaqClient
 

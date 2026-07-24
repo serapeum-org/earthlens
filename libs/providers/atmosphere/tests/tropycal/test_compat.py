@@ -7,6 +7,7 @@ import sys
 import types
 
 import pytest
+
 from earthlens.tropycal._compat import ensure_pkg_resources
 
 pytestmark = pytest.mark.tropycal

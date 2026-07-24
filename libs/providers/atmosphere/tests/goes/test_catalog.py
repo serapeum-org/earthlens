@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from earthlens.goes.catalog import CATALOG_PATH, clear_catalog_cache
 
 from earthlens.goes import Catalog, GOESChannel, GOESDomain, GOESProduct
+from earthlens.goes.catalog import CATALOG_PATH, clear_catalog_cache
 
 pytestmark = pytest.mark.goes
 

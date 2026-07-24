@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.tropycal.catalog import CATALOG_PATH
 from pydantic import ValidationError
 
 from earthlens.tropycal import Basin, Catalog, TrackField
+from earthlens.tropycal.catalog import CATALOG_PATH
 
 pytestmark = pytest.mark.tropycal
 

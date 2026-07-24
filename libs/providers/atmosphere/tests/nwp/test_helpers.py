@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
+
 from earthlens.nwp._helpers import (
     cog_name,
     ensure_dir,
@@ -455,6 +456,7 @@ class TestIdxCachePath:
     def test_cache_root_under_platformdirs(self):
         """The default cache root lives under `platformdirs.user_cache_dir('earthlens')`."""
         import platformdirs
+
         from earthlens.nwp._helpers import _idx_cache_root
 
         root = _idx_cache_root()

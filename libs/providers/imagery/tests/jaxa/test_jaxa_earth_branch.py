@@ -13,8 +13,8 @@ import types
 
 import numpy as np
 import pytest
-from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 
+from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa.catalog import Dataset
 
 
@@ -105,8 +105,9 @@ def extents():
 @pytest.mark.integration
 def test_jaxa_earth_writes_a_cog(tmp_path, fake_jaxa_earth, extents) -> None:
     """A jaxa-earth fetch writes a real COG via pyramids on the fake array."""
-    from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
     from pyramids.dataset import Dataset as PyrDataset
+
+    from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
 
     space, time = extents
     ds = Dataset(

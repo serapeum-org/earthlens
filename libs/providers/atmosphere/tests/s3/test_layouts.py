@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
+
 from earthlens.s3.catalog import Catalog
 from earthlens.s3.layouts import plan_products
 

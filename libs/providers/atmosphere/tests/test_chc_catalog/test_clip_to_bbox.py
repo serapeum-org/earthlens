@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from earthlens.chc.backend import CHIRPS, _snap_bbox_outward
 from pyramids.dataset import Dataset
+
+from earthlens.chc.backend import CHIRPS, _snap_bbox_outward
 
 pytestmark = [pytest.mark.chc]
 

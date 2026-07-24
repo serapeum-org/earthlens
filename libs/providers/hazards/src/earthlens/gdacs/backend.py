@@ -35,9 +35,6 @@ from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
-from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
-from earthlens.gdacs.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -47,11 +44,15 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.gdacs import events
+from earthlens.gdacs.catalog import Catalog
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
+
+    from earthlens.aggregate import AggregationConfig
 
 
 #: GDACS SEARCH endpoint — returns the whole event list for a window in

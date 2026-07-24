@@ -26,7 +26,6 @@ from earthlens.solar_wind_atlas._helpers import (
     window_crop,
 )
 from earthlens.solar_wind_atlas.backend import SolarWindAtlas
-
 from earthlens.solar_wind_atlas.catalog import CATALOG_PATH, Catalog, Layer
 
 __all__ = [

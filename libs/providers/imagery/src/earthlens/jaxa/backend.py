@@ -41,14 +41,13 @@ from pydantic import SecretStr
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
 
+from earthlens.base import OutputKind, date_windows
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
     TemporalExtent,
 )
 from earthlens.jaxa.auth import JaxaAuth, JaxaCredentials
-
-from earthlens.base import OutputKind, date_windows
 from earthlens.jaxa.catalog import Catalog, Dataset, JaxaProtocol
 
 #: Maps an `EarthLens(temporal_resolution=...)` value to the pandas

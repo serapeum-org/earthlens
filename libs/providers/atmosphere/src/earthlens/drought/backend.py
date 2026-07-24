@@ -34,14 +34,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
-from earthlens.base._dates import to_datetime
-from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
-from earthlens.drought._helpers import (
-    attribution_for,
-    bbox_from_extent,
-    snap_to_cadence,
-)
 from loguru import logger
 
 from earthlens.base import (
@@ -51,12 +43,21 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base._dates import to_datetime
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.drought._helpers import (
+    attribution_for,
+    bbox_from_extent,
+    snap_to_cadence,
+)
 from earthlens.drought.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
     import requests
-    from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
+
+    from earthlens.aggregate import AggregationConfig
 
 #: Pinned epoch month for SPEIbase v2.x — every shipped version starts at
 #: January 1901 (CRU TS lineage). The per-month positional index into the

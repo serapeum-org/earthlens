@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from earthlens.airnow.auth import AuthenticationError
 
 from earthlens.airnow import AirNow
+from earthlens.airnow.auth import AuthenticationError
 
 from .conftest import _FakeAirnow, _FakeSession, _observation
 

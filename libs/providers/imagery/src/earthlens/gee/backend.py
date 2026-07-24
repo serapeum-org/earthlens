@@ -52,16 +52,6 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 import ee
 import pandas as pd
-from earthlens.gee._helpers import (
-    EE_MAX_DIMENSION,
-    reduce_collection,
-    slug_asset_id,
-    split_aoi_for_url,
-    wait_for_task,
-)
-from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
-from earthlens.gee.features import create_feature
-from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from loguru import logger
 from pyramids.dataset import Dataset as PyramidsDataset
 from pyramids.dataset.merge import merge_rasters
@@ -76,7 +66,17 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
+from earthlens.gee._helpers import (
+    EE_MAX_DIMENSION,
+    reduce_collection,
+    slug_asset_id,
+    split_aoi_for_url,
+    wait_for_task,
+)
+from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
 from earthlens.gee.catalog import Catalog, Dataset
+from earthlens.gee.features import create_feature
+from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
@@ -890,6 +890,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Earth Engine synchronous limit.
         """
         import requests
+
         from earthlens.base.http import HttpClient, RequestsGet
 
         url = image.getDownloadURL(

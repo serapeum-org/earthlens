@@ -112,6 +112,7 @@ def _configure_ee() -> Any:
     import os
 
     import ee
+
     from earthlens.gee.auth import EarthEngineAuth
 
     EarthEngineAuth.initialize(

@@ -26,13 +26,6 @@ from typing import TYPE_CHECKING, cast
 
 import pandas as pd
 import requests
-from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
-from earthlens.bathymetry._helpers import (
-    bbox_from_extent,
-    estimate_grid_pixels,
-    griddap_subset_url,
-)
 from loguru import logger
 
 from earthlens.base import (
@@ -42,6 +35,13 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     mask_to_geometry,
+)
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.bathymetry._helpers import (
+    bbox_from_extent,
+    estimate_grid_pixels,
+    griddap_subset_url,
 )
 from earthlens.bathymetry.catalog import Catalog, Dataset
 

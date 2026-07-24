@@ -6,14 +6,14 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
+
+from earthlens.goes import GOES
 from earthlens.goes.backend import (
     end_is_date_only,
     enumerate_hours,
     expand_bare_date_end,
     normalize_channel,
 )
-
-from earthlens.goes import GOES
 
 from .conftest import FakeS3
 

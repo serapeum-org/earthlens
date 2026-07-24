@@ -42,9 +42,10 @@ import os
 from pathlib import Path
 from typing import Any, cast
 
+from pydantic import BaseModel, ConfigDict, SecretStr
+
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
-from pydantic import BaseModel, ConfigDict, SecretStr
 
 _REGISTER_URL = "https://urs.earthdata.nasa.gov"
 _DOCS_URL = "https://earthaccess.readthedocs.io"

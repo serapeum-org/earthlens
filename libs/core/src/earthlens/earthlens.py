@@ -26,15 +26,14 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
-from earthlens._backends import discover_backends
-from earthlens.base.spatial import resolve_aoi
 from loguru import logger
 
+from earthlens._backends import discover_backends
 from earthlens.base import split_time
+from earthlens.base.spatial import resolve_aoi
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-
     from earthlens.base import AbstractCatalog, AbstractDataSource, RemoteProduct
 
 

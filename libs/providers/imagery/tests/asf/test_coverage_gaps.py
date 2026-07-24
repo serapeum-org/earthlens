@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from earthlens.asf.catalog import _load_catalog_data
 
 from earthlens.asf import ASF, Catalog, Product
+from earthlens.asf.catalog import _load_catalog_data
 
 
 @pytest.mark.asf

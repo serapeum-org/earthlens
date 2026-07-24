@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.aggregate import AggregationConfig
-from earthlens.earthlens import EarthLens
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.earthdata import EarthData
+from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.earthdata, pytest.mark.integration]
 

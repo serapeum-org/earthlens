@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.earthlens import EarthLens
 
 from earthlens.drought import Drought
+from earthlens.earthlens import EarthLens
 
 
 @pytest.mark.parametrize("key", ["drought", "usdm", "edo", "gdo"])

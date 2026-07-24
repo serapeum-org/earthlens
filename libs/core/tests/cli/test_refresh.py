@@ -11,6 +11,9 @@ from types import SimpleNamespace
 
 import pytest
 import yaml
+
+import earthlens.stac.catalog as stac_catalog
+from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.refresh import (
     AuditOutcome,
@@ -26,9 +29,6 @@ from earthlens.cli.refresh import (
     refresh_one,
     supported_providers,
 )
-
-import earthlens.stac.catalog as stac_catalog
-from earthlens.cli import refresh as refresh_mod
 
 pytestmark = pytest.mark.cli
 
@@ -191,7 +191,6 @@ class TestErddapCoverage:
     def test_coverage_counts_and_todo(self, monkeypatch):
         """Coverage buckets the available index and lists addressable griddap."""
         from earthlens.cli.refresh import _erddap_coverage
-
         from earthlens.erddap.catalog import Dataset
 
         row = Dataset(
@@ -1062,9 +1061,10 @@ class TestGhslTileRegen:
 
     def test_writes_tile_geojson(self, tmp_path, monkeypatch):
         """The tile frame is written to TILE_SCHEMA_PATH as GeoJSON."""
-        import earthlens.ghsl._helpers as ghsl_helpers
         import geopandas as gpd
         from shapely.geometry import box
+
+        import earthlens.ghsl._helpers as ghsl_helpers
 
         frame = gpd.GeoDataFrame(
             {

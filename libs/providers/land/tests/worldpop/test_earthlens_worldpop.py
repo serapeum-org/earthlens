@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.earthlens import EarthLens
 
+from earthlens.earthlens import EarthLens
 from earthlens.worldpop import WorldPop
 
 pytestmark = pytest.mark.worldpop

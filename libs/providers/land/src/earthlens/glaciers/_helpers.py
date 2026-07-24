@@ -28,10 +28,11 @@ from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 import requests
-from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import box
+
+from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent

@@ -21,6 +21,7 @@ import socket
 from pathlib import Path
 
 import pytest
+
 from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.e2e, pytest.mark.usgs_water]

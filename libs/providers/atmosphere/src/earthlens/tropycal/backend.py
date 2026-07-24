@@ -37,7 +37,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
-from earthlens.tropycal.catalog import Catalog
 from loguru import logger
 
 from earthlens.base import (
@@ -48,10 +47,12 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.tropycal import events
+from earthlens.tropycal.catalog import Catalog
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
+
+    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["gpkg", "geojson"]
 Geometry = Literal["point", "track"]

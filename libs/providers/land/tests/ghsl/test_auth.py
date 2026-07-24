@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.base.auth import AbstractAuth
 from earthlens.ghsl.auth import GHSL_ATTRIBUTION, GhslAuth, GhslCredentials
 

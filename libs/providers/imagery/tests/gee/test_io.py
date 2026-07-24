@@ -8,6 +8,9 @@ import ssl
 import geopandas as gpd
 import pandas as pd
 import pytest
+from shapely.geometry import Point
+
+from earthlens.gee import io as io_module
 from earthlens.gee.io import (
     _DEFAULT_RETRIES,
     _TRANSIENT_NETWORK_EXCEPTIONS,
@@ -16,9 +19,6 @@ from earthlens.gee.io import (
     feature_collection_to_gdf,
     feature_collections_to_dataframe,
 )
-from shapely.geometry import Point
-
-from earthlens.gee import io as io_module
 
 
 class _FakeFC:

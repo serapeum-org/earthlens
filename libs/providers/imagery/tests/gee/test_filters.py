@@ -5,6 +5,8 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
+
+from earthlens.gee import filters
 from earthlens.gee.filters import (
     by_bounds,
     by_cloud_cover_lte,
@@ -12,8 +14,6 @@ from earthlens.gee.filters import (
     by_year,
     by_year_and_bounds,
 )
-
-from earthlens.gee import filters
 
 
 class _FakeCollection:

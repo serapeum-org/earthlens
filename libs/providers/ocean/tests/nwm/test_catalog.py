@@ -5,9 +5,9 @@ from __future__ import annotations
 import textwrap
 
 import pytest
-from earthlens.nwm.catalog import NWMConfig, clear_catalog_cache
 
 from earthlens.nwm import Catalog, NWMProduct, NWMVariable
+from earthlens.nwm.catalog import NWMConfig, clear_catalog_cache
 
 pytestmark = [pytest.mark.nwm, pytest.mark.unit]
 

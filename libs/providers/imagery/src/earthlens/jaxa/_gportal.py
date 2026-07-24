@@ -21,7 +21,6 @@ from pathlib import Path
 
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa.auth import AuthenticationError, JaxaAuth
-
 from earthlens.jaxa.catalog import Dataset
 
 

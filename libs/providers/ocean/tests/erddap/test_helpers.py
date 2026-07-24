@@ -6,13 +6,13 @@ import datetime as dt
 
 import pandas as pd
 import pytest
+
+from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.erddap._helpers import (
     build_constraints,
     build_griddap_url,
     empty_canonical,
 )
-
-from earthlens.base import SpatialExtent, TemporalExtent
 
 pytestmark = pytest.mark.erddap
 

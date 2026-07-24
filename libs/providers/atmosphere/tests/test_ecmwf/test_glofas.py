@@ -9,11 +9,11 @@ variable's endpoint. No network.
 from __future__ import annotations
 
 import pytest
-from earthlens.ecmwf.backend import ECMWF
 from pydantic import ValidationError
 
 from earthlens.ecmwf import Catalog, Variable
 from earthlens.ecmwf import constraints as constraints_mod
+from earthlens.ecmwf.backend import ECMWF
 
 pytestmark = [pytest.mark.unit]
 
@@ -225,7 +225,6 @@ class TestGridResolution:
     def test_coarse_dataset_keeps_its_native_resolution(self, tmp_path, monkeypatch):
         """A dataset coarser than ERA5 (0.25°) is not capped at 0.125°."""
         import earthlens.ecmwf.backend as backend_module
-
         from earthlens.ecmwf.catalog import Dataset
 
         backend = _glofas_backend(tmp_path)

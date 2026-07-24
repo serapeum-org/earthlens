@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from earthlens.soilgrids._helpers import IGH_PROJ4
-from earthlens.soilgrids.backend import _close_dataset
 
 from earthlens.soilgrids import SoilGrids
+from earthlens.soilgrids._helpers import IGH_PROJ4
+from earthlens.soilgrids.backend import _close_dataset
 
 from .conftest import FakeDataset
 

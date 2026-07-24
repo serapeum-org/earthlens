@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+
 from earthlens.chc.backend import _reject_unsigned_for_nodata_sentinel
 
 pytestmark = [pytest.mark.chc]

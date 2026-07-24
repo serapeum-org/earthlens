@@ -7,15 +7,15 @@ import sys
 import types
 
 import pytest
+
 from earthlens.nwp.catalog import NWPModel
+from earthlens.nwp.centres import resolve_centre
 from earthlens.nwp.centres.base import CENTRE_REGISTRY, _NWPCentre
 from earthlens.nwp.centres.dwd import DWDCentre
 from earthlens.nwp.centres.ecmwf import ECMWFCentre, _group_params, _source_for
 from earthlens.nwp.centres.meteofrance import MeteoFranceCentre
 from earthlens.nwp.centres.meteofrance_api import MeteoFranceAPICentre, resolve_api_key
 from earthlens.nwp.centres.noaa import NOAACentre, _import_herbie, _priority
-
-from earthlens.nwp.centres import resolve_centre
 
 pytestmark = [pytest.mark.nwp, pytest.mark.unit]
 

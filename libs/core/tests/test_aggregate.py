@@ -17,6 +17,8 @@ from unittest.mock import MagicMock
 import numpy as np
 import pandas as pd
 import pytest
+from pydantic import ValidationError
+
 from earthlens.aggregate import (
     _LEVEL_DIM_CANDIDATES,
     _REDUCERS_SKIPNA,
@@ -31,7 +33,6 @@ from earthlens.aggregate import (
     _window_groups,
     aggregate_netcdf,
 )
-from pydantic import ValidationError
 
 pytestmark = [pytest.mark.unit]
 

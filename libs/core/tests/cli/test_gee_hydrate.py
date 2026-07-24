@@ -6,6 +6,8 @@ from types import SimpleNamespace
 
 import pytest
 import yaml
+
+from earthlens.cli import _gee_hydrate as hydrate_mod
 from earthlens.cli._gee_hydrate import (
     _band_records,
     _configure_ee,
@@ -19,8 +21,6 @@ from earthlens.cli._gee_hydrate import (
     _strip_html,
     bulk_hydrate_empty,
 )
-
-from earthlens.cli import _gee_hydrate as hydrate_mod
 
 pytestmark = pytest.mark.cli
 

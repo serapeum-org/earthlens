@@ -31,9 +31,9 @@ from pathlib import Path
 from typing import cast
 
 import requests
+
 from earthlens.base.archive import extract_members
 from earthlens.base.http import HttpClient, RequestsGet
-
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
 
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).

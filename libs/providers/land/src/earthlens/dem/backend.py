@@ -28,9 +28,6 @@ from pathlib import Path
 from typing import Any, cast
 
 import pandas as pd
-from earthlens.base.s3 import S3Auth, S3Credentials
-from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key
-from earthlens.dem.catalog import Catalog, DEMDataset
 from loguru import logger
 from tqdm import tqdm
 
@@ -40,6 +37,9 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
+from earthlens.base.s3 import S3Auth, S3Credentials
+from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key
+from earthlens.dem.catalog import Catalog, DEMDataset
 
 __all__ = ["DEM"]
 

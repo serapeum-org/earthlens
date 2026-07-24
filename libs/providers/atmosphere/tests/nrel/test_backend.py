@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from earthlens.nrel.auth import AuthenticationError
 
 import earthlens.nrel
 from earthlens.nrel import NREL
+from earthlens.nrel.auth import AuthenticationError
 
 from .conftest import FakeResponse
 

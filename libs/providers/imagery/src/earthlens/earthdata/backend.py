@@ -36,7 +36,6 @@ import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
 from pydantic import SecretStr
 
 from earthlens.base import (
@@ -48,6 +47,7 @@ from earthlens.base import (
     date_windows,
     region_affinity,
 )
+from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
 from earthlens.earthdata.catalog import Catalog, EarthdataDataset
 
 if TYPE_CHECKING:

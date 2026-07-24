@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.osm.catalog import Catalog, Dataset, clear_catalog_cache
 from pydantic import ValidationError
+
+from earthlens.osm.catalog import Catalog, Dataset, clear_catalog_cache
 
 pytestmark = pytest.mark.osm
 

@@ -15,10 +15,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from earthlens.earthlens import EarthLens
-from earthlens.fdsn.events import ATTRIBUTE_COLUMNS
 
+from earthlens.earthlens import EarthLens
 from earthlens.fdsn import FDSN
+from earthlens.fdsn.events import ATTRIBUTE_COLUMNS
 
 # A historically very active window + box: the 2011 Tohoku sequence off
 # the Pacific coast of Japan, which has many M5+ events on record.

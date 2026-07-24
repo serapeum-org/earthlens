@@ -17,7 +17,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from earthlens.base.abstractdatasource import SpatialExtent
-
     from earthlens.soilgrids.catalog import Catalog
 
 #: The quantile layer requested when a call names properties but no quantiles

@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+
 from earthlens.aggregate import AggregationConfig
 from earthlens.sentinel_hub.backend import SentinelHub
 

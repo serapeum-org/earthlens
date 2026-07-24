@@ -11,10 +11,10 @@ import cdsapi
 import numpy as np
 import pandas as pd
 import pytest
-from earthlens.aggregate import AggregationConfig
-from earthlens.earthlens import EarthLens
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.chc import CHIRPS
+from earthlens.earthlens import EarthLens
 from earthlens.ecmwf import ECMWF
 from earthlens.s3 import S3
 
@@ -438,7 +438,6 @@ class TestFunctionalDownload:
     def test_download_delegates_to_facade(self, monkeypatch):
         """download() builds an EarthLens and forwards the run-time args."""
         import earthlens.core
-
         from earthlens import earthlens as facade_module
 
         captured = {}
@@ -531,8 +530,9 @@ class TestFacadeLoad:
 
     def test_load_leaves_non_raster_paths_alone(self, tmp_path):
         """A mixed result reads rasters but leaves a .csv table as a Path."""
-        from earthlens.earthlens import _load_result
         from pyramids.dataset import Dataset
+
+        from earthlens.earthlens import _load_result
 
         tif = tmp_path / "ones.tif"
         _write_ones_tif(tif)
@@ -545,9 +545,10 @@ class TestFacadeLoad:
     def test_load_reads_netcdf_into_netcdf(self, tmp_path):
         """A written .nc path is read into a pyramids NetCDF, not a Dataset."""
         import numpy as np
-        from earthlens.earthlens import _load_result
         from pyramids.dataset import Dataset
         from pyramids.netcdf import NetCDF
+
+        from earthlens.earthlens import _load_result
 
         nc = tmp_path / "cube.nc"
         Dataset.create_from_array(
@@ -563,7 +564,6 @@ class TestFacadeLoad:
     def test_module_download_load_true_calls_load(self, monkeypatch):
         """earthlens.core.download(load=True) routes to EarthLens.load()."""
         import earthlens.core
-
         from earthlens import earthlens as facade_module
 
         calls = {}
@@ -622,7 +622,6 @@ class TestTopLevelDiscovery:
     def test_search_delegates_to_facade(self, monkeypatch):
         """search() builds an EarthLens and returns its .search()."""
         import earthlens.core
-
         from earthlens import earthlens as facade_module
 
         captured = {}
@@ -644,7 +643,6 @@ class TestTopLevelDiscovery:
     def test_find_aggregates_guess_dataset(self, monkeypatch):
         """find() collects guess_dataset hits and skips sources that raise."""
         import earthlens.core
-
         from earthlens import earthlens as facade_module
 
         monkeypatch.setattr(facade_module, "sources", lambda: ["chc", "gee", "broken"])

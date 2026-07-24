@@ -41,14 +41,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
-from earthlens.goes._helpers import (
-    BUCKET_REGION,
-    download_key,
-    list_prefix_keys,
-    parse_scan_start,
-    unsigned_s3_client,
-)
-from earthlens.goes.catalog import Catalog, GOESDomain, GOESProduct
 from loguru import logger
 from tqdm import tqdm
 
@@ -59,6 +51,14 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
+from earthlens.goes._helpers import (
+    BUCKET_REGION,
+    download_key,
+    list_prefix_keys,
+    parse_scan_start,
+    unsigned_s3_client,
+)
+from earthlens.goes.catalog import Catalog, GOESDomain, GOESProduct
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig

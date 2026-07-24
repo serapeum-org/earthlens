@@ -8,10 +8,10 @@ from typing import Any
 
 import pandas as pd
 import pytest
-from earthlens.aggregate import AggregationConfig
-from earthlens.earthlens import EarthLens
 
 import earthlens.sensor_community
+from earthlens.aggregate import AggregationConfig
+from earthlens.earthlens import EarthLens
 
 
 def _facade(client, tmp_path: Path, **overrides: Any) -> EarthLens:

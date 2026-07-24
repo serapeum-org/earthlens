@@ -34,8 +34,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
-from earthlens.fdsn.auth import resolve_earthscope_token
-from earthlens.fdsn.catalog import Catalog, Provider
 from loguru import logger
 
 from earthlens.base import (
@@ -46,10 +44,13 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.fdsn import events
+from earthlens.fdsn.auth import resolve_earthscope_token
+from earthlens.fdsn.catalog import Catalog, Provider
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
     from pyramids.feature.collection import FeatureCollection
+
+    from earthlens.aggregate import AggregationConfig
 
 
 FileFormat = Literal["gpkg", "geojson"]
@@ -361,10 +362,11 @@ class FDSN(AbstractDataSource):
             FeatureCollection: Events for this network (empty on a
                 no-data response).
         """
-        from earthlens.core import __version__
         from obspy import UTCDateTime
         from obspy.clients.fdsn import Client
         from obspy.clients.fdsn.header import FDSNNoDataException
+
+        from earthlens.core import __version__
 
         provider_key = product.id
         fdsn_id = product.metadata["fdsn_id"]

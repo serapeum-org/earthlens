@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import pytest
+
 from earthlens.base.abstractdatasource import SpatialExtent
+from earthlens.soilgrids import Catalog
 from earthlens.soilgrids._helpers import (
     DEFAULT_QUANTILE,
     IGH_PROJ4,
@@ -12,8 +14,6 @@ from earthlens.soilgrids._helpers import (
     coverage_id,
     expand_request,
 )
-
-from earthlens.soilgrids import Catalog
 
 pytestmark = pytest.mark.soilgrids
 

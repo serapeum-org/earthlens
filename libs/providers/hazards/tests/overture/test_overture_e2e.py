@@ -17,8 +17,8 @@ from pathlib import Path
 
 import geopandas as gpd
 import pytest
-from earthlens.earthlens import EarthLens
 
+from earthlens.earthlens import EarthLens
 from earthlens.overture import LicenseWarning
 
 #: A tiny bbox over a dense Manhattan block (Times Square), small enough to

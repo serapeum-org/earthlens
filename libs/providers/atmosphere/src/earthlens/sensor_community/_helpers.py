@@ -24,8 +24,9 @@ from typing import Any, cast
 
 import pandas as pd
 import requests
-from earthlens.base.http import HttpClient
 from loguru import logger
+
+from earthlens.base.http import HttpClient
 
 #: Live JSON API: the last ~5 minutes of every sensor, globally.
 LIVE_URL = "https://data.sensor.community/static/v2/data.json"

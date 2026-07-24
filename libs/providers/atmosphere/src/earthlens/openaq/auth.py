@@ -30,9 +30,10 @@ from __future__ import annotations
 
 import os
 
+from pydantic import BaseModel, ConfigDict, SecretStr
+
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
-from pydantic import BaseModel, ConfigDict, SecretStr
 
 #: Where a user registers for a free OpenAQ API key.
 _REGISTER_URL = "https://explore.openaq.org/register"

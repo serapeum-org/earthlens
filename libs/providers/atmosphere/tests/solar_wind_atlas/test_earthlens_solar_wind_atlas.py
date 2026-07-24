@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from earthlens.earthlens import EarthLens
 
 import earthlens.solar_wind_atlas
+from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.solar_wind_atlas
 

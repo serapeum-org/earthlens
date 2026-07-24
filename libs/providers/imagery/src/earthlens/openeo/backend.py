@@ -27,8 +27,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
-from earthlens.openeo._helpers import OUTPUT_FORMATS, period_for, reducer_for
-from earthlens.openeo.auth import OpeneoAuth, OpeneoCredentials
 from loguru import logger
 from pydantic import SecretStr
 
@@ -40,10 +38,11 @@ from earthlens.base import (
     TemporalExtent,
     date_windows,
 )
+from earthlens.openeo._helpers import OUTPUT_FORMATS, period_for, reducer_for
+from earthlens.openeo.auth import OpeneoAuth, OpeneoCredentials
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
-
     from earthlens.openeo.catalog import Catalog, ResolvedGraph
 
 

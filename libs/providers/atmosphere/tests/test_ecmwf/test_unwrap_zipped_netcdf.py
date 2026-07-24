@@ -14,6 +14,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+
 from earthlens.ecmwf.backend import _unwrap_zipped_netcdf
 
 pytestmark = [pytest.mark.unit]

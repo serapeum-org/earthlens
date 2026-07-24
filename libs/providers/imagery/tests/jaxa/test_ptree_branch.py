@@ -7,7 +7,10 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from pydantic import SecretStr
+
 from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
+from earthlens.jaxa import AuthenticationError, JaxaAuth, JaxaCredentials
 from earthlens.jaxa._ptree import (
     _HIMAWARI_BAND_RESOLUTION,
     _HSD_FILENAME_RE,
@@ -22,9 +25,6 @@ from earthlens.jaxa._ptree import (
     _segment_paths,
     fetch_ptree,
 )
-from pydantic import SecretStr
-
-from earthlens.jaxa import AuthenticationError, JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Dataset
 
 pytestmark = [pytest.mark.jaxa, pytest.mark.unit]

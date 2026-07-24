@@ -30,9 +30,10 @@ import hashlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
+from loguru import logger
+
 from earthlens.base.http import HttpClient
 from earthlens.osm._helpers import OSM_CRS, empty_fc, to_fc
-from loguru import logger
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection

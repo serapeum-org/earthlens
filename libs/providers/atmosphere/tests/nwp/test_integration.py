@@ -11,9 +11,9 @@ are exercised together.
 from __future__ import annotations
 
 import pytest
-from earthlens.nwp.catalog import NWPModel
 
 from earthlens.nwp import NWP
+from earthlens.nwp.catalog import NWPModel
 
 pytestmark = [pytest.mark.nwp, pytest.mark.integration]
 
