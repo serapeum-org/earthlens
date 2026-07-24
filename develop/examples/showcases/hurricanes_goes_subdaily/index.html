@@ -19858,11 +19858,12 @@ the copy bundled with <code>imageio-ffmpeg</code> — so no separate install is 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"hurricanes"</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -19874,11 +19875,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from cleopatra.array_glyph import FrameLabel
-from earthlens.core import EarthLens
 from IPython.display import HTML
 from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
 from pyramids.netcdf import NetCDF
+
+from earthlens.core import EarthLens
 
 OUT = Path("out") / "hurricanes"
 OUT.mkdir(parents=True, exist_ok=True)</div>

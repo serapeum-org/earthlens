@@ -20022,10 +20022,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_dotenv</span><span class="p">,</span> <span class="n">load_dotenv</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>  <span class="c1"># pyramids' own IO + plotting</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
@@ -20040,10 +20041,11 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 from dotenv import find_dotenv, load_dotenv
-from earthlens.core import EarthLens
 from IPython.display import Image, display
 from loguru import logger
 from pyramids.dataset import DatasetCollection  # pyramids' own IO + plotting
+
+from earthlens.core import EarthLens
 
 warnings.filterwarnings("ignore")
 logger.remove()

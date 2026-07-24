@@ -19841,9 +19841,10 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
@@ -19857,9 +19858,10 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from cleopatra.array_glyph import FrameLabel
-from earthlens.core import EarthLens
 from IPython.display import HTML
 from pyramids.dataset.collection import DatasetCollection
+
+from earthlens.core import EarthLens
 
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
