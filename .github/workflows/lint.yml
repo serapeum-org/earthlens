@@ -109,7 +109,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # persist-credentials: false — `gitleaks dir .` scans the .git directory, and
+      # actions/checkout otherwise writes the runner's auth token into .git/config
+      # (an `AUTHORIZATION: basic …` header), which gitleaks would flag as a leak.
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Scan for secrets (gitleaks)
         # Pinned binary + SHA256 verification (avoids the gitleaks-action org-license
