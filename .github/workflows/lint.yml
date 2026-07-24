@@ -126,4 +126,9 @@ jobs:
             "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz"
           echo "${SHA}  gitleaks.tar.gz" | sha256sum -c -
           tar -xzf gitleaks.tar.gz gitleaks
-          ./gitleaks dir . --redact --no-banner
+          # Scan only the committed tree (via git archive). `gitleaks dir .` also walks
+          # the .git directory, whose shallow-checkout packs / config carry CI-internal
+          # material that trips gitleaks; the tracked tree itself is clean.
+          rm -rf _gitleaks_scan && mkdir _gitleaks_scan
+          git archive HEAD | tar -x -C _gitleaks_scan
+          ./gitleaks dir _gitleaks_scan --redact --no-banner
