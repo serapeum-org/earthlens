@@ -34,8 +34,8 @@ from tqdm import tqdm
 from earthlens.base import (
     AbstractDataSource,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key
@@ -81,6 +81,9 @@ class DEM(AbstractDataSource):
     """
 
     OUTPUT_KIND = "raster"
+
+    #: Elevation is time-invariant, so a missing `start` / `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -136,10 +139,6 @@ class DEM(AbstractDataSource):
         )
         return None
 
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent` (no snapping)."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -149,8 +148,8 @@ class DEM(AbstractDataSource):
         `DatetimeIndex` derived from `start` so the shared
         `TemporalExtent` validator passes.
         """
-        start_date = pd.to_datetime(start, format=fmt)
-        end_date = pd.to_datetime(end, format=fmt)
+        start_date = to_datetime(start, fmt)
+        end_date = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_date,
             end_date=end_date,
@@ -286,10 +285,6 @@ class DEM(AbstractDataSource):
     def _client(self) -> Any:
         """Return the unsigned `boto3` client (built lazily by `S3Auth`)."""
         return self._auth.client()
-
-    def _api(self, *args: Any, **kwargs: Any) -> list[Path]:
-        """Compose `_search` + `_fetch` (the canonical post-C3 body)."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

@@ -23,7 +23,11 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    yaml_files_for,
+)
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 #: Path to the bundled catalog directory of per-atlas `*.yaml` files plus the
 #: `_index.yaml` informational index. Tests can monkey-patch this attribute to
@@ -33,7 +37,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: Module-level cache of parsed catalog data, keyed on the resolved path plus a
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-atlas file invalidates the entry without re-parsing an unchanged tree.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Layer]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Layer]]] = CatalogParseCache()
 
 #: The two source atlases a row may belong to.
 Atlas = Literal["gsa", "gwa"]
@@ -86,28 +90,12 @@ class Layer(BaseModel):
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted YAML files that contribute to a catalog load.
+    """Return the sorted YAML files contributing to a load.
 
-    Args:
-        path: A catalog directory of per-atlas `*.yaml` files (the default
-            layout, including `_index.yaml`) or a single `*.yaml` file
-            (back-compat for tests / a monolithic catalog).
-
-    Returns:
-        list[Path]: Sorted YAML paths — every `*.yaml` for a directory, or
-            just the one file.
-
-    Raises:
-        ValueError: If `path` is neither an existing directory nor file.
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    if path.is_file():
-        return [path]
-    raise ValueError(
-        f"solar_wind_atlas catalog path {path} does not exist (expected a "
-        "directory of per-atlas *.yaml files, or a single YAML file)."
-    )
+    return yaml_files_for(path, provider='solar_wind_atlas', shard_noun='per-atlas')
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Layer]]:
@@ -131,13 +119,8 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Layer]]:
             two files, a row fails validation, or a curated id is absent from
             `available_datasets:`.
     """
-    resolved = str(path.resolve())
     files = _yaml_files_for(path)
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
+    key = catalog_cache_key(path, files)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

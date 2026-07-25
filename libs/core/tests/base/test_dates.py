@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import datetime as dt
+import importlib
 
 import pandas as pd
 import pytest
 
-from earthlens.base import split_time, to_datetime
+from earthlens.base import (
+    CADENCE_ALIASES,
+    WHOLE_WINDOW,
+    resolve_cadence,
+    split_time,
+    to_datetime,
+)
 from earthlens.base._dates import _strip_tz
 
 
@@ -147,3 +154,150 @@ class TestSplitTime:
         """A non-range value is rejected with a clear message."""
         with pytest.raises(TypeError, match="time= must be"):
             split_time(2020)
+
+
+class TestResolveCadence:
+    """Cadence lookup that raises instead of silently substituting a default."""
+
+    ACCEPTED = {"daily": "D", "monthly": "MS", "hourly": "h"}
+
+    @pytest.mark.parametrize(
+        "cadence,expected",
+        [("daily", "D"), ("monthly", "MS"), ("hourly", "h")],
+    )
+    def test_accepted_cadence_returns_alias(self, cadence, expected):
+        """Every accepted cadence maps to its pandas offset alias."""
+        assert resolve_cadence(cadence, self.ACCEPTED) == expected
+
+    def test_unknown_cadence_raises(self):
+        """A cadence outside the accepted set raises rather than defaulting."""
+        with pytest.raises(ValueError, match="is not supported"):
+            resolve_cadence("yearly", self.ACCEPTED)
+
+    def test_error_lists_accepted_spellings(self):
+        """The message enumerates the accepted cadences, sorted."""
+        with pytest.raises(ValueError, match=r"\['daily', 'hourly', 'monthly'\]"):
+            resolve_cadence("yearly", self.ACCEPTED)
+
+    def test_error_names_the_backend(self):
+        """The backend name is quoted in the message so the user knows which failed."""
+        with pytest.raises(ValueError, match="supported by CMEMS"):
+            resolve_cadence("yearly", self.ACCEPTED, backend="CMEMS")
+
+    def test_default_backend_phrase(self):
+        """Without a backend name the message falls back to a generic phrase."""
+        with pytest.raises(ValueError, match="supported by this backend"):
+            resolve_cadence("yearly", self.ACCEPTED)
+
+    def test_near_miss_gets_did_you_mean(self):
+        """A typo close to an accepted spelling gets a did-you-mean hint."""
+        with pytest.raises(ValueError, match="Did you mean 'daily'"):
+            resolve_cadence("dailyy", self.ACCEPTED)
+
+    def test_far_miss_has_no_hint(self):
+        """A cadence resembling nothing accepted gets no did-you-mean clause."""
+        with pytest.raises(ValueError) as excinfo:
+            resolve_cadence("zzzzzz", self.ACCEPTED)
+        assert "Did you mean" not in str(excinfo.value)
+
+    def test_empty_accepted_mapping_raises(self):
+        """A backend that accepts no cadence rejects every value."""
+        with pytest.raises(ValueError, match=r"Accepted: \[\]"):
+            resolve_cadence("daily", {})
+
+    def test_raises_from_none_hides_keyerror(self):
+        """The ValueError is raised `from None`, so no KeyError chains onto it."""
+        with pytest.raises(ValueError) as excinfo:
+            resolve_cadence("yearly", self.ACCEPTED)
+        assert excinfo.value.__cause__ is None
+
+    @pytest.mark.parametrize("bad", [None, 5, ["daily"], 3.5])
+    def test_non_string_cadence_raises_value_error(self, bad):
+        """A non-string cadence gives a ValueError, not a difflib TypeError."""
+        with pytest.raises(ValueError, match="must be a string cadence"):
+            resolve_cadence(bad, self.ACCEPTED)
+
+    def test_alias_value_passed_through_verbatim(self):
+        """The mapping's value is returned as-is, not re-normalised."""
+        assert resolve_cadence("weird", {"weird": "6h"}) == "6h"
+
+
+class TestCadenceAliases:
+    """The shared cadence vocabulary covers what the provider catalogs declare."""
+
+    def test_covers_every_declared_cadence_literal(self):
+        """Every backend's `CadenceLiteral` word resolves through the shared map.
+
+        This is the guard that was missing: `CADENCE_ALIASES` was first derived
+        from cmems alone, so 73% of eumetsat's curated rows hard-failed.
+        """
+        import typing
+
+        modules = {}
+        for name in ("earthdata", "eumetsat", "cmems", "drought"):
+            module = importlib.import_module(f"earthlens.{name}.catalog")
+            modules[name] = set(typing.get_args(module.CadenceLiteral))
+        uncovered = {
+            name: sorted(words - set(CADENCE_ALIASES))
+            for name, words in modules.items()
+            if words - set(CADENCE_ALIASES)
+        }
+        assert not uncovered, f"cadence words absent from CADENCE_ALIASES: {uncovered}"
+
+    @pytest.mark.parametrize(
+        "cadence,expected",
+        [
+            ("5min", "5min"),
+            ("hourly", "h"),
+            ("6hourly", "6h"),
+            ("daily", "D"),
+            ("8day", "8D"),
+            ("10day", "10D"),
+            ("16day", "16D"),
+            ("weekly", "7D"),
+            ("monthly", "MS"),
+            ("annual", "YS"),
+            ("seasonal", "QS-DEC"),
+        ],
+    )
+    def test_periodic_words_map_to_pandas_aliases(self, cadence, expected):
+        """Each periodic cadence maps to its pandas offset alias."""
+        assert CADENCE_ALIASES[cadence] == expected
+
+    @pytest.mark.parametrize(
+        "cadence",
+        [
+            "raw",
+            "native",
+            "subhourly",
+            "subdaily",
+            "irregular",
+            "climatology",
+            "static",
+        ],
+    )
+    def test_non_periodic_words_map_to_whole_window(self, cadence):
+        """A cadence naming a release character resolves to the whole-window sentinel."""
+        assert CADENCE_ALIASES[cadence] == WHOLE_WINDOW
+
+    @pytest.mark.parametrize(
+        "cadence", ["pentadal", "weekly", "8day", "10day", "16day"]
+    )
+    def test_multi_day_cadences_start_at_the_window_start(self, cadence):
+        """The sliding multi-day aliases tile the window from its own first day.
+
+        A calendar-anchored weekly alias (`W` is `W-SUN`) emits period *ends* and
+        skips the window's opening days, which a per-period fetch loop would drop.
+        """
+        alias = CADENCE_ALIASES[cadence]
+        index = pd.date_range("2024-02-01", "2024-03-19", freq=alias)
+        assert index[0] == pd.Timestamp("2024-02-01")
+
+    def test_every_periodic_alias_is_a_valid_pandas_offset(self):
+        """No alias is a typo that would only fail at `date_range` time."""
+        for cadence, alias in CADENCE_ALIASES.items():
+            if alias == WHOLE_WINDOW:
+                continue
+            assert len(pd.date_range("2024-01-01", "2025-01-01", freq=alias)) > 0, (
+                f"{cadence!r} maps to {alias!r}, which yields no periods"
+            )

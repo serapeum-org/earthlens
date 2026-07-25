@@ -18,7 +18,6 @@ is a genuine pyramids-consuming backend.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -30,11 +29,10 @@ if TYPE_CHECKING:
 
     from earthlens.aggregate import AggregationConfig
 
-from earthlens.base import OutputKind, date_windows
+from earthlens.base import OutputKind, close_quietly, date_windows, to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.base.spatial import crop_to_aoi
@@ -68,6 +66,9 @@ class GHSL(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
 
     def __init__(
         self,
@@ -286,18 +287,6 @@ class GHSL(AbstractDataSource):
         self._auth.configure()
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a `SpatialExtent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox (WGS84).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -314,7 +303,9 @@ class GHSL(AbstractDataSource):
             start: Inclusive start of the window.
             end: Inclusive end of the window.
             temporal_resolution: Advisory label (ignored).
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
@@ -322,8 +313,8 @@ class GHSL(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         dates = date_windows(start_dt, end_dt, "YS")
         return TemporalExtent(
             start_date=start_dt,
@@ -331,10 +322,6 @@ class GHSL(AbstractDataSource):
             resolution="YS",
             dates=dates,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,
@@ -406,7 +393,7 @@ class GHSL(AbstractDataSource):
         import numpy as np
         from pyramids.dataset import Dataset
 
-        from earthlens.aggregate import _reduce, _window_groups
+        from earthlens.aggregate import reduce_time_axis, window_groups
 
         op = "mean" if config.op == "auto" else config.op
         out_dir = (
@@ -445,8 +432,8 @@ class GHSL(AbstractDataSource):
             geo = datasets[0].geotransform
             nodata = datasets[0].no_data_value
             fill = nodata[0] if isinstance(nodata, (list, tuple)) else nodata
-            for label, mask in _window_groups(time_axis, config.freq):
-                reduced = _reduce(
+            for label, mask in window_groups(time_axis, config.freq):
+                reduced = reduce_time_axis(
                     stack[mask],
                     op,
                     skipna=config.skipna,
@@ -463,10 +450,10 @@ class GHSL(AbstractDataSource):
                     f"_epsg{self._output_epsg}.tif"
                 )
                 result.to_file(str(target))
-                _close_dataset(result)
+                close_quietly(result)
                 out.append(target)
             for ds in datasets:
-                _close_dataset(ds)
+                close_quietly(ds)
         return out
 
     @staticmethod
@@ -736,8 +723,8 @@ class GHSL(AbstractDataSource):
         cropped.to_file(str(target))
         if has_legend:
             self._write_legend_sidecar(target, rp.metadata["product"])
-        _close_dataset(dataset)
-        _close_dataset(cropped)
+        close_quietly(dataset)
+        close_quietly(cropped)
         # Best-effort cleanup of the merge intermediate; on Windows the GDAL
         # handle can briefly outlive the Python object, so a locked file is
         # left in the cache rather than raising.
@@ -828,24 +815,6 @@ class GHSL(AbstractDataSource):
         dest: Path = Path(self.path) / code
         download_and_extract(f"{version_url}/{zips[0]}", dest)
         return dest
-
-
-def _close_dataset(dataset: object) -> None:
-    """Release a pyramids `Dataset`'s underlying GDAL handle if it exposes one.
-
-    pyramids `Dataset` objects may hold an open GDAL dataset; closing it lets
-    the OS release the file lock (notably on Windows) before the intermediate
-    is deleted. A no-op when the object has no `close`.
-
-    Args:
-        dataset: A pyramids `Dataset` (or anything with an optional `close`).
-    """
-    closer = getattr(dataset, "close", None)
-    if callable(closer):
-        try:
-            closer()
-        except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
-            pass
 
 
 def _epsg_int(crs: str | int) -> int:

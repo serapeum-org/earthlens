@@ -29,11 +29,9 @@ sentinel `"all"`.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
-import pandas as pd
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 from loguru import logger
 
@@ -41,7 +39,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
@@ -179,29 +176,6 @@ class GDACS(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No auth, no client — GDACS is a public feed.
-
-        Returns:
-            None: No per-instance client object.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        GDACS takes no server-side bbox, so the box passes through
-        unchanged and is applied client-side in :meth:`_fetch`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -222,7 +196,9 @@ class GDACS(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Ignored beyond being recorded as the
                 resolution label; GDACS always queries the full window.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints.
@@ -230,14 +206,7 @@ class GDACS(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _search(self) -> list[RemoteProduct]:
         """One :class:`RemoteProduct` carrying the whole combined query.
@@ -335,10 +304,6 @@ class GDACS(AbstractDataSource):
             [self.space.west, self.space.east],
         )
         return [clipped]
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

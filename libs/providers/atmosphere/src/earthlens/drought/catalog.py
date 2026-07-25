@@ -30,14 +30,18 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    yaml_files_for,
+)
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 """Path to the bundled `catalog/` directory of per-source YAML files plus
 the `_index.yaml` informational index. Reassign this attribute to redirect
 the loader at another directory or a single YAML file."""
 
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
 
 TransportLiteral = Literal["usdm-geojson", "edo-wcs", "netcdf-url"]
 """The three live transports the drought backend dispatches on. `_fetch`
@@ -68,28 +72,12 @@ def clear_catalog_cache() -> None:
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted YAML files that contribute to a catalog load.
+    """Return the sorted YAML files contributing to a load.
 
-    Args:
-        path: A catalog directory of per-source `*.yaml` files (the default
-            layout, including `_index.yaml`) or a single `*.yaml` file (the
-            supported form when `CATALOG_PATH` is redirected at one file).
-
-    Returns:
-        list[Path]: Sorted YAML paths — every `*.yaml` for a directory, or
-            just the one file.
-
-    Raises:
-        ValueError: If `path` is neither an existing directory nor file.
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    if path.is_file():
-        return [path]
-    raise ValueError(
-        f"drought catalog path {path} does not exist (expected a directory "
-        "of per-source *.yaml files, or a single YAML file)."
-    )
+    return yaml_files_for(path, provider='drought', shard_noun='per-source')
 
 
 def _load_catalog_data(
@@ -114,13 +102,8 @@ def _load_catalog_data(
             two files, a dataset row fails validation, or a curated id is
             absent from `available_datasets:`.
     """
-    resolved = str(path.resolve())
     files = _yaml_files_for(path)
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
+    key = catalog_cache_key(path, files)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

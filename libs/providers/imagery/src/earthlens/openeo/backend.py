@@ -31,12 +31,12 @@ from loguru import logger
 from pydantic import SecretStr
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
-    date_windows,
+    safe_filename,
 )
 from earthlens.openeo._helpers import OUTPUT_FORMATS, period_for, reducer_for
 from earthlens.openeo.auth import OpeneoAuth, OpeneoCredentials
@@ -195,18 +195,6 @@ class OpenEO(AbstractDataSource):
         self._auth = OpeneoAuth(self._credentials, endpoint=self._endpoint)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Build the WGS84 envelope passed straight to openEO `spatial_extent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: The request's bounding box.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -218,37 +206,28 @@ class OpenEO(AbstractDataSource):
             temporal_resolution: Advisory cadence label (`"daily"`, `"monthly"`,
                 `"hourly"`, `"yearly"`) — maps to the pandas frequency stored on
                 the returned extent; the openEO window itself is `start`/`end`.
-            fmt: `strptime` format for `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: The parsed window (with an inclusive `end_date`; the
             backend converts it to openEO's exclusive bound at graph-build time).
 
         Raises:
-            ValueError: When `start` or `end` is `None` — openEO needs an
-                explicit `temporal_extent`, so a missing bound is rejected with
-                an actionable message rather than a bare `TypeError` from
-                `strptime`.
+            ValueError: When `temporal_resolution` is not one of the accepted
+                cadences. A missing `start` / `end` is rejected earlier, by
+                `AbstractDataSource._check_time_window` — openEO needs an
+                explicit `temporal_extent`, so it keeps the inherited
+                `REQUIRES_TIME_WINDOW = True`.
         """
-        import datetime as dt
-
-        if start is None or end is None:
-            raise ValueError(
-                "openEO requires both start and end dates (the process graph "
-                "needs a temporal_extent); pass start=… and end=…."
-            )
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
-        resolution = freq_map.get(temporal_resolution, "D")
-        dates = date_windows(start_dt, end_dt, resolution)
-        return TemporalExtent(
-            start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
+        return self._cadence_extent(
+            start,
+            end,
+            fmt=fmt,
+            cadence=temporal_resolution,
+            accepted=CADENCE_ALIASES,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """List the planned graphs without executing anything (cheap dry-run).
@@ -355,7 +334,7 @@ class OpenEO(AbstractDataSource):
             cube = self._build_cube(conn, product.id, resolved)
             out_format = resolved.output_format or self._output_format
             suffix = OUTPUT_FORMATS[out_format]
-            target = Path(self.root_dir) / f"{_safe_name(product.id)}.{suffix}"
+            target = Path(self.root_dir) / f"{safe_filename(product.id)}.{suffix}"
             if self._execute == "batch":
                 job = cube.create_job(out_format=out_format)
                 job.start_and_wait().get_results().download_file(str(target))
@@ -468,24 +447,3 @@ def _exclusive_end(end_date: Any) -> str:
     import datetime as dt
 
     return cast("str", (end_date + dt.timedelta(days=1)).strftime("%Y-%m-%d"))
-
-
-def _safe_name(key: str) -> str:
-    """Flatten a request key to a filename-safe stem (no path separators).
-
-    Args:
-        key: A collection/recipe key.
-
-    Returns:
-        The key with `/` and `\\` replaced by `_`.
-
-    Examples:
-        - A plain key is unchanged:
-            ```python
-            >>> from earthlens.openeo.backend import _safe_name
-            >>> _safe_name("sentinel-2-l2a-ndvi-monthly")
-            'sentinel-2-l2a-ndvi-monthly'
-
-            ```
-    """
-    return key.replace("/", "_").replace("\\", "_")

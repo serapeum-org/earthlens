@@ -31,7 +31,6 @@ from tqdm import tqdm
 from earthlens.base import (
     AbstractDataSource,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
     date_windows,
@@ -48,15 +47,6 @@ if TYPE_CHECKING:
     from earthlens.ecmwf import Variable
 
 __all__ = ["S3"]
-
-
-def _safe_name(value: str) -> str:
-    """Sanitise a product id into a filesystem-safe file stem.
-
-    Thin alias over :func:`earthlens.base.safe_filename` (the shared
-    implementation); kept as a module-local name for the call sites.
-    """
-    return safe_filename(value)
 
 
 @dataclass(frozen=True)
@@ -109,6 +99,9 @@ class S3(AbstractDataSource):
     """
 
     OUTPUT_KIND = "mixed"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
 
     @classmethod
     def datasets(cls) -> list[str]:
@@ -207,10 +200,6 @@ class S3(AbstractDataSource):
         )
         return self._auth.client()
 
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Capture the AOI bbox as a `SpatialExtent`."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -279,7 +268,7 @@ class S3(AbstractDataSource):
         default_ext = ".nc" if self._dataset.format == "netcdf" else ".tif"
         assert product.href is not None  # S3 products always carry a key/URL
         ext = Path(product.href).suffix or default_ext
-        raw = raw_dir / f"{_safe_name(product.id)}{ext}"
+        raw = raw_dir / f"{safe_filename(product.id)}{ext}"
         if raw.exists():
             return raw
         extra = {"RequestPayer": "requester"} if self._dataset.requester_pays else None
@@ -413,7 +402,7 @@ class S3(AbstractDataSource):
             "netcdf",
         )
         out_ext = ".tif" if as_geotiff else ".nc"
-        out_path = self.path / f"{_safe_name(product.id)}{out_ext}"
+        out_path = self.path / f"{safe_filename(product.id)}{out_ext}"
         data.to_file(str(out_path))
         return out_path
 
@@ -514,10 +503,6 @@ class S3(AbstractDataSource):
         return self._nc_variable_name(NetCDF.read_file(str(raw)), product)
 
     # -- public API ----------------------------------------------------
-
-    def _api(self, *args: Any, **kwargs: Any) -> list[Path]:
-        """Compose `_search` + `_fetch` (the canonical post-C3 body)."""
-        return self._api_via_search_fetch()
 
     def download(
         self, progress_bar: bool = True, aggregate: Any | None = None

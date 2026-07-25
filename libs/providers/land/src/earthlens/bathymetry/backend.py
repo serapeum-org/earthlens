@@ -24,7 +24,6 @@ import difflib
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
-import pandas as pd
 import requests
 from loguru import logger
 
@@ -32,7 +31,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     mask_to_geometry,
 )
@@ -92,6 +90,13 @@ class Bathymetry(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
+    #: The bathymetry grids are time-invariant, so a missing `start` / `end` is legal
+    #: here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -193,22 +198,6 @@ class Bathymetry(AbstractDataSource):
                     f"elevation band is {band!r}.{hint}"
                 )
 
-    def _initialize(self):
-        """No client / auth — the DEM servers are public (returns `None`)."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -224,16 +213,7 @@ class Bathymetry(AbstractDataSource):
             TemporalExtent: A frozen model with `None` bounds and an empty
                 date index (a static DEM has no time axis).
         """
-        return TemporalExtent(
-            start_date=None,
-            end_date=None,
-            resolution=temporal_resolution or "static",
-            dates=pd.DatetimeIndex([]),
-        )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
+        return self._static_extent(resolution=temporal_resolution or "static")
 
     def _search(self) -> list[RemoteProduct]:
         """Name the single resolved product (one DEM per request).
@@ -420,4 +400,4 @@ class Bathymetry(AbstractDataSource):
                 "temporal axis, so there is nothing to reduce. Call "
                 "download() without aggregate=."
             )
-        return self._api()
+        return cast("list[Path]", self._api())

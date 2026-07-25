@@ -287,34 +287,7 @@ class CmemsAuth(AbstractAuth[CmemsCredentials]):
                 f"malformed; see {_DOCS_URL}."
             )
 
-        self._configured = True
-
-    def is_authenticated(self) -> bool:
-        """Return `True` once `configure()` has succeeded for this instance.
-
-        Cheap predicate — does not call the toolbox or the network.
-        A return of `True` means the credentials this object holds
-        have been validated against the auth server at least once
-        during the current process. It does **not** speak to the
-        validity of credentials saved on disk from an earlier
-        process — those are still useable, but their freshness can
-        only be checked by calling `configure()`.
-
-        Returns:
-            bool: `True` after a successful :meth:`configure`,
-                `False` before.
-
-        Examples:
-            - A freshly constructed auth has not yet authenticated:
-                ```python
-                >>> from earthlens.cmems import CmemsAuth, CmemsCredentials
-                >>> auth = CmemsAuth(CmemsCredentials(username="u", password="p"))
-                >>> auth.is_authenticated()
-                False
-
-                ```
-        """
-        return self._configured
+        self.mark_configured()
 
 
 def _saved_credentials_present() -> bool:

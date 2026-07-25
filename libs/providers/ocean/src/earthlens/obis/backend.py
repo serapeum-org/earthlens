@@ -21,7 +21,6 @@ set, writes it (GeoParquet by default). Like GBIF the facade rejects an
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -31,7 +30,6 @@ from loguru import logger
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.biodiversity import occurrences_to_fc, warn_license, wkt_from_bbox
@@ -172,26 +170,6 @@ class OBIS(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No global client — `pyobis` is imported lazily in `_fetch`.
-
-        Returns:
-            None: OBIS occurrence search is anonymous and stateless.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -208,19 +186,14 @@ class OBIS(AbstractDataSource):
             start: Inclusive start date string.
             end: Inclusive end date string.
             temporal_resolution: The sentinel `"all"`.
-            fmt: `strptime` format for both ends.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _plan_search(self, name: str | None = None) -> dict[str, Any]:
         """Build the `occurrences.search` keyword arguments for one species.

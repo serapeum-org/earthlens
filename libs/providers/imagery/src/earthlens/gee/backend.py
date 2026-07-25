@@ -61,7 +61,6 @@ from earthlens.base import (
     AbstractDataSource,
     LazyClientMixin,
     OutputKind,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
     to_datetime,
@@ -262,6 +261,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
     @property
     def catalog(self):
         """The bundled GEE :class:`~earthlens.gee.Catalog` (alias of `_catalog`)."""
@@ -346,21 +348,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             fmt=fmt,
             path=path,
         )
-
-    def _initialize(self) -> None:
-        """Defer the Earth Engine connection to first client access.
-
-        Returns `None` without touching credentials — the constructor
-        describes only what to fetch. Both the connection and the
-        credential resolution happen lazily on first access to
-        `self.client` (see :meth:`_open_client`), which
-        :meth:`authenticate` triggers eagerly. So constructing the
-        backend never blocks on auth and needs no credentials.
-
-        Returns:
-            None: Always.
-        """
-        return None
 
     def _resolve_credentials(self) -> tuple[str | None, str | None, str | None]:
         """Resolve credentials from explicit values, then the environment.
@@ -529,23 +516,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.project = project
         return ee
 
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Build the request bounding box.
-
-        Earth Engine has no fixed native grid like ERA5's 0.125°, so the
-        spatial cell size is the user's `scale` (metres), kept on
-        :attr:`scale` rather than on :attr:`SpatialExtent.resolution`
-        (which is a *degrees* field).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: The bbox (no `resolution`).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -557,7 +527,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             temporal_resolution: `"raw"` (one bucket spanning the whole
                 window), `"daily"` (`freq="D"`), `"monthly"` (`"MS"`),
                 or `"yearly"` (`"YS"`).
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: `start_date`, `end_date`, `resolution` (the

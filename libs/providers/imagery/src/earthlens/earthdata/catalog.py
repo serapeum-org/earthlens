@@ -42,7 +42,11 @@ from pydantic import (
 )
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    yaml_files_for,
+)
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
@@ -57,13 +61,15 @@ AUTO_PATH: Path = Path(__file__).parent / "catalog" / "_auto.json"
 # path plus a tuple of `(file, mtime_ns)` for every YAML the load
 # touched, so editing any per-DAAC file invalidates the entry without
 # inspecting every row. Mirrors the CMEMS / GEE multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, EarthdataDataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, EarthdataDataset]]] = (
+    CatalogParseCache()
+)
 # Same `(path, mtime_ns)` cache for the DAAC provider registry.
-_PROVIDERS_CACHE: dict[Any, dict[str, EarthdataDAAC]] = {}
+_PROVIDERS_CACHE: dict[Any, dict[str, EarthdataDAAC]] = CatalogParseCache()
 # …and for the auto-generated long-tail rows (kept as raw dicts — a model is
 # built only for the one key a caller resolves, so membership/resolution never
 # instantiates all ~8k pydantic rows).
-_AUTO_CACHE: dict[Any, dict[str, dict]] = {}
+_AUTO_CACHE: dict[Any, dict[str, dict]] = CatalogParseCache()
 
 OutputKindLiteral = Literal["raster", "vector", "tabular"]
 
@@ -97,32 +103,12 @@ def clear_catalog_cache() -> None:
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted list of YAML files that contribute to a load.
+    """Return the sorted YAML files contributing to a load.
 
-    `path` may point at either a directory of per-DAAC `*.yaml` files
-    (the default layout) or a single `*.yaml` file (back-compat for
-    tests that monkey-patch :data:`CATALOG_PATH` to a temp file).
-
-    Args:
-        path: Catalog directory or single YAML file.
-
-    Returns:
-        Sorted list of YAML paths. For a directory, every `*.yaml`
-            sibling (including `_index.yaml`); for a file, just that
-            file.
-
-    Raises:
-        ValueError: If `path` is neither an existing directory nor an
-            existing file.
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    if path.is_file():
-        return [path]
-    raise ValueError(
-        f"Earthdata catalog path {path} does not exist (expected a "
-        "directory of per-DAAC *.yaml files, or a single YAML file)."
-    )
+    return yaml_files_for(path, provider='Earthdata', shard_noun='per-DAAC')
 
 
 def _load_providers(path: Path) -> dict[str, EarthdataDAAC]:
@@ -138,12 +124,7 @@ def _load_providers(path: Path) -> dict[str, EarthdataDAAC]:
         ValueError: If the file has no `daacs:` block or a DAAC entry
             fails validation.
     """
-    resolved = str(path.resolve())
-    try:
-        mtime = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime = 0
-    key = (resolved, mtime)
+    key = catalog_cache_key(path, [path])
     cached = _PROVIDERS_CACHE.get(key)
     if cached is not None:
         return cached
@@ -219,13 +200,8 @@ def _load_catalog_data(
         ValueError: If no file has a `datasets:` block, a dataset key
             is declared in two files, or a dataset fails validation.
     """
-    resolved = str(path.resolve())
     files = _yaml_files_for(path)
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
+    key = catalog_cache_key(path, files)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

@@ -215,6 +215,9 @@ class CHIRPS(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
     api_url: str = "data.chc.ucsb.edu"
 
     @property
@@ -344,10 +347,6 @@ class CHIRPS(AbstractDataSource):
                         f"{ds_key!r}. Available: {sorted(available)}."
                     )
 
-    def _initialize(self) -> None:
-        """No persistent client — anonymous FTP opens a connection per fetch."""
-        return None
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -364,7 +363,9 @@ class CHIRPS(AbstractDataSource):
             temporal_resolution: Accepted for API symmetry; ignored
                 here because the real frequency comes from the
                 catalog per dataset.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen outer window. Only `start_date` /

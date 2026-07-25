@@ -7,21 +7,37 @@ into the private module layout.
 
 from __future__ import annotations
 
-from earthlens.base._dates import date_windows, split_time, to_datetime, window_labels
+from earthlens.base._dates import (
+    CADENCE_ALIASES,
+    WHOLE_WINDOW,
+    date_windows,
+    resolve_cadence,
+    split_time,
+    to_datetime,
+    window_labels,
+)
 from earthlens.base.abstractdatasource import (
     AbstractCatalog,
     AbstractDataSource,
     LazyClientMixin,
     OutputKind,
+    PolygonAoiWarning,
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
 )
 from earthlens.base.auth import AbstractAuth, AuthenticationError
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    clear_all_catalog_caches,
+    load_catalog,
+    yaml_files_for,
+)
 from earthlens.base.http import HttpClient
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.naming import safe_filename
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
+from earthlens.base.raster import close_quietly
 from earthlens.base.region import (
     clear_region_cache,
     region_affinity,
@@ -42,30 +58,39 @@ __all__ = [
     "AbstractCatalog",
     "AbstractDataSource",
     "AuthenticationError",
+    "CADENCE_ALIASES",
     "FluxableLeaf",
     "HttpClient",
-    "S3Auth",
-    "S3Credentials",
     "LazyClientMixin",
     "METRES_PER_DEGREE",
     "OutputKind",
+    "PolygonAoiWarning",
     "Provider",
     "RemoteProduct",
+    "S3Auth",
+    "S3Credentials",
     "SpatialExtent",
     "TemporalExtent",
+    "WHOLE_WINDOW",
+    "catalog_cache_key",
+    "clear_all_catalog_caches",
     "clear_providers_cache",
     "clear_region_cache",
+    "close_quietly",
     "crop_to_aoi",
     "date_windows",
-    "mask_to_geometry",
     "estimate_pixel_dims",
+    "load_catalog",
     "load_providers",
+    "mask_to_geometry",
     "normalize_aoi",
     "region_affinity",
     "resolve_aoi",
+    "resolve_cadence",
     "safe_filename",
     "split_time",
     "to_datetime",
     "warn_if_egress",
     "window_labels",
+    "yaml_files_for",
 ]

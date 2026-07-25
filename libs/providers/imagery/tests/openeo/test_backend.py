@@ -7,7 +7,8 @@ from pathlib import Path
 import pytest
 
 from earthlens.aggregate import AggregationConfig
-from earthlens.openeo.backend import OpenEO, _apply_step, _safe_name
+from earthlens.base import safe_filename
+from earthlens.openeo.backend import OpenEO, _apply_step
 
 from .conftest import FakeAuth, FakeConnection, FakeCube
 
@@ -53,7 +54,7 @@ class TestConstruction:
 
     def test_missing_dates_rejected(self, output_dir: Path):
         """A request with no start/end dates is rejected with a clear message."""
-        with pytest.raises(ValueError, match="requires both start and end"):
+        with pytest.raises(ValueError, match="requires a time window"):
             OpenEO(
                 start=None,
                 end=None,
@@ -266,7 +267,7 @@ class TestFetchExecution:
 
 @pytest.mark.openeo
 class TestModuleHelpers:
-    """`_apply_step` dispatch and `_safe_name` flattening."""
+    """`_apply_step` dispatch and `safe_filename` flattening."""
 
     def test_apply_step_dispatches_to_method(self):
         """A DataCube method step is dispatched to the method."""
@@ -284,4 +285,4 @@ class TestModuleHelpers:
 
     def test_safe_name_flattens_separators(self):
         """Path separators in a key are flattened for filenames."""
-        assert _safe_name("a/b\\c") == "a_b_c"
+        assert safe_filename("a/b\\c") == "a_b_c"

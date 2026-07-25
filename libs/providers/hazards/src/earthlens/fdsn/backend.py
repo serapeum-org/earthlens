@@ -29,18 +29,15 @@ day/month — so `temporal_resolution` carries the sentinel `"all"`.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.fdsn import events
@@ -89,6 +86,10 @@ class FDSN(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    #: Partial-failure policy for the per-provider loop; `download(errors=...)`
+    #: overrides it per call.
+    _errors: str = "warn"
 
     def __init__(
         self,
@@ -204,21 +205,6 @@ class FDSN(AbstractDataSource):
         self._earthscope_token = resolve_earthscope_token(self._earthscope_token_arg)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        FDSN takes min/max lat/lon directly, so the box passes through
-        unchanged.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -239,7 +225,9 @@ class FDSN(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Ignored beyond being recorded as the
                 resolution label; FDSN always queries the full window.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints.
@@ -247,14 +235,7 @@ class FDSN(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _search(self) -> list[RemoteProduct]:
         """One :class:`RemoteProduct` per requested network.
@@ -315,24 +296,28 @@ class FDSN(AbstractDataSource):
                 same order; empty collections for no-data or failed
                 networks.
 
+        Args:
+            progress_bar: Whether to show per-provider progress.
+            aggregate: Rejected by the facade for a vector backend.
+            errors: Partial-failure policy for the per-provider loop —
+                `"warn"` (default) logs each failed network and continues,
+                `"raise"` propagates the first failure, `"ignore"` continues
+                silently. An all-failed batch still raises regardless.
+
         Raises:
             RuntimeError: When **every** network's query failed, so a
                 caller cannot silently process nothing. The message
                 aggregates the failed networks and their exception
                 types; the per-network errors are logged at ERROR.
         """
-        collections: list[FeatureCollection] = []
-        failed: list[tuple[str, BaseException]] = []
-        for product in products:
-            try:
-                collections.append(self._query_one(product))
-            except Exception as exc:  # noqa: BLE001 - log the failure and continue
-                logger.error(
-                    f"FDSN query for provider {product.id!r} failed: "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                failed.append((product.id, exc))
-                collections.append(events.empty_fc())
+        collections, failed = self._run_items(
+            products,
+            self._query_one,
+            errors=self._errors,
+            label="provider query",
+            describe=lambda product: repr(product.id),
+            on_failure=lambda _product, _exc: events.empty_fc(),
+        )
 
         if failed and len(failed) == len(products):
             summary = ", ".join(
@@ -420,14 +405,11 @@ class FDSN(AbstractDataSource):
             return events.empty_fc()
         return events.catalog_to_fc(catalog, provider_key)
 
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
-
     def download(
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> FeatureCollection:
         """Query every requested network and return the unioned events.
 
@@ -471,6 +453,7 @@ class FDSN(AbstractDataSource):
                 "FeatureCollection (a GeoDataFrame) directly."
             )
 
+        self._errors = self.check_errors_policy(errors)
         products = self._search()
         collections = self._fetch(products) if products else []
 

@@ -20,11 +20,12 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import catalog_cache_key
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "radar_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[Any, dict[str, Station]] = {}
+_CATALOG_CACHE: dict[Any, dict[str, Station]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -45,12 +46,7 @@ def _load_stations(path: Path) -> dict[str, Station]:
         ValueError: If the file has no `stations:` block or a row fails
             validation.
     """
-    resolved = str(path.resolve())
-    try:
-        mtime = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime = 0
-    key = (resolved, mtime)
+    key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

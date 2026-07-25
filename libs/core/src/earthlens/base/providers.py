@@ -14,7 +14,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 
 class Provider(BaseModel):
@@ -42,7 +42,7 @@ class Provider(BaseModel):
     parent: str | None = None
 
 
-_PROVIDERS_CACHE: dict[tuple[str, int], dict[str, Provider]] = {}
+_PROVIDERS_CACHE: dict[tuple[str, int], dict[str, Provider]] = CatalogParseCache()
 
 
 def clear_providers_cache() -> None:

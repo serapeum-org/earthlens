@@ -22,7 +22,6 @@ scalar series use no gridded-array dependency.
 
 from __future__ import annotations
 
-import datetime as dt
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
@@ -38,6 +37,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     date_windows,
+    to_datetime,
 )
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
@@ -168,14 +168,6 @@ class ClimateIndices(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No auth, no client — both sources are open HTTPS.
-
-        Returns:
-            None: No per-instance client object.
-        """
-        return None
-
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Return a global :class:`SpatialExtent` (spatial args ignored).
 
@@ -205,7 +197,9 @@ class ClimateIndices(AbstractDataSource):
             start: Inclusive start date string.
             end: Inclusive end date string.
             temporal_resolution: Recorded as the resolution label.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model spanning the window at month-start
@@ -214,18 +208,14 @@ class ClimateIndices(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
             resolution="MS",
             dates=date_windows(start_dt, end_dt, "MS"),
         )
-
-    def _api(self) -> list[pd.DataFrame]:
-        """Compose `_search` and `_fetch` into the canonical shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Resolve each requested id to a catalogue row (one product each).

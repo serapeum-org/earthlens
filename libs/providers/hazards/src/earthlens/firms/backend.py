@@ -47,7 +47,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.firms import events
@@ -278,21 +277,6 @@ class FIRMS(AbstractDataSource):
         self.client = auth
         return self
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        FIRMS clips server-side to the bbox path segment, so the box
-        passes through unchanged.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -312,7 +296,9 @@ class FIRMS(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Recorded as the resolution label;
                 FIRMS always chunks the full window.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints.
@@ -320,14 +306,7 @@ class FIRMS(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _search(self) -> list[RemoteProduct]:
         """List one :class:`RemoteProduct` per `(sensor, ≤5-day chunk)`.
@@ -543,10 +522,6 @@ class FIRMS(AbstractDataSource):
             day_range=product.metadata["day_range"],
             start_date=product.metadata["start_date"].isoformat(),
         )
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _api_via_search_fetch_with_progress(
         self, progress_bar: bool

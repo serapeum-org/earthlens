@@ -494,15 +494,15 @@ def test_operational_subset_skips_unpublished(make_nwm, fake_reader, patch_clien
 
 
 def test_close_quietly_swallows_errors():
-    """_close_quietly never raises, even when the store's close() fails."""
-    from earthlens.nwm.backend import _close_quietly
+    """close_quietly never raises, even when the store's close() fails."""
+    from earthlens.base import close_quietly
 
     class _Bad:
         @property
         def dataset(self):
             raise RuntimeError("boom")
 
-    _close_quietly(_Bad())  # must not raise
+    close_quietly(_Bad())  # must not raise
 
 
 def test_api_composes_search_fetch(make_nwm, patch_client):

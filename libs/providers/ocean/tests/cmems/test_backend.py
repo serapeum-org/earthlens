@@ -12,9 +12,9 @@ import pandas as pd
 import pytest
 
 from earthlens.aggregate import AggregationConfig
-from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
+from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent, safe_filename
 from earthlens.cmems import CMEMS, AuthenticationError, CmemsAuth
-from earthlens.cmems.backend import _safe_filename, _unique_output_names
+from earthlens.cmems.backend import _unique_output_names
 
 
 class _FakeResponse:
@@ -566,7 +566,7 @@ class TestCMEMSDownload:
 
 @pytest.mark.cmems
 class TestSafeFilename:
-    """`_safe_filename` strips OS-illegal chars from CMEMS dataset ids."""
+    """`safe_filename` strips OS-illegal chars from CMEMS dataset ids."""
 
     @pytest.mark.parametrize(
         "raw, expected",
@@ -581,8 +581,8 @@ class TestSafeFilename:
     )
     def test_safe_filename(self, raw: str, expected: str):
         """Illegal characters are uniformly replaced with `_`."""
-        assert _safe_filename(raw) == expected, (
-            f"_safe_filename({raw!r}) should be {expected!r}, got {_safe_filename(raw)!r}"
+        assert safe_filename(raw) == expected, (
+            f"safe_filename({raw!r}) should be {expected!r}, got {safe_filename(raw)!r}"
         )
 
 

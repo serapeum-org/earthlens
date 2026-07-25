@@ -31,7 +31,6 @@ backend logs the standard Argo data-acknowledgement statement
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -51,7 +50,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 
@@ -245,22 +243,6 @@ class ARGO(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No network client — Argo is open data, fetched lazily at download."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -278,7 +260,9 @@ class ARGO(AbstractDataSource):
             start: Inclusive start date string.
             end: Inclusive end date string.
             temporal_resolution: Recorded as the resolution label.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints.
@@ -286,13 +270,8 @@ class ARGO(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution=temporal_resolution,
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
+        return self._whole_window_extent(
+            start, end, fmt=fmt, resolution=temporal_resolution
         )
 
     def download(
@@ -347,10 +326,6 @@ class ARGO(AbstractDataSource):
                 f"(schema-only) table to {out_path}"
             )
         return df
-
-    def _api(self) -> list[pd.DataFrame]:
-        """Compose `_search` and `_fetch` into the canonical shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Resolve the single `argopy` request as one product.

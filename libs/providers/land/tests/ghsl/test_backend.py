@@ -9,8 +9,9 @@ import numpy as np
 import pytest
 
 from earthlens.aggregate import AggregationConfig
+from earthlens.base import close_quietly
 from earthlens.ghsl import backend as backend_mod
-from earthlens.ghsl.backend import GHSL, _close_dataset, _epsg_int
+from earthlens.ghsl.backend import GHSL, _epsg_int
 
 from .conftest import make_tiny_tif
 
@@ -320,15 +321,15 @@ class TestInternals:
     """Small module-level helpers."""
 
     def test_close_dataset_calls_close(self):
-        """_close_dataset calls .close when present, swallowing errors."""
+        """close_quietly calls .close when present, swallowing errors."""
         calls = {"n": 0}
 
         class _D:
             def close(self):
                 calls["n"] += 1
 
-        _close_dataset(_D())
-        _close_dataset(object())
+        close_quietly(_D())
+        close_quietly(object())
         assert calls["n"] == 1
 
     def test_first_band(self, tmp_path):
@@ -472,13 +473,13 @@ class TestReviewFixes:
         )
 
     def test_close_dataset_swallows_close_error(self):
-        """_close_dataset never raises when close() fails."""
+        """close_quietly never raises when close() fails."""
 
         class _Boom:
             def close(self):
                 raise RuntimeError("boom")
 
-        _close_dataset(_Boom())
+        close_quietly(_Boom())
 
 
 @pytest.mark.ghsl

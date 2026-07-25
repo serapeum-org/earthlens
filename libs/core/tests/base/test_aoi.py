@@ -196,10 +196,20 @@ class TestNormalizeAoiMalformedGeojson:
 class TestNormalizeAoiErrors:
     """Malformed aoi= inputs."""
 
-    def test_inverted_bbox_raises(self):
-        """A bbox with min > max raises ValueError."""
-        with pytest.raises(ValueError, match="inverted bounds"):
-            normalize_aoi([-74.0, 5.0, -75.0, 4.0])
+    def test_inverted_latitude_raises(self):
+        """A bbox whose south edge is north of its north edge is rejected."""
+        with pytest.raises(ValueError, match="inverted latitude bounds"):
+            normalize_aoi([-75.0, 5.0, -74.0, 4.0])
+
+    def test_west_of_east_reads_as_antimeridian(self):
+        """A west > east bbox is reported as an unsupported antimeridian crossing."""
+        with pytest.raises(ValueError, match="antimeridian crossing"):
+            normalize_aoi([170.0, 4.0, -170.0, 5.0])
+
+    def test_antimeridian_error_suggests_the_split(self):
+        """The message names the two half-boxes to request instead."""
+        with pytest.raises(ValueError, match=r"aoi=\[170.0, 4.0, 180, 5.0\]"):
+            normalize_aoi([170.0, 4.0, -170.0, 5.0])
 
     def test_wrong_length_sequence_raises(self):
         """A 3-element sequence is neither a bbox nor a point."""

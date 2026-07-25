@@ -26,7 +26,8 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import catalog_cache_key
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "climate_indices_data_catalog.yaml"
 
@@ -34,7 +35,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "climate_indices_data_catalog.yaml"
 #: plus the YAML's `st_mtime_ns`, so editing the file invalidates the
 #: entry without re-parsing on every `Catalog()`. Mirrors the
 #: `_CATALOG_CACHE` pattern in the usgs_water / gee / ecmwf loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Index]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Index]] = CatalogParseCache()
 
 #: The two index sources, used to validate each row's `source`.
 Source = Literal["noaa-psl", "knmi-climexp"]
@@ -71,12 +72,7 @@ def _load_catalog_data(path: Path) -> dict[str, Index]:
         ValueError: If the file has no `datasets:` block, a row names an
             unknown `source`, or a row fails :class:`Index` validation.
     """
-    resolved = str(path.resolve())
-    try:
-        mtime = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime = 0
-    key = (resolved, mtime)
+    key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

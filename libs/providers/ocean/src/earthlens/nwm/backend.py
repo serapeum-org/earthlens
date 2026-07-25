@@ -46,7 +46,6 @@ import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeGuard
 
-import pandas as pd
 from loguru import logger
 from tqdm import tqdm
 
@@ -54,9 +53,10 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
+    close_quietly,
     date_windows,
+    safe_filename,
 )
 from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
 
@@ -318,14 +318,6 @@ class NWM(AbstractDataSource):
         )
         self._mode = self._resolve_mode()
 
-    def _initialize(self) -> None:
-        """No-op auth hook — the NWM bucket is anonymous. Returns `None`."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent` (no snapping)."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -335,19 +327,14 @@ class NWM(AbstractDataSource):
             start: Inclusive window start.
             end: Inclusive window end.
             temporal_resolution: Advisory cadence label.
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="raw",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="raw")
 
     def _resolve_mode(self) -> str:
         """Resolve operational vs retrospective for this request.
@@ -672,7 +659,7 @@ class NWM(AbstractDataSource):
                 dataset = nc.subset(variable, time=0, bbox=self._bbox(), crs=4326)
             except ValueError as exc:
                 if "has no 1-D coordinate variable" in str(exc):
-                    _close_quietly(nc)
+                    close_quietly(nc)
                     raise NotImplementedError(
                         f"NWM variable {variable!r} has a vertical/layer dimension "
                         "interleaved between its y and x axes, which the pyramids "
@@ -684,7 +671,7 @@ class NWM(AbstractDataSource):
             out_path = self.root_dir / f"{path.stem}_{variable}.tif"
             dataset.to_cog(str(out_path))
             out.append(Path(out_path))
-        _close_quietly(nc)
+        close_quietly(nc)
         return out
 
     def _fetch_retrospective(self, products: list[RemoteProduct]) -> list[Path]:
@@ -767,7 +754,7 @@ class NWM(AbstractDataSource):
                         cube, product, downloaded.stem, slice_time=False
                     )
                 )
-                _close_quietly(cube)
+                close_quietly(cube)
             else:
                 out.extend(self._subset_gridded_file(downloaded, product))
         return out
@@ -818,7 +805,7 @@ class NWM(AbstractDataSource):
         """
         key = product.href
         assert key is not None  # NWM products always carry an S3 key href
-        target = self.root_dir / key.replace("/", "_")
+        target = self.root_dir / safe_filename(key)
         tmp = target.with_name(target.name + ".part")
         try:
             body = client.get_object(Bucket=BUCKET, Key=key)["Body"]
@@ -832,10 +819,6 @@ class NWM(AbstractDataSource):
                 return None
             raise
         return target
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,
@@ -896,21 +879,6 @@ def _is_int(value: Any) -> TypeGuard[int]:
         bool: `True` for an `int` that is not a `bool`.
     """
     return isinstance(value, int) and not isinstance(value, bool)
-
-
-def _close_quietly(cube: Any) -> None:
-    """Close a `LabeledDataset`'s underlying store, ignoring any error.
-
-    Releasing the file handle lets the intermediate NetCDF be removed on
-    Windows (where an open handle blocks `unlink`).
-
-    Args:
-        cube: An opened `LabeledDataset`.
-    """
-    try:
-        cube.close()
-    except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
-        pass
 
 
 def _is_missing_key(exc: BaseException) -> bool:

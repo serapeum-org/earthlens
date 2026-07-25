@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING, Literal
 
 from loguru import logger
 
+from earthlens.base import safe_filename
 from earthlens.base.http import HttpClient
 from earthlens.osm._helpers import OSM_CRS, empty_fc, to_fc
 
@@ -137,7 +138,7 @@ def _cache_name(region_path: str) -> str:
             two regions sharing a leaf name (`us/georgia`, `asia/georgia`) never
             collide.
     """
-    return f"{region_path.replace('/', '_')}-latest.osm.pbf"
+    return f"{safe_filename(region_path)}-latest.osm.pbf"
 
 
 def _md5_of(path: Path) -> str:

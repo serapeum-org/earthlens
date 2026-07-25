@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
+from earthlens.base import close_quietly
 from earthlens.soilgrids import SoilGrids
 from earthlens.soilgrids._helpers import IGH_PROJ4
-from earthlens.soilgrids.backend import _close_dataset
 
 from .conftest import FakeDataset
 
@@ -343,13 +343,13 @@ def test_output_kind_is_raster(tmp_path: Path) -> None:
 
 
 def test_close_dataset_ignores_missing_close() -> None:
-    """_close_dataset is a no-op when the object exposes no close method."""
-    _close_dataset(object())
+    """close_quietly is a no-op when the object exposes no close method."""
+    close_quietly(object())
 
 
 def test_close_dataset_swallows_close_errors() -> None:
-    """_close_dataset swallows an exception raised by the underlying close."""
-    _close_dataset(_BoomDataset())
+    """close_quietly swallows an exception raised by the underlying close."""
+    close_quietly(_BoomDataset())
 
 
 def test_src_has_no_owslib_or_xarray_import() -> None:

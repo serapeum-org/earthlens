@@ -418,6 +418,7 @@ class TestTopLevelReExports:
         assert sorted(earthlens.core.__all__) == [
             "AggregationConfig",
             "EarthLens",
+            "PolygonAoiWarning",
             "aggregate_netcdf",
             "download",
             "find",

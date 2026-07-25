@@ -42,7 +42,6 @@ imported lazily (Overpass/ohsome inside `_fetch`; pyrosm/pyosmium inside
 
 from __future__ import annotations
 
-import datetime as dt
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
@@ -55,8 +54,8 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.base.http import DEFAULT_TIMEOUT, HttpClient
 from earthlens.osm._helpers import (
@@ -162,6 +161,10 @@ class OSM(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    #: An Overpass current-state query has no window; ohsome supplies its own, so a
+    #: missing `start` / `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -295,27 +298,6 @@ class OSM(AbstractDataSource):
         # temporal cadence the backend does not have.
         self.temporal_resolution = "all"
 
-    def _initialize(self) -> None:
-        """No auth, no client — both protocols are public (`G6`).
-
-        Returns:
-            None: No per-instance client object. The `overpy` / `ohsome`
-                SDKs are imported lazily in `_fetch`.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox feeding the bbox helpers.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str | None,
@@ -335,14 +317,16 @@ class OSM(AbstractDataSource):
             end: Inclusive end date string, or `None`.
             temporal_resolution: Recorded as the resolution label; OSM
                 always queries in one shot.
-            fmt: `strptime` format applied to `start` / `end` when set.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model; `start_date` / `end_date` are
                 `None` when the corresponding argument was `None`.
         """
-        start_dt = dt.datetime.strptime(start, fmt) if start else None
-        end_dt = dt.datetime.strptime(end, fmt) if end else None
+        start_dt = to_datetime(start, fmt) if start else None
+        end_dt = to_datetime(end, fmt) if end else None
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
@@ -649,10 +633,6 @@ class OSM(AbstractDataSource):
         if end is None or end == start:
             return cast("str", start.strftime("%Y-%m-%d"))
         return f"{start:%Y-%m-%d}/{end:%Y-%m-%d}"
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

@@ -26,7 +26,6 @@ date window from `start` / `end`.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -40,8 +39,8 @@ from earthlens.airnow.client import AirnowClient
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
-    SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 
 if TYPE_CHECKING:
@@ -220,18 +219,6 @@ class AirNow(AbstractDataSource):
         self._auth.configure()
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -249,7 +236,9 @@ class AirNow(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Provenance label (`"hourly"` or
                 `"daily"`); does not change the request.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints.
@@ -263,8 +252,8 @@ class AirNow(AbstractDataSource):
                 f"temporal_resolution must be one of "
                 f"{sorted(_ACCEPTED_RESOLUTIONS)}, got {temporal_resolution!r}."
             )
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

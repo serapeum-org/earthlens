@@ -290,30 +290,7 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             )
 
         self._auth = auth
-        self._configured = True
-
-    def is_authenticated(self) -> bool:
-        """Return `True` once `configure()` has succeeded for this instance.
-
-        Cheap predicate — does not call `earthaccess` or the network.
-        A return of `True` means an EDL login succeeded during the
-        current process.
-
-        Returns:
-            bool: `True` after a successful :meth:`configure`,
-                `False` before.
-
-        Examples:
-            - A freshly constructed auth has not yet authenticated:
-                ```python
-                >>> from earthlens.earthdata import EarthdataAuth, EarthdataCredentials
-                >>> auth = EarthdataAuth(EarthdataCredentials(username="u", password="p"))
-                >>> auth.is_authenticated()
-                False
-
-                ```
-        """
-        return self._configured
+        self.mark_configured()
 
     def s3_credentials(self, provider: str) -> dict[str, str]:
         """Return rotating S3 credentials for one CMR provider.

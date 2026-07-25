@@ -4,11 +4,14 @@ import difflib
 import functools
 import inspect
 import os
+import warnings
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal, cast
 
+from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 OutputKind = Literal["raster", "vector", "tabular", "mixed"]
@@ -50,6 +53,41 @@ See Also:
     AbstractDataSource.OUTPUT_KIND: The per-class declaration each
         backend uses to opt into one of these shapes.
 """
+
+
+class PolygonAoiWarning(UserWarning):
+    """A polygon `aoi=` was reduced to its bounding box by the chosen backend.
+
+    Issued when a request passes a real polygon area of
+    interest to a backend whose `SUPPORTS_POLYGON_AOI` is `False`. The
+    download still succeeds, but it covers the polygon's **bounding box**, so
+    cells outside the polygon are included. That is the most dangerous kind of
+    wrong result — a valid raster of the right variable over roughly the right
+    area — so it is surfaced rather than left silent.
+
+    A dedicated class (rather than a bare `UserWarning`) so callers can filter
+    or escalate exactly this case:
+
+    Examples:
+        - Turn the silent degradation into an error for a strict pipeline:
+            ```python
+            >>> import warnings
+            >>> from earthlens.base import PolygonAoiWarning
+            >>> with warnings.catch_warnings(record=True) as caught:
+            ...     warnings.simplefilter("always")
+            ...     warnings.warn("bbox only", PolygonAoiWarning)
+            >>> caught[0].category.__name__
+            'PolygonAoiWarning'
+
+            ```
+        - It is a `UserWarning`, so existing broad filters still catch it:
+            ```python
+            >>> from earthlens.base import PolygonAoiWarning
+            >>> issubclass(PolygonAoiWarning, UserWarning)
+            True
+
+            ```
+    """
 
 
 @dataclass(frozen=True)
@@ -250,9 +288,18 @@ class SpatialExtent(BaseModel):
                 f"latitude_max ({self.latitude_max})"
             )
         if self.longitude_min > self.longitude_max:
+            # A west > east box is how GeoJSON/STAC spell an antimeridian
+            # crossing, so say so and name the remedy: only the stac backend
+            # splits such a box today (via
+            # `pyramids.feature.bbox.split_antimeridian`), and a bare
+            # "min > max" reads like a typo rather than an unsupported case.
             raise ValueError(
-                f"longitude_min ({self.longitude_min}) > "
-                f"longitude_max ({self.longitude_max})"
+                f"longitude_min ({self.longitude_min}) > longitude_max "
+                f"({self.longitude_max}). A west-of-east box denotes an "
+                f"antimeridian crossing, which this backend does not support; "
+                f"split it at ±180 and issue the two halves as separate "
+                f"requests (e.g. [{self.longitude_min}, 180] and "
+                f"[-180, {self.longitude_max}])."
             )
         return self
 
@@ -478,9 +525,34 @@ class AbstractDataSource(ABC):
             `self.OUTPUT_KIND`, and tropycal sets `"tabular"` for its
             `ships` product (else `"vector"`). The facade reads the
             instance attribute, so both forms work.
+        REQUIRES_TIME_WINDOW: Whether this backend needs both `start` and
+            `end`. `True` (the default) makes :meth:`__init__` reject a
+            missing bound up front with an actionable message, instead of
+            letting the `None` reach the subclass's date parsing and surface
+            as a bare `TypeError: strptime() argument 1 must be str, not
+            NoneType`. Snapshot backends with no per-step time axis — admin,
+            osm, overture, glaciers, risk_indicators, bathymetry, dem,
+            soilgrids, solar_wind_atlas — set it to `False` and treat a
+            `None` bound as "the whole record".
+        SUPPORTS_POLYGON_AOI: Whether this backend clips to a polygon
+            `aoi=`, rather than only to its bounding box. A polygon `aoi=`
+            is reduced to `lat_lim` / `lon_lim` *and* carried as a mask on
+            `self.space.geometry`; a backend honours that mask by cropping
+            through `earthlens.base.spatial.crop_to_aoi` /
+            `mask_to_geometry` (or reading `space.geometry` itself) and sets
+            this to `True`. When it is `False`,
+            :meth:`_attach_clip_geometry` emits a
+            :class:`PolygonAoiWarning`, because the request silently returns
+            the polygon's bounding box — a plausible-looking raster over
+            roughly the right area, which is the hardest kind of wrong
+            output to notice.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    REQUIRES_TIME_WINDOW: bool = True
+
+    SUPPORTS_POLYGON_AOI: bool = False
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Give every backend the facade's ergonomic constructor sugar.
@@ -610,7 +682,13 @@ class AbstractDataSource(ABC):
                 to `"%Y-%m-%d"`.
             path: Output directory. Created if it does not exist.
                 Defaults to the current working directory.
+
+        Raises:
+            ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
+                `start` or `end` is `None`.
         """
+        self._check_time_window(start, end)
+
         client = self._initialize()
         if client is not None:
             self.client = client
@@ -642,6 +720,37 @@ class AbstractDataSource(ABC):
         if not os.path.exists(self.root_dir):
             os.makedirs(self.root_dir)
 
+    def _check_time_window(self, start: Any, end: Any) -> None:
+        """Reject a missing `start` / `end` when the backend needs both.
+
+        Runs before :meth:`_check_input_dates` so a backend that declares
+        :attr:`REQUIRES_TIME_WINDOW` never has to defend against `None`, and
+        the user gets the name of the missing bound rather than a bare
+        `strptime` `TypeError` from deep inside the subclass.
+
+        Args:
+            start: The requested start bound, possibly `None`.
+            end: The requested end bound, possibly `None`.
+
+        Raises:
+            ValueError: If the backend requires a window and either bound is
+                `None`. The message names which bound(s) are missing.
+        """
+        if not self.REQUIRES_TIME_WINDOW:
+            return
+        missing = [
+            name for name, value in (("start", start), ("end", end)) if value is None
+        ]
+        if not missing:
+            return
+        raise ValueError(
+            f"the {type(self).__name__} backend requires a time window, but "
+            f"{' and '.join(missing)} "
+            f"{'is' if len(missing) == 1 else 'are'} missing. Pass "
+            f"start=/end= (e.g. start='2024-01-01', end='2024-01-31') or the "
+            f"single time='2024-01-01/2024-01-31' range."
+        )
+
     def _attach_clip_geometry(self, geometry: Any) -> None:
         """Record a polygon mask on `self.space` for precise clipping.
 
@@ -652,12 +761,43 @@ class AbstractDataSource(ABC):
         the fetched bbox down to the exact shape. A no-op when `self.space`
         is not a :class:`SpatialExtent`.
 
+        Backends that do not clip to the polygon (`SUPPORTS_POLYGON_AOI` is
+        `False`) still get the mask recorded — a later migration then needs no
+        facade change — but the caller is warned, because such a request
+        silently returns the polygon's bounding box instead.
+
         Args:
             geometry: A WGS84 `GeoDataFrame` polygon mask.
+
+        Warns:
+            PolygonAoiWarning: When the backend does not honour a polygon
+                `aoi=`, so the result is the polygon's bounding box.
         """
         space = getattr(self, "space", None)
-        if isinstance(space, SpatialExtent):
-            self.space = space.model_copy(update={"geometry": geometry})
+        if not isinstance(space, SpatialExtent):
+            return
+        if geometry is not None and not self.SUPPORTS_POLYGON_AOI:
+            # The remedy differs by output shape: a raster is post-clipped with
+            # pyramids, whereas vector / tabular rows are filtered with a
+            # spatial predicate. Advising `Dataset.crop` to a FeatureCollection
+            # backend would be useless advice.
+            if getattr(self, "OUTPUT_KIND", "raster") in {"raster", "mixed"}:
+                remedy = "Post-clip the result with `pyramids.Dataset.crop(mask=...)`"
+            else:
+                remedy = (
+                    "Filter the returned rows to the polygon (e.g. "
+                    "`gdf[gdf.within(polygon)]`)"
+                )
+            warnings.warn(
+                f"the {type(self).__name__} backend selects by bounding box only, "
+                f"so this polygon aoi= is applied as its bounding box — results "
+                f"outside the polygon but inside its bbox are still included. "
+                f"{remedy}, or pass a bbox aoi= to make the request's extent "
+                f"explicit.",
+                PolygonAoiWarning,
+                stacklevel=3,
+            )
+        self.space = space.model_copy(update={"geometry": geometry})
 
     def authenticate(self) -> AbstractDataSource:
         """Eagerly establish the backend's authenticated connection.
@@ -679,10 +819,13 @@ class AbstractDataSource(ABC):
         Raises:
             AuthenticationError: If the backend cannot authenticate.
         """
+        # Independent checks, not an if/elif chain: a backend may legitimately
+        # have both a lazily-opened client *and* a credential object, and an
+        # `elif` would silently skip `configure()` for it.
         if isinstance(self, LazyClientMixin):
             # Accessing `client` runs the cached `_open_client` (auth).
             _ = self.client
-        elif (auth := getattr(self, "_auth", None)) is not None:
+        if (auth := getattr(self, "_auth", None)) is not None:
             auth.configure()
         return self
 
@@ -690,22 +833,203 @@ class AbstractDataSource(ABC):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ):
-        """Check validity of input dates. Called by `__init__`."""
-        pass
+        """Check validity of input dates. Called by `__init__`.
 
-    @abstractmethod
-    def _initialize(self, *args, **kwargs):
-        """Initialize connection with the data source server (for non-FTP servers).
-
-        Called once by :meth:`__init__`; the return value is captured
-        into `self.client` when non-`None`.
+        Still abstract, because the *shape* of a backend's time axis is a real
+        design decision rather than boilerplate. Most implementations are one
+        call to one of the three factories below —
+        :meth:`_whole_window_extent`, :meth:`_cadence_extent`, or
+        :meth:`_static_extent` — which cover the three archetypes the 48
+        backends fall into; only a genuinely bespoke axis (a provider release
+        cadence to snap to, a forecast `(cycle, step)` grid) needs its own body.
         """
         pass
 
-    @abstractmethod
-    def _create_grid(self, lat_lim: list, lon_lim: list):
-        """Create a grid from the lat/lon boundaries. Called by `__init__`."""
-        pass
+    # ------------------------------------------------------------------
+    # TemporalExtent factories.
+    #
+    # Every backend's `_check_input_dates` used to re-derive one of three
+    # shapes by hand, which is how the cadence bug (a `.get(..., "D")` that
+    # silently substituted daily) reached seven backends. Building the extent
+    # through these keeps the parsing, the cadence validation, and the
+    # `dates` axis consistent.
+    # ------------------------------------------------------------------
+
+    def _whole_window_extent(
+        self,
+        start: Any,
+        end: Any,
+        *,
+        fmt: str,
+        resolution: str = "all",
+    ) -> TemporalExtent:
+        """Build the extent for a backend that queries the window in one request.
+
+        The archetype for a provider whose API takes a date *range* rather
+        than one date per file (an event feed, an occurrence search, a station
+        query): there is no per-step download loop, so `dates` carries just the
+        two bounds and `resolution` is a label rather than a pandas frequency.
+
+        Args:
+            start: The requested start bound, in any form
+                :func:`~earthlens.base.to_datetime` accepts.
+            end: The requested end bound.
+            fmt: `strptime` format tried first for a string bound.
+            resolution: The label to record — conventionally `"all"` (one
+                query spans the window), or the backend's own cadence word
+                where that is more informative.
+
+        Returns:
+            TemporalExtent: The window, with `dates` holding `[start, end]`.
+        """
+        import pandas as pd
+
+        from earthlens.base._dates import to_datetime
+
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
+        return TemporalExtent(
+            start_date=start_dt,
+            end_date=end_dt,
+            resolution=resolution,
+            dates=pd.DatetimeIndex([start_dt, end_dt]),
+        )
+
+    def _cadence_extent(
+        self,
+        start: Any,
+        end: Any,
+        *,
+        fmt: str,
+        cadence: str,
+        accepted: Mapping[str, str],
+    ) -> TemporalExtent:
+        """Build the extent for a backend that loops over one step per cadence.
+
+        The archetype for a provider addressed one file / request per period.
+        The cadence is resolved through
+        :func:`~earthlens.base.resolve_cadence`, so an unsupported or mistyped
+        spelling raises instead of silently substituting a different cadence,
+        and `dates` is the expanded period axis the download loop iterates.
+
+        Args:
+            start: The requested start bound.
+            end: The requested end bound.
+            fmt: `strptime` format tried first for a string bound.
+            cadence: The user-facing cadence (`temporal_resolution`).
+            accepted: This backend's `{cadence: pandas offset alias}` map.
+
+        Returns:
+            TemporalExtent: The window, with `dates` holding one entry per
+                period start.
+
+        Raises:
+            ValueError: If `cadence` is not a key of `accepted`.
+        """
+        from earthlens.base._dates import (
+            WHOLE_WINDOW,
+            date_windows,
+            resolve_cadence,
+            to_datetime,
+        )
+
+        resolution = resolve_cadence(cadence, accepted, backend=type(self).__name__)
+        if resolution == WHOLE_WINDOW:
+            # A cadence naming a release *character* rather than a period
+            # ("irregular", "climatology", "subdaily", "raw", ...) has no period
+            # axis to expand. The caller's own word is kept as the label rather
+            # than collapsed to the sentinel, so `self.time.resolution` still
+            # reports what was asked for — a backend that logs or serialises the
+            # extent would otherwise see every such request as plain "all".
+            return self._whole_window_extent(start, end, fmt=fmt, resolution=cadence)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
+        dates = date_windows(start_dt, end_dt, resolution)
+        if len(dates) == 0:
+            # A coarse cadence expands to nothing when the window contains no
+            # period *anchor* — `"YS"` over 2024-02-01..2024-03-19 has no
+            # January 1st, so `date_range` is empty even though the request is
+            # perfectly valid. Returning that empty axis would make a
+            # download loop over `self.time.dates` silently do nothing, so the
+            # window start stands in for the single period that covers it.
+            import pandas as pd
+
+            dates = pd.DatetimeIndex([start_dt])
+        return TemporalExtent(
+            start_date=start_dt,
+            end_date=end_dt,
+            resolution=resolution,
+            dates=dates,
+        )
+
+    def _static_extent(self, resolution: str = "static") -> TemporalExtent:
+        """Build the extent for a backend whose product has no time axis.
+
+        The archetype for a time-invariant product (elevation, soil
+        properties, a long-term resource climatology): both bounds are `None`
+        and `dates` is empty, so nothing downstream tries to iterate a time
+        axis that does not exist.
+
+        Args:
+            resolution: The label to record. Defaults to `"static"`.
+
+        Returns:
+            TemporalExtent: An empty, boundless extent.
+        """
+        import pandas as pd
+
+        return TemporalExtent(
+            start_date=None,
+            end_date=None,
+            resolution=resolution,
+            dates=pd.DatetimeIndex([]),
+        )
+
+    def _initialize(self, *args: Any, **kwargs: Any) -> Any:
+        """Prepare the backend before the extents are built; return its client.
+
+        Called once by :meth:`__init__`, before :meth:`_create_grid` and
+        :meth:`_check_input_dates`. A non-`None` return is captured onto
+        `self.client`.
+
+        The default does nothing and returns `None` — the right behaviour for a
+        backend that needs no eager setup, which is half of them (an anonymous
+        HTTP/FTP endpoint, or a lazily-imported stateless SDK). Backends that
+        must resolve a catalog row, build an auth object, or open a client
+        override it. A backend whose client is a *network* connection should
+        prefer :class:`LazyClientMixin` and keep `_initialize` offline, so
+        construction never touches the network.
+
+        Returns:
+            `None` by default; an override returns the client to bind onto
+            `self.client`.
+        """
+        return None
+
+    def _create_grid(
+        self, lat_lim: list[float], lon_lim: list[float]
+    ) -> SpatialExtent | dict | None:
+        """Turn the requested lat/lon bounds into this backend's spatial extent.
+
+        Called once by :meth:`__init__`; the result is captured onto
+        `self.space`.
+
+        The default wraps the bounds verbatim in a validated
+        :class:`SpatialExtent`, which is what all but a handful of backends
+        need — most providers accept an arbitrary WGS84 bbox and do any
+        snapping server-side. Override only to do real work on the bounds:
+        snap them to the provider's grid (ecmwf), attach a native cell size
+        (chc), split an antimeridian-crossing box (stac), or ignore them for a
+        global-only product (climate_indices, risk_indicators).
+
+        Args:
+            lat_lim: `[lat_min, lat_max]` in degrees.
+            lon_lim: `[lon_min, lon_max]` in degrees.
+
+        Returns:
+            SpatialExtent: The validated, frozen bbox.
+        """
+        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     @abstractmethod
     def download(self):
@@ -738,20 +1062,33 @@ class AbstractDataSource(ABC):
         """Download a single variable/dataset (called by :meth:`download`)."""
         pass
 
-    @abstractmethod
-    def _api(self, *args, **kwargs):
-        """Send / receive a single request to the data source server.
+    def _api(self, *args: Any, **kwargs: Any) -> Any:
+        """Send / receive the request(s) this download needs.
 
-        Called by :meth:`download` (or :meth:`_download_dataset`) once
-        per `(dataset, variable)` pair. The signature is
-        backend-specific.
+        Called by :meth:`download` (or :meth:`_download_dataset`). The default
+        is the search→fetch composition, :meth:`_api_via_search_fetch`, which
+        is what a backend built on the :meth:`_search` / :meth:`_fetch` split
+        wants — the great majority. Override it only for a backend that talks
+        to its provider in one indivisible step and has no listable product
+        set (chc composes an FTP path per date; ecmwf queues a CDS job; gee
+        builds an ee chain), or one whose `_fetch` takes no product list.
 
-        New backends (C3 onward) should implement :meth:`_search` and
-        :meth:`_fetch` instead and let the default
-        :meth:`_api_via_search_fetch` compose them; existing backends
-        (CHIRPS, S3, ECMWF, GEE) continue to override `_api` directly.
+        Returns:
+            Whatever :meth:`_fetch` returned — see :meth:`_fetch` for the
+            element type, which tracks :attr:`OUTPUT_KIND`.
+
+            Typed `Any` rather than `list[Any]` deliberately: the overrides do
+            not all return lists. chc returns a per-date mapping and gee a
+            `Path | str | TaskInfo` depending on `export_via`, so narrowing the
+            base annotation makes those overrides incompatible. The cost is that
+            a `download()` forwarding `_api()` out of a `-> list[Path]` signature
+            needs a `cast`.
+
+        Raises:
+            NotImplementedError: If the backend overrides neither this method
+                nor the :meth:`_search` / :meth:`_fetch` pair.
         """
-        pass
+        return self._api_via_search_fetch()
 
     # ------------------------------------------------------------------
     # C3 — optional search/fetch decomposition.
@@ -876,6 +1213,119 @@ class AbstractDataSource(ABC):
         if not products:
             return []
         return self._fetch(products)
+
+    #: The partial-failure policies :meth:`_run_items` accepts. `"skip"` is a
+    #: deprecated alias for `"ignore"`, kept because the nwp backend shipped it
+    #: before the convention settled on the three names documented on
+    #: :meth:`download`.
+    ERROR_POLICIES: frozenset[str] = frozenset({"raise", "warn", "ignore", "skip"})
+
+    @staticmethod
+    def check_errors_policy(errors: str) -> str:
+        """Validate an `errors=` argument, normalising the `"skip"` alias.
+
+        Args:
+            errors: The requested policy.
+
+        Returns:
+            The canonical policy — `"raise"`, `"warn"` or `"ignore"`.
+
+        Raises:
+            ValueError: If `errors` is not a recognised policy.
+
+        Examples:
+            - The canonical names pass through, and `"skip"` normalises:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> AbstractDataSource.check_errors_policy("warn")
+                'warn'
+                >>> AbstractDataSource.check_errors_policy("skip")
+                'ignore'
+
+                ```
+            - Anything else is rejected with the accepted set:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> AbstractDataSource.check_errors_policy("continue")
+                Traceback (most recent call last):
+                    ...
+                ValueError: errors must be 'raise', 'warn' or 'ignore'; got 'continue'.
+
+                ```
+        """
+        if errors not in AbstractDataSource.ERROR_POLICIES:
+            raise ValueError(
+                f"errors must be 'raise', 'warn' or 'ignore'; got {errors!r}."
+            )
+        return "ignore" if errors == "skip" else errors
+
+    def _run_items(
+        self,
+        items: Sequence[Any],
+        fn: Callable[[Any], Any],
+        *,
+        errors: str = "warn",
+        label: str = "item",
+        describe: Callable[[Any], str] | None = None,
+        on_failure: Callable[[Any, BaseException], Any] | None = None,
+    ) -> tuple[list[Any], list[tuple[str, BaseException]]]:
+        """Map `fn` over `items`, applying the caller's partial-failure policy.
+
+        The shared form of the skip-and-continue loop the multi-item backends
+        each hand-rolled, and the reason `errors=` was previously advertised on
+        :meth:`download` but honoured by exactly one backend: without somewhere
+        to put the policy, every loop hard-coded "log it and carry on", so a
+        caller could not ask for a batch to fail fast.
+
+        Args:
+            items: The work items — products, dates, `(dataset, variable)` pairs.
+            fn: Called once per item; its return value is collected.
+            errors: `"raise"` propagates the first failure, `"warn"` logs each
+                one and continues, `"ignore"` continues silently. `"skip"` is
+                accepted as a deprecated alias for `"ignore"`.
+            label: Noun for the log lines (e.g. `"granule"`, `"variable"`).
+            describe: Renders an item for the log; defaults to `str`.
+            on_failure: Optional `(item, exception) -> placeholder`. When given,
+                a failed item contributes its placeholder to `results`, so the
+                results stay positionally aligned with `items` — the shape the
+                vector backends need, where a failed provider still occupies a
+                slot with an empty `FeatureCollection`. When omitted, failures
+                are simply absent from `results`.
+
+        Returns:
+            `(results, failures)` — one result per succeeding item, in order,
+            and `(description, exception)` for each failure. The caller decides
+            what an all-failed batch means, since that differs by backend.
+
+        Raises:
+            ValueError: If `errors` is not a recognised policy.
+            BaseException: The first item's exception when `errors="raise"`.
+        """
+        policy = self.check_errors_policy(errors)
+        name = describe or str
+        results: list[Any] = []
+        failures: list[tuple[str, BaseException]] = []
+        for item in items:
+            try:
+                results.append(fn(item))
+            except Exception as exc:  # noqa: BLE001 - policy decides the fate
+                if policy == "raise":
+                    raise
+                described = name(item)
+                if on_failure is not None:
+                    results.append(on_failure(item, exc))
+                if policy == "warn":
+                    logger.warning(
+                        f"{type(self).__name__}: {label} {described} failed: "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                failures.append((described, exc))
+        if failures and policy == "warn":
+            logger.warning(
+                f"{type(self).__name__}: {len(failures)} of {len(items)} "
+                f"{label}(s) failed; {len(results)} succeeded."
+            )
+        return results, failures
 
     def _fetch_one(self, product: RemoteProduct) -> Any:
         """Fetch a single product — the per-product hook for `_search_fetch_each`.

@@ -615,6 +615,73 @@ class TestDownload:
         assert not dest.exists()
         assert not dest.with_name("out.bin.part").exists()
 
+    def test_non_atomic_failure_does_not_delete_dest(self, tmp_path):
+        """A failed atomic=False download leaves dest present, though truncated."""
+        session = _RecordingSession(
+            [_Resp(blocks=[b"partial"], stream_error=OSError("mid-stream"))]
+        )
+        dest = tmp_path / "out.bin"
+        dest.write_bytes(b"previously downloaded")
+        client = HttpClient(session=session)
+        with pytest.raises(OSError):
+            client.download("http://x", dest, progress=False, atomic=False)
+        assert dest.exists()
+        # Documented consequence of atomic=False: the stream opens dest "wb", so
+        # the old contents are already gone before any failure. The failure path
+        # only declines to delete it on top of that.
+        assert dest.read_bytes() == b"partial"
+
+    def test_atomic_default_protects_an_existing_dest(self, tmp_path):
+        """The atomic default is what actually preserves the previous contents."""
+        session = _RecordingSession(
+            [_Resp(blocks=[b"partial"], stream_error=OSError("mid-stream"))]
+        )
+        dest = tmp_path / "out.bin"
+        dest.write_bytes(b"previously downloaded")
+        client = HttpClient(session=session)
+        with pytest.raises(OSError):
+            client.download("http://x", dest, progress=False)
+        assert dest.read_bytes() == b"previously downloaded"
+
+    def test_non_atomic_retry_failure_keeps_existing_dest(self, tmp_path):
+        """An exhausted retry on atomic=False does not delete the old dest."""
+        session = _FlakySession(
+            10, requests.ConnectionError("boom"), _Resp(blocks=[b"ok"])
+        )
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            retry_on_exceptions=(requests.ConnectionError,),
+        )
+        dest = tmp_path / "out.bin"
+        dest.write_bytes(b"previously downloaded")
+        with pytest.raises(requests.ConnectionError):
+            client.download("http://x", dest, progress=False, atomic=False)
+        assert dest.read_bytes() == b"previously downloaded"
+
+    def test_atomic_failure_still_removes_part(self, tmp_path):
+        """The atomic path keeps its promise: the .part temp is cleaned up."""
+        session = _RecordingSession(
+            [_Resp(blocks=[b"partial"], stream_error=OSError("mid-stream"))]
+        )
+        dest = tmp_path / "out.bin"
+        dest.write_bytes(b"previously downloaded")
+        client = HttpClient(session=session)
+        with pytest.raises(OSError):
+            client.download("http://x", dest, progress=False)
+        assert not dest.with_name("out.bin.part").exists()
+        assert dest.read_bytes() == b"previously downloaded"
+
+    def test_non_atomic_success_overwrites_dest(self, tmp_path):
+        """A successful atomic=False download still replaces the old contents."""
+        session = _RecordingSession([_Resp(blocks=[b"fresh"])])
+        dest = tmp_path / "out.bin"
+        dest.write_bytes(b"stale")
+        HttpClient(session=session).download(
+            "http://x", dest, progress=False, atomic=False
+        )
+        assert dest.read_bytes() == b"fresh"
+
     def test_download_retries_on_exception_then_succeeds(self, tmp_path):
         """A configured transport exception retries the whole download."""
         session = _FlakySession(

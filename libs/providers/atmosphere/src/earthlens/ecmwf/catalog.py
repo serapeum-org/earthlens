@@ -58,11 +58,15 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf, Provider
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    yaml_files_for,
+)
 from earthlens.base.providers import (
     clear_providers_cache as _clear_providers_cache_base,
 )
 from earthlens.base.providers import load_providers
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 from earthlens.ecmwf.constraints import fetch_constraints
 
 # `read_cdsapirc` / `download_job` / `list_recent_jobs` were split out of this
@@ -87,7 +91,7 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # script append) invalidates the entry naturally. Mirrors the GEE
 # pattern (H1 / M2) so repeated `Catalog()` construction is ~1 ms
 # instead of paying the YAML parse + pydantic validation each time.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -103,30 +107,12 @@ def clear_catalog_cache() -> None:
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted YAML files that contribute to a load.
+    """Return the sorted YAML files contributing to a load.
 
-    `path` may be a directory of per-family `*.yaml` files (the default
-    layout — `era5.yaml`, `carra.yaml`, … plus `_index.yaml` carrying
-    `available_datasets:`), or a single `*.yaml` file (back-compat for
-    tests that monkey-patch :data:`CATALOG_PATH` to a temp file).
-
-    Args:
-        path: Catalog directory or single YAML file.
-
-    Returns:
-        Sorted list of YAML paths.
-
-    Raises:
-        ValueError: If `path` is neither an existing directory nor file.
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    if path.is_file():
-        return [path]
-    raise ValueError(
-        f"CDS catalog path {path} does not exist (expected a directory of "
-        "per-family *.yaml files, or a single YAML file)."
-    )
+    return yaml_files_for(path, provider='CDS', shard_noun='per-family')
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
@@ -145,13 +131,8 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
             has no variables under any dataset, or declares the same
             dataset key twice anywhere.
     """
-    resolved = str(path.resolve())
     files = _yaml_files_for(path)
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
+    key = catalog_cache_key(path, files)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

@@ -374,10 +374,19 @@ def resolve_aoi(
             "geometry / GeoJSON / WKT, or a GeoDataFrame"
         )
 
-    if min_lon > max_lon or min_lat > max_lat:
+    if min_lon > max_lon:
+        # West-of-east is the GeoJSON / STAC spelling of an antimeridian
+        # crossing rather than a typo, so name the case and the remedy.
         raise ValueError(
-            f"aoi has inverted bounds: "
-            f"lon [{min_lon}, {max_lon}], lat [{min_lat}, {max_lat}]"
+            f"aoi has west ({min_lon}) east of east ({max_lon}), which denotes "
+            f"an antimeridian crossing. Split it at ±180 and pass the two "
+            f"halves as separate requests (e.g. aoi=[{min_lon}, {min_lat}, "
+            f"180, {max_lat}] and aoi=[-180, {min_lat}, {max_lon}, {max_lat}])."
+        )
+    if min_lat > max_lat:
+        raise ValueError(
+            f"aoi has inverted latitude bounds: [{min_lat}, {max_lat}] "
+            f"(south edge north of the north edge)."
         )
     return [min_lat, max_lat], [min_lon, max_lon], _to_clip_gdf(geom)
 

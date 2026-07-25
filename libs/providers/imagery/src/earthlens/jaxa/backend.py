@@ -32,7 +32,6 @@ shape stabilises across the catalog (see `G6` in the planning doc).
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -41,10 +40,9 @@ from pydantic import SecretStr
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
 
-from earthlens.base import OutputKind, date_windows
+from earthlens.base import OutputKind, date_windows, resolve_cadence, to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.jaxa.auth import JaxaAuth, JaxaCredentials
@@ -57,6 +55,11 @@ from earthlens.jaxa.catalog import Catalog, Dataset, JaxaProtocol
 #: so the `dates` index is informational — but it should still report
 #: a frequency that matches the cadence the user asked for instead of
 #: silently snapping every non-`daily` value to month-start.
+#: JAXA keeps its own cadence map rather than `earthlens.base.CADENCE_ALIASES`
+#: because it is the one adopter that actually iterates `self.time.dates`, and
+#: because its `raw` means "the native granule cadence, walked daily" — not the
+#: shared vocabulary's "no temporal aggregation, query the window whole". Adding
+#: a cadence here is deliberate, not an omission from the shared map.
 _FREQ_ALIAS: dict[str, str] = {
     "raw": "D",
     "hourly": "h",
@@ -259,35 +262,6 @@ class JAXA(AbstractDataSource):
         """
         return self._protocol
 
-    def _initialize(self) -> None:
-        """No eager connection setup.
-
-        All three branches import their transport clients lazily:
-        `jaxa.earth` and `gportal` inside their branch modules (needing
-        the `[jaxa]` extra), and the `ptree` branch uses only stdlib
-        `ftplib` on demand. `jaxa-earth` is authless; the optional
-        `gportal` / `ptree` credentials are resolved lazily —
-        `download()` calls `self._auth.configure()` before dispatching,
-        and so does the explicit `EarthLens(...).authenticate()`
-        entry point.
-
-        Returns:
-            None: No backend client to attach.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a `SpatialExtent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox (WGS84).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -306,7 +280,9 @@ class JAXA(AbstractDataSource):
             start: Inclusive start of the window.
             end: Inclusive end of the window.
             temporal_resolution: Advisory label; defaults to `"daily"`.
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
@@ -314,9 +290,11 @@ class JAXA(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        freq_alias = _FREQ_ALIAS.get(temporal_resolution, "MS")
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
+        freq_alias = resolve_cadence(
+            temporal_resolution, _FREQ_ALIAS, backend=type(self).__name__
+        )
         dates = date_windows(start_dt, end_dt, freq_alias)
         return TemporalExtent(
             start_date=start_dt,

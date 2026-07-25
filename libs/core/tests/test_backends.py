@@ -44,6 +44,9 @@ class _FakeEntryPoint:
 
     def __init__(self, name: str, table: dict[str, Any]) -> None:
         self.name = name
+        # Real EntryPoints carry `value` (the "module:attr" target); the
+        # duplicate-key warning names it, so the stub models it too.
+        self.value = f"earthlens._{name}:BACKENDS"
         self._table = table
 
     def load(self) -> dict[str, Any]:
@@ -99,6 +102,48 @@ class TestDiscovery:
             ],
         )
         assert discover_backends()["dup"] == _SPEC_B
+
+    def test_duplicate_key_is_warned_about(
+        self, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """A key claimed by two distributions logs a warning naming both."""
+        from loguru import logger
+
+        monkeypatch.setattr(
+            "earthlens._backends.entry_points",
+            lambda group: [
+                _FakeEntryPoint("alpha", {"dup": _SPEC_A}),
+                _FakeEntryPoint("beta", {"dup": _SPEC_B}),
+            ],
+        )
+        messages: list[str] = []
+        sink = logger.add(lambda record: messages.append(record), level="WARNING")
+        try:
+            discover_backends()
+        finally:
+            logger.remove(sink)
+        assert any("published by both" in message for message in messages)
+
+    def test_distinct_keys_are_not_warned_about(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Merging disjoint tables stays quiet."""
+        from loguru import logger
+
+        monkeypatch.setattr(
+            "earthlens._backends.entry_points",
+            lambda group: [
+                _FakeEntryPoint("alpha", {"a": _SPEC_A}),
+                _FakeEntryPoint("beta", {"b": _SPEC_B}),
+            ],
+        )
+        messages: list[str] = []
+        sink = logger.add(lambda record: messages.append(record), level="WARNING")
+        try:
+            discover_backends()
+        finally:
+            logger.remove(sink)
+        assert messages == []
 
     def test_no_entry_points_yields_an_empty_registry(
         self, monkeypatch: pytest.MonkeyPatch

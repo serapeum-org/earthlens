@@ -18,6 +18,8 @@ from typing import TYPE_CHECKING
 
 from tqdm import tqdm
 
+from earthlens.base import safe_filename
+
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from earthlens.base import SpatialExtent
 
@@ -48,7 +50,8 @@ def slug_asset_id(asset_id: str) -> str:
         asset_id: An Earth Engine asset id, e.g. `"LANDSAT/LC09/C02/T1_L2"`.
 
     Returns:
-        The id with `/` replaced by `_`, e.g. `"LANDSAT_LC09_C02_T1_L2"`.
+        The id sanitised by `earthlens.base.safe_filename`, e.g.
+        `"LANDSAT_LC09_C02_T1_L2"`.
 
     Examples:
         - Slugify a Landsat id:
@@ -64,7 +67,7 @@ def slug_asset_id(asset_id: str) -> str:
 
             ```
     """
-    return asset_id.replace("/", "_")
+    return safe_filename(asset_id)
 
 
 def reduce_collection(collection, reducer: str):

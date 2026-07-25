@@ -29,7 +29,6 @@ for a single explicit point a `ValueError` naming the coordinate is raised.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -42,7 +41,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.nrel import _helpers
@@ -241,18 +239,6 @@ class NREL(AbstractDataSource):
         self._auth.configure()
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -271,7 +257,9 @@ class NREL(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Accepted for the shared constructor shape but
                 not recorded — the label is fixed to `"hourly"`.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints and an
@@ -281,16 +269,11 @@ class NREL(AbstractDataSource):
             pydantic.ValidationError: If `start` parses to a date later than
                 `end` — `TemporalExtent` rejects inverted bounds (note this is
                 not a `ValueError` subclass).
-            ValueError: If `start` / `end` do not match `fmt` (from `strptime`).
+            ValueError: If `start` / `end` cannot be parsed at all. `fmt` is
+                only tried first — a non-matching but ISO-8601-parseable
+                string still succeeds.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="hourly",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="hourly")
 
     def _names(self) -> list[Any]:
         """Enumerate the `names=` values (years, or the literal `tmy`).
@@ -397,10 +380,6 @@ class NREL(AbstractDataSource):
                 f"(schema-only) table to {out_path}"
             )
         return df
-
-    def _api(self) -> list[pd.DataFrame | None]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Enumerate one product per `(lat, lon, name)` call.

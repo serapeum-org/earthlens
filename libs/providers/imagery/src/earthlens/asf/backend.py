@@ -26,11 +26,8 @@ for downstream InSAR tools rather than processing them.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-
-import pandas as pd
+from typing import TYPE_CHECKING, Any, cast
 
 from earthlens.asf._helpers import apply_baseline_windows, wkt_from_extent
 from earthlens.asf.auth import ASFAuth, ASFCredentials
@@ -39,7 +36,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 
@@ -248,18 +244,6 @@ class ASF(AbstractDataSource):
         self._auth = ASFAuth(self._creds_arg or ASFCredentials())
         return None
 
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -282,7 +266,9 @@ class ASF(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Ignored — ASF queries always span
                 the full window in one call.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints.
@@ -291,14 +277,7 @@ class ASF(AbstractDataSource):
             ValueError: If `start` parses to a date later than
                 `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     @property
     def _mode(self) -> str:
@@ -497,15 +476,6 @@ class ASF(AbstractDataSource):
             )
         return targets
 
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape.
-
-        Returns:
-            list[Path]: Whatever :meth:`_fetch` returned, or an
-                empty list when `_search` matched nothing.
-        """
-        return self._api_via_search_fetch()
-
     def download(
         self,
         progress_bar: bool = True,
@@ -556,4 +526,4 @@ class ASF(AbstractDataSource):
                 "aggregate= is not supported. Post-process the downloaded "
                 "SLC/RTC stack with a dedicated InSAR tool."
             )
-        return self._api()
+        return cast("list[Path]", self._api())

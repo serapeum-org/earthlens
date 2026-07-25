@@ -35,10 +35,10 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
     date_windows,
+    to_datetime,
 )
 from earthlens.nwp._helpers import (
     cog_name,
@@ -76,6 +76,9 @@ class NWP(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
 
     def __init__(
         self,
@@ -259,25 +262,6 @@ class NWP(AbstractDataSource):
                     stacklevel=3,
                 )
 
-    def _initialize(self):
-        """No-op auth hook — every MVP centre is an open bucket.
-
-        Returns `None`; the parent binds no `self.client`.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -295,7 +279,9 @@ class NWP(AbstractDataSource):
             start: Inclusive start of the cycle-date range.
             end: Inclusive end of the cycle-date range.
             temporal_resolution: Advisory cadence label.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with parsed bounds.
@@ -303,8 +289,8 @@ class NWP(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         dates = date_windows(start_dt, end_dt, "D")
         return TemporalExtent(
             start_date=start_dt,
@@ -312,10 +298,6 @@ class NWP(AbstractDataSource):
             resolution="D",
             dates=dates,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _steps_for(self, model: NWPModel) -> list[int]:
         """Resolve the forecast lead times to fetch for one model (`G1`).
@@ -481,25 +463,19 @@ class NWP(AbstractDataSource):
         from pyramids.dataset.cog import write_cog
         from pyramids.grib import open_grib
 
-        errors = getattr(self, "_errors", "warn")
         bbox = [
             self.space.west,
             self.space.south,
             self.space.east,
             self.space.north,
         ]
-        out: list[Path] = []
-        for product in products:
-            try:
-                out.append(self._fetch_one(product, bbox, open_grib, write_cog))
-            except Exception as exc:
-                if errors == "raise":
-                    raise
-                if errors == "warn":
-                    logger.warning(
-                        f"NWP: skipping {product.id} — fetch/crop failed: "
-                        f"{type(exc).__name__}: {exc}"
-                    )
+        out, _failed = self._run_items(
+            products,
+            lambda product: self._fetch_one(product, bbox, open_grib, write_cog),
+            errors=getattr(self, "_errors", "warn"),
+            label="forecast step",
+            describe=lambda product: str(product.id),
+        )
         return out
 
     def _fetch_one(  # type: ignore[override]
@@ -604,12 +580,10 @@ class NWP(AbstractDataSource):
             ValueError: If `errors` is not one of
                 `{"raise", "warn", "skip"}`.
         """
-        if errors not in {"raise", "warn", "skip"}:
-            raise ValueError(
-                f"errors must be 'raise', 'warn', or 'skip'; got {errors!r}."
-            )
         self._show_progress = progress_bar
-        self._errors = errors
+        # Shared validator: accepts the canonical raise/warn/ignore and keeps
+        # nwp's original "skip" working as an alias for "ignore".
+        self._errors = self.check_errors_policy(errors)
         paths = self._api_via_search_fetch()
         if aggregate is not None:
             return self._aggregate(paths, aggregate)

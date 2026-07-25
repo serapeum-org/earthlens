@@ -39,7 +39,11 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    yaml_files_for,
+)
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -47,7 +51,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # path plus a tuple of `(file, mtime_ns)` for every YAML the load
 # touched, so editing any per-domain file invalidates the entry
 # without inspecting every row. Mirrors the GEE multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
 
 CadenceLiteral = Literal[
     "hourly",
@@ -73,73 +77,12 @@ def clear_catalog_cache() -> None:
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted list of YAML files that contribute to a load.
+    """Return the sorted YAML files contributing to a load.
 
-    `path` may point at either:
-
-    * a directory of per-domain `*.yaml` files (the default layout —
-      `src/earthlens/cmems/catalog/`, e.g. `global.yaml`,
-      `mediterranean.yaml`, plus `_index.yaml`); or
-    * a single `*.yaml` file (back-compat for tests that monkey-patch
-      `CATALOG_PATH` to a temp file, and for any caller still using a
-      monolithic `cmems_data_catalog.yaml`).
-
-    Args:
-        path: Catalog directory or single YAML file.
-
-    Returns:
-        Sorted list of YAML paths. For a directory, every `*.yaml`
-            sibling (including `_index.yaml`); for a file, just that
-            file.
-
-    Raises:
-        ValueError: If `path` is neither an existing directory nor an
-            existing file (so the loader fails with a clear message
-            instead of trying to read a missing file).
-
-    Examples:
-        - A directory yields its `*.yaml` siblings, sorted, and skips
-          non-YAML files:
-            ```python
-            >>> import tempfile
-            >>> from pathlib import Path
-            >>> d = Path(tempfile.mkdtemp())
-            >>> _ = (d / "b.yaml").write_text("datasets: {}\\n")
-            >>> _ = (d / "a.yaml").write_text("datasets: {}\\n")
-            >>> _ = (d / "notes.txt").write_text("ignore\\n")
-            >>> [p.name for p in _yaml_files_for(d)]
-            ['a.yaml', 'b.yaml']
-
-            ```
-        - A single existing file returns just that file:
-            ```python
-            >>> import tempfile
-            >>> from pathlib import Path
-            >>> f = Path(tempfile.mkdtemp()) / "one.yaml"
-            >>> _ = f.write_text("datasets: {}\\n")
-            >>> _yaml_files_for(f) == [f]
-            True
-
-            ```
-        - A path that does not exist fails loud:
-            ```python
-            >>> from pathlib import Path
-            >>> try:
-            ...     _yaml_files_for(Path("no-such-catalog-path"))
-            ... except ValueError as exc:
-            ...     print("does not exist" in str(exc))
-            True
-
-            ```
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    if path.is_file():
-        return [path]
-    raise ValueError(
-        f"CMEMS catalog path {path} does not exist (expected a "
-        "directory of per-domain *.yaml files, or a single YAML file)."
-    )
+    return yaml_files_for(path, provider='CMEMS', shard_noun='per-domain')
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
@@ -170,13 +113,8 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
             variable fails validation, or a curated dataset id is
             absent from `available_datasets:`.
     """
-    resolved = str(path.resolve())
     files = _yaml_files_for(path)
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
+    key = catalog_cache_key(path, files)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

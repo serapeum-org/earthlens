@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, Any, cast
 from loguru import logger
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     LazyClientMixin,
     OutputKind,
@@ -37,7 +38,6 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
-    date_windows,
     safe_filename,
     window_labels,
 )
@@ -56,6 +56,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
 
     def __init__(
         self,
@@ -250,20 +253,13 @@ class STAC(LazyClientMixin, AbstractDataSource):
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
         """Parse the date window into a :class:`TemporalExtent`."""
-        import datetime as dt
-
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
-        resolution = freq_map.get(temporal_resolution, "D")
-        dates = date_windows(start_dt, end_dt, resolution)
-        return TemporalExtent(
-            start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
+        return self._cadence_extent(
+            start,
+            end,
+            fmt=fmt,
+            cadence=temporal_resolution,
+            accepted=CADENCE_ALIASES,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _bboxes(self) -> list[tuple[float, float, float, float]]:
         """Return the search AOI bbox(es) (two when the AOI crosses 180 deg)."""

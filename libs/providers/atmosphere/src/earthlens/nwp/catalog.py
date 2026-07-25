@@ -27,13 +27,14 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import catalog_cache_key
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "nwp_data_catalog.yaml"
 
 # Module-level cache keyed on `(resolved_path, mtime_ns)` so editing the
 # YAML invalidates the entry without re-parsing on every construction.
-_CATALOG_CACHE: dict[Any, dict[str, NWPModel]] = {}
+_CATALOG_CACHE: dict[Any, dict[str, NWPModel]] = CatalogParseCache()
 
 #: The download backends an `NWPModel` can declare. `herbie` and
 #: `ecmwf-opendata` go through their SDKs (`.idx` byte-range subsetting);
@@ -87,12 +88,7 @@ def _load_catalog_data(path: Path) -> dict[str, NWPModel]:
         ValueError: If the file has no `datasets:` block or a model row
             fails validation.
     """
-    resolved = str(path.resolve())
-    try:
-        mtime = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime = 0
-    key = (resolved, mtime)
+    key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

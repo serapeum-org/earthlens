@@ -66,7 +66,7 @@ import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 #: Canonical `temporal_resolution` vocabulary for CHC datasets (M1).
 #:
@@ -116,7 +116,7 @@ _CacheKey = tuple[str, int | tuple[tuple[str, int], ...]]
 _CATALOG_CACHE: dict[
     _CacheKey,
     tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]],
-] = {}
+] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

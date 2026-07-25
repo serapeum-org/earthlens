@@ -38,7 +38,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "osm_data_catalog.yaml"
 
@@ -62,7 +62,9 @@ _PYROSM_METHODS: frozenset[str] = frozenset(
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
 #: the GDACS / FDSN / overture loaders. The cached value is the
 #: `(datasets, regions)` pair the loader assembles.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], dict[str, str]]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], dict[str, str]]] = (
+    CatalogParseCache()
+)
 
 
 def clear_catalog_cache() -> None:

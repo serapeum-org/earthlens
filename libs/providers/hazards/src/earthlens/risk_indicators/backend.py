@@ -26,7 +26,6 @@ the parse uses no gridded-array dependency.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
@@ -40,6 +39,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.risk_indicators import _helpers
 from earthlens.risk_indicators.auth import GfwAuth, GfwCredentials
@@ -81,6 +81,10 @@ class RiskIndicators(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    #: The indicator tables are a snapshot with no time axis, so a missing `start` /
+    #: `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -206,14 +210,6 @@ class RiskIndicators(AbstractDataSource):
                     f"{self._country!r}."
                 )
 
-    def _initialize(self):
-        """No global client — auth (GFW only) is built in :meth:`__init__`.
-
-        Returns:
-            None: No per-instance client object.
-        """
-        return None
-
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Return a global :class:`SpatialExtent` (spatial args ignored, `G7`).
 
@@ -242,7 +238,9 @@ class RiskIndicators(AbstractDataSource):
             start: Inclusive start date string, or `None`.
             end: Inclusive end date string, or `None`.
             temporal_resolution: Recorded as the resolution label.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed (or `None`) endpoints.
@@ -250,8 +248,8 @@ class RiskIndicators(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt) if start else None
-        end_dt = dt.datetime.strptime(end, fmt) if end else None
+        start_dt = to_datetime(start, fmt) if start else None
+        end_dt = to_datetime(end, fmt) if end else None
         dates = (
             pd.DatetimeIndex([start_dt, end_dt])
             if start_dt is not None and end_dt is not None
@@ -263,10 +261,6 @@ class RiskIndicators(AbstractDataSource):
             resolution=temporal_resolution,
             dates=dates,
         )
-
-    def _api(self) -> list:
-        """Compose `_search` and `_fetch` into the canonical shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Pin the one product to fetch (dataset + resolved selector).

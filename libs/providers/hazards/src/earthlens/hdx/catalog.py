@@ -36,7 +36,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import yaml_files_for
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -44,14 +45,14 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # plus a tuple of `(file, mtime_ns)` for every YAML the load touched, so
 # editing any per-theme file invalidates the entry without inspecting
 # every row. Mirrors the Earthdata / CMEMS multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, HdxDataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, HdxDataset]]] = CatalogParseCache()
 # Same `(path, mtime_ns)` cache for the auto-generated `available_datasets`
 # index. The index is held as JSON (`_available.json`), not YAML, and parsed
 # separately from the curated per-theme YAMLs — so a `Catalog()` pays only the
 # fast JSON read (a flat list of ~7k ids) instead of a multi-hundred-millisecond
 # YAML parse, mirroring how `earthlens.earthdata` keeps its long tail in
 # `_auto.json` out of the curated YAML glob.
-_AVAILABLE_CACHE: dict[Any, dict[str, dict]] = {}
+_AVAILABLE_CACHE: dict[Any, dict[str, dict]] = CatalogParseCache()
 
 #: Filename of the gzipped JSON `available_datasets` index, kept beside the
 #: curated per-theme YAMLs (and out of the `*.yaml` glob). Gzipped because the
@@ -159,32 +160,12 @@ def _load_available(json_path: Path) -> dict[str, dict]:
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted list of YAML files that contribute to a load.
+    """Return the sorted YAML files contributing to a load.
 
-    `path` may point at either a directory of per-theme `*.yaml` files
-    (the default layout) or a single `*.yaml` file (back-compat for
-    tests that monkey-patch :data:`CATALOG_PATH` to a temp file).
-
-    Args:
-        path: Catalog directory or single YAML file.
-
-    Returns:
-        Sorted list of YAML paths. For a directory, every `*.yaml`
-            sibling (the JSON `_available.json` index is read separately);
-            for a file, just that file.
-
-    Raises:
-        ValueError: If `path` is neither an existing directory nor an
-            existing file.
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    if path.is_file():
-        return [path]
-    raise ValueError(
-        f"HDX catalog path {path} does not exist (expected a directory of "
-        "per-theme *.yaml files, or a single YAML file)."
-    )
+    return yaml_files_for(path, provider='HDX', shard_noun='per-theme')
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, HdxDataset]]:

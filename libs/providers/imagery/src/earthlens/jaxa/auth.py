@@ -320,7 +320,7 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
         if self._configured:
             return
         if self._protocol == "jaxa-earth":
-            self._configured = True
+            self.mark_configured()
             return
         spec = _PROTOCOL_SPECS[self._protocol]
         cred_username = getattr(self._creds, spec.cred_user)
@@ -341,26 +341,4 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
             )
         self._username = username
         self._password = SecretStr(password_raw)
-        self._configured = True
-
-    def is_authenticated(self) -> bool:
-        """Return `True` once :meth:`configure` has run successfully.
-
-        Returns:
-            bool: `True` after :meth:`configure` has completed without
-                raising; `False` before then.
-
-        Examples:
-            - Construction does not authenticate; configure flips the flag:
-                ```python
-                >>> from earthlens.jaxa import JaxaAuth, JaxaCredentials
-                >>> auth = JaxaAuth(JaxaCredentials(), protocol="jaxa-earth")
-                >>> auth.is_authenticated()
-                False
-                >>> auth.configure()
-                >>> auth.is_authenticated()
-                True
-
-                ```
-        """
-        return self._configured
+        self.mark_configured()

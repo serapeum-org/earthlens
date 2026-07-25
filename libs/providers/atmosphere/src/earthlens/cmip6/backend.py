@@ -27,11 +27,9 @@ NetCDFs can be aggregated separately.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
 from loguru import logger
 from tqdm import tqdm
 
@@ -39,7 +37,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.cmip6 import accessor
@@ -171,14 +168,6 @@ class CMIP6(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self) -> None:
-        """No-op auth hook — the `gs://cmip6` bucket is anonymous. Returns `None`."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent` (no snapping)."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -188,19 +177,14 @@ class CMIP6(AbstractDataSource):
             start: Inclusive window start.
             end: Inclusive window end.
             temporal_resolution: Advisory cadence label.
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="raw",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="raw")
 
     def _wants_spatial_subset(self) -> bool:
         """Return whether the request narrows the grid (a bbox crop).
@@ -317,10 +301,6 @@ class CMIP6(AbstractDataSource):
             self.time.start_date,
             self.time.end_date,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
 
     def terms_note(self) -> str:
         """Return the attribution note for the requested source model.

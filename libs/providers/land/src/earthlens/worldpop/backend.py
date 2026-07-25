@@ -22,7 +22,6 @@ the `[worldpop]` extra.
 
 from __future__ import annotations
 
-import datetime as dt
 import re
 import time
 from pathlib import Path
@@ -33,10 +32,15 @@ import pandas as pd
 import requests
 from joblib import Parallel, delayed
 
-from earthlens.base import OutputKind, RemoteProduct, date_windows, window_labels
+from earthlens.base import (
+    OutputKind,
+    RemoteProduct,
+    date_windows,
+    to_datetime,
+    window_labels,
+)
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
@@ -95,6 +99,9 @@ class WorldPop(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "mixed"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
 
     def __init__(
         self,
@@ -326,18 +333,6 @@ class WorldPop(AbstractDataSource):
         self._auth.configure()
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a `SpatialExtent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox (WGS84).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -354,7 +349,9 @@ class WorldPop(AbstractDataSource):
             start: Inclusive start of the window.
             end: Inclusive end of the window.
             temporal_resolution: Advisory label (ignored).
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
@@ -362,8 +359,8 @@ class WorldPop(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         dates = date_windows(start_dt, end_dt, "YS")
         return TemporalExtent(
             start_date=start_dt,

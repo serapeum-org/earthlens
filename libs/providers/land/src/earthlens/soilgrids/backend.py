@@ -27,15 +27,14 @@ from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
+    close_quietly,
 )
 from earthlens.base.spatial import mask_to_geometry
 from earthlens.soilgrids._helpers import (
@@ -85,6 +84,17 @@ class SoilGrids(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
+    #: Partial-failure policy for the per-coverage loop; `download(errors=...)`
+    #: overrides it per call.
+    _errors: str = "warn"
+
+    #: The soil property grids are time-invariant, so a missing `start` / `end` is legal
+    #: here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -203,22 +213,6 @@ class SoilGrids(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No client / auth — SoilGrids is public (returns `None`)."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -234,12 +228,7 @@ class SoilGrids(AbstractDataSource):
             TemporalExtent: A frozen model with `None` bounds and an empty date
                 index (a static soil-property map has no time axis).
         """
-        return TemporalExtent(
-            start_date=None,
-            end_date=None,
-            resolution=temporal_resolution or "static",
-            dates=pd.DatetimeIndex([]),
-        )
+        return self._static_extent(resolution=temporal_resolution or "static")
 
     def _api(self) -> list[Path]:
         """Fetch each coverage under a progress bar, isolating per-coverage faults.
@@ -270,22 +259,21 @@ class SoilGrids(AbstractDataSource):
         self.root_dir.mkdir(parents=True, exist_ok=True)
         tmp_dir = Path(tempfile.mkdtemp(dir=self.root_dir, prefix=".soilgrids-tmp-"))
         written: list[Path] = []
-        failed: list[str] = []
         try:
-            for product in tqdm(
-                products,
-                disable=not self._show_progress,
-                desc="soilgrids",
-                unit="coverage",
-            ):
-                try:
-                    written.append(self._fetch_one(product, tmp_dir))
-                except Exception as exc:  # noqa: BLE001 - isolate one flaky coverage
-                    failed.append(product.id)
-                    logger.warning(
-                        f"soilgrids: coverage {product.id} failed "
-                        f"({type(exc).__name__}: {exc}); skipping."
-                    )
+            fetched, failures = self._run_items(
+                tqdm(
+                    products,
+                    disable=not self._show_progress,
+                    desc="soilgrids",
+                    unit="coverage",
+                ),
+                lambda product: self._fetch_one(product, tmp_dir),
+                errors=self._errors,
+                label="coverage",
+                describe=lambda product: str(product.id),
+            )
+            written.extend(fetched)
+            failed = [described for described, _exc in failures]
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         if failed and not written:
@@ -402,13 +390,13 @@ class SoilGrids(AbstractDataSource):
             # keeping `os.replace` in the try means a rename failure is cleaned
             # up rather than orphaning a fully-written temp in the output tree.
             if result is not dataset:
-                _close_dataset(result)
-            _close_dataset(dataset)
+                close_quietly(result)
+            close_quietly(dataset)
             os.replace(tmp_path, out_path)
         except Exception:
             if result is not None and result is not dataset:
-                _close_dataset(result)
-            _close_dataset(dataset)
+                close_quietly(result)
+            close_quietly(dataset)
             try:
                 tmp_path.unlink(missing_ok=True)
             except OSError:
@@ -420,6 +408,7 @@ class SoilGrids(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch every requested coverage's bbox subset as a written GeoTIFF.
 
@@ -446,23 +435,7 @@ class SoilGrids(AbstractDataSource):
                 "is nothing to reduce. Call download() without aggregate=."
             )
         self._show_progress = progress_bar
+        self._errors = self.check_errors_policy(errors)
         paths = self._api()
         logger.info(f"soilgrids attribution: {SOILGRIDS_ATTRIBUTION}")
         return paths
-
-
-def _close_dataset(dataset: object) -> None:
-    """Release a pyramids `Dataset`'s underlying GDAL handle if it exposes one.
-
-    Closing the dataset lets the OS release the file lock (notably on Windows)
-    once the GeoTIFF is written. A no-op when the object has no `close`.
-
-    Args:
-        dataset: A pyramids `Dataset` (or anything with an optional `close`).
-    """
-    closer = getattr(dataset, "close", None)
-    if callable(closer):
-        try:
-            closer()
-        except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
-            pass

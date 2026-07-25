@@ -29,7 +29,6 @@ without `NetCDF.reduce` raises a clear `NotImplementedError`.
 
 from __future__ import annotations
 
-import datetime as dt
 from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
@@ -38,12 +37,11 @@ from loguru import logger
 from pydantic import SecretStr
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
-    date_windows,
     safe_filename,
     window_labels,
 )
@@ -127,10 +125,10 @@ class CMEMS(AbstractDataSource):
                 `[-90, 90]`.
             lon_lim: `[lon_min, lon_max]` in degrees, both in
                 `[-180, 180]`.
-            temporal_resolution: Advisory cadence label; CMEMS
-                handles cadence server-side, so any value the
-                source dataset supports is accepted. Defaults to
-                `"daily"`.
+            temporal_resolution: The requested cadence, validated against
+                `earthlens.base.CADENCE_ALIASES` (which covers every cadence the
+                catalog rows declare). An unrecognised value raises `ValueError`
+                listing the accepted spellings.
             path: Output directory. Created by the parent class if
                 it does not exist. Defaults to the current working
                 directory.
@@ -204,25 +202,6 @@ class CMEMS(AbstractDataSource):
         self._auth = CmemsAuth(creds)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Validate and wrap the user bbox into a :class:`SpatialExtent`.
-
-        CMEMS does not impose a global native grid (each dataset
-        has its own cell size — 1/12°, 1/4°, 5 km, 2.5 km, …) and
-        the toolbox handles snapping server-side, so this method
-        does not snap the input box. It is kept as a thin wrapper
-        for `SpatialExtent.from_pairs` so the bbox lands on
-        `self.space` via the same path the other backends use.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -242,11 +221,16 @@ class CMEMS(AbstractDataSource):
         Args:
             start: Inclusive start date as a string.
             end: Inclusive end date as a string.
-            temporal_resolution: Advisory cadence label; only the
-                `"daily"` and `"monthly"` aliases are mapped to a
-                pandas frequency, otherwise `freq=None` is used and
-                `dates` collapses to the two endpoints.
-            fmt: `strptime` format applied to `start` and `end`.
+            temporal_resolution: The requested cadence. Resolved through
+                `earthlens.base.CADENCE_ALIASES`, which covers every cadence
+                the CMEMS catalog rows declare; a periodic one expands
+                `dates` to its period starts, while a release-character one
+                (`"irregular"`, `"climatology"`) collapses `dates` to the two
+                endpoints. An unrecognised cadence raises rather than
+                silently substituting daily.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen pydantic model with parsed bounds.
@@ -255,16 +239,12 @@ class CMEMS(AbstractDataSource):
             ValueError: If `start` parses to a date later than
                 `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        freq_map = {"daily": "D", "monthly": "MS", "hourly": "h"}
-        resolution = freq_map.get(temporal_resolution, "D")
-        dates = date_windows(start_dt, end_dt, resolution)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution=resolution,
-            dates=dates,
+        return self._cadence_extent(
+            start,
+            end,
+            fmt=fmt,
+            cadence=temporal_resolution,
+            accepted=CADENCE_ALIASES,
         )
 
     def download(
@@ -528,10 +508,6 @@ class CMEMS(AbstractDataSource):
             )
         return window_labels(times, freq)
 
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
-
     def _search(self) -> list[RemoteProduct]:
         """One :class:`RemoteProduct` per `(dataset_id, variables)` group.
 
@@ -663,7 +639,7 @@ class CMEMS(AbstractDataSource):
         variables = product.metadata.get("variables") or []
         ext = "nc" if self._file_format == "netcdf" else "zarr"
         output_filename = product.metadata.get("output_filename") or (
-            f"{_safe_filename(dataset_id)}.{ext}"
+            f"{safe_filename(dataset_id)}.{ext}"
         )
 
         logger.info(
@@ -709,24 +685,6 @@ class CMEMS(AbstractDataSource):
                 f"{getattr(response, 'status', None)!r}"
             )
         return Path(file_path)
-
-
-def _safe_filename(dataset_id: str) -> str:
-    """Sanitise a CMEMS dataset id into a filesystem-safe stem.
-
-    Thin alias over :func:`earthlens.base.safe_filename` (the shared
-    implementation). CMEMS dataset ids contain `.` (e.g.
-    `cmems_mod_glo_phy_my_0.083deg_P1D-m`), which the whitelist keeps,
-    while every path separator and Windows-illegal character
-    (`/ \\ : * ? " < > |`) collapses to `_`.
-
-    Args:
-        dataset_id: The raw CMEMS dataset id.
-
-    Returns:
-        A filename-safe variant of the id.
-    """
-    return safe_filename(dataset_id)
 
 
 def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:
@@ -782,7 +740,7 @@ def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:
     """
     import hashlib
 
-    stems: dict[str, str] = {ds_id: _safe_filename(ds_id) for ds_id in dataset_ids}
+    stems: dict[str, str] = {ds_id: safe_filename(ds_id) for ds_id in dataset_ids}
     counts = Counter(stems.values())
     names: dict[str, str] = {}
     for ds_id, stem in stems.items():

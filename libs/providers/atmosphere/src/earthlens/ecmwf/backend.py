@@ -218,6 +218,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
     def __init__(
         self,
         start: str,
@@ -301,7 +304,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             end: Inclusive end date as a string.
             temporal_resolution: `"daily"` (uses `freq="D"`) or
                 `"monthly"` (uses `freq="MS"`).
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen pydantic model with `start_date`,
@@ -335,19 +340,6 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             resolution=resolution,
             dates=dates,
         )
-
-    def _initialize(self):
-        """No eager client — the cdsapi connection is built lazily.
-
-        Returns `None` so the parent does not bind an eager `client`;
-        :meth:`_open_client` constructs the :class:`cdsapi.Client` on
-        first access to `self.client` (i.e. at `download()` time), so
-        constructing the backend never authenticates against CDS.
-
-        Returns:
-            None: Always.
-        """
-        return None
 
     def _open_client(self, endpoint: str = "cds"):
         """Construct a :class:`cdsapi.Client` for the named CADS endpoint.

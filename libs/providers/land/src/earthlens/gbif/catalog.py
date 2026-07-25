@@ -25,7 +25,8 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import catalog_cache_key
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "gbif_data_catalog.yaml"
 
@@ -35,7 +36,9 @@ TAXON_PREFIX = "taxon:"
 # Module-level cache of parsed catalog rows, keyed on the resolved path plus
 # the YAML's `st_mtime_ns`, so editing the file invalidates the entry without
 # re-parsing on every `Catalog()`. Mirrors the FDSN / OpenAQ catalog loaders.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Taxon], list[str]]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Taxon], list[str]]] = (
+    CatalogParseCache()
+)
 
 
 def clear_catalog_cache() -> None:
@@ -63,12 +66,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Taxon], list[str]]:
         ValueError: If the file has no `taxa:` block, or a row fails
             :class:`Taxon` validation.
     """
-    resolved = str(path.resolve())
-    try:
-        mtime = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime = 0
-    key = (resolved, mtime)
+    key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

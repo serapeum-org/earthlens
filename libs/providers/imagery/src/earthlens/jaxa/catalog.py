@@ -37,25 +37,23 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import yaml_files_for
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
 #: Keyed on the resolved path + every contributing file's mtime so editing any
 #: per-mission YAML invalidates the cache without re-walking the whole tree.
-_CATALOG_CACHE: dict[Any, Catalog] = {}
+_CATALOG_CACHE: dict[Any, Catalog] = CatalogParseCache()
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted YAML files that contribute to a catalog load.
+    """Return the sorted YAML files contributing to a load.
 
-    `path` may be a directory of per-mission `*.yaml` files (the default
-    layout) or a single `*.yaml` file (back-compat for tests that
-    monkey-patch :data:`CATALOG_PATH` to a temp file).
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    return [path]
+    return yaml_files_for(path, provider='jaxa')
 
 
 #: G-Portal dataset ids are 7- to 9-digit numeric strings (e.g. `11001002`).

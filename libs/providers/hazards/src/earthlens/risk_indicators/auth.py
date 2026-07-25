@@ -165,18 +165,7 @@ class GfwAuth(AbstractAuth[GfwCredentials]):
                 f"Create a free key with a MyGFW account: {_CREATE_KEY_URL}."
             )
         self._key = key
-        self._configured = True
-
-    def is_authenticated(self) -> bool:
-        """Return `True` once :meth:`configure` has resolved a key.
-
-        Cheap predicate — does not call the network. A return of `True` means a
-        usable key is held by this instance.
-
-        Returns:
-            bool: `True` after a successful :meth:`configure`, `False` before.
-        """
-        return self._configured
+        self.mark_configured()
 
     @property
     def api_key(self) -> str:

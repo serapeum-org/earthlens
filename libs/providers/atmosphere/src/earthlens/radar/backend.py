@@ -31,7 +31,6 @@ import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import pandas as pd
 from loguru import logger
 from tqdm import tqdm
 
@@ -39,7 +38,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.radar.catalog import Catalog, Station
@@ -176,14 +174,6 @@ class Radar(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No-op auth hook — the chunk bucket is anonymous. Returns `None`."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent`."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -193,7 +183,9 @@ class Radar(AbstractDataSource):
             start: Inclusive window start.
             end: Inclusive window end.
             temporal_resolution: Advisory cadence label.
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with parsed bounds.
@@ -201,25 +193,7 @@ class Radar(AbstractDataSource):
         Raises:
             ValueError: If `start` parses later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="raw",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
-
-    def _api(self) -> list[Path]:
-        """Return the assembled `.ar2v` paths (the raw "paths only" entry).
-
-        `download` is the public entry point — it returns the typed
-        `GeoDataFrame` inventory. `_api` exists to satisfy the
-        `AbstractDataSource` contract and exposes just the written paths
-        for callers (or the C3 `_api_via_search_fetch` composition) that
-        want them without the inventory frame.
-        """
-        return self._api_via_search_fetch()
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="raw")
 
     def _window(self) -> tuple[dt.datetime, dt.datetime]:
         """Return the inclusive scan-time window, extending `end` to its day end."""

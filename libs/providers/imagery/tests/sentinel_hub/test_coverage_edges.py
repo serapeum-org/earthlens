@@ -29,8 +29,8 @@ class TestDateValidation:
     """Missing dates are rejected with an actionable message."""
 
     def test_missing_start_rejected(self, output_dir: Path):
-        """A `None` start date raises a clear ValueError."""
-        with pytest.raises(ValueError, match="both start and end"):
+        """A `None` start date raises a clear ValueError naming the missing bound."""
+        with pytest.raises(ValueError, match="requires a time window.*start"):
             SentinelHub(
                 start=None,
                 end="2020-06-02",

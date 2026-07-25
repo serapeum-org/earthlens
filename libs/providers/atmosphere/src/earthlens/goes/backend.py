@@ -47,7 +47,6 @@ from tqdm import tqdm
 from earthlens.base import (
     AbstractDataSource,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -334,14 +333,6 @@ class GOES(AbstractDataSource):
 
     # -- abstract hooks ------------------------------------------------
 
-    def _initialize(self) -> None:
-        """No-op auth hook — the GOES buckets are anonymous. Returns `None`."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent` (no snapping)."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -351,7 +342,9 @@ class GOES(AbstractDataSource):
             start: Inclusive window start.
             end: Inclusive window end.
             temporal_resolution: Advisory cadence label.
-            fmt: `strptime` format tried first for string bounds.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model whose `dates` are the hour
@@ -504,10 +497,6 @@ class GOES(AbstractDataSource):
             download_key(client, product.metadata["bucket"], product.href, dest)
             out.append(dest)
         return out
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

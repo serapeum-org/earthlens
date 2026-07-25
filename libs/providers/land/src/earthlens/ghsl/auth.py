@@ -84,7 +84,7 @@ class GhslAuth(AbstractAuth[GhslCredentials]):
 
     def configure(self) -> None:
         """No-op setup — GHSL is open + attribution-only (nothing to do)."""
-        self._configured = True
+        self.mark_configured()
 
     def is_authenticated(self) -> bool:
         """Return `True` — open data needs no credentials."""

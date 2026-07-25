@@ -10,6 +10,8 @@ parameter becomes an optional override rather than a requirement.
 from __future__ import annotations
 
 import datetime as dt
+import difflib
+from collections.abc import Mapping
 from typing import Any
 
 import pandas as pd
@@ -112,6 +114,151 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
     raise TypeError(
         f"start / end must be a datetime, date, or string; got {type(value).__name__}"
     )
+
+
+#: Sentinel alias meaning "no fixed spacing — query the window whole". Returned
+#: by :func:`resolve_cadence` for any cadence that names a release *character*
+#: rather than a period, and so has no pandas offset: `"irregular"`,
+#: `"climatology"`, `"subhourly"`, `"subdaily"`, `"raw"`, `"native"` and
+#: `"static"`. `AbstractDataSource._cadence_extent` turns it into a whole-window
+#: extent instead of trying to expand a period axis.
+WHOLE_WINDOW = "all"
+
+#: The cadence vocabulary the providers' own catalogs use, mapped to pandas
+#: offset aliases. Shared rather than re-spelled per backend: the narrow
+#: three-entry maps the backends each carried rejected cadences their catalogs
+#: legitimately name - many of CMEMS's 1141 rows say `irregular` / `annual` /
+#: `climatology` / `weekly` / `6hourly`. A backend that genuinely supports only
+#: a subset passes its own narrower map.
+CADENCE_ALIASES: dict[str, str] = {
+    # Sub-hourly (eumetsat's rapid-scan and full-disc SEVIRI / MTG rows).
+    "5min": "5min",
+    "10min": "10min",
+    "15min": "15min",
+    "30min": "30min",
+    # Hourly multiples.
+    "hourly": "h",
+    "3hourly": "3h",
+    "6hourly": "6h",
+    "12hourly": "12h",
+    # Daily multiples, including the MODIS/VIIRS composite periods
+    # (earthdata's `8day` / `16day`) and the dekad (eumetsat, drought).
+    # The multi-day cadences are deliberately **sliding from the window start**
+    # (`5D` / `7D` / `8D` / `10D` / `16D`) rather than calendar-anchored. Two
+    # reasons: `date_windows` promises one timestamp per period *start*, and
+    # pandas' calendar-anchored weekly alias `W` is `W-SUN`, i.e. a period *end*
+    # — `date_range("2024-02-01", ..., freq="W")` begins on the 4th and never
+    # emits the 1st, so a download loop over the axis would silently skip the
+    # first days of the requested window. The sliding forms always start exactly
+    # at the window start and tile it completely, which is what a per-period
+    # fetch loop needs. MODIS/VIIRS `8day` / `16day` composites are themselves
+    # sliding from a yearly epoch, so this also matches the products.
+    "daily": "D",
+    "pentadal": "5D",
+    "weekly": "7D",
+    "8day": "8D",
+    "10day": "10D",
+    "dekadal": "10D",
+    "16day": "16D",
+    "monthly": "MS",
+    # Meteorological seasons (DJF / MAM / JJA / SON), the geoscience convention;
+    # plain `QS` would anchor on the calendar quarter (Jan / Apr / Jul / Oct).
+    "seasonal": "QS-DEC",
+    "annual": "YS",
+    "yearly": "YS",
+    # No fixed period — the window is queried whole. `raw` / `native` mean "as
+    # the provider stores it, no temporal aggregation"; `subhourly` / `subdaily`
+    # name a release *character* rather than a period, as do `irregular` and
+    # `climatology`.
+    "raw": WHOLE_WINDOW,
+    "native": WHOLE_WINDOW,
+    "subhourly": WHOLE_WINDOW,
+    "subdaily": WHOLE_WINDOW,
+    "irregular": WHOLE_WINDOW,
+    "climatology": WHOLE_WINDOW,
+    "static": WHOLE_WINDOW,
+    "all": WHOLE_WINDOW,
+}
+
+
+def resolve_cadence(
+    cadence: str,
+    accepted: Mapping[str, str],
+    *,
+    backend: str = "this backend",
+) -> str:
+    """Map a user-facing cadence onto its pandas offset alias, or raise.
+
+    The single home for the cadence lookup the multi-cadence backends each
+    spelled as `freq_map.get(temporal_resolution, "D")` — a form that silently
+    substitutes a *different* cadence when the caller's spelling is unknown, so
+    a mistyped `cadence="dailyy"` (or a legitimate `"yearly"` missing from a
+    backend's map) quietly downloaded daily steps instead of failing. Raising
+    is the only safe behaviour: the alternative silently changes both the
+    request count and the output shape.
+
+    Args:
+        cadence: The user-facing cadence (`temporal_resolution` / `cadence=`),
+            e.g. `"daily"`.
+        accepted: Mapping of every cadence this backend supports to its pandas
+            offset alias, e.g. `{"daily": "D", "monthly": "MS"}`.
+        backend: Backend name used in the error message. Defaults to a generic
+            phrase; pass `type(self).__name__`.
+
+    Returns:
+        The pandas offset alias for `cadence`.
+
+    Raises:
+        ValueError: If `cadence` is not a key of `accepted`. The message lists
+            the accepted spellings and suggests the closest one.
+
+    Examples:
+        - A supported cadence resolves to its pandas alias:
+            ```python
+            >>> from earthlens.base import resolve_cadence
+            >>> resolve_cadence("monthly", {"daily": "D", "monthly": "MS"})
+            'MS'
+
+            ```
+        - An unsupported cadence raises instead of defaulting:
+            ```python
+            >>> from earthlens.base import resolve_cadence
+            >>> resolve_cadence(  # doctest: +ELLIPSIS
+            ...     "yearly", {"daily": "D", "monthly": "MS"}
+            ... )
+            Traceback (most recent call last):
+                ...
+            ValueError: temporal_resolution='yearly' is not supported by this backend. ...
+
+            ```
+        - A near-miss gets a did-you-mean hint:
+            ```python
+            >>> from earthlens.base import resolve_cadence
+            >>> try:
+            ...     resolve_cadence("dailyy", {"daily": "D"}, backend="CMEMS")
+            ... except ValueError as exc:
+            ...     print("Did you mean 'daily'?" in str(exc))
+            True
+
+            ```
+    """
+    if not isinstance(cadence, str):
+        # Guard before difflib, which raises a bare `TypeError: 'NoneType'
+        # object is not iterable` on a non-string — the very failure shape this
+        # function exists to replace.
+        raise ValueError(
+            f"temporal_resolution must be a string cadence, got "
+            f"{type(cadence).__name__}. Accepted by {backend}: {sorted(accepted)}."
+        )
+    try:
+        return accepted[cadence]
+    except KeyError:
+        close = difflib.get_close_matches(cadence, accepted, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"temporal_resolution={cadence!r} is not supported by {backend}. "
+            f"Accepted: {sorted(accepted)}.{hint}"
+        ) from None
 
 
 def date_windows(

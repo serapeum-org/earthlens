@@ -42,7 +42,6 @@ client-side).
 
 from __future__ import annotations
 
-import datetime as dt
 import shutil
 import time
 from pathlib import Path
@@ -52,12 +51,11 @@ from loguru import logger
 from pydantic import SecretStr
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
-    date_windows,
 )
 from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
@@ -267,24 +265,6 @@ class EUMETSAT(AbstractDataSource):
         self._auth = EumetsatAuth(creds)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Validate and wrap the user bbox into a `SpatialExtent`.
-
-        The Data Store search accepts a plain bounding box, so this is a
-        thin wrapper over `SpatialExtent.from_pairs`. An earthlens extent
-        constrains longitude to a single `[-180, 180]` range with
-        `west <= east`, so it cannot represent an antimeridian-crossing
-        box and `_search` issues exactly one search bbox.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -299,7 +279,13 @@ class EUMETSAT(AbstractDataSource):
             end: Inclusive end date as a string.
             temporal_resolution: Advisory cadence label; mapped to a
                 pandas frequency for the `dates` index when known.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
+
+        Raises:
+            ValueError: If `temporal_resolution` is not one of the cadences
+                `earthlens.base.CADENCE_ALIASES` accepts.
 
         Returns:
             TemporalExtent: Frozen model with parsed bounds.
@@ -307,21 +293,13 @@ class EUMETSAT(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        freq_map = {"daily": "D", "monthly": "MS", "hourly": "h"}
-        resolution = freq_map.get(temporal_resolution, "D")
-        dates = date_windows(start_dt, end_dt, resolution)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution=resolution,
-            dates=dates,
+        return self._cadence_extent(
+            start,
+            end,
+            fmt=fmt,
+            cadence=temporal_resolution,
+            accepted=CADENCE_ALIASES,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Query the Data Store for products of every requested collection.

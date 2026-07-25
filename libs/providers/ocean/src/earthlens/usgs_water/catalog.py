@@ -28,7 +28,8 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.catalog_source import catalog_cache_key
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "usgs_water_data_catalog.yaml"
 
@@ -36,7 +37,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "usgs_water_data_catalog.yaml"
 #: plus the YAML's `st_mtime_ns`, so editing the file invalidates the
 #: entry without re-parsing on every `Catalog()`. Mirrors the
 #: `_CATALOG_CACHE` pattern in the GEE / ECMWF / CMEMS / FDSN loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Parameter]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Parameter]] = CatalogParseCache()
 
 #: A 5-digit NWIS parameter code (the raw form `resolve` passes through).
 _CODE_RE = re.compile(r"^\d{5}$")
@@ -66,12 +67,7 @@ def _load_catalog_data(path: Path) -> dict[str, Parameter]:
         ValueError: If the file has no `parameters:` block, or a row
             fails :class:`Parameter` validation.
     """
-    resolved = str(path.resolve())
-    try:
-        mtime = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime = 0
-    key = (resolved, mtime)
+    key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

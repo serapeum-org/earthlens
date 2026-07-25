@@ -32,12 +32,13 @@ from loguru import logger
 from pydantic import SecretStr
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
+    safe_filename,
 )
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
 from earthlens.sentinel_hub._helpers import (
@@ -217,18 +218,6 @@ class SentinelHub(AbstractDataSource):
         self._auth = SentinelHubAuth(self._credentials, endpoint=self._endpoint)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Build the WGS84 envelope the Sentinel Hub `BBox` is built from.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: The request's bounding box.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -239,28 +228,26 @@ class SentinelHub(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Advisory cadence label (`"daily"`, `"monthly"`,
                 `"hourly"`, `"yearly"`) → the pandas frequency on the extent.
-            fmt: `strptime` format for `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: The parsed window (inclusive `end_date`).
 
         Raises:
-            ValueError: When `start` or `end` is `None`.
+            ValueError: When `temporal_resolution` is not one of the accepted
+                cadences. A missing `start` / `end` is rejected earlier, by
+                `AbstractDataSource._check_time_window` — the render needs a
+                `time_interval`, so this backend keeps the inherited
+                `REQUIRES_TIME_WINDOW = True`.
         """
-        import datetime as dt
-
-        if start is None or end is None:
-            raise ValueError(
-                "Sentinel Hub requires both start and end dates (the render "
-                "needs a time_interval); pass start=… and end=…."
-            )
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
-        resolution = freq_map.get(temporal_resolution, "D")
-        dates = date_windows(start_dt, end_dt, resolution)
-        return TemporalExtent(
-            start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
+        return self._cadence_extent(
+            start,
+            end,
+            fmt=fmt,
+            cadence=temporal_resolution,
+            accepted=CADENCE_ALIASES,
         )
 
     def _bbox(self) -> Any:
@@ -330,10 +317,6 @@ class SentinelHub(AbstractDataSource):
             self.time.start_date.strftime("%Y-%m-%d"),
             self.time.end_date.strftime("%Y-%m-%d"),
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """List the planned requests without rendering (cheap dry-run).
@@ -709,7 +692,7 @@ class SentinelHub(AbstractDataSource):
         out: list[Path] = []
         for product in products:
             resolved: ResolvedRequest = product.metadata["resolved"]
-            tile_dir = Path(self.root_dir) / f"_tiles_{_safe_name(product.id)}"
+            tile_dir = Path(self.root_dir) / f"_tiles_{safe_filename(product.id)}"
             tile_dir.mkdir(parents=True, exist_ok=True)
             tile_paths: list[str] = []
             for index, (sh_bbox, tile_size) in enumerate(tile_specs):
@@ -721,7 +704,7 @@ class SentinelHub(AbstractDataSource):
                     str(tile_dir / str(index)),
                 )
                 tile_paths.append(str(rendered))
-            merged = Path(self.root_dir) / f"{_safe_name(product.id)}.tif"
+            merged = Path(self.root_dir) / f"{safe_filename(product.id)}.tif"
             merge_rasters(tile_paths, str(merged))
             shutil.rmtree(tile_dir, ignore_errors=True)
             out.append(merged)
@@ -923,7 +906,7 @@ class SentinelHub(AbstractDataSource):
                     f"{product.id!r} over the request geometry + window "
                     "(empty table written)."
                 )
-            target = Path(self.root_dir) / f"{_safe_name(product.id)}.csv"
+            target = Path(self.root_dir) / f"{safe_filename(product.id)}.csv"
             _stats_frame(rows).to_csv(target, index=False)
             out.append(target)
         logger.info(f"Sentinel Hub statistical: wrote {len(out)} table(s)")
@@ -1009,7 +992,7 @@ class SentinelHub(AbstractDataSource):
             ids = feature_ids if feature_ids is not None else range(len(payloads))
             for feature_id, payload in zip(ids, payloads):
                 rows.extend(_flatten_statistics(payload, feature_id=feature_id))
-            target = Path(self.root_dir) / f"{_safe_name(product.id)}.csv"
+            target = Path(self.root_dir) / f"{safe_filename(product.id)}.csv"
             _stats_frame(rows).to_csv(target, index=False)
             out.append(target)
         logger.info(f"Sentinel Hub batch-statistical: wrote {len(out)} table(s)")
@@ -1113,7 +1096,8 @@ class SentinelHub(AbstractDataSource):
             return item
         suffix = source.suffix or ".tif"
         target = (
-            Path(self.root_dir) / f"{_safe_name(key)}_{aggregate.freq}_{stamp}{suffix}"
+            Path(self.root_dir)
+            / f"{safe_filename(key)}_{aggregate.freq}_{stamp}{suffix}"
         )
         source.replace(target)
         return target
@@ -1312,27 +1296,6 @@ def _flatten_statistics(payload: dict, feature_id: Any) -> list[dict]:
                     row[f"p{percentile}"] = value
                 rows.append(row)
     return rows
-
-
-def _safe_name(key: str) -> str:
-    """Flatten a request key to a filename-safe stem (no path separators).
-
-    Args:
-        key: A collection/recipe key.
-
-    Returns:
-        The key with `/` and `\\` replaced by `_`.
-
-    Examples:
-        - A plain key is unchanged:
-            ```python
-            >>> from earthlens.sentinel_hub.backend import _safe_name
-            >>> _safe_name("sentinel-2-l2a-ndvi")
-            'sentinel-2-l2a-ndvi'
-
-            ```
-    """
-    return key.replace("/", "_").replace("\\", "_")
 
 
 def _async_request_id(submission: Any) -> str | None:

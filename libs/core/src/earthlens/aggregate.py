@@ -14,10 +14,26 @@ chains it via `ECMWF.download(aggregate=...)` for the
 "download-and-aggregate-in-one-call" path; standalone callers use
 `aggregate_netcdf` directly.
 
-The two public symbols are :class:`AggregationConfig` (the frozen
-request shape) and :func:`aggregate_netcdf` (the function). They are
-also re-exported from `earthlens` so callers can write
+The two headline public symbols are :class:`AggregationConfig` (the
+frozen request shape) and :func:`aggregate_netcdf` (the function). They
+are also re-exported from `earthlens` so callers can write
 `from earthlens.core import AggregationConfig, aggregate_netcdf`.
+
+Two lower-level primitives are public as well, because the provider
+distributions need them to implement their own per-window reductions over
+outputs that are not CDS NetCDF cubes (ghsl reduces a stack of per-epoch
+GeoTIFFs, and the same shape suits stac's per-date COGs and
+sentinel_hub's rendered windows):
+
+* :func:`window_groups` — bucket a `DatetimeIndex` into
+  `(window_label, mask)` pairs by a pandas offset alias.
+* :func:`reduce_time_axis` — reduce a `(time, y, x)` stack along axis 0
+  with a named op, honouring `skipna` / `min_count`.
+
+They are supported API, not internals: `earthlens-core` and the five
+provider distributions version independently, so a provider importing an
+underscore-private core symbol would break at runtime on any core release
+that renamed it.
 
 Examples:
     - Standalone aggregation: read a CDS NetCDF, write per-month
@@ -98,7 +114,13 @@ if TYPE_CHECKING:
 
     from earthlens.ecmwf import Variable
 
-__all__ = ["AggregationConfig", "OperationLiteral", "aggregate_netcdf"]
+__all__ = [
+    "AggregationConfig",
+    "OperationLiteral",
+    "aggregate_netcdf",
+    "reduce_time_axis",
+    "window_groups",
+]
 
 
 _TIME_VAR_CANDIDATES: tuple[str, ...] = ("valid_time", "time")
@@ -222,7 +244,7 @@ def _resolve_pressure_level(
     return nc.sel(**{level_dim: level})
 
 
-def _window_groups(
+def window_groups(
     time_axis: pd.DatetimeIndex,
     freq: str,
 ) -> Iterator[tuple[pd.Timestamp, np.ndarray]]:
@@ -254,9 +276,9 @@ def _window_groups(
 
             ```python
             >>> import pandas as pd
-            >>> from earthlens.aggregate import _window_groups
+            >>> from earthlens.aggregate import window_groups
             >>> idx = pd.date_range("2022-01-01", periods=4, freq="6h")
-            >>> windows = list(_window_groups(idx, "1D"))
+            >>> windows = list(window_groups(idx, "1D"))
             >>> len(windows)
             1
             >>> label, mask = windows[0]
@@ -270,9 +292,9 @@ def _window_groups(
 
             ```python
             >>> import pandas as pd
-            >>> from earthlens.aggregate import _window_groups
+            >>> from earthlens.aggregate import window_groups
             >>> idx = pd.date_range("2022-01-01", periods=8, freq="6h")
-            >>> [label.strftime("%Y-%m-%d") for label, _ in _window_groups(idx, "1D")]
+            >>> [label.strftime("%Y-%m-%d") for label, _ in window_groups(idx, "1D")]
             ['2022-01-01', '2022-01-02']
 
             ```
@@ -306,7 +328,7 @@ _REDUCERS_STRICT: dict[str, Callable[..., Any]] = {
 }
 
 
-def _reduce(
+def reduce_time_axis(
     arr: np.ndarray,
     op: str,
     skipna: bool,
@@ -348,9 +370,9 @@ def _reduce(
 
             ```python
             >>> import numpy as np
-            >>> from earthlens.aggregate import _reduce
+            >>> from earthlens.aggregate import reduce_time_axis
             >>> arr = np.array([[[1.0, 2.0]], [[3.0, np.nan]], [[5.0, 6.0]]])
-            >>> _reduce(arr, op="mean", skipna=True, min_count=None).tolist()
+            >>> reduce_time_axis(arr, op="mean", skipna=True, min_count=None).tolist()
             [[3.0, 4.0]]
 
             ```
@@ -358,9 +380,9 @@ def _reduce(
 
             ```python
             >>> import numpy as np
-            >>> from earthlens.aggregate import _reduce
+            >>> from earthlens.aggregate import reduce_time_axis
             >>> arr = np.array([[[1.0, np.nan]], [[3.0, 4.0]]])
-            >>> result = _reduce(arr, op="mean", skipna=False, min_count=None)
+            >>> result = reduce_time_axis(arr, op="mean", skipna=False, min_count=None)
             >>> bool(np.isnan(result[0, 1])), float(result[0, 0])
             (True, 2.0)
 
@@ -369,9 +391,9 @@ def _reduce(
 
             ```python
             >>> import numpy as np
-            >>> from earthlens.aggregate import _reduce
+            >>> from earthlens.aggregate import reduce_time_axis
             >>> arr = np.array([[[1.0, np.nan]], [[2.0, np.nan]]])
-            >>> result = _reduce(arr, op="mean", skipna=True, min_count=2)
+            >>> result = reduce_time_axis(arr, op="mean", skipna=True, min_count=2)
             >>> float(result[0, 0]), bool(np.isnan(result[0, 1]))
             (1.5, True)
 
@@ -381,7 +403,7 @@ def _reduce(
     if op not in table:
         raise KeyError(
             f"unknown reduction op {op!r}; expected one of "
-            f"{sorted(table)!r} (resolve 'auto' before calling _reduce)"
+            f"{sorted(table)!r} (resolve 'auto' before calling reduce_time_axis)"
         )
     reducer = table[op]
     result = reducer(arr, axis=0)
@@ -409,7 +431,7 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
     `examples/post_process_ecmwf_netcdf.py:226` (pre-rewrite) used.
     The two are equivalent only when every slot inside a window has
     a sample; for partial windows, true `sum` is correct and
-    `mean × N` overcounts. `_reduce(..., op="sum", ...)` gives the
+    `mean × N` overcounts. `reduce_time_axis(..., op="sum", ...)` gives the
     correct per-window total in both cases.
 
     Args:
@@ -419,7 +441,7 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
 
     Returns:
         str: The concrete operator name (`"mean"`, `"sum"`, `"min"`,
-        `"max"`, or `"std"`) ready for :func:`_reduce`.
+        `"max"`, or `"std"`) ready for :func:`reduce_time_axis`.
 
     Examples:
         - State variable with `is_flux=False` resolves to `"mean"`:
@@ -618,9 +640,9 @@ def aggregate_netcdf(
     arr = var.read_array()
 
     results: list[tuple[pd.Timestamp, np.ndarray, Path | None]] = []
-    for window_label, mask in _window_groups(time_axis, config.freq):
+    for window_label, mask in window_groups(time_axis, config.freq):
         slice_ = arr[mask, :, :]
-        reduced = _reduce(
+        reduced = reduce_time_axis(
             slice_, op=op, skipna=config.skipna, min_count=config.min_count
         )
 
