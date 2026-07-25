@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from typing import Any
 
 import pytest
@@ -541,6 +542,51 @@ class TestThrottle:
         client.get("http://x")
         client.get("http://x")
         assert waits == []
+
+    def test_throttle_serialises_concurrent_callers(self):
+        """Threads sharing a client take the throttle one at a time.
+
+        Without the lock every thread reads the same `_last_request`, decides
+        the interval has elapsed, and they all fire at once — the burst the
+        rate limit exists to prevent.
+        """
+        import threading
+
+        overlaps: list[int] = []
+        inside = 0
+        guard = threading.Lock()
+
+        def slow_sleep(seconds: float) -> None:
+            nonlocal inside
+            with guard:
+                inside += 1
+                overlaps.append(inside)
+            time.sleep(0.01)
+            with guard:
+                inside -= 1
+
+        client = HttpClient(
+            session=_RecordingSession([]),
+            sleep=slow_sleep,
+            clock=lambda: 0.0,
+            min_interval=1.0,
+        )
+        client._last_request = 0.0
+        threads = [threading.Thread(target=client._throttle) for _ in range(8)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        assert max(overlaps) == 1, f"throttle ran concurrently: {overlaps}"
+        assert len(overlaps) == 8, f"every caller should throttle: {overlaps}"
+
+    def test_zero_interval_takes_no_lock(self):
+        """The default (no throttle) short-circuits before touching the lock."""
+        waits: list[float] = []
+        client = HttpClient(session=_RecordingSession([]), sleep=waits.append)
+        client._throttle_lock = None
+        client._throttle()
+        assert waits == [], "min_interval=0 must not sleep"
 
 
 @pytest.mark.unit

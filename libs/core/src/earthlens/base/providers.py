@@ -33,6 +33,12 @@ class Provider(BaseModel):
         parent: Slug of the parent provider, or `None` for top-level
             organisations. Used to group e.g. all NASA DAACs under
             the `"nasa"` umbrella.
+        min_interval: Minimum seconds between consecutive requests to this
+            provider, honoured by `HttpClient` when a backend passes it
+            through. `0.0` (the default) means no client-side throttle.
+            Set it **only** from a rate limit the provider actually
+            publishes — an invented figure is either uselessly slow or
+            still over the real limit.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -40,6 +46,7 @@ class Provider(BaseModel):
     slug: str
     display_name: str
     parent: str | None = None
+    min_interval: float = 0.0
 
 
 _PROVIDERS_CACHE: dict[tuple[str, int], dict[str, Provider]] = CatalogParseCache()

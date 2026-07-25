@@ -25,6 +25,7 @@ module adds none. The public import is
 from __future__ import annotations
 
 import datetime as dt
+import threading
 import time
 from collections.abc import Callable
 from email.utils import parsedate_to_datetime
@@ -396,6 +397,7 @@ class HttpClient:
         self._clock = clock
         self._sleep = sleep
         self._last_request: float | None = None
+        self._throttle_lock = threading.Lock()
         self._default_headers: dict[str, str] = {
             "User-Agent": self._user_agent,
             "Accept-Encoding": "gzip, deflate",
@@ -699,14 +701,24 @@ class HttpClient:
         A no-op when `min_interval` is `0`. Uses the injected monotonic
         `clock`, records the send time, and sleeps via the injected
         `sleep` so tests drive the rate limit deterministically.
+
+        Held under a lock for the whole read-sleep-write sequence. Several
+        backends fan their requests out across threads (`_run_items` with
+        `n_jobs > 1`) sharing one client; without the lock every thread
+        reads the same `_last_request`, computes the same "already
+        elapsed" answer, and they all fire at once — which is precisely
+        the burst the rate limit exists to prevent. Serialising here means
+        `min_interval` bounds the *aggregate* request rate, not the rate
+        per thread.
         """
         if self.min_interval <= 0:
             return
-        if self._last_request is not None:
-            remaining = self.min_interval - (self._clock() - self._last_request)
-            if remaining > 0:
-                self._sleep(remaining)
-        self._last_request = self._clock()
+        with self._throttle_lock:
+            if self._last_request is not None:
+                remaining = self.min_interval - (self._clock() - self._last_request)
+                if remaining > 0:
+                    self._sleep(remaining)
+            self._last_request = self._clock()
 
     def _backoff_wait(self, retry_after: float | None, attempt: int) -> float:
         """Compute one retry wait: `Retry-After` else exponential back-off.
