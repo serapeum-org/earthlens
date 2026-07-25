@@ -30,7 +30,11 @@ def _backend_classes():
 
 
 _CASES = list(_backend_classes())
-_IDS = [key for key, _ in _CASES]
+#: Test ids use the backend class name, not the registry key: `entries()` yields
+#: several aliases per module and the surviving key is whichever comes last, so
+#: ids like `gdo` (drought) or `etopo` (bathymetry) would name the alias rather
+#: than the backend a reader is looking for.
+_IDS = [backend.__name__ for _key, backend in _CASES]
 
 #: The backends that clip to the exact polygon, pinned by class name. Adding a
 #: `crop_to_aoi` / `mask_to_geometry` call to a backend means adding it here.

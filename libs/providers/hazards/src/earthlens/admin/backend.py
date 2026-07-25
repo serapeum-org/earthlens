@@ -113,7 +113,8 @@ class AdminBoundaries(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "vector"
 
-    #: administrative boundaries are a snapshot with no time axis, so a missing `start` / `end` is legal here.
+    #: Administrative boundaries are a snapshot with no time axis, so a missing `start`
+    #: / `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(

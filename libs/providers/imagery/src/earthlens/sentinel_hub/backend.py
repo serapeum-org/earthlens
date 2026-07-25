@@ -245,9 +245,9 @@ class SentinelHub(AbstractDataSource):
         return self._cadence_extent(
             start,
             end,
-            fmt,
-            temporal_resolution,
-            CADENCE_ALIASES,
+            fmt=fmt,
+            cadence=temporal_resolution,
+            accepted=CADENCE_ALIASES,
         )
 
     def _bbox(self) -> Any:
@@ -692,7 +692,7 @@ class SentinelHub(AbstractDataSource):
         out: list[Path] = []
         for product in products:
             resolved: ResolvedRequest = product.metadata["resolved"]
-            tile_dir = Path(self.root_dir) / f"_tiles_{_safe_name(product.id)}"
+            tile_dir = Path(self.root_dir) / f"_tiles_{safe_filename(product.id)}"
             tile_dir.mkdir(parents=True, exist_ok=True)
             tile_paths: list[str] = []
             for index, (sh_bbox, tile_size) in enumerate(tile_specs):
@@ -704,7 +704,7 @@ class SentinelHub(AbstractDataSource):
                     str(tile_dir / str(index)),
                 )
                 tile_paths.append(str(rendered))
-            merged = Path(self.root_dir) / f"{_safe_name(product.id)}.tif"
+            merged = Path(self.root_dir) / f"{safe_filename(product.id)}.tif"
             merge_rasters(tile_paths, str(merged))
             shutil.rmtree(tile_dir, ignore_errors=True)
             out.append(merged)
@@ -906,7 +906,7 @@ class SentinelHub(AbstractDataSource):
                     f"{product.id!r} over the request geometry + window "
                     "(empty table written)."
                 )
-            target = Path(self.root_dir) / f"{_safe_name(product.id)}.csv"
+            target = Path(self.root_dir) / f"{safe_filename(product.id)}.csv"
             _stats_frame(rows).to_csv(target, index=False)
             out.append(target)
         logger.info(f"Sentinel Hub statistical: wrote {len(out)} table(s)")
@@ -992,7 +992,7 @@ class SentinelHub(AbstractDataSource):
             ids = feature_ids if feature_ids is not None else range(len(payloads))
             for feature_id, payload in zip(ids, payloads):
                 rows.extend(_flatten_statistics(payload, feature_id=feature_id))
-            target = Path(self.root_dir) / f"{_safe_name(product.id)}.csv"
+            target = Path(self.root_dir) / f"{safe_filename(product.id)}.csv"
             _stats_frame(rows).to_csv(target, index=False)
             out.append(target)
         logger.info(f"Sentinel Hub batch-statistical: wrote {len(out)} table(s)")
@@ -1096,7 +1096,8 @@ class SentinelHub(AbstractDataSource):
             return item
         suffix = source.suffix or ".tif"
         target = (
-            Path(self.root_dir) / f"{_safe_name(key)}_{aggregate.freq}_{stamp}{suffix}"
+            Path(self.root_dir)
+            / f"{safe_filename(key)}_{aggregate.freq}_{stamp}{suffix}"
         )
         source.replace(target)
         return target
@@ -1295,27 +1296,6 @@ def _flatten_statistics(payload: dict, feature_id: Any) -> list[dict]:
                     row[f"p{percentile}"] = value
                 rows.append(row)
     return rows
-
-
-def _safe_name(key: str) -> str:
-    """Flatten a request key to a filename-safe stem (no path separators).
-
-    Args:
-        key: A collection/recipe key.
-
-    Returns:
-        The key with `/` and `\\` replaced by `_`.
-
-    Examples:
-        - A plain key is unchanged:
-            ```python
-            >>> from earthlens.sentinel_hub.backend import _safe_name
-            >>> _safe_name("sentinel-2-l2a-ndvi")
-            'sentinel-2-l2a-ndvi'
-
-            ```
-    """
-    return safe_filename(key)
 
 
 def _async_request_id(submission: Any) -> str | None:

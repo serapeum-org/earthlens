@@ -201,7 +201,7 @@ class WDPA(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='all')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _fetch(self):  # type: ignore[override]
         """Fetch every selector's protected areas as one GeoDataFrame.

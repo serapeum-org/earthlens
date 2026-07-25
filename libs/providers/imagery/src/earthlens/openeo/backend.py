@@ -224,9 +224,9 @@ class OpenEO(AbstractDataSource):
         return self._cadence_extent(
             start,
             end,
-            fmt,
-            temporal_resolution,
-            CADENCE_ALIASES,
+            fmt=fmt,
+            cadence=temporal_resolution,
+            accepted=CADENCE_ALIASES,
         )
 
     def _search(self) -> list[RemoteProduct]:
@@ -334,7 +334,7 @@ class OpenEO(AbstractDataSource):
             cube = self._build_cube(conn, product.id, resolved)
             out_format = resolved.output_format or self._output_format
             suffix = OUTPUT_FORMATS[out_format]
-            target = Path(self.root_dir) / f"{_safe_name(product.id)}.{suffix}"
+            target = Path(self.root_dir) / f"{safe_filename(product.id)}.{suffix}"
             if self._execute == "batch":
                 job = cube.create_job(out_format=out_format)
                 job.start_and_wait().get_results().download_file(str(target))
@@ -447,24 +447,3 @@ def _exclusive_end(end_date: Any) -> str:
     import datetime as dt
 
     return cast("str", (end_date + dt.timedelta(days=1)).strftime("%Y-%m-%d"))
-
-
-def _safe_name(key: str) -> str:
-    """Flatten a request key to a filename-safe stem (no path separators).
-
-    Args:
-        key: A collection/recipe key.
-
-    Returns:
-        The key with `/` and `\\` replaced by `_`.
-
-    Examples:
-        - A plain key is unchanged:
-            ```python
-            >>> from earthlens.openeo.backend import _safe_name
-            >>> _safe_name("sentinel-2-l2a-ndvi-monthly")
-            'sentinel-2-l2a-ndvi-monthly'
-
-            ```
-    """
-    return safe_filename(key)

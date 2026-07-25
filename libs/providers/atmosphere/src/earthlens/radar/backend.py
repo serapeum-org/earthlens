@@ -193,7 +193,7 @@ class Radar(AbstractDataSource):
         Raises:
             ValueError: If `start` parses later than `end`.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='raw')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="raw")
 
     def _window(self) -> tuple[dt.datetime, dt.datetime]:
         """Return the inclusive scan-time window, extending `end` to its day end."""

@@ -292,9 +292,9 @@ class EUMETSAT(AbstractDataSource):
         return self._cadence_extent(
             start,
             end,
-            fmt,
-            temporal_resolution,
-            CADENCE_ALIASES,
+            fmt=fmt,
+            cadence=temporal_resolution,
+            accepted=CADENCE_ALIASES,
         )
 
     def _search(self) -> list[RemoteProduct]:

@@ -162,7 +162,8 @@ class OSM(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "vector"
 
-    #: an Overpass current-state query has no window; ohsome supplies its own, so a missing `start` / `end` is legal here.
+    #: An Overpass current-state query has no window; ohsome supplies its own, so a
+    #: missing `start` / `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(

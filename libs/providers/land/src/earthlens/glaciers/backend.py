@@ -84,7 +84,8 @@ class Glaciers(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "vector"
 
-    #: the outline / fluctuation records span their whole archive, so a missing `start` / `end` is legal here.
+    #: The outline / fluctuation records span their whole archive, so a missing `start`
+    #: / `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(

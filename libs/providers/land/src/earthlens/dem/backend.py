@@ -82,7 +82,7 @@ class DEM(AbstractDataSource):
 
     OUTPUT_KIND = "raster"
 
-    #: elevation is time-invariant, so a missing `start` / `end` is legal here.
+    #: Elevation is time-invariant, so a missing `start` / `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(

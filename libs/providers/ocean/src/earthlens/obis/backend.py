@@ -193,7 +193,7 @@ class OBIS(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='all')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _plan_search(self, name: str | None = None) -> dict[str, Any]:
         """Build the `occurrences.search` keyword arguments for one species.

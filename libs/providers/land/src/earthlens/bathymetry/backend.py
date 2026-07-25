@@ -94,7 +94,8 @@ class Bathymetry(AbstractDataSource):
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
-    #: the bathymetry grids are time-invariant, so a missing `start` / `end` is legal here.
+    #: The bathymetry grids are time-invariant, so a missing `start` / `end` is legal
+    #: here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(
@@ -212,7 +213,7 @@ class Bathymetry(AbstractDataSource):
             TemporalExtent: A frozen model with `None` bounds and an empty
                 date index (a static DEM has no time axis).
         """
-        return self._static_extent(resolution=temporal_resolution or 'static')
+        return self._static_extent(resolution=temporal_resolution or "static")
 
     def _search(self) -> list[RemoteProduct]:
         """Name the single resolved product (one DEM per request).

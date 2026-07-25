@@ -224,7 +224,7 @@ class PVGIS(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='hourly')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="hourly")
 
     def _resolved_params(self) -> dict[str, Any]:
         """Build the per-request query params (catalog defaults + knobs).

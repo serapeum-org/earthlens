@@ -334,7 +334,7 @@ class NWM(AbstractDataSource):
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='raw')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="raw")
 
     def _resolve_mode(self) -> str:
         """Resolve operational vs retrospective for this request.

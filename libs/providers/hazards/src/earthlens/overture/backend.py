@@ -105,7 +105,8 @@ class Overture(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "vector"
 
-    #: each Overture release is a snapshot with no time axis, so a missing `start` / `end` is legal here.
+    #: Each Overture release is a snapshot with no time axis, so a missing `start` /
+    #: `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(

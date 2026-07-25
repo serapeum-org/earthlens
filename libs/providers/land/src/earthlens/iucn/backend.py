@@ -195,7 +195,7 @@ class IUCN(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='all')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _fetch(self) -> pd.DataFrame:  # type: ignore[override]
         """Fetch every selector's assessments into one DataFrame.

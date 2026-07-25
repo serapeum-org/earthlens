@@ -206,7 +206,7 @@ class GDACS(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='all')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _search(self) -> list[RemoteProduct]:
         """One :class:`RemoteProduct` carrying the whole combined query.

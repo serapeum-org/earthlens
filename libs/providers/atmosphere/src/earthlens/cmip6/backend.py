@@ -184,7 +184,7 @@ class CMIP6(AbstractDataSource):
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='raw')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="raw")
 
     def _wants_spatial_subset(self) -> bool:
         """Return whether the request narrows the grid (a bbox crop).

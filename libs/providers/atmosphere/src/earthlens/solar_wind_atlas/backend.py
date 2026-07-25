@@ -82,7 +82,8 @@ class SolarWindAtlas(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
-    #: the resource-atlas layers are long-term climatologies, so a missing `start` / `end` is legal here.
+    #: The resource-atlas layers are long-term climatologies, so a missing `start` /
+    #: `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(
@@ -174,7 +175,7 @@ class SolarWindAtlas(AbstractDataSource):
             TemporalExtent: A frozen model with `None` bounds and an empty date
                 index (a static climatology layer has no time axis).
         """
-        return self._static_extent(resolution=temporal_resolution or 'static')
+        return self._static_extent(resolution=temporal_resolution or "static")
 
     @property
     def cache_dir(self) -> Path:

@@ -82,7 +82,8 @@ class RiskIndicators(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "tabular"
 
-    #: the indicator tables are a snapshot with no time axis, so a missing `start` / `end` is legal here.
+    #: The indicator tables are a snapshot with no time axis, so a missing `start` /
+    #: `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(

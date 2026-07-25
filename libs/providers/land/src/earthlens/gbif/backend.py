@@ -204,7 +204,7 @@ class GBIF(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='all')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _plan_search(self) -> dict[str, Any]:
         """Build the `occ.search` keyword arguments for the request.

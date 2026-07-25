@@ -269,9 +269,11 @@ class NREL(AbstractDataSource):
             pydantic.ValidationError: If `start` parses to a date later than
                 `end` — `TemporalExtent` rejects inverted bounds (note this is
                 not a `ValueError` subclass).
-            ValueError: If `start` / `end` do not match `fmt` (from `strptime`).
+            ValueError: If `start` / `end` cannot be parsed at all. `fmt` is
+                only tried first — a non-matching but ISO-8601-parseable
+                string still succeeds.
         """
-        return self._whole_window_extent(start, end, fmt, resolution='hourly')
+        return self._whole_window_extent(start, end, fmt=fmt, resolution="hourly")
 
     def _names(self) -> list[Any]:
         """Enumerate the `names=` values (years, or the literal `tmy`).
