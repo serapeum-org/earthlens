@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23081,28 +23081,7 @@ facade forwards <code>aggregate=</code> (translated to a server-side
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
 <span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span>
-<span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span>
-<span class="normal"><a href="#__codelineno-0-384">384</a></span>
-<span class="normal"><a href="#__codelineno-0-385">385</a></span>
-<span class="normal"><a href="#__codelineno-0-386">386</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenEO</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenEO</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Server-side openEO backend (Planetary-agnostic; defaults to CDSE).</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    Attributes:</span>
@@ -23251,195 +23230,174 @@ facade forwards <code>aggregate=</code> (translated to a server-side
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">OpeneoAuth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span><span class="p">)</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>        <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the WGS84 envelope passed straight to openEO `spatial_extent`.</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            lat_lim: `[lat_min, lat_max]` in degrees.</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            lon_lim: `[lon_min, lon_max]` in degrees.</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            SpatialExtent: The request&#39;s bounding box.</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>        <span class="k">return</span> <span class="n">SpatialExtent</span><span class="o">.</span><span class="n">from_pairs</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">)</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date window into a :class:`TemporalExtent`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            start: Inclusive start date string (parsed with `fmt`).</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            end: Inclusive end date string.</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            temporal_resolution: Advisory cadence label (`&quot;daily&quot;`, `&quot;monthly&quot;`,</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">                `&quot;hourly&quot;`, `&quot;yearly&quot;`) — maps to the pandas frequency stored on</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                the returned extent; the openEO window itself is `start`/`end`.</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            TemporalExtent: The parsed window (with an inclusive `end_date`; the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">            backend converts it to openEO&#39;s exclusive bound at graph-build time).</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            ValueError: When `start` or `end` is `None` — openEO needs an</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">                explicit `temporal_extent`, so a missing bound is rejected with</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">                an actionable message rather than a bare `TypeError` from</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">                `strptime`.</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            start: Inclusive start date string (parsed with `fmt`).</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            end: Inclusive end date string.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            temporal_resolution: Advisory cadence label (`&quot;daily&quot;`, `&quot;monthly&quot;`,</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">                `&quot;hourly&quot;`, `&quot;yearly&quot;`) — maps to the pandas frequency stored on</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">                the returned extent; the openEO window itself is `start`/`end`.</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            fmt: `strptime` format tried first for a string `start` /</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">                `end`; a non-matching string falls back to an ISO-8601</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">                parse, and a `datetime` / `date` ignores it.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            TemporalExtent: The parsed window (with an inclusive `end_date`; the</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            backend converts it to openEO&#39;s exclusive bound at graph-build time).</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            ValueError: When `temporal_resolution` is not one of the accepted</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">                cadences. A missing `start` / `end` is rejected earlier, by</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                `AbstractDataSource._check_time_window` — openEO needs an</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                explicit `temporal_extent`, so it keeps the inherited</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">                `REQUIRES_TIME_WINDOW = True`.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cadence_extent</span><span class="p">(</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>            <span class="n">start</span><span class="p">,</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>            <span class="n">end</span><span class="p">,</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>            <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>            <span class="n">cadence</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>            <span class="n">accepted</span><span class="o">=</span><span class="n">CADENCE_ALIASES</span><span class="p">,</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="p">)</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List the planned graphs without executing anything (cheap dry-run).</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>                <span class="s2">&quot;openEO requires both start and end dates (the process graph &quot;</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>                <span class="s2">&quot;needs a temporal_extent); pass start=… and end=….&quot;</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>            <span class="p">)</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="n">freq_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;daily&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;hourly&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;yearly&quot;</span><span class="p">:</span> <span class="s2">&quot;YS&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">freq_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">date_windows</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">resolution</span><span class="p">)</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span> <span class="n">dates</span><span class="o">=</span><span class="n">dates</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="p">)</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical search/fetch shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List the planned graphs without executing anything (cheap dry-run).</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Returns one :class:`RemoteProduct` per requested key; the resolved</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        collection/recipe row rides on `metadata[&quot;resolved&quot;]`. No network call —</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        inspecting the result is a &quot;what would I build?&quot; preview.</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        Returns one :class:`RemoteProduct` per requested key; the resolved</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        collection/recipe row rides on `metadata[&quot;resolved&quot;]`. No network call —</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        inspecting the result is a &quot;what would I build?&quot; preview.</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            One product per requested collection/recipe key.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>            <span class="n">RemoteProduct</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resolved&quot;</span><span class="p">:</span> <span class="n">resolved</span><span class="p">})</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">resolved</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="p">]</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_request_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Pick the bands to load: the request&#39;s override, else the row default.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            key: The requested collection/recipe key.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            resolved: The resolved row for `key`.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            The bands to pass to `load_collection` (may be empty → all bands).</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="n">requested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">requested</span><span class="p">)</span> <span class="k">if</span> <span class="n">requested</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">resolved</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            One product per requested collection/recipe key.</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="n">RemoteProduct</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resolved&quot;</span><span class="p">:</span> <span class="n">resolved</span><span class="p">})</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">resolved</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="p">]</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_request_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Pick the bands to load: the request&#39;s override, else the row default.</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            key: The requested collection/recipe key.</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            resolved: The resolved row for `key`.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the openEO `DataCube` for one requested key.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Loads the collection over the request&#39;s bbox + window + bands, applies</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        the recipe&#39;s graph steps (if any), and appends a server-side</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        `aggregate_temporal_period` node when `aggregate=` was supplied.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            conn: The authenticated openEO connection.</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            key: The requested collection/recipe key.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            resolved: The resolved row for `key`.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            The fully-built `DataCube` ready to download / submit.</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            The bands to pass to `load_collection` (may be empty → all bands).</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="n">requested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">requested</span><span class="p">)</span> <span class="k">if</span> <span class="n">requested</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">resolved</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the openEO `DataCube` for one requested key.</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Loads the collection over the request&#39;s bbox + window + bands, applies</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        the recipe&#39;s graph steps (if any), and appends a server-side</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `aggregate_temporal_period` node when `aggregate=` was supplied.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            conn: The authenticated openEO connection.</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            key: The requested collection/recipe key.</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            resolved: The resolved row for `key`.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            The fully-built `DataCube` ready to download / submit.</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            ValueError: When `max_cloud_cover` was supplied but the collection</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                does not expose `eo:cloud_cover` (non-optical collections), so</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                the filter would be silently ignored or rejected server-side.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_bands</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="n">load_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_cloud_cover</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">resolved</span><span class="o">.</span><span class="n">supports_cloud_cover</span><span class="p">:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                    <span class="sa">f</span><span class="s2">&quot;max_cloud_cover is only supported for optical collections &quot;</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                    <span class="sa">f</span><span class="s2">&quot;that expose eo:cloud_cover (Sentinel-2); </span><span class="si">{</span><span class="n">resolved</span><span class="o">.</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">resolved</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s2">) does not. Drop max_cloud_cover &quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="s2">&quot;for this request.&quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                <span class="p">)</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="n">load_kwargs</span><span class="p">[</span><span class="s2">&quot;max_cloud_cover&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_cloud_cover</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">load_collection</span><span class="p">(</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">resolved</span><span class="o">.</span><span class="n">collection_id</span><span class="p">,</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="n">spatial_extent</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>                <span class="s2">&quot;west&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>                <span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>                <span class="s2">&quot;east&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>                <span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="p">},</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="n">temporal_extent</span><span class="o">=</span><span class="p">[</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="n">_exclusive_end</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="p">),</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="p">],</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="n">bands</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">),</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="o">**</span><span class="n">load_kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="p">)</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">graph</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">_apply_step</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">aggregate_temporal_period</span><span class="p">(</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>                <span class="n">period</span><span class="o">=</span><span class="n">period_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="o">.</span><span class="n">freq</span><span class="p">),</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>                <span class="n">reducer</span><span class="o">=</span><span class="n">reducer_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="o">.</span><span class="n">op</span><span class="p">),</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="p">)</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">return</span> <span class="n">cube</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build, execute, and download one output file per product.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        For each product: build its `DataCube`, then either download it</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        synchronously (`execute=&quot;sync&quot;`, size-capped) or run a polled batch job</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        (`execute=&quot;batch&quot;`). The output format is the recipe&#39;s `output_format`</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        when set, else the backend&#39;s `output_format`.</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            The written file paths, one per product (request key order).</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># set in _initialize before any download</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;resolved&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_cube</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="n">out_format</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">output_format</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="n">suffix</span> <span class="o">=</span> <span class="n">OUTPUT_FORMATS</span><span class="p">[</span><span class="n">out_format</span><span class="p">]</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span> <span class="o">==</span> <span class="s2">&quot;batch&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                <span class="n">job</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">create_job</span><span class="p">(</span><span class="n">out_format</span><span class="o">=</span><span class="n">out_format</span><span class="p">)</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>                <span class="n">job</span><span class="o">.</span><span class="n">start_and_wait</span><span class="p">()</span><span class="o">.</span><span class="n">get_results</span><span class="p">()</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="n">cube</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="n">out_format</span><span class="p">)</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">return</span> <span class="n">out</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the process graph(s), execute server-side, and download outputs.</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            progress_bar: Reserved for parity with the other backends.</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            aggregate: Optional aggregation request. Accepted (not rejected)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                because `OUTPUT_KIND` is `&quot;raster&quot;`; translated into a</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">                server-side `aggregate_temporal_period` node in each graph.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            The downloaded file paths, one per requested key.</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;openEO download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">return</span> <span class="n">paths</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            ValueError: When `max_cloud_cover` was supplied but the collection</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                does not expose `eo:cloud_cover` (non-optical collections), so</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">                the filter would be silently ignored or rejected server-side.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="n">bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_bands</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="n">load_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_cloud_cover</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">resolved</span><span class="o">.</span><span class="n">supports_cloud_cover</span><span class="p">:</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>                    <span class="sa">f</span><span class="s2">&quot;max_cloud_cover is only supported for optical collections &quot;</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                    <span class="sa">f</span><span class="s2">&quot;that expose eo:cloud_cover (Sentinel-2); </span><span class="si">{</span><span class="n">resolved</span><span class="o">.</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">resolved</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s2">) does not. Drop max_cloud_cover &quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>                    <span class="s2">&quot;for this request.&quot;</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                <span class="p">)</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">load_kwargs</span><span class="p">[</span><span class="s2">&quot;max_cloud_cover&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_cloud_cover</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">load_collection</span><span class="p">(</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="n">resolved</span><span class="o">.</span><span class="n">collection_id</span><span class="p">,</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="n">spatial_extent</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                <span class="s2">&quot;west&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                <span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                <span class="s2">&quot;east&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>                <span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="p">},</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="n">temporal_extent</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="n">_exclusive_end</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="p">),</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="p">],</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="n">bands</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">),</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="o">**</span><span class="n">load_kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="p">)</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">graph</span><span class="p">:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">_apply_step</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">aggregate_temporal_period</span><span class="p">(</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                <span class="n">period</span><span class="o">=</span><span class="n">period_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="o">.</span><span class="n">freq</span><span class="p">),</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                <span class="n">reducer</span><span class="o">=</span><span class="n">reducer_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="o">.</span><span class="n">op</span><span class="p">),</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="p">)</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">cube</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build, execute, and download one output file per product.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        For each product: build its `DataCube`, then either download it</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        synchronously (`execute=&quot;sync&quot;`, size-capped) or run a polled batch job</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        (`execute=&quot;batch&quot;`). The output format is the recipe&#39;s `output_format`</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        when set, else the backend&#39;s `output_format`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            The written file paths, one per product (request key order).</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># set in _initialize before any download</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;resolved&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_cube</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="n">out_format</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">output_format</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="n">suffix</span> <span class="o">=</span> <span class="n">OUTPUT_FORMATS</span><span class="p">[</span><span class="n">out_format</span><span class="p">]</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">safe_filename</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span> <span class="o">==</span> <span class="s2">&quot;batch&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="n">job</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">create_job</span><span class="p">(</span><span class="n">out_format</span><span class="o">=</span><span class="n">out_format</span><span class="p">)</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="n">job</span><span class="o">.</span><span class="n">start_and_wait</span><span class="p">()</span><span class="o">.</span><span class="n">get_results</span><span class="p">()</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                <span class="n">cube</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="n">out_format</span><span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">return</span> <span class="n">out</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the process graph(s), execute server-side, and download outputs.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            progress_bar: Reserved for parity with the other backends.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            aggregate: Optional aggregation request. Accepted (not rejected)</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                because `OUTPUT_KIND` is `&quot;raster&quot;`; translated into a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                server-side `aggregate_temporal_period` node in each graph.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            The downloaded file paths, one per requested key.</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;openEO download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24091,45 +24049,45 @@ server-side <code>aggregate_temporal_period</code> node in each graph.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/openeo/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span>
-<span class="normal"><a href="#__codelineno-0-384">384</a></span>
-<span class="normal"><a href="#__codelineno-0-385">385</a></span>
-<span class="normal"><a href="#__codelineno-0-386">386</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the process graph(s), execute server-side, and download outputs.</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        progress_bar: Reserved for parity with the other backends.</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        aggregate: Optional aggregation request. Accepted (not rejected)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            because `OUTPUT_KIND` is `&quot;raster&quot;`; translated into a</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            server-side `aggregate_temporal_period` node in each graph.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        The downloaded file paths, one per requested key.</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;openEO download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="k">return</span> <span class="n">paths</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-346">346</a></span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span>
+<span class="normal"><a href="#__codelineno-0-348">348</a></span>
+<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span>
+<span class="normal"><a href="#__codelineno-0-353">353</a></span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
+<span class="normal"><a href="#__codelineno-0-357">357</a></span>
+<span class="normal"><a href="#__codelineno-0-358">358</a></span>
+<span class="normal"><a href="#__codelineno-0-359">359</a></span>
+<span class="normal"><a href="#__codelineno-0-360">360</a></span>
+<span class="normal"><a href="#__codelineno-0-361">361</a></span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the process graph(s), execute server-side, and download outputs.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        progress_bar: Reserved for parity with the other backends.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        aggregate: Optional aggregation request. Accepted (not rejected)</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            because `OUTPUT_KIND` is `&quot;raster&quot;`; translated into a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            server-side `aggregate_temporal_period` node in each graph.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        The downloaded file paths, one per requested key.</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;openEO download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26152,28 +26110,7 @@ facade forwards <code>aggregate=</code> (translated to a server-side
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
 <span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span>
-<span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span>
-<span class="normal"><a href="#__codelineno-0-384">384</a></span>
-<span class="normal"><a href="#__codelineno-0-385">385</a></span>
-<span class="normal"><a href="#__codelineno-0-386">386</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenEO</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenEO</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Server-side openEO backend (Planetary-agnostic; defaults to CDSE).</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    Attributes:</span>
@@ -26322,195 +26259,174 @@ facade forwards <code>aggregate=</code> (translated to a server-side
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">OpeneoAuth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_credentials</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span><span class="p">)</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>        <span class="k">return</span> <span class="kc">None</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the WGS84 envelope passed straight to openEO `spatial_extent`.</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            lat_lim: `[lat_min, lat_max]` in degrees.</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            lon_lim: `[lon_min, lon_max]` in degrees.</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            SpatialExtent: The request&#39;s bounding box.</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>        <span class="k">return</span> <span class="n">SpatialExtent</span><span class="o">.</span><span class="n">from_pairs</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">)</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date window into a :class:`TemporalExtent`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            start: Inclusive start date string (parsed with `fmt`).</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            end: Inclusive end date string.</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            temporal_resolution: Advisory cadence label (`&quot;daily&quot;`, `&quot;monthly&quot;`,</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">                `&quot;hourly&quot;`, `&quot;yearly&quot;`) — maps to the pandas frequency stored on</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                the returned extent; the openEO window itself is `start`/`end`.</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            TemporalExtent: The parsed window (with an inclusive `end_date`; the</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">            backend converts it to openEO&#39;s exclusive bound at graph-build time).</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            ValueError: When `start` or `end` is `None` — openEO needs an</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">                explicit `temporal_extent`, so a missing bound is rejected with</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">                an actionable message rather than a bare `TypeError` from</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">                `strptime`.</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            start: Inclusive start date string (parsed with `fmt`).</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            end: Inclusive end date string.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            temporal_resolution: Advisory cadence label (`&quot;daily&quot;`, `&quot;monthly&quot;`,</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">                `&quot;hourly&quot;`, `&quot;yearly&quot;`) — maps to the pandas frequency stored on</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">                the returned extent; the openEO window itself is `start`/`end`.</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            fmt: `strptime` format tried first for a string `start` /</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">                `end`; a non-matching string falls back to an ISO-8601</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">                parse, and a `datetime` / `date` ignores it.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            TemporalExtent: The parsed window (with an inclusive `end_date`; the</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            backend converts it to openEO&#39;s exclusive bound at graph-build time).</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            ValueError: When `temporal_resolution` is not one of the accepted</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">                cadences. A missing `start` / `end` is rejected earlier, by</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                `AbstractDataSource._check_time_window` — openEO needs an</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                explicit `temporal_extent`, so it keeps the inherited</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">                `REQUIRES_TIME_WINDOW = True`.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cadence_extent</span><span class="p">(</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>            <span class="n">start</span><span class="p">,</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>            <span class="n">end</span><span class="p">,</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>            <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>            <span class="n">cadence</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>            <span class="n">accepted</span><span class="o">=</span><span class="n">CADENCE_ALIASES</span><span class="p">,</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="p">)</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List the planned graphs without executing anything (cheap dry-run).</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>                <span class="s2">&quot;openEO requires both start and end dates (the process graph &quot;</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>                <span class="s2">&quot;needs a temporal_extent); pass start=… and end=….&quot;</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>            <span class="p">)</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="n">start_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="n">end_dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="n">freq_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;daily&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;hourly&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;yearly&quot;</span><span class="p">:</span> <span class="s2">&quot;YS&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">freq_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="n">date_windows</span><span class="p">(</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_dt</span><span class="p">,</span> <span class="n">resolution</span><span class="p">)</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="k">return</span> <span class="n">TemporalExtent</span><span class="p">(</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">start_dt</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span> <span class="n">dates</span><span class="o">=</span><span class="n">dates</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="p">)</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch` into the canonical search/fetch shape.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List the planned graphs without executing anything (cheap dry-run).</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Returns one :class:`RemoteProduct` per requested key; the resolved</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        collection/recipe row rides on `metadata[&quot;resolved&quot;]`. No network call —</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        inspecting the result is a &quot;what would I build?&quot; preview.</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        Returns one :class:`RemoteProduct` per requested key; the resolved</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        collection/recipe row rides on `metadata[&quot;resolved&quot;]`. No network call —</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        inspecting the result is a &quot;what would I build?&quot; preview.</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            One product per requested collection/recipe key.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>            <span class="n">RemoteProduct</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resolved&quot;</span><span class="p">:</span> <span class="n">resolved</span><span class="p">})</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">resolved</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>        <span class="p">]</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_request_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Pick the bands to load: the request&#39;s override, else the row default.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            key: The requested collection/recipe key.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            resolved: The resolved row for `key`.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            The bands to pass to `load_collection` (may be empty → all bands).</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="n">requested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">requested</span><span class="p">)</span> <span class="k">if</span> <span class="n">requested</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">resolved</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            One product per requested collection/recipe key.</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="n">RemoteProduct</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resolved&quot;</span><span class="p">:</span> <span class="n">resolved</span><span class="p">})</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">resolved</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="p">]</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_request_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Pick the bands to load: the request&#39;s override, else the row default.</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            key: The requested collection/recipe key.</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            resolved: The resolved row for `key`.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the openEO `DataCube` for one requested key.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Loads the collection over the request&#39;s bbox + window + bands, applies</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        the recipe&#39;s graph steps (if any), and appends a server-side</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        `aggregate_temporal_period` node when `aggregate=` was supplied.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            conn: The authenticated openEO connection.</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            key: The requested collection/recipe key.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            resolved: The resolved row for `key`.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            The fully-built `DataCube` ready to download / submit.</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            The bands to pass to `load_collection` (may be empty → all bands).</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="n">requested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">requested</span><span class="p">)</span> <span class="k">if</span> <span class="n">requested</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">resolved</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the openEO `DataCube` for one requested key.</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Loads the collection over the request&#39;s bbox + window + bands, applies</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        the recipe&#39;s graph steps (if any), and appends a server-side</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `aggregate_temporal_period` node when `aggregate=` was supplied.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            conn: The authenticated openEO connection.</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            key: The requested collection/recipe key.</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            resolved: The resolved row for `key`.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            The fully-built `DataCube` ready to download / submit.</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            ValueError: When `max_cloud_cover` was supplied but the collection</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                does not expose `eo:cloud_cover` (non-optical collections), so</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                the filter would be silently ignored or rejected server-side.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_bands</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="n">load_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_cloud_cover</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">resolved</span><span class="o">.</span><span class="n">supports_cloud_cover</span><span class="p">:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                    <span class="sa">f</span><span class="s2">&quot;max_cloud_cover is only supported for optical collections &quot;</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                    <span class="sa">f</span><span class="s2">&quot;that expose eo:cloud_cover (Sentinel-2); </span><span class="si">{</span><span class="n">resolved</span><span class="o">.</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">resolved</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s2">) does not. Drop max_cloud_cover &quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="s2">&quot;for this request.&quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                <span class="p">)</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="n">load_kwargs</span><span class="p">[</span><span class="s2">&quot;max_cloud_cover&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_cloud_cover</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">load_collection</span><span class="p">(</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">resolved</span><span class="o">.</span><span class="n">collection_id</span><span class="p">,</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="n">spatial_extent</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>                <span class="s2">&quot;west&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>                <span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>                <span class="s2">&quot;east&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>                <span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="p">},</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="n">temporal_extent</span><span class="o">=</span><span class="p">[</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="n">_exclusive_end</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="p">),</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="p">],</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="n">bands</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">),</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="o">**</span><span class="n">load_kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="p">)</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">graph</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">_apply_step</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">aggregate_temporal_period</span><span class="p">(</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>                <span class="n">period</span><span class="o">=</span><span class="n">period_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="o">.</span><span class="n">freq</span><span class="p">),</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>                <span class="n">reducer</span><span class="o">=</span><span class="n">reducer_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="o">.</span><span class="n">op</span><span class="p">),</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="p">)</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">return</span> <span class="n">cube</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build, execute, and download one output file per product.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        For each product: build its `DataCube`, then either download it</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        synchronously (`execute=&quot;sync&quot;`, size-capped) or run a polled batch job</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        (`execute=&quot;batch&quot;`). The output format is the recipe&#39;s `output_format`</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        when set, else the backend&#39;s `output_format`.</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            The written file paths, one per product (request key order).</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># set in _initialize before any download</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;resolved&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_cube</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="n">out_format</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">output_format</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="n">suffix</span> <span class="o">=</span> <span class="n">OUTPUT_FORMATS</span><span class="p">[</span><span class="n">out_format</span><span class="p">]</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span> <span class="o">==</span> <span class="s2">&quot;batch&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                <span class="n">job</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">create_job</span><span class="p">(</span><span class="n">out_format</span><span class="o">=</span><span class="n">out_format</span><span class="p">)</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>                <span class="n">job</span><span class="o">.</span><span class="n">start_and_wait</span><span class="p">()</span><span class="o">.</span><span class="n">get_results</span><span class="p">()</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="n">cube</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="n">out_format</span><span class="p">)</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">return</span> <span class="n">out</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the process graph(s), execute server-side, and download outputs.</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            progress_bar: Reserved for parity with the other backends.</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            aggregate: Optional aggregation request. Accepted (not rejected)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                because `OUTPUT_KIND` is `&quot;raster&quot;`; translated into a</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">                server-side `aggregate_temporal_period` node in each graph.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            The downloaded file paths, one per requested key.</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;openEO download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">return</span> <span class="n">paths</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            ValueError: When `max_cloud_cover` was supplied but the collection</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                does not expose `eo:cloud_cover` (non-optical collections), so</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">                the filter would be silently ignored or rejected server-side.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="n">bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_bands</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="n">load_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_cloud_cover</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">resolved</span><span class="o">.</span><span class="n">supports_cloud_cover</span><span class="p">:</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>                    <span class="sa">f</span><span class="s2">&quot;max_cloud_cover is only supported for optical collections &quot;</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                    <span class="sa">f</span><span class="s2">&quot;that expose eo:cloud_cover (Sentinel-2); </span><span class="si">{</span><span class="n">resolved</span><span class="o">.</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">resolved</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s2">) does not. Drop max_cloud_cover &quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>                    <span class="s2">&quot;for this request.&quot;</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                <span class="p">)</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">load_kwargs</span><span class="p">[</span><span class="s2">&quot;max_cloud_cover&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_cloud_cover</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">load_collection</span><span class="p">(</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="n">resolved</span><span class="o">.</span><span class="n">collection_id</span><span class="p">,</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="n">spatial_extent</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                <span class="s2">&quot;west&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                <span class="s2">&quot;south&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                <span class="s2">&quot;east&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>                <span class="s2">&quot;north&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="p">},</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="n">temporal_extent</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="n">_exclusive_end</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="p">),</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="p">],</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="n">bands</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">),</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="o">**</span><span class="n">load_kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="p">)</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">resolved</span><span class="o">.</span><span class="n">graph</span><span class="p">:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">_apply_step</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">aggregate_temporal_period</span><span class="p">(</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                <span class="n">period</span><span class="o">=</span><span class="n">period_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="o">.</span><span class="n">freq</span><span class="p">),</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                <span class="n">reducer</span><span class="o">=</span><span class="n">reducer_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span><span class="o">.</span><span class="n">op</span><span class="p">),</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="p">)</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">cube</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build, execute, and download one output file per product.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        For each product: build its `DataCube`, then either download it</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        synchronously (`execute=&quot;sync&quot;`, size-capped) or run a polled batch job</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        (`execute=&quot;batch&quot;`). The output format is the recipe&#39;s `output_format`</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        when set, else the backend&#39;s `output_format`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            The written file paths, one per product (request key order).</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># set in _initialize before any download</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">resolved</span><span class="p">:</span> <span class="n">ResolvedGraph</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;resolved&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="n">cube</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_cube</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="n">out_format</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">output_format</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="n">suffix</span> <span class="o">=</span> <span class="n">OUTPUT_FORMATS</span><span class="p">[</span><span class="n">out_format</span><span class="p">]</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">safe_filename</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span> <span class="o">==</span> <span class="s2">&quot;batch&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="n">job</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">create_job</span><span class="p">(</span><span class="n">out_format</span><span class="o">=</span><span class="n">out_format</span><span class="p">)</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="n">job</span><span class="o">.</span><span class="n">start_and_wait</span><span class="p">()</span><span class="o">.</span><span class="n">get_results</span><span class="p">()</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                <span class="n">cube</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="n">out_format</span><span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">return</span> <span class="n">out</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the process graph(s), execute server-side, and download outputs.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            progress_bar: Reserved for parity with the other backends.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            aggregate: Optional aggregation request. Accepted (not rejected)</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                because `OUTPUT_KIND` is `&quot;raster&quot;`; translated into a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                server-side `aggregate_temporal_period` node in each graph.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            The downloaded file paths, one per requested key.</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;openEO download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27162,45 +27078,45 @@ server-side <code>aggregate_temporal_period</code> node in each graph.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/openeo/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span>
-<span class="normal"><a href="#__codelineno-0-384">384</a></span>
-<span class="normal"><a href="#__codelineno-0-385">385</a></span>
-<span class="normal"><a href="#__codelineno-0-386">386</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the process graph(s), execute server-side, and download outputs.</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        progress_bar: Reserved for parity with the other backends.</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        aggregate: Optional aggregation request. Accepted (not rejected)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            because `OUTPUT_KIND` is `&quot;raster&quot;`; translated into a</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            server-side `aggregate_temporal_period` node in each graph.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        The downloaded file paths, one per requested key.</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;openEO download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="k">return</span> <span class="n">paths</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-346">346</a></span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span>
+<span class="normal"><a href="#__codelineno-0-348">348</a></span>
+<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span>
+<span class="normal"><a href="#__codelineno-0-353">353</a></span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
+<span class="normal"><a href="#__codelineno-0-357">357</a></span>
+<span class="normal"><a href="#__codelineno-0-358">358</a></span>
+<span class="normal"><a href="#__codelineno-0-359">359</a></span>
+<span class="normal"><a href="#__codelineno-0-360">360</a></span>
+<span class="normal"><a href="#__codelineno-0-361">361</a></span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the process graph(s), execute server-side, and download outputs.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        progress_bar: Reserved for parity with the other backends.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        aggregate: Optional aggregation request. Accepted (not rejected)</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            because `OUTPUT_KIND` is `&quot;raster&quot;`; translated into a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            server-side `aggregate_temporal_period` node in each graph.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        The downloaded file paths, one per requested key.</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;openEO download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">return</span> <span class="n">paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
