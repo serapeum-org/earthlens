@@ -117,12 +117,20 @@ class TestCheckTimeWindow:
         """The base class requires a window unless a backend opts out."""
         assert AbstractDataSource.REQUIRES_TIME_WINDOW is True
 
-    def test_guard_is_callable_without_an_instance(self):
-        """The guard is a classmethod, so it validates before construction."""
-        _Windowed._check_time_window("2024-01-01", "2024-01-02")
+    def test_guard_reads_the_flag_off_the_instance(self, tmp_path):
+        """The guard is an instance method, so a per-instance flag is honoured."""
+        backend = _build(_Windowed, tmp_path, start="2024-01-01", end="2024-01-02")
+        backend._check_time_window("2024-01-01", "2024-01-02")
         with pytest.raises(ValueError, match="requires a time window"):
-            _Windowed._check_time_window(None, None)
+            backend._check_time_window(None, None)
 
-    def test_opt_out_guard_is_a_noop(self):
+    def test_instance_flag_overrides_the_class(self, tmp_path):
+        """Setting the flag on an instance relaxes the guard, as its siblings do."""
+        backend = _build(_Windowed, tmp_path, start="2024-01-01", end="2024-01-02")
+        backend.REQUIRES_TIME_WINDOW = False
+        assert backend._check_time_window(None, None) is None
+
+    def test_opt_out_guard_is_a_noop(self, tmp_path):
         """An opted-out backend's guard accepts anything, including None."""
-        assert _Snapshot._check_time_window(None, None) is None
+        backend = _build(_Snapshot, tmp_path, start=None, end=None)
+        assert backend._check_time_window(None, None) is None

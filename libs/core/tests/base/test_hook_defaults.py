@@ -185,7 +185,9 @@ class TestTemporalExtentFactories:
     def test_whole_window_holds_both_bounds(self, tmp_path):
         """A whole-window extent carries the two bounds as its date axis."""
         backend = _build(_Minimal, tmp_path)
-        extent = backend._whole_window_extent("2024-01-01", "2024-01-31", "%Y-%m-%d")
+        extent = backend._whole_window_extent(
+            "2024-01-01", "2024-01-31", fmt="%Y-%m-%d"
+        )
         assert len(extent.dates) == 2
         assert extent.resolution == "all"
 
@@ -195,7 +197,7 @@ class TestTemporalExtentFactories:
 
         backend = _build(_Minimal, tmp_path)
         extent = backend._whole_window_extent(
-            dt.date(2024, 1, 1), dt.date(2024, 1, 2), "%Y-%m-%d"
+            dt.date(2024, 1, 1), dt.date(2024, 1, 2), fmt="%Y-%m-%d"
         )
         assert extent.start_date == dt.datetime(2024, 1, 1)
 
@@ -203,7 +205,7 @@ class TestTemporalExtentFactories:
         """A backend can record its own label instead of `"all"`."""
         backend = _build(_Minimal, tmp_path)
         extent = backend._whole_window_extent(
-            "2024-01-01", "2024-01-02", "%Y-%m-%d", resolution="raw"
+            "2024-01-01", "2024-01-02", fmt="%Y-%m-%d", resolution="raw"
         )
         assert extent.resolution == "raw"
 
@@ -211,7 +213,11 @@ class TestTemporalExtentFactories:
         """A cadence extent expands to one entry per period start."""
         backend = _build(_Minimal, tmp_path)
         extent = backend._cadence_extent(
-            "2024-01-01", "2024-03-01", "%Y-%m-%d", "monthly", {"monthly": "MS"}
+            "2024-01-01",
+            "2024-03-01",
+            fmt="%Y-%m-%d",
+            cadence="monthly",
+            accepted={"monthly": "MS"},
         )
         assert len(extent.dates) == 3
         assert extent.resolution == "MS"
@@ -221,7 +227,11 @@ class TestTemporalExtentFactories:
         backend = _build(_Minimal, tmp_path)
         with pytest.raises(ValueError, match="is not supported by _Minimal"):
             backend._cadence_extent(
-                "2024-01-01", "2024-03-01", "%Y-%m-%d", "yearly", {"monthly": "MS"}
+                "2024-01-01",
+                "2024-03-01",
+                fmt="%Y-%m-%d",
+                cadence="yearly",
+                accepted={"monthly": "MS"},
             )
 
     def test_static_extent_has_no_axis(self, tmp_path):

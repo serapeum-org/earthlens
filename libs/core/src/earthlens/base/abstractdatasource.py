@@ -57,7 +57,7 @@ See Also:
 class PolygonAoiWarning(UserWarning):
     """A polygon `aoi=` was reduced to its bounding box by the chosen backend.
 
-    Raised (as a warning) when a request passes a real polygon area of
+    Issued when a request passes a real polygon area of
     interest to a backend whose `SUPPORTS_POLYGON_AOI` is `False`. The
     download still succeeds, but it covers the polygon's **bounding box**, so
     cells outside the polygon are included. That is the most dangerous kind of
@@ -719,8 +719,7 @@ class AbstractDataSource(ABC):
         if not os.path.exists(self.root_dir):
             os.makedirs(self.root_dir)
 
-    @classmethod
-    def _check_time_window(cls, start: Any, end: Any) -> None:
+    def _check_time_window(self, start: Any, end: Any) -> None:
         """Reject a missing `start` / `end` when the backend needs both.
 
         Runs before :meth:`_check_input_dates` so a backend that declares
@@ -736,7 +735,7 @@ class AbstractDataSource(ABC):
             ValueError: If the backend requires a window and either bound is
                 `None`. The message names which bound(s) are missing.
         """
-        if not cls.REQUIRES_TIME_WINDOW:
+        if not self.REQUIRES_TIME_WINDOW:
             return
         missing = [
             name for name, value in (("start", start), ("end", end)) if value is None
@@ -744,7 +743,7 @@ class AbstractDataSource(ABC):
         if not missing:
             return
         raise ValueError(
-            f"the {cls.__name__} backend requires a time window, but "
+            f"the {type(self).__name__} backend requires a time window, but "
             f"{' and '.join(missing)} "
             f"{'is' if len(missing) == 1 else 'are'} missing. Pass "
             f"start=/end= (e.g. start='2024-01-01', end='2024-01-31') or the "
@@ -859,6 +858,7 @@ class AbstractDataSource(ABC):
         self,
         start: Any,
         end: Any,
+        *,
         fmt: str,
         resolution: str = "all",
     ) -> TemporalExtent:
@@ -898,6 +898,7 @@ class AbstractDataSource(ABC):
         self,
         start: Any,
         end: Any,
+        *,
         fmt: str,
         cadence: str,
         accepted: Mapping[str, str],
@@ -935,7 +936,9 @@ class AbstractDataSource(ABC):
         if resolution == WHOLE_WINDOW:
             # A cadence naming a release character rather than a period
             # ("irregular", "climatology") has no period axis to expand.
-            return self._whole_window_extent(start, end, fmt, resolution=WHOLE_WINDOW)
+            return self._whole_window_extent(
+                start, end, fmt=fmt, resolution=WHOLE_WINDOW
+            )
         start_dt = to_datetime(start, fmt)
         end_dt = to_datetime(end, fmt)
         return TemporalExtent(
@@ -1059,6 +1062,13 @@ class AbstractDataSource(ABC):
         Returns:
             Whatever :meth:`_fetch` returned — see :meth:`_fetch` for the
             element type, which tracks :attr:`OUTPUT_KIND`.
+
+            Typed `Any` rather than `list[Any]` deliberately: the overrides do
+            not all return lists. chc returns a per-date mapping and gee a
+            `Path | str | TaskInfo` depending on `export_via`, so narrowing the
+            base annotation makes those overrides incompatible. The cost is that
+            a `download()` forwarding `_api()` out of a `-> list[Path]` signature
+            needs a `cast`.
 
         Raises:
             NotImplementedError: If the backend overrides neither this method

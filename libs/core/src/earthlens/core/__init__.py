@@ -23,10 +23,12 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError, version
 
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
+from earthlens.base import PolygonAoiWarning
 from earthlens.earthlens import EarthLens, download, find, search, sources
 
 __all__ = [
     "AggregationConfig",
+    "PolygonAoiWarning",
     "EarthLens",
     "aggregate_netcdf",
     "download",
