@@ -116,6 +116,40 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
     )
 
 
+#: Sentinel alias meaning "no fixed spacing — query the window whole". Returned
+#: by :func:`resolve_cadence` for a cadence that names a release *character*
+#: rather than a period (`"irregular"`, `"climatology"`), which has no pandas
+#: offset. `AbstractDataSource._cadence_extent` turns it into a whole-window
+#: extent instead of trying to expand a period axis.
+WHOLE_WINDOW = "all"
+
+#: The cadence vocabulary the providers' own catalogs use, mapped to pandas
+#: offset aliases. Shared rather than re-spelled per backend: the narrow
+#: three-entry maps the backends each carried rejected cadences their catalogs
+#: legitimately name — 449 of CMEMS's 1157 rows say `irregular` / `annual` /
+#: `climatology` / `weekly` / `6hourly`. A backend that genuinely supports only
+#: a subset passes its own narrower map.
+CADENCE_ALIASES: dict[str, str] = {
+    "hourly": "h",
+    "3hourly": "3h",
+    "6hourly": "6h",
+    "12hourly": "12h",
+    "daily": "D",
+    "weekly": "W",
+    "dekadal": "10D",
+    "pentadal": "5D",
+    "monthly": "MS",
+    "seasonal": "QS",
+    "annual": "YS",
+    "yearly": "YS",
+    # No fixed period — the window is queried whole.
+    "irregular": WHOLE_WINDOW,
+    "climatology": WHOLE_WINDOW,
+    "static": WHOLE_WINDOW,
+    "all": WHOLE_WINDOW,
+}
+
+
 def resolve_cadence(
     cadence: str,
     accepted: Mapping[str, str],
@@ -177,6 +211,14 @@ def resolve_cadence(
 
             ```
     """
+    if not isinstance(cadence, str):
+        # Guard before difflib, which raises a bare `TypeError: 'NoneType'
+        # object is not iterable` on a non-string — the very failure shape this
+        # function exists to replace.
+        raise ValueError(
+            f"temporal_resolution must be a string cadence, got "
+            f"{type(cadence).__name__}. Accepted by {backend}: {sorted(accepted)}."
+        )
     try:
         return accepted[cadence]
     except KeyError:

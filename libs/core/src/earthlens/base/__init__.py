@@ -8,6 +8,8 @@ into the private module layout.
 from __future__ import annotations
 
 from earthlens.base._dates import (
+    CADENCE_ALIASES,
+    WHOLE_WINDOW,
     date_windows,
     resolve_cadence,
     split_time,
@@ -47,6 +49,8 @@ from earthlens.base.spatial import (
 
 __all__ = [
     "AbstractAuth",
+    "CADENCE_ALIASES",
+    "WHOLE_WINDOW",
     "AbstractCatalog",
     "AbstractDataSource",
     "AuthenticationError",

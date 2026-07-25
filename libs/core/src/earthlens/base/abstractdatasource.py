@@ -777,12 +777,23 @@ class AbstractDataSource(ABC):
         if not isinstance(space, SpatialExtent):
             return
         if geometry is not None and not self.SUPPORTS_POLYGON_AOI:
+            # The remedy differs by output shape: a raster is post-clipped with
+            # pyramids, whereas vector / tabular rows are filtered with a
+            # spatial predicate. Advising `Dataset.crop` to a FeatureCollection
+            # backend would be useless advice.
+            if getattr(self, "OUTPUT_KIND", "raster") in {"raster", "mixed"}:
+                remedy = "Post-clip the result with `pyramids.Dataset.crop(mask=...)`"
+            else:
+                remedy = (
+                    "Filter the returned rows to the polygon (e.g. "
+                    "`gdf[gdf.within(polygon)]`)"
+                )
             warnings.warn(
-                f"the {type(self).__name__} backend clips to a bounding box only, "
-                f"so this polygon aoi= is applied as its bounding box — cells "
-                f"outside the polygon are still included. Post-clip the result "
-                f"with `pyramids.Dataset.crop(mask=...)`, or pass a bbox aoi= to "
-                f"make the request's extent explicit.",
+                f"the {type(self).__name__} backend selects by bounding box only, "
+                f"so this polygon aoi= is applied as its bounding box — results "
+                f"outside the polygon but inside its bbox are still included. "
+                f"{remedy}, or pass a bbox aoi= to make the request's extent "
+                f"explicit.",
                 PolygonAoiWarning,
                 stacklevel=3,
             )
@@ -913,11 +924,20 @@ class AbstractDataSource(ABC):
         Raises:
             ValueError: If `cadence` is not a key of `accepted`.
         """
-        from earthlens.base._dates import date_windows, resolve_cadence, to_datetime
+        from earthlens.base._dates import (
+            WHOLE_WINDOW,
+            date_windows,
+            resolve_cadence,
+            to_datetime,
+        )
 
+        resolution = resolve_cadence(cadence, accepted, backend=type(self).__name__)
+        if resolution == WHOLE_WINDOW:
+            # A cadence naming a release character rather than a period
+            # ("irregular", "climatology") has no period axis to expand.
+            return self._whole_window_extent(start, end, fmt, resolution=WHOLE_WINDOW)
         start_dt = to_datetime(start, fmt)
         end_dt = to_datetime(end, fmt)
-        resolution = resolve_cadence(cadence, accepted, backend=type(self).__name__)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

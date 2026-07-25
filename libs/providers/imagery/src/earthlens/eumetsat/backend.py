@@ -51,6 +51,7 @@ from loguru import logger
 from pydantic import SecretStr
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
@@ -293,7 +294,7 @@ class EUMETSAT(AbstractDataSource):
             end,
             fmt,
             temporal_resolution,
-            {'daily': 'D', 'monthly': 'MS', 'hourly': 'h'},
+            CADENCE_ALIASES,
         )
 
     def _search(self) -> list[RemoteProduct]:

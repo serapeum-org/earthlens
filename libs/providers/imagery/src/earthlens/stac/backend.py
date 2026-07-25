@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, Any, cast
 from loguru import logger
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     LazyClientMixin,
     OutputKind,
@@ -257,7 +258,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
             end,
             fmt,
             temporal_resolution,
-            {'daily': 'D', 'monthly': 'MS', 'hourly': 'h', 'yearly': 'YS'},
+            CADENCE_ALIASES,
         )
 
     def _bboxes(self) -> list[tuple[float, float, float, float]]:

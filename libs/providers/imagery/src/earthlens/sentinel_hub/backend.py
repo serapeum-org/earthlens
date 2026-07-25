@@ -32,6 +32,7 @@ from loguru import logger
 from pydantic import SecretStr
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
@@ -246,7 +247,7 @@ class SentinelHub(AbstractDataSource):
             end,
             fmt,
             temporal_resolution,
-            {'daily': 'D', 'monthly': 'MS', 'hourly': 'h', 'yearly': 'YS'},
+            CADENCE_ALIASES,
         )
 
     def _bbox(self) -> Any:

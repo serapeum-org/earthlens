@@ -38,6 +38,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import SecretStr
 
 from earthlens.base import (
+    CADENCE_ALIASES,
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
@@ -277,7 +278,7 @@ class Earthdata(AbstractDataSource):
             end,
             fmt,
             temporal_resolution,
-            {'daily': 'D', 'monthly': 'MS', 'hourly': 'h'},
+            CADENCE_ALIASES,
         )
 
     def _search(self) -> list[RemoteProduct]:

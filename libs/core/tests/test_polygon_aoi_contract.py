@@ -118,7 +118,7 @@ class TestAttachClipGeometryWarning:
         _recorder, caught = self._attach(False, object())
         message = str(caught[0].message)
         assert "_Recorder" in message
-        assert "crop(mask=" in message
+        assert "crop(mask=" in message  # _Recorder inherits OUTPUT_KIND="raster"
 
 
 class TestPolygonAoiThroughFacade:
