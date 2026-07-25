@@ -6,11 +6,12 @@ import inspect
 import os
 import warnings
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal, cast
 
+from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 OutputKind = Literal["raster", "vector", "tabular", "mixed"]
@@ -1212,6 +1213,119 @@ class AbstractDataSource(ABC):
         if not products:
             return []
         return self._fetch(products)
+
+    #: The partial-failure policies :meth:`_run_items` accepts. `"skip"` is a
+    #: deprecated alias for `"ignore"`, kept because the nwp backend shipped it
+    #: before the convention settled on the three names documented on
+    #: :meth:`download`.
+    ERROR_POLICIES: frozenset[str] = frozenset({"raise", "warn", "ignore", "skip"})
+
+    @staticmethod
+    def check_errors_policy(errors: str) -> str:
+        """Validate an `errors=` argument, normalising the `"skip"` alias.
+
+        Args:
+            errors: The requested policy.
+
+        Returns:
+            The canonical policy — `"raise"`, `"warn"` or `"ignore"`.
+
+        Raises:
+            ValueError: If `errors` is not a recognised policy.
+
+        Examples:
+            - The canonical names pass through, and `"skip"` normalises:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> AbstractDataSource.check_errors_policy("warn")
+                'warn'
+                >>> AbstractDataSource.check_errors_policy("skip")
+                'ignore'
+
+                ```
+            - Anything else is rejected with the accepted set:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> AbstractDataSource.check_errors_policy("continue")
+                Traceback (most recent call last):
+                    ...
+                ValueError: errors must be 'raise', 'warn' or 'ignore'; got 'continue'.
+
+                ```
+        """
+        if errors not in AbstractDataSource.ERROR_POLICIES:
+            raise ValueError(
+                f"errors must be 'raise', 'warn' or 'ignore'; got {errors!r}."
+            )
+        return "ignore" if errors == "skip" else errors
+
+    def _run_items(
+        self,
+        items: Sequence[Any],
+        fn: Callable[[Any], Any],
+        *,
+        errors: str = "warn",
+        label: str = "item",
+        describe: Callable[[Any], str] | None = None,
+        on_failure: Callable[[Any, BaseException], Any] | None = None,
+    ) -> tuple[list[Any], list[tuple[str, BaseException]]]:
+        """Map `fn` over `items`, applying the caller's partial-failure policy.
+
+        The shared form of the skip-and-continue loop the multi-item backends
+        each hand-rolled, and the reason `errors=` was previously advertised on
+        :meth:`download` but honoured by exactly one backend: without somewhere
+        to put the policy, every loop hard-coded "log it and carry on", so a
+        caller could not ask for a batch to fail fast.
+
+        Args:
+            items: The work items — products, dates, `(dataset, variable)` pairs.
+            fn: Called once per item; its return value is collected.
+            errors: `"raise"` propagates the first failure, `"warn"` logs each
+                one and continues, `"ignore"` continues silently. `"skip"` is
+                accepted as a deprecated alias for `"ignore"`.
+            label: Noun for the log lines (e.g. `"granule"`, `"variable"`).
+            describe: Renders an item for the log; defaults to `str`.
+            on_failure: Optional `(item, exception) -> placeholder`. When given,
+                a failed item contributes its placeholder to `results`, so the
+                results stay positionally aligned with `items` — the shape the
+                vector backends need, where a failed provider still occupies a
+                slot with an empty `FeatureCollection`. When omitted, failures
+                are simply absent from `results`.
+
+        Returns:
+            `(results, failures)` — one result per succeeding item, in order,
+            and `(description, exception)` for each failure. The caller decides
+            what an all-failed batch means, since that differs by backend.
+
+        Raises:
+            ValueError: If `errors` is not a recognised policy.
+            BaseException: The first item's exception when `errors="raise"`.
+        """
+        policy = self.check_errors_policy(errors)
+        name = describe or str
+        results: list[Any] = []
+        failures: list[tuple[str, BaseException]] = []
+        for item in items:
+            try:
+                results.append(fn(item))
+            except Exception as exc:  # noqa: BLE001 - policy decides the fate
+                if policy == "raise":
+                    raise
+                described = name(item)
+                if on_failure is not None:
+                    results.append(on_failure(item, exc))
+                if policy == "warn":
+                    logger.warning(
+                        f"{type(self).__name__}: {label} {described} failed: "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                failures.append((described, exc))
+        if failures and policy == "warn":
+            logger.warning(
+                f"{type(self).__name__}: {len(failures)} of {len(items)} "
+                f"{label}(s) failed; {len(results)} succeeded."
+            )
+        return results, failures
 
     def _fetch_one(self, product: RemoteProduct) -> Any:
         """Fetch a single product — the per-product hook for `_search_fetch_each`.

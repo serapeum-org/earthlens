@@ -463,25 +463,19 @@ class NWP(AbstractDataSource):
         from pyramids.dataset.cog import write_cog
         from pyramids.grib import open_grib
 
-        errors = getattr(self, "_errors", "warn")
         bbox = [
             self.space.west,
             self.space.south,
             self.space.east,
             self.space.north,
         ]
-        out: list[Path] = []
-        for product in products:
-            try:
-                out.append(self._fetch_one(product, bbox, open_grib, write_cog))
-            except Exception as exc:
-                if errors == "raise":
-                    raise
-                if errors == "warn":
-                    logger.warning(
-                        f"NWP: skipping {product.id} — fetch/crop failed: "
-                        f"{type(exc).__name__}: {exc}"
-                    )
+        out, _failed = self._run_items(
+            products,
+            lambda product: self._fetch_one(product, bbox, open_grib, write_cog),
+            errors=getattr(self, "_errors", "warn"),
+            label="forecast step",
+            describe=lambda product: str(product.id),
+        )
         return out
 
     def _fetch_one(  # type: ignore[override]
@@ -586,12 +580,10 @@ class NWP(AbstractDataSource):
             ValueError: If `errors` is not one of
                 `{"raise", "warn", "skip"}`.
         """
-        if errors not in {"raise", "warn", "skip"}:
-            raise ValueError(
-                f"errors must be 'raise', 'warn', or 'skip'; got {errors!r}."
-            )
         self._show_progress = progress_bar
-        self._errors = errors
+        # Shared validator: accepts the canonical raise/warn/ignore and keeps
+        # nwp's original "skip" working as an alias for "ignore".
+        self._errors = self.check_errors_policy(errors)
         paths = self._api_via_search_fetch()
         if aggregate is not None:
             return self._aggregate(paths, aggregate)

@@ -87,6 +87,10 @@ class FDSN(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "vector"
 
+    #: Partial-failure policy for the per-provider loop; `download(errors=...)`
+    #: overrides it per call.
+    _errors: str = "warn"
+
     def __init__(
         self,
         start: str,
@@ -292,24 +296,28 @@ class FDSN(AbstractDataSource):
                 same order; empty collections for no-data or failed
                 networks.
 
+        Args:
+            progress_bar: Whether to show per-provider progress.
+            aggregate: Rejected by the facade for a vector backend.
+            errors: Partial-failure policy for the per-provider loop —
+                `"warn"` (default) logs each failed network and continues,
+                `"raise"` propagates the first failure, `"ignore"` continues
+                silently. An all-failed batch still raises regardless.
+
         Raises:
             RuntimeError: When **every** network's query failed, so a
                 caller cannot silently process nothing. The message
                 aggregates the failed networks and their exception
                 types; the per-network errors are logged at ERROR.
         """
-        collections: list[FeatureCollection] = []
-        failed: list[tuple[str, BaseException]] = []
-        for product in products:
-            try:
-                collections.append(self._query_one(product))
-            except Exception as exc:  # noqa: BLE001 - log the failure and continue
-                logger.error(
-                    f"FDSN query for provider {product.id!r} failed: "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                failed.append((product.id, exc))
-                collections.append(events.empty_fc())
+        collections, failed = self._run_items(
+            products,
+            self._query_one,
+            errors=self._errors,
+            label="provider query",
+            describe=lambda product: repr(product.id),
+            on_failure=lambda _product, _exc: events.empty_fc(),
+        )
 
         if failed and len(failed) == len(products):
             summary = ", ".join(
@@ -401,6 +409,7 @@ class FDSN(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> FeatureCollection:
         """Query every requested network and return the unioned events.
 
@@ -444,6 +453,7 @@ class FDSN(AbstractDataSource):
                 "FeatureCollection (a GeoDataFrame) directly."
             )
 
+        self._errors = self.check_errors_policy(errors)
         products = self._search()
         collections = self._fetch(products) if products else []
 

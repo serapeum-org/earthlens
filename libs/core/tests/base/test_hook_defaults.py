@@ -282,3 +282,96 @@ class TestAntimeridianExtent:
         """The remedy names the split at ±180."""
         with pytest.raises(ValueError, match=r"\[170.0, 180\]"):
             SpatialExtent.from_pairs(lat_lim=[-10.0, 10.0], lon_lim=[170.0, -170.0])
+
+
+class TestRunItems:
+    """The shared partial-failure loop behind the `errors=` convention."""
+
+    @staticmethod
+    def _backend(tmp_path):
+        """Build the minimal backend used to exercise `_run_items`."""
+        return _build(_Minimal, tmp_path)
+
+    def test_all_succeed(self, tmp_path):
+        """Every result is collected, in order, with no failures."""
+        results, failures = self._backend(tmp_path)._run_items(
+            [1, 2, 3], lambda n: n * 2
+        )
+        assert results == [2, 4, 6]
+        assert failures == []
+
+    def test_warn_continues_past_a_failure(self, tmp_path):
+        """The default policy skips the bad item and keeps the good ones."""
+
+        def flaky(n):
+            if n == 2:
+                raise RuntimeError("boom")
+            return n
+
+        results, failures = self._backend(tmp_path)._run_items([1, 2, 3], flaky)
+        assert results == [1, 3]
+        assert [described for described, _ in failures] == ["2"]
+
+    def test_raise_propagates_the_first_failure(self, tmp_path):
+        """`errors="raise"` aborts instead of collecting."""
+
+        def flaky(n):
+            if n == 2:
+                raise RuntimeError("boom")
+            return n
+
+        with pytest.raises(RuntimeError, match="boom"):
+            self._backend(tmp_path)._run_items([1, 2, 3], flaky, errors="raise")
+
+    def test_ignore_is_silent_but_still_reports(self, tmp_path):
+        """`errors="ignore"` logs nothing yet still returns the failure list."""
+
+        def flaky(n):
+            raise RuntimeError("boom")
+
+        results, failures = self._backend(tmp_path)._run_items(
+            [1], flaky, errors="ignore"
+        )
+        assert results == []
+        assert len(failures) == 1
+
+    def test_skip_is_an_alias_for_ignore(self, tmp_path):
+        """nwp shipped `"skip"` before the convention settled; it still works."""
+        results, failures = self._backend(tmp_path)._run_items(
+            [1], lambda n: n, errors="skip"
+        )
+        assert results == [1] and failures == []
+
+    def test_unknown_policy_rejected(self, tmp_path):
+        """A policy outside the accepted set raises with the accepted names."""
+        with pytest.raises(ValueError, match="errors must be"):
+            self._backend(tmp_path)._run_items([1], lambda n: n, errors="continue")
+
+    def test_on_failure_keeps_results_aligned(self, tmp_path):
+        """A placeholder keeps one result per item, as the vector backends need."""
+
+        def flaky(n):
+            if n == 2:
+                raise RuntimeError("boom")
+            return n
+
+        results, failures = self._backend(tmp_path)._run_items(
+            [1, 2, 3], flaky, on_failure=lambda item, _exc: f"empty-{item}"
+        )
+        assert results == [1, "empty-2", 3]
+        assert len(failures) == 1
+
+    def test_describe_labels_the_failure(self, tmp_path):
+        """`describe` renders the item for the failure record."""
+
+        def flaky(item):
+            raise RuntimeError("boom")
+
+        _results, failures = self._backend(tmp_path)._run_items(
+            [{"id": "abc"}], flaky, describe=lambda item: item["id"]
+        )
+        assert failures[0][0] == "abc"
+
+    def test_empty_items_is_a_noop(self, tmp_path):
+        """No items means no results, no failures, and no logging."""
+        assert self._backend(tmp_path)._run_items([], lambda n: n) == ([], [])

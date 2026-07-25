@@ -88,6 +88,10 @@ class SoilGrids(AbstractDataSource):
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
+    #: Partial-failure policy for the per-coverage loop; `download(errors=...)`
+    #: overrides it per call.
+    _errors: str = "warn"
+
     #: The soil property grids are time-invariant, so a missing `start` / `end` is legal
     #: here.
     REQUIRES_TIME_WINDOW = False
@@ -255,22 +259,21 @@ class SoilGrids(AbstractDataSource):
         self.root_dir.mkdir(parents=True, exist_ok=True)
         tmp_dir = Path(tempfile.mkdtemp(dir=self.root_dir, prefix=".soilgrids-tmp-"))
         written: list[Path] = []
-        failed: list[str] = []
         try:
-            for product in tqdm(
-                products,
-                disable=not self._show_progress,
-                desc="soilgrids",
-                unit="coverage",
-            ):
-                try:
-                    written.append(self._fetch_one(product, tmp_dir))
-                except Exception as exc:  # noqa: BLE001 - isolate one flaky coverage
-                    failed.append(product.id)
-                    logger.warning(
-                        f"soilgrids: coverage {product.id} failed "
-                        f"({type(exc).__name__}: {exc}); skipping."
-                    )
+            fetched, failures = self._run_items(
+                tqdm(
+                    products,
+                    disable=not self._show_progress,
+                    desc="soilgrids",
+                    unit="coverage",
+                ),
+                lambda product: self._fetch_one(product, tmp_dir),
+                errors=self._errors,
+                label="coverage",
+                describe=lambda product: str(product.id),
+            )
+            written.extend(fetched)
+            failed = [described for described, _exc in failures]
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         if failed and not written:
@@ -405,6 +408,7 @@ class SoilGrids(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch every requested coverage's bbox subset as a written GeoTIFF.
 
@@ -431,6 +435,7 @@ class SoilGrids(AbstractDataSource):
                 "is nothing to reduce. Call download() without aggregate=."
             )
         self._show_progress = progress_bar
+        self._errors = self.check_errors_policy(errors)
         paths = self._api()
         logger.info(f"soilgrids attribution: {SOILGRIDS_ATTRIBUTION}")
         return paths
