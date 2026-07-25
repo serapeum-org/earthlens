@@ -518,11 +518,14 @@ class HttpClient:
                 non-interactive / test context) suppresses it.
             atomic: Write to `<dest>.part` then rename on success, cleaning up
                 the temp on failure — so a crashed download never leaves a
-                truncated `dest`, and never removes an existing one. `False`
-                writes straight to `dest`; a failure then leaves whatever was
-                written in place rather than deleting `dest`, since with no temp
-                file the target may be a completed download the caller still
-                owns.
+                truncated `dest` and never removes an existing one. Keep this on
+                (the default) whenever an existing `dest` must survive a failed
+                attempt. `False` streams straight into `dest`, which is opened
+                `"wb"` and therefore **truncated up front**: a mid-stream failure
+                leaves `dest` short, and any previous contents are gone. The
+                failure path does not additionally delete it, but that is damage
+                limitation, not a guarantee — `atomic=False` is only appropriate
+                when `dest` is known to be disposable.
             headers: Per-request headers merged over the client defaults.
             timeout: Per-request timeout override (seconds).
             **kwargs: Extra keyword arguments forwarded to `requests`.
@@ -551,10 +554,10 @@ class HttpClient:
             """Remove the partial write, but never a caller-owned `dest`.
 
             With `atomic` the partial lives at a private `<dest>.part`, so
-            removing it is always safe. Without it the download writes straight
-            to `dest` — which may be a previously-completed file the caller still
-            wants — so a failed attempt must leave it alone rather than delete
-            someone else's data on a transient network error.
+            removing it is always safe. Without it the stream writes straight to
+            `dest`, which `_stream_to_file` has already truncated by opening it
+            `"wb"` — deleting it as well would only turn a truncated file into a
+            missing one, and would destroy a file this call never owned.
             """
             if atomic:
                 tmp.unlink(missing_ok=True)

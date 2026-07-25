@@ -615,8 +615,8 @@ class TestDownload:
         assert not dest.exists()
         assert not dest.with_name("out.bin.part").exists()
 
-    def test_non_atomic_failure_keeps_existing_dest(self, tmp_path):
-        """A failed atomic=False download leaves a pre-existing dest untouched."""
+    def test_non_atomic_failure_does_not_delete_dest(self, tmp_path):
+        """A failed atomic=False download leaves dest present, though truncated."""
         session = _RecordingSession(
             [_Resp(blocks=[b"partial"], stream_error=OSError("mid-stream"))]
         )
@@ -627,6 +627,21 @@ class TestDownload:
                 "http://x", dest, progress=False, atomic=False
             )
         assert dest.exists()
+        # Documented consequence of atomic=False: the stream opens dest "wb", so
+        # the old contents are already gone before any failure. The failure path
+        # only declines to delete it on top of that.
+        assert dest.read_bytes() == b"partial"
+
+    def test_atomic_default_protects_an_existing_dest(self, tmp_path):
+        """The atomic default is what actually preserves the previous contents."""
+        session = _RecordingSession(
+            [_Resp(blocks=[b"partial"], stream_error=OSError("mid-stream"))]
+        )
+        dest = tmp_path / "out.bin"
+        dest.write_bytes(b"previously downloaded")
+        with pytest.raises(OSError):
+            HttpClient(session=session).download("http://x", dest, progress=False)
+        assert dest.read_bytes() == b"previously downloaded"
 
     def test_non_atomic_retry_failure_keeps_existing_dest(self, tmp_path):
         """An exhausted retry on atomic=False does not delete the old dest."""
