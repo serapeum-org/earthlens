@@ -1157,6 +1157,90 @@ class TestFacadeDiscovery:
             EarthLens.catalog("gee")
 
 
+class TestImportBackendModule:
+    """The shared on-demand backend import used by the registry and catalog."""
+
+    def test_returns_the_imported_module(self):
+        """An installed backend is imported and handed back."""
+        from earthlens.earthlens import _import_backend_module
+
+        module = _import_backend_module("earthlens.chc", "chc", "")
+        assert module.__name__ == "earthlens.chc", f"got {module.__name__}"
+
+    def test_missing_sdk_names_the_key_and_extra(self, monkeypatch):
+        """A failed import reports the key plus the pip extra that fixes it."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ImportError("no module named 'ee'")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as exc:
+            _import_backend_module("earthlens.gee", "gee", "gee")
+        message = str(exc.value)
+        assert "Backend 'gee' is unavailable" in message, f"got {message}"
+        assert "pip install earthlens[gee]" in message, f"hint missing from {message}"
+
+    def test_sdk_free_backend_gets_no_install_hint(self, monkeypatch):
+        """With no extra there is nothing to install, so no hint is offered."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ImportError("broken module")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as exc:
+            _import_backend_module("earthlens.chc", "chc", "")
+        assert "pip install" not in str(exc.value), f"unexpected hint: {exc.value}"
+
+    def test_subject_customises_the_opening(self, monkeypatch):
+        """The catalog path opens the message with its own subject."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ImportError("no SDK")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError, match="Backend catalog for 'gee'"):
+            _import_backend_module(
+                "earthlens.gee", "gee", "gee", subject="Backend catalog for"
+            )
+
+    def test_original_error_is_chained(self, monkeypatch):
+        """The underlying ImportError is preserved as __cause__ for debugging."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        original = ImportError("no module named 'ee'")
+
+        def _boom(name):
+            raise original
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as exc:
+            _import_backend_module("earthlens.gee", "gee", "gee")
+        assert exc.value.__cause__ is original, "the SDK error must stay reachable"
+
+    def test_registry_and_catalog_share_the_wording(self, monkeypatch):
+        """Both entry points produce the same body, differing only in subject."""
+        from earthlens import earthlens as facade_module
+
+        def _boom(name):
+            raise ImportError("no SDK")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as registry_exc:
+            EarthLens.DataSources["gee"]
+        with pytest.raises(ImportError) as catalog_exc:
+            EarthLens.catalog("gee")
+        tail = "its runtime dependency is not installed. Install with `pip install earthlens[gee]`."
+        assert str(registry_exc.value).endswith(tail), f"got {registry_exc.value}"
+        assert str(catalog_exc.value).endswith(tail), f"got {catalog_exc.value}"
+
+
 @pytest.mark.chc
 class TestFacadeAoi:
     """The facade's aoi= parameter routes to the backend's spatial extent."""

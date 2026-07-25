@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import pathlib
 import sys
 import types
 
@@ -1069,3 +1070,119 @@ def test_base_centre_fetch_one_raises_not_implemented(tmp_path):
 
     with pytest.raises(NotImplementedError):
         _Bare(tmp_path).fetch_one(None, dt.datetime(2026, 1, 1), 0, [], "auto")
+
+
+class _NoBufferResponse:
+    """Streams its body in small blocks; reading `.content` is a failure."""
+
+    def __init__(self, body: bytes, block: int = 8):
+        self._body = body
+        self._block = block
+        self.status_code = 200
+        self.headers: dict[str, str] = {}
+        self.closed = False
+
+    @property
+    def content(self) -> bytes:
+        raise AssertionError("the body must be streamed, not buffered via .content")
+
+    def raise_for_status(self) -> None:
+        """A 200 needs no action."""
+
+    def iter_content(self, chunk_size=None):
+        """Yield the body in fixed-size blocks, as a streamed response does."""
+        for start in range(0, len(self._body), self._block):
+            yield self._body[start : start + self._block]
+
+    def close(self) -> None:
+        """Record release of the response."""
+        self.closed = True
+
+
+class TestDWDStreams:
+    """DWD decompresses its .bz2 incrementally rather than whole-body."""
+
+    def _stream_requests(self, monkeypatch, block: int = 8):
+        """Install a requests whose get streams a bz2 body across many blocks."""
+        import bz2
+
+        state: dict[str, object] = {"responses": [], "kwargs": []}
+
+        def fake_get(url: str, timeout=None, **kwargs):
+            state["kwargs"].append(kwargs)
+            var = pathlib.Path(url).parent.name.upper()
+            payload = bz2.compress(b"<" + var.encode() + b">")
+            response = _NoBufferResponse(payload, block=block)
+            state["responses"].append(response)
+            return response
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+        return state
+
+    def _icon(self, **overrides) -> NWPModel:
+        """Reuse the DWD centre's ICON row builder."""
+        return TestDWDCentre._icon(TestDWDCentre(), **overrides)
+
+    def test_body_is_decompressed_without_buffering(self, monkeypatch, tmp_path):
+        """A regression to `bz2.decompress(response.content)` fails this test."""
+        state = self._stream_requests(monkeypatch)
+        out = DWDCentre(tmp_path).fetch_one(
+            self._icon(),
+            dt.datetime(2024, 6, 1, 0),
+            3,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
+        )
+        assert out.read_bytes() == b"<T_2M><TOT_PREC>"
+        assert all(r.closed for r in state["responses"]), "responses must be released"
+
+    def test_get_is_streaming(self, monkeypatch, tmp_path):
+        """The per-variable GET passes stream=True."""
+        state = self._stream_requests(monkeypatch)
+        DWDCentre(tmp_path).fetch_one(
+            self._icon(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+        )
+        assert state["kwargs"][0].get("stream") is True, f"got {state['kwargs'][0]}"
+
+    def test_decompression_spans_block_boundaries(self, monkeypatch, tmp_path):
+        """A single-byte block stream still reassembles the exact payload."""
+        self._stream_requests(monkeypatch, block=1)
+        out = DWDCentre(tmp_path).fetch_one(
+            self._icon(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+        )
+        assert out.read_bytes() == b"<T_2M>", "bz2 must be decompressed incrementally"
+
+
+class TestMeteoFranceAPIStreams:
+    """The WCS coverage body is copied block by block, not buffered."""
+
+    def test_coverage_is_streamed(self, monkeypatch, tmp_path):
+        """A regression to `response.content` fails this test."""
+        monkeypatch.setenv("MF_API_KEY", "k")
+        responses: list[_NoBufferResponse] = []
+        seen: list[dict] = []
+
+        def fake_get(url, params=None, headers=None, timeout=None, **kwargs):
+            seen.append(kwargs)
+            coverage = dict(params)["coverageid"].split("__")[0]
+            response = _NoBufferResponse(b"GRIB-" + coverage.encode())
+            responses.append(response)
+            return response
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        centre = MeteoFranceAPICentre(tmp_path)
+        out = centre.fetch_one(
+            TestMeteoFranceAPICentre._arpege(TestMeteoFranceAPICentre()),
+            dt.datetime(2024, 6, 1, 0),
+            24,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
+        )
+        assert out.read_bytes() == b"GRIB-TEMPERATUREGRIB-TOTAL_PRECIPITATION"
+        assert seen[0].get("stream") is True, f"got {seen[0]}"
+        assert all(r.closed for r in responses), "responses must be released"

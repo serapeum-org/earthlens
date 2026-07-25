@@ -12,6 +12,7 @@ from earthlens.base.http import (
     DEFAULT_TIMEOUT,
     HttpClient,
     RequestsGet,
+    _check_magic,
     _default_user_agent,
     _parse_retry_after,
     _progress_total,
@@ -748,6 +749,122 @@ class TestDownload:
         )
         assert dest.read_bytes() == b"data"
         assert not dest.with_name("out.bin.part").exists()
+
+
+class TestCheckMagic:
+    """The leading-bytes guard that rejects an error page served as a file."""
+
+    def test_accepts_matching_single_prefix(self, tmp_path):
+        """A body starting with the one expected prefix passes silently."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"CDF\x01payload")
+        assert _check_magic(path, b"CDF", "http://host/grid.nc") is None
+
+    def test_accepts_any_of_several_prefixes(self, tmp_path):
+        """With a tuple of prefixes, matching any one is enough."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"\x89HDF\r\n\x1a\npayload")
+        assert _check_magic(path, (b"CDF", b"\x89HDF"), "http://host/g.nc") is None
+
+    def test_rejects_html_error_page(self, tmp_path):
+        """An HTML body served under a .nc name raises ValueError."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"<html>Error 500</html>")
+        with pytest.raises(ValueError, match="does not start with") as exc:
+            _check_magic(path, b"CDF", "http://host/grid.nc")
+        assert "<html>" in str(exc.value), (
+            f"message should show what arrived: {exc.value}"
+        )
+
+    def test_message_reports_size_and_head(self, tmp_path):
+        """The message carries the byte count and the first 24 bytes seen."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"x" * 100)
+        with pytest.raises(ValueError) as exc:
+            _check_magic(path, b"CDF", "http://host/grid.nc")
+        message = str(exc.value)
+        assert "100 bytes" in message, f"size missing from: {message}"
+        assert repr(b"x" * 24) in message, f"head missing from: {message}"
+
+    def test_message_redacts_the_url(self, tmp_path):
+        """Only scheme://host reaches the message, never a URL-borne secret."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"nope")
+        with pytest.raises(ValueError) as exc:
+            _check_magic(path, b"CDF", "https://host/api?token=SECRET")
+        message = str(exc.value)
+        assert "SECRET" not in message, f"secret leaked into: {message}"
+        assert "https://host" in message, f"host missing from: {message}"
+
+    def test_short_body_shorter_than_prefix_is_rejected(self, tmp_path):
+        """A truncated body too short to hold the prefix still raises."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"CD")
+        with pytest.raises(ValueError, match="does not start with"):
+            _check_magic(path, b"CDF", "http://host/grid.nc")
+
+    def test_empty_body_is_rejected(self, tmp_path):
+        """A zero-byte body raises rather than passing as a valid file."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"")
+        with pytest.raises(ValueError, match="0 bytes"):
+            _check_magic(path, b"CDF", "http://host/grid.nc")
+
+
+class TestDownloadExpectMagic:
+    """`download(expect_magic=...)` validates the body before publishing it."""
+
+    def test_matching_body_is_published(self, tmp_path):
+        """A body with the expected prefix lands at dest as usual."""
+        session = _RecordingSession([_Resp(blocks=[b"CDF\x01", b"payload"])])
+        dest = tmp_path / "out.nc"
+        result = HttpClient(session=session).download(
+            "http://x/out.nc", dest, progress=False, expect_magic=b"CDF"
+        )
+        assert result == dest
+        assert dest.read_bytes() == b"CDF\x01payload"
+
+    def test_wrong_body_raises_and_leaves_no_dest(self, tmp_path):
+        """A non-matching body raises ValueError and never becomes dest."""
+        session = _RecordingSession([_Resp(blocks=[b"<html>error</html>"])])
+        dest = tmp_path / "out.nc"
+        with pytest.raises(ValueError, match="does not start with"):
+            HttpClient(session=session).download(
+                "http://x/out.nc", dest, progress=False, expect_magic=b"CDF"
+            )
+        assert not dest.exists(), "an error page must not be published as dest"
+        assert not dest.with_name("out.nc.part").exists(), "temp must be cleaned"
+
+    def test_wrong_body_keeps_a_previous_dest(self, tmp_path):
+        """A rejected re-download leaves the previously good dest intact."""
+        session = _RecordingSession([_Resp(blocks=[b"<html>error</html>"])])
+        dest = tmp_path / "out.nc"
+        dest.write_bytes(b"CDF\x01earlier good file")
+        with pytest.raises(ValueError):
+            HttpClient(session=session).download(
+                "http://x/out.nc", dest, progress=False, expect_magic=b"CDF"
+            )
+        assert dest.read_bytes() == b"CDF\x01earlier good file"
+
+    def test_omitting_expect_magic_skips_the_check(self, tmp_path):
+        """Without expect_magic any body is written, preserving the old contract."""
+        session = _RecordingSession([_Resp(blocks=[b"<html>error</html>"])])
+        dest = tmp_path / "out.nc"
+        HttpClient(session=session).download("http://x/out.nc", dest, progress=False)
+        assert dest.read_bytes() == b"<html>error</html>"
+
+    def test_response_is_closed_when_magic_fails(self, tmp_path):
+        """The rejected response is still released, not left open."""
+        response = _Resp(blocks=[b"<html>"])
+        session = _RecordingSession([response])
+        with pytest.raises(ValueError):
+            HttpClient(session=session).download(
+                "http://x/out.nc",
+                tmp_path / "out.nc",
+                progress=False,
+                expect_magic=b"CDF",
+            )
+        assert response.closed, "the response must be closed even on rejection"
 
 
 class _Capture:

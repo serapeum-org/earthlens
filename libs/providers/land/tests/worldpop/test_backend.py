@@ -569,3 +569,64 @@ def test_worldpoppy_unmapped_product_raises(wp_kwargs, fake_worldpoppy):
     )
     with pytest.raises(ValueError, match="no worldpoppy_id"):
         backend.download(progress_bar=False)
+
+
+class _NoBufferResponse:
+    """Streams its body in small blocks; reading `.content` is a failure."""
+
+    status_code = 200
+    headers: dict[str, str] = {}
+
+    def __init__(self, body: bytes):
+        self._body = body
+        self.closed = False
+
+    @property
+    def content(self) -> bytes:
+        raise AssertionError("the body must be streamed, not buffered via .content")
+
+    def raise_for_status(self) -> None:
+        """A 200 needs no action."""
+
+    def iter_content(self, chunk_size=None):
+        """Yield the body in small blocks, as a streamed response does."""
+        for start in range(0, len(self._body), 8):
+            yield self._body[start : start + 8]
+
+    def close(self) -> None:
+        """Record release of the response."""
+        self.closed = True
+
+
+class TestWorldPopStreams:
+    """A raster mosaic reaches disk without being buffered in memory."""
+
+    def _install(self, monkeypatch, records, tif_bytes, seen):
+        """Route the REST query to canned JSON and every .tif to a streaming body."""
+
+        def fake_get(url, params=None, timeout=None, **kwargs):
+            if "/rest/data/" in url:
+                return _FakeResponse(json_data={"data": records})
+            if url.endswith(".tif"):
+                seen.append(kwargs)
+                return _NoBufferResponse(tif_bytes)
+            raise AssertionError(f"unexpected URL in test: {url}")
+
+        monkeypatch.setattr(requests, "get", fake_get)
+
+    def test_tif_download_never_touches_response_content(
+        self, wp_kwargs, monkeypatch, tiny_tif_bytes
+    ):
+        """A regression to `resp.content` fails this test."""
+        seen: list[dict] = []
+        self._install(monkeypatch, pop_records(), tiny_tif_bytes, seen)
+        result = WorldPop(**wp_kwargs()).download(progress_bar=False)
+        assert result, "download should return the written rasters"
+        assert seen, "the .tif URL should have been fetched"
+
+    def test_tif_download_is_streaming(self, wp_kwargs, monkeypatch, tiny_tif_bytes):
+        """The raster GET passes stream=True."""
+        seen: list[dict] = []
+        self._install(monkeypatch, pop_records(), tiny_tif_bytes, seen)
+        WorldPop(**wp_kwargs()).download(progress_bar=False)
+        assert seen[0].get("stream") is True, f"got {seen[0]}"
