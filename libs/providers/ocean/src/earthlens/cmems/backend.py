@@ -125,10 +125,10 @@ class CMEMS(AbstractDataSource):
                 `[-90, 90]`.
             lon_lim: `[lon_min, lon_max]` in degrees, both in
                 `[-180, 180]`.
-            temporal_resolution: Advisory cadence label; CMEMS
-                handles cadence server-side, so any value the
-                source dataset supports is accepted. Defaults to
-                `"daily"`.
+            temporal_resolution: The requested cadence, validated against
+                `earthlens.base.CADENCE_ALIASES` (which covers every cadence the
+                catalog rows declare). An unrecognised value raises `ValueError`
+                listing the accepted spellings.
             path: Output directory. Created by the parent class if
                 it does not exist. Defaults to the current working
                 directory.
@@ -221,10 +221,13 @@ class CMEMS(AbstractDataSource):
         Args:
             start: Inclusive start date as a string.
             end: Inclusive end date as a string.
-            temporal_resolution: Advisory cadence label; only the
-                `"daily"` and `"monthly"` aliases are mapped to a
-                pandas frequency, otherwise `freq=None` is used and
-                `dates` collapses to the two endpoints.
+            temporal_resolution: The requested cadence. Resolved through
+                `earthlens.base.CADENCE_ALIASES`, which covers every cadence
+                the CMEMS catalog rows declare; a periodic one expands
+                `dates` to its period starts, while a release-character one
+                (`"irregular"`, `"climatology"`) collapses `dates` to the two
+                endpoints. An unrecognised cadence raises rather than
+                silently substituting daily.
             fmt: `strptime` format tried first for a string `start` /
                 `end`; a non-matching string falls back to an ISO-8601
                 parse, and a `datetime` / `date` ignores it.

@@ -50,7 +50,8 @@ def slug_asset_id(asset_id: str) -> str:
         asset_id: An Earth Engine asset id, e.g. `"LANDSAT/LC09/C02/T1_L2"`.
 
     Returns:
-        The id sanitised by `earthlens.base.safe_filename`, e.g. `"LANDSAT_LC09_C02_T1_L2"`.
+        The id sanitised by `earthlens.base.safe_filename`, e.g.
+        `"LANDSAT_LC09_C02_T1_L2"`.
 
     Examples:
         - Slugify a Landsat id:

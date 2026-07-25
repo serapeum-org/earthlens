@@ -283,6 +283,10 @@ class EUMETSAT(AbstractDataSource):
                 `end`; a non-matching string falls back to an ISO-8601
                 parse, and a `datetime` / `date` ignores it.
 
+        Raises:
+            ValueError: If `temporal_resolution` is not one of the cadences
+                `earthlens.base.CADENCE_ALIASES` accepts.
+
         Returns:
             TemporalExtent: Frozen model with parsed bounds.
 

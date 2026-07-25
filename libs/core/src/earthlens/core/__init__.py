@@ -16,6 +16,11 @@ intentionally **not** re-exported here — each needs its own optional SDK, so a
 top-level re-export would crash at import time when the extra is absent. Reach
 them via their submodules (`from earthlens.ecmwf import ECMWF`) or, more
 typically, through the :class:`EarthLens` facade's `data_source=` argument.
+
+`PolygonAoiWarning` is re-exported here too: it is issued when a polygon
+`aoi=` is given to a backend that selects by bounding box only, and callers
+who want that to be fatal can escalate it with
+`warnings.simplefilter("error", PolygonAoiWarning)`.
 """
 
 from __future__ import annotations
@@ -28,8 +33,8 @@ from earthlens.earthlens import EarthLens, download, find, search, sources
 
 __all__ = [
     "AggregationConfig",
-    "PolygonAoiWarning",
     "EarthLens",
+    "PolygonAoiWarning",
     "aggregate_netcdf",
     "download",
     "find",

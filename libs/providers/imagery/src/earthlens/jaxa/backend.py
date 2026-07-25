@@ -55,6 +55,11 @@ from earthlens.jaxa.catalog import Catalog, Dataset, JaxaProtocol
 #: so the `dates` index is informational — but it should still report
 #: a frequency that matches the cadence the user asked for instead of
 #: silently snapping every non-`daily` value to month-start.
+#: JAXA keeps its own cadence map rather than `earthlens.base.CADENCE_ALIASES`
+#: because it is the one adopter that actually iterates `self.time.dates`, and
+#: because its `raw` means "the native granule cadence, walked daily" — not the
+#: shared vocabulary's "no temporal aggregation, query the window whole". Adding
+#: a cadence here is deliberate, not an omission from the shared map.
 _FREQ_ALIAS: dict[str, str] = {
     "raw": "D",
     "hourly": "h",

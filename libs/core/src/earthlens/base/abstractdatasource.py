@@ -934,11 +934,13 @@ class AbstractDataSource(ABC):
 
         resolution = resolve_cadence(cadence, accepted, backend=type(self).__name__)
         if resolution == WHOLE_WINDOW:
-            # A cadence naming a release character rather than a period
-            # ("irregular", "climatology") has no period axis to expand.
-            return self._whole_window_extent(
-                start, end, fmt=fmt, resolution=WHOLE_WINDOW
-            )
+            # A cadence naming a release *character* rather than a period
+            # ("irregular", "climatology", "subdaily", "raw", ...) has no period
+            # axis to expand. The caller's own word is kept as the label rather
+            # than collapsed to the sentinel, so `self.time.resolution` still
+            # reports what was asked for — a backend that logs or serialises the
+            # extent would otherwise see every such request as plain "all".
+            return self._whole_window_extent(start, end, fmt=fmt, resolution=cadence)
         start_dt = to_datetime(start, fmt)
         end_dt = to_datetime(end, fmt)
         dates = date_windows(start_dt, end_dt, resolution)

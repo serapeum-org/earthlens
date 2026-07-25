@@ -58,22 +58,46 @@ _IDS = [str(path.relative_to(_ROOT)).replace("\\", "/") for path in _SOURCES]
 
 
 def _unbounded_caches(path: Path) -> list[str]:
-    """Return module-level `_*CACHE*` names still assigned a plain `dict` literal.
+    """Return cache-looking names still bound to a fresh unbounded `dict`.
 
     One entry per declaration, so a file that bounds one cache and leaves two
-    beside it is still reported.
+    beside it is still reported. Matches `{}` and `dict()`, any capitalisation of
+    "cache", every target of a tuple/multiple assignment, and declarations nested
+    inside a class — the first version saw only module-level `_*CACHE*: ... = {}`
+    and would have missed each of those.
     """
     found: list[str] = []
-    for node in ast.parse(path.read_text(encoding="utf-8")).body:
-        target = None
-        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
-            target = node.target.id
-        elif isinstance(node, ast.Assign) and len(node.targets) == 1:
-            target = getattr(node.targets[0], "id", None)
-        if not target or "CACHE" not in target:
+
+    def is_empty_dict(value: ast.expr | None) -> bool:
+        if isinstance(value, ast.Dict):
+            return not value.keys
+        return (
+            isinstance(value, ast.Call)
+            and getattr(value.func, "id", "") == "dict"
+            and not value.args
+            and not value.keywords
+        )
+
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        targets: list[ast.expr] = []
+        if isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        elif isinstance(node, ast.Assign):
+            targets = list(node.targets)
+        else:
             continue
-        if isinstance(node.value, ast.Dict) and not node.value.keys:
-            found.append(target)
+        if not is_empty_dict(node.value):
+            continue
+        for target in targets:
+            names = (
+                [e for e in target.elts]
+                if isinstance(target, (ast.Tuple, ast.List))
+                else [target]
+            )
+            for name in names:
+                ident = getattr(name, "id", None)
+                if ident and "cache" in ident.lower():
+                    found.append(ident)
     return found
 
 

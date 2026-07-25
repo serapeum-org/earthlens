@@ -140,6 +140,11 @@ class UsgsWaterAuth(AbstractAuth[UsgsWaterCredentials]):
         self._configured = False
         self._token: str | None = None
 
+    # `is_authenticated()` is inherited: it reports whether `configure()`
+    # resolved a token. For this backend `False` is a **legitimate, non-error
+    # state** meaning anonymous access — USGS NWIS serves unauthenticated
+    # requests, and an `API_USGS_PAT` only raises the rate limit. Callers must
+    # not treat a `False` here as an auth failure.
     def configure(self) -> None:
         """Resolve the optional token and export it to the environment.
 

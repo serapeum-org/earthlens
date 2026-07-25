@@ -254,9 +254,10 @@ class TestCadenceAliases:
             ("8day", "8D"),
             ("10day", "10D"),
             ("16day", "16D"),
-            ("weekly", "W"),
+            ("weekly", "7D"),
             ("monthly", "MS"),
             ("annual", "YS"),
+            ("seasonal", "QS-DEC"),
         ],
     )
     def test_periodic_words_map_to_pandas_aliases(self, cadence, expected):
@@ -278,6 +279,19 @@ class TestCadenceAliases:
     def test_non_periodic_words_map_to_whole_window(self, cadence):
         """A cadence naming a release character resolves to the whole-window sentinel."""
         assert CADENCE_ALIASES[cadence] == WHOLE_WINDOW
+
+    @pytest.mark.parametrize(
+        "cadence", ["pentadal", "weekly", "8day", "10day", "16day"]
+    )
+    def test_multi_day_cadences_start_at_the_window_start(self, cadence):
+        """The sliding multi-day aliases tile the window from its own first day.
+
+        A calendar-anchored weekly alias (`W` is `W-SUN`) emits period *ends* and
+        skips the window's opening days, which a per-period fetch loop would drop.
+        """
+        alias = CADENCE_ALIASES[cadence]
+        index = pd.date_range("2024-02-01", "2024-03-19", freq=alias)
+        assert index[0] == pd.Timestamp("2024-02-01")
 
     def test_every_periodic_alias_is_a_valid_pandas_offset(self):
         """No alias is a typo that would only fail at `date_range` time."""

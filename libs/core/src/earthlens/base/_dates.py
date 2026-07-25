@@ -117,16 +117,17 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
 
 
 #: Sentinel alias meaning "no fixed spacing — query the window whole". Returned
-#: by :func:`resolve_cadence` for a cadence that names a release *character*
-#: rather than a period (`"irregular"`, `"climatology"`), which has no pandas
-#: offset. `AbstractDataSource._cadence_extent` turns it into a whole-window
+#: by :func:`resolve_cadence` for any cadence that names a release *character*
+#: rather than a period, and so has no pandas offset: `"irregular"`,
+#: `"climatology"`, `"subhourly"`, `"subdaily"`, `"raw"`, `"native"` and
+#: `"static"`. `AbstractDataSource._cadence_extent` turns it into a whole-window
 #: extent instead of trying to expand a period axis.
 WHOLE_WINDOW = "all"
 
 #: The cadence vocabulary the providers' own catalogs use, mapped to pandas
 #: offset aliases. Shared rather than re-spelled per backend: the narrow
 #: three-entry maps the backends each carried rejected cadences their catalogs
-#: legitimately name — 449 of CMEMS's 1157 rows say `irregular` / `annual` /
+#: legitimately name - many of CMEMS's 1141 rows say `irregular` / `annual` /
 #: `climatology` / `weekly` / `6hourly`. A backend that genuinely supports only
 #: a subset passes its own narrower map.
 CADENCE_ALIASES: dict[str, str] = {
@@ -142,15 +143,27 @@ CADENCE_ALIASES: dict[str, str] = {
     "12hourly": "12h",
     # Daily multiples, including the MODIS/VIIRS composite periods
     # (earthdata's `8day` / `16day`) and the dekad (eumetsat, drought).
+    # The multi-day cadences are deliberately **sliding from the window start**
+    # (`5D` / `7D` / `8D` / `10D` / `16D`) rather than calendar-anchored. Two
+    # reasons: `date_windows` promises one timestamp per period *start*, and
+    # pandas' calendar-anchored weekly alias `W` is `W-SUN`, i.e. a period *end*
+    # — `date_range("2024-02-01", ..., freq="W")` begins on the 4th and never
+    # emits the 1st, so a download loop over the axis would silently skip the
+    # first days of the requested window. The sliding forms always start exactly
+    # at the window start and tile it completely, which is what a per-period
+    # fetch loop needs. MODIS/VIIRS `8day` / `16day` composites are themselves
+    # sliding from a yearly epoch, so this also matches the products.
     "daily": "D",
     "pentadal": "5D",
+    "weekly": "7D",
     "8day": "8D",
     "10day": "10D",
     "dekadal": "10D",
     "16day": "16D",
-    "weekly": "W",
     "monthly": "MS",
-    "seasonal": "QS",
+    # Meteorological seasons (DJF / MAM / JJA / SON), the geoscience convention;
+    # plain `QS` would anchor on the calendar quarter (Jan / Apr / Jul / Oct).
+    "seasonal": "QS-DEC",
     "annual": "YS",
     "yearly": "YS",
     # No fixed period — the window is queried whole. `raw` / `native` mean "as
