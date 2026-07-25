@@ -36,6 +36,10 @@ class _FakeResponse:
     def close(self) -> None:
         """No-op — the fake holds no socket."""
 
+    def iter_content(self, chunk_size=None):
+        """Yield the canned body in one chunk, as a streamed response would."""
+        yield self.content
+
 
 class _FakeBand:
     """Stand-in for a pyramids single-variable NetCDF, writing a stub GeoTIFF."""

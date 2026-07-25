@@ -267,20 +267,25 @@ class Bathymetry(AbstractDataSource):
         nc_path = self.root_dir / f"{row.id}.nc"
         tif_path = self.root_dir / f"{row.id}.tif"
         logger.info(f"bathymetry {row.id}: GET {url}")
-        content = self._download(url, row)
-        nc_path.write_bytes(content)
+        self._download(url, row, nc_path)
         self._to_geotiff(nc_path, row.variable, tif_path)
         return tif_path
 
-    def _download(self, url: str, row: Dataset) -> bytes:
-        """GET the griddap `.nc` body, validating it is real NetCDF.
+    def _download(self, url: str, row: Dataset, dest: Path) -> Path:
+        """Stream the griddap `.nc` body to `dest`, validating it is real NetCDF.
+
+        The body is written straight to disk rather than materialised as
+        `bytes` and then written: a DEM subset can be hundreds of megabytes,
+        and buffering the whole thing to copy it doubles the peak memory for
+        no benefit.
 
         Args:
             url: The griddap subset URL.
             row: The resolved catalog row (for error messages).
+            dest: The `.nc` path to write.
 
         Returns:
-            bytes: The NetCDF body.
+            Path: The `dest` path the NetCDF was written to.
 
         Raises:
             ValueError: On any HTTP error, or a non-NetCDF body (an HTML
@@ -295,23 +300,20 @@ class Bathymetry(AbstractDataSource):
             raise_for_status=True,
         )
         try:
-            response = http.get(url)
+            http.download(url, dest, progress=False, expect_magic=_NETCDF_MAGIC)
         except requests.exceptions.RequestException as exc:
             raise ValueError(
                 f"bathymetry request for {row.id!r} failed over "
                 f"{self._extent_label()}: {exc}. The bbox may be outside the "
                 f"DEM's coverage, or too large for the server (shrink it)."
             ) from exc
-        content = response.content
-        if not content.startswith(_NETCDF_MAGIC):
+        except ValueError as exc:
             raise ValueError(
-                f"bathymetry {row.id!r} returned a non-NetCDF body "
-                f"({len(content)} bytes, starts {content[:24]!r}) over "
-                f"{self._extent_label()}. The server likely returned an error "
-                f"page instead of data; the bbox may be outside coverage or "
-                f"too large (shrink it)."
-            )
-        return content
+                f"bathymetry {row.id!r} returned a non-NetCDF body over "
+                f"{self._extent_label()}: {exc} The bbox may be outside "
+                f"coverage or too large (shrink it)."
+            ) from exc
+        return dest
 
     def _to_geotiff(self, nc_path: Path, variable: str, tif_path: Path) -> None:
         """Read the NetCDF band with pyramids, mask to the AOI, write a GeoTIFF.

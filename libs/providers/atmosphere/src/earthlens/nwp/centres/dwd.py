@@ -36,6 +36,9 @@ if TYPE_CHECKING:
 #: HTTP timeout (seconds) for one per-variable `.bz2` download.
 _HTTP_TIMEOUT = 120
 
+#: Streaming block size (bytes) fed to the incremental bz2 decompressor.
+_CHUNK_SIZE = 1 << 20
+
 
 class DWDCentre(_NWPCentre):
     """Direct-HTTPS fetcher for the DWD ICON models."""
@@ -92,8 +95,18 @@ class DWDCentre(_NWPCentre):
             with open(tmp, "wb") as handle:
                 for param in params:
                     url = self._band_url(model, param, cycle, step)
-                    response = client.get(url, timeout=_HTTP_TIMEOUT)
-                    handle.write(bz2.decompress(response.content))
+                    response = client.get(url, timeout=_HTTP_TIMEOUT, stream=True)
+                    # Decompress incrementally: a global ICON band is a
+                    # multi-hundred-MB .bz2, and `bz2.decompress(resp.content)`
+                    # would hold both the whole compressed body and the whole
+                    # decompressed result in memory at once.
+                    decompressor = bz2.BZ2Decompressor()
+                    try:
+                        for block in response.iter_content(chunk_size=_CHUNK_SIZE):
+                            if block:
+                                handle.write(decompressor.decompress(block))
+                    finally:
+                        response.close()
             tmp.replace(out)
         except BaseException:
             tmp.unlink(missing_ok=True)

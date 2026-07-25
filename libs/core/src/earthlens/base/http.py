@@ -147,6 +147,65 @@ def _redact_url(url: str) -> str:
     return f"{parts.scheme}://{parts.hostname}"
 
 
+def _check_magic(path: Path, magic: bytes | tuple[bytes, ...], url: str) -> None:
+    """Raise unless the file at `path` starts with one of the `magic` prefixes.
+
+    A provider that reports failure in the *body* while still returning a
+    `200` (an ERDDAP error page, a portal's HTML login redirect) would
+    otherwise be written out under a `.nc`/`.tif` name and only fail much
+    later, when something tries to open it. Checking the leading bytes turns
+    that into an immediate, readable error at the download site.
+
+    Args:
+        path: The just-written file (typically the `.part` temp).
+        magic: One byte prefix, or a tuple of acceptable prefixes.
+        url: The source URL, redacted before it reaches the message.
+
+    Raises:
+        ValueError: When the file starts with none of the prefixes. The
+            message carries the size and the first bytes actually seen.
+
+    Examples:
+        - A NetCDF-3 body passes the classic `CDF` check:
+            ```python
+            >>> from pathlib import Path
+            >>> from tempfile import TemporaryDirectory
+            >>> from earthlens.base.http import _check_magic
+            >>> with TemporaryDirectory() as tmp:
+            ...     nc = Path(tmp) / "grid.nc"
+            ...     _ = nc.write_bytes(b"CDF\\x01rest-of-the-file")
+            ...     _check_magic(nc, (b"CDF", b"\\x89HDF"), "https://host/grid.nc")
+
+            ```
+        - An HTML error page served as a `.nc` is rejected, and the message
+          names the host and shows what arrived:
+            ```python
+            >>> from pathlib import Path
+            >>> from tempfile import TemporaryDirectory
+            >>> from earthlens.base.http import _check_magic
+            >>> with TemporaryDirectory() as tmp:
+            ...     nc = Path(tmp) / "grid.nc"
+            ...     _ = nc.write_bytes(b"<html>error</html>")
+            ...     _check_magic(nc, b"CDF", "https://host/grid.nc?token=secret")
+            Traceback (most recent call last):
+                ...
+            ValueError: https://host returned a body that does not start with b'CDF' (18 bytes, starts b'<html>error</html>'). The server likely returned an error page or a redirect instead of the file.
+
+            ```
+    """
+    options = (magic,) if isinstance(magic, bytes) else tuple(magic)
+    with open(path, "rb") as handle:
+        head = handle.read(max(max(len(m) for m in options), 24))
+    if any(head.startswith(m) for m in options):
+        return
+    size = path.stat().st_size
+    raise ValueError(
+        f"{_redact_url(url)} returned a body that does not start with "
+        f"{magic!r} ({size} bytes, starts {head[:24]!r}). The server likely "
+        f"returned an error page or a redirect instead of the file."
+    )
+
+
 def _progress_total(headers: Any) -> int | None:
     """Return the download progress-bar total from response headers.
 
@@ -494,6 +553,7 @@ class HttpClient:
         chunk: int = DEFAULT_CHUNK_SIZE,
         progress: bool = True,
         atomic: bool = True,
+        expect_magic: bytes | tuple[bytes, ...] | None = None,
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
         **kwargs: Any,
@@ -526,6 +586,11 @@ class HttpClient:
                 failure path does not additionally delete it, but that is damage
                 limitation, not a guarantee — `atomic=False` is only appropriate
                 when `dest` is known to be disposable.
+            expect_magic: One or more byte prefixes the body must start with
+                (e.g. `b"CDF"` / `b"\\x89HDF"` for NetCDF). A body that starts
+                with none of them raises `ValueError` and the partial write is
+                discarded, so an HTML error page served with a 200 status never
+                lands as a `.nc`. `None` (the default) skips the check.
             headers: Per-request headers merged over the client defaults.
             timeout: Per-request timeout override (seconds).
             **kwargs: Extra keyword arguments forwarded to `requests`.
@@ -534,6 +599,8 @@ class HttpClient:
             Path: The `dest` path the bytes were written to.
 
         Raises:
+            ValueError: When `expect_magic` is given and the body does not
+                start with any of the supplied prefixes.
             requests.HTTPError: On an error status — `download` always
                 calls `raise_for_status` (the client's `raise_for_status`
                 flag governs the verb methods, not `download`; a file
@@ -597,6 +664,8 @@ class HttpClient:
                     self._stream_to_file(
                         response, tmp, chunk=chunk, progress=progress, desc=dest.name
                     )
+                    if expect_magic is not None:
+                        _check_magic(tmp, expect_magic, url)
                 finally:
                     response.close()
             except self.retry_on_exceptions as exc:

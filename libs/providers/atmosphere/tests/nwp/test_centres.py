@@ -659,6 +659,14 @@ class TestMeteoFranceAPICentre:
             def raise_for_status(self):
                 pass
 
+            def iter_content(self, chunk_size=None):
+                """Yield the canned body in one chunk, as a streamed response would."""
+                yield self.content
+
+            def close(self):
+                """Release the response, as the streaming call sites do."""
+                self.closed = True
+
         def fake_get(url, params=None, headers=None, timeout=None, **kwargs):
             calls.append({"url": url, "params": params, "headers": headers})
             return _Resp(b"GRIB-" + dict(params)["coverageid"].split("__")[0].encode())
@@ -741,7 +749,7 @@ class TestMeteoFranceAPICentre:
         """A GetCoverage failure unlinks the partial file and re-raises."""
         monkeypatch.setenv("MF_API_KEY", "k")
 
-        def failing_get(url, params=None, headers=None, timeout=None):
+        def failing_get(url, params=None, headers=None, timeout=None, **kwargs):
             raise RuntimeError("gateway down")
 
         module = types.ModuleType("requests")

@@ -67,6 +67,14 @@ class _FakeResponse:
         """No-op success (the fake never returns an error status)."""
         self.raised = True
 
+    def iter_content(self, chunk_size=None):
+        """Yield the canned body in one chunk, as a streamed response would."""
+        yield self.content
+
+    def close(self):
+        """Release the response, as the streaming call sites do."""
+        self.closed = True
+
 
 class _FakeDataset:
     """Stand-in for a `pyramids` `Dataset` recording crop / longitude calls."""

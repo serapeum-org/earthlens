@@ -161,6 +161,67 @@ def _detach_and_cleanup(temp_dir: Path, result: Any) -> Any:
     return detached
 
 
+def _import_backend_module(
+    module_name: str,
+    label: str,
+    extras: str,
+    *,
+    subject: str = "Backend",
+) -> Any:
+    """Import a backend module, rewriting a missing SDK into a friendly error.
+
+    Both entry points that import a backend on demand — indexing the lazy
+    registry and loading a backend's catalog — need the same rewrite: the
+    raw `ImportError` names the missing SDK, not the earthlens extra that
+    installs it. Keeping one helper means the two paths cannot drift into
+    telling the user different things.
+
+    Args:
+        module_name: The dotted module to import (e.g. `earthlens.gee`).
+        label: The data-source key to name in the message (e.g. `"gee"`).
+        extras: The pip extra that provides the SDK, or `""` when the
+            backend needs none (then no install hint is added).
+        subject: What is unavailable, used to open the message. The default
+            reads `Backend 'gee' is unavailable`; the catalog path passes
+            `"Backend catalog for"`.
+
+    Returns:
+        The imported module.
+
+    Raises:
+        ImportError: When the module cannot be imported. The message names
+            the key and, when `extras` is set, the `pip install` line that
+            fixes it; the original error is chained as `__cause__`.
+
+    Examples:
+        - An installed backend imports normally:
+            ```python
+            >>> from earthlens.earthlens import _import_backend_module
+            >>> module = _import_backend_module("earthlens.chc", "chc", "")
+            >>> module.__name__
+            'earthlens.chc'
+
+            ```
+        - A missing one names the extra to install:
+            ```python
+            >>> from earthlens.earthlens import _import_backend_module
+            >>> _import_backend_module("earthlens.nope", "nope", "nope")
+            Traceback (most recent call last):
+                ...
+            ImportError: Backend 'nope' is unavailable — its runtime dependency is not installed. Install with `pip install earthlens[nope]`.
+
+            ```
+    """
+    try:
+        return importlib.import_module(module_name)
+    except ImportError as exc:
+        hint = f" Install with `pip install earthlens[{extras}]`." if extras else ""
+        raise ImportError(
+            f"{subject} {label!r} is unavailable — its runtime "
+            f"dependency is not installed.{hint}"
+        ) from exc
+
+
 class _LazyRegistry(Mapping):
     """Maps a data-source key to its backend class, importing on demand.
 
@@ -254,14 +315,7 @@ class _LazyRegistry(Mapping):
 
     def __getitem__(self, key: str) -> type[AbstractDataSource]:
         module_name, class_name, extras, _defaults = self._mapping[key]
-        try:
-            module = importlib.import_module(module_name)
-        except ImportError as exc:
-            hint = f" Install with `pip install earthlens[{extras}]`." if extras else ""
-            raise ImportError(
-                f"Backend {key!r} is unavailable — its runtime "
-                f"dependency is not installed.{hint}"
-            ) from exc
+        module = _import_backend_module(module_name, key, extras)
         return cast("type[AbstractDataSource]", getattr(module, class_name))
 
 
@@ -1014,14 +1068,9 @@ class EarthLens:
             for key, mod, extra in cls.DataSources.entries()
             if key == data_source
         )
-        try:
-            module = importlib.import_module(module_name)
-        except ImportError as exc:
-            hint = f" Install with `pip install earthlens[{extras}]`." if extras else ""
-            raise ImportError(
-                f"Backend {data_source!r} catalog is unavailable — its "
-                f"runtime dependency is not installed.{hint}"
-            ) from exc
+        module = _import_backend_module(
+            module_name, data_source, extras, subject="Backend catalog for"
+        )
         catalog_cls = getattr(module, "Catalog", None)
         if catalog_cls is None:
             raise NotImplementedError(

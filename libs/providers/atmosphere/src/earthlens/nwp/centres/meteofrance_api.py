@@ -50,6 +50,9 @@ _API_KEY_ENV = ("METEO_FRANCE_API_KEY", "MF_API_KEY")
 #: HTTP timeout (seconds) for one WCS GetCoverage request.
 _HTTP_TIMEOUT = 300
 
+#: Streaming block size (bytes) for writing a coverage to disk.
+_CHUNK_SIZE = 1 << 20
+
 
 def resolve_api_key() -> str:
     """Return the Météo-France API key from the environment.
@@ -135,9 +138,21 @@ class MeteoFranceAPICentre(_NWPCentre):
                 for param in params:
                     params_qs = self._coverage_query(model.bands[param], cycle, valid)
                     response = client.get(
-                        url, params=params_qs, headers=headers, timeout=_HTTP_TIMEOUT
+                        url,
+                        params=params_qs,
+                        headers=headers,
+                        timeout=_HTTP_TIMEOUT,
+                        stream=True,
                     )
-                    handle.write(response.content)
+                    # Copy block by block: a full-globe ARPEGE coverage is
+                    # large enough that buffering `response.content` before
+                    # writing it doubles the peak footprint per band.
+                    try:
+                        for block in response.iter_content(chunk_size=_CHUNK_SIZE):
+                            if block:
+                                handle.write(block)
+                    finally:
+                        response.close()
             tmp.replace(out)
         except BaseException:
             tmp.unlink(missing_ok=True)

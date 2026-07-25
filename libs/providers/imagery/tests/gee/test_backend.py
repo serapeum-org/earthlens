@@ -201,6 +201,10 @@ class _FakeHTTPResponse:
     def close(self):
         return None
 
+    def iter_content(self, chunk_size=None):
+        """Yield the canned body in one chunk, as a streamed response would."""
+        yield self.content
+
 
 class _FakePyramidsHandle:
     """Stand-in for a `pyramids.dataset.Dataset` returned by `from_bytes`."""

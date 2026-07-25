@@ -524,9 +524,10 @@ class WorldPop(AbstractDataSource):
             timeout=_HTTP_TIMEOUT,
             sleep=lambda seconds: time.sleep(seconds),
         )
-        resp = http.get(url)
-        dest.write_bytes(resp.content)
-        return dest
+        # Stream to disk. A WorldPop national mosaic is routinely > 1 GB, and
+        # buffering the whole body as `resp.content` before writing it holds
+        # two copies at peak for no benefit.
+        return http.download(url, dest, progress=self._show_progress)
 
     def _group_for_mosaic(
         self, products: list[RemoteProduct]

@@ -801,13 +801,18 @@ class TestFacadePath:
             start="2009-01-01",
             end="2009-01-02",
         )
-        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
-        facade.download(progress_bar=False)
         expected = Path.cwd() / "earthlens-data" / "chc"
         assert facade.datasource.root_dir == expected, (
             f"got {facade.datasource.root_dir}"
         )
-        assert expected.is_dir(), "download() should keep the default directory"
+        assert not expected.exists(), "construction must not create the directory"
+
+        # The stub replaces the backend's own download, which is what the
+        # base class wrapped, so drive the directory hook the wrapper runs.
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
+        facade.datasource._ensure_root_dir()
+        facade.download(progress_bar=False)
+        assert expected.is_dir(), "download() should create the default directory"
 
     def test_omitted_path_load_uses_tempdir(self, tmp_path, monkeypatch):
         """load() redirects to a temp dir and removes the empty ./earthlens-data default."""
@@ -1148,7 +1153,7 @@ class TestFacadeDiscovery:
             raise ImportError("no SDK")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
-        with pytest.raises(ImportError, match="catalog is unavailable"):
+        with pytest.raises(ImportError, match="Backend catalog for"):
             EarthLens.catalog("gee")
 
 

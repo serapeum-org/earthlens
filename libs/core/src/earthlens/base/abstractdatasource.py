@@ -3,7 +3,6 @@ from __future__ import annotations
 import difflib
 import functools
 import inspect
-import os
 import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Mapping, Sequence
@@ -635,6 +634,30 @@ class AbstractDataSource(ABC):
 
         __init__._ergonomic = True  # type: ignore[attr-defined]
         cls.__init__ = __init__  # type: ignore[method-assign]
+        cls._wrap_download()
+
+    @classmethod
+    def _wrap_download(cls) -> None:
+        """Make the backend's own `download` create `root_dir` before it runs.
+
+        `root_dir` is resolved at construction but deliberately not created
+        there (see :meth:`_ensure_root_dir`). Rather than make all 48 backends
+        remember to call it, the subclass hook wraps whichever `download` the
+        class defines so the directory exists the moment a real download
+        starts. A backend that inherits `download` unchanged is untouched —
+        the wrapper it inherits already does this.
+        """
+        original = cls.__dict__.get("download")
+        if original is None or getattr(original, "_ensures_root_dir", False):
+            return
+
+        @functools.wraps(original)
+        def download(self, *args, **kw):
+            self._ensure_root_dir()
+            return original(self, *args, **kw)
+
+        download._ensures_root_dir = True  # type: ignore[attr-defined]
+        cls.download = download  # type: ignore[method-assign]
 
     def __init__(
         self,
@@ -667,7 +690,11 @@ class AbstractDataSource(ABC):
           `dates`. Same opt-in semantics as `self.space`.
         * `self.root_dir` — the absolute :class:`pathlib.Path` of the
           output directory. `self.path` is kept as a legacy alias so
-          older backends (CHIRPS, S3) continue to work.
+          older backends (CHIRPS, S3) continue to work. The directory is
+          *resolved* here but only *created* when a download actually
+          runs (see :meth:`_ensure_root_dir`), so merely constructing a
+          backend — to read its catalog, inspect its options, or validate
+          a request — never litters the filesystem.
 
         Args:
             start: Inclusive start date as a string. Format controlled
@@ -680,8 +707,9 @@ class AbstractDataSource(ABC):
             lon_lim: `[lon_min, lon_max]`.
             fmt: `strptime` format for `start` / `end`. Defaults
                 to `"%Y-%m-%d"`.
-            path: Output directory. Created if it does not exist.
-                Defaults to the current working directory.
+            path: Output directory. Resolved here and created on the first
+                download, not at construction. Defaults to the current
+                working directory.
 
         Raises:
             ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
@@ -717,8 +745,24 @@ class AbstractDataSource(ABC):
 
         self.root_dir = Path(path).absolute()
         self.path = self.root_dir
-        if not os.path.exists(self.root_dir):
-            os.makedirs(self.root_dir)
+
+    def _ensure_root_dir(self) -> Path:
+        """Create :attr:`root_dir` if it does not exist yet, and return it.
+
+        Called by the `download` wrapper installed in
+        :meth:`__init_subclass__`, so every backend's output directory exists
+        by the time its own `download` body runs — without construction
+        itself creating one. Constructing a backend to read its catalog,
+        inspect `options_for`, or validate a request is a read-only act and
+        must not leave an empty directory behind (it also used to create the
+        directory before the request had been validated, so a rejected
+        request still made one).
+
+        Returns:
+            Path: The (now existing) :attr:`root_dir`.
+        """
+        self.root_dir.mkdir(parents=True, exist_ok=True)
+        return self.root_dir
 
     def _check_time_window(self, start: Any, end: Any) -> None:
         """Reject a missing `start` / `end` when the backend needs both.
