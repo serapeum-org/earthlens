@@ -341,19 +341,6 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             dates=dates,
         )
 
-    def _initialize(self):
-        """No eager client — the cdsapi connection is built lazily.
-
-        Returns `None` so the parent does not bind an eager `client`;
-        :meth:`_open_client` constructs the :class:`cdsapi.Client` on
-        first access to `self.client` (i.e. at `download()` time), so
-        constructing the backend never authenticates against CDS.
-
-        Returns:
-            None: Always.
-        """
-        return None
-
     def _open_client(self, endpoint: str = "cds"):
         """Construct a :class:`cdsapi.Client` for the named CADS endpoint.
 

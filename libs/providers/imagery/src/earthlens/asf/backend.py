@@ -27,7 +27,7 @@ for downstream InSAR tools rather than processing them.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 
@@ -38,7 +38,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -247,18 +246,6 @@ class ASF(AbstractDataSource):
         """
         self._auth = ASFAuth(self._creds_arg or ASFCredentials())
         return None
-
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,
@@ -499,15 +486,6 @@ class ASF(AbstractDataSource):
             )
         return targets
 
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape.
-
-        Returns:
-            list[Path]: Whatever :meth:`_fetch` returned, or an
-                empty list when `_search` matched nothing.
-        """
-        return self._api_via_search_fetch()
-
     def download(
         self,
         progress_bar: bool = True,
@@ -558,4 +536,4 @@ class ASF(AbstractDataSource):
                 "aggregate= is not supported. Post-process the downloaded "
                 "SLC/RTC stack with a dedicated InSAR tool."
             )
-        return self._api()
+        return cast("list[Path]", self._api())

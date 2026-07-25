@@ -40,7 +40,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -179,29 +178,6 @@ class GDACS(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No auth, no client — GDACS is a public feed.
-
-        Returns:
-            None: No per-instance client object.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        GDACS takes no server-side bbox, so the box passes through
-        unchanged and is applied client-side in :meth:`_fetch`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -337,10 +313,6 @@ class GDACS(AbstractDataSource):
             [self.space.west, self.space.east],
         )
         return [clipped]
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

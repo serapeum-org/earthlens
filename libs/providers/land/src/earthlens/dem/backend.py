@@ -34,7 +34,6 @@ from tqdm import tqdm
 from earthlens.base import (
     AbstractDataSource,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -139,10 +138,6 @@ class DEM(AbstractDataSource):
             S3Credentials(region=self._dataset.region),
         )
         return None
-
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent` (no snapping)."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
@@ -290,10 +285,6 @@ class DEM(AbstractDataSource):
     def _client(self) -> Any:
         """Return the unsigned `boto3` client (built lazily by `S3Auth`)."""
         return self._auth.client()
-
-    def _api(self, *args: Any, **kwargs: Any) -> list[Path]:
-        """Compose `_search` + `_fetch` (the canonical post-C3 body)."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

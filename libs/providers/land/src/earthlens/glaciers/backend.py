@@ -40,7 +40,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -204,26 +203,6 @@ class Glaciers(AbstractDataSource):
                 "(lat_lim=/lon_lim= or aoi=) — a global WFS query is too large."
             )
 
-    def _initialize(self):
-        """No client and no auth — every source is open (`G5`).
-
-        Returns:
-            None: No per-instance client object.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Build the request :class:`SpatialExtent` from the AOI corners.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]`.
-            lon_lim: `[lon_min, lon_max]`.
-
-        Returns:
-            SpatialExtent: The request extent.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str | None,
@@ -269,10 +248,6 @@ class Glaciers(AbstractDataSource):
         """The request AOI as `[west, south, east, north]` in EPSG:4326."""
         space = self.space
         return [space.west, space.south, space.east, space.north]
-
-    def _api(self) -> list:
-        """Compose `_search` and `_fetch` into the canonical shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """List the products to fetch for the resolved source.

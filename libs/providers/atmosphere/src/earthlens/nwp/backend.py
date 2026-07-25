@@ -35,7 +35,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
     date_windows,
@@ -263,25 +262,6 @@ class NWP(AbstractDataSource):
                     stacklevel=3,
                 )
 
-    def _initialize(self):
-        """No-op auth hook — every MVP centre is an open bucket.
-
-        Returns `None`; the parent binds no `self.client`.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -318,10 +298,6 @@ class NWP(AbstractDataSource):
             resolution="D",
             dates=dates,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _steps_for(self, model: NWPModel) -> list[int]:
         """Resolve the forecast lead times to fetch for one model (`G1`).

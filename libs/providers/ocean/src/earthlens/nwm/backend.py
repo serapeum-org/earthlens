@@ -54,7 +54,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
     to_datetime,
@@ -318,14 +317,6 @@ class NWM(AbstractDataSource):
             path=path,
         )
         self._mode = self._resolve_mode()
-
-    def _initialize(self) -> None:
-        """No-op auth hook — the NWM bucket is anonymous. Returns `None`."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent` (no snapping)."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
@@ -835,10 +826,6 @@ class NWM(AbstractDataSource):
                 return None
             raise
         return target
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

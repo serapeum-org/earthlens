@@ -34,7 +34,6 @@ from loguru import logger
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -184,26 +183,6 @@ class GBIF(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
-
-    def _initialize(self):
-        """No global client — `pygbif` is a stateless module imported lazily.
-
-        Returns:
-            None: GBIF occurrence search is anonymous and stateless.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,

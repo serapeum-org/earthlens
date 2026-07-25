@@ -209,14 +209,6 @@ class RiskIndicators(AbstractDataSource):
                     f"{self._country!r}."
                 )
 
-    def _initialize(self):
-        """No global client — auth (GFW only) is built in :meth:`__init__`.
-
-        Returns:
-            None: No per-instance client object.
-        """
-        return None
-
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Return a global :class:`SpatialExtent` (spatial args ignored, `G7`).
 
@@ -268,10 +260,6 @@ class RiskIndicators(AbstractDataSource):
             resolution=temporal_resolution,
             dates=dates,
         )
-
-    def _api(self) -> list:
-        """Compose `_search` and `_fetch` into the canonical shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Pin the one product to fetch (dataset + resolved selector).

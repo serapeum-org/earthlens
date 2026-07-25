@@ -35,7 +35,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
     resolve_cadence,
@@ -219,18 +218,6 @@ class SentinelHub(AbstractDataSource):
         self._auth = SentinelHubAuth(self._credentials, endpoint=self._endpoint)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Build the WGS84 envelope the Sentinel Hub `BBox` is built from.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: The request's bounding box.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -334,10 +321,6 @@ class SentinelHub(AbstractDataSource):
             self.time.start_date.strftime("%Y-%m-%d"),
             self.time.end_date.strftime("%Y-%m-%d"),
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """List the planned requests without rendering (cheap dry-run).

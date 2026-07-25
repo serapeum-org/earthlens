@@ -51,7 +51,6 @@ from loguru import logger
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -167,25 +166,6 @@ class EEA_AQ(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
-
-    def _initialize(self):
-        """No global client to bind — airbase is imported lazily at fetch.
-
-        Returns `None` so the parent binds no opaque client object.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,

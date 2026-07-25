@@ -34,7 +34,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.base.spatial import mask_to_geometry
@@ -208,22 +207,6 @@ class SoilGrids(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
-
-    def _initialize(self):
-        """No client / auth — SoilGrids is public (returns `None`)."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str

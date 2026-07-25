@@ -41,7 +41,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
     region_affinity,
@@ -252,24 +251,6 @@ class Earthdata(AbstractDataSource):
         self._auth = EarthdataAuth(creds)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Validate and wrap the user bbox into a :class:`SpatialExtent`.
-
-        CMR snaps nothing server-side for a whole-granule search, so
-        this is a thin wrapper over `SpatialExtent.from_pairs` — the
-        same path CMEMS uses. No antimeridian splitting is applied (the
-        shipped backends do not, and the CMR search accepts a plain
-        bounding box).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -307,10 +288,6 @@ class Earthdata(AbstractDataSource):
             resolution=resolution,
             dates=dates,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Query CMR for the granules of every requested dataset.

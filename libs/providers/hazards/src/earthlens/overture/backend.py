@@ -43,7 +43,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -238,18 +237,6 @@ class Overture(AbstractDataSource):
         """
         _require_overturemaps()
         return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,
@@ -508,10 +495,6 @@ class Overture(AbstractDataSource):
             collection.to_file(str(out_path), driver=driver)
         return out_path
 
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
-
     def download(
         self,
         progress_bar: bool = True,
@@ -542,7 +525,7 @@ class Overture(AbstractDataSource):
                 "aggregate= and post-process the returned FeatureCollection "
                 "(a GeoDataFrame) directly."
             )
-        return self._api()
+        return cast("list[Path]", self._api())
 
 
 def _read_geodataframe(

@@ -47,7 +47,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -245,21 +244,6 @@ class AdminBoundaries(AbstractDataSource):
                     )
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the (informational) bbox into a `SpatialExtent` (no snapping).
-
-        Admin boundaries are not bbox-sampled (`G6`); the extent is recorded
-        for parity but does not subset the result.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str | None,
@@ -375,10 +359,6 @@ class AdminBoundaries(AbstractDataSource):
                 scope=cast("str", scope),
             )
         raise ValueError(f"unsupported admin provider: {dataset.provider!r}")
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

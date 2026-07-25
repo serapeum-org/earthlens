@@ -41,7 +41,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -241,18 +240,6 @@ class NREL(AbstractDataSource):
         self._auth.configure()
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -399,10 +386,6 @@ class NREL(AbstractDataSource):
                 f"(schema-only) table to {out_path}"
             )
         return df
-
-    def _api(self) -> list[pd.DataFrame | None]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Enumerate one product per `(lat, lon, name)` call.

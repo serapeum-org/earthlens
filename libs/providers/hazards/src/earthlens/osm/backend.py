@@ -54,7 +54,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -297,27 +296,6 @@ class OSM(AbstractDataSource):
         # forwards its default cadence, so the attribute never misrepresents a
         # temporal cadence the backend does not have.
         self.temporal_resolution = "all"
-
-    def _initialize(self) -> None:
-        """No auth, no client — both protocols are public (`G6`).
-
-        Returns:
-            None: No per-instance client object. The `overpy` / `ohsome`
-                SDKs are imported lazily in `_fetch`.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox feeding the bbox helpers.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,
@@ -654,10 +632,6 @@ class OSM(AbstractDataSource):
         if end is None or end == start:
             return cast("str", start.strftime("%Y-%m-%d"))
         return f"{start:%Y-%m-%d}/{end:%Y-%m-%d}"
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

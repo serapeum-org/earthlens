@@ -38,7 +38,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -170,14 +169,6 @@ class CMIP6(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
-
-    def _initialize(self) -> None:
-        """No-op auth hook — the `gs://cmip6` bucket is anonymous. Returns `None`."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent` (no snapping)."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
@@ -319,10 +310,6 @@ class CMIP6(AbstractDataSource):
             self.time.start_date,
             self.time.end_date,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
 
     def terms_note(self) -> str:
         """Return the attribution note for the requested source model.

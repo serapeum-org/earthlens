@@ -267,10 +267,6 @@ class STAC(LazyClientMixin, AbstractDataSource):
             start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
         )
 
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
-
     def _bboxes(self) -> list[tuple[float, float, float, float]]:
         """Return the search AOI bbox(es) (two when the AOI crosses 180 deg)."""
         return self._aoi_bboxes

@@ -40,7 +40,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
     resolve_cadence,
@@ -204,25 +203,6 @@ class CMEMS(AbstractDataSource):
         )
         self._auth = CmemsAuth(creds)
         return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Validate and wrap the user bbox into a :class:`SpatialExtent`.
-
-        CMEMS does not impose a global native grid (each dataset
-        has its own cell size — 1/12°, 1/4°, 5 km, 2.5 km, …) and
-        the toolbox handles snapping server-side, so this method
-        does not snap the input box. It is kept as a thin wrapper
-        for `SpatialExtent.from_pairs` so the bbox lands on
-        `self.space` via the same path the other backends use.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,
@@ -532,10 +512,6 @@ class CMEMS(AbstractDataSource):
                 "(no `time` variable with a CF `units` attribute)."
             )
         return window_labels(times, freq)
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """One :class:`RemoteProduct` per `(dataset_id, variables)` group.

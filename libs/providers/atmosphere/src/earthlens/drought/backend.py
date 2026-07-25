@@ -40,7 +40,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -203,28 +202,6 @@ class Drought(AbstractDataSource):
             fmt=fmt,
             path=path_str,
         )
-
-    def _initialize(self) -> None:
-        """Open no client — every transport is per-call HTTP / pyramids I/O.
-
-        Returns:
-            None: Drought sources are open / unauthenticated; HTTP requests
-                go out per fetch (`requests.get`), and the pyramids NetCDF
-                / FeatureCollection / WCS readers manage their own state.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a frozen `SpatialExtent` (no snapping).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,

@@ -61,7 +61,6 @@ from earthlens.base import (
     AbstractDataSource,
     LazyClientMixin,
     OutputKind,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
     to_datetime,
@@ -350,21 +349,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self) -> None:
-        """Defer the Earth Engine connection to first client access.
-
-        Returns `None` without touching credentials — the constructor
-        describes only what to fetch. Both the connection and the
-        credential resolution happen lazily on first access to
-        `self.client` (see :meth:`_open_client`), which
-        :meth:`authenticate` triggers eagerly. So constructing the
-        backend never blocks on auth and needs no credentials.
-
-        Returns:
-            None: Always.
-        """
-        return None
-
     def _resolve_credentials(self) -> tuple[str | None, str | None, str | None]:
         """Resolve credentials from explicit values, then the environment.
 
@@ -531,23 +515,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ) from exc
         self.project = project
         return ee
-
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Build the request bounding box.
-
-        Earth Engine has no fixed native grid like ERA5's 0.125°, so the
-        spatial cell size is the user's `scale` (metres), kept on
-        :attr:`scale` rather than on :attr:`SpatialExtent.resolution`
-        (which is a *degrees* field).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: The bbox (no `resolution`).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str

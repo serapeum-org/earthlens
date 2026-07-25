@@ -168,14 +168,6 @@ class ClimateIndices(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No auth, no client — both sources are open HTTPS.
-
-        Returns:
-            None: No per-instance client object.
-        """
-        return None
-
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Return a global :class:`SpatialExtent` (spatial args ignored).
 
@@ -224,10 +216,6 @@ class ClimateIndices(AbstractDataSource):
             resolution="MS",
             dates=date_windows(start_dt, end_dt, "MS"),
         )
-
-    def _api(self) -> list[pd.DataFrame]:
-        """Compose `_search` and `_fetch` into the canonical shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Resolve each requested id to a catalogue row (one product each).

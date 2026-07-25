@@ -41,7 +41,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -217,21 +216,6 @@ class OpenAQ(AbstractDataSource):
         )
         self._auth.configure()
         return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        OpenAQ takes a bbox of min/max lat/lon directly, so the box
-        passes through unchanged.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,
@@ -508,10 +492,6 @@ class OpenAQ(AbstractDataSource):
         start = self.time.start_date.strftime("%Y%m%d")
         end = self.time.end_date.strftime("%Y%m%d")
         return self.root_dir / f"openaq_{params}_{start}_{end}.{ext}"
-
-    def _api(self):
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _api_via_search_fetch_with_progress(
         self, progress_bar: bool

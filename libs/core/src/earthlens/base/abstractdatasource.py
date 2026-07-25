@@ -812,19 +812,51 @@ class AbstractDataSource(ABC):
         """Check validity of input dates. Called by `__init__`."""
         pass
 
-    @abstractmethod
-    def _initialize(self, *args, **kwargs):
-        """Initialize connection with the data source server (for non-FTP servers).
+    def _initialize(self, *args: Any, **kwargs: Any) -> Any:
+        """Prepare the backend before the extents are built; return its client.
 
-        Called once by :meth:`__init__`; the return value is captured
-        into `self.client` when non-`None`.
+        Called once by :meth:`__init__`, before :meth:`_create_grid` and
+        :meth:`_check_input_dates`. A non-`None` return is captured onto
+        `self.client`.
+
+        The default does nothing and returns `None` — the right behaviour for a
+        backend that needs no eager setup, which is half of them (an anonymous
+        HTTP/FTP endpoint, or a lazily-imported stateless SDK). Backends that
+        must resolve a catalog row, build an auth object, or open a client
+        override it. A backend whose client is a *network* connection should
+        prefer :class:`LazyClientMixin` and keep `_initialize` offline, so
+        construction never touches the network.
+
+        Returns:
+            `None` by default; an override returns the client to bind onto
+            `self.client`.
         """
-        pass
+        return None
 
-    @abstractmethod
-    def _create_grid(self, lat_lim: list, lon_lim: list):
-        """Create a grid from the lat/lon boundaries. Called by `__init__`."""
-        pass
+    def _create_grid(
+        self, lat_lim: list[float], lon_lim: list[float]
+    ) -> SpatialExtent | dict | None:
+        """Turn the requested lat/lon bounds into this backend's spatial extent.
+
+        Called once by :meth:`__init__`; the result is captured onto
+        `self.space`.
+
+        The default wraps the bounds verbatim in a validated
+        :class:`SpatialExtent`, which is what all but a handful of backends
+        need — most providers accept an arbitrary WGS84 bbox and do any
+        snapping server-side. Override only to do real work on the bounds:
+        snap them to the provider's grid (ecmwf), attach a native cell size
+        (chc), split an antimeridian-crossing box (stac), or ignore them for a
+        global-only product (climate_indices, risk_indicators).
+
+        Args:
+            lat_lim: `[lat_min, lat_max]` in degrees.
+            lon_lim: `[lon_min, lon_max]` in degrees.
+
+        Returns:
+            SpatialExtent: The validated, frozen bbox.
+        """
+        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     @abstractmethod
     def download(self):
@@ -857,20 +889,26 @@ class AbstractDataSource(ABC):
         """Download a single variable/dataset (called by :meth:`download`)."""
         pass
 
-    @abstractmethod
-    def _api(self, *args, **kwargs):
-        """Send / receive a single request to the data source server.
+    def _api(self, *args: Any, **kwargs: Any) -> Any:
+        """Send / receive the request(s) this download needs.
 
-        Called by :meth:`download` (or :meth:`_download_dataset`) once
-        per `(dataset, variable)` pair. The signature is
-        backend-specific.
+        Called by :meth:`download` (or :meth:`_download_dataset`). The default
+        is the search→fetch composition, :meth:`_api_via_search_fetch`, which
+        is what a backend built on the :meth:`_search` / :meth:`_fetch` split
+        wants — the great majority. Override it only for a backend that talks
+        to its provider in one indivisible step and has no listable product
+        set (chc composes an FTP path per date; ecmwf queues a CDS job; gee
+        builds an ee chain), or one whose `_fetch` takes no product list.
 
-        New backends (C3 onward) should implement :meth:`_search` and
-        :meth:`_fetch` instead and let the default
-        :meth:`_api_via_search_fetch` compose them; existing backends
-        (CHIRPS, S3, ECMWF, GEE) continue to override `_api` directly.
+        Returns:
+            Whatever :meth:`_fetch` returned — see :meth:`_fetch` for the
+            element type, which tracks :attr:`OUTPUT_KIND`.
+
+        Raises:
+            NotImplementedError: If the backend overrides neither this method
+                nor the :meth:`_search` / :meth:`_fetch` pair.
         """
-        pass
+        return self._api_via_search_fetch()
 
     # ------------------------------------------------------------------
     # C3 — optional search/fetch decomposition.

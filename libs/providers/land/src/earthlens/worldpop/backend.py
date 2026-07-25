@@ -41,7 +41,6 @@ from earthlens.base import (
 )
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
@@ -333,18 +332,6 @@ class WorldPop(AbstractDataSource):
         """
         self._auth.configure()
         return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a `SpatialExtent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox (WGS84).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,

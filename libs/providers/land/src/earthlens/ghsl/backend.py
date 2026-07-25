@@ -33,7 +33,6 @@ from earthlens.base import OutputKind, date_windows, to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.base.spatial import crop_to_aoi
@@ -288,18 +287,6 @@ class GHSL(AbstractDataSource):
         self._auth.configure()
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a `SpatialExtent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox (WGS84).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -335,10 +322,6 @@ class GHSL(AbstractDataSource):
             resolution="YS",
             dates=dates,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

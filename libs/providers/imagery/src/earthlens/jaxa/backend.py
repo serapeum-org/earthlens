@@ -43,7 +43,6 @@ if TYPE_CHECKING:
 from earthlens.base import OutputKind, date_windows, resolve_cadence, to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
-    SpatialExtent,
     TemporalExtent,
 )
 from earthlens.jaxa.auth import JaxaAuth, JaxaCredentials
@@ -257,35 +256,6 @@ class JAXA(AbstractDataSource):
                 ```
         """
         return self._protocol
-
-    def _initialize(self) -> None:
-        """No eager connection setup.
-
-        All three branches import their transport clients lazily:
-        `jaxa.earth` and `gportal` inside their branch modules (needing
-        the `[jaxa]` extra), and the `ptree` branch uses only stdlib
-        `ftplib` on demand. `jaxa-earth` is authless; the optional
-        `gportal` / `ptree` credentials are resolved lazily —
-        `download()` calls `self._auth.configure()` before dispatching,
-        and so does the explicit `EarthLens(...).authenticate()`
-        entry point.
-
-        Returns:
-            None: No backend client to attach.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a `SpatialExtent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox (WGS84).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,

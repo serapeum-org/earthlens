@@ -31,7 +31,6 @@ from tqdm import tqdm
 from earthlens.base import (
     AbstractDataSource,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     crop_to_aoi,
     date_windows,
@@ -209,10 +208,6 @@ class S3(AbstractDataSource):
             )
         )
         return self._auth.client()
-
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Capture the AOI bbox as a `SpatialExtent`."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
@@ -517,10 +512,6 @@ class S3(AbstractDataSource):
         return self._nc_variable_name(NetCDF.read_file(str(raw)), product)
 
     # -- public API ----------------------------------------------------
-
-    def _api(self, *args: Any, **kwargs: Any) -> list[Path]:
-        """Compose `_search` + `_fetch` (the canonical post-C3 body)."""
-        return self._api_via_search_fetch()
 
     def download(
         self, progress_bar: bool = True, aggregate: Any | None = None

@@ -347,10 +347,6 @@ class CHIRPS(AbstractDataSource):
                         f"{ds_key!r}. Available: {sorted(available)}."
                     )
 
-    def _initialize(self) -> None:
-        """No persistent client — anonymous FTP opens a connection per fetch."""
-        return None
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:

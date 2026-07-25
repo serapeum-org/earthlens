@@ -47,7 +47,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -278,21 +277,6 @@ class FIRMS(AbstractDataSource):
         auth.configure()
         self.client = auth
         return self
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        FIRMS clips server-side to the bbox path segment, so the box
-        passes through unchanged.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,
@@ -546,10 +530,6 @@ class FIRMS(AbstractDataSource):
             day_range=product.metadata["day_range"],
             start_date=product.metadata["start_date"].isoformat(),
         )
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _api_via_search_fetch_with_progress(
         self, progress_bar: bool

@@ -55,7 +55,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -297,22 +296,6 @@ class HDX(AbstractDataSource):
             )
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (ignored, `G2`).
-
-        HDX/CKAN has no spatial query, so the bbox is never sent to the
-        server; it is validated and kept only so the request shape
-        matches the other backends.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox (unused by the query).
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -349,10 +332,6 @@ class HDX(AbstractDataSource):
             resolution="all",
             dates=pd.DatetimeIndex([start_dt, end_dt]),
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Resolve every requested dataset and list its matching resources.

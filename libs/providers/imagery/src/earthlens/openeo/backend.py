@@ -34,7 +34,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
     resolve_cadence,
@@ -197,18 +196,6 @@ class OpenEO(AbstractDataSource):
         self._auth = OpeneoAuth(self._credentials, endpoint=self._endpoint)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Build the WGS84 envelope passed straight to openEO `spatial_extent`.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: The request's bounding box.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -246,10 +233,6 @@ class OpenEO(AbstractDataSource):
         return TemporalExtent(
             start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical search/fetch shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """List the planned graphs without executing anything (cheap dry-run).

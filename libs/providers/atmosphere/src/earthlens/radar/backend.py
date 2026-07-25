@@ -39,7 +39,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -177,14 +176,6 @@ class Radar(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self):
-        """No-op auth hook — the chunk bucket is anonymous. Returns `None`."""
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the user bbox into a :class:`SpatialExtent`."""
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
@@ -212,17 +203,6 @@ class Radar(AbstractDataSource):
             resolution="raw",
             dates=pd.DatetimeIndex([start_dt, end_dt]),
         )
-
-    def _api(self) -> list[Path]:
-        """Return the assembled `.ar2v` paths (the raw "paths only" entry).
-
-        `download` is the public entry point — it returns the typed
-        `GeoDataFrame` inventory. `_api` exists to satisfy the
-        `AbstractDataSource` contract and exposes just the written paths
-        for callers (or the C3 `_api_via_search_fetch` composition) that
-        want them without the inventory frame.
-        """
-        return self._api_via_search_fetch()
 
     def _window(self) -> tuple[dt.datetime, dt.datetime]:
         """Return the inclusive scan-time window, extending `end` to its day end."""

@@ -39,7 +39,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -203,21 +202,6 @@ class FDSN(AbstractDataSource):
         """
         self._earthscope_token = resolve_earthscope_token(self._earthscope_token_arg)
         return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        FDSN takes min/max lat/lon directly, so the box passes through
-        unchanged.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,
@@ -421,10 +405,6 @@ class FDSN(AbstractDataSource):
             )
             return events.empty_fc()
         return events.catalog_to_fc(catalog, provider_key)
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

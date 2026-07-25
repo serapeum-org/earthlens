@@ -43,7 +43,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     to_datetime,
 )
@@ -272,29 +271,6 @@ class TropicalCyclone(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
-
-    def _initialize(self):
-        """No auth, no client — tropycal fetches public best-track files.
-
-        Returns:
-            None: No per-instance client object.
-        """
-        return None
-
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Wrap the WGS84 bbox into a :class:`SpatialExtent` (no snapping).
-
-        The bbox is applied client-side at the fix level in
-        :meth:`_query_one`, so it passes through unchanged.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     def _check_input_dates(
         self,
@@ -625,10 +601,6 @@ class TropicalCyclone(AbstractDataSource):
             categories = filtered["vmax"].map(events.saffir_simpson_category)
             filtered = filtered[categories >= self._min_category]
         return filtered
-
-    def _api(self) -> list[FeatureCollection]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def download(
         self,

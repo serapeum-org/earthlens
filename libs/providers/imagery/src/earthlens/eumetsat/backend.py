@@ -54,7 +54,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
     date_windows,
     resolve_cadence,
@@ -268,24 +267,6 @@ class EUMETSAT(AbstractDataSource):
         self._auth = EumetsatAuth(creds)
         return None
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Validate and wrap the user bbox into a `SpatialExtent`.
-
-        The Data Store search accepts a plain bounding box, so this is a
-        thin wrapper over `SpatialExtent.from_pairs`. An earthlens extent
-        constrains longitude to a single `[-180, 180]` range with
-        `west <= east`, so it cannot represent an antimeridian-crossing
-        box and `_search` issues exactly one search bbox.
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: Validated, frozen bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str,
@@ -323,10 +304,6 @@ class EUMETSAT(AbstractDataSource):
             resolution=resolution,
             dates=dates,
         )
-
-    def _api(self) -> list[Path]:
-        """Compose `_search` and `_fetch` into the canonical C3 shape."""
-        return self._api_via_search_fetch()
 
     def _search(self) -> list[RemoteProduct]:
         """Query the Data Store for products of every requested collection.
