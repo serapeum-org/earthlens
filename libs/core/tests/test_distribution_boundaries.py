@@ -77,47 +77,90 @@ def _unbounded_caches(path: Path) -> list[str]:
     return found
 
 
+def _separator_replacements(path: Path) -> list[int]:
+    """Return line numbers of `.replace(<sep>, "_")` calls on a path separator.
+
+    Matched from the AST, so the quote style is irrelevant — the earlier
+    double-quoted string grep missed `osm/_pbf.py`'s single-quoted
+    `replace('/', '_')` entirely.
+    """
+    found: list[int] = []
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)):
+            continue
+        if node.func.attr != "replace" or len(node.args) != 2:
+            continue
+        first, second = node.args
+        if not (isinstance(first, ast.Constant) and isinstance(second, ast.Constant)):
+            continue
+        if first.value in ("/", "\\") and second.value == "_":
+            found.append(node.lineno)
+    return found
+
+
+def _swallows_everything(node: ast.AST) -> bool:
+    """Whether `node` contains a handler that silently absorbs `Exception`.
+
+    Structural, not textual: an earlier version tested `"pass" in unparse(...)`,
+    which matched the substring inside identifiers like `password` and so
+    false-positived on functions that actually re-raise. `contextlib.suppress`
+    counts too — it is the same swallow written differently.
+    """
+    for sub in ast.walk(node):
+        if isinstance(sub, ast.ExceptHandler):
+            names = (
+                {sub.type.id}
+                if isinstance(sub.type, ast.Name)
+                else {
+                    e.id
+                    for e in getattr(sub.type, "elts", [])
+                    if isinstance(e, ast.Name)
+                }
+            )
+            if not names & {"Exception", "BaseException"}:
+                continue
+            if all(isinstance(s, ast.Pass) for s in sub.body):
+                return True
+        if isinstance(sub, ast.With):
+            for item in sub.items:
+                call = item.context_expr
+                if (
+                    isinstance(call, ast.Call)
+                    and getattr(call.func, "attr", getattr(call.func, "id", ""))
+                    == "suppress"
+                ):
+                    return True
+    return False
+
+
 def _quiet_close_lookalikes(path: Path) -> list[str]:
-    """Return module-level functions whose body is the quiet-close shape.
+    """Return functions whose body is the quiet-close shape.
 
     The shape is "look up `close`, call it, swallow whatever it raises" — the
     duplication `earthlens.base.close_quietly` replaced. Detected from the AST so
-    renaming the helper cannot hide it. A genuinely different teardown (chc's FTP
-    `quit()`-then-`close()` fallback) has more than one call and is not matched.
+    renaming the helper cannot hide it.
+
+    Covers module-level *and* method definitions, `async def`, and any body length,
+    since the previous version's "one or two statements, module level, `def` only"
+    shape was easy to slip past. The discriminator is that `close` is the only
+    method called: chc's FTP teardown calls `quit()` first and so is a genuinely
+    different protocol-specific sequence, and an unrelated `try: return int(v)
+    except Exception: pass` helper calls no method at all.
     """
     found: list[str] = []
-    for node in ast.parse(path.read_text(encoding="utf-8")).body:
-        if not isinstance(node, ast.FunctionDef):
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
-        body = [
-            statement
-            for statement in node.body
-            if not (
-                isinstance(statement, ast.Expr)
-                and isinstance(statement.value, ast.Constant)
-            )
-        ]
-        if len(body) != 1 or not isinstance(body[0], ast.Try):
-            # Allow the `closer = getattr(...)` / `if callable(closer)` prelude.
-            if not (
-                len(body) == 2
-                and isinstance(body[0], ast.Assign)
-                and isinstance(body[1], ast.If)
-            ):
-                continue
-        module = ast.Module(body=body, type_ignores=[])
-        source = ast.unparse(module)
-        swallows = "except Exception" in source and "pass" in source
-        # Exactly one try, and `close` is the only method it calls. chc's FTP
-        # teardown has a nested try and calls `quit()` first, so it is a genuinely
-        # different protocol-specific shape and is not matched.
-        tries = sum(isinstance(n, ast.Try) for n in ast.walk(module))
+        if not _swallows_everything(node):
+            continue
         methods = {
-            n.func.attr
-            for n in ast.walk(module)
-            if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+            sub.func.attr
+            for sub in ast.walk(node)
+            if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute)
         }
-        if swallows and tries == 1 and methods <= {"close"}:
+        # `close` called, and nothing else — a lone `close` inside a
+        # swallow-everything handler is the helper, whatever it is named.
+        if methods == {"close"}:
             found.append(node.name)
     return found
 
@@ -192,12 +235,12 @@ class TestSharedHelpersAreNotReimplemented:
         straight through into a filename.
         """
         offenders = [
-            str(path.relative_to(_ROOT)).replace("\\", "/")
+            f"{str(path.relative_to(_ROOT)).replace(chr(92), '/')}:{line}"
             for path in _provider_sources()
-            if 'replace("/", "_")' in path.read_text(encoding="utf-8")
+            for line in _separator_replacements(path)
         ]
         assert not offenders, (
-            f"{offenders} sanitise filenames by hand; use "
+            f"{offenders} sanitise a path separator by hand; use "
             f"`earthlens.base.safe_filename`, which also strips the "
             f"Windows-illegal characters"
         )
