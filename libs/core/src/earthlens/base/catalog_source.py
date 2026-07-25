@@ -187,10 +187,30 @@ def catalog_cache_key(path: Path, files: Sequence[Path]) -> tuple[Any, ...]:
     """
     resolved = str(path.resolve())
     try:
-        stamps = tuple((str(f), f.stat().st_mtime_ns) for f in files)
+        stamps = tuple(_file_stamp(f) for f in files)
     except FileNotFoundError:
-        stamps = ((resolved, 0),)
-    return (resolved, stamps or ((resolved, 0),))
+        stamps = ((resolved, 0, 0),)
+    return (resolved, stamps or ((resolved, 0, 0),))
+
+
+def _file_stamp(path: Path) -> tuple[str, int, int]:
+    """Return `(path, mtime_ns, size)` — the change signature for one file.
+
+    The size is part of the stamp because `st_mtime_ns` alone is not
+    reliable for back-to-back rewrites: filesystems quantise timestamps, so
+    two writes within the same tick produce the same mtime and a
+    content-changed file would be served from cache. Length rarely survives
+    a real catalog edit unchanged, so pairing the two closes the common
+    case at the cost of one already-performed `stat`.
+
+    Args:
+        path: The contributing YAML file.
+
+    Returns:
+        tuple[str, int, int]: The file's path, mtime in nanoseconds, and size.
+    """
+    info = path.stat()
+    return (str(path), info.st_mtime_ns, info.st_size)
 
 
 def load_catalog(

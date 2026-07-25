@@ -20,9 +20,25 @@ def _write(tmp_path, name, body):
 class TestStrictSafeLoader:
     """Tests for the `_StrictSafeLoader` class itself."""
 
-    def test_is_safe_loader_subclass(self):
-        """`_StrictSafeLoader` extends `yaml.SafeLoader` (no arbitrary objects)."""
-        assert issubclass(_StrictSafeLoader, yaml.SafeLoader)
+    def test_is_a_safe_loader(self):
+        """The strict loader extends a *safe* base — never the unsafe one.
+
+        The base is libyaml's `CSafeLoader` when PyYAML ships the C
+        extension, else the pure-Python `SafeLoader`; both refuse arbitrary
+        object instantiation.
+        """
+        safe_bases = tuple(
+            base
+            for base in (getattr(yaml, "CSafeLoader", None), yaml.SafeLoader)
+            if base is not None
+        )
+        assert issubclass(_StrictSafeLoader, safe_bases)
+        assert not issubclass(_StrictSafeLoader, yaml.UnsafeLoader)
+
+    def test_prefers_the_libyaml_backed_loader(self):
+        """When libyaml is available the strict loader is built on it."""
+        expected = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+        assert issubclass(_StrictSafeLoader, expected)
 
 
 class TestLoadYamlStrict:
