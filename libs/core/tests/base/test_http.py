@@ -622,10 +622,9 @@ class TestDownload:
         )
         dest = tmp_path / "out.bin"
         dest.write_bytes(b"previously downloaded")
+        client = HttpClient(session=session)
         with pytest.raises(OSError):
-            HttpClient(session=session).download(
-                "http://x", dest, progress=False, atomic=False
-            )
+            client.download("http://x", dest, progress=False, atomic=False)
         assert dest.exists()
         # Documented consequence of atomic=False: the stream opens dest "wb", so
         # the old contents are already gone before any failure. The failure path
@@ -639,8 +638,9 @@ class TestDownload:
         )
         dest = tmp_path / "out.bin"
         dest.write_bytes(b"previously downloaded")
+        client = HttpClient(session=session)
         with pytest.raises(OSError):
-            HttpClient(session=session).download("http://x", dest, progress=False)
+            client.download("http://x", dest, progress=False)
         assert dest.read_bytes() == b"previously downloaded"
 
     def test_non_atomic_retry_failure_keeps_existing_dest(self, tmp_path):
@@ -666,8 +666,9 @@ class TestDownload:
         )
         dest = tmp_path / "out.bin"
         dest.write_bytes(b"previously downloaded")
+        client = HttpClient(session=session)
         with pytest.raises(OSError):
-            HttpClient(session=session).download("http://x", dest, progress=False)
+            client.download("http://x", dest, progress=False)
         assert not dest.with_name("out.bin.part").exists()
         assert dest.read_bytes() == b"previously downloaded"
 

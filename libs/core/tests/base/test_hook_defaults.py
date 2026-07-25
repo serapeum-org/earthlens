@@ -320,8 +320,9 @@ class TestRunItems:
                 raise RuntimeError("boom")
             return n
 
+        backend = self._backend(tmp_path)
         with pytest.raises(RuntimeError, match="boom"):
-            self._backend(tmp_path)._run_items([1, 2, 3], flaky, errors="raise")
+            backend._run_items([1, 2, 3], flaky, errors="raise")
 
     def test_ignore_is_silent_but_still_reports(self, tmp_path):
         """`errors="ignore"` logs nothing yet still returns the failure list."""
@@ -344,8 +345,9 @@ class TestRunItems:
 
     def test_unknown_policy_rejected(self, tmp_path):
         """A policy outside the accepted set raises with the accepted names."""
+        backend = self._backend(tmp_path)
         with pytest.raises(ValueError, match="errors must be"):
-            self._backend(tmp_path)._run_items([1], lambda n: n, errors="continue")
+            backend._run_items([1], lambda n: n, errors="continue")
 
     def test_on_failure_keeps_results_aligned(self, tmp_path):
         """A placeholder keeps one result per item, as the vector backends need."""

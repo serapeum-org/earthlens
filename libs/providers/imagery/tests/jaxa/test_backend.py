@@ -166,9 +166,6 @@ def test_temporal_resolution_maps_to_frequency_alias(
 @pytest.mark.unit
 def test_unknown_temporal_resolution_rejected(base_kwargs) -> None:
     """An unsupported cadence raises instead of silently becoming month-start."""
+    kwargs = {k: v for k, v in base_kwargs.items() if k != "temporal_resolution"}
     with pytest.raises(ValueError, match="is not supported by JAXA"):
-        JAXA(
-            variables=["elevation"],
-            temporal_resolution="nonsense",
-            **{k: v for k, v in base_kwargs.items() if k != "temporal_resolution"},
-        )
+        JAXA(variables=["elevation"], temporal_resolution="nonsense", **kwargs)
