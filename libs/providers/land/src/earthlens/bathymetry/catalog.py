@@ -25,7 +25,10 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.catalog_source import yaml_files_for
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    yaml_files_for,
+)
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 #: Path to the bundled catalog directory of per-family `*.yaml` files plus the
@@ -124,13 +127,8 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
             two files, a row fails validation, or a curated id is absent from
             `available_datasets:`.
     """
-    resolved = str(path.resolve())
     files = _yaml_files_for(path)
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
+    key = catalog_cache_key(path, files)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached

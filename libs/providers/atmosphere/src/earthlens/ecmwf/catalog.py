@@ -58,7 +58,10 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf, Provider
-from earthlens.base.catalog_source import yaml_files_for
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    yaml_files_for,
+)
 from earthlens.base.providers import (
     clear_providers_cache as _clear_providers_cache_base,
 )
@@ -128,13 +131,8 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
             has no variables under any dataset, or declares the same
             dataset key twice anywhere.
     """
-    resolved = str(path.resolve())
     files = _yaml_files_for(path)
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
+    key = catalog_cache_key(path, files)
     cached = _CATALOG_CACHE.get(key)
     if cached is not None:
         return cached
