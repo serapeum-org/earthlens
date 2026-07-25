@@ -37,6 +37,7 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
     date_windows,
+    safe_filename,
 )
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
 from earthlens.sentinel_hub._helpers import (
@@ -1313,7 +1314,7 @@ def _safe_name(key: str) -> str:
 
             ```
     """
-    return key.replace("/", "_").replace("\\", "_")
+    return safe_filename(key)
 
 
 def _async_request_id(submission: Any) -> str | None:

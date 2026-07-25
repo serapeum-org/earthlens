@@ -114,3 +114,43 @@ class TestAggregatePublicSurface:
 
         assert not hasattr(aggregate, "_reduce")
         assert not hasattr(aggregate, "_window_groups")
+
+
+class TestSharedHelpersAreNotReimplemented:
+    """The base helpers that exist are the ones the providers use."""
+
+    def test_no_provider_reimplements_filename_sanitising(self):
+        """Every path-sanitising site routes through `base.safe_filename`.
+
+        The three local sanitisers only replaced path separators, so a
+        Windows-illegal character (`:` in a timestamped product id) passed
+        straight through into a filename.
+        """
+        offenders = [
+            str(path.relative_to(_ROOT)).replace("\\", "/")
+            for path in _provider_sources()
+            if 'replace("/", "_")' in path.read_text(encoding="utf-8")
+        ]
+        assert not offenders, (
+            f"{offenders} sanitise filenames by hand; use "
+            f"`earthlens.base.safe_filename`, which also strips the "
+            f"Windows-illegal characters"
+        )
+
+    def test_no_provider_reimplements_quiet_close(self):
+        """No provider re-declares its own best-effort handle-release helper."""
+        offenders = [
+            str(path.relative_to(_ROOT)).replace("\\", "/")
+            for path in _provider_sources()
+            if "def _close_quietly" in path.read_text(encoding="utf-8")
+        ]
+        assert not offenders, (
+            f"{offenders} declare a local close helper; use "
+            f"`earthlens.base.close_quietly`"
+        )
+
+    def test_close_quietly_is_exported(self):
+        """The shared helper is part of the public base surface."""
+        from earthlens.base import close_quietly
+
+        assert callable(close_quietly)

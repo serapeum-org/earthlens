@@ -35,6 +35,7 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
+    safe_filename,
 )
 from earthlens.openeo._helpers import OUTPUT_FORMATS, period_for, reducer_for
 from earthlens.openeo.auth import OpeneoAuth, OpeneoCredentials
@@ -465,4 +466,4 @@ def _safe_name(key: str) -> str:
 
             ```
     """
-    return key.replace("/", "_").replace("\\", "_")
+    return safe_filename(key)

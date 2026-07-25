@@ -29,6 +29,7 @@ from earthlens.base.http import HttpClient
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.naming import safe_filename
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
+from earthlens.base.raster import close_quietly
 from earthlens.base.region import (
     clear_region_cache,
     region_affinity,
@@ -62,6 +63,7 @@ __all__ = [
     "SpatialExtent",
     "TemporalExtent",
     "clear_providers_cache",
+    "close_quietly",
     "clear_region_cache",
     "crop_to_aoi",
     "date_windows",

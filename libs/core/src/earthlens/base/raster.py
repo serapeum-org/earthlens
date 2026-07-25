@@ -13,6 +13,64 @@ from __future__ import annotations
 from typing import Any
 
 
+def close_quietly(handle: Any) -> None:
+    """Release a pyramids handle, ignoring any error from the close itself.
+
+    The shared form of the "best-effort handle release" the raster backends each
+    re-spelled. Releasing the handle matters on Windows, where an open GDAL /
+    netCDF handle blocks a later `open` or `unlink` of the same file, so an
+    intermediate cannot be replaced or removed while it is held. The close is
+    best-effort by design: it runs on the cleanup path of an operation that has
+    already produced its result, so a failure to close must not mask that result
+    or the exception being propagated.
+
+    Accepts anything — a `Dataset`, `NetCDF`, `LabeledDataset`, `None`, or an
+    object with no `close` at all — so a caller never has to guard the call.
+
+    Args:
+        handle: The object to close. Ignored when it is `None` or exposes no
+            callable `close`.
+
+    Examples:
+        - A closeable handle is closed:
+            ```python
+            >>> from earthlens.base.raster import close_quietly
+            >>> class Handle:
+            ...     closed = False
+            ...     def close(self):
+            ...         self.closed = True
+            >>> handle = Handle()
+            >>> close_quietly(handle)
+            >>> handle.closed
+            True
+
+            ```
+        - A handle whose close fails is swallowed, not propagated:
+            ```python
+            >>> from earthlens.base.raster import close_quietly
+            >>> class Stubborn:
+            ...     def close(self):
+            ...         raise OSError("still locked")
+            >>> close_quietly(Stubborn())
+
+            ```
+        - `None` and objects without `close` are no-ops:
+            ```python
+            >>> from earthlens.base.raster import close_quietly
+            >>> close_quietly(None)
+            >>> close_quietly(object())
+
+            ```
+    """
+    closer = getattr(handle, "close", None)
+    if not callable(closer):
+        return
+    try:
+        closer()
+    except Exception:  # noqa: BLE001 - best-effort release on a cleanup path
+        pass
+
+
 def array_to_raster(
     arr: Any,
     geo: Any,

@@ -18,6 +18,8 @@ from typing import TYPE_CHECKING
 
 from tqdm import tqdm
 
+from earthlens.base import safe_filename
+
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from earthlens.base import SpatialExtent
 
@@ -64,7 +66,7 @@ def slug_asset_id(asset_id: str) -> str:
 
             ```
     """
-    return asset_id.replace("/", "_")
+    return safe_filename(asset_id)
 
 
 def reduce_collection(collection, reducer: str):

@@ -54,7 +54,9 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
+    close_quietly,
     date_windows,
+    safe_filename,
 )
 from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
 
@@ -657,7 +659,7 @@ class NWM(AbstractDataSource):
                 dataset = nc.subset(variable, time=0, bbox=self._bbox(), crs=4326)
             except ValueError as exc:
                 if "has no 1-D coordinate variable" in str(exc):
-                    _close_quietly(nc)
+                    close_quietly(nc)
                     raise NotImplementedError(
                         f"NWM variable {variable!r} has a vertical/layer dimension "
                         "interleaved between its y and x axes, which the pyramids "
@@ -669,7 +671,7 @@ class NWM(AbstractDataSource):
             out_path = self.root_dir / f"{path.stem}_{variable}.tif"
             dataset.to_cog(str(out_path))
             out.append(Path(out_path))
-        _close_quietly(nc)
+        close_quietly(nc)
         return out
 
     def _fetch_retrospective(self, products: list[RemoteProduct]) -> list[Path]:
@@ -752,7 +754,7 @@ class NWM(AbstractDataSource):
                         cube, product, downloaded.stem, slice_time=False
                     )
                 )
-                _close_quietly(cube)
+                close_quietly(cube)
             else:
                 out.extend(self._subset_gridded_file(downloaded, product))
         return out
@@ -803,7 +805,7 @@ class NWM(AbstractDataSource):
         """
         key = product.href
         assert key is not None  # NWM products always carry an S3 key href
-        target = self.root_dir / key.replace("/", "_")
+        target = self.root_dir / safe_filename(key)
         tmp = target.with_name(target.name + ".part")
         try:
             body = client.get_object(Bucket=BUCKET, Key=key)["Body"]
@@ -877,21 +879,6 @@ def _is_int(value: Any) -> TypeGuard[int]:
         bool: `True` for an `int` that is not a `bool`.
     """
     return isinstance(value, int) and not isinstance(value, bool)
-
-
-def _close_quietly(cube: Any) -> None:
-    """Close a `LabeledDataset`'s underlying store, ignoring any error.
-
-    Releasing the file handle lets the intermediate NetCDF be removed on
-    Windows (where an open handle blocks `unlink`).
-
-    Args:
-        cube: An opened `LabeledDataset`.
-    """
-    try:
-        cube.close()
-    except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
-        pass
 
 
 def _is_missing_key(exc: BaseException) -> bool:

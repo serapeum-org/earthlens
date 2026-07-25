@@ -197,7 +197,7 @@ def test_close_quietly_swallows_errors():
         def close(self):
             raise RuntimeError("boom")
 
-    accessor._close_quietly(_Bad())
+    accessor.close_quietly(_Bad())
 
 
 def test_no_forbidden_imports():

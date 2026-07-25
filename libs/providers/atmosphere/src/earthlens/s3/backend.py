@@ -49,15 +49,6 @@ if TYPE_CHECKING:
 __all__ = ["S3"]
 
 
-def _safe_name(value: str) -> str:
-    """Sanitise a product id into a filesystem-safe file stem.
-
-    Thin alias over :func:`earthlens.base.safe_filename` (the shared
-    implementation); kept as a module-local name for the call sites.
-    """
-    return safe_filename(value)
-
-
 @dataclass(frozen=True)
 class _AggregationVariable:
     """Duck-typed `var_info` for `aggregate_netcdf` (the fields it reads)."""
@@ -277,7 +268,7 @@ class S3(AbstractDataSource):
         default_ext = ".nc" if self._dataset.format == "netcdf" else ".tif"
         assert product.href is not None  # S3 products always carry a key/URL
         ext = Path(product.href).suffix or default_ext
-        raw = raw_dir / f"{_safe_name(product.id)}{ext}"
+        raw = raw_dir / f"{safe_filename(product.id)}{ext}"
         if raw.exists():
             return raw
         extra = {"RequestPayer": "requester"} if self._dataset.requester_pays else None
@@ -411,7 +402,7 @@ class S3(AbstractDataSource):
             "netcdf",
         )
         out_ext = ".tif" if as_geotiff else ".nc"
-        out_path = self.path / f"{_safe_name(product.id)}{out_ext}"
+        out_path = self.path / f"{safe_filename(product.id)}{out_ext}"
         data.to_file(str(out_path))
         return out_path
 

@@ -635,7 +635,7 @@ class CMEMS(AbstractDataSource):
         variables = product.metadata.get("variables") or []
         ext = "nc" if self._file_format == "netcdf" else "zarr"
         output_filename = product.metadata.get("output_filename") or (
-            f"{_safe_filename(dataset_id)}.{ext}"
+            f"{safe_filename(dataset_id)}.{ext}"
         )
 
         logger.info(
@@ -681,24 +681,6 @@ class CMEMS(AbstractDataSource):
                 f"{getattr(response, 'status', None)!r}"
             )
         return Path(file_path)
-
-
-def _safe_filename(dataset_id: str) -> str:
-    """Sanitise a CMEMS dataset id into a filesystem-safe stem.
-
-    Thin alias over :func:`earthlens.base.safe_filename` (the shared
-    implementation). CMEMS dataset ids contain `.` (e.g.
-    `cmems_mod_glo_phy_my_0.083deg_P1D-m`), which the whitelist keeps,
-    while every path separator and Windows-illegal character
-    (`/ \\ : * ? " < > |`) collapses to `_`.
-
-    Args:
-        dataset_id: The raw CMEMS dataset id.
-
-    Returns:
-        A filename-safe variant of the id.
-    """
-    return safe_filename(dataset_id)
 
 
 def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:
@@ -754,7 +736,7 @@ def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:
     """
     import hashlib
 
-    stems: dict[str, str] = {ds_id: _safe_filename(ds_id) for ds_id in dataset_ids}
+    stems: dict[str, str] = {ds_id: safe_filename(ds_id) for ds_id in dataset_ids}
     counts = Counter(stems.values())
     names: dict[str, str] = {}
     for ds_id, stem in stems.items():

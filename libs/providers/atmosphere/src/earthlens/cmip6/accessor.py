@@ -29,6 +29,8 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+from earthlens.base import close_quietly
+
 if TYPE_CHECKING:
     from earthlens.cmip6.resolver import ResolvedStore
 
@@ -205,7 +207,7 @@ def resolve_time_window(
                 f"{variable!r} in {zstore!r}: {exc}"
             ) from exc
         finally:
-            _close_quietly(dataset)
+            close_quietly(dataset)
     if i1 <= i0:
         raise ValueError(
             f"no CMIP6 timesteps fall in the window [{start}, {end}] for "
@@ -251,23 +253,8 @@ def write_subset(
             subset = container.subset(variable, time=time, bbox=bbox, crs=crs)
             subset.to_file(str(out))
         finally:
-            _close_quietly(container)
+            close_quietly(container)
     return out
-
-
-def _close_quietly(handle: Any) -> None:
-    """Close a pyramids reader handle, ignoring any error.
-
-    Releasing the handle lets the store be reopened on Windows (where an open
-    handle can block a later open / unlink).
-
-    Args:
-        handle: An opened `NetCDF` / `LabeledDataset`.
-    """
-    try:
-        handle.close()
-    except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
-        pass
 
 
 def store_output_stem(store: ResolvedStore, start: Any, end: Any) -> str:
