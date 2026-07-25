@@ -61,11 +61,11 @@ _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, EarthdataDataset]]] = (
     CatalogParseCache()
 )
 # Same `(path, mtime_ns)` cache for the DAAC provider registry.
-_PROVIDERS_CACHE: dict[Any, dict[str, EarthdataDAAC]] = {}
+_PROVIDERS_CACHE: dict[Any, dict[str, EarthdataDAAC]] = CatalogParseCache()
 # …and for the auto-generated long-tail rows (kept as raw dicts — a model is
 # built only for the one key a caller resolves, so membership/resolution never
 # instantiates all ~8k pydantic rows).
-_AUTO_CACHE: dict[Any, dict[str, dict]] = {}
+_AUTO_CACHE: dict[Any, dict[str, dict]] = CatalogParseCache()
 
 OutputKindLiteral = Literal["raster", "vector", "tabular"]
 

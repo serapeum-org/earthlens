@@ -51,7 +51,7 @@ _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, HdxDataset]]] = CatalogPars
 # fast JSON read (a flat list of ~7k ids) instead of a multi-hundred-millisecond
 # YAML parse, mirroring how `earthlens.earthdata` keeps its long tail in
 # `_auto.json` out of the curated YAML glob.
-_AVAILABLE_CACHE: dict[Any, dict[str, dict]] = {}
+_AVAILABLE_CACHE: dict[Any, dict[str, dict]] = CatalogParseCache()
 
 #: Filename of the gzipped JSON `available_datasets` index, kept beside the
 #: curated per-theme YAMLs (and out of the `*.yaml` glob). Gzipped because the
