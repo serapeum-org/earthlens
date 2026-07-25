@@ -102,6 +102,7 @@ Examples:
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -109,15 +110,19 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel, ConfigDict
 
+from earthlens.base.raster import close_quietly
+
 if TYPE_CHECKING:
     from pyramids.netcdf import NetCDF
 
     from earthlens.ecmwf import Variable
 
 __all__ = [
+    "AggregatedWindow",
     "AggregationConfig",
     "OperationLiteral",
     "aggregate_netcdf",
+    "iter_aggregate_netcdf",
     "reduce_time_axis",
     "window_groups",
 ]
@@ -568,13 +573,72 @@ class AggregationConfig(BaseModel):
     level: int | float | None = None
     skipna: bool = True
     min_count: int | None = None
+    keep_arrays: bool = True
+
+
+@dataclass(frozen=True)
+class AggregatedWindow:
+    """One reduced time window: its label, its array, and where it was written.
+
+    Yielded by :func:`iter_aggregate_netcdf`. `array` is `None` when the
+    request set `keep_arrays=False` and the window was written to disk — the
+    point of that mode is that a long run does not accumulate every window in
+    memory alongside the GeoTIFFs it has already produced.
+
+    Attributes:
+        label: The window's left-edge timestamp.
+        array: The reduced 2-D array, or `None` when the request asked not to
+            retain it.
+        path: The written GeoTIFF, or `None` when `out_dir` was `None`.
+
+    Examples:
+        - A window keeps both its array and its path when it was written:
+            ```python
+            >>> import numpy as np
+            >>> import pandas as pd
+            >>> from pathlib import Path
+            >>> from earthlens.aggregate import AggregatedWindow
+            >>> window = AggregatedWindow(
+            ...     label=pd.Timestamp("2020-01-01"),
+            ...     array=np.array([[1.0, 2.0]]),
+            ...     path=Path("out/t2m_1D_20200101.tif"),
+            ... )
+            >>> window.label.strftime("%Y-%m-%d")
+            '2020-01-01'
+            >>> float(window.array.mean())
+            1.5
+            >>> window.path.name
+            't2m_1D_20200101.tif'
+
+            ```
+        - A discarded array leaves only the label and the path to read back:
+            ```python
+            >>> import pandas as pd
+            >>> from pathlib import Path
+            >>> from earthlens.aggregate import AggregatedWindow
+            >>> window = AggregatedWindow(
+            ...     label=pd.Timestamp("2020-02-01"),
+            ...     array=None,
+            ...     path=Path("out/t2m_1D_20200201.tif"),
+            ... )
+            >>> window.array is None
+            True
+            >>> window.path.name
+            't2m_1D_20200201.tif'
+
+            ```
+    """
+
+    label: pd.Timestamp
+    array: np.ndarray | None
+    path: Path | None
 
 
 def aggregate_netcdf(
     nc_path: Path | str,
     var_info: Variable,
     config: AggregationConfig,
-) -> list[tuple[pd.Timestamp, np.ndarray, Path | None]]:
+) -> list[tuple[pd.Timestamp, np.ndarray | None, Path | None]]:
     """Slice a CDS-shaped NetCDF into per-window aggregated outputs.
 
     Reads the NetCDF, groups its time axis by `config.freq`, reduces
@@ -594,10 +658,12 @@ def aggregate_netcdf(
             window, reduction, and output location.
 
     Returns:
-        list[tuple[pd.Timestamp, np.ndarray, Path | None]]: One entry
-        per window. The first item is the window's left-edge
-        timestamp; the second is the reduced 2-D array; the third is
-        the GeoTIFF path (or `None` when `config.out_dir` was `None`).
+        list[tuple[pd.Timestamp, np.ndarray | None, Path | None]]: One
+        entry per window. The first item is the window's left-edge
+        timestamp; the second is the reduced 2-D array — `None` only when
+        the request set `keep_arrays=False` and the window was written to
+        disk; the third is the GeoTIFF path (or `None` when
+        `config.out_dir` was `None`).
 
     Raises:
         KeyError: If the NetCDF has no recognised time variable
@@ -615,6 +681,62 @@ def aggregate_netcdf(
         - `examples/post_process_ecmwf_netcdf.py`: thin CLI demo of
           this function (after task L1).
     """
+    return [
+        (window.label, window.array, window.path)
+        for window in iter_aggregate_netcdf(nc_path, var_info, config)
+    ]
+
+
+def iter_aggregate_netcdf(
+    nc_path: Path | str,
+    var_info: Variable,
+    config: AggregationConfig,
+) -> Iterator[AggregatedWindow]:
+    """Yield one :class:`AggregatedWindow` per time window, streaming.
+
+    The streaming counterpart to :func:`aggregate_netcdf`, and the
+    implementation it is built on. Two properties make it usable on cubes
+    that do not fit in memory:
+
+    * **Only one window is resident at a time.** The time steps for the
+      current window are read band by band and stacked; the whole
+      `(time, y, x)` cube is never materialised. A ten-year hourly ERA5
+      request over Europe at 0.25° is ~33.6 GB as one array but ~9 MB per
+      daily window.
+    * **Windows are not accumulated.** Each is yielded and then dropped, so
+      a caller that writes and discards holds nothing. Pair it with
+      `keep_arrays=False` to drop the reduced array too once it is on disk.
+
+    Every handle opened — the container, the variable subset, and the
+    level-pinned view — is closed when the generator finishes or is
+    abandoned, so the file can be deleted or overwritten straight after.
+    Closing the container alone is not sufficient: the variable subset holds
+    its own handle, and one left open keeps a Windows lock on the file.
+
+    Args:
+        nc_path: Path to the NetCDF on disk.
+        var_info: Catalog row for the variable being aggregated. Used to
+            pick the variable from the NetCDF (`var_info.nc_variable`),
+            seed the output filename (`var_info.cds_variable`), and resolve
+            `op="auto"` (`var_info.is_flux`).
+        config: Frozen :class:`AggregationConfig` describing the window,
+            reduction, output location, and whether to retain arrays.
+
+    Yields:
+        AggregatedWindow: One per window, in time order.
+
+    Raises:
+        KeyError: If the NetCDF has no recognised time variable
+            (`valid_time` / `time`); see :func:`_read_time_axis`.
+        ValueError: If `config.level` is set but the NetCDF has no
+            pressure-level dimension, or vice versa; see
+            :func:`_resolve_pressure_level`. Also raised by pandas when
+            `config.freq` is not a recognised offset alias.
+
+    See Also:
+        - :func:`aggregate_netcdf`: the eager `list` form of this function.
+        - :class:`AggregationConfig`: the frozen request payload.
+    """
     from pyramids.dataset import Dataset
     from pyramids.netcdf import NetCDF
 
@@ -626,35 +748,68 @@ def aggregate_netcdf(
     op = _resolve_op(config.op, var_info)
 
     nc = NetCDF.read_file(str(nc_path))
-    # Read time axis + geotransform from the root container — only the
-    # container exposes `get_time_variable` against the underlying CF
-    # metadata. The variable-subset cube returned by `get_variable`
-    # tracks coords on `_band_dim_values_map` instead, but does not
-    # round-trip them through `get_time_variable`. The cube is what
-    # `sel()` and the band-dim-aware multi-D logic need, so use it
-    # for level pinning + array read.
-    time_axis = _read_time_axis(nc)
-    geo = nc.geotransform
-    var = nc.get_variable(var_info.nc_variable)
-    var = _resolve_pressure_level(var, config.level)
-    arr = var.read_array()
+    # Every handle opened here is closed on the way out. Closing only the
+    # root container is not enough: the variable subset (and the level-pinned
+    # `sel()` result) each hold their own handle, and any one of them left
+    # open keeps a lock on the file under Windows — so the caller could not
+    # delete or overwrite the NetCDF it just aggregated.
+    opened: list[Any] = [nc]
+    try:
+        # Read time axis + geotransform from the root container — only the
+        # container exposes `get_time_variable` against the underlying CF
+        # metadata. The variable-subset cube returned by `get_variable`
+        # tracks coords on `_band_dim_values_map` instead, but does not
+        # round-trip them through `get_time_variable`. The cube is what
+        # `sel()` and the band-dim-aware multi-D logic need, so use it
+        # for level pinning + array read.
+        time_axis = _read_time_axis(nc)
+        geo = nc.geotransform
+        var = nc.get_variable(var_info.nc_variable)
+        opened.append(var)
+        var = _resolve_pressure_level(var, config.level)
+        if var is not opened[-1]:
+            opened.append(var)
 
-    results: list[tuple[pd.Timestamp, np.ndarray, Path | None]] = []
-    for window_label, mask in window_groups(time_axis, config.freq):
-        slice_ = arr[mask, :, :]
-        reduced = reduce_time_axis(
-            slice_, op=op, skipna=config.skipna, min_count=config.min_count
-        )
-
-        target: Path | None = None
-        if out_dir is not None:
-            target = out_dir / (
-                f"{var_info.cds_variable}_{config.freq}_{window_label:%Y%m%d}.tif"
+        for window_label, mask in window_groups(time_axis, config.freq):
+            slice_ = _read_window(var, mask)
+            reduced = reduce_time_axis(
+                slice_, op=op, skipna=config.skipna, min_count=config.min_count
             )
-            Dataset.create_from_array(arr=reduced, geo=geo, epsg=4326).to_file(
-                str(target)
+
+            target: Path | None = None
+            if out_dir is not None:
+                target = out_dir / (
+                    f"{var_info.cds_variable}_{config.freq}_{window_label:%Y%m%d}.tif"
+                )
+                Dataset.create_from_array(arr=reduced, geo=geo, epsg=4326).to_file(
+                    str(target)
+                )
+
+            keep = config.keep_arrays or target is None
+            yield AggregatedWindow(
+                label=window_label,
+                array=reduced if keep else None,
+                path=target,
             )
+    finally:
+        for handle in reversed(opened):
+            close_quietly(handle)
 
-        results.append((window_label, reduced, target))
 
-    return results
+def _read_window(var: NetCDF, mask: np.ndarray) -> np.ndarray:
+    """Read just the time steps `mask` selects, stacked as `(time, y, x)`.
+
+    Reads band by band and stacks, rather than reading the whole cube and
+    slicing it: the peak allocation is then one window, not the entire time
+    series. `read_array(band=...)` is 0-based and returns the 2-D grid for
+    that step.
+
+    Args:
+        var: The (optionally level-pinned) variable cube.
+        mask: Boolean mask over the time axis selecting this window's steps.
+
+    Returns:
+        numpy.ndarray: The window's steps stacked along a leading time axis.
+    """
+    indices = np.flatnonzero(mask)
+    return np.stack([var.read_array(band=int(index)) for index in indices])
