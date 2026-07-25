@@ -142,7 +142,12 @@ CADENCE_ALIASES: dict[str, str] = {
     "seasonal": "QS",
     "annual": "YS",
     "yearly": "YS",
-    # No fixed period — the window is queried whole.
+    # No fixed period — the window is queried whole. `raw` and `native` mean
+    # "as the provider stores it, no temporal aggregation", which is the same
+    # request shape; they are listed so a caller who reaches for the cadence
+    # word GEE uses is not rejected by a backend that has no period axis.
+    "raw": WHOLE_WINDOW,
+    "native": WHOLE_WINDOW,
     "irregular": WHOLE_WINDOW,
     "climatology": WHOLE_WINDOW,
     "static": WHOLE_WINDOW,
