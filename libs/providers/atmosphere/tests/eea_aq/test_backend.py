@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 
 from earthlens.eea_aq import EEA_AQ
+
 from .conftest import _FakeAirbaseClient
 
 
@@ -53,7 +54,9 @@ class _EraRequest:
     def __init__(self, parquet: str) -> None:
         self._parquet = parquet
 
-    def download(self, dir: str, skip_existing: bool = True, raise_for_status: bool = True) -> None:
+    def download(
+        self, dir: str, skip_existing: bool = True, raise_for_status: bool = True
+    ) -> None:
         shutil.copy(self._parquet, Path(dir) / "d.parquet")
 
 
@@ -119,7 +122,9 @@ class TestApi:
         """A 2023 window queries both Verified and Unverified for MT / PM2.5."""
         _backend(fake_client, tmp_path).download(progress_bar=False)
         assert [call[0] for call in fake_client.calls] == ["Verified", "Unverified"]
-        assert all(call[1] == ("MT",) and call[2] == ["PM2.5"] for call in fake_client.calls)
+        assert all(
+            call[1] == ("MT",) and call[2] == ["PM2.5"] for call in fake_client.calls
+        )
 
     def test_dedup_across_eras(self, tmp_path, fake_client):
         """A row served by both eras (recent year) is de-duplicated."""
@@ -141,9 +146,9 @@ class TestApi:
 
     def test_multi_dataset_range(self, tmp_path, fake_client):
         """A range straddling the boundary requests two datasets."""
-        _backend(
-            fake_client, tmp_path, start="2021-06-01", end="2024-06-30"
-        ).download(progress_bar=False)
+        _backend(fake_client, tmp_path, start="2021-06-01", end="2024-06-30").download(
+            progress_bar=False
+        )
         sources = [call[0] for call in fake_client.calls]
         assert sources == ["Verified", "Unverified"]
 
@@ -153,7 +158,11 @@ class TestApi:
         _hourly_frame().to_parquet(parquet)
         client = _FakeAirbaseClient(str(parquet))
         df = _backend(
-            client, tmp_path, start="2023-06-15T00", end="2023-06-15T12", fmt="%Y-%m-%dT%H"
+            client,
+            tmp_path,
+            start="2023-06-15T00",
+            end="2023-06-15T12",
+            fmt="%Y-%m-%dT%H",
         ).download(progress_bar=False)
         assert len(df) == 1
         assert df.iloc[0]["datetime_utc"].hour == 11
@@ -161,7 +170,11 @@ class TestApi:
     def test_no_country_returns_empty(self, tmp_path, fake_client):
         """A bbox intersecting no country returns a schema-only frame."""
         backend = _backend(
-            fake_client, tmp_path, country=None, lat_lim=[10.0, 11.0], lon_lim=[-40.0, -39.0]
+            fake_client,
+            tmp_path,
+            country=None,
+            lat_lim=[10.0, 11.0],
+            lon_lim=[-40.0, -39.0],
         )
         df = backend.download(progress_bar=False)
         assert df.empty and "country" in df.columns
@@ -170,7 +183,9 @@ class TestApi:
     def test_unsupported_country_dropped(self, tmp_path, fake_client):
         """A country airbase does not serve is dropped, not crashed on."""
         fake_client.countries = frozenset({"MT"})  # DE not served
-        _backend(fake_client, tmp_path, country=["MT", "DE"]).download(progress_bar=False)
+        _backend(fake_client, tmp_path, country=["MT", "DE"]).download(
+            progress_bar=False
+        )
         assert all(set(call[1]) <= {"MT"} for call in fake_client.calls)
 
     def test_all_countries_unsupported_returns_empty(self, tmp_path, fake_client):

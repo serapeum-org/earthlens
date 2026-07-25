@@ -24,7 +24,7 @@ YAML and is monkey-patchable in tests.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -242,7 +242,7 @@ class Catalog(AbstractCatalog):
                 names the catalog kind and, when a close match exists,
                 adds a did-you-mean hint.
         """
-        return self.get_dataset(name)
+        return cast("Pollutant", self.get_dataset(name))
 
     def polls_for(self, names: list[str]) -> list[str]:
         """Resolve names to their airbase `poll` notations, order-stable.

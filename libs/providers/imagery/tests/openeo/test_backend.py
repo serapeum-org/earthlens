@@ -8,6 +8,7 @@ import pytest
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.openeo.backend import OpenEO, _apply_step, _safe_name
+
 from .conftest import FakeAuth, FakeConnection, FakeCube
 
 

@@ -335,7 +335,9 @@ class SoilGrids(AbstractDataSource):
             )
         return plan
 
-    def _fetch_one(self, product: RemoteProduct, tmp_dir: Path) -> Path:
+    def _fetch_one(  # type: ignore[override]
+        self, product: RemoteProduct, tmp_dir: Path
+    ) -> Path:
         """Fetch one coverage's bbox window as a GeoTIFF over WCS.
 
         Uses `pyramids.dataset.Dataset.from_wcs` — GDAL's WCS driver inside
@@ -462,5 +464,5 @@ def _close_dataset(dataset: object) -> None:
     if callable(closer):
         try:
             closer()
-        except Exception:  # noqa: BLE001 - best-effort handle release
+        except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
             pass

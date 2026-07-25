@@ -25,7 +25,7 @@ no `odc-stac` / `stackstac` dependency.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
 
@@ -211,6 +211,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         """
         from pyramids.stac import open_client
 
+        assert self._endpoint_obj is not None  # set in _initialize
         return open_client(self._endpoint_obj.url, signer=self._signer)
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
@@ -279,6 +280,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
         start = self.time.start_date.strftime("%Y-%m-%d")
         end = self.time.end_date.strftime("%Y-%m-%d")
         products: list[RemoteProduct] = []
+        assert self._catalog is not None  # set in _initialize
+        assert self._endpoint is not None  # resolved in _initialize
+        assert isinstance(self.vars, dict)  # STAC always uses the mapping form
         for collection_key, requested in self.vars.items():
             collection = self._catalog.get_collection(collection_key)
             assets = list(requested) or list(collection.default_assets)
@@ -396,6 +400,8 @@ class STAC(LazyClientMixin, AbstractDataSource):
         Returns:
             The endpoint signer, or the collection's override signer.
         """
+        assert self._catalog is not None  # set in _initialize
+        assert self._endpoint_obj is not None  # set in _initialize
         override = self._catalog.get_collection(collection_key).signer
         if not override or override == self._endpoint_obj.signer:
             return self._signer
@@ -418,6 +424,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
             A mapping of the set credential kwargs (`region`, `access_key`,
             `secret_key`, `username`, `password`, `token`, `client_id`).
         """
+        assert self._endpoint_obj is not None  # set in _initialize
         creds = {
             "region": self._region or self._endpoint_obj.region,
             "access_key": self._access_key,
@@ -464,6 +471,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         Returns:
             The no-data value to write (catalog `nodata`, or `0`).
         """
+        assert self._catalog is not None  # set in _initialize
         try:
             collection = self._catalog.get_collection(collection_key)
         except ValueError:
@@ -637,7 +645,7 @@ def _item_epsg(item: Any) -> int | None:
     """
     from pyramids.stac import read_extension_metadata
 
-    return read_extension_metadata(item, None).get("epsg")
+    return cast("int | None", read_extension_metadata(item, None).get("epsg"))
 
 
 def _acq_date(item: Any) -> str:
@@ -652,7 +660,7 @@ def _acq_date(item: Any) -> str:
     """
     dttm = getattr(item, "datetime", None)
     if dttm is not None and hasattr(dttm, "strftime"):
-        return dttm.strftime("%Y-%m-%d")
+        return cast("str", dttm.strftime("%Y-%m-%d"))
     props = getattr(item, "properties", None)
     if props is None and isinstance(item, dict):
         props = item.get("properties")

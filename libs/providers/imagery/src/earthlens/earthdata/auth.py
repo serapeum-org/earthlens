@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, SecretStr
 
@@ -170,7 +171,7 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
                 object carrying the strategy-resolution rules.
         """
         super().__init__(credentials)
-        self._auth = None
+        self._auth: Any = None
         self._configured = False
 
     def _has_explicit_credentials(self) -> bool:
@@ -256,8 +257,14 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             # EARTHDATA_USERNAME / EARTHDATA_PASSWORD. Export whichever
             # explicit credential was supplied so it reaches the login.
             if self._has_explicit_token():
+                assert (
+                    self._creds.token is not None
+                )  # _has_explicit_token guarantees it
                 os.environ["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
             elif self._has_explicit_credentials():
+                # _has_explicit_credentials guarantees both are non-None
+                assert self._creds.username is not None
+                assert self._creds.password is not None
                 os.environ["EARTHDATA_USERNAME"] = self._creds.username
                 os.environ["EARTHDATA_PASSWORD"] = (
                     self._creds.password.get_secret_value()
@@ -341,4 +348,4 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             )
         # A1: the first positional param of get_s3_credentials is `daac`,
         # so the provider code must be passed by keyword.
-        return self._auth.get_s3_credentials(provider=provider)
+        return cast("dict[str, str]", self._auth.get_s3_credentials(provider=provider))

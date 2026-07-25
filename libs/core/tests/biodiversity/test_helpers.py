@@ -11,8 +11,8 @@ from shapely.geometry import Point
 from earthlens.base import SpatialExtent
 from earthlens.biodiversity import (
     IUCN_LICENSE,
-    LicenseWarning,
     WDPA_LICENSE,
+    LicenseWarning,
     occurrences_to_fc,
     warn_license,
     wkt_from_bbox,
@@ -200,7 +200,5 @@ class TestParseRetryAfter:
         """
         from earthlens.biodiversity import _helpers, parse_retry_after
 
-        monkeypatch.setattr(
-            _helpers, "parsedate_to_datetime", lambda value: None
-        )
+        monkeypatch.setattr(_helpers, "parsedate_to_datetime", lambda value: None)
         assert parse_retry_after("Fri, 31 Dec 2099 23:59:59 GMT") is None

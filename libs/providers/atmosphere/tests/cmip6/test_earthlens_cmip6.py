@@ -33,9 +33,16 @@ def test_keys_hint_no_extra(key):
 def test_facade_facet_call_builds_backend():
     """The facet-only facade call (no variables=) builds the CMIP6 backend."""
     el = EarthLens(
-        "cmip6", source_id="CanESM5", experiment_id="ssp585", variable_id="tas",
-        table_id="Amon", member_id="r1i1p1f1", start="2050-01-01", end="2050-12-31",
-        lat_lim=[35, 60], lon_lim=[-10, 30],
+        "cmip6",
+        source_id="CanESM5",
+        experiment_id="ssp585",
+        variable_id="tas",
+        table_id="Amon",
+        member_id="r1i1p1f1",
+        start="2050-01-01",
+        end="2050-12-31",
+        lat_lim=[35, 60],
+        lon_lim=[-10, 30],
     )
     backend = el.datasource
     assert isinstance(backend, earthlens.cmip6.CMIP6)
@@ -49,8 +56,13 @@ def test_facade_facet_call_builds_backend():
 def test_facade_aliases_build_backend(alias):
     """The CMIP6 aliases build the same backend as the canonical key."""
     el = EarthLens(
-        alias, source_id="GFDL-ESM4", experiment_id="ssp585", variable_id="pr",
-        table_id="day", start="2050-01-01", end="2050-12-31",
+        alias,
+        source_id="GFDL-ESM4",
+        experiment_id="ssp585",
+        variable_id="pr",
+        table_id="day",
+        start="2050-01-01",
+        end="2050-12-31",
     )
     assert isinstance(el.datasource, earthlens.cmip6.CMIP6)
 
@@ -59,8 +71,14 @@ def test_facade_rejects_variables():
     """Passing variables= to the facet-only CMIP6 backend is rejected."""
     with pytest.raises(ValueError, match="facet keyword arguments"):
         EarthLens(
-            "cmip6", variables=["tas"], source_id="CanESM5", experiment_id="ssp585",
-            variable_id="tas", table_id="Amon", start="2050-01-01", end="2050-12-31",
+            "cmip6",
+            variables=["tas"],
+            source_id="CanESM5",
+            experiment_id="ssp585",
+            variable_id="tas",
+            table_id="Amon",
+            start="2050-01-01",
+            end="2050-12-31",
         )
 
 
@@ -68,17 +86,30 @@ def test_facade_rejects_dataset():
     """Passing dataset= to the facet-only CMIP6 backend is rejected."""
     with pytest.raises(ValueError, match="facet keyword arguments"):
         EarthLens(
-            "cmip6", dataset="Amon", source_id="CanESM5", experiment_id="ssp585",
-            variable_id="tas", table_id="Amon", start="2050-01-01", end="2050-12-31",
+            "cmip6",
+            dataset="Amon",
+            source_id="CanESM5",
+            experiment_id="ssp585",
+            variable_id="tas",
+            table_id="Amon",
+            start="2050-01-01",
+            end="2050-12-31",
         )
 
 
 def test_facade_forwards_optional_facets():
     """Optional facets (grid_label, version, whole_time) reach the backend."""
     el = EarthLens(
-        "cmip6", source_id="CanESM5", experiment_id="ssp585", variable_id="tas",
-        table_id="Amon", grid_label="gn", version="20190429", whole_time=True,
-        start="2050-01-01", end="2050-12-31",
+        "cmip6",
+        source_id="CanESM5",
+        experiment_id="ssp585",
+        variable_id="tas",
+        table_id="Amon",
+        grid_label="gn",
+        version="20190429",
+        whole_time=True,
+        start="2050-01-01",
+        end="2050-12-31",
     )
     assert el.datasource._grid_label == "gn"
     assert el.datasource._version == "20190429"
@@ -89,8 +120,12 @@ def test_facade_missing_facet_friendly_error():
     """Omitting a required facet entirely raises a friendly ValueError."""
     with pytest.raises(ValueError, match="requires a non-empty variable_id"):
         EarthLens(
-            "cmip6", source_id="CanESM5", experiment_id="ssp585", table_id="Amon",
-            start="2050-01-01", end="2050-12-31",
+            "cmip6",
+            source_id="CanESM5",
+            experiment_id="ssp585",
+            table_id="Amon",
+            start="2050-01-01",
+            end="2050-12-31",
         )
 
 

@@ -19,7 +19,7 @@ monkey-patchable in tests.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -230,4 +230,4 @@ class Catalog(AbstractCatalog):
         text = selector.strip()
         if text.lower().startswith(SPECIES_PREFIX):
             return text[len(SPECIES_PREFIX) :].strip()
-        return self.get_dataset(text).scientific_name
+        return cast("Species", self.get_dataset(text)).scientific_name

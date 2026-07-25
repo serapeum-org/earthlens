@@ -1,361 +1,361 @@
 {
- "inputs": {
-  "location": {
-   "latitude": 45.0,
-   "longitude": 8.0,
-   "elevation": 250.0
-  },
-  "meteo_data": {
-   "radiation_db": "PVGIS-SARAH3",
-   "meteo_db": "ERA5",
-   "year_min": 2020,
-   "year_max": 2020,
-   "use_horizon": true,
-   "horizon_db": null,
-   "horizon_data": "DEM-calculated"
-  },
-  "mounting_system": {
-   "fixed": {
-    "slope": {
-     "value": 35,
-     "optimal": false
+    "inputs": {
+        "location": {
+            "latitude": 45.0,
+            "longitude": 8.0,
+            "elevation": 250.0
+        },
+        "meteo_data": {
+            "radiation_db": "PVGIS-SARAH3",
+            "meteo_db": "ERA5",
+            "year_min": 2020,
+            "year_max": 2020,
+            "use_horizon": true,
+            "horizon_db": null,
+            "horizon_data": "DEM-calculated"
+        },
+        "mounting_system": {
+            "fixed": {
+                "slope": {
+                    "value": 35,
+                    "optimal": false
+                },
+                "azimuth": {
+                    "value": 0,
+                    "optimal": false
+                },
+                "type": "free-standing"
+            }
+        },
+        "pv_module": {
+            "technology": "c-Si",
+            "peak_power": 1.0,
+            "system_loss": 14.0
+        }
     },
-    "azimuth": {
-     "value": 0,
-     "optimal": false
+    "outputs": {
+        "hourly": [
+            {
+                "time": "20200101:0010",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 1.81,
+                "WS10m": 0.9,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0110",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 1.26,
+                "WS10m": 0.83,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0210",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 0.9,
+                "WS10m": 0.76,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0310",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 0.69,
+                "WS10m": 0.69,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0410",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 0.46,
+                "WS10m": 0.62,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0510",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 0.1,
+                "WS10m": 0.69,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0610",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": -0.01,
+                "WS10m": 0.62,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0710",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": -1.34,
+                "WS10m": 0.69,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0810",
+                "P": 314.35,
+                "G(i)": 364.84,
+                "H_sun": 8.06,
+                "T2m": -1.12,
+                "WS10m": 0.62,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:0910",
+                "P": 511.09,
+                "G(i)": 597.55,
+                "H_sun": 14.8,
+                "T2m": 1.34,
+                "WS10m": 0.41,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1010",
+                "P": 626.03,
+                "G(i)": 757.4,
+                "H_sun": 19.54,
+                "T2m": 4.21,
+                "WS10m": 0.21,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1110",
+                "P": 666.06,
+                "G(i)": 820.7,
+                "H_sun": 21.82,
+                "T2m": 6.73,
+                "WS10m": 0.34,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1210",
+                "P": 659.56,
+                "G(i)": 812.68,
+                "H_sun": 21.41,
+                "T2m": 8.46,
+                "WS10m": 0.69,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1310",
+                "P": 586.61,
+                "G(i)": 715.46,
+                "H_sun": 18.33,
+                "T2m": 9.59,
+                "WS10m": 0.9,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1410",
+                "P": 447.52,
+                "G(i)": 538.07,
+                "H_sun": 12.93,
+                "T2m": 9.68,
+                "WS10m": 1.1,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1510",
+                "P": 10.3,
+                "G(i)": 23.61,
+                "H_sun": 5.68,
+                "T2m": 8.66,
+                "WS10m": 1.52,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1610",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 6.73,
+                "WS10m": 2.0,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1710",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 5.04,
+                "WS10m": 1.79,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1810",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 3.66,
+                "WS10m": 1.59,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:1910",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 3.51,
+                "WS10m": 0.97,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:2010",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 3.0,
+                "WS10m": 0.97,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:2110",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 2.04,
+                "WS10m": 1.1,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:2210",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 1.22,
+                "WS10m": 1.17,
+                "Int": 0.0
+            },
+            {
+                "time": "20200101:2310",
+                "P": 0.0,
+                "G(i)": 0.0,
+                "H_sun": 0.0,
+                "T2m": 0.77,
+                "WS10m": 0.9,
+                "Int": 0.0
+            }
+        ]
     },
-    "type": "free-standing"
-   }
-  },
-  "pv_module": {
-   "technology": "c-Si",
-   "peak_power": 1.0,
-   "system_loss": 14.0
-  }
- },
- "outputs": {
-  "hourly": [
-   {
-    "time": "20200101:0010",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 1.81,
-    "WS10m": 0.9,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0110",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 1.26,
-    "WS10m": 0.83,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0210",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 0.9,
-    "WS10m": 0.76,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0310",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 0.69,
-    "WS10m": 0.69,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0410",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 0.46,
-    "WS10m": 0.62,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0510",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 0.1,
-    "WS10m": 0.69,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0610",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": -0.01,
-    "WS10m": 0.62,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0710",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": -1.34,
-    "WS10m": 0.69,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0810",
-    "P": 314.35,
-    "G(i)": 364.84,
-    "H_sun": 8.06,
-    "T2m": -1.12,
-    "WS10m": 0.62,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:0910",
-    "P": 511.09,
-    "G(i)": 597.55,
-    "H_sun": 14.8,
-    "T2m": 1.34,
-    "WS10m": 0.41,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1010",
-    "P": 626.03,
-    "G(i)": 757.4,
-    "H_sun": 19.54,
-    "T2m": 4.21,
-    "WS10m": 0.21,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1110",
-    "P": 666.06,
-    "G(i)": 820.7,
-    "H_sun": 21.82,
-    "T2m": 6.73,
-    "WS10m": 0.34,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1210",
-    "P": 659.56,
-    "G(i)": 812.68,
-    "H_sun": 21.41,
-    "T2m": 8.46,
-    "WS10m": 0.69,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1310",
-    "P": 586.61,
-    "G(i)": 715.46,
-    "H_sun": 18.33,
-    "T2m": 9.59,
-    "WS10m": 0.9,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1410",
-    "P": 447.52,
-    "G(i)": 538.07,
-    "H_sun": 12.93,
-    "T2m": 9.68,
-    "WS10m": 1.1,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1510",
-    "P": 10.3,
-    "G(i)": 23.61,
-    "H_sun": 5.68,
-    "T2m": 8.66,
-    "WS10m": 1.52,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1610",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 6.73,
-    "WS10m": 2.0,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1710",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 5.04,
-    "WS10m": 1.79,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1810",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 3.66,
-    "WS10m": 1.59,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:1910",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 3.51,
-    "WS10m": 0.97,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:2010",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 3.0,
-    "WS10m": 0.97,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:2110",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 2.04,
-    "WS10m": 1.1,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:2210",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 1.22,
-    "WS10m": 1.17,
-    "Int": 0.0
-   },
-   {
-    "time": "20200101:2310",
-    "P": 0.0,
-    "G(i)": 0.0,
-    "H_sun": 0.0,
-    "T2m": 0.77,
-    "WS10m": 0.9,
-    "Int": 0.0
-   }
-  ]
- },
- "meta": {
-  "inputs": {
-   "location": {
-    "description": "Selected location",
-    "variables": {
-     "latitude": {
-      "description": "Latitude",
-      "units": "decimal degree"
-     },
-     "longitude": {
-      "description": "Longitude",
-      "units": "decimal degree"
-     },
-     "elevation": {
-      "description": "Elevation",
-      "units": "m"
-     }
+    "meta": {
+        "inputs": {
+            "location": {
+                "description": "Selected location",
+                "variables": {
+                    "latitude": {
+                        "description": "Latitude",
+                        "units": "decimal degree"
+                    },
+                    "longitude": {
+                        "description": "Longitude",
+                        "units": "decimal degree"
+                    },
+                    "elevation": {
+                        "description": "Elevation",
+                        "units": "m"
+                    }
+                }
+            },
+            "meteo_data": {
+                "description": "Sources of meteorological data",
+                "variables": {
+                    "radiation_db": {
+                        "description": "Solar radiation database"
+                    },
+                    "meteo_db": {
+                        "description": "Database used for meteorological variables other than solar radiation"
+                    },
+                    "year_min": {
+                        "description": "First year of the calculations"
+                    },
+                    "year_max": {
+                        "description": "Last year of the calculations"
+                    },
+                    "use_horizon": {
+                        "description": "Include horizon shadows"
+                    },
+                    "horizon_db": {
+                        "description": "Source of horizon data"
+                    }
+                }
+            },
+            "mounting_system": {
+                "description": "Mounting system",
+                "choices": "fixed, vertical_axis, inclined_axis, two_axis",
+                "fields": {
+                    "slope": {
+                        "description": "Inclination angle from the horizontal plane",
+                        "units": "degree"
+                    },
+                    "azimuth": {
+                        "description": "Orientation (azimuth) angle of the (fixed) PV system (0 = S, 90 = W, -90 = E)",
+                        "units": "degree"
+                    }
+                }
+            },
+            "pv_module": {
+                "description": "PV module parameters",
+                "variables": {
+                    "technology": {
+                        "description": "PV technology"
+                    },
+                    "peak_power": {
+                        "description": "Nominal (peak) power of the PV module",
+                        "units": "kW"
+                    },
+                    "system_loss": {
+                        "description": "Sum of system losses",
+                        "units": "%"
+                    }
+                }
+            }
+        },
+        "outputs": {
+            "hourly": {
+                "type": "time series",
+                "timestamp": "hourly averages",
+                "variables": {
+                    "P": {
+                        "description": "PV system power",
+                        "units": "W"
+                    },
+                    "G(i)": {
+                        "description": "Global irradiance on the inclined plane (plane of the array)",
+                        "units": "W/m2"
+                    },
+                    "H_sun": {
+                        "description": "Sun height",
+                        "units": "degree"
+                    },
+                    "T2m": {
+                        "description": "2-m air temperature",
+                        "units": "degree Celsius"
+                    },
+                    "WS10m": {
+                        "description": "10-m total wind speed",
+                        "units": "m/s"
+                    },
+                    "Int": {
+                        "description": "1 means solar radiation values are reconstructed"
+                    }
+                }
+            }
+        }
     }
-   },
-   "meteo_data": {
-    "description": "Sources of meteorological data",
-    "variables": {
-     "radiation_db": {
-      "description": "Solar radiation database"
-     },
-     "meteo_db": {
-      "description": "Database used for meteorological variables other than solar radiation"
-     },
-     "year_min": {
-      "description": "First year of the calculations"
-     },
-     "year_max": {
-      "description": "Last year of the calculations"
-     },
-     "use_horizon": {
-      "description": "Include horizon shadows"
-     },
-     "horizon_db": {
-      "description": "Source of horizon data"
-     }
-    }
-   },
-   "mounting_system": {
-    "description": "Mounting system",
-    "choices": "fixed, vertical_axis, inclined_axis, two_axis",
-    "fields": {
-     "slope": {
-      "description": "Inclination angle from the horizontal plane",
-      "units": "degree"
-     },
-     "azimuth": {
-      "description": "Orientation (azimuth) angle of the (fixed) PV system (0 = S, 90 = W, -90 = E)",
-      "units": "degree"
-     }
-    }
-   },
-   "pv_module": {
-    "description": "PV module parameters",
-    "variables": {
-     "technology": {
-      "description": "PV technology"
-     },
-     "peak_power": {
-      "description": "Nominal (peak) power of the PV module",
-      "units": "kW"
-     },
-     "system_loss": {
-      "description": "Sum of system losses",
-      "units": "%"
-     }
-    }
-   }
-  },
-  "outputs": {
-   "hourly": {
-    "type": "time series",
-    "timestamp": "hourly averages",
-    "variables": {
-     "P": {
-      "description": "PV system power",
-      "units": "W"
-     },
-     "G(i)": {
-      "description": "Global irradiance on the inclined plane (plane of the array)",
-      "units": "W/m2"
-     },
-     "H_sun": {
-      "description": "Sun height",
-      "units": "degree"
-     },
-     "T2m": {
-      "description": "2-m air temperature",
-      "units": "degree Celsius"
-     },
-     "WS10m": {
-      "description": "10-m total wind speed",
-      "units": "m/s"
-     },
-     "Int": {
-      "description": "1 means solar radiation values are reconstructed"
-     }
-    }
-   }
-  }
- }
 }

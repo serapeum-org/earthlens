@@ -181,14 +181,24 @@ class TestValidateDrought:
         catalog = SimpleNamespace(
             datasets={
                 "edo-spaST": SimpleNamespace(
-                    source="EDO", endpoint="https://x/wcs", output_kind="raster",
-                    cadence="10day", native_crs="EPSG:4326", transport="edo-wcs",
-                    coverage="spaST", timescale="01",
+                    source="EDO",
+                    endpoint="https://x/wcs",
+                    output_kind="raster",
+                    cadence="10day",
+                    native_crs="EPSG:4326",
+                    transport="edo-wcs",
+                    coverage="spaST",
+                    timescale="01",
                 ),
                 "usdm": SimpleNamespace(
-                    source="USDM", endpoint="https://x/{ymd}.json",
-                    output_kind="vector", cadence="weekly", native_crs="EPSG:4326",
-                    transport="usdm-geojson", coverage=None, timescale=None,
+                    source="USDM",
+                    endpoint="https://x/{ymd}.json",
+                    output_kind="vector",
+                    cadence="weekly",
+                    native_crs="EPSG:4326",
+                    transport="usdm-geojson",
+                    coverage=None,
+                    timescale=None,
                 ),
             }
         )
@@ -201,9 +211,14 @@ class TestValidateDrought:
         catalog = SimpleNamespace(
             datasets={
                 "edo-bad": SimpleNamespace(
-                    source="EDO", endpoint="https://x/wcs", output_kind="raster",
-                    cadence="10day", native_crs="EPSG:4326", transport="edo-wcs",
-                    coverage=None, timescale=None,
+                    source="EDO",
+                    endpoint="https://x/wcs",
+                    output_kind="raster",
+                    cadence="10day",
+                    native_crs="EPSG:4326",
+                    transport="edo-wcs",
+                    coverage=None,
+                    timescale=None,
                 )
             }
         )
@@ -217,9 +232,14 @@ class TestValidateDrought:
         catalog = SimpleNamespace(
             datasets={
                 "usdm": SimpleNamespace(
-                    source="USDM", endpoint="https://x", output_kind="raster",
-                    cadence="weekly", native_crs="EPSG:4326",
-                    transport="usdm-geojson", coverage=None, timescale=None,
+                    source="USDM",
+                    endpoint="https://x",
+                    output_kind="raster",
+                    cadence="weekly",
+                    native_crs="EPSG:4326",
+                    transport="usdm-geojson",
+                    coverage=None,
+                    timescale=None,
                 )
             }
         )
@@ -361,9 +381,9 @@ class TestValidateErddap:
         _, issues = _validate_erddap(
             self._catalog(protocol="griddap", variables=["a"], flux_variables=["b"])
         )
-        assert any(
-            "flux_variables" in i for i in issues
-        ), f"flux typo not flagged: {issues}"
+        assert any("flux_variables" in i for i in issues), (
+            f"flux typo not flagged: {issues}"
+        )
 
 
 class TestStructuralLints:
@@ -412,13 +432,18 @@ class TestStructuralLints:
             domains={"C": None, "F": None},
             datasets={
                 "bare": SimpleNamespace(
-                    product_group="", domains=[], default_domain="C",
-                    band_split=False, bands=[],
+                    product_group="",
+                    domains=[],
+                    default_domain="C",
+                    band_split=False,
+                    bands=[],
                 ),
             },
         )
         _checked, issues = _validate_goes(catalog)
-        assert any("product_group" in i for i in issues), "missing product_group flagged"
+        assert any("product_group" in i for i in issues), (
+            "missing product_group flagged"
+        )
         assert any("domains" in i for i in issues), "empty domains flagged"
 
     def test_goes_flags_unknown_domain_and_empty_bands(self):
@@ -754,9 +779,9 @@ class TestNwmValidateInternals:
             tokens: The sampled file tokens for one configuration directory.
             expected: Whether `channel_rt` should be reported present.
         """
-        assert (
-            validate_mod._nwm_token_present("channel_rt", tokens) is expected
-        ), f"_nwm_token_present('channel_rt', {tokens}) should be {expected}"
+        assert validate_mod._nwm_token_present("channel_rt", tokens) is expected, (
+            f"_nwm_token_present('channel_rt', {tokens}) should be {expected}"
+        )
 
     def test_validate_nwm_flags_empty_variables(self):
         """A product with an empty `variables` map is flagged by the offline lint."""

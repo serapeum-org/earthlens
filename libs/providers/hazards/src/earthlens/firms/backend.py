@@ -41,6 +41,7 @@ from typing import TYPE_CHECKING, Literal
 import pandas as pd
 import requests
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -167,8 +168,7 @@ class FIRMS(AbstractDataSource):
         """
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         if isinstance(variables, dict):
             raise TypeError(
@@ -269,7 +269,11 @@ class FIRMS(AbstractDataSource):
 
                 ```
         """
-        auth = FirmsAuth(FirmsCredentials(api_key=api_key))
+        auth = FirmsAuth(
+            FirmsCredentials(
+                api_key=SecretStr(api_key) if api_key is not None else None
+            )
+        )
         auth.configure()
         self.client = auth
         return self
@@ -643,8 +647,7 @@ class FIRMS(AbstractDataSource):
         driver, ext = _DRIVERS[self._file_format]
         sensors = "-".join(self.vars)
         stem = (
-            f"firms_{sensors}_{self.time.start_date:%Y%m%d}"
-            f"_{self.time.end_date:%Y%m%d}"
+            f"firms_{sensors}_{self.time.start_date:%Y%m%d}_{self.time.end_date:%Y%m%d}"
         )
         out_path = self.root_dir / f"{stem}.{ext}"
         collection.to_file(str(out_path), driver=driver)

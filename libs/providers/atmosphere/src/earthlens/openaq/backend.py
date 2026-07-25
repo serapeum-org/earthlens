@@ -32,10 +32,11 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -209,7 +210,11 @@ class OpenAQ(AbstractDataSource):
             AuthenticationError: When :meth:`OpenaqAuth.configure`
                 finds no key (no `api_key=` and no `OPENAQ_API_KEY`).
         """
-        self._auth = OpenaqAuth(OpenaqCredentials(api_key=self._api_key))
+        self._auth = OpenaqAuth(
+            OpenaqCredentials(
+                api_key=None if self._api_key is None else SecretStr(self._api_key)
+            )
+        )
         self._auth.configure()
         return None
 
@@ -311,8 +316,7 @@ class OpenAQ(AbstractDataSource):
     def _bbox(self) -> str:
         """Return the request bbox as OpenAQ's `"west,south,east,north"`."""
         return (
-            f"{self.space.west},{self.space.south},"
-            f"{self.space.east},{self.space.north}"
+            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
         )
 
     def _search(self) -> list[RemoteProduct]:
@@ -337,7 +341,7 @@ class OpenAQ(AbstractDataSource):
         # different unit. The id union is passed only as a server-side
         # narrowing hint for the locations query.
         wanted_names = set(self.vars)
-        wanted_ids = self._catalog.ids_for(self.vars)
+        wanted_ids = self._catalog.ids_for(cast("list[str]", self.vars))
         cap = self._max_locations
         locations = self._client().list_locations(
             bbox=self._bbox(),

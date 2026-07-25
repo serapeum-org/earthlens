@@ -259,9 +259,9 @@ class TestCatalog:
         missing = set(shipped_catalog.datasets) - set(
             shipped_catalog.available_datasets
         )
-        assert (
-            not missing
-        ), f"curated datasets absent from available_datasets: {missing}"
+        assert not missing, (
+            f"curated datasets absent from available_datasets: {missing}"
+        )
 
     def test_get_catalog_returns_datasets(self, shipped_catalog: Catalog):
         """`get_catalog` returns the same mapping as `.datasets`."""

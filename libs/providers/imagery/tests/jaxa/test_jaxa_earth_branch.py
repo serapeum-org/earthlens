@@ -31,7 +31,9 @@ def fake_jaxa_earth(monkeypatch):
     calls: list[str] = []
 
     class _Raster:
-        img = np.array([[[[1.0], [2.0], [3.0]], [[4.0], [5.0], [6.0]]]], dtype=np.float32)
+        img = np.array(
+            [[[[1.0], [2.0], [3.0]], [[4.0], [5.0], [6.0]]]], dtype=np.float32
+        )
         # latlim/lonlim arrive as 2-D `(1, 2)` arrays — see A1 capture.
         latlim = np.array([[35.0, 36.0]])
         lonlim = np.array([[138.0, 139.5]])

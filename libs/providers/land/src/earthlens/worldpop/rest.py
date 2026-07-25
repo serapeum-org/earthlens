@@ -11,7 +11,7 @@ record whose `popyear` matches.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import requests
 
@@ -53,7 +53,8 @@ def _rest_json(
     """
     from earthlens.base.http import HttpClient, RequestsGet
 
-    client = HttpClient(session=session if session is not None else RequestsGet())
+    shim = session if session is not None else RequestsGet()
+    client = HttpClient(session=cast("requests.Session | None", shim))
     return client.get_json(url, params=params, timeout=timeout)
 
 
@@ -93,7 +94,7 @@ def rest_records(
         timeout=timeout,
         params={"iso3": iso3},
     )
-    return body.get("data", [])
+    return cast("list[dict[str, Any]]", body.get("data", []))
 
 
 def files_for_year(records: list[dict[str, Any]], year: int | None) -> list[str]:
@@ -124,12 +125,13 @@ def files_for_year(records: list[dict[str, Any]], year: int | None) -> list[str]
     elif year is None:
         record = max(dated, key=lambda d: int(d["popyear"]))
     else:
-        record = next((d for d in dated if int(d["popyear"]) == int(year)), None)
-        if record is None:
+        matched = next((d for d in dated if int(d["popyear"]) == int(year)), None)
+        if matched is None:
             available = sorted({int(d["popyear"]) for d in dated})
             raise ValueError(
                 f"WorldPop year {year} is not available; have {available}."
             )
+        record = matched
     tifs = [
         url
         for url in record.get("files", [])
@@ -174,7 +176,7 @@ def global_records(
     body = _rest_json(
         f"{base_url}/{alias}/{subalias_id}", session=session, timeout=timeout
     )
-    return body.get("data", [])
+    return cast("list[dict[str, Any]]", body.get("data", []))
 
 
 def record_files(
@@ -265,13 +267,14 @@ def global_files_for_year(
     if year is None:
         record = max(dated, key=lambda d: int(d["popyear"]))
     else:
-        record = next((d for d in dated if int(d["popyear"]) == int(year)), None)
-        if record is None:
+        matched = next((d for d in dated if int(d["popyear"]) == int(year)), None)
+        if matched is None:
             available = sorted({int(d["popyear"]) for d in dated})
             raise ValueError(
                 f"WorldPop {alias}/{subalias_id} year {year} is not available; "
                 f"have {available}."
             )
+        record = matched
     tifs = record_files(
         alias,
         subalias_id,

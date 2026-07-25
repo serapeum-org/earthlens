@@ -149,7 +149,8 @@ def _md5_of(path: Path) -> str:
     Returns:
         str: The lower-case hex MD5 digest.
     """
-    digest = hashlib.md5()  # noqa: S324 - integrity check vs Geofabrik sidecar, not security
+    # integrity check vs Geofabrik sidecar, not security
+    digest = hashlib.md5(usedforsecurity=False)
     with open(path, "rb") as handle:
         for block in iter(lambda: handle.read(1 << 20), b""):
             digest.update(block)
@@ -174,7 +175,9 @@ def _expected_md5(url: str, http: HttpClient) -> str | None:
     try:
         body = http.get(f"{url}.md5").text
     except Exception as exc:  # noqa: BLE001 - a flaky sidecar must not fail the fetch
-        logger.warning(f"Could not read the Geofabrik md5 sidecar ({exc}); skipping check")
+        logger.warning(
+            f"Could not read the Geofabrik md5 sidecar ({exc}); skipping check"
+        )
         return None
     token = body.split()
     return token[0] if token else None
@@ -311,9 +314,7 @@ def read_pbf(
         return _read_pyrosm(path, pyrosm_method, network_type, bbox)
     if engine == "pyosmium":
         return _read_pyosmium(path, pyrosm_method, network_type, bbox)
-    raise ValueError(
-        f"engine must be 'pyrosm' or 'pyosmium', got {engine!r}."
-    )
+    raise ValueError(f"engine must be 'pyrosm' or 'pyosmium', got {engine!r}.")
 
 
 def _read_pyrosm(
@@ -361,7 +362,11 @@ def _read_pyrosm(
         bounding_box = box(west, south, east, north)
     reader = PyrosmOSM(str(path), bounding_box=bounding_box)
     method = getattr(reader, pyrosm_method)
-    gdf = method(network_type=network_type) if pyrosm_method == "get_network" else method()
+    gdf = (
+        method(network_type=network_type)
+        if pyrosm_method == "get_network"
+        else method()
+    )
     if gdf is None or len(gdf) == 0:
         return empty_fc()
     # pyrosm names its identity column `id`; normalise it to `osm_id` so every

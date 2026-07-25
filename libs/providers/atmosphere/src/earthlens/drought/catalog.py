@@ -25,7 +25,7 @@ the loader at another directory or a single YAML file.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -37,7 +37,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 the `_index.yaml` informational index. Reassign this attribute to redirect
 the loader at another directory or a single YAML file."""
 
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 TransportLiteral = Literal["usdm-geojson", "edo-wcs", "netcdf-url"]
 """The three live transports the drought backend dispatches on. `_fetch`
@@ -94,7 +94,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
 
 def _load_catalog_data(
     path: Path,
-) -> tuple[list[str], dict[str, "Dataset"]]:
+) -> tuple[list[str], dict[str, Dataset]]:
     """Parse, validate, and cache the drought catalog at `path`.
 
     When `path` is a directory, every `*.yaml` is merged: `available_datasets:`
@@ -343,4 +343,4 @@ class Catalog(AbstractCatalog):
                 lists the closest known ids via the shipped
                 `AbstractCatalog.get_dataset` did-you-mean helper.
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))

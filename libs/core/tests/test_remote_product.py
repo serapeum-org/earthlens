@@ -52,9 +52,9 @@ class TestRemoteProduct:
         a = RemoteProduct(id="a")
         b = RemoteProduct(id="b")
         a.metadata["k"] = 1
-        assert (
-            b.metadata == {}
-        ), f"default factory leaked across instances: b.metadata={b.metadata!r}"
+        assert b.metadata == {}, (
+            f"default factory leaked across instances: b.metadata={b.metadata!r}"
+        )
 
     def test_equality_value_based(self):
         """Two `RemoteProduct`s with the same fields compare equal."""
@@ -137,9 +137,9 @@ class TestSearchFetchHelpers:
             src, "_fetch", lambda products: fetch_calls.append(products) or []
         )
         assert src._api_via_search_fetch() == []
-        assert (
-            fetch_calls == []
-        ), f"_fetch should not be called when search is empty: {fetch_calls!r}"
+        assert fetch_calls == [], (
+            f"_fetch should not be called when search is empty: {fetch_calls!r}"
+        )
 
     def test_api_via_search_fetch_forwards_products(self, src, monkeypatch):
         """Non-empty `_search()` is handed to `_fetch()` verbatim."""

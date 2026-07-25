@@ -26,7 +26,7 @@ redirect the loader at a temporary directory or single YAML file.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -48,7 +48,7 @@ _DEFAULT_DIM_NAMES: tuple[str, ...] = ("time", "latitude", "longitude")
 # plus a tuple of `(file, mtime_ns)` for every YAML the load touched, so
 # editing any per-slice file invalidates the entry without inspecting
 # every row. Mirrors the CMEMS multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 
 def clear_catalog_cache() -> None:
@@ -91,7 +91,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
     )
 
 
-def _load_catalog_data(path: Path) -> dict[str, Dataset]:
+def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     """Parse, validate, and cache the ERDDAP catalog at `path`.
 
     When `path` is a directory, every `*.yaml` file is merged: a dataset
@@ -348,4 +348,4 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))

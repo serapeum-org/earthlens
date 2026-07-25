@@ -71,9 +71,9 @@ class TestAggregationConfig:
         """`freq` has no default — omitting it raises ValidationError."""
         with pytest.raises(ValidationError) as excinfo:
             AggregationConfig()
-        assert "freq" in str(
-            excinfo.value
-        ), f"ValidationError should mention `freq`, got: {excinfo.value}"
+        assert "freq" in str(excinfo.value), (
+            f"ValidationError should mention `freq`, got: {excinfo.value}"
+        )
 
     def test_default_op_is_auto(self):
         """`op` defaults to `"auto"` so flux/state routing works without
@@ -89,9 +89,9 @@ class TestAggregationConfig:
     def test_default_min_count_is_none(self):
         """`min_count` defaults to `None` (no minimum)."""
         cfg = AggregationConfig(freq="1D")
-        assert (
-            cfg.min_count is None
-        ), f"Expected default min_count None, got {cfg.min_count!r}"
+        assert cfg.min_count is None, (
+            f"Expected default min_count None, got {cfg.min_count!r}"
+        )
 
     def test_default_level_is_none(self):
         """`level` defaults to `None` (3-D NetCDFs assumed)."""
@@ -101,16 +101,16 @@ class TestAggregationConfig:
     def test_default_cell_size_is_era5_native(self):
         """`cell_size` defaults to ERA5's native 0.125° grid."""
         cfg = AggregationConfig(freq="1D")
-        assert (
-            cfg.cell_size == 0.125
-        ), f"Expected default cell_size 0.125, got {cfg.cell_size!r}"
+        assert cfg.cell_size == 0.125, (
+            f"Expected default cell_size 0.125, got {cfg.cell_size!r}"
+        )
 
     def test_default_out_dir_is_none(self):
         """`out_dir=None` means in-memory only — no GeoTIFF writes."""
         cfg = AggregationConfig(freq="1D")
-        assert (
-            cfg.out_dir is None
-        ), f"Expected default out_dir None, got {cfg.out_dir!r}"
+        assert cfg.out_dir is None, (
+            f"Expected default out_dir None, got {cfg.out_dir!r}"
+        )
 
     def test_frozen_disallows_mutation(self):
         """Mutating an instantiated config raises (frozen)."""
@@ -122,9 +122,9 @@ class TestAggregationConfig:
         """`freqency=` (typo) raises ValidationError, not a silent default."""
         with pytest.raises(ValidationError) as excinfo:
             AggregationConfig(freqency="1D")
-        assert "freqency" in str(
-            excinfo.value
-        ), f"ValidationError should mention the offending key, got: {excinfo.value}"
+        assert "freqency" in str(excinfo.value), (
+            f"ValidationError should mention the offending key, got: {excinfo.value}"
+        )
 
     def test_invalid_op_rejected(self):
         """`op` outside the `OperationLiteral` set raises."""
@@ -144,19 +144,19 @@ class TestAggregationConfig:
     def test_out_dir_path_object_accepted(self, tmp_path):
         """A `Path` instance for `out_dir` is preserved as a `Path`."""
         cfg = AggregationConfig(freq="1D", out_dir=tmp_path)
-        assert isinstance(
-            cfg.out_dir, Path
-        ), f"Expected Path instance, got {type(cfg.out_dir).__name__}"
-        assert (
-            cfg.out_dir == tmp_path
-        ), f"Expected out_dir {tmp_path}, got {cfg.out_dir}"
+        assert isinstance(cfg.out_dir, Path), (
+            f"Expected Path instance, got {type(cfg.out_dir).__name__}"
+        )
+        assert cfg.out_dir == tmp_path, (
+            f"Expected out_dir {tmp_path}, got {cfg.out_dir}"
+        )
 
     def test_out_dir_string_coerced_to_path(self):
         """A string `out_dir` is coerced to a `pathlib.Path` by pydantic."""
         cfg = AggregationConfig(freq="1D", out_dir="out/monthly")
-        assert isinstance(
-            cfg.out_dir, Path
-        ), f"Expected Path coercion, got {type(cfg.out_dir).__name__}"
+        assert isinstance(cfg.out_dir, Path), (
+            f"Expected Path coercion, got {type(cfg.out_dir).__name__}"
+        )
 
     def test_min_count_int_accepted(self):
         """An integer `min_count` survives validation."""
@@ -191,42 +191,42 @@ class TestReadTimeAxis:
             }
         )
         result = _read_time_axis(nc)
-        assert result[0] == pd.Timestamp(
-            "2022-06-15"
-        ), f"Expected valid_time to win, got {result[0]}"
+        assert result[0] == pd.Timestamp("2022-06-15"), (
+            f"Expected valid_time to win, got {result[0]}"
+        )
 
     def test_falls_back_to_time_when_valid_time_absent(self):
         """`time` is used when `valid_time` returns None."""
         nc = _make_nc(time_strs_by_var={"valid_time": None, "time": ["2020-01-01"]})
         result = _read_time_axis(nc)
-        assert result[0] == pd.Timestamp(
-            "2020-01-01"
-        ), f"Expected time fallback, got {result[0]}"
+        assert result[0] == pd.Timestamp("2020-01-01"), (
+            f"Expected time fallback, got {result[0]}"
+        )
 
     def test_falls_back_to_time_when_valid_time_empty_list(self):
         """An empty list for `valid_time` is treated as absence."""
         nc = _make_nc(time_strs_by_var={"valid_time": [], "time": ["2021-03-04"]})
         result = _read_time_axis(nc)
-        assert result[0] == pd.Timestamp(
-            "2021-03-04"
-        ), f"Expected time fallback for empty valid_time, got {result[0]}"
+        assert result[0] == pd.Timestamp("2021-03-04"), (
+            f"Expected time fallback for empty valid_time, got {result[0]}"
+        )
 
     def test_returns_datetimeindex(self):
         """Return type is `pandas.DatetimeIndex`."""
         nc = _make_nc(time_strs_by_var={"time": ["2022-01-01"]})
         result = _read_time_axis(nc)
-        assert isinstance(
-            result, pd.DatetimeIndex
-        ), f"Expected DatetimeIndex, got {type(result).__name__}"
+        assert isinstance(result, pd.DatetimeIndex), (
+            f"Expected DatetimeIndex, got {type(result).__name__}"
+        )
 
     def test_parses_multiple_dates_in_order(self):
         """The helper preserves the order of the input strings."""
         dates = ["2022-01-01", "2022-01-02", "2022-01-03"]
         nc = _make_nc(time_strs_by_var={"time": dates})
         result = _read_time_axis(nc)
-        assert list(result) == [
-            pd.Timestamp(d) for d in dates
-        ], f"Expected dates in order, got {list(result)}"
+        assert list(result) == [pd.Timestamp(d) for d in dates], (
+            f"Expected dates in order, got {list(result)}"
+        )
 
     def test_keyerror_when_no_candidate_resolves(self):
         """`KeyError` when both candidates return None / empty."""
@@ -235,18 +235,18 @@ class TestReadTimeAxis:
             _read_time_axis(nc)
         msg = str(excinfo.value)
         for name in _TIME_VAR_CANDIDATES:
-            assert (
-                name in msg
-            ), f"KeyError message should list candidate {name!r}, got: {msg}"
+            assert name in msg, (
+                f"KeyError message should list candidate {name!r}, got: {msg}"
+            )
 
     def test_get_time_variable_called_with_var_name_kwarg(self):
         """The helper passes each candidate as a keyword argument."""
         nc = _make_nc(time_strs_by_var={"time": ["2022-01-01"]})
         _read_time_axis(nc)
         call_kwargs = [call.kwargs for call in nc.get_time_variable.call_args_list]
-        assert all(
-            "var_name" in kwargs for kwargs in call_kwargs
-        ), f"All calls should pass var_name as kwarg, got: {call_kwargs}"
+        assert all("var_name" in kwargs for kwargs in call_kwargs), (
+            f"All calls should pass var_name as kwarg, got: {call_kwargs}"
+        )
 
 
 class TestFindLevelDim:
@@ -268,9 +268,9 @@ class TestFindLevelDim:
         """When both names are present, the first candidate wins."""
         nc = _make_nc(dimension_names=["time", "pressure_level", "level", "lat", "lon"])
         result = _find_level_dim(nc)
-        assert (
-            result == "pressure_level"
-        ), f"Expected 'pressure_level' to win over 'level', got {result!r}"
+        assert result == "pressure_level", (
+            f"Expected 'pressure_level' to win over 'level', got {result!r}"
+        )
 
     def test_returns_none_for_3d_netcdf(self):
         """No level dimension → `None`."""
@@ -282,9 +282,9 @@ class TestFindLevelDim:
         """A NetCDF with no root group reports `dimension_names=None`."""
         nc = _make_nc(dimension_names=None)
         result = _find_level_dim(nc)
-        assert (
-            result is None
-        ), f"Expected None when dimension_names is None, got {result!r}"
+        assert result is None, (
+            f"Expected None when dimension_names is None, got {result!r}"
+        )
 
     def test_candidates_constant_shape(self):
         """Documenting the candidate list as a tuple of two names."""
@@ -310,9 +310,9 @@ class TestResolvePressureLevel:
         with pytest.raises(ValueError) as excinfo:
             _resolve_pressure_level(nc, level=1000)
         msg = str(excinfo.value)
-        assert (
-            "no" in msg.lower() and "pressure-level dimension" in msg
-        ), f"Error should explain the missing dimension, got: {msg}"
+        assert "no" in msg.lower() and "pressure-level dimension" in msg, (
+            f"Error should explain the missing dimension, got: {msg}"
+        )
 
     def test_3d_with_level_error_mentions_passed_value(self):
         """The error names the offending `level` so users can find it."""
@@ -326,9 +326,9 @@ class TestResolvePressureLevel:
         with pytest.raises(ValueError) as excinfo:
             _resolve_pressure_level(nc, level=None)
         msg = str(excinfo.value)
-        assert (
-            "level=" in msg.lower() or "level=" in msg
-        ), f"Error should hint at `level=` parameter, got: {msg}"
+        assert "level=" in msg.lower() or "level=" in msg, (
+            f"Error should hint at `level=` parameter, got: {msg}"
+        )
 
     def test_4d_without_level_error_mentions_dim_name(self):
         """The error names the actual dimension found."""
@@ -356,9 +356,9 @@ class TestResolvePressureLevel:
             sel_result=sel_output,
         )
         result = _resolve_pressure_level(nc, level=1000)
-        assert (
-            result is sel_output
-        ), f"Expected sel result, got {result!r} (input was {nc!r})"
+        assert result is sel_output, (
+            f"Expected sel result, got {result!r} (input was {nc!r})"
+        )
 
     def test_4d_with_float_level(self):
         """A float `level` (e.g., 850.5) is forwarded to `sel` verbatim."""
@@ -376,9 +376,9 @@ class TestWindowGroups:
         windows = list(_window_groups(idx, "1D"))
         assert len(windows) == 1, f"Expected 1 daily window, got {len(windows)}"
         label, mask = windows[0]
-        assert label == pd.Timestamp(
-            "2022-01-01"
-        ), f"Expected window label 2022-01-01, got {label}"
+        assert label == pd.Timestamp("2022-01-01"), (
+            f"Expected window label 2022-01-01, got {label}"
+        )
         assert mask.tolist() == [
             True,
             True,
@@ -409,9 +409,9 @@ class TestWindowGroups:
         windows = list(_window_groups(idx, "1MS"))
         assert len(windows) == 1, f"Expected 1 monthly window, got {len(windows)}"
         label, mask = windows[0]
-        assert label == pd.Timestamp(
-            "2022-01-01"
-        ), f"Expected month-start label, got {label}"
+        assert label == pd.Timestamp("2022-01-01"), (
+            f"Expected month-start label, got {label}"
+        )
         assert mask.sum() == 31, f"Expected 31 samples, got {mask.sum()}"
 
     def test_monthly_ms_two_months_yields_two_windows(self):
@@ -437,25 +437,25 @@ class TestWindowGroups:
         """Group keys returned are the windows' left-edge timestamps."""
         idx = pd.date_range("2022-06-15", periods=4, freq="6h")
         label, _ = next(iter(_window_groups(idx, "1D")))
-        assert label == pd.Timestamp(
-            "2022-06-15"
-        ), f"Expected left-edge 2022-06-15, got {label}"
+        assert label == pd.Timestamp("2022-06-15"), (
+            f"Expected left-edge 2022-06-15, got {label}"
+        )
 
     def test_mask_length_matches_input(self):
         """Each emitted mask has length equal to the time axis."""
         idx = pd.date_range("2022-01-01", periods=12, freq="6h")
         for _, mask in _window_groups(idx, "1D"):
-            assert (
-                len(mask) == 12
-            ), f"Mask length {len(mask)} should match time-axis length 12"
+            assert len(mask) == 12, (
+                f"Mask length {len(mask)} should match time-axis length 12"
+            )
 
     def test_mask_dtype_is_bool(self):
         """Mask is a numpy bool array — drop-in for ndarray indexing."""
         idx = pd.date_range("2022-01-01", periods=4, freq="6h")
         _, mask = next(iter(_window_groups(idx, "1D")))
-        assert isinstance(
-            mask, np.ndarray
-        ), f"Expected numpy ndarray, got {type(mask).__name__}"
+        assert isinstance(mask, np.ndarray), (
+            f"Expected numpy ndarray, got {type(mask).__name__}"
+        )
         assert mask.dtype == np.bool_, f"Expected bool dtype, got {mask.dtype}"
 
     def test_masks_isolate_correct_indices(self):
@@ -464,12 +464,12 @@ class TestWindowGroups:
         windows = list(_window_groups(idx, "1D"))
         first_mask = windows[0][1]
         second_mask = windows[1][1]
-        assert (
-            first_mask.tolist() == [True] * 4 + [False] * 4
-        ), f"First daily mask wrong: {first_mask.tolist()}"
-        assert (
-            second_mask.tolist() == [False] * 4 + [True] * 4
-        ), f"Second daily mask wrong: {second_mask.tolist()}"
+        assert first_mask.tolist() == [True] * 4 + [False] * 4, (
+            f"First daily mask wrong: {first_mask.tolist()}"
+        )
+        assert second_mask.tolist() == [False] * 4 + [True] * 4, (
+            f"Second daily mask wrong: {second_mask.tolist()}"
+        )
         assert (first_mask & second_mask).sum() == 0, "Daily masks must be disjoint"
 
     def test_empty_time_axis_yields_nothing(self):
@@ -531,68 +531,68 @@ class TestReduce:
         """
         result = _reduce(cube, op=op, skipna=True, min_count=None)
         assert result.shape == (2, 2), f"Expected (2, 2), got {result.shape}"
-        assert result[0, 0] == pytest.approx(
-            expected_pixel_00
-        ), f"Op {op!r} at (0, 0): expected {expected_pixel_00}, got {result[0, 0]}"
+        assert result[0, 0] == pytest.approx(expected_pixel_00), (
+            f"Op {op!r} at (0, 0): expected {expected_pixel_00}, got {result[0, 0]}"
+        )
 
     def test_std_op_returns_nonzero(self, cube):
         """`std` over a non-constant series produces a positive value."""
         result = _reduce(cube, op="std", skipna=True, min_count=None)
-        assert (
-            result[0, 0] > 0
-        ), f"std should be positive for non-constant series, got {result[0, 0]}"
+        assert result[0, 0] > 0, (
+            f"std should be positive for non-constant series, got {result[0, 0]}"
+        )
 
     def test_skipna_true_excludes_nan_from_mean(self):
         """NaN-aware mean ignores NaN samples in the window."""
         arr = np.array([[[1.0]], [[2.0]], [[np.nan]], [[3.0]]])
         result = _reduce(arr, op="mean", skipna=True, min_count=None)
-        assert result[0, 0] == pytest.approx(
-            2.0
-        ), f"Expected NaN-skipped mean 2.0, got {result[0, 0]}"
+        assert result[0, 0] == pytest.approx(2.0), (
+            f"Expected NaN-skipped mean 2.0, got {result[0, 0]}"
+        )
 
     def test_skipna_false_propagates_nan_to_output(self):
         """Strict mean propagates any NaN to the result."""
         arr = np.array([[[1.0, 2.0]], [[np.nan, 3.0]]])
         result = _reduce(arr, op="mean", skipna=False, min_count=None)
-        assert np.isnan(
-            result[0, 0]
-        ), f"Pixel (0, 0) should be NaN under strict mode, got {result[0, 0]}"
-        assert result[0, 1] == pytest.approx(
-            2.5
-        ), f"Pixel (0, 1) had no NaN; expected 2.5, got {result[0, 1]}"
+        assert np.isnan(result[0, 0]), (
+            f"Pixel (0, 0) should be NaN under strict mode, got {result[0, 0]}"
+        )
+        assert result[0, 1] == pytest.approx(2.5), (
+            f"Pixel (0, 1) had no NaN; expected 2.5, got {result[0, 1]}"
+        )
 
     @pytest.mark.parametrize("op", ["mean", "sum", "min", "max", "std"])
     def test_skipna_true_uses_nan_aware_table(self, op):
         """Every op routes through the NaN-aware table when `skipna=True`."""
-        assert (
-            op in _REDUCERS_SKIPNA
-        ), f"_REDUCERS_SKIPNA missing op {op!r}: {sorted(_REDUCERS_SKIPNA)}"
+        assert op in _REDUCERS_SKIPNA, (
+            f"_REDUCERS_SKIPNA missing op {op!r}: {sorted(_REDUCERS_SKIPNA)}"
+        )
 
     @pytest.mark.parametrize("op", ["mean", "sum", "min", "max", "std"])
     def test_skipna_false_uses_strict_table(self, op):
         """Every op routes through the strict table when `skipna=False`."""
-        assert (
-            op in _REDUCERS_STRICT
-        ), f"_REDUCERS_STRICT missing op {op!r}: {sorted(_REDUCERS_STRICT)}"
+        assert op in _REDUCERS_STRICT, (
+            f"_REDUCERS_STRICT missing op {op!r}: {sorted(_REDUCERS_STRICT)}"
+        )
 
     def test_min_count_masks_under_sampled_pixel(self):
         """Pixels with fewer non-NaN samples than `min_count` emit NaN."""
         arr = np.array([[[1.0, 2.0]], [[np.nan, 3.0]]])
         result = _reduce(arr, op="mean", skipna=True, min_count=2)
-        assert np.isnan(
-            result[0, 0]
-        ), f"Under-sampled pixel should be NaN, got {result[0, 0]}"
-        assert result[0, 1] == pytest.approx(
-            2.5
-        ), f"Fully-sampled pixel should survive: expected 2.5, got {result[0, 1]}"
+        assert np.isnan(result[0, 0]), (
+            f"Under-sampled pixel should be NaN, got {result[0, 0]}"
+        )
+        assert result[0, 1] == pytest.approx(2.5), (
+            f"Fully-sampled pixel should survive: expected 2.5, got {result[0, 1]}"
+        )
 
     def test_min_count_none_disables_floor(self):
         """`min_count=None` lets every reduction reach the output as-is."""
         arr = np.array([[[1.0]], [[np.nan]], [[3.0]]])
         result = _reduce(arr, op="mean", skipna=True, min_count=None)
-        assert result[0, 0] == pytest.approx(
-            2.0
-        ), f"Expected 2.0 with min_count=None, got {result[0, 0]}"
+        assert result[0, 0] == pytest.approx(2.0), (
+            f"Expected 2.0 with min_count=None, got {result[0, 0]}"
+        )
 
     def test_keyerror_on_auto(self):
         """`op="auto"` is rejected — caller must resolve it first."""
@@ -607,9 +607,9 @@ class TestReduce:
             _reduce(arr, op="median", skipna=True, min_count=None)
         msg = str(excinfo.value)
         for valid in ("mean", "sum", "min", "max", "std"):
-            assert (
-                valid in msg
-            ), f"Error message should list valid op {valid!r}, got: {msg}"
+            assert valid in msg, (
+                f"Error message should list valid op {valid!r}, got: {msg}"
+            )
 
     def test_collapses_axis_zero_only(self):
         """Reduction collapses axis 0; the remaining shape passes through."""
@@ -639,9 +639,9 @@ class TestResolveOp:
             explicit_op: The op literal under test.
         """
         result = _resolve_op(explicit_op, SimpleNamespace(is_flux=True))
-        assert (
-            result == explicit_op
-        ), f"Expected {explicit_op!r} passthrough, got {result!r}"
+        assert result == explicit_op, (
+            f"Expected {explicit_op!r} passthrough, got {result!r}"
+        )
 
     def test_explicit_op_does_not_consult_is_flux(self):
         """Explicit ops do not read `var_info.is_flux`."""
@@ -836,16 +836,16 @@ class TestAggregateNetcdfRoundTrip:
 
         assert len(results) == 2, f"Expected 2 daily windows, got {len(results)}"
         first_label, first_arr, _ = results[0]
-        assert first_label == pd.Timestamp(
-            "2022-01-01"
-        ), f"First label should be 2022-01-01, got {first_label}"
-        assert first_arr[0, 0] == pytest.approx(
-            2.5
-        ), f"Day 1 mean should be (1+2+3+4)/4 = 2.5, got {first_arr[0, 0]}"
+        assert first_label == pd.Timestamp("2022-01-01"), (
+            f"First label should be 2022-01-01, got {first_label}"
+        )
+        assert first_arr[0, 0] == pytest.approx(2.5), (
+            f"Day 1 mean should be (1+2+3+4)/4 = 2.5, got {first_arr[0, 0]}"
+        )
         second_arr = results[1][1]
-        assert second_arr[0, 0] == pytest.approx(
-            6.5
-        ), f"Day 2 mean should be (5+6+7+8)/4 = 6.5, got {second_arr[0, 0]}"
+        assert second_arr[0, 0] == pytest.approx(6.5), (
+            f"Day 2 mean should be (5+6+7+8)/4 = 6.5, got {second_arr[0, 0]}"
+        )
         assert len(writes) == 2, f"Expected 2 GeoTIFFs to be written, got {len(writes)}"
 
     def test_op_auto_routes_state_to_mean(self, monkeypatch, tmp_path, state_var):
@@ -865,9 +865,9 @@ class TestAggregateNetcdfRoundTrip:
             AggregationConfig(freq="1D", op="auto", out_dir=None),
         )
         _, arr, _ = results[0]
-        assert arr[0, 0] == pytest.approx(
-            2.5
-        ), f"Auto on state var should mean to 2.5, got {arr[0, 0]}"
+        assert arr[0, 0] == pytest.approx(2.5), (
+            f"Auto on state var should mean to 2.5, got {arr[0, 0]}"
+        )
 
     def test_op_auto_routes_flux_to_sum(self, monkeypatch, tmp_path, flux_var):
         """`op="auto"` + `is_flux=True` → sum over the window."""
@@ -886,9 +886,9 @@ class TestAggregateNetcdfRoundTrip:
             AggregationConfig(freq="1D", op="auto", out_dir=None),
         )
         _, arr, _ = results[0]
-        assert arr[0, 0] == pytest.approx(
-            10.0
-        ), f"Auto on flux var should sum to 1+2+3+4=10.0, got {arr[0, 0]}"
+        assert arr[0, 0] == pytest.approx(10.0), (
+            f"Auto on flux var should sum to 1+2+3+4=10.0, got {arr[0, 0]}"
+        )
 
     def test_min_count_emits_nan_for_partial_windows(
         self, monkeypatch, tmp_path, state_var
@@ -973,9 +973,9 @@ class TestAggregateNetcdfRoundTrip:
             AggregationConfig(freq="1D", op="mean", out_dir=None, level=1000),
         )
         _, arr, _ = results[0]
-        assert arr[0, 0] == pytest.approx(
-            2.5
-        ), f"After level pin, daily mean should be 2.5, got {arr[0, 0]}"
+        assert arr[0, 0] == pytest.approx(2.5), (
+            f"After level pin, daily mean should be 2.5, got {arr[0, 0]}"
+        )
 
     def test_out_dir_none_skips_writes(self, monkeypatch, tmp_path, state_var):
         """`out_dir=None` returns arrays in memory and writes no files."""
@@ -993,12 +993,12 @@ class TestAggregateNetcdfRoundTrip:
             state_var,
             AggregationConfig(freq="1D", op="mean", out_dir=None),
         )
-        assert (
-            results[0][2] is None
-        ), f"Third tuple element should be None, got {results[0][2]!r}"
-        assert (
-            writes == []
-        ), f"No GeoTIFF writes should occur when out_dir=None; got {writes!r}"
+        assert results[0][2] is None, (
+            f"Third tuple element should be None, got {results[0][2]!r}"
+        )
+        assert writes == [], (
+            f"No GeoTIFF writes should occur when out_dir=None; got {writes!r}"
+        )
 
     def test_geotiff_filename_carries_variable_freq_and_window(
         self, monkeypatch, tmp_path, state_var
@@ -1048,7 +1048,7 @@ class TestAggregateNetcdfRoundTrip:
         )
         label, _, _ = results[0]
         assert label == pd.Timestamp("2022-01-01"), (
-            f"`valid_time` should drive the time axis (2022-01-01); " f"got {label}"
+            f"`valid_time` should drive the time axis (2022-01-01); got {label}"
         )
 
     def test_out_dir_created_if_missing(self, monkeypatch, tmp_path, state_var):
@@ -1069,9 +1069,9 @@ class TestAggregateNetcdfRoundTrip:
             state_var,
             AggregationConfig(freq="1D", op="mean", out_dir=out_dir),
         )
-        assert (
-            out_dir.exists()
-        ), f"`out_dir` should be created with parents; missing at {out_dir}"
+        assert out_dir.exists(), (
+            f"`out_dir` should be created with parents; missing at {out_dir}"
+        )
 
     def test_skipna_false_propagates_nan_through_body(
         self, monkeypatch, tmp_path, state_var
@@ -1098,9 +1098,9 @@ class TestAggregateNetcdfRoundTrip:
             f"Day 1 pixel (0, 0) was NaN-tainted; with skipna=False it "
             f"should propagate NaN, got {day1[0, 0]}"
         )
-        assert day2[0, 0] == pytest.approx(
-            6.5
-        ), f"Day 2 was clean; mean should be 6.5, got {day2[0, 0]}"
+        assert day2[0, 0] == pytest.approx(6.5), (
+            f"Day 2 was clean; mean should be 6.5, got {day2[0, 0]}"
+        )
 
     def test_monthly_grouping_runs_end_to_end(self, monkeypatch, tmp_path, state_var):
         """A 32-day cube + `freq="1MS"` produces 2 monthly windows."""
@@ -1127,12 +1127,12 @@ class TestAggregateNetcdfRoundTrip:
             pd.Timestamp("2022-01-01"),
             pd.Timestamp("2022-02-01"),
         ], f"Expected monthly labels [Jan-1, Feb-1], got {labels}"
-        assert results[0][1][0, 0] == pytest.approx(
-            1.0
-        ), f"January mean should be 1.0, got {results[0][1][0, 0]}"
-        assert results[1][1][0, 0] == pytest.approx(
-            2.0
-        ), f"February mean (1 sample) should be 2.0, got {results[1][1][0, 0]}"
+        assert results[0][1][0, 0] == pytest.approx(1.0), (
+            f"January mean should be 1.0, got {results[0][1][0, 0]}"
+        )
+        assert results[1][1][0, 0] == pytest.approx(2.0), (
+            f"February mean (1 sample) should be 2.0, got {results[1][1][0, 0]}"
+        )
 
     def test_empty_time_axis_returns_empty_results(
         self, monkeypatch, tmp_path, state_var
@@ -1152,9 +1152,9 @@ class TestAggregateNetcdfRoundTrip:
                 state_var,
                 AggregationConfig(freq="1D", op="mean", out_dir=tmp_path),
             )
-        assert (
-            writes == []
-        ), f"No writes should occur on empty time axis, got {writes!r}"
+        assert writes == [], (
+            f"No writes should occur on empty time axis, got {writes!r}"
+        )
 
     def test_cell_size_does_not_affect_geotransform(
         self, monkeypatch, tmp_path, state_var

@@ -31,9 +31,9 @@ directory or a single YAML file.
 from __future__ import annotations
 
 import datetime as _dt
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import (
     BaseModel,
@@ -78,7 +78,7 @@ CadenceLiteral = Literal[
 TimelinessLiteral = Literal["nrt", "reprocessed", "offline"]
 
 
-class DataStoreGroup(str, Enum):
+class DataStoreGroup(StrEnum):
     """The EUMETSAT Data Store collection groups (mission families).
 
     Each value is the human-readable group label carried on a catalog
@@ -209,7 +209,7 @@ def _load_catalog_data(
             )
         except ValidationError as exc:
             raise ValueError(
-                f"{origin[ds_key]} dataset {ds_key!r} failed " f"validation:\n{exc}"
+                f"{origin[ds_key]} dataset {ds_key!r} failed validation:\n{exc}"
             ) from exc
 
     _CATALOG_CACHE[key] = (merged_available, structural)
@@ -468,7 +468,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        dataset = self.get_dataset(key)
+        dataset = cast("EumetsatDataset", self.get_dataset(key))
         if group is not None:
             wanted = group.value if isinstance(group, DataStoreGroup) else str(group)
             if dataset.group.value != wanted:

@@ -15,8 +15,7 @@ class TestDatasetPath:
         """The path embeds the bucket, release, theme, and type partitions."""
         path = _dataset_path("places", "place", "2026-05-20.0")
         assert path == (
-            "s3://overturemaps-us-west-2/release/2026-05-20.0/"
-            "theme=places/type=place/*"
+            "s3://overturemaps-us-west-2/release/2026-05-20.0/theme=places/type=place/*"
         )
 
 

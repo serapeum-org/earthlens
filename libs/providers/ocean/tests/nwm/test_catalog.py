@@ -108,13 +108,15 @@ def test_dict_surface(catalog):
 def test_extra_field_rejected(tmp_path):
     """A product row with an unexpected field fails validation."""
     path = tmp_path / "bad.yaml"
-    path.write_text(textwrap.dedent("""
+    path.write_text(
+        textwrap.dedent("""
             products:
               chrtout:
                 output_kind: tabular
                 s3_token: channel_rt
                 bogus_field: 1
-            """))
+            """)
+    )
     clear_catalog_cache()
     with pytest.raises(ValueError, match="failed validation"):
         Catalog.load(path)
@@ -132,7 +134,8 @@ def test_missing_products_block(tmp_path):
 def test_duplicate_key_rejected(tmp_path):
     """A duplicate YAML key is rejected at parse time."""
     path = tmp_path / "dup.yaml"
-    path.write_text(textwrap.dedent("""
+    path.write_text(
+        textwrap.dedent("""
             products:
               chrtout:
                 output_kind: tabular
@@ -140,7 +143,8 @@ def test_duplicate_key_rejected(tmp_path):
               chrtout:
                 output_kind: raster
                 s3_token: land
-            """))
+            """)
+    )
     clear_catalog_cache()
     with pytest.raises(ValueError, match="duplicate YAML key"):
         Catalog.load(path)
@@ -149,12 +153,14 @@ def test_duplicate_key_rejected(tmp_path):
 def test_parse_cache_returns_same_object(tmp_path):
     """Loading the same path twice hits the parse cache (identity)."""
     path = tmp_path / "ok.yaml"
-    path.write_text(textwrap.dedent("""
+    path.write_text(
+        textwrap.dedent("""
             products:
               chrtout:
                 output_kind: tabular
                 s3_token: channel_rt
-            """))
+            """)
+    )
     clear_catalog_cache()
     first = Catalog.load(path)
     second = Catalog.load(path)
@@ -189,7 +195,8 @@ def test_config_is_frozen():
 def test_bad_configuration_row_rejected(tmp_path):
     """A configuration row with a bad field type fails validation."""
     path = tmp_path / "badcfg.yaml"
-    path.write_text(textwrap.dedent("""
+    path.write_text(
+        textwrap.dedent("""
             products:
               chrtout:
                 output_kind: tabular
@@ -197,7 +204,8 @@ def test_bad_configuration_row_rejected(tmp_path):
             configurations:
               short_range:
                 step_kind: not-a-valid-kind
-            """))
+            """)
+    )
     clear_catalog_cache()
     with pytest.raises(ValueError, match="configuration 'short_range' failed"):
         Catalog.load(path)

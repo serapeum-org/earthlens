@@ -235,8 +235,8 @@ class TestListEndpoints:
         )
         params = session.calls[0]["params"]
         assert session.calls[0]["url"] == f"{BASE_URL}/sensors/10/{rollup}"
-        assert (
-            params["date_from"] == "2024-01-01"
-        ), "date should be truncated to YYYY-MM-DD"
+        assert params["date_from"] == "2024-01-01", (
+            "date should be truncated to YYYY-MM-DD"
+        )
         assert params["date_to"] == "2024-01-07"
         assert "datetime_from" not in params

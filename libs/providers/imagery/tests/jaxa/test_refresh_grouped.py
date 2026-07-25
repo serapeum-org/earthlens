@@ -56,7 +56,8 @@ def test_ptree_group_picks_up_new_catalog_row(monkeypatch: pytest.MonkeyPatch) -
 
     grouped = _jaxa_grouped(catalog)
     assert grouped["ptree"] == [
-        "himawari-ahi-fldk", "himawari-ahi-target-area",
+        "himawari-ahi-fldk",
+        "himawari-ahi-target-area",
     ]
 
 

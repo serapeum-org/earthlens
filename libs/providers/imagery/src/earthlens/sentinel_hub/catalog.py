@@ -30,7 +30,7 @@ the loader at a temporary directory.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
@@ -451,7 +451,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If the key is unknown (message suggests the closest key).
         """
-        return self.get_dataset(collection_key)
+        return cast("Collection", self.get_dataset(collection_key))
 
     def get_recipe(self, recipe_key: str) -> EvalscriptRecipe:
         """Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).

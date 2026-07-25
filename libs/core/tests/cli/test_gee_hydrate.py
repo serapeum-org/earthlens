@@ -399,14 +399,11 @@ class TestConfigureEe:
         calls = {}
 
         class FakeAuth:
-            def __init__(self, creds):
-                calls["creds"] = creds
-
-            def configure(self):
-                calls["configured"] = True
+            @staticmethod
+            def initialize(service_account, service_key, project=None):
+                calls["initialized"] = True
 
         monkeypatch.setattr(auth_mod, "EarthEngineAuth", FakeAuth)
-        monkeypatch.setattr(auth_mod, "EarthEngineCredentials", lambda: "C")
         module = _configure_ee()
-        assert calls.get("configured") is True, "configure() called"
+        assert calls.get("initialized") is True, "initialize() called"
         assert module.__name__ == "ee", "the ee module is returned"

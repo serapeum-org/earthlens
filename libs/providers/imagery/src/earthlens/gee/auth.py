@@ -25,7 +25,7 @@ from __future__ import annotations
 import base64
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import ee
 from pydantic import BaseModel, ConfigDict
@@ -133,11 +133,11 @@ def _load_key_dict(service_key: str) -> dict[str, Any] | None:
         return None
     if service_key.lstrip().startswith("{"):
         try:
-            return json.loads(service_key)
+            return cast("dict[str, Any]", json.loads(service_key))
         except ValueError:
             return None
     try:
-        return json.loads(Path(service_key).read_text())
+        return cast("dict[str, Any]", json.loads(Path(service_key).read_text()))
     except (OSError, ValueError):
         return None
 
@@ -436,4 +436,6 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
         See Also:
             encode_service_account: The inverse operation.
         """
-        return json.loads(base64.b64decode(service_key_bytes).decode())
+        return cast(
+            "dict[str, Any]", json.loads(base64.b64decode(service_key_bytes).decode())
+        )

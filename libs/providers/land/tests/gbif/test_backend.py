@@ -68,8 +68,16 @@ class TestPaging:
         """Two pages (endOfRecords False then True) concatenate both results."""
         fake_gbif.occurrences.set_pages(
             [
-                {"results": [fake_gbif.record(key=1)], "count": 2, "endOfRecords": False},
-                {"results": [fake_gbif.record(key=2)], "count": 2, "endOfRecords": True},
+                {
+                    "results": [fake_gbif.record(key=1)],
+                    "count": 2,
+                    "endOfRecords": False,
+                },
+                {
+                    "results": [fake_gbif.record(key=2)],
+                    "count": 2,
+                    "endOfRecords": True,
+                },
             ]
         )
         rows = _backend(tmp_path)._page(fake_gbif.occurrences, {"taxonKey": 212})
@@ -78,8 +86,13 @@ class TestPaging:
     def test_max_records_caps_and_logs(self, tmp_path, fake_gbif, log_messages):
         """`max_records=1` stops after one row and logs the upstream count once."""
         fake_gbif.occurrences.set_pages(
-            [{"results": [fake_gbif.record(key=1), fake_gbif.record(key=2)],
-              "count": 57, "endOfRecords": False}]
+            [
+                {
+                    "results": [fake_gbif.record(key=1), fake_gbif.record(key=2)],
+                    "count": 57,
+                    "endOfRecords": False,
+                }
+            ]
         )
         rows = _backend(tmp_path, max_records=1)._page(
             fake_gbif.occurrences, {"taxonKey": 212}
@@ -96,8 +109,13 @@ class TestFetchAndDownload:
     def test_download_returns_points(self, tmp_path, fake_gbif):
         """A two-record result becomes a two-feature EPSG:4326 Point collection."""
         fake_gbif.occurrences.set_pages(
-            [{"results": [fake_gbif.record(key=1), fake_gbif.record(key=2)],
-              "count": 2, "endOfRecords": True}]
+            [
+                {
+                    "results": [fake_gbif.record(key=1), fake_gbif.record(key=2)],
+                    "count": 2,
+                    "endOfRecords": True,
+                }
+            ]
         )
         fc = _backend(tmp_path).download()
         assert isinstance(fc, GeoDataFrame)
@@ -108,8 +126,13 @@ class TestFetchAndDownload:
     def test_null_coordinate_null_geometry(self, tmp_path, fake_gbif):
         """A record missing a latitude gets a null geometry."""
         fake_gbif.occurrences.set_pages(
-            [{"results": [fake_gbif.record(decimalLatitude=None)],
-              "count": 1, "endOfRecords": True}]
+            [
+                {
+                    "results": [fake_gbif.record(decimalLatitude=None)],
+                    "count": 1,
+                    "endOfRecords": True,
+                }
+            ]
         )
         fc = _backend(tmp_path).download()
         assert fc.geometry.iloc[0] is None
@@ -117,8 +140,13 @@ class TestFetchAndDownload:
     def test_cc_by_nc_warns(self, tmp_path, fake_gbif):
         """A CC-BY-NC record raises a LicenseWarning."""
         fake_gbif.occurrences.set_pages(
-            [{"results": [fake_gbif.record(license="CC_BY_NC_4_0")],
-              "count": 1, "endOfRecords": True}]
+            [
+                {
+                    "results": [fake_gbif.record(license="CC_BY_NC_4_0")],
+                    "count": 1,
+                    "endOfRecords": True,
+                }
+            ]
         )
         with pytest.warns(LicenseWarning):
             _backend(tmp_path).download()
@@ -126,8 +154,13 @@ class TestFetchAndDownload:
     def test_all_cc0_no_warning(self, tmp_path, fake_gbif, recwarn):
         """An all-CC0 batch raises no LicenseWarning."""
         fake_gbif.occurrences.set_pages(
-            [{"results": [fake_gbif.record(license="CC0_1_0")],
-              "count": 1, "endOfRecords": True}]
+            [
+                {
+                    "results": [fake_gbif.record(license="CC0_1_0")],
+                    "count": 1,
+                    "endOfRecords": True,
+                }
+            ]
         )
         _backend(tmp_path).download()
         assert not [w for w in recwarn.list if issubclass(w.category, LicenseWarning)]

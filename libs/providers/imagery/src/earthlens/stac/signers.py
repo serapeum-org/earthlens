@@ -40,7 +40,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import parse_qs, urlencode, urlparse
 
@@ -172,7 +172,7 @@ class PlanetaryComputerSigner(_BaseSigner):
             blob URL, otherwise `href` unchanged.
         """
         account, container = self._parse_blob(href)
-        if account is None or self._already_signed(href):
+        if account is None or container is None or self._already_signed(href):
             return href
         token = self._token(account, container)
         sep = "&" if urlparse(href).query else "?"
@@ -246,12 +246,14 @@ class PlanetaryComputerSigner(_BaseSigner):
 
         cached = self._cache.get(key)
         if fresh(cached):
+            assert cached is not None  # fresh() is False for a None entry
             return cached[0]
         # Double-checked locking: serialise the fetch so concurrent callers for
         # the same (account, container) do not each mint a token.
         with self._lock:
             cached = self._cache.get(key)
             if fresh(cached):
+                assert cached is not None  # fresh() is False for a None entry
                 return cached[0]
             token, expiry = self._fetch_token(account, container)
             self._cache[key] = (token, expiry)
@@ -273,7 +275,7 @@ class PlanetaryComputerSigner(_BaseSigner):
         request = urllib.request.Request(url)
         if self._subscription_key:
             request.add_header("Ocp-Apim-Subscription-Key", self._subscription_key)
-        with urllib.request.urlopen(request, timeout=self._timeout) as response:
+        with urllib.request.urlopen(request, timeout=self._timeout) as response:  # nosec B310 - fixed http(s) endpoint, not attacker-controlled
             payload = json.loads(response.read().decode("utf-8"))
         token = payload["token"]
         expiry = self._parse_expiry(payload.get("msft:expiry"))
@@ -293,7 +295,7 @@ class PlanetaryComputerSigner(_BaseSigner):
         except ValueError:
             return 0.0
         if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=timezone.utc)
+            parsed = parsed.replace(tzinfo=UTC)
         return parsed.timestamp()
 
 
@@ -337,11 +339,13 @@ class _BearerProviderSigner(_BaseSigner):
             )
 
         if fresh():
+            assert self._cache is not None  # fresh() is False when _cache is None
             return self._cache[0]
         # Double-checked locking: serialise the mint so concurrent callers do
         # not each fetch a token.
         with self._lock:
             if fresh():
+                assert self._cache is not None  # fresh() is False when _cache is None
                 return self._cache[0]
             token, expiry = self._fetch_token()
             self._cache = (token, expiry)
@@ -386,7 +390,7 @@ class EarthdataSigner(_BearerProviderSigner):
     """
 
     name = "earthdata"
-    _TOKEN_URL = "https://urs.earthdata.nasa.gov/api/users/find_or_create_token"
+    _TOKEN_URL = "https://urs.earthdata.nasa.gov/api/users/find_or_create_token"  # nosec B105 - not a secret (public URL / identifier)
 
     def __init__(
         self,
@@ -424,7 +428,7 @@ class EarthdataSigner(_BearerProviderSigner):
         request = urllib.request.Request(self._TOKEN_URL, method="POST")
         request.add_header("Authorization", f"Basic {creds}")
         request.add_header("Accept", "application/json")
-        with urllib.request.urlopen(request, timeout=self._timeout) as response:
+        with urllib.request.urlopen(request, timeout=self._timeout) as response:  # nosec B310 - fixed http(s) endpoint, not attacker-controlled
             payload = json.loads(response.read().decode("utf-8"))
         token = payload["access_token"]
         expiry = self._parse_expiry(payload.get("expiration_date"))
@@ -439,7 +443,7 @@ class EarthdataSigner(_BearerProviderSigner):
             except ValueError:
                 return time.time() + 3600.0
             if parsed.tzinfo is None:
-                parsed = parsed.replace(tzinfo=timezone.utc)
+                parsed = parsed.replace(tzinfo=UTC)
             return parsed.timestamp()
         return time.time() + 3600.0
 
@@ -467,7 +471,7 @@ class CDSESigner(_BearerProviderSigner):
 
     name = "cdse"
     _TOKEN_URL = (
-        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/"
+        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/"  # nosec B105 - not a secret (public URL / identifier)
         "openid-connect/token"
     )
 
@@ -528,7 +532,7 @@ class CDSESigner(_BearerProviderSigner):
         body = urlencode(form).encode("utf-8")
         request = urllib.request.Request(self._TOKEN_URL, data=body, method="POST")
         request.add_header("Content-Type", "application/x-www-form-urlencoded")
-        with urllib.request.urlopen(request, timeout=self._timeout) as response:
+        with urllib.request.urlopen(request, timeout=self._timeout) as response:  # nosec B310 - fixed http(s) endpoint, not attacker-controlled
             payload = json.loads(response.read().decode("utf-8"))
         self._refresh_token = payload.get("refresh_token", self._refresh_token)
         expiry = time.time() + float(payload.get("expires_in", 600))
@@ -721,12 +725,18 @@ class BdcTokenSigner(_BaseSigner):
         `"?" in href` check would mistake a fragment for a query and append
         after `#`, where the server never sees it).
         """
-        from urllib.parse import urlsplit, urlunsplit, quote
+        from urllib.parse import quote, urlsplit, urlunsplit
 
         token = quote(self._token(), safe="")
         parts = urlsplit(href)
-        new_query = f"{parts.query}&access_token={token}" if parts.query else f"access_token={token}"
-        return urlunsplit((parts.scheme, parts.netloc, parts.path, new_query, parts.fragment))
+        new_query = (
+            f"{parts.query}&access_token={token}"
+            if parts.query
+            else f"access_token={token}"
+        )
+        return urlunsplit(
+            (parts.scheme, parts.netloc, parts.path, new_query, parts.fragment)
+        )
 
 
 def build_signer(signer_type: str, **creds: Any) -> Any:

@@ -20,7 +20,7 @@ endpoint without a model change, but none ships today.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
@@ -35,7 +35,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: Module-level cache of parsed catalog data, keyed on the resolved path plus a
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-family file invalidates the entry without re-parsing an unchanged tree.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 #: Transport mechanisms a catalog row may declare. Only `erddap-griddap`
 #: ships today; the other two are reserved for a future GEBCO-API / OPeNDAP
@@ -281,4 +281,4 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))

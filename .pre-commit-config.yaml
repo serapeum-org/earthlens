@@ -33,69 +33,31 @@ repos:
         args: [ --fix=auto ]
       - id: pretty-format-json
         name: "[json - format] pretty json"
+        # Exclude notebooks: .ipynb is JSON, but jupyter/nbformat owns its serialization
+        # (indent=1, ensure_ascii=False). pretty-format-json's --indent=4 + ascii escapes
+        # rewrite every notebook into a huge spurious diff on each run (and re-break the
+        # code cells' unicode). Notebook code is already handled by ruff.
+        exclude: \.ipynb$
         args: [ --autofix,
                 --indent=4,
                 --no-sort-keys ]
-        # Notebooks are JSON but reformatting them rewrites cell
-        # metadata / outputs / kernel info and can corrupt the file.
-        exclude: '\.ipynb$'
+      - id: requirements-txt-fixer
+        name: "[reqs - format] fix requirements.txt"
       - id: check-yaml
         name: "[yaml -  check] validate yaml"
         exclude: mkdocs\.yml
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
+  # Ruff replaces black + isort + flake8 + pyupgrade and their nbqa notebook
+  # wrappers. One engine and one line-length ruler mean the formatter and the
+  # import sorter can't disagree the way black and isort did (a long trailing
+  # comment on an import). Ruff lints and formats both .py and .ipynb natively.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.22
     hooks:
-      -   id: pyupgrade
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.3.0
-    hooks:
-      - id: flake8
-        additional_dependencies: [Flake8-pyproject]
-        name: "[py   - check] flake8"
-        exclude: ^(examples/|libs/.*/tests/)
-#   - repo: https://github.com/pycqa/docformatter
-#     rev: v1.4
-#     hooks:
-#      - id: docformatter
-#        name: "[py   - format] docformatter"
-#        description: 'Formats docstrings to follow PEP 257.'
-#        entry: docformatter
-#        args: [-i]
-#        language: python
-#        types: [python]
-#   - repo: https://github.com/pycqa/pydocstyle
-#     rev: 6.3.0
-#     hooks:
-#       - id: pydocstyle
-#         name: "[py   - check] pydocstyle"
-#         files: ^hydrolib/.*\.py$
-  - repo: https://github.com/pycqa/isort
-    rev: 9.0.0a3
-    hooks:
-      - id: isort
-        name: "[py   - format] isort"
-  - repo: https://github.com/psf/black
-    rev: 26.3.1
-    hooks:
-      - id: black
-
-  # Run the same Python linters / formatters on notebook code cells.
-  # nbqa wraps each tool so it sees only the code cells and does not
-  # touch the surrounding JSON envelope (cell metadata, outputs,
-  # kernel info).
-  - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.9.1
-    hooks:
-      - id: nbqa-pyupgrade
-        name: "[ipynb - format] pyupgrade"
-      - id: nbqa-isort
-        name: "[ipynb - format] isort"
-      - id: nbqa-black
-        name: "[ipynb - format] black"
-      - id: nbqa-flake8
-        name: "[ipynb -   lint] flake8"
-        additional_dependencies: [Flake8-pyproject]
-        exclude: ^(examples/|libs/.*/tests/)
+      - id: ruff-check
+        name: "[py   -   lint] ruff"
+        args: [--fix]
+      - id: ruff-format
+        name: "[py   - format] ruff-format"
 
   - repo: https://github.com/lovesegfault/beautysh
     rev: v6.4.3
@@ -103,11 +65,15 @@ repos:
       - id: beautysh
         name: "[bash - format] beautysh"
 
-  - repo: https://github.com/detailyang/pre-commit-shell
-    rev: 1.0.5
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
     hooks:
-      - id: shell-lint
-        name: "[bash -   lint] shell-lint"
+      - id: shellcheck
+        name: "[bash -   lint] shellcheck"
+        # SC2218 (false positive on define-then-dispatch build scripts), SC2012 (ls vs
+        # find) and SC2001 (sed vs ${//}) are intentional — excluded inline here instead
+        # of via a separate .shellcheckrc file.
+        args: ["--exclude=SC2218,SC2012,SC2001"]
 
   - repo: https://github.com/rlindsgaard/pre-commit-commit-msg-hooks
     rev: 0.1.0
@@ -134,15 +100,14 @@ repos:
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
     hooks:
+      # The repo's single secret scanner (replaced detect-secrets). This hook scans
+      # staged changes at commit time; CI runs a full-tree `gitleaks dir` in lint.yml.
+      # Both use gitleaks' default ruleset (no custom config).
       - id: gitleaks
+        name: "[cred -  check] gitleaks"
 
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
-    hooks:
-      - id: detect-secrets
-        exclude: '\.drawio$'
   - repo: https://github.com/bridgecrewio/checkov
-    rev: 3.2.526
+    rev: 3.3.8
     hooks:
       - id: checkov
 
@@ -152,20 +117,15 @@ repos:
       - id: nbstripout
         name: "[ipynb - format] strip notebook outputs"
 
-  - repo: local
-    hooks:
-      - id: safety
-        name: "[sec  -  check] safety scan"
-        entry: pixi run -e dev safety scan --output screen
-        language: system
-        types: [python]
-        pass_filenames: false
-
+  # The local hooks below run inside the uv `dev` group of the workspace venv.
+  # `uv run --active` targets the active env (on this machine the off-Drive uv venv
+  # at C:\python-environments\uv\earthlens); `-p no:cacheprovider` stops pytest
+  # writing .pytest_cache, which fails with WinError 183 on this Google-Drive tree.
   - repo: local
     hooks:
       - id: mypy
         name: "[py   -  type] mypy"
-        entry: pixi run -e dev mypy src/earthlens
+        entry: uv run --active mypy
         language: system
         pass_filenames: false
         always_run: true
@@ -175,7 +135,7 @@ repos:
     hooks:
       - id: pytest-check
         name: "[py   -  test] pytest"
-        entry: pixi run -e dev pytest -v --cov=src/earthlens --cov-report=term-missing -m "not slow and not e2e"
+        entry: uv run --active pytest -v --cov=libs --cov-report=term-missing -m "not slow and not e2e" -p no:cacheprovider
         language: system
         pass_filenames: false
         always_run: true
@@ -184,16 +144,39 @@ repos:
     hooks:
       - id: doctest
         name: "[py   -   doc] doctest"
-        entry: pixi run -e dev pytest --doctest-modules src
+        # MPLBACKEND=Agg via the inline snippet so a `>>>` example that imports pyplot
+        # never opens a GUI window. The paths are the six workspace `src` roots (the
+        # real source lives under libs/*/src/earthlens, not a top-level src/).
+        entry: uv run --active python -c 'import matplotlib; matplotlib.use("Agg"); import pytest, sys; sys.exit(pytest.main(["--doctest-modules", "libs/core/src", "libs/providers/atmosphere/src", "libs/providers/ocean/src", "libs/providers/imagery/src", "libs/providers/land/src", "libs/providers/hazards/src", "-p", "no:cacheprovider"]))'
         language: system
         always_run: true
+        # The entry hardcodes the doctest paths, so staged filenames would land unused
+        # in sys.argv[2:]. Match pytest-check: run the fixed sweep, pass no names.
         pass_filenames: false
 
   - repo: local
     hooks:
       - id: notebook-check
         name: nbval
-        entry: pixi run -e dev pytest --nbval --nbval-lax --verbose
+        entry: uv run --active pytest --nbval --nbval-lax --verbose -p no:cacheprovider
         language: system
-        files: .*\.ipynb$
-        always_run: true
+        # Gate strictly on notebooks. With always_run, a commit touching no .ipynb
+        # passed zero filenames, so pytest fell back to testpaths and ran the regular
+        # suite instead of the notebooks (duplicating pytest-check).
+        files: \.ipynb$
+        # One pytest session for every notebook. Otherwise pre-commit splits the files
+        # across concurrent processes, letting notebooks that write into examples/ collide.
+        require_serial: true
+
+  - repo: local
+    hooks:
+      # Fail the commit if uv.lock is stale relative to any member's pyproject.toml.
+      # `uv lock --check` re-resolves from the manifests and exits non-zero if the
+      # lockfile would change. Only fires when a pyproject.toml or uv.lock is staged so
+      # unrelated commits don't pay the round-trip; skip with `SKIP=uv-lock-check`.
+      - id: uv-lock-check
+        name: "[uv   -  check] uv.lock up to date"
+        entry: uv lock --check
+        language: system
+        pass_filenames: false
+        files: ^(pyproject\.toml|uv\.lock|libs/.*/pyproject\.toml)$

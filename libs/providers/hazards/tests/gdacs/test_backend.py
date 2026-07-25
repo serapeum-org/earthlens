@@ -36,9 +36,9 @@ class TestGDACSConstruction:
 
     def test_output_kind_is_vector(self):
         """GDACS declares vector output (alert features, not gridded)."""
-        assert (
-            GDACS.OUTPUT_KIND == "vector"
-        ), f"GDACS.OUTPUT_KIND must be 'vector', got {GDACS.OUTPUT_KIND!r}"
+        assert GDACS.OUTPUT_KIND == "vector", (
+            f"GDACS.OUTPUT_KIND must be 'vector', got {GDACS.OUTPUT_KIND!r}"
+        )
 
     def test_space_captured(self, tmp_path: Path):
         """The bbox lands on `self.space` as a SpatialExtent."""
@@ -51,9 +51,9 @@ class TestGDACSConstruction:
         """The temporal resolution is the GDACS 'all' sentinel."""
         backend = _make_backend(tmp_path)
         assert isinstance(backend.time, TemporalExtent)
-        assert (
-            backend.time.resolution == "all"
-        ), f"expected 'all' sentinel, got {backend.time.resolution!r}"
+        assert backend.time.resolution == "all", (
+            f"expected 'all' sentinel, got {backend.time.resolution!r}"
+        )
 
     def test_empty_variables_defaults_to_all_types(self, tmp_path: Path):
         """An empty `variables` list defaults to all six hazard types."""
@@ -191,9 +191,9 @@ class TestGDACSFetch:
         )
         backend = _make_backend(tmp_path)
         backend._fetch(backend._search())
-        assert any(
-            "truncated" in msg for msg in warnings_log
-        ), f"expected a truncation warning, got {warnings_log}"
+        assert any("truncated" in msg for msg in warnings_log), (
+            f"expected a truncation warning, got {warnings_log}"
+        )
 
     def test_below_cap_no_warning(
         self,
@@ -209,9 +209,9 @@ class TestGDACSFetch:
         )
         backend = _make_backend(tmp_path)
         backend._fetch(backend._search())
-        assert not any(
-            "truncated" in msg for msg in warnings_log
-        ), f"unexpected truncation warning, got {warnings_log}"
+        assert not any("truncated" in msg for msg in warnings_log), (
+            f"unexpected truncation warning, got {warnings_log}"
+        )
 
     def test_bbox_post_filter(
         self,

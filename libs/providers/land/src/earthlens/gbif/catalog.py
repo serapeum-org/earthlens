@@ -20,7 +20,7 @@ dict-like surface (`len(cat)`, `name in cat`, `cat[name]`, `iter(cat)`,
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -85,7 +85,9 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Taxon], list[str]]:
         try:
             rows[name] = Taxon(**dict(body or {}))
         except ValidationError as exc:
-            raise ValueError(f"{path} taxon {name!r} failed validation:\n{exc}") from exc
+            raise ValueError(
+                f"{path} taxon {name!r} failed validation:\n{exc}"
+            ) from exc
 
     available = [str(item) for item in (data.get("available_datasets") or [])]
     _CATALOG_CACHE[key] = (rows, available)
@@ -277,4 +279,4 @@ class Catalog(AbstractCatalog):
             return int(text)
         if text.lower().startswith(TAXON_PREFIX):
             return _name_backbone_key(text[len(TAXON_PREFIX) :].strip())
-        return self.get_dataset(text).taxon_key
+        return cast("int", self.get_dataset(text).taxon_key)

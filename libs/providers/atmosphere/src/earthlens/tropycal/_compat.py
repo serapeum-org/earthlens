@@ -20,6 +20,7 @@ from __future__ import annotations
 import importlib.util
 import sys
 import types
+from typing import Any
 
 
 def ensure_pkg_resources() -> None:
@@ -44,7 +45,7 @@ def ensure_pkg_resources() -> None:
 
     import importlib.metadata as metadata
 
-    shim = types.ModuleType("pkg_resources")
+    shim: Any = types.ModuleType("pkg_resources")
 
     def get_distribution(name: str):
         """Return a stub distribution exposing `.version` for `name`."""

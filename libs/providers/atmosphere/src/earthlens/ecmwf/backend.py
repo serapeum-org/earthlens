@@ -6,17 +6,12 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-import cdsapi
 import numpy as np
-import pandas as pd
 from loguru import logger
 
 from earthlens.aggregate import AggregationConfig, aggregate_netcdf
 from earthlens.base import (
     AbstractDataSource,
-)
-from earthlens.base import AuthenticationError as _BaseAuthenticationError
-from earthlens.base import (
     LazyClientMixin,
     OutputKind,
     SpatialExtent,
@@ -24,6 +19,7 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
+from earthlens.base import AuthenticationError as _BaseAuthenticationError
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
 from earthlens.ecmwf.endpoints import constraints_base_url, endpoint_url
@@ -319,14 +315,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 `"daily"` nor `"monthly"`, or if the parsed
                 `start` is later than the parsed `end`.
         """
-        start = to_datetime(start, fmt)
-        end = to_datetime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
 
         if temporal_resolution == "daily":
-            dates = date_windows(start, end, "D")
+            dates = date_windows(start_dt, end_dt, "D")
             resolution = "D"
         elif temporal_resolution == "monthly":
-            dates = date_windows(start, end, "MS")
+            dates = date_windows(start_dt, end_dt, "MS")
             resolution = "MS"
         else:
             raise ValueError(
@@ -334,8 +330,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             )
 
         return TemporalExtent(
-            start_date=start,
-            end_date=end,
+            start_date=start_dt,
+            end_date=end_dt,
             resolution=resolution,
             dates=dates,
         )
@@ -399,9 +395,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         """
         try:
             client = _open_endpoint_client(endpoint)
-        except (
-            Exception
-        ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as AuthenticationError
+        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as AuthenticationError
             if isinstance(exc, AuthenticationError):
                 raise
             if _looks_like_missing_credentials(exc):
@@ -698,6 +692,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             else:
                 effective_aggregate = aggregate
 
+        assert isinstance(self.vars, dict)  # ECMWF requires a {dataset: [vars]} mapping
         for dataset_name, var_codes in self.vars.items():
             for var in var_codes:
                 start = self.time.start_date
@@ -711,9 +706,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                     nc_path = self._download_dataset(
                         var_info, progress_bar=progress_bar
                     )
-                except (
-                    Exception
-                ) as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
+                except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
                     logger.error(
                         f"ECMWF download for {dataset_name}/{var} failed: "
                         f"{type(exc).__name__}: {exc}"
@@ -724,9 +717,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 if effective_aggregate is not None:
                     try:
                         agg = aggregate_netcdf(nc_path, var_info, effective_aggregate)
-                    except (
-                        Exception
-                    ) as exc:  # noqa: BLE001 - log + continue so one bad aggregate doesn't kill the batch
+                    except Exception as exc:  # noqa: BLE001 - log + continue so one bad aggregate doesn't kill the batch
                         logger.error(
                             f"ECMWF aggregate for {dataset_name}/{var} failed: "
                             f"{type(exc).__name__}: {exc}"
@@ -755,7 +746,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         return out_paths
 
-    def _download_dataset(
+    def _download_dataset(  # type: ignore[override]
         self,
         var_info: Variable,
         progress_bar: bool = True,
@@ -911,9 +902,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
         try:
             client.retrieve(dataset, request, str(target))
-        except (
-            Exception
-        ) as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
+        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
             if _looks_like_licence_not_accepted(exc):
                 base = endpoint_url(var_info.endpoint).rsplit("/api", 1)[0]
                 raise PermissionError(

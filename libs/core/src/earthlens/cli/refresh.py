@@ -39,7 +39,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from ftplib import FTP, error_perm  # nosec B402  # noqa: S402
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import requests
 import yaml
@@ -134,7 +134,7 @@ def _get_json(
     """
     response = requests.get(url, headers=headers, params=params, timeout=_TIMEOUT)
     response.raise_for_status()
-    return response.json()
+    return cast("dict[str, Any]", response.json())
 
 
 def _redact(text: str, secret: str) -> str:
@@ -264,7 +264,7 @@ def _index_path(info: BackendInfo) -> Path:
         single `<pkg>_data_catalog.yaml` file.
     """
     base = importlib.import_module(f"{info.module}.catalog").CATALOG_PATH
-    return base / "_index.yaml" if base.is_dir() else base
+    return cast("Path", base / "_index.yaml" if base.is_dir() else base)
 
 
 def _replace_index_block(path: Path, block_key: str, payload: Any) -> None:
@@ -488,9 +488,10 @@ def _cmr_page(provider: str, search_after: str | None) -> tuple[list[str], str |
         names and the cursor for the next page (`None` when exhausted).
     """
     headers = {"CMR-Search-After": search_after} if search_after else {}
+    params: dict[str, str | int] = {"provider": provider, "page_size": 2000}
     response = requests.get(
         _CMR_COLLECTIONS_URL,
-        params={"provider": provider, "page_size": 2000},
+        params=params,
         headers=headers,
         timeout=_TIMEOUT,
     )
@@ -655,7 +656,7 @@ def _gee_dataset_hrefs() -> list[str]:
         seen.add(url)
         try:
             node = _get_json(url)
-        except Exception:  # noqa: BLE001 — skip an unreachable sub-catalog
+        except Exception:  # noqa: BLE001 — skip an unreachable sub-catalog  # nosec B112
             continue
         for link in node.get("links", []):
             if link.get("rel") != "child":
@@ -1222,8 +1223,8 @@ def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
         `{"jaxa-earth": [STAC collection ids], "gportal": [numeric
         ids], "ptree": [product tokens]}`.
     """
-    from jaxa.earth import je as _je  # type: ignore[import-not-found]
     import gportal as _gportal  # type: ignore[import-not-found]
+    from jaxa.earth import je as _je  # type: ignore[import-not-found]
 
     je_ids, _ = _je.ImageCollectionList().filter_name()
     gp_tree = _gportal.datasets()
@@ -1236,10 +1237,13 @@ def _jaxa_grouped(catalog: Any) -> dict[str, list[str]]:
             stack.extend(node.values())
         elif isinstance(node, list):
             gp_ids.extend(str(x) for x in node)
-    ptree_ids = sorted({
-        row.short_name for row in catalog.datasets.values()
-        if row.protocol == "ptree" and row.short_name
-    })
+    ptree_ids = sorted(
+        {
+            row.short_name
+            for row in catalog.datasets.values()
+            if row.protocol == "ptree" and row.short_name
+        }
+    )
     return {
         "jaxa-earth": sorted(set(str(c) for c in je_ids)),
         "gportal": sorted(set(gp_ids)),
@@ -1337,7 +1341,7 @@ def _nwm_latest_complete_day(client: Any) -> str:
     )
     if not days:
         raise RuntimeError(f"no nwm.YYYYMMDD/ prefixes found on {BUCKET}")
-    return days[-2] if len(days) > 1 else days[-1]
+    return cast("str", days[-2] if len(days) > 1 else days[-1])
 
 
 def _nwm_config_dirs(client: Any, day: str) -> list[str]:

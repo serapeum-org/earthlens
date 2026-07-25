@@ -282,7 +282,7 @@ def _build_dataset_map(
                 ds_vars[code] = Variable(**merged)
             except ValidationError as exc:
                 raise ValueError(
-                    f"{catalog_path} entry {code!r} failed " f"validation:\n{exc}"
+                    f"{catalog_path} entry {code!r} failed validation:\n{exc}"
                 ) from exc
             total_vars += 1
         structural[ds_name] = Dataset(

@@ -36,7 +36,7 @@ import datetime as dt
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 import requests
@@ -50,16 +50,17 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.erddap._helpers import (
     build_constraints,
     build_griddap_url,
     empty_canonical,
 )
 from earthlens.erddap.catalog import Catalog, Dataset
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
+    from earthlens.ecmwf import Variable
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -78,6 +79,8 @@ _NO_MATCH_MARKER = "produced no matching results"
 #: body that does not start with one of these is an error page (ERDDAP serves
 #: those as HTML, sometimes with a 200), not data.
 _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HDF")
+
+
 @dataclass(frozen=True)
 class _GridVarInfo:
     """Minimal `var_info` adapter for :func:`earthlens.aggregate.aggregate_netcdf`.
@@ -402,7 +405,7 @@ class ERDDAP(AbstractDataSource):
         dest = self.root_dir / f"{row.dataset_id}.nc"
         logger.info(f"ERDDAP griddap {row.dataset_id}: GET {url}")
         http = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             timeout=self._timeout,
             max_retries=0,
             status_forcelist=(),
@@ -536,7 +539,7 @@ class ERDDAP(AbstractDataSource):
                 var_info = _GridVarInfo(
                     nc_variable=var, cds_variable=var, is_flux=var in flux
                 )
-                agg = aggregate_netcdf(nc_path, var_info, effective)
+                agg = aggregate_netcdf(nc_path, cast("Variable", var_info), effective)
                 out_paths.extend(p for _, _, p in agg if p is not None)
         return out_paths
 

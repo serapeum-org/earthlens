@@ -25,7 +25,7 @@ conventional `unit` (verified live 2026-07-01; see
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -283,7 +283,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(property_id)
+        return cast("Property", self.get_dataset(property_id))
 
     def parameters(self) -> list[str]:
         """Return the curated property ids, sorted.

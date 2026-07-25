@@ -7,7 +7,7 @@ import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -561,8 +561,8 @@ class AbstractDataSource(ABC):
             if clip_geometry is not None:
                 self._attach_clip_geometry(clip_geometry)
 
-        __init__._ergonomic = True
-        cls.__init__ = __init__
+        __init__._ergonomic = True  # type: ignore[attr-defined]
+        cls.__init__ = __init__  # type: ignore[method-assign]
 
     def __init__(
         self,
@@ -633,7 +633,7 @@ class AbstractDataSource(ABC):
             self.time = TemporalExtent(
                 start_date=time["start_date"],
                 end_date=time["end_date"],
-                resolution=time.get("resolution", time.get("time_freq")),
+                resolution=cast(str, time.get("resolution", time.get("time_freq"))),
                 dates=time["dates"],
             )
 
@@ -682,8 +682,8 @@ class AbstractDataSource(ABC):
         if isinstance(self, LazyClientMixin):
             # Accessing `client` runs the cached `_open_client` (auth).
             _ = self.client
-        elif getattr(self, "_auth", None) is not None:
-            self._auth.configure()
+        elif (auth := getattr(self, "_auth", None)) is not None:
+            auth.configure()
         return self
 
     @abstractmethod
@@ -1191,6 +1191,7 @@ class AbstractCatalog(BaseModel):
                 body[key] = dataset.model_dump(exclude_none=True)
             else:
                 body[key] = dataset
-        return yaml.safe_dump(
+        dumped = yaml.safe_dump(
             body, default_flow_style=False, sort_keys=False, allow_unicode=True
         )
+        return cast(str, dumped)

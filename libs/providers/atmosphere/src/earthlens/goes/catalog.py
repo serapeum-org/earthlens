@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import difflib
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -312,7 +312,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `key` is not a registered GOES product.
         """
-        return self.get_dataset(key)
+        return cast("GOESProduct", self.get_dataset(key))
 
     def get_domain(self, key: str) -> GOESDomain:
         """Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.

@@ -15,12 +15,15 @@ from __future__ import annotations
 
 import datetime
 from pathlib import Path
-from typing import Any
-
-import requests
+from typing import TYPE_CHECKING, Any, cast
 
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
+
+if TYPE_CHECKING:
+    import requests
+
+
 def read_cdsapirc() -> dict[str, str]:
     """Parse `~/.cdsapirc` into a `{url, key}` dict.
 
@@ -68,7 +71,7 @@ def list_recent_jobs(
     if status:
         params["status"] = status
     client = HttpClient(
-        session=_RequestsGet(),
+        session=cast("requests.Session | None", _RequestsGet()),
         timeout=30,
         max_retries=0,
         status_forcelist=(),
@@ -79,7 +82,7 @@ def list_recent_jobs(
         headers={"PRIVATE-TOKEN": cfg["key"]},
         params=params,
     )
-    now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+    now = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
     out: list[dict[str, Any]] = []
     for job in body.get("jobs", []):
         created = job.get("created", "")
@@ -126,7 +129,7 @@ def download_job(
         return target_path
     rurl = cfg["url"].rstrip("/") + f"/retrieve/v1/jobs/{job_id}/results"
     results_client = HttpClient(
-        session=_RequestsGet(),
+        session=cast("requests.Session | None", _RequestsGet()),
         timeout=30,
         max_retries=0,
         status_forcelist=(),
@@ -136,7 +139,7 @@ def download_job(
     href = body.get("asset", {}).get("value", {}).get("href")
     if not href:
         raise ValueError(
-            f"job {job_id!r} has no downloadable asset href in its " "results record"
+            f"job {job_id!r} has no downloadable asset href in its results record"
         )
     target_path.parent.mkdir(parents=True, exist_ok=True)
     # `href` comes from CDS server JSON; reject anything that is not
@@ -145,7 +148,7 @@ def download_job(
     if not href.startswith(("https://", "http://")):
         raise ValueError(f"refusing to download from non-http(s) href: {href!r}")
     asset_client = HttpClient(
-        session=_RequestsGet(),
+        session=cast("requests.Session | None", _RequestsGet()),
         timeout=60,
         max_retries=0,
         status_forcelist=(),

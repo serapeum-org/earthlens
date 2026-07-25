@@ -35,6 +35,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -193,7 +194,11 @@ class CMEMS(AbstractDataSource):
         """
         creds = CmemsCredentials(
             username=self._service_username,
-            password=self._service_password,
+            password=(
+                SecretStr(self._service_password)
+                if self._service_password is not None
+                else None
+            ),
             credentials_file=self._credentials_file,
         )
         self._auth = CmemsAuth(creds)
@@ -317,6 +322,7 @@ class CMEMS(AbstractDataSource):
                 toolbox exceptions are logged at ERROR.
         """
         # Authenticate lazily on first download (deferred out of __init__).
+        assert self._auth is not None  # set by _initialize() before download()
         self._auth.configure()
         out_paths = self._api_via_search_fetch_with_progress(progress_bar)
 
@@ -332,7 +338,7 @@ class CMEMS(AbstractDataSource):
             # Reached only for an empty request — total failure raises
             # inside _fetch_with_progress before we get here.
             logger.warning(
-                "CMEMS download summary: no datasets requested, " "nothing written"
+                "CMEMS download summary: no datasets requested, nothing written"
             )
         return out_paths
 
@@ -435,8 +441,7 @@ class CMEMS(AbstractDataSource):
         dims = tuple(nc.dimension_names or ())
         if "time" not in dims:
             raise ValueError(
-                f"{nc_path.name} has no `time` dimension to aggregate "
-                f"(dims={dims})."
+                f"{nc_path.name} has no `time` dimension to aggregate (dims={dims})."
             )
 
         # Compute the window labels from the freshly-read container, before any
@@ -469,9 +474,9 @@ class CMEMS(AbstractDataSource):
                 target = out_dir / (
                     f"{nc_path.stem}_{var_name}_{config.freq}_{window}.tif"
                 )
-                array_to_raster(
-                    arr[i], var.geotransform, epsg=var.epsg
-                ).to_file(str(target))
+                array_to_raster(arr[i], var.geotransform, epsg=var.epsg).to_file(
+                    str(target)
+                )
                 written.append(target)
 
         logger.info(
@@ -545,6 +550,8 @@ class CMEMS(AbstractDataSource):
         ext = "nc" if self._file_format == "netcdf" else "zarr"
         filenames = _unique_output_names(list(self.vars), ext)
         products: list[RemoteProduct] = []
+        # CMEMS always builds `self.vars` in the {dataset_id: [vars]} form.
+        assert isinstance(self.vars, dict)
         for dataset_id, var_codes in self.vars.items():
             products.append(
                 RemoteProduct(

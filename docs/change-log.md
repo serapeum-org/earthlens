@@ -49,37 +49,37 @@ sources, AggregationConfig, aggregate_netcdf, __version__).
 - **erddap**: add generic ERDDAP backend (griddap raster / tabledap tabular) (#490)
 - **bathymetry**: add earthlens.bathymetry DEM backend (GEBCO 2020 + ETOPO1) (#503)
 - add the biodiversity backend cluster (gbif, obis, wdpa, iucn) (#470)
-- add the biodiversity backend cluster (gbif, obis, wdpa, iucn) 
-                                                                                                                 
-  Four new provider backends share one request shape (taxon / species /                                          
-  area selector over a bbox) and a small set of helpers:                                                         
-                                                                                                                 
-  - gbif (anonymous, pygbif) -> vector occurrence FeatureCollection                                              
-  - obis (anonymous, pyobis) -> vector occurrence FeatureCollection                                              
-  - wdpa / protected-planet (WDPA_TOKEN ?token=) -> vector polygons                                              
-  - iucn / redlist (IUCN_TOKEN Bearer) -> tabular DataFrame                                                      
-                                                                                                                 
-  Shared in earthlens.biodiversity:                                                                              
-                                                                                                                 
-  - wkt_from_bbox: SpatialExtent -> ccw POLYGON((...)) for geometry=                                             
-  - occurrences_to_fc: pygbif list[dict] / pyobis DataFrame ->                                                   
-    EPSG:4326 points FeatureCollection (modelled on fdsn.events)                                                 
-  - LicenseWarning / warn_license: promoted out of overture/_helpers                                             
-    with re-export so overture's is-identity is preserved (G8)                                                   
-                                                                                                                 
-  Each backend ships a catalog.py + curated YAML matching the standard                                           
-  subpackage layout, plus a richer available_datasets index (gbif 36                                             
-  taxa, obis 30 marine groups, wdpa/iucn 40 country codes each). The                                             
-  cluster is wired into every earthlens datasets CLI surface (list,                                              
-  show, search, where, validate, refresh, audit, curate, stanza).                                                
-                                                                                                                 
-  CI lanes e2e-iucn / e2e-wdpa added in .github/workflows/tests-e2e.yml                                          
-  against secrets.IUCN_TOKEN / secrets.WDPA_TOKEN; gbif/obis run live                                            
-  in nbval-lax. Cluster coverage: 100% line+branch (920/226).                                                    
-                                                                                                                 
-  New optional extras: gbif (pygbif >=0.6.6), obis (pyobis >=1.6.1);                                             
-  both folded into [all]. wdpa/iucn use core requests.                                                           
-                                                                                                                 
+- add the biodiversity backend cluster (gbif, obis, wdpa, iucn)
+
+  Four new provider backends share one request shape (taxon / species /  
+  area selector over a bbox) and a small set of helpers:  
+
+  - gbif (anonymous, pygbif) -> vector occurrence FeatureCollection  
+  - obis (anonymous, pyobis) -> vector occurrence FeatureCollection  
+  - wdpa / protected-planet (WDPA_TOKEN ?token=) -> vector polygons  
+  - iucn / redlist (IUCN_TOKEN Bearer) -> tabular DataFrame  
+
+  Shared in earthlens.biodiversity:  
+
+  - wkt_from_bbox: SpatialExtent -> ccw POLYGON((...)) for geometry=  
+  - occurrences_to_fc: pygbif list[dict] / pyobis DataFrame ->  
+    EPSG:4326 points FeatureCollection (modelled on fdsn.events)  
+  - LicenseWarning / warn_license: promoted out of overture/_helpers  
+    with re-export so overture's is-identity is preserved (G8)  
+
+  Each backend ships a catalog.py + curated YAML matching the standard  
+  subpackage layout, plus a richer available_datasets index (gbif 36  
+  taxa, obis 30 marine groups, wdpa/iucn 40 country codes each). The  
+  cluster is wired into every earthlens datasets CLI surface (list,  
+  show, search, where, validate, refresh, audit, curate, stanza).  
+
+  CI lanes e2e-iucn / e2e-wdpa added in .github/workflows/tests-e2e.yml  
+  against secrets.IUCN_TOKEN / secrets.WDPA_TOKEN; gbif/obis run live  
+  in nbval-lax. Cluster coverage: 100% line+branch (920/226).  
+
+  New optional extras: gbif (pygbif >=0.6.6), obis (pyobis >=1.6.1);  
+  both folded into [all]. wdpa/iucn use core requests.  
+
   Closes #491, #492, #493, #494, #495, #496, #497, #498, #499, #500, #501, #502
 - **jaxa**: add earthlens.jaxa backend (jaxa-earth STAC/COG + G-Portal SFTP) (#469)
 - **asf**: new earthlens.asf — Alaska Satellite Facility SAR + InSAR baseline stack (#451)

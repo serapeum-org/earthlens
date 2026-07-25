@@ -109,11 +109,17 @@ def _band_records(asset_id: str, asset: dict[str, Any], ee_mod: Any) -> list[dic
 
 def _configure_ee() -> Any:
     """Authenticate the service account and return the `ee` module (creds)."""
+    import os
+
     import ee
 
-    from earthlens.gee.auth import EarthEngineAuth, EarthEngineCredentials
+    from earthlens.gee.auth import EarthEngineAuth
 
-    EarthEngineAuth(EarthEngineCredentials()).configure()
+    EarthEngineAuth.initialize(
+        os.environ.get("GEE_SERVICE_ACCOUNT", ""),
+        os.environ.get("GEE_SERVICE_KEY", ""),
+        os.environ.get("GEE_PROJECT"),
+    )
     return ee
 
 

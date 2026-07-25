@@ -52,9 +52,9 @@ class TestPublicSurface:
 
     def test_all_lists_the_expected_names(self):
         """`__all__` is exactly the documented public surface."""
-        assert (
-            set(gee_pkg.__all__) == _EXPECTED_EXPORTS
-        ), f"__all__ mismatch: {set(gee_pkg.__all__) ^ _EXPECTED_EXPORTS}"
+        assert set(gee_pkg.__all__) == _EXPECTED_EXPORTS, (
+            f"__all__ mismatch: {set(gee_pkg.__all__) ^ _EXPECTED_EXPORTS}"
+        )
 
     def test_classes_resolve_to_their_modules(self):
         """The re-exported classes are the canonical ones from their submodules."""

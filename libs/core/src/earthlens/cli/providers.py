@@ -8,6 +8,7 @@ importable and how many datasets the bundled catalog carries.
 from __future__ import annotations
 
 import json
+from typing import cast
 
 import typer
 from rich.table import Table
@@ -98,8 +99,12 @@ def list_providers(
         table.add_column("SDK", overflow="fold")
         table.add_column("DATASETS", justify="right")
     for record in records:
-        aliases = ", ".join(record["aliases"])
-        cells = [record["provider"], aliases, record["extra"] or "-"]
+        aliases = ", ".join(cast("list[str]", record["aliases"]))
+        cells: list[str] = [
+            cast("str", record["provider"]),
+            aliases,
+            cast("str | None", record["extra"]) or "-",
+        ]
         if check:
             cells.append("ok" if record["sdk_available"] else "missing")
             count = record["datasets"]

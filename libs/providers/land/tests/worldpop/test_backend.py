@@ -11,6 +11,7 @@ from pyramids.dataset import Dataset
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.worldpop import WorldPop
+
 from .conftest import _FakeResponse, age_records, pop_records
 
 pytestmark = pytest.mark.worldpop

@@ -33,7 +33,7 @@ from __future__ import annotations
 
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -170,8 +170,7 @@ class Dataset(BaseModel):
                 )
             if self.query_template is not None or self.ohsome_filter is not None:
                 raise ValueError(
-                    "a 'pbf' row must not carry a 'query_template' or "
-                    "'ohsome_filter'"
+                    "a 'pbf' row must not carry a 'query_template' or 'ohsome_filter'"
                 )
 
 
@@ -284,8 +283,7 @@ class Catalog(AbstractCatalog):
                     f"{catalog_path} query {query_id!r} failed validation:\n{exc}"
                 ) from exc
         regions: dict[str, str] = {
-            str(name): str(path)
-            for name, path in (data.get("regions") or {}).items()
+            str(name): str(path) for name, path in (data.get("regions") or {}).items()
         }
         _CATALOG_CACHE[key] = (datasets, regions)
         return cls(datasets=dict(datasets), regions=dict(regions))
@@ -313,7 +311,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `query_id` is not a registered named query.
         """
-        return self.get_dataset(query_id)
+        return cast("Dataset", self.get_dataset(query_id))
 
     def query_ids(self) -> list[str]:
         """Return the registered named-query ids, sorted.

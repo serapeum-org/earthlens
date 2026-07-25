@@ -11,6 +11,8 @@ feature's property dictionary.
 
 from __future__ import annotations
 
+from typing import cast
+
 import ee
 import pandas as pd
 from ee.featurecollection import FeatureCollection
@@ -78,9 +80,9 @@ def create_geometry(
     coords = shapely_geometry.__geo_interface__["coordinates"]
     geom_type = shapely_geometry.geom_type
     if geom_type == "Polygon":
-        return ee.Geometry.Polygon(coords, f"epsg:{epsg}")
+        return cast("Geometry", ee.Geometry.Polygon(coords, f"epsg:{epsg}"))
     if geom_type == "Point":
-        return ee.Geometry.Point(coords, f"epsg:{epsg}")
+        return cast("Geometry", ee.Geometry.Point(coords, f"epsg:{epsg}"))
     if geom_type == "LineString":
         raise NotImplementedError(
             "LineString geometries are not yet supported by the GEE backend."
@@ -173,7 +175,7 @@ def create_feature(
             ee_geom_list.append(create_geometry(geom))
         except NotImplementedError as exc:
             raise ValueError(
-                f"create_feature cannot convert row {i} " f"({geom.geom_type}): {exc}"
+                f"create_feature cannot convert row {i} ({geom.geom_type}): {exc}"
             ) from exc
     records_df = pd.DataFrame(gdf.drop("geometry", axis=1))
     if columns:
@@ -185,4 +187,4 @@ def create_feature(
         ee_feature_list = [
             ee.Feature(geom, record) for geom, record in zip(ee_geom_list, records)
         ]
-    return ee.FeatureCollection(ee_feature_list)
+    return cast("FeatureCollection", ee.FeatureCollection(ee_feature_list))

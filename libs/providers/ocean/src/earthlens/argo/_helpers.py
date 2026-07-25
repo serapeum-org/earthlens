@@ -11,7 +11,7 @@ any `argopy` import — lets them be unit-tested without the optional
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -103,7 +103,9 @@ def parse_selection(variables: list[str]) -> Selection:
     token = selectors[0]
     if token.startswith("float:"):
         body = token[len("float:") :]
-        wmos = tuple(_selector_int(part, token, "WMO id") for part in body.split(",") if part)
+        wmos = tuple(
+            _selector_int(part, token, "WMO id") for part in body.split(",") if part
+        )
         if not wmos:
             raise ValueError(f"float: selector has no WMO id: {token!r}.")
         return Selection("float", wmos)

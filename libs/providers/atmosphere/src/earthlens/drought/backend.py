@@ -31,7 +31,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 from loguru import logger
@@ -45,15 +45,16 @@ from earthlens.base import (
 )
 from earthlens.base._dates import to_datetime
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.drought._helpers import (
     attribution_for,
     bbox_from_extent,
     snap_to_cadence,
 )
 from earthlens.drought.catalog import Catalog, Dataset
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
+    import requests
     from pyramids.feature.collection import FeatureCollection
 
     from earthlens.aggregate import AggregationConfig
@@ -190,8 +191,11 @@ class Drought(AbstractDataSource):
             )
 
         super().__init__(
-            start=start,
-            end=end,
+            # Drought accepts str/date/datetime; the overridden
+            # `_check_input_dates` normalises all three via `to_datetime`,
+            # so bridge the base template's narrower `str` here.
+            start=cast("str", start),
+            end=cast("str", end),
             variables=[dataset],
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim,
@@ -210,9 +214,7 @@ class Drought(AbstractDataSource):
         """
         return None
 
-    def _create_grid(
-        self, lat_lim: list[float], lon_lim: list[float]
-    ) -> SpatialExtent:
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Wrap the WGS84 bbox into a frozen `SpatialExtent` (no snapping).
 
         Args:
@@ -262,9 +264,7 @@ class Drought(AbstractDataSource):
         # second tick and yield only [Jun 30 23:59], silently dropping
         # July 1 (and therefore the July monthly snap) from the request.
         # Always range over calendar days.
-        raw = pd.date_range(
-            start=start_dt.date(), end=end_dt.date(), freq="D"
-        )
+        raw = pd.date_range(start=start_dt.date(), end=end_dt.date(), freq="D")
         # `pd.date_range(start, end)` with `end_dt >= start_dt` always yields
         # at least one element, and `snap_to_cadence` is total over non-empty
         # input, so `snapped` is guaranteed non-empty here. Resist adding a
@@ -365,6 +365,7 @@ class Drought(AbstractDataSource):
         frames: list[gpd.GeoDataFrame] = []
         for product in products:
             period: dt.date = product.metadata["period"]
+            assert product.href is not None  # USDM products always carry a URL template
             url = self._render_usdm_url(product.href, period)
             payload = _http_get_json(url)
             frame = self._geojson_to_gdf(payload, period)
@@ -399,9 +400,7 @@ class Drought(AbstractDataSource):
         # against. A future maintainer who edits the block between line
         # `gdf = gdf.to_crs(...)` and this wrap must keep `within.crs`
         # consistent rather than relying on a re-stamp.
-        return FeatureCollection(
-            gpd.GeoDataFrame(within, geometry="geometry")
-        )
+        return FeatureCollection(gpd.GeoDataFrame(within, geometry="geometry"))
 
     @staticmethod
     def _render_usdm_url(template: str, period: dt.date) -> str:
@@ -531,8 +530,7 @@ class Drought(AbstractDataSource):
                     crs=4326,
                 )
                 out_path = (
-                    self.root_dir
-                    / f"{self._dataset.id}_{period.strftime('%Y%m')}.tif"
+                    self.root_dir / f"{self._dataset.id}_{period.strftime('%Y%m')}.tif"
                 )
                 try:
                     subset.to_file(str(out_path))
@@ -577,8 +575,7 @@ class Drought(AbstractDataSource):
         for product in products:
             period: dt.date = product.metadata["period"]
             out_path = (
-                self.root_dir
-                / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
+                self.root_dir / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
             )
             # Write to a sibling temp first and rename only on success, so a
             # failed write (full disk, GDAL error mid-write) never leaves a
@@ -885,7 +882,9 @@ def _http_get_json(url: str) -> dict[str, Any]:
     Raises:
         requests.HTTPError: For non-2xx responses.
     """
-    return _http_client().get_json(url, timeout=_HTTP_TIMEOUT)
+    return cast("dict[str, Any]", _http_client().get_json(url, timeout=_HTTP_TIMEOUT))
+
+
 def _http_client() -> HttpClient:
     """Build the drought `HttpClient`: fresh-connection GETs, no status retry.
 
@@ -896,7 +895,7 @@ def _http_client() -> HttpClient:
     retry, and consistent User-Agent.
     """
     return HttpClient(
-        session=_RequestsGet(),
+        session=cast("requests.Session | None", _RequestsGet()),
         user_agent=_USER_AGENT,
         status_forcelist=(),
         max_backoff=None,

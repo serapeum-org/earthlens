@@ -42,16 +42,16 @@ class TestCatalogToFc:
     def test_is_geodataframe(self, make_catalog: Callable[..., Catalog]):
         """The result is a GeoDataFrame subclass (pyramids FeatureCollection)."""
         fc = catalog_to_fc(make_catalog(), "USGS")
-        assert isinstance(
-            fc, GeoDataFrame
-        ), "FeatureCollection must subclass GeoDataFrame"
+        assert isinstance(fc, GeoDataFrame), (
+            "FeatureCollection must subclass GeoDataFrame"
+        )
 
     def test_depth_metres_to_km(self, make_event: Callable[..., Event]):
         """obspy depth (metres) is converted to kilometres."""
         fc = catalog_to_fc(Catalog(events=[make_event(depth_m=25000.0)]), "USGS")
-        assert (
-            float(fc["depth_km"].iloc[0]) == 25.0
-        ), f"25000 m should map to 25 km, got {fc['depth_km'].iloc[0]}"
+        assert float(fc["depth_km"].iloc[0]) == 25.0, (
+            f"25000 m should map to 25 km, got {fc['depth_km'].iloc[0]}"
+        )
 
     def test_provider_column_stamped(self, make_catalog: Callable[..., Catalog]):
         """The provider key is recorded on every row."""
@@ -80,9 +80,9 @@ class TestCatalogToFc:
             Catalog(events=[make_event(lon=12.5, lat=42.0, extra_first_origin=True)]),
             "USGS",
         )
-        assert (
-            float(fc["longitude"].iloc[0]) == 12.5
-        ), "preferred origin coordinates must be used, not origins[0]"
+        assert float(fc["longitude"].iloc[0]) == 12.5, (
+            "preferred origin coordinates must be used, not origins[0]"
+        )
 
     def test_no_magnitude_yields_na(self, make_event: Callable[..., Event]):
         """An event without magnitudes maps to a missing magnitude value."""
@@ -126,9 +126,9 @@ class TestEmptyFc:
         fc = empty_fc()
         for column, dtype in ATTRIBUTE_COLUMNS.items():
             assert column in fc.columns, f"missing column {column!r}"
-            assert (
-                str(fc[column].dtype) == dtype
-            ), f"{column!r} dtype {fc[column].dtype} != declared {dtype}"
+            assert str(fc[column].dtype) == dtype, (
+                f"{column!r} dtype {fc[column].dtype} != declared {dtype}"
+            )
 
     def test_crs_is_wgs84(self):
         """The empty collection is tagged EPSG:4326."""

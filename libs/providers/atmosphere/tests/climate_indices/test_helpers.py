@@ -119,10 +119,7 @@ def test_parse_psl_without_sentinel_line_warns_and_keeps_values() -> None:
     """A PSL body with no lone sentinel line warns and keeps raw values (L1)."""
     from loguru import logger
 
-    text = (
-        "2000 2000\n"
-        "2000 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2\n"
-    )
+    text = "2000 2000\n2000 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2\n"
     messages: list[str] = []
     sink_id = logger.add(messages.append, level="WARNING")
     try:

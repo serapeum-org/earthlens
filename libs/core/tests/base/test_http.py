@@ -9,7 +9,9 @@ import requests
 
 from earthlens.base.http import (
     DEFAULT_STATUS_FORCELIST,
+    DEFAULT_TIMEOUT,
     HttpClient,
+    RequestsGet,
     _default_user_agent,
     _parse_retry_after,
     _progress_total,
@@ -679,3 +681,46 @@ class TestDownload:
         )
         assert dest.read_bytes() == b"data"
         assert not dest.with_name("out.bin.part").exists()
+
+
+class _Capture:
+    """Callable that records the kwargs of the requests call it stands in for."""
+
+    def __init__(self) -> None:
+        self.kwargs: dict[str, Any] = {}
+
+    def __call__(self, url: str, **kwargs: Any) -> _Resp:
+        self.kwargs = kwargs
+        return _Resp(body={})
+
+
+class TestRequestsGet:
+    """Tests for the RequestsGet session shim's default-timeout guarantee."""
+
+    def test_get_applies_default_timeout_when_omitted(self, monkeypatch):
+        """A get with no timeout kwarg forwards DEFAULT_TIMEOUT."""
+        capture = _Capture()
+        monkeypatch.setattr(requests, "get", capture)
+        RequestsGet().get("https://x/y")
+        assert capture.kwargs["timeout"] == DEFAULT_TIMEOUT
+
+    def test_get_leaves_explicit_timeout(self, monkeypatch):
+        """An explicit timeout is forwarded unchanged."""
+        capture = _Capture()
+        monkeypatch.setattr(requests, "get", capture)
+        RequestsGet().get("https://x/y", timeout=5.0)
+        assert capture.kwargs["timeout"] == 5.0
+
+    def test_get_leaves_explicit_none_timeout(self, monkeypatch):
+        """An explicit timeout of None is left as None, not overridden."""
+        capture = _Capture()
+        monkeypatch.setattr(requests, "get", capture)
+        RequestsGet().get("https://x/y", timeout=None)
+        assert capture.kwargs["timeout"] is None
+
+    def test_post_applies_default_timeout_when_omitted(self, monkeypatch):
+        """A post with no timeout kwarg forwards DEFAULT_TIMEOUT."""
+        capture = _Capture()
+        monkeypatch.setattr(requests, "post", capture)
+        RequestsGet().post("https://x/y")
+        assert capture.kwargs["timeout"] == DEFAULT_TIMEOUT

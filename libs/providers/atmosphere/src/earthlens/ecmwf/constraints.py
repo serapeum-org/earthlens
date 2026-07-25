@@ -48,7 +48,6 @@ import urllib.request
 from typing import Any
 
 from loguru import logger
-
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -82,7 +81,9 @@ _UNIVERSAL_KEYS: frozenset[str] = frozenset({"area", "data_format", "format", "g
 _CACHE: dict[str, list[dict[str, Any]] | None] = {}
 
 
-def fetch_constraints(dataset: str, base_url: str | None = None) -> list[dict[str, Any]]:
+def fetch_constraints(
+    dataset: str, base_url: str | None = None
+) -> list[dict[str, Any]]:
     """Fetch and cache the constraints document for `dataset`.
 
     Args:

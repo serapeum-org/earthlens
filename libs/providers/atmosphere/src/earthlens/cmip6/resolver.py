@@ -23,15 +23,14 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-
-import requests
+from typing import TYPE_CHECKING, Any, cast
 
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     import pandas as pd
+    import requests
 
 #: The request facets the resolver filters on, in precedence order. This — not
 #: the catalog's `facet_columns:` block (which merely documents the CSV schema) —
@@ -139,6 +138,8 @@ class ResolvedStore:
             self.grid_label,
         ]
         return "_".join(str(p).replace("/", "-") for p in parts if p)
+
+
 class StoreResolver:
     """Resolve CMIP6 facet tuples to `zstore` URIs over the consolidated CSV.
 
@@ -221,7 +222,7 @@ class StoreResolver:
         if self.cache_path.exists() and self.cache_path.stat().st_size > 0:
             return self.cache_path
         client = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             timeout=self.timeout,
             max_retries=0,
             status_forcelist=(),
@@ -379,7 +380,9 @@ class StoreResolver:
         return ", ".join(applied) if applied else "no prior facets"
 
     @staticmethod
-    def _available_hint(facet: str, value: str, available: list[str], limit: int = 20) -> str:
+    def _available_hint(
+        facet: str, value: str, available: list[str], limit: int = 20
+    ) -> str:
         """Build a concise "available values" hint with a did-you-mean.
 
         Keeps the miss message readable on a high-cardinality facet (a

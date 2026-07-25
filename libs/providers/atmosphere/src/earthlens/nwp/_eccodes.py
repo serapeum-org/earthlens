@@ -61,7 +61,7 @@ def ensure_eccodes() -> None:
     if not lib:
         return
     lib_dir = os.path.dirname(lib)
-    os.add_dll_directory(lib_dir)
+    os.add_dll_directory(lib_dir)  # type: ignore[attr-defined]  # Windows-only; reached only when os.name == 'nt'
     os.environ["PATH"] = lib_dir + os.pathsep + os.environ.get("PATH", "")
     # Route the binding through findlibs (which now finds the DLL on PATH). Set
     # unconditionally: the binding does `int(os.environ[var])` and crashes on a

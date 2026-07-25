@@ -11,7 +11,9 @@ import requests
 class _FakeResponse:
     """Stand-in for a `requests.Response` with a canned JSON body."""
 
-    def __init__(self, payload: dict, status_code: int = 200, headers: dict | None = None):
+    def __init__(
+        self, payload: dict, status_code: int = 200, headers: dict | None = None
+    ):
         """Hold the JSON payload, HTTP status code, and headers."""
         self._payload = payload
         self.status_code = status_code

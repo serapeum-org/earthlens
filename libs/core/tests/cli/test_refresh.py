@@ -93,9 +93,9 @@ class TestSupportedProviders:
         assert "s3" in supported_providers(), "s3 regenerates its index from curated"
         assert "nwm" in supported_providers(), "nwm walks its operational bucket"
         assert "jaxa" in supported_providers(), "jaxa lists both SDK universes"
-        assert (
-            "erddap" in supported_providers()
-        ), "erddap crawls each server's allDatasets"
+        assert "erddap" in supported_providers(), (
+            "erddap crawls each server's allDatasets"
+        )
         for key in ("gbif", "obis", "wdpa", "iucn"):
             assert key in supported_providers(), f"{key} cluster backend is wired up"
 
@@ -148,9 +148,9 @@ class TestErddapRefresher:
         monkeypatch.setattr(refresh_mod, "_get_json", fake)
         grouped = _erddap_grouped(load_catalog(_info("erddap")))
         assert len(grouped) == 1, "the shipped catalog references one server"
-        assert all(
-            u.endswith("/tabledap/allDatasets.json?datasetID") for u in calls
-        ), f"unexpected endpoint(s): {calls}"
+        assert all(u.endswith("/tabledap/allDatasets.json?datasetID") for u in calls), (
+            f"unexpected endpoint(s): {calls}"
+        )
         assert _flatten(grouped) == ["NOAA_DHW", "cwwcNDBCMet"]
 
     def test_erddap_is_supported(self):
@@ -517,8 +517,10 @@ class TestFirmsRefresher:
         monkeypatch.setattr(
             refresh_mod,
             "_get_text",
-            lambda url: "data_id,min_date,max_date\n"
-            "VIIRS_SNPP_NRT,2020,2026\nBA_MODIS,2000,2026\nMODIS_NRT,2019,2026\n",
+            lambda url: (
+                "data_id,min_date,max_date\n"
+                "VIIRS_SNPP_NRT,2020,2026\nBA_MODIS,2000,2026\nMODIS_NRT,2019,2026\n"
+            ),
         )
         outcome = refresh_one(_info("firms"))
         assert outcome.status == "ok", "firms refresh ran"
@@ -580,9 +582,9 @@ class TestNwmRefresher:
         monkeypatch.setattr(refresh_mod, "_nwm_live_config_dirs", lambda: live_dirs)
         outcome = refresh_one(_info("nwm"))
         assert outcome.status == "ok", "nwm refresh ran"
-        assert (
-            outcome.live_count == len(catalog.configurations) + 1
-        ), "members collapsed"
+        assert outcome.live_count == len(catalog.configurations) + 1, (
+            "members collapsed"
+        )
         assert outcome.new_ids == ["usgs_timeslices"], "only the uncurated dir is new"
         assert not outcome.removed_ids, "every curated config is still live"
 
@@ -596,9 +598,9 @@ class TestNwmRefresher:
         monkeypatch.setattr(refresh_mod, "_nwm_live_config_dirs", lambda: live_dirs)
         outcome = audit_one(_info("nwm"))
         assert outcome.status == "ok", "nwm audit ran"
-        assert (
-            "short_range" not in outcome.broken
-        ), "a live curated config is not broken"
+        assert "short_range" not in outcome.broken, (
+            "a live curated config is not broken"
+        )
         assert "usgs_timeslices" in outcome.untracked, "the uncurated dir is untracked"
 
     def test_refresh_has_no_writer(self, monkeypatch):
@@ -646,18 +648,18 @@ class TestNwmBucketPrimitives:
         """`_nwm_unsigned_client` builds an unsigned us-east-1 S3 client offline."""
         client = refresh_mod._nwm_unsigned_client()
         assert client.meta.region_name == "us-east-1", "region pinned to us-east-1"
-        assert (
-            client.meta.service_model.service_name == "s3"
-        ), "an S3 client is returned"
+        assert client.meta.service_model.service_name == "s3", (
+            "an S3 client is returned"
+        )
 
     def test_latest_complete_day_picks_day_before_latest(self):
         """The day before the newest prefix is chosen (newest may be partial)."""
         client = _FakeNwmClient(
             date_pages=[_date_page("20260601", "20260603", "20260602")]
         )
-        assert (
-            refresh_mod._nwm_latest_complete_day(client) == "nwm.20260602"
-        ), "second-newest day selected"
+        assert refresh_mod._nwm_latest_complete_day(client) == "nwm.20260602", (
+            "second-newest day selected"
+        )
 
     def test_latest_complete_day_single_day_uses_only_day(self):
         """With a single published day, that day is used as-is."""
@@ -739,9 +741,9 @@ class TestChcRefresher:
         monkeypatch.setattr(refresh_mod, "_chc_discovered_paths", lambda: live)
         outcome = refresh_one(_info("chc"))
         assert outcome.status == "ok", "chc refresh ran"
-        assert outcome.new_ids == [
-            "pub/org/chc/products/NEW_PRODUCT/daily/"
-        ], "only-on-ftp surfaced as new"
+        assert outcome.new_ids == ["pub/org/chc/products/NEW_PRODUCT/daily/"], (
+            "only-on-ftp surfaced as new"
+        )
         assert len(outcome.removed_ids) == 1, "the dropped base is only-in-yaml"
 
     def test_refresh_has_no_writer(self, monkeypatch):

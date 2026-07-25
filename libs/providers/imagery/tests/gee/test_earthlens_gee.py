@@ -14,8 +14,10 @@ from unittest.mock import MagicMock
 import pytest
 
 import earthlens.gee
-from earthlens.earthlens import _LazyRegistry  # noqa: F401 - imported for completeness
-from earthlens.earthlens import EarthLens
+from earthlens.earthlens import (
+    EarthLens,
+    _LazyRegistry,  # noqa: F401 - imported for completeness
+)
 
 
 @pytest.fixture(scope="function")
@@ -223,9 +225,9 @@ class TestFacadeConstruction:
         EarthLens(**_gee_kwargs(**extra))
         kwargs = fake_gee.call_args.kwargs
         for name, value in extra.items():
-            assert (
-                kwargs.get(name) == value
-            ), f"{name} not forwarded: {kwargs.get(name)!r}"
+            assert kwargs.get(name) == value, (
+                f"{name} not forwarded: {kwargs.get(name)!r}"
+            )
 
     def test_authenticate_forwards_credentials(self, fake_gee):
         """EarthLens.authenticate(...) forwards GEE credentials to the backend."""

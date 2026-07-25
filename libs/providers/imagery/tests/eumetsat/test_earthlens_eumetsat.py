@@ -6,6 +6,7 @@ import pytest
 
 import earthlens.eumetsat
 from earthlens.earthlens import EarthLens
+
 from .conftest import _FakeProduct
 
 pytestmark = pytest.mark.eumetsat

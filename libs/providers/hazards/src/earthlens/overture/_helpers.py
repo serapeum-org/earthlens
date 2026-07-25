@@ -30,6 +30,8 @@ Derivation rule (per row), in order:
 from __future__ import annotations
 
 import warnings
+from collections.abc import Iterable
+from typing import Any, cast
 
 import pandas as pd
 
@@ -76,7 +78,7 @@ def _coerce_sources(sources: object) -> list[dict]:
     if isinstance(sources, float) and pd.isna(sources):
         return []
     try:
-        items = list(sources)
+        items = list(cast("Iterable[Any]", sources))
     except TypeError:
         return []
     return [item for item in items if isinstance(item, dict)]

@@ -67,7 +67,9 @@ class _FakeAirbaseClient:
         self._parquet = parquet
         self.calls: list[tuple[str, tuple[str, ...], Any]] = []
 
-    def request(self, source: str, *countries: str, poll: Any = None, verbose: bool = True):
+    def request(
+        self, source: str, *countries: str, poll: Any = None, verbose: bool = True
+    ):
         self.calls.append((source, countries, poll))
         return _FakeRequest(self._parquet)
 

@@ -118,7 +118,9 @@ class TestProviderBackendHint:
     def test_deep_core_or_sdk_miss_returns_none(self, missing):
         """A deeper (provider-internal), core, or third-party SDK miss is not rewritten."""
         exc = ModuleNotFoundError("boom", name=missing)
-        assert _provider_backend_hint(exc) is None, "only top-level provider misses rewrite"
+        assert _provider_backend_hint(exc) is None, (
+            "only top-level provider misses rewrite"
+        )
 
 
 class TestMainGuard:
@@ -126,13 +128,17 @@ class TestMainGuard:
 
     def test_provider_miss_prints_hint_and_exits_one(self, monkeypatch, capsys):
         """main() turns a missing top-level provider into a friendly hint and exit 1."""
-        exc = ModuleNotFoundError("No module named 'earthlens.ecmwf'", name="earthlens.ecmwf")
+        exc = ModuleNotFoundError(
+            "No module named 'earthlens.ecmwf'", name="earthlens.ecmwf"
+        )
         monkeypatch.setattr(_app_module, "app", partial(_raise, exc))
         with pytest.raises(SystemExit) as exc_info:
             main()
         assert exc_info.value.code == 1, "provider miss exits non-zero"
         err = capsys.readouterr().err
-        assert "pip install earthlens" in err and "ecmwf" in err, "hint printed to stderr"
+        assert "pip install earthlens" in err and "ecmwf" in err, (
+            "hint printed to stderr"
+        )
 
     def test_deep_provider_miss_propagates(self, monkeypatch):
         """main() re-raises an installed provider's own import fault, not a fake hint."""
@@ -142,7 +148,9 @@ class TestMainGuard:
         monkeypatch.setattr(_app_module, "app", partial(_raise, exc))
         with pytest.raises(ModuleNotFoundError) as exc_info:
             main()
-        assert exc_info.value.name == "earthlens.ecmwf.catalog", "deep miss is not rewritten"
+        assert exc_info.value.name == "earthlens.ecmwf.catalog", (
+            "deep miss is not rewritten"
+        )
 
     def test_sdk_miss_propagates(self, monkeypatch):
         """main() re-raises a missing backend SDK unchanged (not a provider distribution)."""
@@ -150,4 +158,6 @@ class TestMainGuard:
         monkeypatch.setattr(_app_module, "app", partial(_raise, exc))
         with pytest.raises(ModuleNotFoundError) as exc_info:
             main()
-        assert exc_info.value.name == "cdsapi", "unrelated import error is not rewritten"
+        assert exc_info.value.name == "cdsapi", (
+            "unrelated import error is not rewritten"
+        )

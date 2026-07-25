@@ -153,7 +153,7 @@ class _ProtocolSpec(NamedTuple):
 _PROTOCOL_SPECS: dict[JaxaProtocol, _ProtocolSpec] = {
     "gportal": _ProtocolSpec(
         cred_user="gportal_username",
-        cred_pass="gportal_password",
+        cred_pass="gportal_password",  # nosec B106 - credential field-name, not a value
         env_user="GPORTAL_USERNAME",
         env_pass="GPORTAL_PASSWORD",
         register_url=_GPORTAL_REGISTER_URL,
@@ -161,7 +161,7 @@ _PROTOCOL_SPECS: dict[JaxaProtocol, _ProtocolSpec] = {
     ),
     "ptree": _ProtocolSpec(
         cred_user="ptree_username",
-        cred_pass="ptree_password",
+        cred_pass="ptree_password",  # nosec B106 - credential field-name, not a value
         env_user="JAXA_PTREE_USERNAME",
         env_pass="JAXA_PTREE_PASSWORD",
         register_url=_PTREE_REGISTER_URL,

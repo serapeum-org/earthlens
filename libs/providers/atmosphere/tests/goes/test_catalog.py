@@ -65,8 +65,7 @@ class TestCatalogLoad:
         """A domain row missing prefix_suffix fails validation with the key named."""
         bad = tmp_path / "bad.yaml"
         bad.write_text(
-            "products:\n  x:\n    product_group: G\n"
-            "domains:\n  C:\n    name: CONUS\n",
+            "products:\n  x:\n    product_group: G\ndomains:\n  C:\n    name: CONUS\n",
             encoding="utf-8",
         )
         with pytest.raises(ValueError, match="domain 'C' failed validation"):

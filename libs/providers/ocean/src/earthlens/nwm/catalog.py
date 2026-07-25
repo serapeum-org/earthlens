@@ -23,7 +23,7 @@ hang off a parallel :attr:`Catalog.configurations` map.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -331,7 +331,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `key` is not a registered NWM product.
         """
-        return self.get_dataset(key)
+        return cast("NWMProduct", self.get_dataset(key))
 
     def get_config(self, key: str) -> NWMConfig:
         """Return the :class:`NWMConfig` for `key`, with a did-you-mean hint.

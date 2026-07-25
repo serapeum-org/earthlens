@@ -60,10 +60,7 @@ class TestLoadProviders:
         """A `parent:` pointing at an unknown slug raises `ValueError`."""
         path = _write(
             tmp_path / "providers.yaml",
-            "providers:\n"
-            "  daac-x:\n"
-            "    display_name: DAAC X\n"
-            "    parent: nasa\n",
+            "providers:\n  daac-x:\n    display_name: DAAC X\n    parent: nasa\n",
         )
         with pytest.raises(ValueError, match="parent='nasa'"):
             load_providers(path)
@@ -72,7 +69,7 @@ class TestLoadProviders:
         """A row missing the required `display_name` raises `ValueError`."""
         path = _write(
             tmp_path / "providers.yaml",
-            "providers:\n" "  ucsb-chc: {}\n",
+            "providers:\n  ucsb-chc: {}\n",
         )
         with pytest.raises(ValueError, match="invalid provider 'ucsb-chc'"):
             load_providers(path)

@@ -31,7 +31,7 @@ def _strip_tz(value: dt.datetime) -> dt.datetime:
         A naive `datetime` (the UTC wall-clock time when `value` was aware).
     """
     if value.tzinfo is not None:
-        return value.astimezone(dt.timezone.utc).replace(tzinfo=None)
+        return value.astimezone(dt.UTC).replace(tzinfo=None)
     return value
 
 
@@ -110,8 +110,7 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
                 pass
         return _strip_tz(pd.Timestamp(value).to_pydatetime())
     raise TypeError(
-        f"start / end must be a datetime, date, or string; got "
-        f"{type(value).__name__}"
+        f"start / end must be a datetime, date, or string; got {type(value).__name__}"
     )
 
 
@@ -264,8 +263,7 @@ def split_time(value: Any) -> tuple[Any, Any]:
     if isinstance(value, (tuple, list)):
         if len(value) != 2:
             raise ValueError(
-                f"time= sequence must have 2 elements [start, end]; "
-                f"got {len(value)}"
+                f"time= sequence must have 2 elements [start, end]; got {len(value)}"
             )
         return value[0], value[1]
     raise TypeError(

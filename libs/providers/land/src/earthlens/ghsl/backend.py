@@ -20,12 +20,14 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 from loguru import logger
 
 if TYPE_CHECKING:
+    import numpy as np
+
     from earthlens.aggregate import AggregationConfig
 
 from earthlens.base import OutputKind, date_windows
@@ -161,7 +163,10 @@ class GHSL(AbstractDataSource):
         self._crs = crs
         self._output_epsg = _epsg_int(crs)
         self._tiling = tiling
-        self._api = api
+        # `_api` is intentionally reused as an instance-level access-path string
+        # ("direct"/"stac"); GHSL drives downloads through its own download()
+        # rather than the inherited _api() method.
+        self._api = api  # type: ignore[method-assign, assignment]
         self._auth = GhslAuth()
         # Resolve + statically validate (product / release / resolution) up
         # front; epoch validation happens once the epoch list is derived.
@@ -465,12 +470,12 @@ class GHSL(AbstractDataSource):
         return out
 
     @staticmethod
-    def _first_band(arr) -> object:
+    def _first_band(arr) -> np.ndarray:
         """Return the first band of a raster array (2-D as-is, 3-D's band 0)."""
         import numpy as np
 
         array = np.asarray(arr)
-        return array[0] if array.ndim == 3 else array
+        return cast("np.ndarray", array[0] if array.ndim == 3 else array)
 
     @property
     def _raw_dir(self) -> Path:
@@ -546,8 +551,13 @@ class GHSL(AbstractDataSource):
         release = self._release_for(code)
         resolution = self._resolution_for(code)
         block = product.block_for(release, epoch, resolution)
+        # The epoch was validated for this (product, release, resolution), so a
+        # matching availability block always exists here.
+        assert block is not None
         family = product.family_token()
-        url_kw = dict(version=block.version, region=block.region, nested=block.nested)
+        url_kw: dict[str, Any] = dict(
+            version=block.version, region=block.region, nested=block.nested
+        )
         is_tiled = resolution in block.tiled() and self._tiling != "global"
         if not is_tiled:
             return [ghsl_url(family, code, epoch, release, resolution, **url_kw)]
@@ -642,8 +652,11 @@ class GHSL(AbstractDataSource):
         from joblib import Parallel, delayed
 
         n_jobs = min(8, len(urls))
-        return Parallel(n_jobs=n_jobs, prefer="threads")(
-            delayed(download_and_unzip)(url, self._raw_dir) for url in urls
+        return cast(
+            "list[Path]",
+            Parallel(n_jobs=n_jobs, prefer="threads")(
+                delayed(download_and_unzip)(url, self._raw_dir) for url in urls
+            ),
         )
 
     def _localise(self, tifs: list[Path], rp: RemoteProduct) -> Path:
@@ -812,7 +825,7 @@ class GHSL(AbstractDataSource):
                 f"GHSL: {code} {version} has multiple table zips {zips}; "
                 f"downloading the first ({zips[0]})."
             )
-        dest = Path(self.path) / code
+        dest: Path = Path(self.path) / code
         download_and_extract(f"{version_url}/{zips[0]}", dest)
         return dest
 
@@ -831,7 +844,7 @@ def _close_dataset(dataset: object) -> None:
     if callable(closer):
         try:
             closer()
-        except Exception:  # noqa: BLE001 - best-effort handle release
+        except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
             pass
 
 

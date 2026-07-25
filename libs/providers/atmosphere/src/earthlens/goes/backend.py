@@ -482,8 +482,7 @@ class GOES(AbstractDataSource):
                 f"for {prefix} on {self._bucket} (not yet published or an outage)."
             )
         logger.info(
-            f"goes: planned {len(products)} granule(s) for {prefix} on "
-            f"{self._bucket}"
+            f"goes: planned {len(products)} granule(s) for {prefix} on {self._bucket}"
         )
         return products
 

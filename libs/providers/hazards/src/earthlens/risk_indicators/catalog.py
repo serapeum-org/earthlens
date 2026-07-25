@@ -22,7 +22,7 @@ ids with :meth:`Catalog.available`.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -36,7 +36,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "risk_indicators_data_catalog.yaml"
 #: re-parsing on every `Catalog()`. Mirrors the `_CATALOG_CACHE` pattern in the
 #: climate_indices / usgs_water / gee loaders. The value is the
 #: `(datasets, admin_codes)` pair both fields are built from.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, "Dataset"], dict[str, int]]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], dict[str, int]]] = {}
 
 #: The three risk providers a :class:`Dataset` row can name.
 Provider = Literal["thinkhazard", "inform", "gfw"]
@@ -319,7 +319,7 @@ class Catalog(AbstractCatalog):
                 names the catalog kind and, when a close match exists, adds a
                 did-you-mean hint.
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))
 
     def available(self) -> list[str]:
         """Return the sorted list of shipped dataset ids.

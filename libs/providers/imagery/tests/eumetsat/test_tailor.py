@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import earthlens.eumetsat
-
 from pathlib import Path
 
 import pytest
 
+import earthlens.eumetsat
 from earthlens.eumetsat import EUMETSAT, TailorConfig
+
 from .conftest import _FakeCustomisation, _FakeProduct
 
 pytestmark = pytest.mark.eumetsat

@@ -26,6 +26,7 @@ import datetime as dt
 import re
 import time
 from pathlib import Path
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -39,6 +40,7 @@ from earthlens.base.abstractdatasource import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.base.spatial import crop_to_aoi, resolve_aoi
 from earthlens.worldpop._helpers import (
     cohort_of,
@@ -58,7 +60,6 @@ from earthlens.worldpop.rest import (
     record_archive_files,
     rest_records,
 )
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: Sub-directory under the output path where raw per-country GeoTIFFs land.
 _RAW_DIRNAME: str = ".worldpop_raw"
@@ -82,6 +83,8 @@ _RESOLUTIONS: frozenset[str] = frozenset({"100m", "1km"})
 _SCOPES: frozenset[str] = frozenset({"countries", "global"})
 #: Allowed values for the `level=` selector (only `pwd` offers both).
 _LEVELS: frozenset[str] = frozenset({"national", "subnational"})
+
+
 class WorldPop(AbstractDataSource):
     """Download WorldPop population + demographic products, localised via pyramids.
 
@@ -299,14 +302,16 @@ class WorldPop(AbstractDataSource):
         if isinstance(aoi, str):
             return [normalise_iso3(aoi)]
         if isinstance(aoi, list) and aoi and isinstance(aoi[0], str):
-            return sorted({normalise_iso3(code) for code in aoi})
+            codes = cast("list[str]", aoi)
+            return sorted({normalise_iso3(code) for code in codes})
         if isinstance(aoi, list) and len(aoi) == 4 and isinstance(aoi[0], (int, float)):
             bbox = [float(x) for x in aoi]
         elif aoi is not None and hasattr(aoi, "total_bounds"):  # a GeoDataFrame
-            crs = getattr(aoi, "crs", None)
+            gdf: Any = aoi
+            crs = getattr(gdf, "crs", None)
             if crs is not None and crs.to_epsg() != 4326:
-                aoi = aoi.to_crs(4326)
-            bbox = [float(x) for x in aoi.total_bounds]
+                gdf = gdf.to_crs(4326)
+            bbox = [float(x) for x in gdf.total_bounds]
         else:
             bbox = [lon_lim[0], lat_lim[0], lon_lim[1], lat_lim[1]]
         return iso3_for_bbox(bbox, load_iso3_bbox())
@@ -513,7 +518,7 @@ class WorldPop(AbstractDataSource):
         if dest.exists() and dest.stat().st_size > 0:
             return dest
         http = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
             status_forcelist=(),
             max_retries=_MAX_RETRIES - 1,
@@ -544,13 +549,14 @@ class WorldPop(AbstractDataSource):
         """
         raw = self._raw_dir()
         paths = Parallel(n_jobs=_DOWNLOAD_JOBS, prefer="threads")(
-            delayed(self._http_get)(rp.href, raw / Path(rp.href).name)
+            delayed(self._http_get)(rp.href, raw / Path(cast("str", rp.href)).name)
             for rp in products
         )
         groups: dict[
             tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
         ] = {}
         for path, rp in zip(paths, products):
+            assert rp.href is not None  # worldpop products always carry a URL
             key = (rp.metadata["product"], rp.metadata["year"], cohort_of(rp.href))
             groups.setdefault(key, []).append((path, rp))
         return groups
@@ -710,9 +716,7 @@ class WorldPop(AbstractDataSource):
             geo, epsg = template.geotransform, template.epsg
             tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
             for label, array in reduced.items():
-                target = (
-                    Path(self.path) / f"{product}{tag}_{cfg.freq}_{label}_{op}.tif"
-                )
+                target = Path(self.path) / f"{product}{tag}_{cfg.freq}_{label}_{op}.tif"
                 Dataset.create_from_array(arr=array, geo=geo, epsg=epsg).to_file(
                     str(target)
                 )
@@ -810,6 +814,7 @@ class WorldPop(AbstractDataSource):
 
         tifs = [str(path) for path, _ in group]
         rp = group[0][1]
+        assert rp.href is not None  # worldpop products always carry a URL
         product = rp.metadata["product"]
         year = rp.metadata["year"]
         dst_crs = self._output_epsg if self._output_epsg != 4326 else None

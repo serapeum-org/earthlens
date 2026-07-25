@@ -169,8 +169,10 @@ def fetch_jaxa_earth(
             f"dataset {dataset.key!r} has no collection — bad catalog row."
         )
 
-    target_bands = bands if bands is not None else (
-        [dataset.default_band] if dataset.default_band else []
+    target_bands = (
+        bands
+        if bands is not None
+        else ([dataset.default_band] if dataset.default_band else [])
     )
     if not target_bands:
         raise ValueError(

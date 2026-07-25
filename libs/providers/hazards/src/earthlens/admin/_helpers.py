@@ -19,9 +19,9 @@ gate are applied by the per-provider URL builders so the backend hands
 
 from __future__ import annotations
 
-from typing import Any
+from typing import cast
 
-import requests
+import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base.http import HttpClient
@@ -39,6 +39,8 @@ NE_BASE = "https://naciscdn.org/naturalearth"
 
 #: US Census TIGER base — the GENZ cartographic-boundary (`cb_`) shapefile tree.
 TIGER_BASE = "https://www2.census.gov/geo/tiger"
+
+
 def vsicurl(url: str) -> str:
     """Wrap an HTTP(S) URL in GDAL's `/vsicurl/` virtual-filesystem prefix.
 
@@ -77,7 +79,7 @@ def geoboundaries_resolve(iso: str, adm: str, timeout: float = 60.0) -> str:
         KeyError: If the metadata carries no `gjDownloadURL`.
     """
     http = HttpClient(
-        session=_RequestsGet(),
+        session=cast("requests.Session | None", _RequestsGet()),
         timeout=timeout,
         max_retries=0,
         status_forcelist=(),
@@ -91,7 +93,7 @@ def geoboundaries_resolve(iso: str, adm: str, timeout: float = 60.0) -> str:
                 "country may not publish that ADM level."
             )
         meta = meta[0]
-    return meta["gjDownloadURL"]
+    return cast("str", meta["gjDownloadURL"])
 
 
 def cgaz_url(level: str) -> str:

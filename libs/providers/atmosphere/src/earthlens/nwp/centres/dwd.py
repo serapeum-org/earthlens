@@ -21,13 +21,15 @@ from __future__ import annotations
 
 import bz2
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from earthlens.nwp._helpers import grib_name
 from earthlens.nwp.centres.base import _NWPCentre
 
 if TYPE_CHECKING:
     import datetime as dt
+
+    import requests
 
     from earthlens.nwp.catalog import NWPModel
 
@@ -80,7 +82,7 @@ class DWDCentre(_NWPCentre):
         """
         from earthlens.base.http import HttpClient, RequestsGet
 
-        client = HttpClient(session=RequestsGet())
+        client = HttpClient(session=cast("requests.Session | None", RequestsGet()))
         out = self.save_dir / grib_name(model.model_family, cycle, step)
         # Stream into a sibling .part and atomically rename on full success, so
         # a failure partway through (variable 2 of N) never leaves a truncated
@@ -130,13 +132,16 @@ class DWDCentre(_NWPCentre):
                     f"model {model.model_family!r} has no 'pl_url_template' in "
                     f"request_options for pressure-level band {param!r}."
                 )
-            return template.format(
-                cycle=cycle,
-                date=cycle,
-                step=step,
-                level=level,
-                var=var,
-                var_lc=var.lower(),
+            return cast(
+                "str",
+                template.format(
+                    cycle=cycle,
+                    date=cycle,
+                    step=step,
+                    level=level,
+                    var=var,
+                    var_lc=var.lower(),
+                ),
             )
         if not model.url_template:
             raise ValueError(

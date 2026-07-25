@@ -66,9 +66,9 @@ class TestFacadeAggregateRejection:
         facade = _make_facade(tmp_path)
         with pytest.raises(NotImplementedError) as exc:
             facade.download(aggregate=object())
-        assert "vector" in str(
-            exc.value
-        ), f"rejection message should mention 'vector', got: {exc.value}"
+        assert "vector" in str(exc.value), (
+            f"rejection message should mention 'vector', got: {exc.value}"
+        )
 
     def test_aggregate_none_is_allowed(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
         """`aggregate=None` is fine and a normal download runs."""

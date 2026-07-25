@@ -68,9 +68,7 @@ def test_apply_baseline_windows_wildcard_keeps_all() -> None:
             }
 
     products = [_P(0.0, 0), _P(500.0, 500), _P(None, None)]
-    assert (
-        apply_baseline_windows(products, None, None) == products
-    )
+    assert apply_baseline_windows(products, None, None) == products
 
 
 @pytest.mark.asf
@@ -147,8 +145,12 @@ def test_stack_mode_runs_granule_search_then_stack(
     from .conftest import _FakeProduct
 
     stacked = [
-        _FakeProduct(sceneName="S1A_REF_SLC", perpendicularBaseline=0.0, temporalBaseline=0),
-        _FakeProduct(sceneName="S1A_SEC_SLC", perpendicularBaseline=42.0, temporalBaseline=12),
+        _FakeProduct(
+            sceneName="S1A_REF_SLC", perpendicularBaseline=0.0, temporalBaseline=0
+        ),
+        _FakeProduct(
+            sceneName="S1A_SEC_SLC", perpendicularBaseline=42.0, temporalBaseline=12
+        ),
     ]
     reference = _FakeProduct(sceneName="S1A_REF_SLC", stack_return=stacked)
     fake_asf_search.granule_results = [reference]
@@ -186,7 +188,9 @@ def test_stack_mode_post_filters_baseline_windows(
     stacked = [
         _FakeProduct(sceneName="S1_A", perpendicularBaseline=10.0, temporalBaseline=6),
         _FakeProduct(sceneName="S1_B", perpendicularBaseline=999.0, temporalBaseline=6),
-        _FakeProduct(sceneName="S1_C", perpendicularBaseline=10.0, temporalBaseline=999),
+        _FakeProduct(
+            sceneName="S1_C", perpendicularBaseline=10.0, temporalBaseline=999
+        ),
     ]
     reference = _FakeProduct(sceneName="REF", stack_return=stacked)
     fake_asf_search.granule_results = [reference]
@@ -205,9 +209,7 @@ def test_stack_mode_post_filters_baseline_windows(
 
 @pytest.mark.asf
 @pytest.mark.unit
-def test_stack_mode_unknown_reference_raises(
-    fake_asf_search, tmp_path: Path
-) -> None:
+def test_stack_mode_unknown_reference_raises(fake_asf_search, tmp_path: Path) -> None:
     """An empty `granule_search` result names the reference id in the error."""
     fake_asf_search.granule_results = []
     backend = ASF(

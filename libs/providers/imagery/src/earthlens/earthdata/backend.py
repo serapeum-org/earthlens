@@ -36,7 +36,7 @@ import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import pandas as pd
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -244,8 +244,8 @@ class Earthdata(AbstractDataSource):
         """
         creds = EarthdataCredentials(
             username=self._username,
-            password=self._password,
-            token=self._token,
+            password=SecretStr(self._password) if self._password is not None else None,
+            token=SecretStr(self._token) if self._token is not None else None,
             netrc_path=self._netrc_path,
         )
         self._auth = EarthdataAuth(creds)

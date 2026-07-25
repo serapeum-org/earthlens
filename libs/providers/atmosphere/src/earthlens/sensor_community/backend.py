@@ -32,7 +32,7 @@ from __future__ import annotations
 import datetime as dt
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -233,12 +233,15 @@ class SensorCommunity(AbstractDataSource):
         start = self.time.start_date.date()
         end = self.time.end_date.date()
         span = (end - start).days
-        return [(start + dt.timedelta(days=offset)).isoformat() for offset in range(span + 1)]
+        return [
+            (start + dt.timedelta(days=offset)).isoformat()
+            for offset in range(span + 1)
+        ]
 
     def _column_map(self) -> dict[str, str]:
         """CSV column -> pollutant name for the requested pollutants (cached)."""
         if self._columns is None:
-            self._columns = self._catalog.columns_for(self.vars)
+            self._columns = self._catalog.columns_for(cast("list[str]", self.vars))
         return self._columns
 
     def _unit_map(self) -> dict[str, str]:
@@ -258,7 +261,7 @@ class SensorCommunity(AbstractDataSource):
                 requested pollutant; `id` is the sensor id and `metadata`
                 carries `sensor_type` / `lat` / `lon`.
         """
-        wanted = self._catalog.sensor_types_for(self.vars)
+        wanted = self._catalog.sensor_types_for(cast("list[str]", self.vars))
         snapshot = self._client().live_snapshot()
         sensors = sensors_in_bbox(
             snapshot,
@@ -272,7 +275,9 @@ class SensorCommunity(AbstractDataSource):
                 "type(s) is currently reporting in the bbox; historical "
                 "coverage is limited to sensors active now."
             )
-        return [RemoteProduct(id=sensor["sensor_id"], metadata=sensor) for sensor in sensors]
+        return [
+            RemoteProduct(id=sensor["sensor_id"], metadata=sensor) for sensor in sensors
+        ]
 
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Fetch one sensor's per-day archive CSVs over the date window.

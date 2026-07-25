@@ -30,24 +30,38 @@ class TestRouting:
     def test_keys_present(self):
         """stac plus every endpoint alias (incl. bdc) is registered."""
         for key in (
-            "stac", "planetary-computer", "earth-search", "cdse",
-            "deafrica", "digital-earth-africa",
-            "dea", "digital-earth-australia",
+            "stac",
+            "planetary-computer",
+            "earth-search",
+            "cdse",
+            "deafrica",
+            "digital-earth-africa",
+            "dea",
+            "digital-earth-australia",
             "veda",
-            "usgs-landsat", "landsat",
-            "bdc", "brazil-data-cube",
+            "usgs-landsat",
+            "landsat",
+            "bdc",
+            "brazil-data-cube",
         ):
             assert key in EarthLens.DataSources
 
     def test_keys_resolve_to_stac_class(self):
         """Every STAC key resolves to earthlens.stac.STAC."""
         for key in (
-            "stac", "planetary-computer", "earth-search", "cdse",
-            "deafrica", "digital-earth-africa",
-            "dea", "digital-earth-australia",
+            "stac",
+            "planetary-computer",
+            "earth-search",
+            "cdse",
+            "deafrica",
+            "digital-earth-africa",
+            "dea",
+            "digital-earth-australia",
             "veda",
-            "usgs-landsat", "landsat",
-            "bdc", "brazil-data-cube",
+            "usgs-landsat",
+            "landsat",
+            "bdc",
+            "brazil-data-cube",
         ):
             assert EarthLens.DataSources[key] is STAC
 
@@ -78,12 +92,16 @@ class TestAliasEndpointBinding:
     def test_deafrica_alias_prebinds_endpoint(self, fake_pyramids, tmp_path):
         """data_source='deafrica' / 'digital-earth-africa' bind the deafrica endpoint."""
         el = _facade(
-            fake_pyramids, tmp_path, "deafrica",
+            fake_pyramids,
+            tmp_path,
+            "deafrica",
             variables={"deafrica/wofs_ls": ["water"]},
         )
         assert el.datasource._endpoint == "deafrica"
         el2 = _facade(
-            fake_pyramids, tmp_path, "digital-earth-africa",
+            fake_pyramids,
+            tmp_path,
+            "digital-earth-africa",
             variables={"deafrica/wofs_ls": ["water"]},
         )
         assert el2.datasource._endpoint == "deafrica"
@@ -91,12 +109,16 @@ class TestAliasEndpointBinding:
     def test_dea_alias_prebinds_endpoint(self, fake_pyramids, tmp_path):
         """data_source='dea' / 'digital-earth-australia' bind the dea endpoint."""
         el = _facade(
-            fake_pyramids, tmp_path, "dea",
+            fake_pyramids,
+            tmp_path,
+            "dea",
             variables={"dea/ga_ls_wo_3": ["water"]},
         )
         assert el.datasource._endpoint == "dea"
         el2 = _facade(
-            fake_pyramids, tmp_path, "digital-earth-australia",
+            fake_pyramids,
+            tmp_path,
+            "digital-earth-australia",
             variables={"dea/ga_ls_wo_3": ["water"]},
         )
         assert el2.datasource._endpoint == "dea"
@@ -104,7 +126,9 @@ class TestAliasEndpointBinding:
     def test_veda_alias_prebinds_endpoint(self, fake_pyramids, tmp_path):
         """data_source='veda' binds the veda endpoint."""
         el = _facade(
-            fake_pyramids, tmp_path, "veda",
+            fake_pyramids,
+            tmp_path,
+            "veda",
             variables={"veda/nldas3": ["cog_default"]},
         )
         assert el.datasource._endpoint == "veda"
@@ -112,12 +136,16 @@ class TestAliasEndpointBinding:
     def test_usgs_landsat_alias_prebinds_endpoint(self, fake_pyramids, tmp_path):
         """data_source='usgs-landsat' / 'landsat' bind the usgs-landsat endpoint."""
         el = _facade(
-            fake_pyramids, tmp_path, "usgs-landsat",
+            fake_pyramids,
+            tmp_path,
+            "usgs-landsat",
             variables={"usgs-landsat/landsat-c2l2-sr": ["red"]},
         )
         assert el.datasource._endpoint == "usgs-landsat"
         el2 = _facade(
-            fake_pyramids, tmp_path, "landsat",
+            fake_pyramids,
+            tmp_path,
+            "landsat",
             variables={"usgs-landsat/landsat-c2l2-sr": ["red"]},
         )
         assert el2.datasource._endpoint == "usgs-landsat"
@@ -125,12 +153,16 @@ class TestAliasEndpointBinding:
     def test_bdc_alias_prebinds_endpoint(self, fake_pyramids, tmp_path):
         """data_source='bdc' / 'brazil-data-cube' bind the bdc endpoint."""
         el = _facade(
-            fake_pyramids, tmp_path, "bdc",
+            fake_pyramids,
+            tmp_path,
+            "bdc",
             variables={"bdc/CBERS4-WFI-16D-2": ["NDVI"]},
         )
         assert el.datasource._endpoint == "bdc"
         el2 = _facade(
-            fake_pyramids, tmp_path, "brazil-data-cube",
+            fake_pyramids,
+            tmp_path,
+            "brazil-data-cube",
             variables={"bdc/CBERS4-WFI-16D-2": ["NDVI"]},
         )
         assert el2.datasource._endpoint == "bdc"

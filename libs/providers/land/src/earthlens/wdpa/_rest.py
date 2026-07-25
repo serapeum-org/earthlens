@@ -23,7 +23,7 @@ a pyramids `FeatureCollection`.
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, cast
 
 import geopandas as gpd
 import pandas as pd
@@ -145,7 +145,7 @@ def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
             f"Protected Planet returned HTTP {status} for /{path} "
             "(the WDPA token has been redacted from this error)."
         )
-    return response.json()
+    return cast("dict[Any, Any]", response.json())
 
 
 def _row(area: dict) -> dict[str, Any] | None:
@@ -168,16 +168,18 @@ def _row(area: dict) -> dict[str, Any] | None:
     countries = area.get("countries") or []
     first_country = countries[0] if countries else None
     iso3 = (
-        first_country.get("iso_3")
-        if isinstance(first_country, dict)
-        else first_country
+        first_country.get("iso_3") if isinstance(first_country, dict) else first_country
     ) or area.get("iso3")
     return {
         "wdpa_id": str(area.get("wdpa_id") or area.get("id") or ""),
         "name": area.get("name"),
         "iso3": iso3,
-        "designation": designation.get("name") if isinstance(designation, dict) else designation,
-        "iucn_category": category.get("name") if isinstance(category, dict) else category,
+        "designation": designation.get("name")
+        if isinstance(designation, dict)
+        else designation,
+        "iucn_category": category.get("name")
+        if isinstance(category, dict)
+        else category,
         "marine": area.get("marine"),
         "geometry": shape(geometry),
     }
@@ -195,7 +197,9 @@ def _to_gdf(rows: list[dict]) -> gpd.GeoDataFrame:
             input yields a schema-correct empty frame.
     """
     if not rows:
-        frame = pd.DataFrame({c: pd.Series([], dtype=t) for c, t in WDPA_COLUMNS.items()})
+        frame = pd.DataFrame(
+            {c: pd.Series([], dtype=t) for c, t in WDPA_COLUMNS.items()}
+        )
         return gpd.GeoDataFrame(frame, geometry=gpd.GeoSeries([], crs=CRS), crs=CRS)
     # Read geometry without mutating the caller's rows (no `.pop`): a future
     # caller may want to inspect the original records after the GeoDataFrame
@@ -246,7 +250,9 @@ def fetch_country(
             "per_page": PER_PAGE,
             "page": page,
         }
-        areas = _get(http, "protected_areas/search", params).get("protected_areas") or []
+        areas = (
+            _get(http, "protected_areas/search", params).get("protected_areas") or []
+        )
         rows.extend(row for area in areas if (row := _row(area)) is not None)
         if len(areas) < PER_PAGE:
             break

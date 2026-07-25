@@ -48,8 +48,8 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -257,7 +257,11 @@ class EUMETSAT(AbstractDataSource):
         """
         creds = EumetsatCredentials(
             consumer_key=self._consumer_key,
-            consumer_secret=self._consumer_secret,
+            consumer_secret=(
+                SecretStr(self._consumer_secret)
+                if self._consumer_secret is not None
+                else None
+            ),
             credentials_file=self._credentials_file,
         )
         self._auth = EumetsatAuth(creds)
@@ -567,13 +571,16 @@ class EUMETSAT(AbstractDataSource):
             product=dataset.tailor_product_type,
             format=tailor.format,
             projection=tailor.crs,
-            roi=eumdac.tailor_models.RegionOfInterest(NSWE=nswe),
+            # eumdac types NSWE as Optional[str], but the Data Tailor ROI takes
+            # a north/south/west/east list (see TailorConfig.nswe).
+            roi=eumdac.tailor_models.RegionOfInterest(NSWE=nswe),  # type: ignore[arg-type]
             filter=(
                 eumdac.tailor_models.Filter(bands=list(tailor.filter))
                 if tailor.filter
                 else None
             ),
-            quicklook=tailor.quicklook or None,
+            # eumdac types quicklook as a Quicklook/dict; the API accepts a truthy flag.
+            quicklook=tailor.quicklook or None,  # type: ignore[arg-type]
         )
         product_handle = product.metadata["product"]
         # Choose the per-product output subdir *before* submitting, so nothing

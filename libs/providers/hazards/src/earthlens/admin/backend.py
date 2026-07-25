@@ -28,10 +28,11 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 from loguru import logger
+from pyramids.feature.collection import FeatureCollection
 
 from earthlens.admin._helpers import (
     cgaz_url,
@@ -50,7 +51,6 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
 )
-from pyramids.feature.collection import FeatureCollection
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -176,8 +176,7 @@ class AdminBoundaries(AbstractDataSource):
         """
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         ids = list(variables.keys()) if isinstance(variables, dict) else list(variables)
         if not ids:
@@ -202,8 +201,8 @@ class AdminBoundaries(AbstractDataSource):
         # an empty / unset path returns the in-memory collection only.
         self._should_write = bool(path) and str(path) != "."
         super().__init__(
-            start=start,
-            end=end,
+            start=cast("str", start),
+            end=cast("str", end),
             variables=ids,
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim if lat_lim is not None else list(_WHOLE_EARTH_LAT),
@@ -351,18 +350,25 @@ class AdminBoundaries(AbstractDataSource):
         """
         if dataset.provider == "geoboundaries":
             gj_url = geoboundaries_resolve(
-                self._country, dataset.adm_level, timeout=self._timeout
+                cast("str", self._country),
+                cast("str", dataset.adm_level),
+                timeout=self._timeout,
             )
             return vsicurl(gj_url)
         if dataset.provider == "cgaz":
-            return cgaz_url(dataset.adm_level)
+            return cgaz_url(cast("str", dataset.adm_level))
         if dataset.provider == "natural_earth":
             scale = self._scale or dataset.default_scale
-            return natural_earth_url(scale, dataset.layer)
+            return natural_earth_url(cast("str", scale), cast("str", dataset.layer))
         if dataset.provider == "tiger":
             year = self._year or dataset.default_year
             scope = self._state if dataset.per_state else "us"
-            return tiger_url(year, dataset.layer, dataset.resolution, scope=scope)
+            return tiger_url(
+                cast("int", year),
+                cast("str", dataset.layer),
+                cast("str", dataset.resolution),
+                scope=cast("str", scope),
+            )
         raise ValueError(f"unsupported admin provider: {dataset.provider!r}")
 
     def _api(self) -> list[FeatureCollection]:

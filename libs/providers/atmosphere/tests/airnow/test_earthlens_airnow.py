@@ -11,6 +11,7 @@ import pytest
 import earthlens.airnow
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
+
 from .conftest import _FakeAirnow, _FakeSession
 
 
@@ -45,7 +46,9 @@ class TestFacadeRouting:
 
     def test_facade_builds_backend(self, tmp_path):
         """The facade binds an AirNow instance as its datasource."""
-        assert isinstance(_facade(_FakeAirnow(), tmp_path).datasource, earthlens.airnow.AirNow)
+        assert isinstance(
+            _facade(_FakeAirnow(), tmp_path).datasource, earthlens.airnow.AirNow
+        )
 
     def test_backend_kwargs_forwarded(self, tmp_path):
         """Filter kwargs ride through to the backend."""

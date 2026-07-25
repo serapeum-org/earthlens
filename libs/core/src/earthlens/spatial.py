@@ -69,11 +69,10 @@ import geopandas as gpd
 import pandas as pd
 from geopandas import GeoDataFrame
 from pyproj.exceptions import CRSError
+from pyramids.utm import project_to_utm
 from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
-
-from pyramids.utm import project_to_utm
 
 _WGS84_CODE: int = 4326
 
@@ -456,6 +455,7 @@ def split_points(
         return [samples]
 
     target_crs = output_crs if output_crs is not None else samples.crs
+    assert grid is not None  # non-None whenever was_split is True
     grid_in_samples = grid.to_crs(samples.crs)
 
     claimed = pd.Series(False, index=samples.index)

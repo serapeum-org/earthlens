@@ -94,9 +94,9 @@ class TestApiE2E:
 
         assert target.exists(), f"NetCDF file not created at {target}"
         assert target.stat().st_size > 0, f"NetCDF file is empty: {target}"
-        assert (
-            "reanalysis-era5-single-levels-monthly-means" in target.name
-        ), f"Monthly retrieve should land at -monthly-means; got {target.name}"
+        assert "reanalysis-era5-single-levels-monthly-means" in target.name, (
+            f"Monthly retrieve should land at -monthly-means; got {target.name}"
+        )
 
 
 class TestFacadeE2E:
@@ -125,9 +125,9 @@ class TestFacadeE2E:
         # Each variable gets its own
         # <cds_variable>_<cds_dataset>.nc under tmp_path.
         produced = sorted(p.name for p in tmp_path.glob("*.nc"))
-        assert (
-            "2m_temperature_reanalysis-era5-single-levels.nc" in produced
-        ), f"2T NetCDF missing from outputs: {produced}"
-        assert (
-            "total_precipitation_reanalysis-era5-single-levels.nc" in produced
-        ), f"TP NetCDF missing from outputs: {produced}"
+        assert "2m_temperature_reanalysis-era5-single-levels.nc" in produced, (
+            f"2T NetCDF missing from outputs: {produced}"
+        )
+        assert "total_precipitation_reanalysis-era5-single-levels.nc" in produced, (
+            f"TP NetCDF missing from outputs: {produced}"
+        )

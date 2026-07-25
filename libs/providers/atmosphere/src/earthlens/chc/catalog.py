@@ -476,7 +476,7 @@ def _build_chc_dataset(
         )
     except (ValidationError, KeyError) as exc:
         raise ValueError(
-            f"{source_path.name} dataset {ds_key!r} " f"failed validation:\n{exc}"
+            f"{source_path.name} dataset {ds_key!r} failed validation:\n{exc}"
         ) from exc
     return ds, len(ds_vars)
 

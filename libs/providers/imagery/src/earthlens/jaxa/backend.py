@@ -36,7 +36,6 @@ import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
 from pydantic import SecretStr
 
 if TYPE_CHECKING:

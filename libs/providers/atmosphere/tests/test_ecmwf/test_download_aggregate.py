@@ -87,9 +87,9 @@ class TestDownloadAggregateIntegration:
         cfg = AggregationConfig(freq="1MS", op="mean")
         stubbed_download.download(progress_bar=False, aggregate=cfg)
 
-        assert (
-            len(aggregate_recorder) == 1
-        ), f"Expected exactly 1 aggregator call, got {len(aggregate_recorder)}"
+        assert len(aggregate_recorder) == 1, (
+            f"Expected exactly 1 aggregator call, got {len(aggregate_recorder)}"
+        )
         nc_path, var_info, eff_cfg = aggregate_recorder[0]
         assert (
             nc_path == tmp_path / "2m_temperature_reanalysis-era5-single-levels.nc"
@@ -98,9 +98,9 @@ class TestDownloadAggregateIntegration:
             f"Aggregator received wrong var_info: cds_variable="
             f"{var_info.cds_variable!r}"
         )
-        assert (
-            eff_cfg.freq == "1MS"
-        ), f"Aggregator received wrong freq: {eff_cfg.freq!r}"
+        assert eff_cfg.freq == "1MS", (
+            f"Aggregator received wrong freq: {eff_cfg.freq!r}"
+        )
         assert eff_cfg.op == "mean", f"Aggregator received wrong op: {eff_cfg.op!r}"
 
     def test_default_out_dir_is_root_dir_aggregated(
@@ -113,8 +113,7 @@ class TestDownloadAggregateIntegration:
 
         _, _, eff_cfg = aggregate_recorder[0]
         assert eff_cfg.out_dir == tmp_path / "aggregated", (
-            f"Default out_dir should be <root_dir>/aggregated; "
-            f"got {eff_cfg.out_dir}"
+            f"Default out_dir should be <root_dir>/aggregated; got {eff_cfg.out_dir}"
         )
 
     def test_explicit_out_dir_is_preserved(
@@ -126,9 +125,9 @@ class TestDownloadAggregateIntegration:
         stubbed_download.download(progress_bar=False, aggregate=cfg)
 
         _, _, eff_cfg = aggregate_recorder[0]
-        assert (
-            eff_cfg.out_dir == explicit
-        ), f"Explicit out_dir should be preserved; got {eff_cfg.out_dir}"
+        assert eff_cfg.out_dir == explicit, (
+            f"Explicit out_dir should be preserved; got {eff_cfg.out_dir}"
+        )
 
     def test_aggregate_failure_does_not_abort_remaining_variables(
         self, ecmwf_stub, monkeypatch, tmp_path
@@ -205,7 +204,7 @@ class TestDownloadAggregateIntegration:
         )
 
         assert len(recorder) == 2, (
-            f"Expected 2 aggregator calls (one per variable); " f"got {len(recorder)}"
+            f"Expected 2 aggregator calls (one per variable); got {len(recorder)}"
         )
         assert [name for _, name in recorder] == [
             "2m_temperature",
@@ -245,5 +244,5 @@ class TestDownloadAggregateIntegration:
         )
 
         assert recorder == [], (
-            f"Aggregator should not be called when retrieve fails; " f"got {recorder}"
+            f"Aggregator should not be called when retrieve fails; got {recorder}"
         )

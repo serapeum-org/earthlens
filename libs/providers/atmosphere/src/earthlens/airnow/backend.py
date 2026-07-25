@@ -28,10 +28,11 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.airnow.auth import AirnowAuth, AirnowCredentials, AuthenticationError
 from earthlens.airnow.catalog import Catalog
@@ -211,7 +212,11 @@ class AirNow(AbstractDataSource):
             AuthenticationError: When `AirnowAuth.configure` finds no key
                 (no `api_key=` and no `AIRNOW_API_KEY`).
         """
-        self._auth = AirnowAuth(AirnowCredentials(api_key=self._api_key))
+        self._auth = AirnowAuth(
+            AirnowCredentials(
+                api_key=None if self._api_key is None else SecretStr(self._api_key)
+            )
+        )
         self._auth.configure()
         return None
 
@@ -296,8 +301,7 @@ class AirNow(AbstractDataSource):
     def _bbox(self) -> str:
         """Return the request bbox as AirNow's `"minLon,minLat,maxLon,maxLat"`."""
         return (
-            f"{self.space.west},{self.space.south},"
-            f"{self.space.east},{self.space.north}"
+            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
         )
 
     def _date_bounds(self) -> tuple[str, str]:
@@ -338,7 +342,9 @@ class AirNow(AbstractDataSource):
         start_date, end_date = self._date_bounds()
         return {
             "BBOX": self._bbox(),
-            "parameters": ",".join(self._catalog.codes_for(self.vars)),
+            "parameters": ",".join(
+                self._catalog.codes_for(cast("list[str]", self.vars))
+            ),
             "startDate": start_date,
             "endDate": end_date,
             "dataType": self._data_type,

@@ -17,9 +17,8 @@ download-then-localise for the solar layers — see the A1 gate,
 
 from __future__ import annotations
 
-import difflib
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
@@ -34,7 +33,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: Module-level cache of parsed catalog data, keyed on the resolved path plus a
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-atlas file invalidates the entry without re-parsing an unchanged tree.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Layer"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Layer]]] = {}
 
 #: The two source atlases a row may belong to.
 Atlas = Literal["gsa", "gwa"]
@@ -274,7 +273,7 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(layer_id)
+        return cast("Layer", self.get_dataset(layer_id))
 
     def available(self) -> list[str]:
         """Return the curated layer ids, sorted.

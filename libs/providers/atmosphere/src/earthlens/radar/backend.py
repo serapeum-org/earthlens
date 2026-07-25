@@ -158,8 +158,7 @@ class Radar(AbstractDataSource):
         """
         if not variables:
             raise ValueError(
-                "Radar requires a non-empty `variables` mapping of "
-                "{station_id: [...]}."
+                "Radar requires a non-empty `variables` mapping of {station_id: [...]}."
             )
         self._region = region
         self._catalog = catalog if catalog is not None else Catalog()

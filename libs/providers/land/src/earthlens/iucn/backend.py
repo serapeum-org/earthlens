@@ -26,6 +26,7 @@ from typing import Literal
 
 import pandas as pd
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -163,7 +164,13 @@ class IUCN(AbstractDataSource):
         Raises:
             AuthenticationError: When no `IUCN_TOKEN` / `token=` is set.
         """
-        self._auth = IucnAuth(IucnCredentials(token=self._token_arg))
+        self._auth = IucnAuth(
+            IucnCredentials(
+                token=SecretStr(self._token_arg)
+                if self._token_arg is not None
+                else None
+            )
+        )
         self._auth.configure()
         return None
 
@@ -209,7 +216,7 @@ class IUCN(AbstractDataSource):
             dates=pd.DatetimeIndex([start_dt, end_dt]),
         )
 
-    def _fetch(self) -> pd.DataFrame:
+    def _fetch(self) -> pd.DataFrame:  # type: ignore[override]
         """Fetch every selector's assessments into one DataFrame.
 
         Routes each `variables` entry to the species (two-step) or country
@@ -220,6 +227,7 @@ class IUCN(AbstractDataSource):
                 `_rest.IUCN_COLUMNS`; empty (schema-only) when nothing
                 matched.
         """
+        assert self._auth is not None  # set by _initialize before _fetch runs
         token = self._auth.token
         rows: list[dict] = []
         for selector in self.vars:
@@ -232,7 +240,7 @@ class IUCN(AbstractDataSource):
             )
         return _frame(rows)
 
-    def _fetch_one(self, token: str, selector: str) -> list[dict]:
+    def _fetch_one(self, token: str, selector: str) -> list[dict]:  # type: ignore[override]
         """Fetch one selector (species binomial or country ISO2).
 
         Args:

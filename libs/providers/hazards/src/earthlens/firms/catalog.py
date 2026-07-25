@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -290,7 +290,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `code` is not a registered FIRMS sensor.
         """
-        return self.get_dataset(code)
+        return cast("Sensor", self.get_dataset(code))
 
     def get_column(self, code: str, column: str) -> SensorColumn:
         """Return one column's metadata for a `(sensor, column)` pair.

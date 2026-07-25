@@ -32,7 +32,7 @@ from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
 
 #: Where a user requests a personal Protected Planet API token.
-_TOKEN_URL = "https://api.protectedplanet.net/request"
+_TOKEN_URL = "https://api.protectedplanet.net/request"  # nosec B105 - not a secret (public URL / identifier)
 
 
 class AuthenticationError(_BaseAuthenticationError):

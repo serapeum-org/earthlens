@@ -57,6 +57,7 @@ def _yaml_files_for(path: Path) -> list[Path]:
         return sorted(path.glob("*.yaml"))
     return [path]
 
+
 #: G-Portal dataset ids are 7- to 9-digit numeric strings (e.g. `11001002`).
 _GPORTAL_ID_RE = re.compile(r"^\d{7,9}$")
 

@@ -655,7 +655,9 @@ class TestEcmwfProberBranches:
         import earthlens.ecmwf.constraints as constraints
 
         monkeypatch.setattr(
-            constraints, "fetch_constraints", lambda d, base_url=None: [{"variable": []}]
+            constraints,
+            "fetch_constraints",
+            lambda d, base_url=None: [{"variable": []}],
         )
         assert curate_mod._ecmwf_constraints("x") == [{"variable": []}]
 
@@ -1275,7 +1277,9 @@ class TestBiodiversityProbers:
         from earthlens.gbif import Catalog as G
 
         result = curate_mod._gbif_probe(G(), "birds")
-        assert result == {"birds": {"taxon_key": 212, "title": "Aves — birds", "rank": "class"}}
+        assert result == {
+            "birds": {"taxon_key": 212, "title": "Aves — birds", "rank": "class"}
+        }
 
     def test_gbif_raises_on_unknown_taxon(self):
         """An unknown taxon raises with a clear message."""

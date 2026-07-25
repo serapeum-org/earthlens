@@ -6,8 +6,8 @@ import inspect
 from types import SimpleNamespace
 
 import ee
-import geopandas as gpd
 import geopandas as _gpd
+import geopandas as gpd
 import pytest
 from shapely.geometry import Point
 

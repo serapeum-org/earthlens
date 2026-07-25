@@ -16,6 +16,7 @@ from earthlens.osm._helpers import (
     shapely_bbox,
     to_fc,
 )
+
 from .conftest import FakeResult, make_result
 
 pytestmark = pytest.mark.osm
@@ -143,6 +144,7 @@ class TestWayGeometry:
     def test_closed_ring_is_polygon(self):
         """A 4+ point ring whose ends match becomes a Polygon."""
         from earthlens.osm._helpers import _way_geometry
+
         from .conftest import FakeWay
 
         way = FakeWay(1, {}, [(0, 0), (0, 1), (1, 1), (0, 0)])
@@ -151,6 +153,7 @@ class TestWayGeometry:
     def test_open_way_is_linestring(self):
         """An open run of points becomes a LineString."""
         from earthlens.osm._helpers import _way_geometry
+
         from .conftest import FakeWay
 
         way = FakeWay(1, {}, [(0, 0), (1, 1), (2, 0)])
@@ -159,6 +162,7 @@ class TestWayGeometry:
     def test_too_few_points_is_none(self):
         """A way with one point yields no geometry."""
         from earthlens.osm._helpers import _way_geometry
+
         from .conftest import FakeWay
 
         assert _way_geometry(FakeWay(1, {}, [(0, 0)])) is None

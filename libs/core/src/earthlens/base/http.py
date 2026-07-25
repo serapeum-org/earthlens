@@ -29,7 +29,7 @@ import time
 from collections.abc import Callable
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlsplit
 
 import requests
@@ -186,6 +186,7 @@ def _default_user_agent() -> str:
         `"earthlens/unknown"` when the package metadata is unavailable).
     """
     from earthlens.core import __version__
+
     return f"earthlens/{__version__}"
 
 
@@ -200,19 +201,26 @@ class RequestsGet:
     or injects a fake `requests` module via `sys.modules` still drives the
     transport. One shared class instead of the shim re-declared verbatim in a
     dozen backends.
+
+    Each call fills in a default `timeout` (`DEFAULT_TIMEOUT`) when the caller
+    omits one, so a bare `RequestsGet().get(url)` cannot hang indefinitely; an
+    explicit `timeout=` (including the `None` that `HttpClient` passes for "no
+    timeout") is left untouched.
     """
 
     def get(self, url: str, **kwargs: Any) -> Any:
         """Issue a `GET` via the current `requests.get`."""
         import requests
 
-        return requests.get(url, **kwargs)
+        kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
+        return requests.get(url, **kwargs)  # nosec B113 - default timeout applied above
 
     def post(self, url: str, **kwargs: Any) -> Any:
         """Issue a `POST` via the current `requests.post`."""
         import requests
 
-        return requests.post(url, **kwargs)
+        kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
+        return requests.post(url, **kwargs)  # nosec B113 - default timeout applied above
 
 
 class HttpClient:
@@ -729,5 +737,5 @@ class HttpClient:
         """
         verb = getattr(self._session, method.lower(), None)
         if callable(verb):
-            return verb(url, **kwargs)
+            return cast("requests.Response", verb(url, **kwargs))
         return self._session.request(method, url, **kwargs)

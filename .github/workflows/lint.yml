@@ -1,0 +1,134 @@
+name: Lint
+
+# The static gate that the test matrix (tests.yml) does not provide. tests.yml runs
+# pytest across the member/Python matrix, but nothing in CI runs the pre-commit hooks,
+# mypy, or the src doctests — so a formatting slip, a ruff violation, a leaked secret, a
+# type error, or a rotted `>>>` example could reach main unnoticed. This workflow closes
+# that gap. It stays out of tests.yml so a slow test leg never blocks the sub-two-minute
+# lint feedback, and vice versa.
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Fast, environment-free hooks: ruff (lint + format), the file/format/security checks,
+  # beautysh, shellcheck, nbstripout. Formatting and linting are identical on every OS
+  # and Python version, so this runs ONCE (no matrix) on a plain runner in ~1-2 min.
+  #
+  # SKIP drops the hooks that need the uv dev env: pytest-check and notebook-check are
+  # already the tests.yml matrix's job (running them here would duplicate it and pin to
+  # one Python), while mypy and doctest run in the `static` job below. no-commit-to-branch
+  # is a local commit guard that would misfire in CI, which legitimately runs on main.
+  #
+  # uv-lock-check is deliberately out of scope here: tests.yml already gates lock freshness
+  # via the python-setup/uv action's `verify-lock: true`, so re-checking it would duplicate.
+  pre-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # No fetch-depth: `pre-commit run --all-files` scans the working tree, not history.
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Cache the hook toolchains (each hook repo builds an isolated env on first run).
+      # Keyed on the config so a hook or rev bump rebuilds; restore-keys reuse the rest.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: pre-commit-
+
+      # Pin the resolved version (reproducible CI, and satisfies the supply-chain
+      # "lock resolved versions" check); bump deliberately or via dependabot.
+      - run: python -m pip install pre-commit==4.5.1
+
+      - name: Run pre-commit hooks
+        # --show-diff-on-failure prints exactly what the auto-fixers (ruff-format,
+        # end-of-file-fixer, ...) would change, so a contributor sees the fix to apply.
+        # gitleaks is skipped here: its hook scans only staged changes (empty after a CI
+        # checkout), so it is inert in --all-files; the dedicated `gitleaks` job below
+        # scans the whole tree and is the real CI secret gate.
+        run: pre-commit run --all-files --show-diff-on-failure --color=always
+        env:
+          SKIP: no-commit-to-branch,gitleaks,mypy,pytest-check,doctest,notebook-check,uv-lock-check
+
+  # Type check and doctests. Both need the full dev env (typed deps and an importable
+  # package) but neither is platform- or Python-version-sensitive, so one runner covers
+  # them. Neither runs anywhere else in CI today.
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
+        with:
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          version: "0.11.29"
+
+      - name: Type check with mypy
+        run: uv run mypy
+
+      - name: Doctests (src)
+        # The same check as the `doctest` pre-commit hook: run the shipped `>>>` examples
+        # in the six workspace src roots. MPLBACKEND=Agg forces the headless matplotlib
+        # backend so no example opens a GUI window; -p no:cacheprovider disables the cache.
+        env:
+          MPLBACKEND: Agg
+        run: >
+          uv run pytest --doctest-modules
+          libs/core/src
+          libs/providers/atmosphere/src
+          libs/providers/ocean/src
+          libs/providers/imagery/src
+          libs/providers/land/src
+          libs/providers/hazards/src
+          -p no:cacheprovider
+
+  # The repo's secret gate. gitleaks is the single secret scanner (it replaced
+  # detect-secrets). The pre-commit hook only scans staged changes, which are empty in
+  # CI, so this job scans the whole working tree — every tracked file, notebooks
+  # included — with gitleaks' default ruleset.
+  gitleaks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # persist-credentials: false — `gitleaks dir .` scans the .git directory, and
+      # actions/checkout otherwise writes the runner's auth token into .git/config
+      # (an `AUTHORIZATION: basic …` header), which gitleaks would flag as a leak.
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Scan for secrets (gitleaks)
+        # Pinned binary + SHA256 verification (avoids the gitleaks-action org-license
+        # requirement). `gitleaks dir` exits non-zero on a leak, which fails the job.
+        run: |
+          VER=8.30.0
+          SHA=79a3ab579b53f71efd634f3aaf7e04a0fa0cf206b7ed434638d1547a2470a66e
+          curl -sSL --proto '=https' --proto-redir '=https' -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz"
+          echo "${SHA}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          # Scan only the committed tree (via git archive). `gitleaks dir .` also walks
+          # the .git directory, whose shallow-checkout packs / config carry CI-internal
+          # material that trips gitleaks; the tracked tree itself is clean.
+          rm -rf _gitleaks_scan && mkdir _gitleaks_scan
+          git archive HEAD | tar -x -C _gitleaks_scan
+          ./gitleaks dir _gitleaks_scan --redact --no-banner

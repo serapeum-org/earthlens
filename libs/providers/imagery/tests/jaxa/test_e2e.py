@@ -101,6 +101,7 @@ def test_gportal_sftp_download_lives(tmp_path: Path) -> None:
     """
     pytest.importorskip("gportal")
     from earthlens.core import EarthLens
+
     lens = EarthLens(
         data_source="jaxa",
         variables=["sgli-l3-nwlr"],
@@ -134,14 +135,14 @@ def test_ptree_ftp_download_lives(tmp_path: Path) -> None:
     selection).
     """
     if not (
-        os.environ.get("JAXA_PTREE_USERNAME")
-        and os.environ.get("JAXA_PTREE_PASSWORD")
+        os.environ.get("JAXA_PTREE_USERNAME") and os.environ.get("JAXA_PTREE_PASSWORD")
     ):
         pytest.skip("needs $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD")
     import datetime as dt
     import re
 
     from earthlens.core import EarthLens
+
     # 3 days back at 12:00 UTC: safely inside the 30-day retention
     # boundary in either direction and well past upload latency (near-
     # real-time slots can lag by 10-15 min). Yesterday 00:00 UTC was
@@ -166,12 +167,8 @@ def test_ptree_ftp_download_lives(tmp_path: Path) -> None:
     assert len(written) == 10, f"expected 10 segments, got {len(written)}"
     assert all(p.exists() for p in written)
     assert all(p.stat().st_size > 0 for p in written)
-    pattern = re.compile(
-        r"^HS_H\d\d_\d{8}_\d{4}_B13_FLDK_R20_S\d{2}10\.DAT\.bz2$"
-    )
+    pattern = re.compile(r"^HS_H\d\d_\d{8}_\d{4}_B13_FLDK_R20_S\d{2}10\.DAT\.bz2$")
     for path in written:
         assert pattern.match(path.name), f"unexpected filename: {path.name}"
     segments = sorted(int(p.name.split("_S")[-1][:2]) for p in written)
-    assert segments == list(range(1, 11)), (
-        f"expected segments 1..10, got {segments}"
-    )
+    assert segments == list(range(1, 11)), f"expected segments 1..10, got {segments}"

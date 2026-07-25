@@ -144,11 +144,13 @@ class TestFetchAndDownload:
 
     def test_retries_on_502_then_succeeds(self, tmp_path, fake_wdpa):
         """A 502 is retried; once a 200 arrives the download completes."""
-        fake_wdpa.state.set_responses([
-            fake_wdpa.response({}, status_code=502),
-            fake_wdpa.response({}, status_code=502),
-            fake_wdpa.response({"protected_areas": [fake_wdpa.area()]}),
-        ])
+        fake_wdpa.state.set_responses(
+            [
+                fake_wdpa.response({}, status_code=502),
+                fake_wdpa.response({}, status_code=502),
+                fake_wdpa.response({"protected_areas": [fake_wdpa.area()]}),
+            ]
+        )
         fc = _backend(tmp_path).download()
         assert len(fc) == 1
         assert len(fake_wdpa.state.calls) == 3
@@ -156,19 +158,23 @@ class TestFetchAndDownload:
 
     def test_retries_on_429_honours_retry_after(self, tmp_path, fake_wdpa):
         """A 429 with `Retry-After` sleeps for that many seconds, then retries."""
-        fake_wdpa.state.set_responses([
-            fake_wdpa.response({}, status_code=429, headers={"Retry-After": "7"}),
-            fake_wdpa.response({"protected_areas": []}),
-        ])
+        fake_wdpa.state.set_responses(
+            [
+                fake_wdpa.response({}, status_code=429, headers={"Retry-After": "7"}),
+                fake_wdpa.response({"protected_areas": []}),
+            ]
+        )
         _backend(tmp_path).download()
         assert fake_wdpa.sleeps == [7.0]
 
     def test_retries_on_connection_error(self, tmp_path, fake_wdpa):
         """A transport-layer ConnectionError is retried and recovers on success."""
-        fake_wdpa.state.set_responses([
-            fake_wdpa.ConnectionError("network glitch"),
-            fake_wdpa.response({"protected_areas": [fake_wdpa.area()]}),
-        ])
+        fake_wdpa.state.set_responses(
+            [
+                fake_wdpa.ConnectionError("network glitch"),
+                fake_wdpa.response({"protected_areas": [fake_wdpa.area()]}),
+            ]
+        )
         fc = _backend(tmp_path).download()
         assert len(fc) == 1
         assert len(fake_wdpa.sleeps) == 1
@@ -204,19 +210,13 @@ class TestFetchAndDownload:
 
     def test_warn_license_suppressed_on_empty(self, tmp_path, fake_wdpa, recwarn):
         """An empty country result does not emit the LicenseWarning."""
-        fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": []})]
-        )
+        fake_wdpa.state.set_responses([fake_wdpa.response({"protected_areas": []})])
         _backend(tmp_path).download()
-        assert not [
-            w for w in recwarn.list if issubclass(w.category, LicenseWarning)
-        ]
+        assert not [w for w in recwarn.list if issubclass(w.category, LicenseWarning)]
 
     def test_persistent_5xx_exhausts_retries_then_raises(self, tmp_path, fake_wdpa):
         """When every retry returns 5xx, _get raises a token-free RuntimeError."""
-        fake_wdpa.state.set_responses(
-            [fake_wdpa.response({}, status_code=503)] * 10
-        )
+        fake_wdpa.state.set_responses([fake_wdpa.response({}, status_code=503)] * 10)
         with pytest.raises(RuntimeError, match="503") as exc:
             _backend(tmp_path).download()
         assert "SECRET-TOKEN-HERE" not in str(exc.value)
@@ -224,19 +224,21 @@ class TestFetchAndDownload:
 
     def test_persistent_connection_error_exhausts_retries(self, tmp_path, fake_wdpa):
         """Persistent transport errors raise a token-free RuntimeError after retries."""
-        fake_wdpa.state.set_responses(
-            [fake_wdpa.ConnectionError("down")] * 10
-        )
+        fake_wdpa.state.set_responses([fake_wdpa.ConnectionError("down")] * 10)
         with pytest.raises(RuntimeError, match="redacted") as exc:
             _backend(tmp_path).download()
         assert "SECRET-TOKEN-HERE" not in str(exc.value)
 
     def test_retry_after_malformed_falls_back_to_backoff(self, tmp_path, fake_wdpa):
         """A 429 with an unparseable Retry-After uses the exponential back-off."""
-        fake_wdpa.state.set_responses([
-            fake_wdpa.response({}, status_code=429, headers={"Retry-After": "soon"}),
-            fake_wdpa.response({"protected_areas": []}),
-        ])
+        fake_wdpa.state.set_responses(
+            [
+                fake_wdpa.response(
+                    {}, status_code=429, headers={"Retry-After": "soon"}
+                ),
+                fake_wdpa.response({"protected_areas": []}),
+            ]
+        )
         _backend(tmp_path).download()
         # No usable Retry-After -> sleep = BACKOFF_FACTOR * 2**0 = 1.0
         assert fake_wdpa.sleeps == [1.0]
@@ -266,12 +268,16 @@ class TestFetchAndDownload:
         upstream uses it, but we honour it if they ever do — a future
         server-side change should not silently fall back to back-off.
         """
-        fake_wdpa.state.set_responses([
-            fake_wdpa.response(
-                {}, status_code=429, headers={"Retry-After": "Fri, 31 Dec 2099 23:59:59 GMT"}
-            ),
-            fake_wdpa.response({"protected_areas": []}),
-        ])
+        fake_wdpa.state.set_responses(
+            [
+                fake_wdpa.response(
+                    {},
+                    status_code=429,
+                    headers={"Retry-After": "Fri, 31 Dec 2099 23:59:59 GMT"},
+                ),
+                fake_wdpa.response({"protected_areas": []}),
+            ]
+        )
         _backend(tmp_path).download()
         # The wait is the delta until 2099 — many years of seconds.
         assert len(fake_wdpa.sleeps) == 1

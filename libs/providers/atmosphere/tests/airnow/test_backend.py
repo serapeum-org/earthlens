@@ -9,6 +9,7 @@ import pytest
 
 from earthlens.airnow import AirNow
 from earthlens.airnow.auth import AuthenticationError
+
 from .conftest import _FakeAirnow, _FakeSession, _observation
 
 
@@ -60,7 +61,11 @@ class TestRequestShaping:
         """A non-midnight (hour-aware fmt) end passes through as the inclusive end hour."""
         state = _FakeAirnow()
         _backend(
-            state, tmp_path, start="2026-01-01T06", end="2026-01-01T15", fmt="%Y-%m-%dT%H"
+            state,
+            tmp_path,
+            start="2026-01-01T06",
+            end="2026-01-01T15",
+            fmt="%Y-%m-%dT%H",
         ).download(progress_bar=False)
         assert state.calls[0]["startDate"] == "2026-01-01T06"
         assert state.calls[0]["endDate"] == "2026-01-01T15"
@@ -71,7 +76,9 @@ class TestRequestShaping:
         _backend(off, tmp_path).download(progress_bar=False)
         assert off.calls[0]["includerawconcentrations"] == 0
         on = _FakeAirnow()
-        _backend(on, tmp_path, include_raw_concentrations=True).download(progress_bar=False)
+        _backend(on, tmp_path, include_raw_concentrations=True).download(
+            progress_bar=False
+        )
         assert on.calls[0]["includerawconcentrations"] == 1
 
 
@@ -148,8 +155,18 @@ class TestOutputFrame:
         state = _FakeAirnow(rows=[_observation()])
         df = _backend(state, tmp_path).download(progress_bar=False)
         assert list(df.columns) == [
-            "station_id", "parameter", "datetime_utc", "value", "raw_value",
-            "units", "aqi", "category", "lat", "lon", "site_name", "provider",
+            "station_id",
+            "parameter",
+            "datetime_utc",
+            "value",
+            "raw_value",
+            "units",
+            "aqi",
+            "category",
+            "lat",
+            "lon",
+            "site_name",
+            "provider",
         ]
         assert str(df["datetime_utc"].dtype) == "datetime64[ns, UTC]"
         assert df.loc[0, "value"] == 12.3

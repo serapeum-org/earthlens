@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 from loguru import logger
+from pydantic import SecretStr
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base import (
@@ -169,7 +170,13 @@ class WDPA(AbstractDataSource):
         Raises:
             AuthenticationError: When no `WDPA_TOKEN` / `token=` is set.
         """
-        self._auth = WdpaAuth(WdpaCredentials(token=self._token_arg))
+        self._auth = WdpaAuth(
+            WdpaCredentials(
+                token=SecretStr(self._token_arg)
+                if self._token_arg is not None
+                else None
+            )
+        )
         self._auth.configure()
         return None
 
@@ -215,7 +222,7 @@ class WDPA(AbstractDataSource):
             dates=pd.DatetimeIndex([start_dt, end_dt]),
         )
 
-    def _fetch(self):
+    def _fetch(self):  # type: ignore[override]
         """Fetch every selector's protected areas as one GeoDataFrame.
 
         Routes each `variables` entry to the country or by-id v4 fetch,
@@ -224,6 +231,7 @@ class WDPA(AbstractDataSource):
         Returns:
             gpd.GeoDataFrame: The protected-area polygons, CRS `EPSG:4326`.
         """
+        assert self._auth is not None  # set by _initialize before _fetch runs
         token = self._auth.token
         frames = [self._fetch_one(token, selector) for selector in self.vars]
         non_empty = [frame for frame in frames if len(frame)]
@@ -234,7 +242,7 @@ class WDPA(AbstractDataSource):
         merged = pd.concat(non_empty, ignore_index=True)
         return gpd.GeoDataFrame(merged, geometry="geometry", crs=_rest.CRS)
 
-    def _fetch_one(self, token: str, selector: str):
+    def _fetch_one(self, token: str, selector: str):  # type: ignore[override]
         """Fetch one selector (country or WDPA id).
 
         A numeric selector is a WDPA id; anything else is resolved to an

@@ -73,9 +73,9 @@ class TestFacadeAggregateRejection:
         facade = _facade(tmp_path)
         with pytest.raises(NotImplementedError) as exc:
             facade.download(aggregate=AggregationConfig(freq="1MS", op="mean"))
-        assert "tabular" in str(
-            exc.value
-        ), f"rejection message should mention 'tabular', got: {exc.value}"
+        assert "tabular" in str(exc.value), (
+            f"rejection message should mention 'tabular', got: {exc.value}"
+        )
 
     def test_aggregate_none_reaches_backend(
         self, tmp_path: Path, fake_openaq: _FakeOpenaq

@@ -49,23 +49,22 @@ class TestAbstractDataSourceOutputKindDefault:
     def test_existing_backends_inherit_raster(self, backend_cls):
         """CHIRPS / ECMWF inherit the raster default unchanged (C1 back-compat)."""
         assert backend_cls.OUTPUT_KIND == "raster", (
-            f"{backend_cls.__name__} drifted from raster: "
-            f"{backend_cls.OUTPUT_KIND!r}"
+            f"{backend_cls.__name__} drifted from raster: {backend_cls.OUTPUT_KIND!r}"
         )
 
     def test_s3_backend_is_mixed(self):
         """The S3 backend is multi-dataset (NetCDF + COG), so it declares mixed."""
-        assert (
-            S3.OUTPUT_KIND == "mixed"
-        ), f"S3 should be mixed (multi-dataset), got {S3.OUTPUT_KIND!r}"
+        assert S3.OUTPUT_KIND == "mixed", (
+            f"S3 should be mixed (multi-dataset), got {S3.OUTPUT_KIND!r}"
+        )
 
     def test_gee_backend_inherits_raster(self):
         """GEE backend inherits raster (separate test — it may be installed conditionally)."""
         from earthlens.gee import GEE
 
-        assert (
-            GEE.OUTPUT_KIND == "raster"
-        ), f"GEE drifted from raster: {GEE.OUTPUT_KIND!r}"
+        assert GEE.OUTPUT_KIND == "raster", (
+            f"GEE drifted from raster: {GEE.OUTPUT_KIND!r}"
+        )
 
 
 @pytest.mark.unit
@@ -91,9 +90,9 @@ class TestEarthLensAggregateGuard:
         cfg = object()
         facade.download(progress_bar=False, aggregate=cfg)
         _, kwargs = fake_backend.download.call_args
-        assert (
-            kwargs.get("aggregate") is cfg
-        ), f"aggregate not forwarded for OUTPUT_KIND={kind!r}: kwargs={kwargs!r}"
+        assert kwargs.get("aggregate") is cfg, (
+            f"aggregate not forwarded for OUTPUT_KIND={kind!r}: kwargs={kwargs!r}"
+        )
 
     @pytest.mark.parametrize("kind", ["vector", "tabular"])
     def test_aggregate_rejected_for_disallowed_kinds(self, facade, fake_backend, kind):
@@ -109,9 +108,9 @@ class TestEarthLensAggregateGuard:
         fake_backend.OUTPUT_KIND = "vector"
         facade.download(progress_bar=False)
         _, kwargs = fake_backend.download.call_args
-        assert (
-            "aggregate" not in kwargs
-        ), f"aggregate should be omitted when None: kwargs={kwargs!r}"
+        assert "aggregate" not in kwargs, (
+            f"aggregate should be omitted when None: kwargs={kwargs!r}"
+        )
 
     def test_missing_output_kind_attr_defaults_to_raster(self, facade, fake_backend):
         """A backend with no `OUTPUT_KIND` attribute is treated as raster (back-compat)."""

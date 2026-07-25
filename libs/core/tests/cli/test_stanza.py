@@ -444,14 +444,11 @@ class TestGeeLiveBands:
         monkeypatch.setitem(sys.modules, "ee", fake_ee)
 
         class FakeAuth:
-            def __init__(self, creds):
-                pass
-
-            def configure(self):
+            @staticmethod
+            def initialize(service_account, service_key, project=None):
                 pass
 
         monkeypatch.setattr(auth_mod, "EarthEngineAuth", FakeAuth)
-        monkeypatch.setattr(auth_mod, "EarthEngineCredentials", lambda: None)
         ee_type, bands = stanza_mod._gee_live_bands("projects/x/y")
         assert ee_type == "image_collection", "asset type lowercased"
         assert sorted(bands) == ["B1", "B2"], "live band names read"
@@ -462,7 +459,9 @@ class TestBiodiversityEmitters:
 
     def test_gbif_seeds_taxon_row(self):
         """`emit_stanza` for gbif seeds taxon_key + title + rank from args."""
-        result = emit_stanza(_info("gbif"), "212", key="birds", title="Aves", rank="class")
+        result = emit_stanza(
+            _info("gbif"), "212", key="birds", title="Aves", rank="class"
+        )
         assert result.status == "ok", f"emit ran: {result.detail}"
         assert result.row == {"taxon_key": 212, "title": "Aves", "rank": "class"}
 
@@ -476,13 +475,17 @@ class TestBiodiversityEmitters:
 
     def test_wdpa_seeds_country_row(self):
         """`emit_stanza` for wdpa seeds name + region from args."""
-        result = emit_stanza(_info("wdpa"), "KEN", key="KEN", name="Kenya", region="Africa")
+        result = emit_stanza(
+            _info("wdpa"), "KEN", key="KEN", name="Kenya", region="Africa"
+        )
         assert result.status == "ok", f"emit ran: {result.detail}"
         assert result.row == {"name": "Kenya", "region": "Africa"}
 
     def test_iucn_seeds_country_row(self):
         """`emit_stanza` for iucn seeds name + region from args."""
-        result = emit_stanza(_info("iucn"), "KE", key="KE", name="Kenya", region="Africa")
+        result = emit_stanza(
+            _info("iucn"), "KE", key="KE", name="Kenya", region="Africa"
+        )
         assert result.status == "ok", f"emit ran: {result.detail}"
         assert result.row == {"name": "Kenya", "region": "Africa"}
 

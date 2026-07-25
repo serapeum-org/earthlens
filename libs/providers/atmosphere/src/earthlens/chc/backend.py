@@ -55,9 +55,8 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
-from earthlens.chc.catalog import Catalog
+from earthlens.chc.catalog import Catalog, Variable
 from earthlens.chc.catalog import Dataset as ChcDataset
-from earthlens.chc.catalog import Variable
 
 __all__ = ["CHIRPS"]
 
@@ -100,7 +99,7 @@ def _close_ftp_quietly(ftp: FTP) -> None:
     except Exception:  # noqa: BLE001 - best-effort cleanup, never raises
         try:
             ftp.close()
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001  # nosec B110
             pass
 
 
@@ -467,6 +466,7 @@ class CHIRPS(AbstractDataSource):
         failed: list[tuple[tuple[str, str], BaseException]] = []
         out_paths: list[Path] = []
 
+        assert isinstance(self.vars, dict)  # CHC normalises variables to a mapping
         for ds_key, var_names in self.vars.items():
             dataset = self._catalog.datasets[ds_key]
             for var_name in var_names:
@@ -486,9 +486,7 @@ class CHIRPS(AbstractDataSource):
                             cores=cores,
                         )
                     )
-                except (
-                    Exception
-                ) as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
+                except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
                     logger.error(
                         f"CHIRPS download for {ds_key}/{var_name} failed: "
                         f"{type(exc).__name__}: {exc}"
@@ -513,7 +511,7 @@ class CHIRPS(AbstractDataSource):
 
         return out_paths
 
-    def _download_dataset(
+    def _download_dataset(  # type: ignore[override]
         self,
         ds_key: str,
         dataset: ChcDataset,
@@ -657,6 +655,7 @@ class CHIRPS(AbstractDataSource):
         """
         fmt_key = dataset.default_format
         ftp_base = dataset.ftp_bases[fmt_key]
+        assert dataset.discrete_files is not None  # discrete-file datasets set this
         filenames = dataset.discrete_files[fmt_key]
         is_2d_raster = fmt_key in {"tif", "cog", "bil"}
         iterable = tqdm(filenames, desc=f"CHC {ds_key}", disable=not progress_bar)
@@ -718,6 +717,7 @@ class CHIRPS(AbstractDataSource):
         """
         fmt_key = dataset.default_format
         ftp_base = dataset.ftp_bases[fmt_key]
+        assert dataset.file_patterns is not None  # pattern datasets set this
         pattern = dataset.file_patterns[fmt_key]
 
         try:
@@ -743,9 +743,7 @@ class CHIRPS(AbstractDataSource):
         local_compressed = self.root_dir / remote_filename
         try:
             self._fetch_ftp(remote_dir, remote_filename, local_compressed, ftp=ftp)
-        except (
-            Exception
-        ):  # noqa: BLE001 - clean up the partial download on any FTP-stack failure, then re-raise unchanged
+        except Exception:  # noqa: BLE001 - clean up the partial download on any FTP-stack failure, then re-raise unchanged
             if local_compressed.exists():
                 try:
                     local_compressed.unlink()
@@ -944,7 +942,10 @@ class CHIRPS(AbstractDataSource):
         # no mask is involved, so nothing depends on the sentinel being
         # declared up front. Snap the bbox out to the granule's cell edges so
         # `touch=False` keeps every partially-covered edge cell (see H1).
-        bbox = _snap_bbox_outward(tuple(request_bbox), raster.geotransform)
+        bbox = _snap_bbox_outward(
+            (request_bbox[0], request_bbox[1], request_bbox[2], request_bbox[3]),
+            raster.geotransform,
+        )
         cropped = crop_to_aoi(raster, self.space, bbox=bbox, touch=False)
         window = cropped.read_array()
         window = np.where(window < 0, nodata_sentinel, window).astype(
@@ -1021,9 +1022,7 @@ class CHIRPS(AbstractDataSource):
         }:
             date_str = f"{date.year}.{date.month:02d}"
         elif granularity == "6-hourly":
-            date_str = (
-                f"{date.year}.{date.month:02d}.{date.day:02d}." f"{date.hour:02d}"
-            )
+            date_str = f"{date.year}.{date.month:02d}.{date.day:02d}.{date.hour:02d}"
         else:
             date_str = f"{date.year}.{date.month:02d}.{date.day:02d}"
         return f"{ds_key}_{var.name}_{date_str}.tif"

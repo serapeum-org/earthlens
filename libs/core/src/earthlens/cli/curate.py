@@ -21,7 +21,7 @@ import os
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, cast
 
 import requests
 
@@ -219,7 +219,7 @@ def _openeo_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
                     "unit": band.get("unit"),
                 }
     else:
-        band_names = next(
+        band_names: list[Any] = next(
             (
                 dim.get("values", [])
                 for dim in dimensions.values()
@@ -921,7 +921,9 @@ def _nwp_idx_url(models_dir: Any, model: Any, cycle: Any, step: int) -> str:
     if not getattr(model, "product", "") and getattr(stub, "PRODUCTS", None):
         stub = _TemplateStub(cycle, step, list(stub.PRODUCTS)[0])
         template_cls.template(stub)
-    sources = stub.SOURCES
+    # The executed Herbie template assigns `stub.SOURCES` a dict at runtime;
+    # the stub's `__getattr__` only advertises a `str` return to the type checker.
+    sources = cast("dict[str, str]", stub.SOURCES)
     base = sources.get("aws") or sources.get("nomads") or next(iter(sources.values()))
     return base + ".idx"
 
@@ -943,7 +945,7 @@ def _nwp_idx_body(model: Any) -> str:
         url = _nwp_idx_url(models_dir, model, cycle, step)
         try:
             response = requests.get(url, timeout=_TIMEOUT)
-        except Exception:  # noqa: BLE001 — try the previous day
+        except Exception:  # noqa: BLE001 — try the previous day  # nosec B112
             continue
         if response.status_code == 200:
             return response.text
@@ -1264,7 +1266,7 @@ def _nwp_availability(model: Any, cycle: Any, step: int) -> str:
     in `_NWP_PROBES`.
     """
     backend = getattr(model, "backend", None)
-    probe = _NWP_PROBES.get(backend)
+    probe = _NWP_PROBES.get(backend) if backend is not None else None
     return (
         probe(model, cycle, step)
         if probe is not None

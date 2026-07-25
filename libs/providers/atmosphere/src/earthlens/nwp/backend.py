@@ -29,7 +29,6 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
@@ -383,8 +382,7 @@ class NWP(AbstractDataSource):
             unknown = [m for m in self._members_arg if m not in model.members]
             if unknown:
                 raise ValueError(
-                    f"members {unknown} are not in the model's members "
-                    f"{model.members}."
+                    f"members {unknown} are not in the model's members {model.members}."
                 )
             return list(self._members_arg)
         return [model.members[0]]
@@ -504,7 +502,9 @@ class NWP(AbstractDataSource):
                     )
         return out
 
-    def _fetch_one(self, product: RemoteProduct, bbox, open_grib, write_cog) -> Path:
+    def _fetch_one(  # type: ignore[override]
+        self, product: RemoteProduct, bbox, open_grib, write_cog
+    ) -> Path:
         """Fetch + crop + write the COG for one product (no error handling).
 
         Args:

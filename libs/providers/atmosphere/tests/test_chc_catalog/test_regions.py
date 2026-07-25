@@ -78,9 +78,9 @@ class TestRegionAuthoritative:
         offenders: list[tuple[str, str, list, list, list, list]] = []
         for key, ds in bundled_catalog.datasets.items():
             region_def = bundled_catalog.available_regions.get(ds.region)
-            assert (
-                region_def is not None
-            ), f"{key}: region {ds.region!r} is missing from available_regions"
+            assert region_def is not None, (
+                f"{key}: region {ds.region!r} is missing from available_regions"
+            )
             expected_lat = [float(v) for v in region_def["lat_boundaries"]]
             expected_lon = [float(v) for v in region_def["lon_boundaries"]]
             if ds.lat_boundaries != expected_lat or ds.lon_boundaries != expected_lon:

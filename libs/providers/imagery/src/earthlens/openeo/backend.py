@@ -25,9 +25,10 @@ the CDSE federation or openEO Platform.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -130,8 +131,12 @@ class OpenEO(AbstractDataSource):
         env_creds = OpeneoCredentials.from_env()
         self._credentials = OpeneoCredentials(
             client_id=client_id or env_creds.client_id,
-            client_secret=client_secret or env_creds.client_secret,
-            refresh_token=refresh_token or env_creds.refresh_token,
+            client_secret=(
+                SecretStr(client_secret) if client_secret else env_creds.client_secret
+            ),
+            refresh_token=(
+                SecretStr(refresh_token) if refresh_token else env_creds.refresh_token
+            ),
             provider_id=provider_id or env_creds.provider_id,
         )
         # Stored before super().__init__ because the base constructor calls
@@ -226,8 +231,6 @@ class OpenEO(AbstractDataSource):
                 `strptime`.
         """
         import datetime as dt
-
-        import pandas as pd
 
         if start is None or end is None:
             raise ValueError(
@@ -344,6 +347,7 @@ class OpenEO(AbstractDataSource):
         Returns:
             The written file paths, one per product (request key order).
         """
+        assert self._auth is not None  # set in _initialize before any download
         conn = self._auth.connection()
         out: list[Path] = []
         for product in products:
@@ -463,7 +467,7 @@ def _exclusive_end(end_date: Any) -> str:
     """
     import datetime as dt
 
-    return (end_date + dt.timedelta(days=1)).strftime("%Y-%m-%d")
+    return cast("str", (end_date + dt.timedelta(days=1)).strftime("%Y-%m-%d"))
 
 
 def _safe_name(key: str) -> str:

@@ -20,7 +20,7 @@ from __future__ import annotations
 import io
 import time
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 import requests
@@ -137,9 +137,7 @@ class SensorCommunityClient:
         payload = self._http.get_json(LIVE_URL)
         return payload if isinstance(payload, list) else []
 
-    def archive_csv(
-        self, date: str, sensor_type: str, sensor_id: str
-    ) -> str | None:
+    def archive_csv(self, date: str, sensor_type: str, sensor_id: str) -> str | None:
         """Fetch one per-sensor daily archive CSV, or `None` when absent.
 
         Args:
@@ -191,8 +189,8 @@ def sensors_in_bbox(
         if sensor_type not in wanted_types:
             continue
         try:
-            lat = float(location.get("latitude"))
-            lon = float(location.get("longitude"))
+            lat = float(cast("Any", location.get("latitude")))
+            lon = float(cast("Any", location.get("longitude")))
         except (TypeError, ValueError):
             continue
         if not (lat_min <= lat <= lat_max and lon_min <= lon <= lon_max):

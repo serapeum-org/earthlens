@@ -239,6 +239,8 @@ class OBIS(AbstractDataSource):
                 `size`).
         """
         if name is None:
+            # OBIS carries `variables` as a flat list of species selectors.
+            assert isinstance(self.vars, list)
             name = self._catalog.resolve_scientific_name(self.vars[0])
         return {
             "scientificname": name,
@@ -248,7 +250,7 @@ class OBIS(AbstractDataSource):
             "size": self._size,
         }
 
-    def _fetch(self) -> FeatureCollection:
+    def _fetch(self) -> FeatureCollection:  # type: ignore[override]
         """Search every requested species and map the rows to a FeatureCollection.
 
         Imports `pyobis` lazily (so the package imports without the
@@ -271,7 +273,9 @@ class OBIS(AbstractDataSource):
             frames.append(frame)
             if "license" in frame.columns:
                 licenses.update(frame["license"].dropna())
-        combined = pd.concat(frames, ignore_index=True) if len(frames) > 1 else frames[0]
+        combined = (
+            pd.concat(frames, ignore_index=True) if len(frames) > 1 else frames[0]
+        )
         collection = occurrences_to_fc(
             combined,
             lat_field="decimalLatitude",

@@ -67,9 +67,9 @@ class TestFacadeAggregateRejection:
         facade = _make_facade(tmp_path)
         with pytest.raises(NotImplementedError) as exc:
             facade.download(aggregate=object())
-        assert "aggregate= is not supported" in str(
-            exc.value
-        ), f"rejection message should name the guard, got: {exc.value}"
+        assert "aggregate= is not supported" in str(exc.value), (
+            f"rejection message should name the guard, got: {exc.value}"
+        )
 
     def test_aggregate_none_is_allowed(self, tmp_path: Path, fake_tropycal: _FakeState):
         """`aggregate=None` is fine and a normal download runs."""

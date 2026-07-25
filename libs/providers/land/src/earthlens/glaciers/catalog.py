@@ -25,7 +25,7 @@ monkey-patch it at a temporary directory or a single YAML file.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -43,9 +43,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: per-source file invalidates the entry without re-parsing on an unchanged
 #: tree. The value is the `(datasets, regions, available)` triple the fields are
 #: built from.
-_CATALOG_CACHE: dict[
-    Any, tuple[dict[str, "Dataset"], dict[str, "Region"], list[str]]
-] = {}
+_CATALOG_CACHE: dict[Any, tuple[dict[str, Dataset], dict[str, Region], list[str]]] = {}
 
 #: The three glacier sources a :class:`Dataset` row can name.
 Source = Literal["rgi", "glims", "wgms"]
@@ -147,8 +145,7 @@ def _load_catalog_data(
         for region_id, body in (data.get("regions") or {}).items():
             if region_id in regions_yaml:
                 raise ValueError(
-                    f"region {region_id!r} declared twice in the catalog "
-                    f"({file_path})."
+                    f"region {region_id!r} declared twice in the catalog ({file_path})."
                 )
             regions_yaml[region_id] = body
 
@@ -165,8 +162,7 @@ def _load_catalog_data(
             datasets[dataset_id] = Dataset(id=dataset_id, **dict(body or {}))
         except ValidationError as exc:
             raise ValueError(
-                f"{origin[dataset_id]} dataset {dataset_id!r} failed "
-                f"validation:\n{exc}"
+                f"{origin[dataset_id]} dataset {dataset_id!r} failed validation:\n{exc}"
             ) from exc
         if available and dataset_id not in available:
             raise ValueError(
@@ -437,7 +433,7 @@ class Catalog(AbstractCatalog):
                 the catalog kind and, when a close match exists, adds a
                 did-you-mean hint.
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))
 
     def available(self) -> list[str]:
         """Return the sorted list of shipped dataset ids.

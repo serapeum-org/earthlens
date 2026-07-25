@@ -22,7 +22,7 @@ incompatible).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
@@ -37,7 +37,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: Module-level cache of parsed catalog data, keyed on the resolved path plus a
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-provider file invalidates the entry without re-parsing an unchanged tree.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, "Dataset"]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
 
 #: The four administrative-boundary providers a catalog row may declare.
 Provider = Literal["geoboundaries", "cgaz", "tiger", "natural_earth"]
@@ -298,4 +298,4 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return self.get_dataset(dataset_id)
+        return cast("Dataset", self.get_dataset(dataset_id))

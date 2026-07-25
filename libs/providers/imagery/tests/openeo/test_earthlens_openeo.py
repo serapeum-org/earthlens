@@ -9,6 +9,7 @@ import pytest
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
 from earthlens.openeo import OpenEO
+
 from .conftest import FakeAuth, FakeConnection
 
 

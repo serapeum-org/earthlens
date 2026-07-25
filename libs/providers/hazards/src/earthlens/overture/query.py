@@ -110,7 +110,7 @@ def build_query(
     if where:
         predicate = f"({predicate}) AND ({where})"
     sql = (
-        f"SELECT {_projection(columns)} "
+        f"SELECT {_projection(columns)} "  # nosec B608 - `where=` is caller-owned SQL by design; runs in the caller's local DuckDB over public read-only S3, no privilege boundary
         f"FROM read_parquet('{path}', hive_partitioning=1) "
         f"WHERE {predicate}"
     )

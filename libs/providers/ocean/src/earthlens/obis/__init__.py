@@ -18,7 +18,7 @@ Examples:
 
 from __future__ import annotations
 
-from earthlens.obis.backend import OBIS_COLUMNS, OBIS
+from earthlens.obis.backend import OBIS, OBIS_COLUMNS
 from earthlens.obis.catalog import CATALOG_PATH, Catalog, Species
 
 __all__ = [

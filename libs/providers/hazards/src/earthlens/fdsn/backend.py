@@ -167,8 +167,7 @@ class FDSN(AbstractDataSource):
         self._earthscope_token: str | None = None
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         self._file_format: FileFormat = file_format
         if isinstance(variables, dict):
@@ -368,6 +367,7 @@ class FDSN(AbstractDataSource):
         from obspy.clients.fdsn.header import FDSNNoDataException
 
         from earthlens.core import __version__
+
         provider_key = product.id
         fdsn_id = product.metadata["fdsn_id"]
         needs_token = product.metadata.get("needs_token", False)
@@ -487,8 +487,7 @@ class FDSN(AbstractDataSource):
             )
         else:
             logger.warning(
-                "FDSN download summary: no events matched the request, "
-                "nothing written"
+                "FDSN download summary: no events matched the request, nothing written"
             )
         return combined
 

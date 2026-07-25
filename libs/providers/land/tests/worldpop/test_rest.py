@@ -14,6 +14,7 @@ from earthlens.worldpop.rest import (
     record_files,
     rest_records,
 )
+
 from .conftest import _FakeResponse, pop_records
 
 pytestmark = pytest.mark.worldpop

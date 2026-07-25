@@ -105,10 +105,16 @@ class OpeneoCredentials(BaseModel):
         Returns:
             The credentials object built from the environment.
         """
+        client_secret = os.environ.get("OPENEO_CLIENT_SECRET")
+        refresh_token = os.environ.get("OPENEO_REFRESH_TOKEN")
         return cls(
             client_id=os.environ.get("OPENEO_CLIENT_ID"),
-            client_secret=os.environ.get("OPENEO_CLIENT_SECRET"),
-            refresh_token=os.environ.get("OPENEO_REFRESH_TOKEN"),
+            client_secret=SecretStr(client_secret)
+            if client_secret is not None
+            else None,
+            refresh_token=SecretStr(refresh_token)
+            if refresh_token is not None
+            else None,
             provider_id=os.environ.get("OPENEO_PROVIDER_ID"),
         )
 

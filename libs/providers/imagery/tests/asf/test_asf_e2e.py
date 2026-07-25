@@ -29,10 +29,7 @@ from earthlens.asf import ASF  # noqa: E402
 
 _HAVE_CREDS = bool(
     os.environ.get("EARTHDATA_TOKEN")
-    or (
-        os.environ.get("EARTHDATA_USERNAME")
-        and os.environ.get("EARTHDATA_PASSWORD")
-    )
+    or (os.environ.get("EARTHDATA_USERNAME") and os.environ.get("EARTHDATA_PASSWORD"))
 )
 
 

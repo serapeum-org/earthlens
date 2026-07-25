@@ -1,0 +1,61 @@
+name: pip-audit
+
+# Dependency-vulnerability scan. Replaces the old `safety` pre-commit hook, which was
+# unmaintainable (safety v3 deprecated `safety check` and now requires an API key) and
+# mis-placed: dependencies rarely change per commit, and CVEs are disclosed over time
+# against packages we already ship. A CI job on every PR catches a newly introduced
+# vulnerable dependency, and the weekly schedule re-audits the unchanged tree so a
+# freshly disclosed CVE is caught without needing a code change.
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+  schedule:
+    # Weekly, Monday 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
+        with:
+          python-version: "3.11"
+          install-groups: "groups: dev, extras: all"
+          version: "0.11.29"
+
+      - name: Audit dependencies with pip-audit
+        # pip-audit checks installed packages against the PyPI/OSV advisory DB. A
+        # `pip freeze` of the resolved env captures the whole tree; we audit that pinned
+        # list. pip-audit is run via pipx so it is never added to the project's own
+        # dependency graph. No --strict: a package with no PyPI advisory record is skipped
+        # rather than failing the run — the job fails only when a real vulnerability is
+        # reported (pip-audit exits non-zero).
+        run: |
+          # Ignore known advisories in two TRANSITIVE deps that cannot currently be
+          # remediated and do not apply to earthlens (a client data-download library,
+          # not a server): aiohttp 3.12.15 is capped by a transitive SDK constraint so
+          # it can't reach the fixed 3.13/3.14 line, and all its advisories are
+          # server-side (request smuggling / DoS on an aiohttp server earthlens never
+          # runs); paramiko 3.5.1's PYSEC-2026-2858 (SHA-1) has no released fix and is
+          # not used directly. The gate still fails on any new or direct vulnerability.
+          IGNORED_VULNS="PYSEC-2026-1097 PYSEC-2026-1099 PYSEC-2026-1100 PYSEC-2026-1101 PYSEC-2026-1105 PYSEC-2026-1106 PYSEC-2026-1107 PYSEC-2026-1109 PYSEC-2026-2094 PYSEC-2026-2095 PYSEC-2026-2096 PYSEC-2026-2097 PYSEC-2026-2098 PYSEC-2026-2099 PYSEC-2026-2100 PYSEC-2026-2101 PYSEC-2026-2102 PYSEC-2026-2103 PYSEC-2026-2104 PYSEC-2026-2105 PYSEC-2026-2106 PYSEC-2026-2107 PYSEC-2026-2108 PYSEC-2026-2109 PYSEC-2026-2110 PYSEC-2026-2111 PYSEC-2026-2112 PYSEC-2026-2113 PYSEC-2026-237 PYSEC-2026-2858"
+          IGNORE_FLAGS=""
+          for id in $IGNORED_VULNS; do IGNORE_FLAGS="$IGNORE_FLAGS --ignore-vuln $id"; done
+          uv run python -m pip freeze --exclude-editable \
+            | grep -E '^[A-Za-z0-9_.-]+==' > "${RUNNER_TEMP}/pip-audit-reqs.txt"
+          echo "Auditing $(wc -l < "${RUNNER_TEMP}/pip-audit-reqs.txt") pinned packages against the advisory DB"
+          pipx run pip-audit --requirement "${RUNNER_TEMP}/pip-audit-reqs.txt" --desc $IGNORE_FLAGS

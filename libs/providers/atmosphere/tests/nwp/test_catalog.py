@@ -171,7 +171,9 @@ class TestNWPModel:
 
     def test_license_round_trips(self):
         """A populated `license` survives construction."""
-        assert NWPModel(provider="noaa-nodd", license="PD-US-GOV").license == "PD-US-GOV"
+        assert (
+            NWPModel(provider="noaa-nodd", license="PD-US-GOV").license == "PD-US-GOV"
+        )
 
 
 class TestBundledTitles:
@@ -201,7 +203,10 @@ class TestBundledTitles:
         from earthlens.cli.adapter import record_title
         from earthlens.nwp import Catalog
 
-        assert record_title(Catalog().datasets["gfs"]) == "NOAA GFS (Global Forecast System)"
+        assert (
+            record_title(Catalog().datasets["gfs"])
+            == "NOAA GFS (Global Forecast System)"
+        )
 
 
 class TestBundledLicenses:

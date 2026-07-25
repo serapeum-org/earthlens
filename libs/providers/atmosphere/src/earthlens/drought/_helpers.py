@@ -19,6 +19,7 @@ do **no** network / file I/O.
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -173,7 +174,7 @@ def _snap_monthly(date: dt.date) -> dt.date:
     return date.replace(day=1)
 
 
-_SNAPPERS = {
+_SNAPPERS: dict[str, Callable[..., dt.date]] = {
     "weekly": _snap_weekly,
     "10day": _snap_10day,
     "monthly": _snap_monthly,
@@ -245,8 +246,7 @@ def snap_to_cadence(
         snapper = _SNAPPERS[cadence]
     except KeyError as exc:
         raise ValueError(
-            f"unknown cadence {cadence!r}; expected one of "
-            f"{sorted(_SNAPPERS)}"
+            f"unknown cadence {cadence!r}; expected one of {sorted(_SNAPPERS)}"
         ) from exc
     if cadence == "weekly":
         snapped = {snapper(_to_date(d), today=today) for d in dates}

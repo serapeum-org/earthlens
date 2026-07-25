@@ -37,8 +37,8 @@ from earthlens.base.auth import AbstractAuth
 
 #: Environment variable the `dataretrieval` SDK reads for the PAT, and
 #: where a registered token can be obtained.
-_TOKEN_ENV_VAR = "API_USGS_PAT"
-_TOKEN_URL = "https://api.waterdata.usgs.gov/docs/ogcapi/keys/"
+_TOKEN_ENV_VAR = "API_USGS_PAT"  # nosec B105 - not a secret (public URL / identifier)
+_TOKEN_URL = "https://api.waterdata.usgs.gov/docs/ogcapi/keys/"  # nosec B105 - not a secret (public URL / identifier)
 
 
 class UsgsWaterCredentials(BaseModel):

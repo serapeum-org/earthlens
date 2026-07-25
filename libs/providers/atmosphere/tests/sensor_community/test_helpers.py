@@ -12,6 +12,7 @@ from earthlens.sensor_community._helpers import (
     frame_from_csv,
     sensors_in_bbox,
 )
+
 from .conftest import SDS_CSV, _record
 
 
@@ -120,8 +121,12 @@ class TestSensorsInBbox:
 
     def test_bad_coords_skipped(self):
         """A record with non-numeric coordinates is skipped."""
-        snap = [{"location": {"latitude": "x", "longitude": "y"},
-                 "sensor": {"id": 1, "sensor_type": {"name": "SDS011"}}}]
+        snap = [
+            {
+                "location": {"latitude": "x", "longitude": "y"},
+                "sensor": {"id": 1, "sensor_type": {"name": "SDS011"}},
+            }
+        ]
         assert sensors_in_bbox(snap, (0, 90), (0, 90), {"sds011"}) == []
 
 
@@ -139,7 +144,9 @@ class TestFrameFromCsv:
 
     def test_missing_column_yields_empty(self):
         """A CSV lacking the requested column yields the empty frame."""
-        out = frame_from_csv(SDS_CSV, {"temperature": "temperature"}, {"temperature": "°C"})
+        out = frame_from_csv(
+            SDS_CSV, {"temperature": "temperature"}, {"temperature": "°C"}
+        )
         assert out.empty
 
     def test_non_numeric_values_dropped(self):

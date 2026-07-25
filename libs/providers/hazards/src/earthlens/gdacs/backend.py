@@ -31,10 +31,10 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
-import requests
+import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 from loguru import logger
 
 from earthlens.base import (
@@ -45,9 +45,9 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
+from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.gdacs import events
 from earthlens.gdacs.catalog import Catalog
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -83,6 +83,8 @@ _DRIVERS: dict[str, tuple[str, str]] = {
     "gpkg": ("GPKG", "gpkg"),
     "geojson": ("GeoJSON", "geojson"),
 }
+
+
 class GDACS(AbstractDataSource):
     """GDACS multi-hazard alert backend (vector point-feature output).
 
@@ -153,8 +155,7 @@ class GDACS(AbstractDataSource):
         """
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         if isinstance(variables, dict):
             raise TypeError(
@@ -311,7 +312,7 @@ class GDACS(AbstractDataSource):
             f"(levels {params['alertlevel']})"
         )
         http = HttpClient(
-            session=_RequestsGet(),
+            session=cast("requests.Session | None", _RequestsGet()),
             timeout=self._timeout,
             max_retries=0,
             status_forcelist=(),
@@ -388,8 +389,7 @@ class GDACS(AbstractDataSource):
             )
         else:
             logger.warning(
-                "GDACS download summary: no alerts matched the request, "
-                "nothing written"
+                "GDACS download summary: no alerts matched the request, nothing written"
             )
         return collection
 

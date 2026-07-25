@@ -15,7 +15,7 @@ monkey-patch it to redirect the loader in tests.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -138,7 +138,7 @@ class Catalog(AbstractCatalog):
             ValueError: When `site_id` is unknown (with a did-you-mean
                 hint from the base class).
         """
-        return self.get_dataset(site_id)
+        return cast("Station", self.get_dataset(site_id))
 
     def in_bbox(
         self, west: float, south: float, east: float, north: float

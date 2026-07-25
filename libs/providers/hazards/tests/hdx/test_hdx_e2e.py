@@ -66,9 +66,9 @@ class TestHdxLiveDownload:
         backend = HDX(variables={"kontur-population": []}, path=str(tmp_path))
         products = backend._search()
         assert products, "kontur-population should expose resources"
-        assert any(
-            p.metadata["format"].lower() == "geopackage" for p in products
-        ), "expected a Geopackage resource per the catalog"
+        assert any(p.metadata["format"].lower() == "geopackage" for p in products), (
+            "expected a Geopackage resource per the catalog"
+        )
 
     def test_stage_site_constructs_without_error(self, tmp_path: Path):
         """hdx_site='stage' is accepted and constructs without raising (L4).

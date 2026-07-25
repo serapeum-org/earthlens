@@ -18,7 +18,7 @@ Examples:
 
 from __future__ import annotations
 
-from earthlens.gbif.backend import GBIF_COLUMNS, GBIF
+from earthlens.gbif.backend import GBIF, GBIF_COLUMNS
 from earthlens.gbif.catalog import CATALOG_PATH, Catalog, Taxon
 
 __all__ = [

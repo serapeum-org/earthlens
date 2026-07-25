@@ -29,7 +29,7 @@ monkey-patchable in tests.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -203,7 +203,7 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `code` is not a registered hazard type.
         """
-        return self.get_dataset(code)
+        return cast("HazardType", self.get_dataset(code))
 
     def codes(self) -> list[str]:
         """Return the registered GDACS hazard codes, sorted.

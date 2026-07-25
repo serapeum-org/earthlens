@@ -134,13 +134,15 @@ dev = [
     "cleopatra >=0.26.1",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
+    # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
+    "mypy >=1.11",
     "pytest >=8.2.2",
     "pytest-cov >=5.0.0",
     "coverage",
     "build>=1.0.0",
     "twine>=5.0.0",
     "pip",
-    "jupyterlab",
+    "jupyterlab>=4.6.2",
     "notebook",
     "jupyter",
     "commitizen>=4.8.4",
@@ -168,7 +170,7 @@ docs = [
 
 notebook = [
     "pip",
-    "jupyterlab",
+    "jupyterlab>=4.6.2",
     "notebook",
     "jupyter",
     "ipykernel",
@@ -190,24 +192,85 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = []
 
-[tool.flake8]
-ignore = ["E203", "E266", "E501", "W503", "E722", "C901", "E741", "E731"]
-max-line-length = 88
-max-complexity = 18
-select = "B,C,E,F,W,T4"
-
-[tool.black]
+[tool.ruff]
 line-length = 88
-skip-string-normalization = true
+target-version = "py311"  # requires-python floors at 3.11
 
-[tool.isort]
-profile = "black"
-line_length = 88
-multi_line_output = 3
+[tool.ruff.format]
+# black had skip-string-normalization = true → preserve existing quotes.
+quote-style = "preserve"
+
+[tool.ruff.lint]
+# The *effective* flake8 rule set here was E/F/W: the old config's B/C/T4 selectors
+# were inert (flake8-bugbear / flake8-print / mccabe were never installed). Add I
+# (isort) and UP (pyupgrade) to fold in those two standalone hooks.
+select = ["E", "F", "W", "I", "UP"]
+# Mirror the old [tool.flake8].ignore. W503 is dropped — ruff does not implement it
+# (a formatter-owned pycodestyle code black conflicts with), so there is nothing to
+# ignore.
+ignore = ["E203", "E266", "E501", "E722", "C901", "E741", "E731"]
+
+[tool.ruff.lint.per-file-ignores]
+# flake8 excluded tests/ and examples/ from linting; keep only import-sorting (I) there
+# and drop E/F/W + UP to keep the migration's lint churn on shipped src/. Tests live under
+# each member as libs/*/tests, so the glob is anchored with a leading **.
+"**/tests/**" = ["E", "F", "W", "UP"]
+"examples/**" = ["E", "F", "W", "UP"]
+# Tutorial notebooks import next to first use and run setup (e.g. `%matplotlib inline`)
+# before imports — both legitimately trip E402, which stays enforced for real modules.
+"*.ipynb" = ["E402"]
+
+[tool.ruff.lint.isort]
+# `earthlens` is a PEP 420 namespace split across libs/*/src, so ruff's src-layout
+# auto-detection classifies it as first-party inconsistently across environments
+# (local vs CI), producing spurious import-group churn. Pin it explicitly.
+known-first-party = ["earthlens"]
 
 [tool.bandit]
-exclude_dirs = ["tests", "examples", "docs"]
+# Non-shipped tooling and fixtures (build/CI scripts, tests, docs, planning notes):
+# excluded from the security scan.
+exclude_dirs = ["ci", "tests", "examples", "scripts", "planning", "docs"]
 skips = ["B101"]
+
+[tool.mypy]
+# Checker target is 3.12 even though `requires-python` floors at 3.11: numpy's newer
+# stubs ship PEP 695 `type` statements that mypy only parses when the target is >= 3.12
+# (at 3.11 it aborts with a syntax error before checking any source). This only widens
+# the *typing* target; actual 3.11 runtime compatibility is covered by the py311 leg of
+# the test matrix, not by mypy. The source is a PEP 420 namespace split across the six
+# workspace `src` roots, so each is a mypy base and the checked files are their
+# earthlens/ subtrees.
+python_version = "3.12"
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = [
+    "libs/core/src",
+    "libs/providers/atmosphere/src",
+    "libs/providers/ocean/src",
+    "libs/providers/imagery/src",
+    "libs/providers/land/src",
+    "libs/providers/hazards/src",
+]
+files = [
+    "libs/core/src/earthlens",
+    "libs/providers/atmosphere/src/earthlens",
+    "libs/providers/ocean/src/earthlens",
+    "libs/providers/imagery/src/earthlens",
+    "libs/providers/land/src/earthlens",
+    "libs/providers/hazards/src/earthlens",
+]
+warn_return_any = true
+warn_unused_configs = false
+disallow_untyped_defs = false
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = [
+    "tests/",
+    "examples/",
+    "docs/",
+    "scripts/",
+    "planning/",
+]
 
 [tool.coverage.run]
 branch = true

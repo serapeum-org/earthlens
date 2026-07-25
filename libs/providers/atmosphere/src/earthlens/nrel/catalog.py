@@ -20,7 +20,7 @@ one with `get` (a did-you-mean hint on an unknown id) and list the ids with
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -279,4 +279,4 @@ class Catalog(AbstractCatalog):
                 catalog kind and, when a close match exists, a did-you-mean
                 hint.
         """
-        return self.get_dataset(product)
+        return cast("Product", self.get_dataset(product))

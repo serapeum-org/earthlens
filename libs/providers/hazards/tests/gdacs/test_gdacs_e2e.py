@@ -69,6 +69,6 @@ class TestGdacsLiveQuery:
                 lon_lim=[-180.0, 180.0],
                 path=str(tmp_path),
             ).download(progress_bar=False)
-        assert (
-            spy.call_count == 1
-        ), f"expected a single SEARCH request, got {spy.call_count}"
+        assert spy.call_count == 1, (
+            f"expected a single SEARCH request, got {spy.call_count}"
+        )

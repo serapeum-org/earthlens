@@ -22,7 +22,7 @@ cheap and a file edit invalidates the entry naturally.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -338,7 +338,7 @@ class Catalog(AbstractCatalog):
                 f"{catalog_path} is missing or has an empty 'datasets:' block. "
                 "The S3 registry must list at least one dataset."
             )
-        datasets: dict[str, Dataset] = {}
+        datasets = {}
         for name, body in datasets_yaml.items():
             try:
                 datasets[name] = Dataset(**dict(body or {}))
@@ -383,7 +383,7 @@ class Catalog(AbstractCatalog):
                 raise ValueError(
                     f"inline dataset spec failed validation:\n{exc}"
                 ) from exc
-        return self.get_dataset(dataset)
+        return cast("Dataset", self.get_dataset(dataset))
 
     def dataset_names(self) -> list[str]:
         """Return the registered dataset names, sorted.

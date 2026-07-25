@@ -25,9 +25,13 @@ from __future__ import annotations
 
 import datetime as dt
 import time
-from typing import Any, Callable, Literal
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from earthlens.base.http import HttpClient
+
+if TYPE_CHECKING:
+    import requests
 
 #: A FIRMS area request covers at most this many days (verified live
 #: against the area CSV API, which rejects >5 with "Expects [1..5]").
@@ -227,7 +231,7 @@ def firms_get(
         The final response object from `get`.
     """
     client = HttpClient(
-        session=_RequestsGet(get),
+        session=cast("requests.Session | None", _RequestsGet(get)),
         timeout=timeout,
         max_retries=max_retries,
         backoff_factor=backoff_factor,

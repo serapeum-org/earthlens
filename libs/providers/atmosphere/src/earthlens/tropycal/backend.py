@@ -34,7 +34,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -202,8 +202,7 @@ class TropicalCyclone(AbstractDataSource):
         """
         if file_format not in _DRIVERS:
             raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got "
-                f"{file_format!r}."
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         if source not in _SOURCES:
             raise ValueError(
@@ -470,14 +469,13 @@ class TropicalCyclone(AbstractDataSource):
         )
 
     @staticmethod
-    def _get_storm(track_dataset: object, storm_id: str) -> object | None:
+    def _get_storm(track_dataset: Any, storm_id: str) -> object | None:
         """Resolve a storm by id, or `None` (logged) when it cannot be read."""
         try:
-            return track_dataset.get_storm(storm_id)
+            return cast("object | None", track_dataset.get_storm(storm_id))
         except Exception as exc:  # noqa: BLE001
             logger.warning(
-                f"tropycal storm {storm_id!r} not resolved: "
-                f"{type(exc).__name__}: {exc}"
+                f"tropycal storm {storm_id!r} not resolved: {type(exc).__name__}: {exc}"
             )
             return None
 
@@ -550,7 +548,7 @@ class TropicalCyclone(AbstractDataSource):
         return track_dataset
 
     @staticmethod
-    def _season_storm_ids(track_dataset: object, year: int) -> list[str]:
+    def _season_storm_ids(track_dataset: Any, year: int) -> list[str]:
         """Return the storm ids in one season, or `[]` when none.
 
         A season with no storms (or a year tropycal cannot serve) is
@@ -579,7 +577,7 @@ class TropicalCyclone(AbstractDataSource):
             return []
 
     @staticmethod
-    def _storm_frame(track_dataset: object, storm_id: str) -> pd.DataFrame | None:
+    def _storm_frame(track_dataset: Any, storm_id: str) -> pd.DataFrame | None:
         """Return one storm's per-fix DataFrame, or `None` on failure.
 
         Args:
@@ -592,7 +590,9 @@ class TropicalCyclone(AbstractDataSource):
         """
         try:
             storm = track_dataset.get_storm(storm_id)
-            return storm.to_dataframe(attrs_as_columns=True)
+            return cast(
+                "pd.DataFrame | None", storm.to_dataframe(attrs_as_columns=True)
+            )
         except Exception as exc:  # noqa: BLE001
             # Intentionally broad (batch resilience, as above): one unreadable
             # storm is logged with its exception type and skipped rather than
@@ -746,7 +746,7 @@ class TropicalCyclone(AbstractDataSource):
         )
         return combined
 
-    def _get_realtime(self) -> object:
+    def _get_realtime(self) -> Any:
         """Build a `tropycal.realtime.Realtime` (lazy import; one live fetch)."""
         try:
             import tropycal.realtime as realtime
@@ -759,11 +759,13 @@ class TropicalCyclone(AbstractDataSource):
         return realtime.Realtime(jtwc=self._realtime_jtwc)
 
     @staticmethod
-    def _realtime_storm_frame(realtime: object, storm_id: str) -> pd.DataFrame | None:
+    def _realtime_storm_frame(realtime: Any, storm_id: str) -> pd.DataFrame | None:
         """Return one active storm's current-track frame, or `None` on failure."""
         try:
             storm = realtime.get_storm(storm_id)
-            return storm.to_dataframe(attrs_as_columns=True)
+            return cast(
+                "pd.DataFrame | None", storm.to_dataframe(attrs_as_columns=True)
+            )
         except Exception as exc:  # noqa: BLE001
             logger.warning(
                 f"tropycal realtime storm {storm_id!r} skipped: "
@@ -803,8 +805,7 @@ class TropicalCyclone(AbstractDataSource):
                 written.append(self._write_table(product.id, init, df))
         if not frames:
             logger.warning(
-                "Tropycal ships: no SHIPS guidance matched the request, "
-                "nothing written"
+                "Tropycal ships: no SHIPS guidance matched the request, nothing written"
             )
             return pd.DataFrame(columns=["storm_id", "forecast_init", "fhr"])
         combined = pd.concat(frames, ignore_index=True)
@@ -815,10 +816,10 @@ class TropicalCyclone(AbstractDataSource):
         return combined
 
     @staticmethod
-    def _ships_frame(storm: object, init: dt.datetime) -> pd.DataFrame | None:
+    def _ships_frame(storm: Any, init: dt.datetime) -> pd.DataFrame | None:
         """Return a storm's SHIPS table for `init`, or `None` (logged) if absent."""
         try:
-            return storm.get_ships(init).to_dataframe()
+            return cast("pd.DataFrame | None", storm.get_ships(init).to_dataframe())
         except Exception as exc:  # noqa: BLE001
             logger.warning(
                 f"tropycal SHIPS unavailable for the requested storm/cycle: "

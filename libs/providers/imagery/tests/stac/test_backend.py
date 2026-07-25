@@ -56,9 +56,9 @@ class TestInitialize:
     def test_opens_client_with_endpoint_url(self, fake_pyramids, tmp_path):
         """The client is opened against the endpoint's URL (lazily, on first use)."""
         stac = _build_stac(tmp_path, endpoint="earth-search")
-        assert (
-            not fake_pyramids.open_client_calls
-        ), "construction must not open a client"
+        assert not fake_pyramids.open_client_calls, (
+            "construction must not open a client"
+        )
         _ = stac.client
         assert fake_pyramids.open_client_calls[0]["url"].startswith(
             "https://earth-search"
@@ -286,9 +286,9 @@ class TestFetch:
         )
         stac._fetch(stac._search())
         cropped = fake_pyramids.write_data[-1]
-        assert (
-            cropped.cropped_epsg == 4326
-        ), "crop bbox must be declared in WGS84 (EPSG:4326)"
+        assert cropped.cropped_epsg == 4326, (
+            "crop bbox must be declared in WGS84 (EPSG:4326)"
+        )
         assert cropped.cropped_bbox == [-4.0, 40.0, -3.0, 41.0]
 
     def test_fetch_wraps_in_cloudconfig_with_gdal_env(self, fake_pyramids, tmp_path):
@@ -454,9 +454,9 @@ class TestDownload:
         out = stac.download(
             aggregate=AggregationConfig(freq="1MS", out_dir=tmp_path / "agg")
         )
-        assert (
-            len(out) == 1
-        ), f"two Jan dates should reduce to one monthly COG, got {out}"
+        assert len(out) == 1, (
+            f"two Jan dates should reduce to one monthly COG, got {out}"
+        )
         assert out[0].name == "sentinel-2-l2a_mean_1MS_20240101.tif"
         # the intermediate per-date COGs are cleaned up (M3)
         assert not (tmp_path / "sentinel-2-l2a_2024-01-05.tif").exists()

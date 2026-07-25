@@ -303,7 +303,7 @@ class GBIF(AbstractDataSource):
             )
         return rows[: self._max_records]
 
-    def _fetch(self) -> FeatureCollection:
+    def _fetch(self) -> FeatureCollection:  # type: ignore[override]
         """Run the search and map the rows to a FeatureCollection.
 
         Imports `pygbif` lazily (so the package imports without the
@@ -324,7 +324,8 @@ class GBIF(AbstractDataSource):
             lon_field="decimalLongitude",
             columns=GBIF_COLUMNS,
         )
-        for lic in sorted({row.get("license") for row in rows} - {None}):
+        licenses = {row.get("license") for row in rows}
+        for lic in sorted(lic for lic in licenses if lic is not None):
             warn_license(lic, "gbif")
         return collection
 

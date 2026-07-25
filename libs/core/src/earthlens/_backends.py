@@ -29,6 +29,7 @@ ENTRY_POINT_GROUP = "earthlens.backends"
 #: backend and depends on no provider distribution.
 BackendSpec = tuple[str, str, str, dict[str, object]]
 
+
 def discover_backends() -> dict[str, BackendSpec]:
     """Merge the backend tables published by every installed provider package.
 

@@ -23,7 +23,8 @@ hemispheres.
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Callable, Iterable
+from collections.abc import Callable, Iterable
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
@@ -362,8 +363,7 @@ def _copernicus_dem_products(
     for lat in _tile_origins(south, north, step):
         for lon in _tile_origins(west, east, step):
             name = (
-                f"Copernicus_DSM_COG_{token}_{_fmt_lat(lat)}_00_"
-                f"{_fmt_lon(lon)}_00_DEM"
+                f"Copernicus_DSM_COG_{token}_{_fmt_lat(lat)}_00_{_fmt_lon(lon)}_00_DEM"
             )
             out.append(
                 RemoteProduct(

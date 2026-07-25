@@ -467,9 +467,9 @@ class TestCancelTask:
         finally:
             _loguru.remove(sink_id)
         joined = "".join(buffer)
-        assert (
-            "already terminal" in joined
-        ), f"expected an INFO log mentioning 'already terminal'; got {joined!r}"
+        assert "already terminal" in joined, (
+            f"expected an INFO log mentioning 'already terminal'; got {joined!r}"
+        )
 
     def test_failed_precondition_in_message_is_swallowed(self, monkeypatch):
         """A non-HttpError carrying `FAILED_PRECONDITION` text is also swallowed."""

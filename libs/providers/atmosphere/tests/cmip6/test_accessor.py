@@ -17,6 +17,7 @@ from earthlens.cmip6.accessor import (
     zstore_to_vsi,
 )
 from earthlens.cmip6.resolver import ResolvedStore
+
 from .conftest import FakeContainer, FakeLabeled
 
 pytestmark = [pytest.mark.cmip6, pytest.mark.unit]
@@ -82,7 +83,9 @@ def test_resolve_time_window_empty_store_is_none(monkeypatch):
             return FakeLabeled(kept=[])
 
     monkeypatch.setattr(accessor, "_labeled_reader", lambda: _EmptyReader)
-    assert resolve_time_window("gs://cmip6/x/", "tas", "2015-01-01", "2015-06-30") is None
+    assert (
+        resolve_time_window("gs://cmip6/x/", "tas", "2015-01-01", "2015-06-30") is None
+    )
 
 
 def test_resolve_time_window_computes_index_range(monkeypatch):
@@ -109,7 +112,9 @@ def test_resolve_time_window_wraps_select_error(monkeypatch):
 def test_write_subset_reads_and_writes(monkeypatch, tmp_path):
     """write_subset opens the store, applies the window, and writes NetCDF."""
     container = FakeContainer()
-    monkeypatch.setattr(accessor, "_netcdf_reader", lambda: _reader_returning(container))
+    monkeypatch.setattr(
+        accessor, "_netcdf_reader", lambda: _reader_returning(container)
+    )
     out = tmp_path / "tas.nc"
     result = write_subset(
         "gs://cmip6/x/", "tas", bbox=(-10, 40, 10, 55), time=(0, 6), out_path=out
@@ -132,7 +137,9 @@ def test_write_subset_anonymous_during_read(monkeypatch, tmp_path):
             return super().subset(variable, **kwargs)
 
     monkeypatch.delenv(GS_NO_SIGN_ENV, raising=False)
-    monkeypatch.setattr(accessor, "_netcdf_reader", lambda: _reader_returning(_Recorder()))
+    monkeypatch.setattr(
+        accessor, "_netcdf_reader", lambda: _reader_returning(_Recorder())
+    )
     write_subset("gs://cmip6/x/", "tas", bbox=None, time=0, out_path=tmp_path / "o.nc")
     assert seen["flag"] == "YES"
 
@@ -140,8 +147,13 @@ def test_write_subset_anonymous_during_read(monkeypatch, tmp_path):
 def test_store_output_stem_with_dates():
     """The output stem appends the window's start/end dates to the slug."""
     store = ResolvedStore(
-        zstore="gs://cmip6/x/", source_id="CanESM5", experiment_id="ssp585",
-        variable_id="tas", table_id="Amon", member_id="r1i1p1f1", grid_label="gn",
+        zstore="gs://cmip6/x/",
+        source_id="CanESM5",
+        experiment_id="ssp585",
+        variable_id="tas",
+        table_id="Amon",
+        member_id="r1i1p1f1",
+        grid_label="gn",
         version="1",
     )
     stem = store_output_stem(store, dt.datetime(2050, 1, 1), dt.datetime(2050, 12, 31))
@@ -151,8 +163,14 @@ def test_store_output_stem_with_dates():
 def test_store_output_stem_without_dates():
     """A window with no date objects yields the facet slug plus the version."""
     store = ResolvedStore(
-        zstore="gs://cmip6/x/", source_id="M", experiment_id="e", variable_id="v",
-        table_id="Amon", member_id="r1i1p1f1", grid_label="gn", version="1",
+        zstore="gs://cmip6/x/",
+        source_id="M",
+        experiment_id="e",
+        variable_id="v",
+        table_id="Amon",
+        member_id="r1i1p1f1",
+        grid_label="gn",
+        version="1",
     )
     assert store_output_stem(store, None, None) == f"{store.slug}_v1"
 
@@ -160,8 +178,14 @@ def test_store_output_stem_without_dates():
 def test_store_output_stem_no_version():
     """A store with no version tag falls back to the bare facet slug."""
     store = ResolvedStore(
-        zstore="gs://cmip6/x/", source_id="M", experiment_id="e", variable_id="v",
-        table_id="Amon", member_id="r1i1p1f1", grid_label="gn", version="",
+        zstore="gs://cmip6/x/",
+        source_id="M",
+        experiment_id="e",
+        variable_id="v",
+        table_id="Amon",
+        member_id="r1i1p1f1",
+        grid_label="gn",
+        version="",
     )
     assert store_output_stem(store, None, None) == store.slug
 

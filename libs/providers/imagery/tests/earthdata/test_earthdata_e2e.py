@@ -106,12 +106,12 @@ class TestEarthdataLiveFetch:
             direct_s3="never",
         )
         paths = el.download(progress_bar=False)
-        assert (
-            paths
-        ), f"no granules written into {tmp_path!r}: {list(tmp_path.iterdir())!r}"
-        assert all(
-            Path(p).exists() for p in paths
-        ), f"download() returned non-existent paths: {paths!r}"
+        assert paths, (
+            f"no granules written into {tmp_path!r}: {list(tmp_path.iterdir())!r}"
+        )
+        assert all(Path(p).exists() for p in paths), (
+            f"download() returned non-existent paths: {paths!r}"
+        )
 
 
 @pytest.mark.e2e
@@ -127,9 +127,9 @@ class TestEarthdataExampleNotebooks:
     def test_live_notebook_runs(self, notebook: str, tmp_path: Path):
         """The notebook's cells run end-to-end and its live query is not skipped."""
         out = _run_notebook_cells(_EXAMPLES / notebook, tmp_path)
-        assert (
-            "skipped live query" not in out
-        ), f"{notebook} fell into the offline skip branch — the live query failed:\n{out}"
+        assert "skipped live query" not in out, (
+            f"{notebook} fell into the offline skip branch — the live query failed:\n{out}"
+        )
         assert "granule(s)" in out, f"{notebook} did not report a fetch:\n{out}"
 
 
@@ -148,7 +148,7 @@ class TestEarthdataAsfNotebook:
         # so force the username/password path by removing any token from the env.
         monkeypatch.delenv("EARTHDATA_TOKEN", raising=False)
         out = _run_notebook_cells(_EXAMPLES / "opera_s1_backscatter.ipynb", tmp_path)
-        assert (
-            "skipped live query" not in out
-        ), f"opera_s1_backscatter fell into the skip branch — ASF download failed:\n{out}"
+        assert "skipped live query" not in out, (
+            f"opera_s1_backscatter fell into the skip branch — ASF download failed:\n{out}"
+        )
         assert "file(s)" in out, f"opera_s1_backscatter did not report a fetch:\n{out}"

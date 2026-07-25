@@ -28,10 +28,11 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 from loguru import logger
+from pydantic import SecretStr
 
 from earthlens.base import (
     AbstractDataSource,
@@ -163,12 +164,16 @@ class RiskIndicators(AbstractDataSource):
         # G3 — only a GFW dataset needs (and builds) auth. Configuring here so a
         # missing key fails fast at construction of a gfw request.
         if self._dataset.provider == "gfw":
-            self._auth = GfwAuth(GfwCredentials(api_key=api_key))
+            self._auth = GfwAuth(
+                GfwCredentials(
+                    api_key=SecretStr(api_key) if api_key is not None else None
+                )
+            )
             self._auth.configure()
 
         super().__init__(
-            start=start,
-            end=end,
+            start=cast("str", start),
+            end=cast("str", end),
             variables=ids,
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim if lat_lim is not None else _GLOBAL_LAT,
@@ -307,25 +312,31 @@ class RiskIndicators(AbstractDataSource):
         country = product.metadata.get("country")
         admin_code = product.metadata.get("admin_code")
         if dataset.provider == "thinkhazard":
-            code = admin_code or self._catalog.resolve_admin(country)
+            code = admin_code or self._catalog.resolve_admin(cast("str", country))
             payload = _helpers.thinkhazard_query(code, dataset.hazard)
             return _helpers.thinkhazard_to_frame(
                 payload, admin_code=code, hazard=dataset.hazard, country=country
             )
         if dataset.provider == "inform":
-            payload = _helpers.inform_query(dataset.workflow_id, dataset.indicator_id)
+            payload = _helpers.inform_query(
+                cast("int", dataset.workflow_id), cast("str", dataset.indicator_id)
+            )
             return _helpers.inform_to_frame(payload, country=country)
         # provider == "gfw" — GFW keys on upper-case ISO3, so normalise the
         # country before interpolating it (the other two providers already
         # resolve / filter case-insensitively).
+        assert self._auth is not None  # a gfw dataset always builds auth in __init__
         api_key = self._auth.api_key
-        iso = country.strip().upper()
+        iso = cast("str", country).strip().upper()
         if dataset.output_kind == "vector":
             payload = _helpers.gfw_geostore(iso, api_key=api_key)
             return _helpers.gfw_geostore_to_feature_collection(payload)
-        sql = dataset.sql_template.format(iso=iso)
+        sql = cast("str", dataset.sql_template).format(iso=iso)
         payload = _helpers.gfw_query(
-            dataset.gfw_dataset, dataset.gfw_version, sql, api_key=api_key
+            cast("str", dataset.gfw_dataset),
+            cast("str", dataset.gfw_version),
+            sql,
+            api_key=api_key,
         )
         return _helpers.to_frame(payload)
 

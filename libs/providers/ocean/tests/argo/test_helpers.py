@@ -8,7 +8,12 @@ import pandas as pd
 import pytest
 
 from earthlens.argo import _helpers
-from earthlens.argo._helpers import Selection, empty_canonical, parse_selection, region_box
+from earthlens.argo._helpers import (
+    Selection,
+    empty_canonical,
+    parse_selection,
+    region_box,
+)
 from earthlens.base import SpatialExtent, TemporalExtent
 
 pytestmark = pytest.mark.argo

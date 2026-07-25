@@ -383,9 +383,9 @@ class TestInit:
                 path=str(tmp_path),
                 export_via="ftp",
             )
-        assert (
-            loads == 0
-        ), "Catalog() should not be constructed when export_via is invalid"
+        assert loads == 0, (
+            "Catalog() should not be constructed when export_via is invalid"
+        )
 
     @pytest.mark.parametrize(
         "kwargs, match",
@@ -803,9 +803,9 @@ class TestDiscoverExtent:
         )
         gee_b._maybe_discover_ee_extent(ds)
 
-        assert calls == [
-            "UCSB-CHG/CHIRPS/DAILY"
-        ], f"second instance should hit the shared cache; got {calls}"
+        assert calls == ["UCSB-CHG/CHIRPS/DAILY"], (
+            f"second instance should hit the shared cache; got {calls}"
+        )
 
     def test_clear_extent_cache_drops_every_entry(self, make_gee, monkeypatch):
         """`clear_extent_cache()` forces the next call to re-query EE."""
