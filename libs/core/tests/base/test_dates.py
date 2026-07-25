@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import datetime as dt
+import importlib
 
 import pandas as pd
 import pytest
 
-from earthlens.base import resolve_cadence, split_time, to_datetime
+from earthlens.base import (
+    CADENCE_ALIASES,
+    WHOLE_WINDOW,
+    resolve_cadence,
+    split_time,
+    to_datetime,
+)
 from earthlens.base._dates import _strip_tz
 
 
@@ -204,6 +211,79 @@ class TestResolveCadence:
             resolve_cadence("yearly", self.ACCEPTED)
         assert excinfo.value.__cause__ is None
 
+    @pytest.mark.parametrize("bad", [None, 5, ["daily"], 3.5])
+    def test_non_string_cadence_raises_value_error(self, bad):
+        """A non-string cadence gives a ValueError, not a difflib TypeError."""
+        with pytest.raises(ValueError, match="must be a string cadence"):
+            resolve_cadence(bad, self.ACCEPTED)
+
     def test_alias_value_passed_through_verbatim(self):
         """The mapping's value is returned as-is, not re-normalised."""
         assert resolve_cadence("weird", {"weird": "6h"}) == "6h"
+
+
+class TestCadenceAliases:
+    """The shared cadence vocabulary covers what the provider catalogs declare."""
+
+    def test_covers_every_declared_cadence_literal(self):
+        """Every backend's `CadenceLiteral` word resolves through the shared map.
+
+        This is the guard that was missing: `CADENCE_ALIASES` was first derived
+        from cmems alone, so 73% of eumetsat's curated rows hard-failed.
+        """
+        import typing
+
+        modules = {}
+        for name in ("earthdata", "eumetsat", "cmems", "drought"):
+            module = importlib.import_module(f"earthlens.{name}.catalog")
+            modules[name] = set(typing.get_args(module.CadenceLiteral))
+        uncovered = {
+            name: sorted(words - set(CADENCE_ALIASES))
+            for name, words in modules.items()
+            if words - set(CADENCE_ALIASES)
+        }
+        assert not uncovered, f"cadence words absent from CADENCE_ALIASES: {uncovered}"
+
+    @pytest.mark.parametrize(
+        "cadence,expected",
+        [
+            ("5min", "5min"),
+            ("hourly", "h"),
+            ("6hourly", "6h"),
+            ("daily", "D"),
+            ("8day", "8D"),
+            ("10day", "10D"),
+            ("16day", "16D"),
+            ("weekly", "W"),
+            ("monthly", "MS"),
+            ("annual", "YS"),
+        ],
+    )
+    def test_periodic_words_map_to_pandas_aliases(self, cadence, expected):
+        """Each periodic cadence maps to its pandas offset alias."""
+        assert CADENCE_ALIASES[cadence] == expected
+
+    @pytest.mark.parametrize(
+        "cadence",
+        [
+            "raw",
+            "native",
+            "subhourly",
+            "subdaily",
+            "irregular",
+            "climatology",
+            "static",
+        ],
+    )
+    def test_non_periodic_words_map_to_whole_window(self, cadence):
+        """A cadence naming a release character resolves to the whole-window sentinel."""
+        assert CADENCE_ALIASES[cadence] == WHOLE_WINDOW
+
+    def test_every_periodic_alias_is_a_valid_pandas_offset(self):
+        """No alias is a typo that would only fail at `date_range` time."""
+        for cadence, alias in CADENCE_ALIASES.items():
+            if alias == WHOLE_WINDOW:
+                continue
+            assert len(pd.date_range("2024-01-01", "2025-01-01", freq=alias)) > 0, (
+                f"{cadence!r} maps to {alias!r}, which yields no periods"
+            )

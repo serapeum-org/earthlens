@@ -130,24 +130,37 @@ WHOLE_WINDOW = "all"
 #: `climatology` / `weekly` / `6hourly`. A backend that genuinely supports only
 #: a subset passes its own narrower map.
 CADENCE_ALIASES: dict[str, str] = {
+    # Sub-hourly (eumetsat's rapid-scan and full-disc SEVIRI / MTG rows).
+    "5min": "5min",
+    "10min": "10min",
+    "15min": "15min",
+    "30min": "30min",
+    # Hourly multiples.
     "hourly": "h",
     "3hourly": "3h",
     "6hourly": "6h",
     "12hourly": "12h",
+    # Daily multiples, including the MODIS/VIIRS composite periods
+    # (earthdata's `8day` / `16day`) and the dekad (eumetsat, drought).
     "daily": "D",
-    "weekly": "W",
-    "dekadal": "10D",
     "pentadal": "5D",
+    "8day": "8D",
+    "10day": "10D",
+    "dekadal": "10D",
+    "16day": "16D",
+    "weekly": "W",
     "monthly": "MS",
     "seasonal": "QS",
     "annual": "YS",
     "yearly": "YS",
-    # No fixed period — the window is queried whole. `raw` and `native` mean
-    # "as the provider stores it, no temporal aggregation", which is the same
-    # request shape; they are listed so a caller who reaches for the cadence
-    # word GEE uses is not rejected by a backend that has no period axis.
+    # No fixed period — the window is queried whole. `raw` / `native` mean "as
+    # the provider stores it, no temporal aggregation"; `subhourly` / `subdaily`
+    # name a release *character* rather than a period, as do `irregular` and
+    # `climatology`.
     "raw": WHOLE_WINDOW,
     "native": WHOLE_WINDOW,
+    "subhourly": WHOLE_WINDOW,
+    "subdaily": WHOLE_WINDOW,
     "irregular": WHOLE_WINDOW,
     "climatology": WHOLE_WINDOW,
     "static": WHOLE_WINDOW,

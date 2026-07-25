@@ -941,11 +941,22 @@ class AbstractDataSource(ABC):
             )
         start_dt = to_datetime(start, fmt)
         end_dt = to_datetime(end, fmt)
+        dates = date_windows(start_dt, end_dt, resolution)
+        if len(dates) == 0:
+            # A coarse cadence expands to nothing when the window contains no
+            # period *anchor* — `"YS"` over 2024-02-01..2024-03-19 has no
+            # January 1st, so `date_range` is empty even though the request is
+            # perfectly valid. Returning that empty axis would make a
+            # download loop over `self.time.dates` silently do nothing, so the
+            # window start stands in for the single period that covers it.
+            import pandas as pd
+
+            dates = pd.DatetimeIndex([start_dt])
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,
             resolution=resolution,
-            dates=date_windows(start_dt, end_dt, resolution),
+            dates=dates,
         )
 
     def _static_extent(self, resolution: str = "static") -> TemporalExtent:
