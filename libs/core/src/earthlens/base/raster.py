@@ -72,7 +72,7 @@ def close_quietly(handle: Any) -> None:
         closer = getattr(handle, "close", None)
         if callable(closer):
             closer()
-    except Exception:  # noqa: BLE001 - best-effort release on a cleanup path
+    except Exception:  # noqa: BLE001 - best-effort release  # nosec B110
         pass
 
 
