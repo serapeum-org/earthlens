@@ -581,6 +581,9 @@ class AbstractDataSource(ABC):
             `temporal_resolution` / `variables`) instead.
         """
         super().__init_subclass__(**kwargs)
+        # Independent of the constructor sugar below: a backend that inherits
+        # `__init__` unchanged still needs its `download` to create `root_dir`.
+        cls._wrap_download()
         orig = cls.__dict__.get("__init__")
         if orig is None or getattr(orig, "_ergonomic", False):
             return
@@ -634,7 +637,6 @@ class AbstractDataSource(ABC):
 
         __init__._ergonomic = True  # type: ignore[attr-defined]
         cls.__init__ = __init__  # type: ignore[method-assign]
-        cls._wrap_download()
 
     @classmethod
     def _wrap_download(cls) -> None:
