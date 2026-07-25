@@ -738,7 +738,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         return out_paths
 
-    def _download_dataset(  # type: ignore[override]
+    def _download_dataset(
         self,
         var_info: Variable,
         progress_bar: bool = True,

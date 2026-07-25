@@ -512,7 +512,7 @@ class CHIRPS(AbstractDataSource):
 
         return out_paths
 
-    def _download_dataset(  # type: ignore[override]
+    def _download_dataset(
         self,
         ds_key: str,
         dataset: ChcDataset,

@@ -673,7 +673,7 @@ class GHSL(AbstractDataSource):
 
         resolution = rp.metadata["resolution"]
         target = Path(self.path) / (f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif")
-        if target.exists():
+        if self._is_complete(target):
             return target
         categorical = rp.metadata["categorical"]
         resampling = "nearest neighbor" if categorical else "bilinear"

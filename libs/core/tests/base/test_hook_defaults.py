@@ -481,3 +481,65 @@ class TestLazyRootDir:
             )
         ]
         assert unwrapped == [], f"these backends would not create root_dir: {unwrapped}"
+
+
+class TestIsComplete:
+    """ARC-15: the shared skip-if-exists / resume check."""
+
+    def _backend(self, tmp_path):
+        """Build a minimal backend rooted at `tmp_path`."""
+        return _build(_WithSearchFetch, tmp_path)
+
+    def test_missing_file_is_incomplete(self, tmp_path):
+        """A path that does not exist is never reusable."""
+        backend = self._backend(tmp_path)
+        assert backend._is_complete(tmp_path / "absent.tif") is False
+
+    def test_empty_file_is_incomplete(self, tmp_path):
+        """A zero-byte file is the classic failed-download leftover."""
+        target = tmp_path / "empty.tif"
+        target.write_bytes(b"")
+        assert self._backend(tmp_path)._is_complete(target) is False
+
+    def test_written_file_is_complete(self, tmp_path):
+        """A non-empty file is reusable when no size is known."""
+        target = tmp_path / "grid.tif"
+        target.write_bytes(b"raster-bytes")
+        assert self._backend(tmp_path)._is_complete(target) is True
+
+    def test_expected_size_catches_a_truncated_file(self, tmp_path):
+        """A short file is rejected once the real size is known."""
+        target = tmp_path / "half.tif"
+        target.write_bytes(b"12345")
+        assert self._backend(tmp_path)._is_complete(target, expected_size=10) is False
+
+    def test_expected_size_accepts_an_exact_match(self, tmp_path):
+        """A file of exactly the advertised size is complete."""
+        target = tmp_path / "whole.tif"
+        target.write_bytes(b"12345")
+        assert self._backend(tmp_path)._is_complete(target, expected_size=5) is True
+
+    def test_expected_size_rejects_an_overlong_file(self, tmp_path):
+        """More bytes than advertised is as wrong as fewer."""
+        target = tmp_path / "long.tif"
+        target.write_bytes(b"1234567890")
+        assert self._backend(tmp_path)._is_complete(target, expected_size=5) is False
+
+    def test_force_ignores_a_complete_file(self, tmp_path):
+        """force=True re-fetches even when the file is present and sized right."""
+        target = tmp_path / "grid.tif"
+        target.write_bytes(b"12345")
+        backend = self._backend(tmp_path)
+        assert backend._is_complete(target, expected_size=5, force=True) is False
+
+    def test_accepts_a_string_path(self, tmp_path):
+        """A str path works as well as a Path."""
+        target = tmp_path / "grid.tif"
+        target.write_bytes(b"bytes")
+        assert self._backend(tmp_path)._is_complete(str(target)) is True
+
+    def test_a_directory_is_not_a_complete_download(self, tmp_path):
+        """A directory at the destination must not be mistaken for a file."""
+        target = tmp_path / "adir"
+        target.mkdir()
+        assert self._backend(tmp_path)._is_complete(target, expected_size=0) is False

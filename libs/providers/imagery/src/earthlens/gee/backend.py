@@ -652,7 +652,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))
         return outputs
 
-    def _download_dataset(  # type: ignore[override]  # base is a loose template
+    def _download_dataset(
         self, asset_id: str, bands: list[str], progress_bar: bool = True
     ) -> list[Path | str | TaskInfo]:
         """Download one dataset's requested bands across the time buckets.

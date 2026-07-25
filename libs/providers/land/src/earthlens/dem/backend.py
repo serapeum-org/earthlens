@@ -264,7 +264,7 @@ class DEM(AbstractDataSource):
         bucket: str = product.metadata["bucket"]
         key: str = product.href or ""
         target = self.root_dir / Path(key).name
-        if target.exists():
+        if self._is_complete(target):
             return target
         try:
             client.head_object(Bucket=bucket, Key=key)

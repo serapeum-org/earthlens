@@ -519,7 +519,7 @@ class WorldPop(AbstractDataSource):
             requests.ConnectionError | requests.Timeout: If every retry of a
                 transient network error is exhausted.
         """
-        if dest.exists() and dest.stat().st_size > 0:
+        if self._is_complete(dest):
             return dest
         http = HttpClient(
             session=cast("requests.Session | None", _RequestsGet()),

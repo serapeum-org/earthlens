@@ -3,11 +3,13 @@ from __future__ import annotations
 import difflib
 import functools
 import inspect
+import stat
 import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Literal, cast
 
 from loguru import logger
@@ -761,6 +763,101 @@ class AbstractDataSource(ABC):
         self.root_dir = Path(path).absolute()
         self.path = self.root_dir
 
+    def _is_complete(
+        self,
+        dest: Path | str,
+        expected_size: int | None = None,
+        *,
+        force: bool = False,
+    ) -> bool:
+        """Report whether `dest` already holds a usable, complete download.
+
+        The shared form of the skip-if-exists check eight backends each
+        hand-rolled as `dest.exists() and dest.stat().st_size > 0`. Routing
+        them through one helper means a re-run skips what it already has, a
+        failed multi-gigabyte fetch resumes instead of restarting from zero,
+        and — where the caller knows the size — a *truncated* file is no
+        longer mistaken for a finished one.
+
+        "Non-empty" is a weak completeness signal on its own: it is only
+        trustworthy because the shared downloader writes to a sibling
+        `<dest>.part` and renames on success, so a file present at `dest`
+        was never a partial write. Pass `expected_size` whenever the
+        provider advertises one (a `Content-Length`, a catalog field) to get
+        a real check rather than a proxy.
+
+        Args:
+            dest: The output path to test.
+            expected_size: Exact size in bytes the finished file must have.
+                `None` (the default) falls back to the non-empty check.
+            force: When `True`, always report `False` so the caller re-fetches.
+                Wire a backend's `force=` download kwarg through here.
+
+        Returns:
+            bool: `True` when `dest` can be reused as-is.
+
+        Examples:
+            - A written file counts as complete; an empty one does not:
+                ```python
+                >>> from pathlib import Path
+                >>> from tempfile import TemporaryDirectory
+                >>> from earthlens.chc import CHIRPS
+                >>> backend = CHIRPS(
+                ...     start="2009-01-01", end="2009-01-02",
+                ...     variables=["precipitation"],
+                ...     lat_lim=[4.0, 5.0], lon_lim=[-75.0, -74.0],
+                ... )
+                >>> with TemporaryDirectory() as tmp:
+                ...     good = Path(tmp) / "grid.tif"
+                ...     _ = good.write_bytes(b"raster-bytes")
+                ...     empty = Path(tmp) / "empty.tif"
+                ...     _ = empty.write_bytes(b"")
+                ...     print(backend._is_complete(good))
+                ...     print(backend._is_complete(empty))
+                ...     print(backend._is_complete(Path(tmp) / "absent.tif"))
+                True
+                False
+                False
+
+                ```
+            - A known size catches a truncated file the size check alone
+              would accept, and `force=` re-fetches regardless:
+                ```python
+                >>> from pathlib import Path
+                >>> from tempfile import TemporaryDirectory
+                >>> from earthlens.chc import CHIRPS
+                >>> backend = CHIRPS(
+                ...     start="2009-01-01", end="2009-01-02",
+                ...     variables=["precipitation"],
+                ...     lat_lim=[4.0, 5.0], lon_lim=[-75.0, -74.0],
+                ... )
+                >>> with TemporaryDirectory() as tmp:
+                ...     part = Path(tmp) / "half.tif"
+                ...     _ = part.write_bytes(b"12345")
+                ...     print(backend._is_complete(part, expected_size=10))
+                ...     print(backend._is_complete(part, expected_size=5))
+                ...     print(backend._is_complete(part, force=True))
+                False
+                True
+                False
+
+                ```
+        """
+        if force:
+            return False
+        dest = Path(dest)
+        try:
+            info = dest.stat()
+        except OSError:
+            return False
+        # A directory reports a size too, and on Windows that size is 0 — so
+        # `expected_size=0` would accept one as a finished download.
+        if not stat.S_ISREG(info.st_mode):
+            return False
+        if expected_size is not None:
+            return info.st_size == expected_size
+        return info.st_size > 0
+
     def _ensure_root_dir(self) -> Path:
         """Create :attr:`root_dir` if it does not exist yet, and return it.
 
@@ -1147,14 +1244,10 @@ class AbstractDataSource(ABC):
         # list of dates
         pass
 
-    def _download_dataset(self):
-        """Download a single variable/dataset (called by :meth:`download`)."""
-        pass
-
     def _api(self, *args: Any, **kwargs: Any) -> Any:
         """Send / receive the request(s) this download needs.
 
-        Called by :meth:`download` (or :meth:`_download_dataset`). The default
+        Called by :meth:`download`. The default
         is the search→fetch composition, :meth:`_api_via_search_fetch`, which
         is what a backend built on the :meth:`_search` / :meth:`_fetch` split
         wants — the great majority. Override it only for a backend that talks
@@ -1515,20 +1608,57 @@ class AbstractCatalog(BaseModel):
     #: it (e.g. `"parameters"` for the openaq / usgs_water catalogs).
     _entry_noun: str = "datasets"
 
-    catalog: dict[str, Any] = Field(default_factory=dict)
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, Any] = Field(default_factory=dict)
     providers: dict[str, Any] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Populate :attr:`catalog` after pydantic validation runs.
+    @property
+    def catalog(self) -> Mapping[str, Any]:
+        """Read-only view of the catalog mapping (see :meth:`get_catalog`).
 
-        Pydantic calls this hook automatically; subclasses that need
-        their own post-init wiring should override it and call
-        `super().model_post_init(__context)` first to keep the
-        catalog-loading behaviour.
+        For nearly every backend `get_catalog()` returns :attr:`datasets`
+        itself, so `catalog` used to be a second name bound to the very same
+        `dict` — assigning through one silently rewrote the other, and a
+        caller who mutated `cat.catalog` corrupted the shared parse cache
+        the loader hands out. Exposing a `MappingProxyType` keeps every read
+        working (`cat.catalog["key"]`, `in`, `len`, iteration) while making
+        that accidental write fail loudly.
+
+        Returns:
+            Mapping[str, Any]: A read-only view over `get_catalog()`.
+
+        Examples:
+            - It reads exactly like the underlying mapping:
+                ```python
+                >>> from earthlens.gdacs import Catalog
+                >>> catalog = Catalog()
+                >>> catalog.catalog["EQ"].name
+                'Earthquake'
+                >>> sorted(catalog.catalog) == sorted(catalog.datasets)
+                True
+
+                ```
+            - But writing through it is refused rather than silently
+              rewriting `datasets`:
+                ```python
+                >>> from earthlens.gdacs import Catalog
+                >>> Catalog().catalog["EQ"] = None
+                Traceback (most recent call last):
+                    ...
+                TypeError: 'mappingproxy' object does not support item assignment
+
+                ```
         """
-        self.catalog = self.get_catalog()
+        return MappingProxyType(self.get_catalog())
+
+    def model_post_init(self, __context: Any) -> None:
+        """Hook run after pydantic validation.
+
+        Kept as an overridable no-op so subclasses can call
+        `super().model_post_init(__context)` first and keep their own
+        post-init wiring in one place. :attr:`catalog` is a property now, so
+        nothing has to be populated here.
+        """
 
     def get_catalog(self) -> Any:
         """Read the catalog of the datasource from disk or retrieve it from server.
