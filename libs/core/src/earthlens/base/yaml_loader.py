@@ -69,6 +69,17 @@ class CatalogParseCache(dict):
             ```
     """
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Build the cache and register it for `clear_all_catalog_caches`.
+
+        The import is deferred to call time because `catalog_source` imports this
+        module; doing it at module scope would be a cycle.
+        """
+        super().__init__(*args, **kwargs)
+        from earthlens.base.catalog_source import register_cache
+
+        register_cache(self)
+
     def __setitem__(self, key: Any, value: Any) -> None:
         """Store `value`, evicting any other entry for the same catalog path."""
         if isinstance(key, tuple) and key:

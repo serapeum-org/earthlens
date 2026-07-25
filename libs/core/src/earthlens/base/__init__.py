@@ -27,6 +27,12 @@ from earthlens.base.abstractdatasource import (
     TemporalExtent,
 )
 from earthlens.base.auth import AbstractAuth, AuthenticationError
+from earthlens.base.catalog_source import (
+    catalog_cache_key,
+    clear_all_catalog_caches,
+    load_catalog,
+    yaml_files_for,
+)
 from earthlens.base.http import HttpClient
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.naming import safe_filename
@@ -66,12 +72,15 @@ __all__ = [
     "SpatialExtent",
     "TemporalExtent",
     "WHOLE_WINDOW",
+    "catalog_cache_key",
+    "clear_all_catalog_caches",
     "clear_providers_cache",
     "clear_region_cache",
     "close_quietly",
     "crop_to_aoi",
     "date_windows",
     "estimate_pixel_dims",
+    "load_catalog",
     "load_providers",
     "mask_to_geometry",
     "normalize_aoi",
@@ -83,4 +92,5 @@ __all__ = [
     "to_datetime",
     "warn_if_egress",
     "window_labels",
+    "yaml_files_for",
 ]

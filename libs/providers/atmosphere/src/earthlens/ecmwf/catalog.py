@@ -58,6 +58,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf, Provider
+from earthlens.base.catalog_source import yaml_files_for
 from earthlens.base.providers import (
     clear_providers_cache as _clear_providers_cache_base,
 )
@@ -103,30 +104,12 @@ def clear_catalog_cache() -> None:
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted YAML files that contribute to a load.
+    """Return the sorted YAML files contributing to a load.
 
-    `path` may be a directory of per-family `*.yaml` files (the default
-    layout — `era5.yaml`, `carra.yaml`, … plus `_index.yaml` carrying
-    `available_datasets:`), or a single `*.yaml` file (back-compat for
-    tests that monkey-patch :data:`CATALOG_PATH` to a temp file).
-
-    Args:
-        path: Catalog directory or single YAML file.
-
-    Returns:
-        Sorted list of YAML paths.
-
-    Raises:
-        ValueError: If `path` is neither an existing directory nor file.
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    if path.is_file():
-        return [path]
-    raise ValueError(
-        f"CDS catalog path {path} does not exist (expected a directory of "
-        "per-family *.yaml files, or a single YAML file)."
-    )
+    return yaml_files_for(path, provider='CDS', shard_noun='per-family')
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:

@@ -25,6 +25,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import yaml_files_for
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 #: Path to the bundled catalog directory of per-family `*.yaml` files plus the
@@ -94,28 +95,12 @@ class Dataset(BaseModel):
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted YAML files that contribute to a catalog load.
+    """Return the sorted YAML files contributing to a load.
 
-    Args:
-        path: A catalog directory of per-family `*.yaml` files (the default
-            layout, including `_index.yaml`) or a single `*.yaml` file
-            (back-compat for tests / a monolithic catalog).
-
-    Returns:
-        list[Path]: Sorted YAML paths — every `*.yaml` for a directory, or
-            just the one file.
-
-    Raises:
-        ValueError: If `path` is neither an existing directory nor file.
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    if path.is_file():
-        return [path]
-    raise ValueError(
-        f"bathymetry catalog path {path} does not exist (expected a directory "
-        "of per-family *.yaml files, or a single YAML file)."
-    )
+    return yaml_files_for(path, provider='bathymetry', shard_noun='per-family')
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:

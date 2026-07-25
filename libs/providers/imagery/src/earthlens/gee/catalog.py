@@ -61,6 +61,7 @@ if TYPE_CHECKING:
     from earthlens.gee.jobs import TaskInfo
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import yaml_files_for
 from earthlens.base.providers import (
     Provider,
 )
@@ -85,19 +86,12 @@ _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCa
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted list of YAML files that contribute to a catalog load.
+    """Return the sorted YAML files contributing to a load.
 
-    `path` may point at either:
-
-    * a directory containing per-category `*.yaml` files (the default
-      layout — `src/earthlens/gee/catalog/`); or
-    * a single `*.yaml` file (back-compat for tests that monkey-patch
-      `CATALOG_PATH` to a temp file, and for any external user still
-      shipping the legacy monolithic `gee_data_catalog.yaml`).
+    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
+    as a module-level name because the tests import and monkey-patch it.
     """
-    if path.is_dir():
-        return sorted(path.glob("*.yaml"))
-    return [path]
+    return yaml_files_for(path, provider='gee')
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
