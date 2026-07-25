@@ -21577,7 +21577,7 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            ValueError: If `name` is not a registered family.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Family&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">parameters_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the valid parameter names for a family.</span>
@@ -21813,7 +21813,7 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        ValueError: If `name` is not a registered family.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Family&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24504,7 +24504,7 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            ValueError: If `name` is not a registered family.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Family&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">parameters_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the valid parameter names for a family.</span>
@@ -24740,7 +24740,7 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        ValueError: If `name` is not a registered family.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Family&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

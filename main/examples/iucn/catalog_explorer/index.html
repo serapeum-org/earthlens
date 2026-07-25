@@ -19786,7 +19786,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fc63dd32">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19797,7 +19797,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4c54d92f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19808,7 +19808,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=55d3919c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19845,7 +19845,7 @@ print(f"{len(catalog)} curated countries")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bc8f83e6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19856,7 +19856,7 @@ print(f"{len(catalog)} curated countries")</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=da5bba25">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19893,7 +19893,7 @@ frame.groupby("region").size().rename("countries")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=57198610">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19904,7 +19904,7 @@ frame.groupby("region").size().rename("countries")</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9baa4ba2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19922,22 +19922,22 @@ frame.groupby("region").size().rename("countries")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">resolve_iso2</span><span class="p">(</span><span class="s2">"KE"</span><span class="p">))</span>          <span class="c1"># bare code</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">resolve_iso2</span><span class="p">(</span><span class="s2">"Kenya"</span><span class="p">))</span>       <span class="c1"># friendly name</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">resolve_iso2</span><span class="p">(</span><span class="s2">"KE"</span><span class="p">))</span>  <span class="c1"># bare code</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">resolve_iso2</span><span class="p">(</span><span class="s2">"Kenya"</span><span class="p">))</span>  <span class="c1"># friendly name</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">resolve_iso2</span><span class="p">(</span><span class="s2">"country:BR"</span><span class="p">))</span>  <span class="c1"># country: selector</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">resolve_iso2</span><span class="p">(</span><span class="s2">"ZW"</span><span class="p">))</span>          <span class="c1"># uncatalogued, still valid</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">resolve_iso2</span><span class="p">(</span><span class="s2">"ZW"</span><span class="p">))</span>  <span class="c1"># uncatalogued, still valid</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">print(catalog.resolve_iso2("KE"))          # bare code
-print(catalog.resolve_iso2("Kenya"))       # friendly name
+<div class="clipboard-copy-txt" id="cell-3">print(catalog.resolve_iso2("KE"))  # bare code
+print(catalog.resolve_iso2("Kenya"))  # friendly name
 print(catalog.resolve_iso2("country:BR"))  # country: selector
-print(catalog.resolve_iso2("ZW"))          # uncatalogued, still valid</div>
+print(catalog.resolve_iso2("ZW"))  # uncatalogued, still valid</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4027ae70">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

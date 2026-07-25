@@ -19808,7 +19808,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d6cd6c24">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19823,7 +19823,7 @@ preview), so the request shape is uniform across the catalogue.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b2106cfb">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19834,7 +19834,7 @@ preview), so the request shape is uniform across the catalogue.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6ad2cc90">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19877,7 +19877,7 @@ for k in veda_keys:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=beee120c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19890,7 +19890,7 @@ Midwest bbox illustrates the uniform <code>cog_default</code> access pattern.</p
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=69d692a2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19914,11 +19914,13 @@ Midwest bbox illustrates the uniform <code>cog_default</code> access pattern.</p
 
 <span class="n">nldas</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"veda"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2020-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-12-31"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2020-01-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2024-12-31"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"veda/nldas3"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"cog_default"</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+    <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">nldas_paths</span> <span class="o">=</span> <span class="n">nldas</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">nldas_paths</span>
@@ -19929,11 +19931,13 @@ from earthlens.earthlens import EarthLens
 
 nldas = EarthLens(
     data_source="veda",
-    start="2020-01-01", end="2024-12-31",
+    start="2020-01-01",
+    end="2024-12-31",
     dataset="veda/nldas3",
     variables=["cog_default"],
     aoi=[-100.0, 35.0, -90.0, 45.0],
-    path=tempfile.mkdtemp(), max_items=1,
+    path=tempfile.mkdtemp(),
+    max_items=1,
 )
 nldas_paths = nldas.download()
 nldas_paths</div>
@@ -19943,7 +19947,7 @@ nldas_paths</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6aa202e8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19955,7 +19959,7 @@ nighttime-light composites focused on regions affected by disasters. Same reques
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1f61c4fb">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19975,22 +19979,26 @@ nighttime-light composites focused on regions affected by disasters. Same reques
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bm</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"veda"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2020-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-12-31"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2020-01-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2024-12-31"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"veda/delta-disasters-hd-blackmarble-nightlights"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"cog_default"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">78.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">76.0</span><span class="p">,</span> <span class="mf">19.5</span><span class="p">],</span>   <span class="c1"># Caribbean / disaster-impacted region</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">78.0</span><span class="p">,</span> <span class="mf">18.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">76.0</span><span class="p">,</span> <span class="mf">19.5</span><span class="p">],</span>  <span class="c1"># Caribbean / disaster-impacted region</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+    <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">bm_paths</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">bm_paths</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">bm = EarthLens(
     data_source="veda",
-    start="2020-01-01", end="2024-12-31",
+    start="2020-01-01",
+    end="2024-12-31",
     dataset="veda/delta-disasters-hd-blackmarble-nightlights",
     variables=["cog_default"],
-    aoi=[-78.0, 18.0, -76.0, 19.5],   # Caribbean / disaster-impacted region
-    path=tempfile.mkdtemp(), max_items=1,
+    aoi=[-78.0, 18.0, -76.0, 19.5],  # Caribbean / disaster-impacted region
+    path=tempfile.mkdtemp(),
+    max_items=1,
 )
 bm_paths = bm.download()
 bm_paths</div>
@@ -20000,7 +20008,7 @@ bm_paths</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=351bc4fb">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20013,7 +20021,7 @@ difference; <code>CMIP585-winter-median-pr</code> is the SSP5-8.5 (high-emission
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9c721c55">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20033,22 +20041,26 @@ difference; <code>CMIP585-winter-median-pr</code> is the SSP5-8.5 (high-emission
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cmip</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"veda"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2020-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2099-12-31"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2020-01-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2099-12-31"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"veda/CMIP585-winter-median-pr"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"cog_default"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">130.0</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">65.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">],</span>   <span class="c1"># CONUS</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">130.0</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">65.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">],</span>  <span class="c1"># CONUS</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+    <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">cmip_paths</span> <span class="o">=</span> <span class="n">cmip</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">cmip_paths</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">cmip = EarthLens(
     data_source="veda",
-    start="2020-01-01", end="2099-12-31",
+    start="2020-01-01",
+    end="2099-12-31",
     dataset="veda/CMIP585-winter-median-pr",
     variables=["cog_default"],
-    aoi=[-130.0, 25.0, -65.0, 50.0],   # CONUS
-    path=tempfile.mkdtemp(), max_items=1,
+    aoi=[-130.0, 25.0, -65.0, 50.0],  # CONUS
+    path=tempfile.mkdtemp(),
+    max_items=1,
 )
 cmip_paths = cmip.download()
 cmip_paths</div>
@@ -20058,7 +20070,7 @@ cmip_paths</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2ec8a056">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20069,7 +20081,7 @@ cmip_paths</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f81bbfad">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20089,15 +20101,27 @@ cmip_paths</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"NLDAS-3"</span><span class="p">,</span> <span class="n">nldas_paths</span><span class="p">),</span> <span class="p">(</span><span class="s2">"Black Marble HD"</span><span class="p">,</span> <span class="n">bm_paths</span><span class="p">),</span> <span class="p">(</span><span class="s2">"CMIP6 SSP5-8.5 winter pr"</span><span class="p">,</span> <span class="n">cmip_paths</span><span class="p">)):</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s2">"NLDAS-3"</span><span class="p">,</span> <span class="n">nldas_paths</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"Black Marble HD"</span><span class="p">,</span> <span class="n">bm_paths</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"CMIP6 SSP5-8.5 winter pr"</span><span class="p">,</span> <span class="n">cmip_paths</span><span class="p">),</span>
+<span class="p">):</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">30</span><span class="si">}</span><span class="s2"> bands=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">band_count</span><span class="si">}</span><span class="s2"> epsg=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s2"> shape=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">30</span><span class="si">}</span><span class="s2"> bands=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">band_count</span><span class="si">}</span><span class="s2"> epsg=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s2"> shape=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">from pyramids.dataset import Dataset
 
-for label, ps in (("NLDAS-3", nldas_paths), ("Black Marble HD", bm_paths), ("CMIP6 SSP5-8.5 winter pr", cmip_paths)):
+for label, ps in (
+    ("NLDAS-3", nldas_paths),
+    ("Black Marble HD", bm_paths),
+    ("CMIP6 SSP5-8.5 winter pr", cmip_paths),
+):
     ds = Dataset.read_file(str(ps[0]))
-    print(f"{label:30} bands={ds.band_count} epsg={ds.epsg} shape={ds.read_array().shape}")</div>
+    print(
+        f"{label:30} bands={ds.band_count} epsg={ds.epsg} shape={ds.read_array().shape}"
+    )</div>
 </div>
 </div>
 </div>

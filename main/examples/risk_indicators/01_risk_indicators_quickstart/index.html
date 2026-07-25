@@ -19808,7 +19808,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=152993e2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19833,12 +19833,12 @@ and you get back a tidy <code>pandas.DataFrame</code>. This notebook covers the 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=447076a3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -19853,15 +19853,11 @@ and you get back a tidy <code>pandas.DataFrame</code>. This notebook covers the 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>  <span class="c1"># tabular downloads also write a CSV here</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
-
-import pandas as pd
 
 from earthlens.earthlens import EarthLens
 
@@ -19872,7 +19868,7 @@ OUT = tempfile.mkdtemp()  # tabular downloads also write a CSV here</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=192cdeb3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19885,13 +19881,13 @@ with the qualitative <code>level</code> / <code>level_title</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7901487d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -19925,80 +19921,9 @@ flood</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>2026-06-27 04:27:27 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
-</pre>
 </div>
 </div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-27 04:27:29.305</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.risk_indicators.backend</span>:<span class="ansi-cyan-fg">_log_citation</span>:<span class="ansi-cyan-fg">419</span> - <span class="ansi-bold">RiskIndicators source citation: GFDRR ThinkHazard! — https://thinkhazard.org (public domain).</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-27 04:27:29.310</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.risk_indicators.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">377</span> - <span class="ansi-bold">RiskIndicators thinkhazard:flood_river: 1 row(s) written to C:\Users\main\AppData\Local\Temp\tmp062iwcx3\risk_thinkhazard_flood_river.csv.</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>country</th>
-<th>admin_code</th>
-<th>hazard</th>
-<th>hazard_type</th>
-<th>level</th>
-<th>level_title</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>KEN</td>
-<td>133</td>
-<td>FL</td>
-<td>River flood</td>
-<td>HIG</td>
-<td>High</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=214e9e69">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20012,13 +19937,13 @@ for the division in a single call — handy for a quick risk profile.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c490ef15">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -20054,170 +19979,9 @@ profile</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-27 04:27:29.640</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.risk_indicators.backend</span>:<span class="ansi-cyan-fg">_log_citation</span>:<span class="ansi-cyan-fg">419</span> - <span class="ansi-bold">RiskIndicators source citation: GFDRR ThinkHazard! — https://thinkhazard.org (public domain).</span>
-</pre>
 </div>
 </div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-27 04:27:29.643</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.risk_indicators.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">377</span> - <span class="ansi-bold">RiskIndicators thinkhazard:all: 11 row(s) written to C:\Users\main\AppData\Local\Temp\tmp062iwcx3\risk_thinkhazard_all.csv.</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>hazards: 11
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>country</th>
-<th>admin_code</th>
-<th>hazard</th>
-<th>hazard_type</th>
-<th>level</th>
-<th>level_title</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>KEN</td>
-<td>133</td>
-<td>FL</td>
-<td>River flood</td>
-<td>HIG</td>
-<td>High</td>
-</tr>
-<tr>
-<th>1</th>
-<td>KEN</td>
-<td>133</td>
-<td>UF</td>
-<td>Urban flood</td>
-<td>HIG</td>
-<td>High</td>
-</tr>
-<tr>
-<th>2</th>
-<td>KEN</td>
-<td>133</td>
-<td>CF</td>
-<td>Coastal flood</td>
-<td>HIG</td>
-<td>High</td>
-</tr>
-<tr>
-<th>3</th>
-<td>KEN</td>
-<td>133</td>
-<td>EQ</td>
-<td>Earthquake</td>
-<td>MED</td>
-<td>Medium</td>
-</tr>
-<tr>
-<th>4</th>
-<td>KEN</td>
-<td>133</td>
-<td>LS</td>
-<td>Landslide</td>
-<td>HIG</td>
-<td>High</td>
-</tr>
-<tr>
-<th>5</th>
-<td>KEN</td>
-<td>133</td>
-<td>TS</td>
-<td>Tsunami</td>
-<td>MED</td>
-<td>Medium</td>
-</tr>
-<tr>
-<th>6</th>
-<td>KEN</td>
-<td>133</td>
-<td>VA</td>
-<td>Volcano</td>
-<td>HIG</td>
-<td>High</td>
-</tr>
-<tr>
-<th>7</th>
-<td>KEN</td>
-<td>133</td>
-<td>CY</td>
-<td>Cyclone</td>
-<td>VLO</td>
-<td>Very low</td>
-</tr>
-<tr>
-<th>8</th>
-<td>KEN</td>
-<td>133</td>
-<td>DG</td>
-<td>Water scarcity</td>
-<td>MED</td>
-<td>Medium</td>
-</tr>
-<tr>
-<th>9</th>
-<td>KEN</td>
-<td>133</td>
-<td>EH</td>
-<td>Extreme heat</td>
-<td>MED</td>
-<td>Medium</td>
-</tr>
-<tr>
-<th>10</th>
-<td>KEN</td>
-<td>133</td>
-<td>WF</td>
-<td>Wildfire</td>
-<td>HIG</td>
-<td>High</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=413da418">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20229,13 +19993,13 @@ backend, so either works as <code>data_source=</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=aa377752">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -20269,69 +20033,9 @@ risk</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-27 04:27:29.955</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.risk_indicators.backend</span>:<span class="ansi-cyan-fg">_log_citation</span>:<span class="ansi-cyan-fg">419</span> - <span class="ansi-bold">RiskIndicators source citation: INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index.</span>
-</pre>
 </div>
 </div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-27 04:27:29.958</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.risk_indicators.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">377</span> - <span class="ansi-bold">RiskIndicators inform:risk: 1 row(s) written to C:\Users\main\AppData\Local\Temp\tmp062iwcx3\risk_inform_risk.csv.</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>iso3</th>
-<th>indicator_id</th>
-<th>indicator_score</th>
-<th>validity_year</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>KEN</td>
-<td>INFORM</td>
-<td>6.2</td>
-<td>0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6455e436">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20344,13 +20048,13 @@ table in one frame, ready to rank or join.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2fb7dcfe">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -20384,104 +20088,9 @@ world.sort_values("indicator_score", ascending=False).head(5)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-27 04:27:30.273</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.risk_indicators.backend</span>:<span class="ansi-cyan-fg">_log_citation</span>:<span class="ansi-cyan-fg">419</span> - <span class="ansi-bold">RiskIndicators source citation: INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index.</span>
-</pre>
 </div>
 </div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-27 04:27:30.276</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.risk_indicators.backend</span>:<span class="ansi-cyan-fg">download</span>:<span class="ansi-cyan-fg">377</span> - <span class="ansi-bold">RiskIndicators inform:risk: 191 row(s) written to C:\Users\main\AppData\Local\Temp\tmp062iwcx3\risk_inform_risk.csv.</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>countries: 191
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>iso3</th>
-<th>indicator_id</th>
-<th>indicator_score</th>
-<th>validity_year</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>156</th>
-<td>SSD</td>
-<td>INFORM</td>
-<td>8.5</td>
-<td>0</td>
-</tr>
-<tr>
-<th>154</th>
-<td>SOM</td>
-<td>INFORM</td>
-<td>8.1</td>
-<td>0</td>
-</tr>
-<tr>
-<th>187</th>
-<td>YEM</td>
-<td>INFORM</td>
-<td>8.1</td>
-<td>0</td>
-</tr>
-<tr>
-<th>34</th>
-<td>COD</td>
-<td>INFORM</td>
-<td>8.0</td>
-<td>0</td>
-</tr>
-<tr>
-<th>165</th>
-<td>TCD</td>
-<td>INFORM</td>
-<td>7.9</td>
-<td>0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9beb02d0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

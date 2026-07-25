@@ -20068,8 +20068,8 @@ instance attribute, so both forms work.</p>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a>            <span class="k">if</span> <span class="n">clip_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_attach_clip_geometry</span><span class="p">(</span><span class="n">clip_geometry</span><span class="p">)</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="fm">__init__</span><span class="o">.</span><span class="n">_ergonomic</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>        <span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="fm">__init__</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="fm">__init__</span><span class="o">.</span><span class="n">_ergonomic</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># type: ignore[attr-defined]</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>        <span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="fm">__init__</span>  <span class="c1"># type: ignore[method-assign]</span>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 <a id="__codelineno-0-568" name="__codelineno-0-568"></a>        <span class="bp">self</span><span class="p">,</span>
@@ -20140,7 +20140,7 @@ instance attribute, so both forms work.</p>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">TemporalExtent</span><span class="p">(</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a>                <span class="n">start_date</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">],</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>                <span class="n">end_date</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;end_date&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>                <span class="n">resolution</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;resolution&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_freq&quot;</span><span class="p">)),</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>                <span class="n">resolution</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;resolution&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_freq&quot;</span><span class="p">))),</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a>                <span class="n">dates</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;dates&quot;</span><span class="p">],</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a>            <span class="p">)</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a>
@@ -20189,8 +20189,8 @@ instance attribute, so both forms work.</p>
 <a id="__codelineno-0-682" name="__codelineno-0-682"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LazyClientMixin</span><span class="p">):</span>
 <a id="__codelineno-0-683" name="__codelineno-0-683"></a>            <span class="c1"># Accessing `client` runs the cached `_open_client` (auth).</span>
 <a id="__codelineno-0-684" name="__codelineno-0-684"></a>            <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_auth&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="k">elif</span> <span class="p">(</span><span class="n">auth</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_auth&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>            <span class="n">auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
 <a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="k">return</span> <span class="bp">self</span>
 <a id="__codelineno-0-688" name="__codelineno-0-688"></a>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a>    <span class="nd">@abstractmethod</span>
@@ -20783,7 +20783,7 @@ Defaults to the current working directory.</p>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">TemporalExtent</span><span class="p">(</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a>            <span class="n">start_date</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">],</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>            <span class="n">end_date</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;end_date&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;resolution&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_freq&quot;</span><span class="p">)),</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;resolution&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time_freq&quot;</span><span class="p">))),</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a>            <span class="n">dates</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;dates&quot;</span><span class="p">],</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a>        <span class="p">)</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a>
@@ -20997,8 +20997,8 @@ already-resolved native parameters (<code>lat_lim</code> / <code>lon_lim</code> 
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a>        <span class="k">if</span> <span class="n">clip_geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_attach_clip_geometry</span><span class="p">(</span><span class="n">clip_geometry</span><span class="p">)</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="fm">__init__</span><span class="o">.</span><span class="n">_ergonomic</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="fm">__init__</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="fm">__init__</span><span class="o">.</span><span class="n">_ergonomic</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># type: ignore[attr-defined]</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="fm">__init__</span>  <span class="c1"># type: ignore[method-assign]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21134,8 +21134,8 @@ and is idempotent.</p>
 <a id="__codelineno-0-682" name="__codelineno-0-682"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LazyClientMixin</span><span class="p">):</span>
 <a id="__codelineno-0-683" name="__codelineno-0-683"></a>        <span class="c1"># Accessing `client` runs the cached `_open_client` (auth).</span>
 <a id="__codelineno-0-684" name="__codelineno-0-684"></a>        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>    <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_auth&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>    <span class="k">elif</span> <span class="p">(</span><span class="n">auth</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_auth&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="n">auth</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
 <a id="__codelineno-0-687" name="__codelineno-0-687"></a>    <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -21576,7 +21576,8 @@ for the ECMWF backend).</p>
 <span class="normal"><a href="#__codelineno-0-1193">1193</a></span>
 <span class="normal"><a href="#__codelineno-0-1194">1194</a></span>
 <span class="normal"><a href="#__codelineno-0-1195">1195</a></span>
-<span class="normal"><a href="#__codelineno-0-1196">1196</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-937" name="__codelineno-0-937"></a><span class="k">class</span><span class="w"> </span><span class="nc">AbstractCatalog</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-1196">1196</a></span>
+<span class="normal"><a href="#__codelineno-0-1197">1197</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-937" name="__codelineno-0-937"></a><span class="k">class</span><span class="w"> </span><span class="nc">AbstractCatalog</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <a id="__codelineno-0-938" name="__codelineno-0-938"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for per-data-source variable catalogs.</span>
 <a id="__codelineno-0-939" name="__codelineno-0-939"></a>
 <a id="__codelineno-0-940" name="__codelineno-0-940"></a><span class="sd">    Subclasses load a backend-specific catalog (a YAML file, an</span>
@@ -21833,9 +21834,10 @@ for the ECMWF backend).</p>
 <a id="__codelineno-0-1191" name="__codelineno-0-1191"></a>                <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-0-1192" name="__codelineno-0-1192"></a>            <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-1193" name="__codelineno-0-1193"></a>                <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
-<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a>        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
+<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a>        <span class="n">dumped</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
 <a id="__codelineno-0-1195" name="__codelineno-0-1195"></a>            <span class="n">body</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_unicode</span><span class="o">=</span><span class="kc">True</span>
 <a id="__codelineno-0-1196" name="__codelineno-0-1196"></a>        <span class="p">)</span>
+<a id="__codelineno-0-1197" name="__codelineno-0-1197"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">dumped</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22037,7 +22039,8 @@ override.</p>
 <span class="normal"><a href="#__codelineno-0-1193">1193</a></span>
 <span class="normal"><a href="#__codelineno-0-1194">1194</a></span>
 <span class="normal"><a href="#__codelineno-0-1195">1195</a></span>
-<span class="normal"><a href="#__codelineno-0-1196">1196</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1178" name="__codelineno-0-1178"></a><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-1196">1196</a></span>
+<span class="normal"><a href="#__codelineno-0-1197">1197</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1178" name="__codelineno-0-1178"></a><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-1179" name="__codelineno-0-1179"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pretty-print the curated `datasets` map as YAML.</span>
 <a id="__codelineno-0-1180" name="__codelineno-0-1180"></a>
 <a id="__codelineno-0-1181" name="__codelineno-0-1181"></a><span class="sd">    `None`-valued fields are omitted so the output stays readable;</span>
@@ -22053,9 +22056,10 @@ override.</p>
 <a id="__codelineno-0-1191" name="__codelineno-0-1191"></a>            <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-0-1192" name="__codelineno-0-1192"></a>        <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-1193" name="__codelineno-0-1193"></a>            <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
-<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a>    <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
+<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a>    <span class="n">dumped</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
 <a id="__codelineno-0-1195" name="__codelineno-0-1195"></a>        <span class="n">body</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_unicode</span><span class="o">=</span><span class="kc">True</span>
 <a id="__codelineno-0-1196" name="__codelineno-0-1196"></a>    <span class="p">)</span>
+<a id="__codelineno-0-1197" name="__codelineno-0-1197"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">dumped</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

@@ -20028,7 +20028,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b3de76d6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20054,7 +20054,7 @@ arguments change.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fd594c3c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20109,7 +20109,7 @@ keys that matter here:</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=347abfe0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20122,7 +20122,7 @@ facade. No helper functions: every cell reads top-to-bottom.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bd7c52d0">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20168,15 +20168,14 @@ from IPython.display import HTML
 from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
 
-from earthlens.core import EarthLens
+from earthlens.core import EarthLens</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dccd182a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20189,7 +20188,7 @@ cities — so the whole notebook is deterministic.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=61582ed6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20211,11 +20210,21 @@ cities — so the whole notebook is deterministic.</p>
 <span class="n">EUROPE</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">58.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">27.0</span><span class="p">])</span>
 
 <span class="n">CANDIDATES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"Madrid"</span><span class="p">:</span> <span class="p">(</span><span class="mf">40.42</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.70</span><span class="p">),</span> <span class="s2">"Seville"</span><span class="p">:</span> <span class="p">(</span><span class="mf">37.39</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.99</span><span class="p">),</span> <span class="s2">"Barcelona"</span><span class="p">:</span> <span class="p">(</span><span class="mf">41.39</span><span class="p">,</span> <span class="mf">2.17</span><span class="p">),</span>
-    <span class="s2">"Lisbon"</span><span class="p">:</span> <span class="p">(</span><span class="mf">38.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.14</span><span class="p">),</span> <span class="s2">"Paris"</span><span class="p">:</span> <span class="p">(</span><span class="mf">48.85</span><span class="p">,</span> <span class="mf">2.35</span><span class="p">),</span> <span class="s2">"London"</span><span class="p">:</span> <span class="p">(</span><span class="mf">51.51</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.13</span><span class="p">),</span>
-    <span class="s2">"Milan"</span><span class="p">:</span> <span class="p">(</span><span class="mf">45.46</span><span class="p">,</span> <span class="mf">9.19</span><span class="p">),</span> <span class="s2">"Rome"</span><span class="p">:</span> <span class="p">(</span><span class="mf">41.90</span><span class="p">,</span> <span class="mf">12.50</span><span class="p">),</span> <span class="s2">"Berlin"</span><span class="p">:</span> <span class="p">(</span><span class="mf">52.52</span><span class="p">,</span> <span class="mf">13.40</span><span class="p">),</span>
-    <span class="s2">"Vienna"</span><span class="p">:</span> <span class="p">(</span><span class="mf">48.21</span><span class="p">,</span> <span class="mf">16.37</span><span class="p">),</span> <span class="s2">"Zurich"</span><span class="p">:</span> <span class="p">(</span><span class="mf">47.37</span><span class="p">,</span> <span class="mf">8.54</span><span class="p">),</span> <span class="s2">"Athens"</span><span class="p">:</span> <span class="p">(</span><span class="mf">37.98</span><span class="p">,</span> <span class="mf">23.73</span><span class="p">),</span>
-    <span class="s2">"Amsterdam"</span><span class="p">:</span> <span class="p">(</span><span class="mf">52.37</span><span class="p">,</span> <span class="mf">4.90</span><span class="p">),</span> <span class="s2">"Rotterdam"</span><span class="p">:</span> <span class="p">(</span><span class="mf">51.92</span><span class="p">,</span> <span class="mf">4.48</span><span class="p">),</span> <span class="s2">"Utrecht"</span><span class="p">:</span> <span class="p">(</span><span class="mf">52.09</span><span class="p">,</span> <span class="mf">5.12</span><span class="p">),</span>
+    <span class="s2">"Madrid"</span><span class="p">:</span> <span class="p">(</span><span class="mf">40.42</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.70</span><span class="p">),</span>
+    <span class="s2">"Seville"</span><span class="p">:</span> <span class="p">(</span><span class="mf">37.39</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.99</span><span class="p">),</span>
+    <span class="s2">"Barcelona"</span><span class="p">:</span> <span class="p">(</span><span class="mf">41.39</span><span class="p">,</span> <span class="mf">2.17</span><span class="p">),</span>
+    <span class="s2">"Lisbon"</span><span class="p">:</span> <span class="p">(</span><span class="mf">38.72</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.14</span><span class="p">),</span>
+    <span class="s2">"Paris"</span><span class="p">:</span> <span class="p">(</span><span class="mf">48.85</span><span class="p">,</span> <span class="mf">2.35</span><span class="p">),</span>
+    <span class="s2">"London"</span><span class="p">:</span> <span class="p">(</span><span class="mf">51.51</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.13</span><span class="p">),</span>
+    <span class="s2">"Milan"</span><span class="p">:</span> <span class="p">(</span><span class="mf">45.46</span><span class="p">,</span> <span class="mf">9.19</span><span class="p">),</span>
+    <span class="s2">"Rome"</span><span class="p">:</span> <span class="p">(</span><span class="mf">41.90</span><span class="p">,</span> <span class="mf">12.50</span><span class="p">),</span>
+    <span class="s2">"Berlin"</span><span class="p">:</span> <span class="p">(</span><span class="mf">52.52</span><span class="p">,</span> <span class="mf">13.40</span><span class="p">),</span>
+    <span class="s2">"Vienna"</span><span class="p">:</span> <span class="p">(</span><span class="mf">48.21</span><span class="p">,</span> <span class="mf">16.37</span><span class="p">),</span>
+    <span class="s2">"Zurich"</span><span class="p">:</span> <span class="p">(</span><span class="mf">47.37</span><span class="p">,</span> <span class="mf">8.54</span><span class="p">),</span>
+    <span class="s2">"Athens"</span><span class="p">:</span> <span class="p">(</span><span class="mf">37.98</span><span class="p">,</span> <span class="mf">23.73</span><span class="p">),</span>
+    <span class="s2">"Amsterdam"</span><span class="p">:</span> <span class="p">(</span><span class="mf">52.37</span><span class="p">,</span> <span class="mf">4.90</span><span class="p">),</span>
+    <span class="s2">"Rotterdam"</span><span class="p">:</span> <span class="p">(</span><span class="mf">51.92</span><span class="p">,</span> <span class="mf">4.48</span><span class="p">),</span>
+    <span class="s2">"Utrecht"</span><span class="p">:</span> <span class="p">(</span><span class="mf">52.09</span><span class="p">,</span> <span class="mf">5.12</span><span class="p">),</span>
 <span class="p">}</span>
 <span class="n">CITY_BOXES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"Madrid"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.1</span><span class="p">,</span> <span class="mf">40.7</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.4</span><span class="p">]),</span>
@@ -20236,11 +20245,21 @@ cities — so the whole notebook is deterministic.</p>
 EUROPE = dict(lat_lim=[35.0, 58.0], lon_lim=[-10.0, 27.0])
 
 CANDIDATES = {
-    "Madrid": (40.42, -3.70), "Seville": (37.39, -5.99), "Barcelona": (41.39, 2.17),
-    "Lisbon": (38.72, -9.14), "Paris": (48.85, 2.35), "London": (51.51, -0.13),
-    "Milan": (45.46, 9.19), "Rome": (41.90, 12.50), "Berlin": (52.52, 13.40),
-    "Vienna": (48.21, 16.37), "Zurich": (47.37, 8.54), "Athens": (37.98, 23.73),
-    "Amsterdam": (52.37, 4.90), "Rotterdam": (51.92, 4.48), "Utrecht": (52.09, 5.12),
+    "Madrid": (40.42, -3.70),
+    "Seville": (37.39, -5.99),
+    "Barcelona": (41.39, 2.17),
+    "Lisbon": (38.72, -9.14),
+    "Paris": (48.85, 2.35),
+    "London": (51.51, -0.13),
+    "Milan": (45.46, 9.19),
+    "Rome": (41.90, 12.50),
+    "Berlin": (52.52, 13.40),
+    "Vienna": (48.21, 16.37),
+    "Zurich": (47.37, 8.54),
+    "Athens": (37.98, 23.73),
+    "Amsterdam": (52.37, 4.90),
+    "Rotterdam": (51.92, 4.48),
+    "Utrecht": (52.09, 5.12),
 }
 CITY_BOXES = {
     "Madrid": dict(lat_lim=[40.1, 40.7], lon_lim=[-4.0, -3.4]),
@@ -20262,7 +20281,7 @@ START, END</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=510cbc8a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20274,7 +20293,7 @@ the heat-wave providers from the table above are all registered.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bc05c342">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20292,10 +20311,30 @@ the heat-wave providers from the table above are all registered.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">wanted</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"gee"</span><span class="p">,</span> <span class="s2">"ecmwf"</span><span class="p">,</span> <span class="s2">"chc"</span><span class="p">,</span> <span class="s2">"drought"</span><span class="p">,</span> <span class="s2">"firms"</span><span class="p">,</span> <span class="s2">"eea-aq"</span><span class="p">,</span> <span class="s2">"worldpop"</span><span class="p">,</span> <span class="s2">"ghsl"</span><span class="p">,</span> <span class="s2">"admin"</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">wanted</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"gee"</span><span class="p">,</span>
+    <span class="s2">"ecmwf"</span><span class="p">,</span>
+    <span class="s2">"chc"</span><span class="p">,</span>
+    <span class="s2">"drought"</span><span class="p">,</span>
+    <span class="s2">"firms"</span><span class="p">,</span>
+    <span class="s2">"eea-aq"</span><span class="p">,</span>
+    <span class="s2">"worldpop"</span><span class="p">,</span>
+    <span class="s2">"ghsl"</span><span class="p">,</span>
+    <span class="s2">"admin"</span><span class="p">,</span>
+<span class="p">]</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">EarthLens</span><span class="o">.</span><span class="n">DataSources</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">wanted</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"registered"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">wanted = ["gee", "ecmwf", "chc", "drought", "firms", "eea-aq", "worldpop", "ghsl", "admin"]
+<div class="clipboard-copy-txt" id="cell-3">wanted = [
+    "gee",
+    "ecmwf",
+    "chc",
+    "drought",
+    "firms",
+    "eea-aq",
+    "worldpop",
+    "ghsl",
+    "admin",
+]
 pd.Series({k: k in EarthLens.DataSources for k in wanted}, name="registered")</div>
 </div>
 </div>
@@ -20303,7 +20342,7 @@ pd.Series({k: k in EarthLens.DataSources for k in wanted}, name="registered")</d
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=84260037">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20314,7 +20353,7 @@ pd.Series({k: k in EarthLens.DataSources for k in wanted}, name="registered")</d
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d74233fc">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20343,7 +20382,7 @@ pd.Series({k: k in EarthLens.DataSources for k in wanted}, name="registered")</d
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a6ee2923">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20354,7 +20393,7 @@ pd.Series({k: k in EarthLens.DataSources for k in wanted}, name="registered")</d
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fc39af41">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20389,7 +20428,7 @@ pd.DataFrame(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c87646d1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20403,7 +20442,7 @@ from <code>OPENAQ_API_KEY</code>. (<code>drought</code> needs no credentials.)</
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=14c6ab73">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=13">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20436,7 +20475,7 @@ SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ae563a9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=14">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20449,7 +20488,7 @@ Engine, so we fetch it through the same <code>gee</code> key and sidestep the Co
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b4f067ba">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=15">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20471,7 +20510,8 @@ Engine, so we fetch it through the same <code>gee</code> key and sidestep the Co
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"ECMWF/ERA5_LAND/DAILY_AGGR"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"temperature_2m"</span><span class="p">],</span>
-    <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
     <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"europe"</span><span class="p">,</span>
     <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
@@ -20485,7 +20525,8 @@ Engine, so we fetch it through the same <code>gee</code> key and sidestep the Co
     data_source="gee",
     dataset="ECMWF/ERA5_LAND/DAILY_AGGR",
     variables=["temperature_2m"],
-    start=START, end=END,
+    start=START,
+    end=END,
     temporal_resolution="daily",
     path=OUT / "europe",
     export_via="url",
@@ -20500,7 +20541,7 @@ print(f"{len(eu_paths)} daily continental tiles")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df522369">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20511,7 +20552,7 @@ print(f"{len(eu_paths)} daily continental tiles")</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2c200466">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=17">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20533,26 +20574,34 @@ print(f"{len(eu_paths)} daily continental tiles")</div>
 <span class="n">dome</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">peak_path</span><span class="p">)</span>
 <span class="n">dome</span> <span class="o">=</span> <span class="n">dome</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">kelvin</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">kelvin</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">,</span> <span class="n">kelvin</span> <span class="o">-</span> <span class="mf">273.15</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">dome</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exclude_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"T2m (°C)"</span><span class="p">)</span>
+<span class="n">dome</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exclude_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"T2m (°C)"</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"ERA5-Land daily-mean 2 m air temperature — 22 Jun 2026"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">peak_path = next(p for p in eu_paths if p.stem.endswith(PEAK))
 dome = Dataset.read_file(peak_path)
 dome = dome.apply(lambda kelvin: np.where(kelvin &gt; 200, kelvin - 273.15, np.nan))
 fig, ax = plt.subplots(figsize=(8, 6))
-dome.plot(band=0, exclude_value=np.nan, ax=ax, fig=fig, cmap="inferno", cbar_label="T2m (°C)")
+dome.plot(
+    band=0, exclude_value=np.nan, ax=ax, fig=fig, cmap="inferno", cbar_label="T2m (°C)"
+)
 ax.set_title("ERA5-Land daily-mean 2 m air temperature — 22 Jun 2026")
-ax.set_xlabel("lon"); ax.set_ylabel("lat")
-plt.tight_layout(); plt.show()</div>
+ax.set_xlabel("lon")
+ax.set_ylabel("lat")
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3c740f1a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20565,7 +20614,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=827e8da3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20582,7 +20631,7 @@ downloaded above, animate the whole window with the genuine ECMWF colour scale, 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6e3eb6f1">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=20">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20610,7 +20659,9 @@ downloaded above, animate the whole window with the genuine ECMWF colour scale, 
     <span class="n">field</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">celsius_path</span><span class="p">))</span>
     <span class="n">celsius_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">celsius_path</span><span class="p">)</span>
 
-<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%b </span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">eu_paths</span><span class="p">)]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%b </span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">eu_paths</span><span class="p">)</span>
+<span class="p">]</span>
 
 <span class="c1"># "2t"'s palette is flat-saturated navy/magenta at both ends by design (5 identical</span>
 <span class="c1"># shades each) with the gradient packed into the middle third. Auto-ranging tightly to</span>
@@ -20626,7 +20677,9 @@ downloaded above, animate the whole window with the genuine ECMWF colour scale, 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">celsius_paths</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"2t"</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">7.6</span><span class="p">))</span>
-    <span class="n">apply_blank_canvas</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>  <span class="c1"># the ECMWF/CAMS dark-animation look</span>
+    <span class="n">apply_blank_canvas</span><span class="p">(</span>
+        <span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">"black"</span>
+    <span class="p">)</span>  <span class="c1"># the ECMWF/CAMS dark-animation look</span>
 
     <span class="n">west</span><span class="p">,</span> <span class="n">east</span> <span class="o">=</span> <span class="n">EUROPE</span><span class="p">[</span><span class="s2">"lon_lim"</span><span class="p">]</span>
     <span class="n">south</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">EUROPE</span><span class="p">[</span><span class="s2">"lat_lim"</span><span class="p">]</span>
@@ -20634,8 +20687,11 @@ downloaded above, animate the whole window with the genuine ECMWF colour scale, 
     <span class="c1"># uses below -- ax.transData is live, so the label lands correctly once that extent is</span>
     <span class="c1"># applied below, with no transform/clip_on/subplots_adjust juggling.</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
-        <span class="n">labels</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"2t"</span><span class="p">,</span>
-        <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">north</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">),</span> <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="s2">"2t"</span><span class="p">,</span>
+        <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">north</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">),</span>
+        <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">add_reference_map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"ecmwf-dark"</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">])</span>
 
@@ -20647,7 +20703,9 @@ downloaded above, animate the whole window with the genuine ECMWF colour scale, 
     <span class="k">del</span> <span class="n">DATA_STYLES</span><span class="p">[</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"2t"</span><span class="p">][</span><span class="s2">"vmax"</span><span class="p">]</span>
 
 <span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">dome_mp4</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-<span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s1">'&lt;video src="data:video/mp4;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">" width="700" autoplay loop muted playsinline controls&gt;&lt;/video&gt;'</span><span class="p">)</span>
+<span class="n">HTML</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'&lt;video src="data:video/mp4;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">" width="700" autoplay loop muted playsinline controls&gt;&lt;/video&gt;'</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9">celsius_dir = OUT / "europe_celsius"
 celsius_dir.mkdir(parents=True, exist_ok=True)
@@ -20659,7 +20717,9 @@ for path in sorted(eu_paths):
     field.to_file(str(celsius_path))
     celsius_paths.append(celsius_path)
 
-labels = [pd.to_datetime(p.stem.split("_")[-1]).strftime("%b %d") for p in sorted(eu_paths)]
+labels = [
+    pd.to_datetime(p.stem.split("_")[-1]).strftime("%b %d") for p in sorted(eu_paths)
+]
 
 # "2t"'s palette is flat-saturated navy/magenta at both ends by design (5 identical
 # shades each) with the gradient packed into the middle third. Auto-ranging tightly to
@@ -20675,7 +20735,9 @@ DATA_STYLES["2t"]["2t"]["vmax"] = 50.0
 try:
     cube = DatasetCollection.read_multiple_files(celsius_paths, date=False)
     glyph = cube.plot(style="2t", figsize=(8, 7.6))
-    apply_blank_canvas(glyph.ax, facecolor="black")  # the ECMWF/CAMS dark-animation look
+    apply_blank_canvas(
+        glyph.ax, facecolor="black"
+    )  # the ECMWF/CAMS dark-animation look
 
     west, east = EUROPE["lon_lim"]
     south, north = EUROPE["lat_lim"]
@@ -20683,8 +20745,11 @@ try:
     # uses below -- ax.transData is live, so the label lands correctly once that extent is
     # applied below, with no transform/clip_on/subplots_adjust juggling.
     glyph.animate(
-        labels, interval=400, style="2t",
-        frame_label=FrameLabel(location=[west, north + 2], color="white"), cbar_label_size=16,
+        labels,
+        interval=400,
+        style="2t",
+        frame_label=FrameLabel(location=[west, north + 2], color="white"),
+        cbar_label_size=16,
     )
     glyph.add_reference_map(style="ecmwf-dark", extent=[west, south, east, north])
 
@@ -20696,15 +20761,16 @@ finally:
     del DATA_STYLES["2t"]["2t"]["vmax"]
 
 encoded = base64.b64encode(dome_mp4.read_bytes()).decode()
-HTML(f'&lt;video src="data:video/mp4;base64,{encoded}" width="700" autoplay loop muted playsinline controls&gt;&lt;/video&gt;')
+HTML(
+    f'&lt;video src="data:video/mp4;base64,{encoded}" width="700" autoplay loop muted playsinline controls&gt;&lt;/video&gt;'
+)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df630c6d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20718,7 +20784,7 @@ gaps that blend into the black background are ERA5-Land's own coverage edge, not
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=869d88a2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=22">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20730,7 +20796,7 @@ take each city's hottest day in the window. The ranking picks the focus cities f
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=74fc624e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=23">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20749,14 +20815,16 @@ take each city's hottest day in the window. The ranking picks the focus cities f
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cities</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="p">[</span><span class="n">lon</span> <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">CANDIDATES</span><span class="o">.</span><span class="n">values</span><span class="p">()],</span>
-     <span class="s2">"y"</span><span class="p">:</span> <span class="p">[</span><span class="n">lat</span> <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">CANDIDATES</span><span class="o">.</span><span class="n">values</span><span class="p">()]},</span>
+    <span class="p">{</span>
+        <span class="s2">"x"</span><span class="p">:</span> <span class="p">[</span><span class="n">lon</span> <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">CANDIDATES</span><span class="o">.</span><span class="n">values</span><span class="p">()],</span>
+        <span class="s2">"y"</span><span class="p">:</span> <span class="p">[</span><span class="n">lat</span> <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">CANDIDATES</span><span class="o">.</span><span class="n">values</span><span class="p">()],</span>
+    <span class="p">},</span>
     <span class="n">index</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">CANDIDATES</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">eu_paths</span><span class="p">):</span>
     <span class="n">field</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">sampled</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">cities</span><span class="p">)</span>          <span class="c1"># shape (1 band, N cities)</span>
+    <span class="n">sampled</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">cities</span><span class="p">)</span>  <span class="c1"># shape (1 band, N cities)</span>
     <span class="n">kelvin</span> <span class="o">=</span> <span class="n">sampled</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">celsius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">kelvin</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">,</span> <span class="n">kelvin</span> <span class="o">-</span> <span class="mf">273.15</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>  <span class="c1"># mask the 0 K sea/fill</span>
     <span class="n">day</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -20767,14 +20835,16 @@ take each city's hottest day in the window. The ranking picks the focus cities f
 <span class="n">peaks</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10">cities = pd.DataFrame(
-    {"x": [lon for lat, lon in CANDIDATES.values()],
-     "y": [lat for lat, lon in CANDIDATES.values()]},
+    {
+        "x": [lon for lat, lon in CANDIDATES.values()],
+        "y": [lat for lat, lon in CANDIDATES.values()],
+    },
     index=list(CANDIDATES),
 )
 records = []
 for path in sorted(eu_paths):
     field = Dataset.read_file(path)
-    sampled = field.sample(cities)          # shape (1 band, N cities)
+    sampled = field.sample(cities)  # shape (1 band, N cities)
     kelvin = sampled.ravel()
     celsius = np.where(kelvin &gt; 200, kelvin - 273.15, np.nan)  # mask the 0 K sea/fill
     day = pd.to_datetime(path.stem.split("_")[-1])
@@ -20789,7 +20859,7 @@ peaks.round(1)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2f882b6c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=24">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20809,22 +20879,28 @@ peaks.round(1)</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">peaks</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#c1440e"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Window-peak daily-mean 2 m air temperature by city — 17–26 Jun 2026"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"peak T2m (°C)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"right"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"peak T2m (°C)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"right"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-11">ax = peaks.plot.bar(figsize=(9, 4), color="#c1440e")
 ax.set_title("Window-peak daily-mean 2 m air temperature by city — 17–26 Jun 2026")
-ax.set_ylabel("peak T2m (°C)"); ax.set_xlabel("")
-plt.xticks(rotation=45, ha="right"); ax.grid(axis="y", alpha=0.3)
-plt.tight_layout(); plt.show()</div>
+ax.set_ylabel("peak T2m (°C)")
+ax.set_xlabel("")
+plt.xticks(rotation=45, ha="right")
+ax.grid(axis="y", alpha=0.3)
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2be8e06f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=25">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20836,7 +20912,7 @@ plt.tight_layout(); plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b8f1c40b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=26">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20851,7 +20927,7 @@ air.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=80a0da44">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=27">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20875,7 +20951,8 @@ air.</p>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
         <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
         <span class="n">scale</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
@@ -20894,7 +20971,8 @@ for name, box in CITY_BOXES.items():
         data_source="gee",
         dataset="COPERNICUS/S2_SR_HARMONIZED",
         variables=["B4", "B3", "B2"],
-        start=START, end=END,
+        start=START,
+        end=END,
         temporal_resolution="raw",
         reducer="median",
         scale=50.0,
@@ -20912,7 +20990,7 @@ for name, box in CITY_BOXES.items():
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2ad233e4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=28">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20936,7 +21014,8 @@ for name, box in CITY_BOXES.items():
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="s2">"MODIS/061/MOD11A1"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"LST_Day_1km"</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
         <span class="n">reducer</span><span class="o">=</span><span class="s2">"max"</span><span class="p">,</span>
         <span class="n">scale</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
@@ -20955,7 +21034,8 @@ for name, box in CITY_BOXES.items():
         data_source="gee",
         dataset="MODIS/061/MOD11A1",
         variables=["LST_Day_1km"],
-        start=START, end=END,
+        start=START,
+        end=END,
         temporal_resolution="raw",
         reducer="max",
         scale=1000.0,
@@ -20973,7 +21053,7 @@ for name, box in CITY_BOXES.items():
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bded28fd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=29">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20984,7 +21064,7 @@ for name, box in CITY_BOXES.items():
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f6e8c40c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=30">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21007,15 +21087,25 @@ for name, box in CITY_BOXES.items():
     <span class="n">true_colour</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">city_rgb</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
     <span class="n">true_colour</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
         <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3000</span><span class="p">},</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span>
+        <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> — true colour"</span><span class="p">)</span>
-    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
     <span class="n">lst</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">city_lst</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
     <span class="n">lst</span> <span class="o">=</span> <span class="n">lst</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dn</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dn</span> <span class="o">&gt;=</span> <span class="mi">7500</span><span class="p">,</span> <span class="n">dn</span> <span class="o">*</span> <span class="mf">0.02</span> <span class="o">-</span> <span class="mf">273.15</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
-    <span class="n">lst</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exclude_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
-             <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"LST (°C)"</span><span class="p">)</span>
+    <span class="n">lst</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">exclude_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span>
+        <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span>
+        <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"LST (°C)"</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> — MODIS LST"</span><span class="p">)</span>
-    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-14">fig, axes = plt.subplots(2, 3, figsize=(15, 9), constrained_layout=True)
@@ -21023,15 +21113,25 @@ for col, name in enumerate(CITY_BOXES):
     true_colour = Dataset.read_file(city_rgb[name])
     true_colour.plot(
         rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3000},
-        ax=axes[0, col], fig=fig)
+        ax=axes[0, col],
+        fig=fig,
+    )
     axes[0, col].set_title(f"{name} — true colour")
-    axes[0, col].set_xlabel("lon"); axes[0, col].set_ylabel("lat")
+    axes[0, col].set_xlabel("lon")
+    axes[0, col].set_ylabel("lat")
     lst = Dataset.read_file(city_lst[name])
     lst = lst.apply(lambda dn: np.where(dn &gt;= 7500, dn * 0.02 - 273.15, np.nan))
-    lst.plot(band=0, exclude_value=np.nan, ax=axes[1, col], fig=fig,
-             cmap="inferno", cbar_label="LST (°C)")
+    lst.plot(
+        band=0,
+        exclude_value=np.nan,
+        ax=axes[1, col],
+        fig=fig,
+        cmap="inferno",
+        cbar_label="LST (°C)",
+    )
     axes[1, col].set_title(f"{name} — MODIS LST")
-    axes[1, col].set_xlabel("lon"); axes[1, col].set_ylabel("lat")
+    axes[1, col].set_xlabel("lon")
+    axes[1, col].set_ylabel("lat")
 plt.show()</div>
 </div>
 </div>
@@ -21039,7 +21139,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af1f9f37">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=31">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21053,7 +21153,7 @@ irrigated land beside them stay markedly cooler.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=985fa02d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=32">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21066,7 +21166,7 @@ poleward.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=21374537">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=33">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21085,25 +21185,35 @@ poleward.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">transect</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Madrid"</span><span class="p">,</span> <span class="s2">"Paris"</span><span class="p">,</span> <span class="s2">"Amsterdam"</span><span class="p">]</span>
-<span class="n">wide</span> <span class="o">=</span> <span class="n">city_temps</span><span class="p">[</span><span class="n">city_temps</span><span class="o">.</span><span class="n">city</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">transect</span><span class="p">)]</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">"date"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">"t2m_C"</span><span class="p">)</span>
+<span class="n">wide</span> <span class="o">=</span> <span class="n">city_temps</span><span class="p">[</span><span class="n">city_temps</span><span class="o">.</span><span class="n">city</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">transect</span><span class="p">)]</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span>
+    <span class="n">index</span><span class="o">=</span><span class="s2">"date"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">"t2m_C"</span>
+<span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">wide</span><span class="p">[</span><span class="n">transect</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Daily-mean 2 m air temperature — the heat dome marches SW → NE"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"T2m (°C)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"date"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"T2m (°C)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"date"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-15">transect = ["Madrid", "Paris", "Amsterdam"]
-wide = city_temps[city_temps.city.isin(transect)].pivot(index="date", columns="city", values="t2m_C")
+wide = city_temps[city_temps.city.isin(transect)].pivot(
+    index="date", columns="city", values="t2m_C"
+)
 ax = wide[transect].plot(marker="o", figsize=(9, 4))
 ax.set_title("Daily-mean 2 m air temperature — the heat dome marches SW → NE")
-ax.set_ylabel("T2m (°C)"); ax.set_xlabel("date"); ax.grid(alpha=0.3)
-plt.tight_layout(); plt.show()</div>
+ax.set_ylabel("T2m (°C)")
+ax.set_xlabel("date")
+ax.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=93c87fa2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=34">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21117,7 +21227,7 @@ northern edge, is worth a closer look next.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f8cbee1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=35">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21129,7 +21239,7 @@ Rotterdam and Utrecht</strong> with the same peak-heat MODIS LST composite.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bc25d7f6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=36">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21153,7 +21263,8 @@ Rotterdam and Utrecht</strong> with the same peak-heat MODIS LST composite.</p>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="s2">"MODIS/061/MOD11A1"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"LST_Day_1km"</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
         <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
         <span class="n">reducer</span><span class="o">=</span><span class="s2">"max"</span><span class="p">,</span>
         <span class="n">scale</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
@@ -21172,7 +21283,8 @@ for name, box in DUTCH_BOXES.items():
         data_source="gee",
         dataset="MODIS/061/MOD11A1",
         variables=["LST_Day_1km"],
-        start=START, end=END,
+        start=START,
+        end=END,
         temporal_resolution="raw",
         reducer="max",
         scale=1000.0,
@@ -21190,7 +21302,7 @@ for name, box in DUTCH_BOXES.items():
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ae56cd25">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=37">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21212,16 +21324,34 @@ for name, box in DUTCH_BOXES.items():
 <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">dutch_lst</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
     <span class="n">lst</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">lst</span> <span class="o">=</span> <span class="n">lst</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dn</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dn</span> <span class="o">&gt;=</span> <span class="mi">7500</span><span class="p">,</span> <span class="n">dn</span> <span class="o">*</span> <span class="mf">0.02</span> <span class="o">-</span> <span class="mf">273.15</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
-    <span class="n">lst</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exclude_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"LST (°C)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> — MODIS LST"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
+    <span class="n">lst</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">exclude_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span>
+        <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"LST (°C)"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> — MODIS LST"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-17">fig, axes = plt.subplots(1, 3, figsize=(15, 4.6), constrained_layout=True)
 for ax, (name, path) in zip(axes, dutch_lst.items()):
     lst = Dataset.read_file(path)
     lst = lst.apply(lambda dn: np.where(dn &gt;= 7500, dn * 0.02 - 273.15, np.nan))
-    lst.plot(band=0, exclude_value=np.nan, ax=ax, fig=fig, cmap="inferno", cbar_label="LST (°C)")
-    ax.set_title(f"{name} — MODIS LST"); ax.set_xlabel("lon"); ax.set_ylabel("lat")
+    lst.plot(
+        band=0,
+        exclude_value=np.nan,
+        ax=ax,
+        fig=fig,
+        cmap="inferno",
+        cbar_label="LST (°C)",
+    )
+    ax.set_title(f"{name} — MODIS LST")
+    ax.set_xlabel("lon")
+    ax.set_ylabel("lat")
 plt.show()</div>
 </div>
 </div>
@@ -21229,7 +21359,7 @@ plt.show()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f02f6079">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=38">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21243,7 +21373,7 @@ cooler.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3c06cf07">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=39">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21259,7 +21389,7 @@ free key, read from the <code>OPENAQ_API_KEY</code> environment variable.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f2a5dcc3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=40">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21281,8 +21411,10 @@ free key, read from the <code>OPENAQ_API_KEY</code> environment variable.</p>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"openaq"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"o3"</span><span class="p">],</span>
     <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.5</span><span class="p">,</span> <span class="mf">52.6</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span>
+    <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.5</span><span class="p">,</span> <span class="mf">52.6</span><span class="p">],</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"ozone"</span><span class="p">,</span>
     <span class="n">max_locations</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
 <span class="p">)</span>
@@ -21293,8 +21425,10 @@ free key, read from the <code>OPENAQ_API_KEY</code> environment variable.</p>
     data_source="openaq",
     variables=["o3"],
     temporal_resolution="daily",
-    start=START, end=END,
-    lat_lim=[51.5, 52.6], lon_lim=[4.0, 5.5],
+    start=START,
+    end=END,
+    lat_lim=[51.5, 52.6],
+    lon_lim=[4.0, 5.5],
     path=OUT / "ozone",
     max_locations=25,
 )
@@ -21306,7 +21440,7 @@ print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3ef5e716">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=41">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21317,7 +21451,7 @@ print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0b3bebf3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=42">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21335,16 +21469,26 @@ print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ozone</span><span class="p">[</span><span class="s2">"date"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">ozone</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ozone</span><span class="p">[</span><span class="s2">"date"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">ozone</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+<span class="p">)</span>
 <span class="n">o3_daily</span> <span class="o">=</span> <span class="n">ozone</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"date"</span><span class="p">)[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">nl_temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">city_temps</span><span class="p">[</span><span class="n">city_temps</span><span class="o">.</span><span class="n">city</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">"Amsterdam"</span><span class="p">,</span> <span class="s2">"Rotterdam"</span><span class="p">,</span> <span class="s2">"Utrecht"</span><span class="p">])]</span>
-           <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"date"</span><span class="p">)[</span><span class="s2">"t2m_C"</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="n">nl_temp</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">city_temps</span><span class="p">[</span><span class="n">city_temps</span><span class="o">.</span><span class="n">city</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">"Amsterdam"</span><span class="p">,</span> <span class="s2">"Rotterdam"</span><span class="p">,</span> <span class="s2">"Utrecht"</span><span class="p">])]</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"date"</span><span class="p">)[</span><span class="s2">"t2m_C"</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="p">)</span>
 <span class="n">o3_daily</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">ozone["date"] = pd.to_datetime(ozone["datetime_utc"]).dt.tz_localize(None).dt.normalize()
+<div class="clipboard-copy-txt" id="cell-19">ozone["date"] = (
+    pd.to_datetime(ozone["datetime_utc"]).dt.tz_localize(None).dt.normalize()
+)
 o3_daily = ozone.groupby("date")["value"].mean()
-nl_temp = (city_temps[city_temps.city.isin(["Amsterdam", "Rotterdam", "Utrecht"])]
-           .groupby("date")["t2m_C"].mean())
+nl_temp = (
+    city_temps[city_temps.city.isin(["Amsterdam", "Rotterdam", "Utrecht"])]
+    .groupby("date")["t2m_C"]
+    .mean()
+)
 o3_daily.round(0)</div>
 </div>
 </div>
@@ -21352,7 +21496,7 @@ o3_daily.round(0)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2114a152">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=43">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21373,33 +21517,37 @@ o3_daily.round(0)</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">))</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">o3_daily</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">o3_daily</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#8c6bb1"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#555"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"daily-mean O$_3$ (µg/m³)"</span><span class="p">);</span> <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"date"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"daily-mean O$_3$ (µg/m³)"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"date"</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Netherlands — ground-level ozone tracks the heat"</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">"WHO 8 h guideline (100)"</span><span class="p">,</span> <span class="s2">"daily-mean ozone"</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
 <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">nl_temp</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">nl_temp</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#c1440e"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"2 m air temperature (°C)"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#c1440e"</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">"air temperature"</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-20">fig, ax1 = plt.subplots(figsize=(9, 4.5))
 ax1.bar(o3_daily.index, o3_daily.values, color="#8c6bb1", alpha=0.85)
 ax1.axhline(100, color="#555", ls="--", lw=1)
-ax1.set_ylabel("daily-mean O$_3$ (µg/m³)"); ax1.set_xlabel("date")
+ax1.set_ylabel("daily-mean O$_3$ (µg/m³)")
+ax1.set_xlabel("date")
 ax1.set_title("Netherlands — ground-level ozone tracks the heat")
 ax1.legend(["WHO 8 h guideline (100)", "daily-mean ozone"], loc="upper left")
 ax2 = ax1.twinx()
 ax2.plot(nl_temp.index, nl_temp.values, color="#c1440e", marker="o")
 ax2.set_ylabel("2 m air temperature (°C)", color="#c1440e")
 ax2.legend(["air temperature"], loc="upper right")
-plt.tight_layout(); plt.show()</div>
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=15b03d90">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=44">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21415,7 +21563,7 @@ wildfires, the other heat consequence, see the <code>firms</code> backend.)</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=56cb07d9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=45">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21430,7 +21578,7 @@ over Iberia for two windows: the <strong>winter before</strong> the event and th
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6ccef01b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=46">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21449,14 +21597,18 @@ over Iberia for two windows: the <strong>winter before</strong> the event and th
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">spi</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"Feb 2026"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2026-02-01"</span><span class="p">,</span> <span class="s2">"2026-02-12"</span><span class="p">),</span>
-                    <span class="s2">"Jun 2026"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2026-06-01"</span><span class="p">,</span> <span class="s2">"2026-06-12"</span><span class="p">)}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="ow">in</span> <span class="p">{</span>
+    <span class="s2">"Feb 2026"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2026-02-01"</span><span class="p">,</span> <span class="s2">"2026-02-12"</span><span class="p">),</span>
+    <span class="s2">"Jun 2026"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2026-06-01"</span><span class="p">,</span> <span class="s2">"2026-06-12"</span><span class="p">),</span>
+<span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="n">request</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"edo"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="s2">"edo-spaST"</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[],</span>
-        <span class="n">start</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">s</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">],</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"spi"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -21464,14 +21616,18 @@ over Iberia for two windows: the <strong>winter before</strong> the event and th
 <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spi</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-21">spi = {}
-for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
-                    "Jun 2026": ("2026-06-01", "2026-06-12")}.items():
+for tag, (s, e) in {
+    "Feb 2026": ("2026-02-01", "2026-02-12"),
+    "Jun 2026": ("2026-06-01", "2026-06-12"),
+}.items():
     request = EarthLens(
         data_source="edo",
         dataset="edo-spaST",
         variables=[],
-        start=s, end=e,
-        lat_lim=[36.0, 48.0], lon_lim=[-10.0, 6.0],
+        start=s,
+        end=e,
+        lat_lim=[36.0, 48.0],
+        lon_lim=[-10.0, 6.0],
         path=OUT / "spi",
     )
     paths = request.download(progress_bar=False)
@@ -21483,7 +21639,7 @@ for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7b47b6a9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=47">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21494,7 +21650,7 @@ for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d1446c5e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=48">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21517,29 +21673,51 @@ for tag, (s, e) in {"Feb 2026": ("2026-02-01", "2026-02-12"),
     <span class="c1"># SPI is already in class units (no conversion), so plot the raster straight.</span>
     <span class="n">spi_map</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">spi_map</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-        <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"cividis"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-        <span class="n">add_colorbar</span><span class="o">=</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">spi</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># one shared bar (both panels share the 0–4 scale)</span>
-        <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"SPI class (0 = near-normal)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"EDO short-term SPI — </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">"cividis"</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">add_colorbar</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">spi</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">),</span>  <span class="c1"># one shared bar (both panels share the 0–4 scale)</span>
+        <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"SPI class (0 = near-normal)"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"EDO short-term SPI — </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-22">fig, axes = plt.subplots(1, 2, figsize=(11, 5))
 for i, (ax, (tag, path)) in enumerate(zip(axes, spi.items())):
     # SPI is already in class units (no conversion), so plot the raster straight.
     spi_map = Dataset.read_file(path)
     spi_map.plot(
-        band=0, ax=ax, fig=fig, cmap="cividis", vmin=0, vmax=4,
-        add_colorbar=(i == len(spi) - 1),  # one shared bar (both panels share the 0–4 scale)
-        cbar_label="SPI class (0 = near-normal)")
-    ax.set_title(f"EDO short-term SPI — {tag}"); ax.set_xlabel("lon"); ax.set_ylabel("lat")
-plt.tight_layout(); plt.show()</div>
+        band=0,
+        ax=ax,
+        fig=fig,
+        cmap="cividis",
+        vmin=0,
+        vmax=4,
+        add_colorbar=(
+            i == len(spi) - 1
+        ),  # one shared bar (both panels share the 0–4 scale)
+        cbar_label="SPI class (0 = near-normal)",
+    )
+    ax.set_title(f"EDO short-term SPI — {tag}")
+    ax.set_xlabel("lon")
+    ax.set_ylabel("lat")
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=44e7fbfa">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=49">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21555,7 +21733,7 @@ lag by weeks and weren't yet published for mid-2026.)</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=486a6d15">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=50">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21569,7 +21747,7 @@ temperature maps.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ebb3915d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=51">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21588,17 +21766,21 @@ temperature maps.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">exposure</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"worldpop"</span><span class="p">,</span> <span class="s2">"ghsl"</span><span class="p">,</span> <span class="s2">"admin"</span><span class="p">]</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">EarthLens</span><span class="o">.</span><span class="n">DataSources</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">exposure</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"backend_class"</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+    <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">EarthLens</span><span class="o">.</span><span class="n">DataSources</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">exposure</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"backend_class"</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-23">exposure = ["worldpop", "ghsl", "admin"]
-pd.Series({k: EarthLens.DataSources[k].__name__ for k in exposure}, name="backend_class")</div>
+pd.Series(
+    {k: EarthLens.DataSources[k].__name__ for k in exposure}, name="backend_class"
+)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ea1d69b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=52">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

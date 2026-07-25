@@ -19842,7 +19842,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cell-0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19854,7 +19854,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cell-1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19866,7 +19866,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cell-2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19887,13 +19887,17 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.asf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
 <span class="n">row</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="s1">'opera-rtc-s1'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'platform=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">platform</span><span class="si">!r}</span><span class="s1">  dataset=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">dataset</span><span class="si">!r}</span><span class="s1">  product_type=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">product_type</span><span class="si">!r}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'platform=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">platform</span><span class="si">!r}</span><span class="s1">  dataset=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">dataset</span><span class="si">!r}</span><span class="s1">  product_type=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">product_type</span><span class="si">!r}</span><span class="s1">'</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'stackable: </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">stackable</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.asf import Catalog
 
 row = Catalog().get_product('opera-rtc-s1')
-print(f'platform={row.platform!r}  dataset={row.dataset!r}  product_type={row.product_type!r}')
+print(
+    f'platform={row.platform!r}  dataset={row.dataset!r}  product_type={row.product_type!r}'
+)
 print(f'stackable: {row.stackable}')</div>
 </div>
 </div>
@@ -19901,7 +19905,7 @@ print(f'stackable: {row.stackable}')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cell-3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19912,7 +19916,7 @@ print(f'stackable: {row.stackable}')</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cell-4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19934,10 +19938,10 @@ print(f'stackable: {row.stackable}')</div>
 
 <span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'asf'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'opera-rtc-s1'</span><span class="p">],</span>          <span class="c1"># alias 'opera-rtc' also works</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'opera-rtc-s1'</span><span class="p">],</span>  <span class="c1"># alias 'opera-rtc' also works</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2024-06-01'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2024-06-15'</span><span class="p">,</span>
-    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.0</span><span class="p">,</span> <span class="mf">37.5</span><span class="p">],</span>                <span class="c1"># San Francisco Bay</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">37.0</span><span class="p">,</span> <span class="mf">37.5</span><span class="p">],</span>  <span class="c1"># San Francisco Bay</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">122.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">122.0</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="s1">'opera_rtc_out'</span><span class="p">,</span>
     <span class="n">max_results</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
@@ -19949,10 +19953,10 @@ print(f'stackable: {row.stackable}')</div>
 
 el = EarthLens(
     data_source='asf',
-    variables=['opera-rtc-s1'],          # alias 'opera-rtc' also works
+    variables=['opera-rtc-s1'],  # alias 'opera-rtc' also works
     start='2024-06-01',
     end='2024-06-15',
-    lat_lim=[37.0, 37.5],                # San Francisco Bay
+    lat_lim=[37.0, 37.5],  # San Francisco Bay
     lon_lim=[-122.5, -122.0],
     path='opera_rtc_out',
     max_results=20,
@@ -19965,7 +19969,7 @@ print(f'{len(products)} RTC product(s) match the request')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cell-5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19976,7 +19980,7 @@ print(f'{len(products)} RTC product(s) match the request')</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cell-6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20011,7 +20015,7 @@ print(f'{len(products)} RTC product(s) match the request')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cell-7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20022,7 +20026,7 @@ print(f'{len(products)} RTC product(s) match the request')</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cell-8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20071,7 +20075,7 @@ print(f'{len(static_products)} static-layer mask product(s)')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cell-9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20082,7 +20086,7 @@ print(f'{len(static_products)} static-layer mask product(s)')</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cell-10">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20131,7 +20135,7 @@ print(f'{len(dist_products)} disturbance-alert product(s)')</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cell-11">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

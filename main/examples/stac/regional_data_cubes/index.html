@@ -19808,7 +19808,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=605b7e45">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19823,7 +19823,7 @@ abstraction — same request shape, different region, same <code>anonymous</code
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ea42a3d2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19834,7 +19834,7 @@ abstraction — same request shape, different region, same <code>anonymous</code
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e1395420">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19860,8 +19860,13 @@ abstraction — same request shape, different region, same <code>anonymous</code
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ep</span><span class="si">:</span><span class="s2">9</span><span class="si">}</span><span class="s2"> url=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"          signer=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">signer</span><span class="si">}</span><span class="s2">  region=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">region</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"deafrica wofs default_assets:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">"deafrica/wofs_ls"</span><span class="p">)</span><span class="o">.</span><span class="n">default_assets</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"dea      wofs default_assets:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">"dea/ga_ls_wo_3"</span><span class="p">)</span><span class="o">.</span><span class="n">default_assets</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"deafrica wofs default_assets:"</span><span class="p">,</span>
+    <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">"deafrica/wofs_ls"</span><span class="p">)</span><span class="o">.</span><span class="n">default_assets</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"dea      wofs default_assets:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">"dea/ga_ls_wo_3"</span><span class="p">)</span><span class="o">.</span><span class="n">default_assets</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.stac import Catalog
 
@@ -19871,15 +19876,20 @@ for ep in ("deafrica", "dea"):
     print(f"{ep:9} url={e.url}")
     print(f"          signer={e.signer}  region={e.region}")
 print()
-print("deafrica wofs default_assets:", cat.get_collection("deafrica/wofs_ls").default_assets)
-print("dea      wofs default_assets:", cat.get_collection("dea/ga_ls_wo_3").default_assets)</div>
+print(
+    "deafrica wofs default_assets:",
+    cat.get_collection("deafrica/wofs_ls").default_assets,
+)
+print(
+    "dea      wofs default_assets:", cat.get_collection("dea/ga_ls_wo_3").default_assets
+)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9219b1fc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19891,7 +19901,7 @@ single-band classification we want.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=922f1421">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19915,11 +19925,13 @@ single-band classification we want.</p>
 
 <span class="n">africa</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"deafrica"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-12-31"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-01-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2024-12-31"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"deafrica/wofs_ls"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"water"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">28.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">26.5</span><span class="p">,</span> <span class="mf">28.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">26.0</span><span class="p">],</span>   <span class="c1"># Johannesburg</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">28.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">26.5</span><span class="p">,</span> <span class="mf">28.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">26.0</span><span class="p">],</span>  <span class="c1"># Johannesburg</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+    <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">africa_paths</span> <span class="o">=</span> <span class="n">africa</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">africa_paths</span>
@@ -19930,11 +19942,13 @@ from earthlens.earthlens import EarthLens
 
 africa = EarthLens(
     data_source="deafrica",
-    start="2024-01-01", end="2024-12-31",
+    start="2024-01-01",
+    end="2024-12-31",
     dataset="deafrica/wofs_ls",
     variables=["water"],
-    aoi=[28.0, -26.5, 28.5, -26.0],   # Johannesburg
-    path=tempfile.mkdtemp(), max_items=1,
+    aoi=[28.0, -26.5, 28.5, -26.0],  # Johannesburg
+    path=tempfile.mkdtemp(),
+    max_items=1,
 )
 africa_paths = africa.download()
 africa_paths</div>
@@ -19944,7 +19958,7 @@ africa_paths</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=502bf569">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19956,7 +19970,7 @@ africa_paths</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6869f260">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19975,23 +19989,27 @@ africa_paths</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">australia</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"dea"</span><span class="p">,</span>                    <span class="c1"># alias 'digital-earth-australia' works too</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-01-01"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2024-12-31"</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"dea"</span><span class="p">,</span>  <span class="c1"># alias 'digital-earth-australia' works too</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2024-01-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2024-12-31"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"dea/ga_ls_wo_3"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"water"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">149.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">35.5</span><span class="p">,</span> <span class="mf">149.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">35.0</span><span class="p">],</span>     <span class="c1"># Canberra</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">149.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">35.5</span><span class="p">,</span> <span class="mf">149.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">35.0</span><span class="p">],</span>  <span class="c1"># Canberra</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+    <span class="n">max_items</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">aus_paths</span> <span class="o">=</span> <span class="n">australia</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="n">aus_paths</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">australia = EarthLens(
-    data_source="dea",                    # alias 'digital-earth-australia' works too
-    start="2024-01-01", end="2024-12-31",
+    data_source="dea",  # alias 'digital-earth-australia' works too
+    start="2024-01-01",
+    end="2024-12-31",
     dataset="dea/ga_ls_wo_3",
     variables=["water"],
-    aoi=[149.0, -35.5, 149.5, -35.0],     # Canberra
-    path=tempfile.mkdtemp(), max_items=1,
+    aoi=[149.0, -35.5, 149.5, -35.0],  # Canberra
+    path=tempfile.mkdtemp(),
+    max_items=1,
 )
 aus_paths = australia.download()
 aus_paths</div>
@@ -20001,7 +20019,7 @@ aus_paths</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2443c8f7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20013,7 +20031,7 @@ UTM zone. Reading them through pyramids exposes the CRS and shape.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=448e0685">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20035,20 +20053,24 @@ UTM zone. Reading them through pyramids exposes the CRS and shape.</p>
 
 <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">paths</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"DEAfrica"</span><span class="p">,</span> <span class="n">africa_paths</span><span class="p">),</span> <span class="p">(</span><span class="s2">"DEA"</span><span class="p">,</span> <span class="n">aus_paths</span><span class="p">)):</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">8</span><span class="si">}</span><span class="s2"> bands=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">band_count</span><span class="si">}</span><span class="s2"> epsg=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s2"> shape=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">8</span><span class="si">}</span><span class="s2"> bands=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">band_count</span><span class="si">}</span><span class="s2"> epsg=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s2"> shape=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">from pyramids.dataset import Dataset
 
 for label, paths in (("DEAfrica", africa_paths), ("DEA", aus_paths)):
     ds = Dataset.read_file(str(paths[0]))
-    print(f"{label:8} bands={ds.band_count} epsg={ds.epsg} shape={ds.read_array().shape}")</div>
+    print(
+        f"{label:8} bands={ds.band_count} epsg={ds.epsg} shape={ds.read_array().shape}"
+    )</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6a679e31">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

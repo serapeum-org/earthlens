@@ -19764,7 +19764,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7d82353b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19777,12 +19777,12 @@ the no-network companion to the live wind quickstart.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=09c2282c">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -19801,15 +19801,14 @@ the no-network companion to the live wind quickstart.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import pandas as pd
 
-from earthlens.solar_wind_atlas import Catalog
+from earthlens.solar_wind_atlas import Catalog</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d4386b90">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19820,13 +19819,13 @@ Each row is a frozen pydantic <code>Layer</code> carrying its atlas, transport, 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0caabdf0">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -19863,183 +19862,14 @@ rows = [
     }
     for lid in catalog.available()
 ]
-pd.DataFrame(rows)
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>id</th>
-<th>atlas</th>
-<th>transport</th>
-<th>units</th>
-<th>long_name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>air_density_100m</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>kg/m3</td>
-<td>Mean air density at 100 m above ground level</td>
-</tr>
-<tr>
-<th>1</th>
-<td>capacity_factor_iec1</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>fraction</td>
-<td>Wind turbine capacity factor, IEC Class 1</td>
-</tr>
-<tr>
-<th>2</th>
-<td>capacity_factor_iec2</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>fraction</td>
-<td>Wind turbine capacity factor, IEC Class 2</td>
-</tr>
-<tr>
-<th>3</th>
-<td>capacity_factor_iec3</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>fraction</td>
-<td>Wind turbine capacity factor, IEC Class 3</td>
-</tr>
-<tr>
-<th>4</th>
-<td>dif</td>
-<td>gsa</td>
-<td>download_zip</td>
-<td>kWh/m2/day</td>
-<td>Diffuse horizontal irradiation (long-term aver...</td>
-</tr>
-<tr>
-<th>5</th>
-<td>dni</td>
-<td>gsa</td>
-<td>download_zip</td>
-<td>kWh/m2/day</td>
-<td>Direct normal irradiation (long-term average d...</td>
-</tr>
-<tr>
-<th>6</th>
-<td>ghi</td>
-<td>gsa</td>
-<td>download_zip</td>
-<td>kWh/m2/day</td>
-<td>Global horizontal irradiation (long-term avera...</td>
-</tr>
-<tr>
-<th>7</th>
-<td>gti</td>
-<td>gsa</td>
-<td>download_zip</td>
-<td>kWh/m2/day</td>
-<td>Global irradiation for optimally tilted surfac...</td>
-</tr>
-<tr>
-<th>8</th>
-<td>opta</td>
-<td>gsa</td>
-<td>download_zip</td>
-<td>degree</td>
-<td>Optimum tilt of PV modules</td>
-</tr>
-<tr>
-<th>9</th>
-<td>pvout</td>
-<td>gsa</td>
-<td>download_zip</td>
-<td>kWh/kWp/day</td>
-<td>Photovoltaic power potential — specific PV out...</td>
-</tr>
-<tr>
-<th>10</th>
-<td>weibull_k_100m</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>dimensionless</td>
-<td>Weibull shape parameter k at 100 m above groun...</td>
-</tr>
-<tr>
-<th>11</th>
-<td>weibull_k_10m</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>dimensionless</td>
-<td>Weibull shape parameter k at 10 m above ground...</td>
-</tr>
-<tr>
-<th>12</th>
-<td>weibull_k_150m</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>dimensionless</td>
-<td>Weibull shape parameter k at 150 m above groun...</td>
-</tr>
-<tr>
-<th>13</th>
-<td>weibull_k_200m</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>dimensionless</td>
-<td>Weibull shape parameter k at 200 m above groun...</td>
-</tr>
-<tr>
-<th>14</th>
-<td>weibull_k_50m</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>dimensionless</td>
-<td>Weibull shape parameter k at 50 m above ground...</td>
-</tr>
-<tr>
-<th>15</th>
-<td>wind_100m</td>
-<td>gwa</td>
-<td>vsicurl</td>
-<td>m/s</td>
-<td>Mean wind speed at 100 m above ground level</td>
-</tr>
-</tbody>
-</table>
+pd.DataFrame(rows)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=47f3dd2f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20056,13 +19886,13 @@ locally.</li>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0373ff7e">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -20083,37 +19913,14 @@ locally.</li>
 <div class="clipboard-copy-txt" id="cell-3">by_transport = {}
 for lid in catalog.available():
     by_transport.setdefault(catalog.get(lid).transport, []).append(lid)
-by_transport
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>{'vsicurl': ['air_density_100m',
-  'capacity_factor_iec1',
-  'capacity_factor_iec2',
-  'capacity_factor_iec3',
-  'weibull_k_100m',
-  'weibull_k_10m',
-  'weibull_k_150m',
-  'weibull_k_200m',
-  'weibull_k_50m',
-  'wind_100m'],
- 'download_zip': ['dif', 'dni', 'ghi', 'gti', 'opta', 'pvout']}</pre>
+by_transport</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=849e1d08">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20123,13 +19930,13 @@ by_transport
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell celltag_raises-exception">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell celltag_raises-exception" id="cell-id=9690b300">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_raises-exception">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_raises-exception" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="celltoolbar">
 <div class="button_container tags_button_container">
 <span class="tag-container">
@@ -20151,43 +19958,7 @@ by_transport
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gho"</span><span class="p">)</span>  <span class="c1"># unknown id -&gt; ValueError with a did-you-mean hint</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">catalog.get("gho")  # unknown id -&gt; ValueError with a did-you-mean hint
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[4]</span><span class="ansi-green-fg">, line 1</span>
-<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">1</span> catalog.get(<span class="ansi-yellow-fg">"gho"</span>)  <span style="color: rgb(95,135,135)"># unknown id -&gt; ValueError with a did-you-mean hint</span>
-
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\solar-wind-atlas\src\earthlens\solar_wind_atlas\catalog.py:277</span>, in <span class="ansi-cyan-fg">Catalog.get</span><span class="ansi-blue-fg">(self, layer_id)</span>
-<span class="ansi-green-fg">    253</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-blue-fg">get</span>(<span style="color: rgb(0,135,0)">self</span>, layer_id: <span style="color: rgb(0,135,0)">str</span>) -&gt; Layer:
-<span class="ansi-green-fg">    254</span> <span style="color: rgb(188,188,188)">    </span><span class="ansi-yellow-fg">"""Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<span class="ansi-green-fg">    255</span> 
-<span class="ansi-green-fg">    256</span> <span class="ansi-yellow-fg">    Args:</span>
-<span class="ansi-green-fg">   (...)</span><span class="ansi-green-fg">    275</span> <span class="ansi-yellow-fg">            ```</span>
-<span class="ansi-green-fg">    276</span> <span class="ansi-yellow-fg">    """</span>
-<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">277</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-black-fg ansi-yellow-bg">self</span><span class="ansi-black-fg ansi-yellow-bg">.</span><span class="ansi-black-fg ansi-yellow-bg">get_dataset</span><span class="ansi-black-fg ansi-yellow-bg">(</span><span class="ansi-black-fg ansi-yellow-bg">layer_id</span><span class="ansi-black-fg ansi-yellow-bg">)</span>
-
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">C:\gdrive\algorithms\remote-sensing\earthlens\.claude\worktrees\solar-wind-atlas\src\earthlens\base\abstractdatasource.py:1072</span>, in <span class="ansi-cyan-fg">AbstractCatalog.get_dataset</span><span class="ansi-blue-fg">(self, name)</span>
-<span class="ansi-green-fg">   1070</span> close = difflib.get_close_matches(name, <span style="color: rgb(0,135,0)">self</span>.datasets, n=<span class="ansi-green-fg">1</span>)
-<span class="ansi-green-fg">   1071</span> hint = <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg"> Did you mean </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>close[<span class="ansi-green-fg">0</span>]<span class="ansi-bold" style="color: rgb(175,95,135)">!r}</span><span class="ansi-yellow-fg">?</span><span class="ansi-yellow-fg">"</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> close <span class="ansi-bold" style="color: rgb(0,135,0)">else</span> <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">"</span>
-<span class="ansi-green-fg">-&gt; </span><span class="ansi-green-fg">1072</span> <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">ValueError</span>(
-<span class="ansi-green-fg">   1073</span>     <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>name<span class="ansi-bold" style="color: rgb(175,95,135)">!r}</span><span class="ansi-yellow-fg"> is not in the </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span><span style="color: rgb(0,135,0)">self</span>._catalog_kind<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">. </span><span class="ansi-yellow-fg">"</span>
-<span class="ansi-green-fg">   1074</span>     <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Known </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span><span style="color: rgb(0,135,0)">self</span>._entry_noun<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">: </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span><span style="color: rgb(0,135,0)">sorted</span>(<span style="color: rgb(0,135,0)">self</span>.datasets)<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">.</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>hint<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">"</span>
-<span class="ansi-green-fg">   1075</span> ) <span class="ansi-bold" style="color: rgb(0,135,0)">from</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>
-
-<span class="ansi-red-fg">ValueError</span>: 'gho' is not in the Solar &amp; Wind Atlas catalog. Known layers: ['air_density_100m', 'capacity_factor_iec1', 'capacity_factor_iec2', 'capacity_factor_iec3', 'dif', 'dni', 'ghi', 'gti', 'opta', 'pvout', 'weibull_k_100m', 'weibull_k_10m', 'weibull_k_150m', 'weibull_k_200m', 'weibull_k_50m', 'wind_100m']. Did you mean 'ghi'?</pre>
+<div class="clipboard-copy-txt" id="cell-4">catalog.get("gho")  # unknown id -&gt; ValueError with a did-you-mean hint</div>
 </div>
 </div>
 </div>

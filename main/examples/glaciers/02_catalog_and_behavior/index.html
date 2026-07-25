@@ -19808,7 +19808,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=93b47bac">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19819,7 +19819,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a9e07d7b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19829,13 +19829,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d10a171d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -19861,32 +19861,9 @@ cat.available()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>2026-06-28 17:54:18 | <span class="ansi-green-fg">INFO</span> | pyramids.base.config | Logging is configured.
-</pre>
 </div>
 </div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>['glims:outlines',
- 'rgi:outlines',
- 'wgms:front_variation',
- 'wgms:mass_balance',
- 'wgms:state']</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=78a67c88">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -19896,13 +19873,13 @@ cat.available()</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d1bd521b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -19918,9 +19895,12 @@ cat.available()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="n">d</span><span class="p">,</span> <span class="s1">'source'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
-     <span class="s1">'output_kind'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
-     <span class="s1">'long_name'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span><span class="p">}</span>
+    <span class="p">{</span>
+        <span class="s1">'id'</span><span class="p">:</span> <span class="n">d</span><span class="p">,</span>
+        <span class="s1">'source'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+        <span class="s1">'output_kind'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
+        <span class="s1">'long_name'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span>
+    <span class="p">}</span>
     <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
 <span class="p">]</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
@@ -19928,9 +19908,12 @@ cat.available()</div>
 <div class="clipboard-copy-txt" id="cell-2">import pandas as pd
 
 rows = [
-    {'id': d, 'source': cat.get(d).source,
-     'output_kind': cat.get(d).output_kind,
-     'long_name': cat.get(d).long_name}
+    {
+        'id': d,
+        'source': cat.get(d).source,
+        'output_kind': cat.get(d).output_kind,
+        'long_name': cat.get(d).long_name,
+    }
     for d in cat.available()
 ]
 pd.DataFrame(rows)</div>
@@ -19938,83 +19921,9 @@ pd.DataFrame(rows)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>id</th>
-<th>source</th>
-<th>output_kind</th>
-<th>long_name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>glims:outlines</td>
-<td>glims</td>
-<td>vector</td>
-<td>GLIMS time-series glacier outlines (WFS, bbox ...</td>
-</tr>
-<tr>
-<th>1</th>
-<td>rgi:outlines</td>
-<td>rgi</td>
-<td>vector</td>
-<td>RGI 7.0 glacier outlines (per GTN-G region)</td>
-</tr>
-<tr>
-<th>2</th>
-<td>wgms:front_variation</td>
-<td>wgms</td>
-<td>tabular</td>
-<td>WGMS glacier front variation (length change)</td>
-</tr>
-<tr>
-<th>3</th>
-<td>wgms:mass_balance</td>
-<td>wgms</td>
-<td>tabular</td>
-<td>WGMS glacier mass balance (winter / summer / a...</td>
-</tr>
-<tr>
-<th>4</th>
-<td>wgms:state</td>
-<td>wgms</td>
-<td>tabular</td>
-<td>WGMS glacier state (elevation / area / length ...</td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=87510b52">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20024,13 +19933,13 @@ pd.DataFrame(rows)</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c9d861e4">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -20044,15 +19953,13 @@ pd.DataFrame(rows)</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">region_rows</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-     <span class="s1">'n_boxes'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">bboxes</span><span class="p">)}</span>
+    <span class="p">{</span><span class="s1">'id'</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">'n_boxes'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">bboxes</span><span class="p">)}</span>
     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
 <span class="p">]</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">region_rows</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">region_rows = [
-    {'id': r, 'name': cat.regions[r].name,
-     'n_boxes': len(cat.regions[r].bboxes)}
+    {'id': r, 'name': cat.regions[r].name, 'n_boxes': len(cat.regions[r].bboxes)}
     for r in sorted(cat.regions)
 ]
 pd.DataFrame(region_rows)</div>
@@ -20060,161 +19967,9 @@ pd.DataFrame(region_rows)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>id</th>
-<th>name</th>
-<th>n_boxes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>01</td>
-<td>Alaska</td>
-<td>1</td>
-</tr>
-<tr>
-<th>1</th>
-<td>02</td>
-<td>Western Canada and USA</td>
-<td>1</td>
-</tr>
-<tr>
-<th>2</th>
-<td>03</td>
-<td>Arctic Canada North</td>
-<td>1</td>
-</tr>
-<tr>
-<th>3</th>
-<td>04</td>
-<td>Arctic Canada South</td>
-<td>1</td>
-</tr>
-<tr>
-<th>4</th>
-<td>05</td>
-<td>Greenland Periphery</td>
-<td>1</td>
-</tr>
-<tr>
-<th>5</th>
-<td>06</td>
-<td>Iceland</td>
-<td>1</td>
-</tr>
-<tr>
-<th>6</th>
-<td>07</td>
-<td>Svalbard and Jan Mayen</td>
-<td>1</td>
-</tr>
-<tr>
-<th>7</th>
-<td>08</td>
-<td>Scandinavia</td>
-<td>1</td>
-</tr>
-<tr>
-<th>8</th>
-<td>09</td>
-<td>Russian Arctic</td>
-<td>1</td>
-</tr>
-<tr>
-<th>9</th>
-<td>10</td>
-<td>North Asia</td>
-<td>2</td>
-</tr>
-<tr>
-<th>10</th>
-<td>11</td>
-<td>Central Europe</td>
-<td>1</td>
-</tr>
-<tr>
-<th>11</th>
-<td>12</td>
-<td>Caucasus and Middle East</td>
-<td>1</td>
-</tr>
-<tr>
-<th>12</th>
-<td>13</td>
-<td>Central Asia</td>
-<td>1</td>
-</tr>
-<tr>
-<th>13</th>
-<td>14</td>
-<td>South Asia West</td>
-<td>1</td>
-</tr>
-<tr>
-<th>14</th>
-<td>15</td>
-<td>South Asia East</td>
-<td>1</td>
-</tr>
-<tr>
-<th>15</th>
-<td>16</td>
-<td>Low Latitudes</td>
-<td>1</td>
-</tr>
-<tr>
-<th>16</th>
-<td>17</td>
-<td>Southern Andes</td>
-<td>1</td>
-</tr>
-<tr>
-<th>17</th>
-<td>18</td>
-<td>New Zealand</td>
-<td>1</td>
-</tr>
-<tr>
-<th>18</th>
-<td>19</td>
-<td>Subantarctic and Antarctic Islands</td>
-<td>1</td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3a6cdc7f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20224,13 +19979,13 @@ pd.DataFrame(region_rows)</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=b87b0f3e">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -20258,21 +20013,9 @@ alps, siberia</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>(['11'], ['10'])</pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=806f1ca5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20282,13 +20025,13 @@ alps, siberia</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5e63eabf">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -20303,52 +20046,22 @@ alps, siberia</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">rgi</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'rgi:outlines'</span><span class="p">],</span>
-                <span class="n">region</span><span class="o">=</span><span class="s1">'11'</span><span class="p">)</span>
-<span class="n">wgms</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span>
-                 <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'wgms:mass_balance'</span><span class="p">])</span>
+<span class="n">rgi</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'rgi:outlines'</span><span class="p">],</span> <span class="n">region</span><span class="o">=</span><span class="s1">'11'</span><span class="p">)</span>
+<span class="n">wgms</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">'glaciers'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'wgms:mass_balance'</span><span class="p">])</span>
 <span class="n">rgi</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">OUTPUT_KIND</span><span class="p">,</span> <span class="n">wgms</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">OUTPUT_KIND</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">from earthlens.core import EarthLens
 
-rgi = EarthLens(data_source='glaciers', variables=['rgi:outlines'],
-                region='11')
-wgms = EarthLens(data_source='glaciers',
-                 variables=['wgms:mass_balance'])
+rgi = EarthLens(data_source='glaciers', variables=['rgi:outlines'], region='11')
+wgms = EarthLens(data_source='glaciers', variables=['wgms:mass_balance'])
 rgi.datasource.OUTPUT_KIND, wgms.datasource.OUTPUT_KIND</div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-28 17:54:19.802</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.earthlens</span>:<span class="ansi-cyan-fg">__init__</span>:<span class="ansi-cyan-fg">1046</span> - <span class="ansi-bold">No `path` given; download() writes 'glaciers' output under earthlens-data\glaciers/ (load() uses a temp dir).</span>
-</pre>
 </div>
 </div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre><span class="ansi-green-fg">2026-06-28 17:54:19.806</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">earthlens.earthlens</span>:<span class="ansi-cyan-fg">__init__</span>:<span class="ansi-cyan-fg">1046</span> - <span class="ansi-bold">No `path` given; download() writes 'glaciers' output under earthlens-data\glaciers/ (load() uses a temp dir).</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>('vector', 'tabular')</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=31471452">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20358,13 +20071,13 @@ rgi.datasource.OUTPUT_KIND, wgms.datasource.OUTPUT_KIND</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f6bc25f9">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -20390,22 +20103,9 @@ except NotImplementedError as exc:
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>rejected: Glaciers.download(aggregate=...) is not supported
-</pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c913b8f5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
