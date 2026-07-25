@@ -29,7 +29,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "asf_data_catalog.yaml"
 
@@ -37,7 +37,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "asf_data_catalog.yaml"
 #: path plus the YAML's `st_mtime_ns`. Mirrors the cache pattern in
 #: the usgs_water / fdsn / cmems loaders so editing the file
 #: invalidates the entry without re-parsing on every `Catalog()`.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Product]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Product]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

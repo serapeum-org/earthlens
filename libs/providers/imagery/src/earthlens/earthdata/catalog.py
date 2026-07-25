@@ -42,7 +42,7 @@ from pydantic import (
 )
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
@@ -57,7 +57,9 @@ AUTO_PATH: Path = Path(__file__).parent / "catalog" / "_auto.json"
 # path plus a tuple of `(file, mtime_ns)` for every YAML the load
 # touched, so editing any per-DAAC file invalidates the entry without
 # inspecting every row. Mirrors the CMEMS / GEE multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, EarthdataDataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, EarthdataDataset]]] = (
+    CatalogParseCache()
+)
 # Same `(path, mtime_ns)` cache for the DAAC provider registry.
 _PROVIDERS_CACHE: dict[Any, dict[str, EarthdataDAAC]] = {}
 # …and for the auto-generated long-tail rows (kept as raw dicts — a model is

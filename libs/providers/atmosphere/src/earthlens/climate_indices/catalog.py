@@ -26,7 +26,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "climate_indices_data_catalog.yaml"
 
@@ -34,7 +34,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "climate_indices_data_catalog.yaml"
 #: plus the YAML's `st_mtime_ns`, so editing the file invalidates the
 #: entry without re-parsing on every `Catalog()`. Mirrors the
 #: `_CATALOG_CACHE` pattern in the usgs_water / gee / ecmwf loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Index]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Index]] = CatalogParseCache()
 
 #: The two index sources, used to validate each row's `source`.
 Source = Literal["noaa-psl", "knmi-climexp"]

@@ -36,7 +36,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
 
@@ -44,9 +44,9 @@ CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Stores the
 #: `(themes, available_releases, available_datasets)` triple. Mirrors the
 #: FDSN / NWP / radar loaders.
-_CATALOG_CACHE: dict[
-    tuple[str, int], tuple[dict[str, Theme], list[str], list[str]]
-] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Theme], list[str], list[str]]] = (
+    CatalogParseCache()
+)
 
 
 def clear_catalog_cache() -> None:

@@ -20,11 +20,11 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "radar_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[Any, dict[str, Station]] = {}
+_CATALOG_CACHE: dict[Any, dict[str, Station]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

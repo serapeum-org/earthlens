@@ -62,7 +62,7 @@ from earthlens.base.providers import (
     clear_providers_cache as _clear_providers_cache_base,
 )
 from earthlens.base.providers import load_providers
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 from earthlens.ecmwf.constraints import fetch_constraints
 
 # `read_cdsapirc` / `download_job` / `list_recent_jobs` were split out of this
@@ -87,7 +87,7 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # script append) invalidates the entry naturally. Mirrors the GEE
 # pattern (H1 / M2) so repeated `Catalog()` construction is ~1 ms
 # instead of paying the YAML parse + pydantic validation each time.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

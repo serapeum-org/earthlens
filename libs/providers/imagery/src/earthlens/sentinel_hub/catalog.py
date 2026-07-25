@@ -35,7 +35,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 EVALSCRIPTS_PATH: Path = Path(__file__).parent / "evalscripts"
@@ -49,7 +49,7 @@ _RECIPE_KINDS: frozenset[str] = frozenset({"render", "stats"})
 _CATALOG_CACHE: dict[
     Any,
     tuple[dict[str, Collection], dict[str, EvalscriptRecipe], list[str]],
-] = {}
+] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

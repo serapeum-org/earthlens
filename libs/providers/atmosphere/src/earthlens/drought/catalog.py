@@ -30,14 +30,14 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 """Path to the bundled `catalog/` directory of per-source YAML files plus
 the `_index.yaml` informational index. Reassign this attribute to redirect
 the loader at another directory or a single YAML file."""
 
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
 
 TransportLiteral = Literal["usdm-geojson", "edo-wcs", "netcdf-url"]
 """The three live transports the drought backend dispatches on. `_fetch`

@@ -33,7 +33,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "tropycal_data_catalog.yaml"
 
@@ -45,7 +45,7 @@ _KNOWN_SOURCES: frozenset[str] = frozenset({"ibtracs", "hurdat"})
 # mtime_ns)` so any real file mutation invalidates the entry naturally.
 # Mirrors the ECMWF / GEE catalog cache so repeated `Catalog()`
 # construction skips the YAML parse + pydantic validation.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Basin]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Basin]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

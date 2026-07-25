@@ -192,14 +192,34 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
                 missing/invalid or the backend rejects them.
         """
 
-    @abstractmethod
+    #: Set to `True` by :meth:`mark_configured`; read by the default
+    #: :meth:`is_authenticated`. Class-level so an instance that never
+    #: configured still answers `False` without an `__init__` of its own.
+    _configured: bool = False
+
+    def mark_configured(self) -> None:
+        """Record that :meth:`configure` completed, for the default predicate.
+
+        Call this at the end of a successful `configure()` so the inherited
+        :meth:`is_authenticated` starts returning `True` and the next
+        `configure()` short-circuits.
+        """
+        self._configured = True
+
     def is_authenticated(self) -> bool:
         """Return `True` when the in-process state has working credentials.
 
         Cheap predicate — must not call the network. Used by
         :meth:`configure` for idempotency and by callers that want to
         skip a redundant setup pass.
+
+        The default reports whether :meth:`mark_configured` has run, which is
+        the "did `configure()` succeed?" flag the majority of the auth classes
+        each declared by hand. Override it when the real answer lives elsewhere
+        — an SDK's own session object (asf), a token expiry, or a backend whose
+        credentials are always present (ghsl, worldpop return `True`).
         """
+        return self._configured
 
     def close(self) -> None:
         """Release any resource held by :meth:`configure`.

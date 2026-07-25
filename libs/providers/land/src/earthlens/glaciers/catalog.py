@@ -30,7 +30,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 #: Path to the bundled sharded catalog directory (`rgi.yaml` / `glims.yaml` /
 #: `wgms.yaml` + the `_index.yaml` informational index). Tests can monkey-patch
@@ -43,7 +43,9 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: per-source file invalidates the entry without re-parsing on an unchanged
 #: tree. The value is the `(datasets, regions, available)` triple the fields are
 #: built from.
-_CATALOG_CACHE: dict[Any, tuple[dict[str, Dataset], dict[str, Region], list[str]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[dict[str, Dataset], dict[str, Region], list[str]]] = (
+    CatalogParseCache()
+)
 
 #: The three glacier sources a :class:`Dataset` row can name.
 Source = Literal["rgi", "glims", "wgms"]

@@ -39,7 +39,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -47,7 +47,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # path plus a tuple of `(file, mtime_ns)` for every YAML the load
 # touched, so editing any per-domain file invalidates the entry
 # without inspecting every row. Mirrors the GEE multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
 
 CadenceLiteral = Literal[
     "hourly",

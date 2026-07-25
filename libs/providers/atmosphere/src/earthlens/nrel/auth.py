@@ -175,16 +175,6 @@ class NrelAuth(AbstractAuth[NrelCredentials]):
         self._email = email
         self._configured = True
 
-    def is_authenticated(self) -> bool:
-        """Return `True` once `configure` has resolved both secrets.
-
-        Cheap predicate — does not call the network.
-
-        Returns:
-            bool: `True` after a successful `configure`, `False` before.
-        """
-        return self._configured
-
     @property
     def api_key(self) -> SecretStr:
         """The resolved API key; valid only after `configure`.

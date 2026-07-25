@@ -167,18 +167,6 @@ class FirmsAuth(AbstractAuth[FirmsCredentials]):
         self._key = key
         self._configured = True
 
-    def is_authenticated(self) -> bool:
-        """Return `True` once :meth:`configure` has resolved a key.
-
-        Cheap predicate — does not call the network. A return of `True`
-        means a usable key is held by this instance.
-
-        Returns:
-            bool: `True` after a successful :meth:`configure`, `False`
-                before.
-        """
-        return self._configured
-
     @property
     def api_key(self) -> str:
         """The resolved `MAP_KEY`; valid only after :meth:`configure`.

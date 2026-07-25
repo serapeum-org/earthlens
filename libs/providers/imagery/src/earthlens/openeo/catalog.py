@@ -32,7 +32,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -47,7 +47,7 @@ _CATALOG_CACHE: dict[
         list[str],
         list[str],
     ],
-] = {}
+] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

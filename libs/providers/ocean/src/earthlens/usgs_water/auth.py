@@ -164,18 +164,6 @@ class UsgsWaterAuth(AbstractAuth[UsgsWaterCredentials]):
             self._token = token
             self._configured = True
 
-    def is_authenticated(self) -> bool:
-        """Return `True` when a token was resolved (token-backed mode).
-
-        Cheap predicate — does not call the network. `False` is a
-        legitimate, non-error state meaning "anonymous access".
-
-        Returns:
-            bool: `True` after :meth:`configure` resolved a token,
-                `False` when anonymous (no token).
-        """
-        return self._configured
-
     @property
     def token(self) -> str | None:
         """The resolved PAT, or `None` for anonymous access.

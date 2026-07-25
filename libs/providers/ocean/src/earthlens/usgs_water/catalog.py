@@ -28,7 +28,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "usgs_water_data_catalog.yaml"
 
@@ -36,7 +36,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "usgs_water_data_catalog.yaml"
 #: plus the YAML's `st_mtime_ns`, so editing the file invalidates the
 #: entry without re-parsing on every `Catalog()`. Mirrors the
 #: `_CATALOG_CACHE` pattern in the GEE / ECMWF / CMEMS / FDSN loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Parameter]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Parameter]] = CatalogParseCache()
 
 #: A 5-digit NWIS parameter code (the raw form `resolve` passes through).
 _CODE_RE = re.compile(r"^\d{5}$")

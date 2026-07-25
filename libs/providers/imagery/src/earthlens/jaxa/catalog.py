@@ -37,13 +37,13 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
 #: Keyed on the resolved path + every contributing file's mtime so editing any
 #: per-mission YAML invalidates the cache without re-walking the whole tree.
-_CATALOG_CACHE: dict[Any, Catalog] = {}
+_CATALOG_CACHE: dict[Any, Catalog] = CatalogParseCache()
 
 
 def _yaml_files_for(path: Path) -> list[Path]:

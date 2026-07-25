@@ -146,15 +146,6 @@ class WdpaAuth(AbstractAuth[WdpaCredentials]):
         self._token = token
         self._configured = True
 
-    def is_authenticated(self) -> bool:
-        """Return `True` once :meth:`configure` has resolved a token.
-
-        Returns:
-            bool: `True` after a successful :meth:`configure`, `False`
-                before.
-        """
-        return self._configured
-
     @property
     def token(self) -> str:
         """The resolved token; valid only after :meth:`configure`.

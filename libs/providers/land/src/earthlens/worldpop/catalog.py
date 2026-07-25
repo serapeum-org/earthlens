@@ -29,7 +29,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "worldpop_data_catalog.yaml"
 
@@ -185,7 +185,7 @@ class Product(BaseModel):
 # mtime_ns)` so any real file mutation invalidates the entry naturally.
 # Mirrors the ECMWF / GEE / tropycal catalog caches so repeated `Catalog()`
 # construction skips the YAML parse + pydantic validation.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Product]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], dict[str, Product]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

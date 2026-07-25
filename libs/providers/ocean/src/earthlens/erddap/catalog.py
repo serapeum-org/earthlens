@@ -31,7 +31,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -48,7 +48,7 @@ _DEFAULT_DIM_NAMES: tuple[str, ...] = ("time", "latitude", "longitude")
 # plus a tuple of `(file, mtime_ns)` for every YAML the load touched, so
 # editing any per-slice file invalidates the entry without inspecting
 # every row. Mirrors the CMEMS multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

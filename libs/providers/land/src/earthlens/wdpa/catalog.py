@@ -23,7 +23,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "wdpa_data_catalog.yaml"
 
@@ -33,7 +33,9 @@ COUNTRY_PREFIX = "country:"
 # Module-level cache of parsed catalog rows, keyed on the resolved path plus
 # the YAML's `st_mtime_ns`, so editing the file invalidates the entry. Mirrors
 # the FDSN / GBIF catalog loaders.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Country], list[str]]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Country], list[str]]] = (
+    CatalogParseCache()
+)
 
 
 def clear_catalog_cache() -> None:

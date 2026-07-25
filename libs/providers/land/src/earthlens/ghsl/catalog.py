@@ -42,7 +42,7 @@ from pandas import DataFrame
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 #: Path to the bundled catalog directory of per-family `*.yaml` files plus the
 #: `_index.yaml` informational index. Tests can monkey-patch this attribute to
@@ -53,7 +53,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-family file invalidates the entry without re-parsing on an unchanged
 #: tree. Mirrors the GEE / CMEMS multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Product]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Product]]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

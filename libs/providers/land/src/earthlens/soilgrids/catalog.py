@@ -30,7 +30,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 #: Path to the bundled catalog directory of per-group `*.yaml` files plus the
 #: `_index.yaml` informational index. Override this attribute to redirect the
@@ -40,7 +40,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: Module-level cache of parsed catalog data, keyed on the resolved path plus a
 #: tuple of `(file, mtime_ns)` for every YAML the load touched, so editing any
 #: per-group file invalidates the entry without re-parsing an unchanged tree.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Property]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Property]]] = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:

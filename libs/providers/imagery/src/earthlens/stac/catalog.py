@@ -29,7 +29,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -39,7 +39,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # Mirrors the GEE / CMEMS multi-file caches.
 _CATALOG_CACHE: dict[
     Any, tuple[dict[str, Endpoint], dict[str, list[str]], dict[str, Collection]]
-] = {}
+] = CatalogParseCache()
 
 SignerType = Literal[
     "anonymous",

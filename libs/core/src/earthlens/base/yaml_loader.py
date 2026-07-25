@@ -20,6 +20,68 @@ from typing import Any
 import yaml
 
 
+class CatalogParseCache(dict):
+    """Parse cache that keeps only the newest entry per catalog path.
+
+    Every backend's `catalog.py` memoises its parsed rows under a
+    `(resolved_path, mtime)` key so editing the YAML invalidates the entry
+    without re-parsing on every `Catalog()`. Keyed that way a plain `dict`
+    grows without bound: each edit adds a key and the superseded parse is never
+    evicted, so a long-lived process that regenerates a catalog (the `earthlens
+    datasets refresh` tooling, a test suite rewriting a temp catalog) retains
+    every past version of it.
+
+    This keeps the memoisation but drops the stale generations: writing a key
+    evicts any other key for the same path, so a given catalog holds at most
+    one parse. The eviction reads `key[0]` — the resolved path string every
+    backend puts first, whether the rest of the key is a single mtime or a
+    per-shard tuple.
+
+    Examples:
+        - A newer mtime for the same path replaces the older entry:
+            ```python
+            >>> from earthlens.base.yaml_loader import CatalogParseCache
+            >>> cache = CatalogParseCache()
+            >>> cache[("/catalog.yaml", 1)] = "first parse"
+            >>> cache[("/catalog.yaml", 2)] = "second parse"
+            >>> list(cache)
+            [('/catalog.yaml', 2)]
+
+            ```
+        - Entries for different paths coexist:
+            ```python
+            >>> from earthlens.base.yaml_loader import CatalogParseCache
+            >>> cache = CatalogParseCache()
+            >>> cache[("/a.yaml", 1)] = "a"
+            >>> cache[("/b.yaml", 1)] = "b"
+            >>> sorted(cache)
+            [('/a.yaml', 1), ('/b.yaml', 1)]
+
+            ```
+        - Re-reading a cached entry is still a plain dict hit:
+            ```python
+            >>> from earthlens.base.yaml_loader import CatalogParseCache
+            >>> cache = CatalogParseCache()
+            >>> cache[("/a.yaml", 1)] = "parsed"
+            >>> cache[("/a.yaml", 1)]
+            'parsed'
+
+            ```
+    """
+
+    def __setitem__(self, key: Any, value: Any) -> None:
+        """Store `value`, evicting any other entry for the same catalog path."""
+        if isinstance(key, tuple) and key:
+            path = key[0]
+            for existing in [
+                k
+                for k in self
+                if isinstance(k, tuple) and k and k[0] == path and k != key
+            ]:
+                super().__delitem__(existing)
+        super().__setitem__(key, value)
+
+
 class _StrictSafeLoader(yaml.SafeLoader):
     """:class:`yaml.SafeLoader` that rejects duplicate keys in any mapping.
 

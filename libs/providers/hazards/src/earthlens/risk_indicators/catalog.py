@@ -27,7 +27,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "risk_indicators_data_catalog.yaml"
 
@@ -36,7 +36,9 @@ CATALOG_PATH: Path = Path(__file__).parent / "risk_indicators_data_catalog.yaml"
 #: re-parsing on every `Catalog()`. Mirrors the `_CATALOG_CACHE` pattern in the
 #: climate_indices / usgs_water / gee loaders. The value is the
 #: `(datasets, admin_codes)` pair both fields are built from.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], dict[str, int]]] = {}
+_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], dict[str, int]]] = (
+    CatalogParseCache()
+)
 
 #: The three risk providers a :class:`Dataset` row can name.
 Provider = Literal["thinkhazard", "inform", "gfw"]

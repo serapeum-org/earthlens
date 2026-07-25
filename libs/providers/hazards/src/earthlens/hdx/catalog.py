@@ -36,7 +36,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.yaml_loader import load_yaml_strict
+from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
@@ -44,7 +44,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # plus a tuple of `(file, mtime_ns)` for every YAML the load touched, so
 # editing any per-theme file invalidates the entry without inspecting
 # every row. Mirrors the Earthdata / CMEMS multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, HdxDataset]]] = {}
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, HdxDataset]]] = CatalogParseCache()
 # Same `(path, mtime_ns)` cache for the auto-generated `available_datasets`
 # index. The index is held as JSON (`_available.json`), not YAML, and parsed
 # separately from the curated per-theme YAMLs — so a `Catalog()` pays only the
