@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20036,7 +20036,24 @@ drought</code> CLI and the audit gate.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+<span class="normal"><a href="#__codelineno-0-234">234</a></span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+<span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
 <span class="normal"><a href="#__codelineno-0-247">247</a></span>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
@@ -20120,125 +20137,108 @@ drought</code> CLI and the audit gate.</p>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
 <span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the `earthlens.drought` backend.</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data) and</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    exposes its consumed top-level sections as typed pydantic fields.</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) — `model_post_init` parses</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    the YAML and populates every field in one pass. Mirrors the</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    `earthlens.eumetsat` / `earthlens.earthdata` / `earthlens.ghsl`</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    catalogs: `datasets` (the curated map) and `available_datasets` (the</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    informational index).</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        available_datasets: Informational list of every curated dataset</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            id, merged across every per-source YAML. Runtime code does</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            not consume it; it seeds the `earthlens datasets list</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            drought` CLI and the audit gate.</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        datasets: Structural map keyed by dataset id. Each value is a</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            `Dataset`.</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        - List how many datasets are curated:</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            &gt;&gt;&gt; from earthlens.drought import Catalog</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            &gt;&gt;&gt; len(Catalog().datasets) &gt;= 25</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            True</span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the `earthlens.drought` backend.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data) and</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    exposes its consumed top-level sections as typed pydantic fields.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) — `model_post_init` parses</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    the YAML and populates every field in one pass. Mirrors the</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    `earthlens.eumetsat` / `earthlens.earthdata` / `earthlens.ghsl`</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    catalogs: `datasets` (the curated map) and `available_datasets` (the</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    informational index).</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        available_datasets: Informational list of every curated dataset</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            id, merged across every per-source YAML. Runtime code does</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            not consume it; it seeds the `earthlens datasets list</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            drought` CLI and the audit gate.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        datasets: Structural map keyed by dataset id. Each value is a</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            `Dataset`.</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        - List how many datasets are curated:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            &gt;&gt;&gt; from earthlens.drought import Catalog</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            &gt;&gt;&gt; len(Catalog().datasets) &gt;= 25</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            True</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;drought catalog&quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">available_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        `Catalog()` with no args is sugar for `Catalog.load()` — it reads</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        the bundled `catalog/` directory through the `(path, mtime)`-keyed</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        cache so repeated construction is fast. If the caller passed</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        `datasets=...`, the disk read is skipped.</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;drought catalog&quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="n">available_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        `Catalog()` with no args is sugar for `Catalog.load()` — it reads</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        the bundled `catalog/` directory through the `(path, mtime)`-keyed</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        cache so repeated construction is fast. If the caller passed</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `datasets=...`, the disk read is skipped.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">                `load`.</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the drought catalog from disk (cached).</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                `load`.</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the drought catalog from disk (cached).</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            catalog_path: Path to the `catalog/` directory or a single</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                `*.yaml` file. Defaults to module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">            ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="p">)</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            catalog_path: Path to the `catalog/` directory or a single</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                `*.yaml` file. Defaults to module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is done</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        in `model_post_init`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            dict[str, Dataset]: One entry per curated dataset (same object</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                as `datasets`).</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="p">)</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is done</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        in `model_post_init`.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            dict[str, Dataset]: One entry per curated dataset (same object</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                as `datasets`).</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its row, with a did-you-mean on miss.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            dataset_id: A curated dataset id (`&quot;usdm&quot;`, `&quot;edo-spaST&quot;`,</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                `&quot;speibase-12&quot;`, …).</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ValueError: When `dataset_id` is not curated; the message</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                lists the closest known ids via the shipped</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                `AbstractCatalog.get_dataset` did-you-mean helper.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its row, with a did-you-mean on miss.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            dataset_id: A curated dataset id (`&quot;usdm&quot;`, `&quot;edo-spaST&quot;`,</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">                `&quot;speibase-12&quot;`, …).</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            Dataset: The matching row.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            ValueError: When `dataset_id` is not curated; the message</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">                lists the closest known ids via the shipped</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">                `AbstractCatalog.get_dataset` did-you-mean helper.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -20351,37 +20351,37 @@ lists the closest known ids via the shipped
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its row, with a did-you-mean on miss.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        dataset_id: A curated dataset id (`&quot;usdm&quot;`, `&quot;edo-spaST&quot;`,</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            `&quot;speibase-12&quot;`, …).</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        Dataset: The matching row.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        ValueError: When `dataset_id` is not curated; the message</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            lists the closest known ids via the shipped</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">            `AbstractCatalog.get_dataset` did-you-mean helper.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its row, with a did-you-mean on miss.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        dataset_id: A curated dataset id (`&quot;usdm&quot;`, `&quot;edo-spaST&quot;`,</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            `&quot;speibase-12&quot;`, …).</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Dataset: The matching row.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        ValueError: When `dataset_id` is not curated; the message</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            lists the closest known ids via the shipped</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            `AbstractCatalog.get_dataset` did-you-mean helper.</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20430,27 +20430,27 @@ as <code>datasets</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is done</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    in `model_post_init`.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        dict[str, Dataset]: One entry per curated dataset (same object</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            as `datasets`).</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is done</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    in `model_post_init`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        dict[str, Dataset]: One entry per curated dataset (same object</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            as `datasets`).</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20555,45 +20555,45 @@ as <code>datasets</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-298">298</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span>
+<span class="normal"><a href="#__codelineno-0-283">283</a></span>
+<span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span>
+<span class="normal"><a href="#__codelineno-0-287">287</a></span>
+<span class="normal"><a href="#__codelineno-0-288">288</a></span>
+<span class="normal"><a href="#__codelineno-0-289">289</a></span>
+<span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span>
-<span class="normal"><a href="#__codelineno-0-301">301</a></span>
-<span class="normal"><a href="#__codelineno-0-302">302</a></span>
-<span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span>
-<span class="normal"><a href="#__codelineno-0-305">305</a></span>
-<span class="normal"><a href="#__codelineno-0-306">306</a></span>
-<span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span>
-<span class="normal"><a href="#__codelineno-0-312">312</a></span>
-<span class="normal"><a href="#__codelineno-0-313">313</a></span>
-<span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the drought catalog from disk (cached).</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        catalog_path: Path to the `catalog/` directory or a single</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            `*.yaml` file. Defaults to module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        ValueError: Propagated from `_load_catalog_data`.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the drought catalog from disk (cached).</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        catalog_path: Path to the `catalog/` directory or a single</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            `*.yaml` file. Defaults to module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20644,39 +20644,39 @@ cache so repeated construction is fast. If the caller passed
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span>
-<span class="normal"><a href="#__codelineno-0-282">282</a></span>
-<span class="normal"><a href="#__codelineno-0-283">283</a></span>
-<span class="normal"><a href="#__codelineno-0-284">284</a></span>
-<span class="normal"><a href="#__codelineno-0-285">285</a></span>
-<span class="normal"><a href="#__codelineno-0-286">286</a></span>
-<span class="normal"><a href="#__codelineno-0-287">287</a></span>
-<span class="normal"><a href="#__codelineno-0-288">288</a></span>
-<span class="normal"><a href="#__codelineno-0-289">289</a></span>
-<span class="normal"><a href="#__codelineno-0-290">290</a></span>
-<span class="normal"><a href="#__codelineno-0-291">291</a></span>
-<span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    `Catalog()` with no args is sugar for `Catalog.load()` — it reads</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    the bundled `catalog/` directory through the `(path, mtime)`-keyed</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    cache so repeated construction is fast. If the caller passed</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    `datasets=...`, the disk read is skipped.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            `load`.</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span>
+<span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span>
+<span class="normal"><a href="#__codelineno-0-268">268</a></span>
+<span class="normal"><a href="#__codelineno-0-269">269</a></span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span>
+<span class="normal"><a href="#__codelineno-0-275">275</a></span>
+<span class="normal"><a href="#__codelineno-0-276">276</a></span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span>
+<span class="normal"><a href="#__codelineno-0-278">278</a></span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    `Catalog()` with no args is sugar for `Catalog.load()` — it reads</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    the bundled `catalog/` directory through the `(path, mtime)`-keyed</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    cache so repeated construction is fast. If the caller passed</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    `datasets=...`, the disk read is skipped.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            `load`.</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20901,7 +20901,24 @@ Vicente-Serrano et al. and SPEIbase v2.11"</code>).</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-169">169</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-152">152</a></span>
+<span class="normal"><a href="#__codelineno-0-153">153</a></span>
+<span class="normal"><a href="#__codelineno-0-154">154</a></span>
+<span class="normal"><a href="#__codelineno-0-155">155</a></span>
+<span class="normal"><a href="#__codelineno-0-156">156</a></span>
+<span class="normal"><a href="#__codelineno-0-157">157</a></span>
+<span class="normal"><a href="#__codelineno-0-158">158</a></span>
+<span class="normal"><a href="#__codelineno-0-159">159</a></span>
+<span class="normal"><a href="#__codelineno-0-160">160</a></span>
+<span class="normal"><a href="#__codelineno-0-161">161</a></span>
+<span class="normal"><a href="#__codelineno-0-162">162</a></span>
+<span class="normal"><a href="#__codelineno-0-163">163</a></span>
+<span class="normal"><a href="#__codelineno-0-164">164</a></span>
+<span class="normal"><a href="#__codelineno-0-165">165</a></span>
+<span class="normal"><a href="#__codelineno-0-166">166</a></span>
+<span class="normal"><a href="#__codelineno-0-167">167</a></span>
+<span class="normal"><a href="#__codelineno-0-168">168</a></span>
+<span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
@@ -20957,97 +20974,80 @@ Vicente-Serrano et al. and SPEIbase v2.11"</code>).</p>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span>
-<span class="normal"><a href="#__codelineno-0-226">226</a></span>
-<span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span>
-<span class="normal"><a href="#__codelineno-0-230">230</a></span>
-<span class="normal"><a href="#__codelineno-0-231">231</a></span>
-<span class="normal"><a href="#__codelineno-0-232">232</a></span>
-<span class="normal"><a href="#__codelineno-0-233">233</a></span>
-<span class="normal"><a href="#__codelineno-0-234">234</a></span>
-<span class="normal"><a href="#__codelineno-0-235">235</a></span>
-<span class="normal"><a href="#__codelineno-0-236">236</a></span>
-<span class="normal"><a href="#__codelineno-0-237">237</a></span>
-<span class="normal"><a href="#__codelineno-0-238">238</a></span>
-<span class="normal"><a href="#__codelineno-0-239">239</a></span>
-<span class="normal"><a href="#__codelineno-0-240">240</a></span>
-<span class="normal"><a href="#__codelineno-0-241">241</a></span>
-<span class="normal"><a href="#__codelineno-0-242">242</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated drought dataset row (USDM / EDO / GDO / SPEIbase).</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Mirrors a single `datasets.&lt;id&gt;:` block in one of the per-source</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    `catalog/*.yaml` files. The dataset id is the parent key in the YAML and</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    is copied onto the row at load time so the backend can echo it back into</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    output filenames without indexing back through the catalog dict.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        id: The dataset id (the catalog key, e.g. `&quot;usdm&quot;`,</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            `&quot;edo-spaST&quot;`, `&quot;speibase-12&quot;`). Copied from the YAML key.</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        source: Human-readable source / version string used in the</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            success log line (`&quot;Copernicus European Drought Observatory</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            (EDO)&quot;`, `&quot;CSIC SPEIbase v2.11 (Vicente-Serrano et al., CRU</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            TS 4.09)&quot;`, …).</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        transport: The transport the backend&#39;s `_fetch` dispatches on.</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            One of `&quot;usdm-geojson&quot;`, `&quot;edo-wcs&quot;`, `&quot;netcdf-url&quot;`.</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        endpoint: URL or URL template. USDM has a `{ymd}` placeholder</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            substituted with the **Tuesday valid date** (USDM releases on</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            Thursday for the prior Tuesday, and the JSON URL stem is</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            keyed on that Tuesday — verified live; every Thursday URL</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            returns 404); EDO/GDO is the WCS map endpoint (the coverage</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            and time-subset go in the request, not the URL); SPEIbase</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            is the literal per-scale NetCDF URL.</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        coverage: WCS `CoverageId` for `&quot;edo-wcs&quot;` rows; `None` for the</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            other transports.</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        output_kind: Per-row output shape — `&quot;vector&quot;` for USDM,</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            `&quot;raster&quot;` for EDO/GDO/SPEIbase. Copied onto the backend</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            instance&#39;s `OUTPUT_KIND` (`G1`).</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        cadence: Source release cadence — `&quot;weekly&quot;` (USDM),</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            `&quot;10day&quot;` (most EDO/GDO indicators), `&quot;monthly&quot;` (SPEIbase,</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">            some EDO/GDO indicators like `spgTS`). Drives the</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            date-snapping helper.</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        native_crs: The CRS the source delivers in, as an EPSG string</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            (`&quot;EPSG:4326&quot;`). USDM was documented Albers but ships</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            `GCS_WGS_1984` today (`G4` — kept as a `to_crs(&quot;EPSG:4326&quot;)`</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            defensive no-op in the backend).</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        timescale: The Copernicus `SELECTED_TIMESCALE` value for</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">            `edo-wcs` rows — a one-or-two-digit string naming the SPI /</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            SPEI integration window in months (`&quot;01&quot;`, `&quot;03&quot;`, `&quot;06&quot;`,</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            `&quot;12&quot;`, …). The SPI coverages (`spaST`, `spcLT`, `spgTS`)</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            **require** it; the other EDO/GDO indicators accept and ignore</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            it, so every `edo-wcs` row carries one (default `&quot;01&quot;`). It is</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            config-as-code: change a row&#39;s `timescale` in the YAML to pick</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            a different window without touching the backend. `None` for</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            the non-WCS transports.</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        license_note: Short attribution string logged once on success</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            (`&quot;Copernicus EMS — free reuse with attribution&quot;`,</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            `&quot;USDM public domain — cite NDMC / UNL&quot;`, `&quot;CC-BY 4.0 — cite</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            Vicente-Serrano et al. and SPEIbase v2.11&quot;`).</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        - Inspect a USDM vector row:</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">            &gt;&gt;&gt; from earthlens.drought import Catalog</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            &gt;&gt;&gt; ds = Catalog().get(&quot;usdm&quot;)</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">            &gt;&gt;&gt; ds.output_kind, ds.transport, ds.cadence</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">            (&#39;vector&#39;, &#39;usdm-geojson&#39;, &#39;weekly&#39;)</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">transport</span><span class="p">:</span> <span class="n">TransportLiteral</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="n">coverage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="n">output_kind</span><span class="p">:</span> <span class="n">OutputKindLiteral</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="n">CadenceLiteral</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="n">native_crs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>    <span class="n">timescale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="n">license_note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated drought dataset row (USDM / EDO / GDO / SPEIbase).</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Mirrors a single `datasets.&lt;id&gt;:` block in one of the per-source</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    `catalog/*.yaml` files. The dataset id is the parent key in the YAML and</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    is copied onto the row at load time so the backend can echo it back into</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    output filenames without indexing back through the catalog dict.</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        id: The dataset id (the catalog key, e.g. `&quot;usdm&quot;`,</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            `&quot;edo-spaST&quot;`, `&quot;speibase-12&quot;`). Copied from the YAML key.</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        source: Human-readable source / version string used in the</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            success log line (`&quot;Copernicus European Drought Observatory</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            (EDO)&quot;`, `&quot;CSIC SPEIbase v2.11 (Vicente-Serrano et al., CRU</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            TS 4.09)&quot;`, …).</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">        transport: The transport the backend&#39;s `_fetch` dispatches on.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            One of `&quot;usdm-geojson&quot;`, `&quot;edo-wcs&quot;`, `&quot;netcdf-url&quot;`.</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        endpoint: URL or URL template. USDM has a `{ymd}` placeholder</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            substituted with the **Tuesday valid date** (USDM releases on</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            Thursday for the prior Tuesday, and the JSON URL stem is</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">            keyed on that Tuesday — verified live; every Thursday URL</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            returns 404); EDO/GDO is the WCS map endpoint (the coverage</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            and time-subset go in the request, not the URL); SPEIbase</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            is the literal per-scale NetCDF URL.</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        coverage: WCS `CoverageId` for `&quot;edo-wcs&quot;` rows; `None` for the</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            other transports.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        output_kind: Per-row output shape — `&quot;vector&quot;` for USDM,</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            `&quot;raster&quot;` for EDO/GDO/SPEIbase. Copied onto the backend</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            instance&#39;s `OUTPUT_KIND` (`G1`).</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        cadence: Source release cadence — `&quot;weekly&quot;` (USDM),</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            `&quot;10day&quot;` (most EDO/GDO indicators), `&quot;monthly&quot;` (SPEIbase,</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            some EDO/GDO indicators like `spgTS`). Drives the</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">            date-snapping helper.</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        native_crs: The CRS the source delivers in, as an EPSG string</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            (`&quot;EPSG:4326&quot;`). USDM was documented Albers but ships</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            `GCS_WGS_1984` today (`G4` — kept as a `to_crs(&quot;EPSG:4326&quot;)`</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            defensive no-op in the backend).</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        timescale: The Copernicus `SELECTED_TIMESCALE` value for</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            `edo-wcs` rows — a one-or-two-digit string naming the SPI /</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            SPEI integration window in months (`&quot;01&quot;`, `&quot;03&quot;`, `&quot;06&quot;`,</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            `&quot;12&quot;`, …). The SPI coverages (`spaST`, `spcLT`, `spgTS`)</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            **require** it; the other EDO/GDO indicators accept and ignore</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            it, so every `edo-wcs` row carries one (default `&quot;01&quot;`). It is</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            config-as-code: change a row&#39;s `timescale` in the YAML to pick</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            a different window without touching the backend. `None` for</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            the non-WCS transports.</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        license_note: Short attribution string logged once on success</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            (`&quot;Copernicus EMS — free reuse with attribution&quot;`,</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">            `&quot;USDM public domain — cite NDMC / UNL&quot;`, `&quot;CC-BY 4.0 — cite</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            Vicente-Serrano et al. and SPEIbase v2.11&quot;`).</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        - Inspect a USDM vector row:</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            &gt;&gt;&gt; from earthlens.drought import Catalog</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">            &gt;&gt;&gt; ds = Catalog().get(&quot;usdm&quot;)</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            &gt;&gt;&gt; ds.output_kind, ds.transport, ds.cadence</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            (&#39;vector&#39;, &#39;usdm-geojson&#39;, &#39;weekly&#39;)</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">transport</span><span class="p">:</span> <span class="n">TransportLiteral</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="n">coverage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="n">output_kind</span><span class="p">:</span> <span class="n">OutputKindLiteral</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="n">CadenceLiteral</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="n">native_crs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">timescale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="n">license_note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23340,23 +23340,23 @@ the entry on its own.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-59">59</a></span>
-<span class="normal"><a href="#__codelineno-0-60">60</a></span>
-<span class="normal"><a href="#__codelineno-0-61">61</a></span>
-<span class="normal"><a href="#__codelineno-0-62">62</a></span>
-<span class="normal"><a href="#__codelineno-0-63">63</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-63">63</a></span>
 <span class="normal"><a href="#__codelineno-0-64">64</a></span>
 <span class="normal"><a href="#__codelineno-0-65">65</a></span>
 <span class="normal"><a href="#__codelineno-0-66">66</a></span>
-<span class="normal"><a href="#__codelineno-0-67">67</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty the module-level catalog parse cache.</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    Useful after rewriting the catalog on disk to force a re-parse.</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    Production callers do not need this — the cache keys include every</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    contributing file&#39;s `st_mtime_ns`, so any real file mutation invalidates</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    the entry on its own.</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>    <span class="n">_CATALOG_CACHE</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-67">67</a></span>
+<span class="normal"><a href="#__codelineno-0-68">68</a></span>
+<span class="normal"><a href="#__codelineno-0-69">69</a></span>
+<span class="normal"><a href="#__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty the module-level catalog parse cache.</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Useful after rewriting the catalog on disk to force a re-parse.</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Production callers do not need this — the cache keys include every</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    contributing file&#39;s `st_mtime_ns`, so any real file mutation invalidates</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    the entry on its own.</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="n">_CATALOG_CACHE</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25915,7 +25915,24 @@ drought</code> CLI and the audit gate.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+<span class="normal"><a href="#__codelineno-0-234">234</a></span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+<span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
 <span class="normal"><a href="#__codelineno-0-247">247</a></span>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
@@ -25999,125 +26016,108 @@ drought</code> CLI and the audit gate.</p>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
 <span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the `earthlens.drought` backend.</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data) and</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    exposes its consumed top-level sections as typed pydantic fields.</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) — `model_post_init` parses</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    the YAML and populates every field in one pass. Mirrors the</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    `earthlens.eumetsat` / `earthlens.earthdata` / `earthlens.ghsl`</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    catalogs: `datasets` (the curated map) and `available_datasets` (the</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    informational index).</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        available_datasets: Informational list of every curated dataset</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            id, merged across every per-source YAML. Runtime code does</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            not consume it; it seeds the `earthlens datasets list</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            drought` CLI and the audit gate.</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        datasets: Structural map keyed by dataset id. Each value is a</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            `Dataset`.</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        - List how many datasets are curated:</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            &gt;&gt;&gt; from earthlens.drought import Catalog</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            &gt;&gt;&gt; len(Catalog().datasets) &gt;= 25</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            True</span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the `earthlens.drought` backend.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data) and</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    exposes its consumed top-level sections as typed pydantic fields.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) — `model_post_init` parses</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    the YAML and populates every field in one pass. Mirrors the</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    `earthlens.eumetsat` / `earthlens.earthdata` / `earthlens.ghsl`</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    catalogs: `datasets` (the curated map) and `available_datasets` (the</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    informational index).</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        available_datasets: Informational list of every curated dataset</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            id, merged across every per-source YAML. Runtime code does</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            not consume it; it seeds the `earthlens datasets list</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            drought` CLI and the audit gate.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        datasets: Structural map keyed by dataset id. Each value is a</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            `Dataset`.</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        - List how many datasets are curated:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            &gt;&gt;&gt; from earthlens.drought import Catalog</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            &gt;&gt;&gt; len(Catalog().datasets) &gt;= 25</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            True</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;drought catalog&quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">available_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        `Catalog()` with no args is sugar for `Catalog.load()` — it reads</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        the bundled `catalog/` directory through the `(path, mtime)`-keyed</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        cache so repeated construction is fast. If the caller passed</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        `datasets=...`, the disk read is skipped.</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;drought catalog&quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="n">available_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        `Catalog()` with no args is sugar for `Catalog.load()` — it reads</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        the bundled `catalog/` directory through the `(path, mtime)`-keyed</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        cache so repeated construction is fast. If the caller passed</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `datasets=...`, the disk read is skipped.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">                `load`.</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the drought catalog from disk (cached).</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                `load`.</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the drought catalog from disk (cached).</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            catalog_path: Path to the `catalog/` directory or a single</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                `*.yaml` file. Defaults to module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">            ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="p">)</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            catalog_path: Path to the `catalog/` directory or a single</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                `*.yaml` file. Defaults to module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is done</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        in `model_post_init`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            dict[str, Dataset]: One entry per curated dataset (same object</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                as `datasets`).</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="p">)</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is done</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        in `model_post_init`.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            dict[str, Dataset]: One entry per curated dataset (same object</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                as `datasets`).</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its row, with a did-you-mean on miss.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            dataset_id: A curated dataset id (`&quot;usdm&quot;`, `&quot;edo-spaST&quot;`,</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                `&quot;speibase-12&quot;`, …).</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ValueError: When `dataset_id` is not curated; the message</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                lists the closest known ids via the shipped</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                `AbstractCatalog.get_dataset` did-you-mean helper.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its row, with a did-you-mean on miss.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            dataset_id: A curated dataset id (`&quot;usdm&quot;`, `&quot;edo-spaST&quot;`,</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">                `&quot;speibase-12&quot;`, …).</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            Dataset: The matching row.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            ValueError: When `dataset_id` is not curated; the message</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">                lists the closest known ids via the shipped</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">                `AbstractCatalog.get_dataset` did-you-mean helper.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26230,37 +26230,37 @@ lists the closest known ids via the shipped
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its row, with a did-you-mean on miss.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        dataset_id: A curated dataset id (`&quot;usdm&quot;`, `&quot;edo-spaST&quot;`,</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            `&quot;speibase-12&quot;`, …).</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        Dataset: The matching row.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        ValueError: When `dataset_id` is not curated; the message</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            lists the closest known ids via the shipped</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">            `AbstractCatalog.get_dataset` did-you-mean helper.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its row, with a did-you-mean on miss.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        dataset_id: A curated dataset id (`&quot;usdm&quot;`, `&quot;edo-spaST&quot;`,</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            `&quot;speibase-12&quot;`, …).</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Dataset: The matching row.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        ValueError: When `dataset_id` is not curated; the message</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            lists the closest known ids via the shipped</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            `AbstractCatalog.get_dataset` did-you-mean helper.</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26309,27 +26309,27 @@ as <code>datasets</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is done</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    in `model_post_init`.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        dict[str, Dataset]: One entry per curated dataset (same object</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            as `datasets`).</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is done</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    in `model_post_init`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        dict[str, Dataset]: One entry per curated dataset (same object</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            as `datasets`).</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26434,45 +26434,45 @@ as <code>datasets</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-298">298</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span>
+<span class="normal"><a href="#__codelineno-0-283">283</a></span>
+<span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span>
+<span class="normal"><a href="#__codelineno-0-287">287</a></span>
+<span class="normal"><a href="#__codelineno-0-288">288</a></span>
+<span class="normal"><a href="#__codelineno-0-289">289</a></span>
+<span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span>
-<span class="normal"><a href="#__codelineno-0-301">301</a></span>
-<span class="normal"><a href="#__codelineno-0-302">302</a></span>
-<span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span>
-<span class="normal"><a href="#__codelineno-0-305">305</a></span>
-<span class="normal"><a href="#__codelineno-0-306">306</a></span>
-<span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span>
-<span class="normal"><a href="#__codelineno-0-312">312</a></span>
-<span class="normal"><a href="#__codelineno-0-313">313</a></span>
-<span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the drought catalog from disk (cached).</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        catalog_path: Path to the `catalog/` directory or a single</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            `*.yaml` file. Defaults to module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        ValueError: Propagated from `_load_catalog_data`.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the drought catalog from disk (cached).</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        catalog_path: Path to the `catalog/` directory or a single</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            `*.yaml` file. Defaults to module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26523,39 +26523,39 @@ cache so repeated construction is fast. If the caller passed
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span>
-<span class="normal"><a href="#__codelineno-0-282">282</a></span>
-<span class="normal"><a href="#__codelineno-0-283">283</a></span>
-<span class="normal"><a href="#__codelineno-0-284">284</a></span>
-<span class="normal"><a href="#__codelineno-0-285">285</a></span>
-<span class="normal"><a href="#__codelineno-0-286">286</a></span>
-<span class="normal"><a href="#__codelineno-0-287">287</a></span>
-<span class="normal"><a href="#__codelineno-0-288">288</a></span>
-<span class="normal"><a href="#__codelineno-0-289">289</a></span>
-<span class="normal"><a href="#__codelineno-0-290">290</a></span>
-<span class="normal"><a href="#__codelineno-0-291">291</a></span>
-<span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    `Catalog()` with no args is sugar for `Catalog.load()` — it reads</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    the bundled `catalog/` directory through the `(path, mtime)`-keyed</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    cache so repeated construction is fast. If the caller passed</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    `datasets=...`, the disk read is skipped.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            `load`.</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span>
+<span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span>
+<span class="normal"><a href="#__codelineno-0-268">268</a></span>
+<span class="normal"><a href="#__codelineno-0-269">269</a></span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span>
+<span class="normal"><a href="#__codelineno-0-275">275</a></span>
+<span class="normal"><a href="#__codelineno-0-276">276</a></span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span>
+<span class="normal"><a href="#__codelineno-0-278">278</a></span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    `Catalog()` with no args is sugar for `Catalog.load()` — it reads</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    the bundled `catalog/` directory through the `(path, mtime)`-keyed</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    cache so repeated construction is fast. If the caller passed</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    `datasets=...`, the disk read is skipped.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            `load`.</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26780,7 +26780,24 @@ Vicente-Serrano et al. and SPEIbase v2.11"</code>).</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-169">169</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-152">152</a></span>
+<span class="normal"><a href="#__codelineno-0-153">153</a></span>
+<span class="normal"><a href="#__codelineno-0-154">154</a></span>
+<span class="normal"><a href="#__codelineno-0-155">155</a></span>
+<span class="normal"><a href="#__codelineno-0-156">156</a></span>
+<span class="normal"><a href="#__codelineno-0-157">157</a></span>
+<span class="normal"><a href="#__codelineno-0-158">158</a></span>
+<span class="normal"><a href="#__codelineno-0-159">159</a></span>
+<span class="normal"><a href="#__codelineno-0-160">160</a></span>
+<span class="normal"><a href="#__codelineno-0-161">161</a></span>
+<span class="normal"><a href="#__codelineno-0-162">162</a></span>
+<span class="normal"><a href="#__codelineno-0-163">163</a></span>
+<span class="normal"><a href="#__codelineno-0-164">164</a></span>
+<span class="normal"><a href="#__codelineno-0-165">165</a></span>
+<span class="normal"><a href="#__codelineno-0-166">166</a></span>
+<span class="normal"><a href="#__codelineno-0-167">167</a></span>
+<span class="normal"><a href="#__codelineno-0-168">168</a></span>
+<span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
@@ -26836,97 +26853,80 @@ Vicente-Serrano et al. and SPEIbase v2.11"</code>).</p>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span>
-<span class="normal"><a href="#__codelineno-0-226">226</a></span>
-<span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span>
-<span class="normal"><a href="#__codelineno-0-230">230</a></span>
-<span class="normal"><a href="#__codelineno-0-231">231</a></span>
-<span class="normal"><a href="#__codelineno-0-232">232</a></span>
-<span class="normal"><a href="#__codelineno-0-233">233</a></span>
-<span class="normal"><a href="#__codelineno-0-234">234</a></span>
-<span class="normal"><a href="#__codelineno-0-235">235</a></span>
-<span class="normal"><a href="#__codelineno-0-236">236</a></span>
-<span class="normal"><a href="#__codelineno-0-237">237</a></span>
-<span class="normal"><a href="#__codelineno-0-238">238</a></span>
-<span class="normal"><a href="#__codelineno-0-239">239</a></span>
-<span class="normal"><a href="#__codelineno-0-240">240</a></span>
-<span class="normal"><a href="#__codelineno-0-241">241</a></span>
-<span class="normal"><a href="#__codelineno-0-242">242</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated drought dataset row (USDM / EDO / GDO / SPEIbase).</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Mirrors a single `datasets.&lt;id&gt;:` block in one of the per-source</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    `catalog/*.yaml` files. The dataset id is the parent key in the YAML and</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    is copied onto the row at load time so the backend can echo it back into</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    output filenames without indexing back through the catalog dict.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        id: The dataset id (the catalog key, e.g. `&quot;usdm&quot;`,</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            `&quot;edo-spaST&quot;`, `&quot;speibase-12&quot;`). Copied from the YAML key.</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        source: Human-readable source / version string used in the</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            success log line (`&quot;Copernicus European Drought Observatory</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            (EDO)&quot;`, `&quot;CSIC SPEIbase v2.11 (Vicente-Serrano et al., CRU</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            TS 4.09)&quot;`, …).</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        transport: The transport the backend&#39;s `_fetch` dispatches on.</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            One of `&quot;usdm-geojson&quot;`, `&quot;edo-wcs&quot;`, `&quot;netcdf-url&quot;`.</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        endpoint: URL or URL template. USDM has a `{ymd}` placeholder</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            substituted with the **Tuesday valid date** (USDM releases on</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            Thursday for the prior Tuesday, and the JSON URL stem is</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            keyed on that Tuesday — verified live; every Thursday URL</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            returns 404); EDO/GDO is the WCS map endpoint (the coverage</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            and time-subset go in the request, not the URL); SPEIbase</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            is the literal per-scale NetCDF URL.</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        coverage: WCS `CoverageId` for `&quot;edo-wcs&quot;` rows; `None` for the</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            other transports.</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        output_kind: Per-row output shape — `&quot;vector&quot;` for USDM,</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            `&quot;raster&quot;` for EDO/GDO/SPEIbase. Copied onto the backend</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            instance&#39;s `OUTPUT_KIND` (`G1`).</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        cadence: Source release cadence — `&quot;weekly&quot;` (USDM),</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            `&quot;10day&quot;` (most EDO/GDO indicators), `&quot;monthly&quot;` (SPEIbase,</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">            some EDO/GDO indicators like `spgTS`). Drives the</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            date-snapping helper.</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        native_crs: The CRS the source delivers in, as an EPSG string</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            (`&quot;EPSG:4326&quot;`). USDM was documented Albers but ships</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            `GCS_WGS_1984` today (`G4` — kept as a `to_crs(&quot;EPSG:4326&quot;)`</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            defensive no-op in the backend).</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        timescale: The Copernicus `SELECTED_TIMESCALE` value for</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">            `edo-wcs` rows — a one-or-two-digit string naming the SPI /</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            SPEI integration window in months (`&quot;01&quot;`, `&quot;03&quot;`, `&quot;06&quot;`,</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            `&quot;12&quot;`, …). The SPI coverages (`spaST`, `spcLT`, `spgTS`)</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            **require** it; the other EDO/GDO indicators accept and ignore</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            it, so every `edo-wcs` row carries one (default `&quot;01&quot;`). It is</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            config-as-code: change a row&#39;s `timescale` in the YAML to pick</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            a different window without touching the backend. `None` for</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            the non-WCS transports.</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        license_note: Short attribution string logged once on success</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            (`&quot;Copernicus EMS — free reuse with attribution&quot;`,</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            `&quot;USDM public domain — cite NDMC / UNL&quot;`, `&quot;CC-BY 4.0 — cite</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            Vicente-Serrano et al. and SPEIbase v2.11&quot;`).</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        - Inspect a USDM vector row:</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">            &gt;&gt;&gt; from earthlens.drought import Catalog</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            &gt;&gt;&gt; ds = Catalog().get(&quot;usdm&quot;)</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">            &gt;&gt;&gt; ds.output_kind, ds.transport, ds.cadence</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">            (&#39;vector&#39;, &#39;usdm-geojson&#39;, &#39;weekly&#39;)</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">transport</span><span class="p">:</span> <span class="n">TransportLiteral</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="n">coverage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="n">output_kind</span><span class="p">:</span> <span class="n">OutputKindLiteral</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="n">CadenceLiteral</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="n">native_crs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>    <span class="n">timescale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="n">license_note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated drought dataset row (USDM / EDO / GDO / SPEIbase).</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Mirrors a single `datasets.&lt;id&gt;:` block in one of the per-source</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    `catalog/*.yaml` files. The dataset id is the parent key in the YAML and</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    is copied onto the row at load time so the backend can echo it back into</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    output filenames without indexing back through the catalog dict.</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        id: The dataset id (the catalog key, e.g. `&quot;usdm&quot;`,</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            `&quot;edo-spaST&quot;`, `&quot;speibase-12&quot;`). Copied from the YAML key.</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        source: Human-readable source / version string used in the</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            success log line (`&quot;Copernicus European Drought Observatory</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            (EDO)&quot;`, `&quot;CSIC SPEIbase v2.11 (Vicente-Serrano et al., CRU</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            TS 4.09)&quot;`, …).</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">        transport: The transport the backend&#39;s `_fetch` dispatches on.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            One of `&quot;usdm-geojson&quot;`, `&quot;edo-wcs&quot;`, `&quot;netcdf-url&quot;`.</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        endpoint: URL or URL template. USDM has a `{ymd}` placeholder</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            substituted with the **Tuesday valid date** (USDM releases on</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            Thursday for the prior Tuesday, and the JSON URL stem is</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">            keyed on that Tuesday — verified live; every Thursday URL</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            returns 404); EDO/GDO is the WCS map endpoint (the coverage</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            and time-subset go in the request, not the URL); SPEIbase</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            is the literal per-scale NetCDF URL.</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        coverage: WCS `CoverageId` for `&quot;edo-wcs&quot;` rows; `None` for the</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            other transports.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        output_kind: Per-row output shape — `&quot;vector&quot;` for USDM,</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            `&quot;raster&quot;` for EDO/GDO/SPEIbase. Copied onto the backend</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            instance&#39;s `OUTPUT_KIND` (`G1`).</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        cadence: Source release cadence — `&quot;weekly&quot;` (USDM),</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            `&quot;10day&quot;` (most EDO/GDO indicators), `&quot;monthly&quot;` (SPEIbase,</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            some EDO/GDO indicators like `spgTS`). Drives the</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">            date-snapping helper.</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        native_crs: The CRS the source delivers in, as an EPSG string</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            (`&quot;EPSG:4326&quot;`). USDM was documented Albers but ships</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            `GCS_WGS_1984` today (`G4` — kept as a `to_crs(&quot;EPSG:4326&quot;)`</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            defensive no-op in the backend).</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        timescale: The Copernicus `SELECTED_TIMESCALE` value for</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            `edo-wcs` rows — a one-or-two-digit string naming the SPI /</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            SPEI integration window in months (`&quot;01&quot;`, `&quot;03&quot;`, `&quot;06&quot;`,</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            `&quot;12&quot;`, …). The SPI coverages (`spaST`, `spcLT`, `spgTS`)</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            **require** it; the other EDO/GDO indicators accept and ignore</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            it, so every `edo-wcs` row carries one (default `&quot;01&quot;`). It is</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            config-as-code: change a row&#39;s `timescale` in the YAML to pick</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            a different window without touching the backend. `None` for</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            the non-WCS transports.</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        license_note: Short attribution string logged once on success</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            (`&quot;Copernicus EMS — free reuse with attribution&quot;`,</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">            `&quot;USDM public domain — cite NDMC / UNL&quot;`, `&quot;CC-BY 4.0 — cite</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            Vicente-Serrano et al. and SPEIbase v2.11&quot;`).</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        - Inspect a USDM vector row:</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            &gt;&gt;&gt; from earthlens.drought import Catalog</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">            &gt;&gt;&gt; ds = Catalog().get(&quot;usdm&quot;)</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            &gt;&gt;&gt; ds.output_kind, ds.transport, ds.cadence</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            (&#39;vector&#39;, &#39;usdm-geojson&#39;, &#39;weekly&#39;)</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">transport</span><span class="p">:</span> <span class="n">TransportLiteral</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="n">coverage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="n">output_kind</span><span class="p">:</span> <span class="n">OutputKindLiteral</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="n">CadenceLiteral</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="n">native_crs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">timescale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="n">license_note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26972,23 +26972,23 @@ the entry on its own.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/drought/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-59">59</a></span>
-<span class="normal"><a href="#__codelineno-0-60">60</a></span>
-<span class="normal"><a href="#__codelineno-0-61">61</a></span>
-<span class="normal"><a href="#__codelineno-0-62">62</a></span>
-<span class="normal"><a href="#__codelineno-0-63">63</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-63">63</a></span>
 <span class="normal"><a href="#__codelineno-0-64">64</a></span>
 <span class="normal"><a href="#__codelineno-0-65">65</a></span>
 <span class="normal"><a href="#__codelineno-0-66">66</a></span>
-<span class="normal"><a href="#__codelineno-0-67">67</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty the module-level catalog parse cache.</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    Useful after rewriting the catalog on disk to force a re-parse.</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    Production callers do not need this — the cache keys include every</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    contributing file&#39;s `st_mtime_ns`, so any real file mutation invalidates</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    the entry on its own.</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>    <span class="n">_CATALOG_CACHE</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-67">67</a></span>
+<span class="normal"><a href="#__codelineno-0-68">68</a></span>
+<span class="normal"><a href="#__codelineno-0-69">69</a></span>
+<span class="normal"><a href="#__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty the module-level catalog parse cache.</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Useful after rewriting the catalog on disk to force a re-parse.</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Production callers do not need this — the cache keys include every</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    contributing file&#39;s `st_mtime_ns`, so any real file mutation invalidates</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    the entry on its own.</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="n">_CATALOG_CACHE</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
