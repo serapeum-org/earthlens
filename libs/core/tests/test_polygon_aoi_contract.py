@@ -76,9 +76,11 @@ class _Recorder:
     """Stand-in exposing just what `_attach_clip_geometry` touches."""
 
     SUPPORTS_POLYGON_AOI = False
+    OUTPUT_KIND = "raster"
 
-    def __init__(self, supports: bool):
+    def __init__(self, supports: bool, output_kind: str = "raster"):
         self.SUPPORTS_POLYGON_AOI = supports
+        self.OUTPUT_KIND = output_kind
         self.space = SpatialExtent.from_pairs(lat_lim=[0.0, 1.0], lon_lim=[0.0, 1.0])
 
 
@@ -86,11 +88,11 @@ class TestAttachClipGeometryWarning:
     """`_attach_clip_geometry` warns exactly when the mask will be ignored."""
 
     @staticmethod
-    def _attach(supports: bool, geometry: object):
+    def _attach(supports: bool, geometry: object, output_kind: str = "raster"):
         """Run the base implementation against a recorder, returning warnings."""
         from earthlens.base import AbstractDataSource
 
-        recorder = _Recorder(supports)
+        recorder = _Recorder(supports, output_kind)
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             AbstractDataSource._attach_clip_geometry(recorder, geometry)
@@ -155,3 +157,32 @@ class TestPolygonAoiThroughFacade:
                 path=str(tmp_path),
             )
         assert not any(issubclass(w.category, PolygonAoiWarning) for w in caught)
+
+
+class TestRemedyMatchesOutputKind:
+    """The warning's advice suits the backend's output shape."""
+
+    @staticmethod
+    def _message(output_kind: str) -> str:
+        """Return the warning text for a bbox-only backend of `output_kind`."""
+        import warnings as w
+
+        from earthlens.base import AbstractDataSource
+
+        recorder = _Recorder(False, output_kind)
+        with w.catch_warnings(record=True) as caught:
+            w.simplefilter("always")
+            AbstractDataSource._attach_clip_geometry(recorder, object())
+        return str(caught[0].message)
+
+    @pytest.mark.parametrize("output_kind", ["raster", "mixed"])
+    def test_raster_kinds_get_the_pyramids_remedy(self, output_kind):
+        """A gridded backend is told to post-clip with pyramids."""
+        assert "crop(mask=" in self._message(output_kind)
+
+    @pytest.mark.parametrize("output_kind", ["vector", "tabular"])
+    def test_row_kinds_get_a_row_filter_remedy(self, output_kind):
+        """A FeatureCollection / DataFrame backend is told to filter rows instead."""
+        message = self._message(output_kind)
+        assert "crop(mask=" not in message
+        assert "within" in message
