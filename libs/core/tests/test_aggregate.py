@@ -3,7 +3,7 @@
 Covers `AggregationConfig` validation, `_read_time_axis` (the
 candidate-loop and KeyError fallback), `_find_level_dim`, the
 four-cell decision matrix in `_resolve_pressure_level`,
-`_window_groups`, `_reduce` (op dispatch + skipna + min_count),
+`window_groups`, `reduce_time_axis` (op dispatch + skipna + min_count),
 `_resolve_op` (auto-routing from `Variable.is_flux`), and round-trip
 runs of `aggregate_netcdf` against synthetic NetCDFs (H7).
 """
@@ -27,11 +27,11 @@ from earthlens.aggregate import (
     AggregationConfig,
     _find_level_dim,
     _read_time_axis,
-    _reduce,
     _resolve_op,
     _resolve_pressure_level,
-    _window_groups,
     aggregate_netcdf,
+    reduce_time_axis,
+    window_groups,
 )
 
 pytestmark = [pytest.mark.unit]
@@ -368,12 +368,12 @@ class TestResolvePressureLevel:
 
 
 class TestWindowGroups:
-    """Tests for the private `_window_groups` helper (H3)."""
+    """Tests for the public `window_groups` primitive (H3)."""
 
     def test_daily_grouping_six_hourly_input_yields_one_window(self):
         """Four 6-hourly slots in one day collapse to one daily window."""
         idx = pd.date_range("2022-01-01", periods=4, freq="6h")
-        windows = list(_window_groups(idx, "1D"))
+        windows = list(window_groups(idx, "1D"))
         assert len(windows) == 1, f"Expected 1 daily window, got {len(windows)}"
         label, mask = windows[0]
         assert label == pd.Timestamp("2022-01-01"), (
@@ -389,7 +389,7 @@ class TestWindowGroups:
     def test_daily_grouping_two_days_yields_two_windows(self):
         """Eight 6-hourly slots over two days produce two daily windows."""
         idx = pd.date_range("2022-01-01", periods=8, freq="6h")
-        labels = [label for label, _ in _window_groups(idx, "1D")]
+        labels = [label for label, _ in window_groups(idx, "1D")]
         assert labels == [
             pd.Timestamp("2022-01-01"),
             pd.Timestamp("2022-01-02"),
@@ -398,7 +398,7 @@ class TestWindowGroups:
     def test_weekly_grouping_collapses_seven_days(self):
         """Daily samples over a week reduce to one `"7D"` window."""
         idx = pd.date_range("2022-01-01", periods=7, freq="D")
-        windows = list(_window_groups(idx, "7D"))
+        windows = list(window_groups(idx, "7D"))
         assert len(windows) == 1, f"Expected 1 weekly window, got {len(windows)}"
         _, mask = windows[0]
         assert mask.sum() == 7, f"Expected 7 samples in window, got {mask.sum()}"
@@ -406,7 +406,7 @@ class TestWindowGroups:
     def test_monthly_ms_grouping_collapses_january(self):
         """31 daily samples in January produce one `"1MS"` window."""
         idx = pd.date_range("2022-01-01", periods=31, freq="D")
-        windows = list(_window_groups(idx, "1MS"))
+        windows = list(window_groups(idx, "1MS"))
         assert len(windows) == 1, f"Expected 1 monthly window, got {len(windows)}"
         label, mask = windows[0]
         assert label == pd.Timestamp("2022-01-01"), (
@@ -417,7 +417,7 @@ class TestWindowGroups:
     def test_monthly_ms_two_months_yields_two_windows(self):
         """A 32-day range across Jan/Feb yields two month-start windows."""
         idx = pd.date_range("2022-01-01", periods=32, freq="D")
-        labels = [label for label, _ in _window_groups(idx, "1MS")]
+        labels = [label for label, _ in window_groups(idx, "1MS")]
         assert labels == [
             pd.Timestamp("2022-01-01"),
             pd.Timestamp("2022-02-01"),
@@ -426,7 +426,7 @@ class TestWindowGroups:
     def test_seasonal_grouping_qs_dec_yields_three_aligned_seasons(self):
         """`QS-DEC` aligns seasons on Dec/Mar/Jun/Sep starts."""
         idx = pd.date_range("2022-03-01", periods=9, freq="MS")
-        labels = [label for label, _ in _window_groups(idx, "QS-DEC")]
+        labels = [label for label, _ in window_groups(idx, "QS-DEC")]
         assert labels == [
             pd.Timestamp("2022-03-01"),
             pd.Timestamp("2022-06-01"),
@@ -436,7 +436,7 @@ class TestWindowGroups:
     def test_window_label_is_left_edge(self):
         """Group keys returned are the windows' left-edge timestamps."""
         idx = pd.date_range("2022-06-15", periods=4, freq="6h")
-        label, _ = next(iter(_window_groups(idx, "1D")))
+        label, _ = next(iter(window_groups(idx, "1D")))
         assert label == pd.Timestamp("2022-06-15"), (
             f"Expected left-edge 2022-06-15, got {label}"
         )
@@ -444,7 +444,7 @@ class TestWindowGroups:
     def test_mask_length_matches_input(self):
         """Each emitted mask has length equal to the time axis."""
         idx = pd.date_range("2022-01-01", periods=12, freq="6h")
-        for _, mask in _window_groups(idx, "1D"):
+        for _, mask in window_groups(idx, "1D"):
             assert len(mask) == 12, (
                 f"Mask length {len(mask)} should match time-axis length 12"
             )
@@ -452,7 +452,7 @@ class TestWindowGroups:
     def test_mask_dtype_is_bool(self):
         """Mask is a numpy bool array — drop-in for ndarray indexing."""
         idx = pd.date_range("2022-01-01", periods=4, freq="6h")
-        _, mask = next(iter(_window_groups(idx, "1D")))
+        _, mask = next(iter(window_groups(idx, "1D")))
         assert isinstance(mask, np.ndarray), (
             f"Expected numpy ndarray, got {type(mask).__name__}"
         )
@@ -461,7 +461,7 @@ class TestWindowGroups:
     def test_masks_isolate_correct_indices(self):
         """Each mask selects exactly the samples in its window."""
         idx = pd.date_range("2022-01-01", periods=8, freq="6h")
-        windows = list(_window_groups(idx, "1D"))
+        windows = list(window_groups(idx, "1D"))
         first_mask = windows[0][1]
         second_mask = windows[1][1]
         assert first_mask.tolist() == [True] * 4 + [False] * 4, (
@@ -475,13 +475,13 @@ class TestWindowGroups:
     def test_empty_time_axis_yields_nothing(self):
         """An empty index produces no windows."""
         idx = pd.DatetimeIndex([])
-        windows = list(_window_groups(idx, "1D"))
+        windows = list(window_groups(idx, "1D"))
         assert windows == [], f"Expected no windows, got {windows}"
 
     def test_single_sample_yields_single_window(self):
         """One timestamp → one window with one true bit."""
         idx = pd.DatetimeIndex(["2022-06-15"])
-        windows = list(_window_groups(idx, "1D"))
+        windows = list(window_groups(idx, "1D"))
         assert len(windows) == 1, f"Expected 1 window, got {len(windows)}"
         _, mask = windows[0]
         assert mask.tolist() == [True], f"Expected [True], got {mask.tolist()}"
@@ -490,11 +490,11 @@ class TestWindowGroups:
         """An unparseable `freq` string surfaces a pandas error."""
         idx = pd.date_range("2022-01-01", periods=4, freq="6h")
         with pytest.raises(ValueError):
-            list(_window_groups(idx, "not-a-real-freq"))
+            list(window_groups(idx, "not-a-real-freq"))
 
 
 class TestReduce:
-    """Tests for the private `_reduce` helper (H4)."""
+    """Tests for the public `reduce_time_axis` primitive (H4)."""
 
     @pytest.fixture(scope="class")
     def cube(self) -> np.ndarray:
@@ -529,7 +529,7 @@ class TestReduce:
             op: Reduction operator under test.
             expected_pixel_00: Known result at pixel `(0, 0)`.
         """
-        result = _reduce(cube, op=op, skipna=True, min_count=None)
+        result = reduce_time_axis(cube, op=op, skipna=True, min_count=None)
         assert result.shape == (2, 2), f"Expected (2, 2), got {result.shape}"
         assert result[0, 0] == pytest.approx(expected_pixel_00), (
             f"Op {op!r} at (0, 0): expected {expected_pixel_00}, got {result[0, 0]}"
@@ -537,7 +537,7 @@ class TestReduce:
 
     def test_std_op_returns_nonzero(self, cube):
         """`std` over a non-constant series produces a positive value."""
-        result = _reduce(cube, op="std", skipna=True, min_count=None)
+        result = reduce_time_axis(cube, op="std", skipna=True, min_count=None)
         assert result[0, 0] > 0, (
             f"std should be positive for non-constant series, got {result[0, 0]}"
         )
@@ -545,7 +545,7 @@ class TestReduce:
     def test_skipna_true_excludes_nan_from_mean(self):
         """NaN-aware mean ignores NaN samples in the window."""
         arr = np.array([[[1.0]], [[2.0]], [[np.nan]], [[3.0]]])
-        result = _reduce(arr, op="mean", skipna=True, min_count=None)
+        result = reduce_time_axis(arr, op="mean", skipna=True, min_count=None)
         assert result[0, 0] == pytest.approx(2.0), (
             f"Expected NaN-skipped mean 2.0, got {result[0, 0]}"
         )
@@ -553,7 +553,7 @@ class TestReduce:
     def test_skipna_false_propagates_nan_to_output(self):
         """Strict mean propagates any NaN to the result."""
         arr = np.array([[[1.0, 2.0]], [[np.nan, 3.0]]])
-        result = _reduce(arr, op="mean", skipna=False, min_count=None)
+        result = reduce_time_axis(arr, op="mean", skipna=False, min_count=None)
         assert np.isnan(result[0, 0]), (
             f"Pixel (0, 0) should be NaN under strict mode, got {result[0, 0]}"
         )
@@ -578,7 +578,7 @@ class TestReduce:
     def test_min_count_masks_under_sampled_pixel(self):
         """Pixels with fewer non-NaN samples than `min_count` emit NaN."""
         arr = np.array([[[1.0, 2.0]], [[np.nan, 3.0]]])
-        result = _reduce(arr, op="mean", skipna=True, min_count=2)
+        result = reduce_time_axis(arr, op="mean", skipna=True, min_count=2)
         assert np.isnan(result[0, 0]), (
             f"Under-sampled pixel should be NaN, got {result[0, 0]}"
         )
@@ -589,7 +589,7 @@ class TestReduce:
     def test_min_count_none_disables_floor(self):
         """`min_count=None` lets every reduction reach the output as-is."""
         arr = np.array([[[1.0]], [[np.nan]], [[3.0]]])
-        result = _reduce(arr, op="mean", skipna=True, min_count=None)
+        result = reduce_time_axis(arr, op="mean", skipna=True, min_count=None)
         assert result[0, 0] == pytest.approx(2.0), (
             f"Expected 2.0 with min_count=None, got {result[0, 0]}"
         )
@@ -598,13 +598,13 @@ class TestReduce:
         """`op="auto"` is rejected — caller must resolve it first."""
         arr = np.zeros((2, 2, 2))
         with pytest.raises(KeyError, match="auto"):
-            _reduce(arr, op="auto", skipna=True, min_count=None)
+            reduce_time_axis(arr, op="auto", skipna=True, min_count=None)
 
     def test_keyerror_on_unknown_op(self):
         """An unknown op raises `KeyError` listing the valid choices."""
         arr = np.zeros((2, 2, 2))
         with pytest.raises(KeyError) as excinfo:
-            _reduce(arr, op="median", skipna=True, min_count=None)
+            reduce_time_axis(arr, op="median", skipna=True, min_count=None)
         msg = str(excinfo.value)
         for valid in ("mean", "sum", "min", "max", "std"):
             assert valid in msg, (
@@ -614,7 +614,7 @@ class TestReduce:
     def test_collapses_axis_zero_only(self):
         """Reduction collapses axis 0; the remaining shape passes through."""
         arr = np.zeros((4, 3, 5))
-        result = _reduce(arr, op="mean", skipna=True, min_count=None)
+        result = reduce_time_axis(arr, op="mean", skipna=True, min_count=None)
         assert result.shape == (3, 5), f"Expected (3, 5), got {result.shape}"
 
 

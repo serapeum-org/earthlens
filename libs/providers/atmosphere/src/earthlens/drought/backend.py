@@ -42,8 +42,8 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
-from earthlens.base._dates import to_datetime
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.drought._helpers import (

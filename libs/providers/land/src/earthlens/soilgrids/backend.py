@@ -86,6 +86,9 @@ class SoilGrids(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
     #: the soil property grids are time-invariant, so a missing `start` / `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 

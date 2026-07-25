@@ -262,6 +262,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
     @property
     def catalog(self):
         """The bundled GEE :class:`~earthlens.gee.Catalog` (alias of `_catalog`)."""

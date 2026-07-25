@@ -59,6 +59,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
     def __init__(
         self,
         start: str,

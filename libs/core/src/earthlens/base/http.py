@@ -516,8 +516,13 @@ class HttpClient:
             chunk: Streaming block size in bytes (default 1 MiB).
             progress: Show a `tqdm` progress bar. `False` (or a
                 non-interactive / test context) suppresses it.
-            atomic: Write to `<dest>.part` then rename on success, cleaning
-                up the temp on failure. `False` writes straight to `dest`.
+            atomic: Write to `<dest>.part` then rename on success, cleaning up
+                the temp on failure — so a crashed download never leaves a
+                truncated `dest`, and never removes an existing one. `False`
+                writes straight to `dest`; a failure then leaves whatever was
+                written in place rather than deleting `dest`, since with no temp
+                file the target may be a completed download the caller still
+                owns.
             headers: Per-request headers merged over the client defaults.
             timeout: Per-request timeout override (seconds).
             **kwargs: Extra keyword arguments forwarded to `requests`.
@@ -541,6 +546,19 @@ class HttpClient:
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
         tmp = dest.with_name(dest.name + ".part") if atomic else dest
+
+        def discard_partial() -> None:
+            """Remove the partial write, but never a caller-owned `dest`.
+
+            With `atomic` the partial lives at a private `<dest>.part`, so
+            removing it is always safe. Without it the download writes straight
+            to `dest` — which may be a previously-completed file the caller still
+            wants — so a failed attempt must leave it alone rather than delete
+            someone else's data on a transient network error.
+            """
+            if atomic:
+                tmp.unlink(missing_ok=True)
+
         merged = self._merge_headers(headers)
         effective_timeout = self.timeout if timeout is None else timeout
         attempt = 0
@@ -579,7 +597,7 @@ class HttpClient:
                 finally:
                     response.close()
             except self.retry_on_exceptions as exc:
-                tmp.unlink(missing_ok=True)
+                discard_partial()
                 if attempt >= self.max_retries:
                     raise
                 wait = self._backoff_wait(None, attempt)
@@ -591,7 +609,7 @@ class HttpClient:
                 attempt += 1
                 continue
             except BaseException:
-                tmp.unlink(missing_ok=True)
+                discard_partial()
                 raise
             if atomic:
                 # Guard the rename too, so the "removes the temp on any
@@ -599,7 +617,7 @@ class HttpClient:
                 try:
                     tmp.replace(dest)
                 except BaseException:
-                    tmp.unlink(missing_ok=True)
+                    discard_partial()
                     raise
             return dest
 

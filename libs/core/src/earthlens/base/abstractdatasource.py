@@ -4,6 +4,7 @@ import difflib
 import functools
 import inspect
 import os
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -50,6 +51,41 @@ See Also:
     AbstractDataSource.OUTPUT_KIND: The per-class declaration each
         backend uses to opt into one of these shapes.
 """
+
+
+class PolygonAoiWarning(UserWarning):
+    """A polygon `aoi=` was reduced to its bounding box by the chosen backend.
+
+    Raised (as a warning) when a request passes a real polygon area of
+    interest to a backend whose `SUPPORTS_POLYGON_AOI` is `False`. The
+    download still succeeds, but it covers the polygon's **bounding box**, so
+    cells outside the polygon are included. That is the most dangerous kind of
+    wrong result — a valid raster of the right variable over roughly the right
+    area — so it is surfaced rather than left silent.
+
+    A dedicated class (rather than a bare `UserWarning`) so callers can filter
+    or escalate exactly this case:
+
+    Examples:
+        - Turn the silent degradation into an error for a strict pipeline:
+            ```python
+            >>> import warnings
+            >>> from earthlens.base import PolygonAoiWarning
+            >>> with warnings.catch_warnings(record=True) as caught:
+            ...     warnings.simplefilter("always")
+            ...     warnings.warn("bbox only", PolygonAoiWarning)
+            >>> caught[0].category.__name__
+            'PolygonAoiWarning'
+
+            ```
+        - It is a `UserWarning`, so existing broad filters still catch it:
+            ```python
+            >>> from earthlens.base import PolygonAoiWarning
+            >>> issubclass(PolygonAoiWarning, UserWarning)
+            True
+
+            ```
+    """
 
 
 @dataclass(frozen=True)
@@ -487,11 +523,25 @@ class AbstractDataSource(ABC):
             osm, overture, glaciers, risk_indicators, bathymetry, dem,
             soilgrids, solar_wind_atlas — set it to `False` and treat a
             `None` bound as "the whole record".
+        SUPPORTS_POLYGON_AOI: Whether this backend clips to a polygon
+            `aoi=`, rather than only to its bounding box. A polygon `aoi=`
+            is reduced to `lat_lim` / `lon_lim` *and* carried as a mask on
+            `self.space.geometry`; a backend honours that mask by cropping
+            through `earthlens.base.spatial.crop_to_aoi` /
+            `mask_to_geometry` (or reading `space.geometry` itself) and sets
+            this to `True`. When it is `False`,
+            :meth:`_attach_clip_geometry` emits a
+            :class:`PolygonAoiWarning`, because the request silently returns
+            the polygon's bounding box — a plausible-looking raster over
+            roughly the right area, which is the hardest kind of wrong
+            output to notice.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
 
     REQUIRES_TIME_WINDOW: bool = True
+
+    SUPPORTS_POLYGON_AOI: bool = False
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Give every backend the facade's ergonomic constructor sugar.
@@ -701,12 +751,32 @@ class AbstractDataSource(ABC):
         the fetched bbox down to the exact shape. A no-op when `self.space`
         is not a :class:`SpatialExtent`.
 
+        Backends that do not clip to the polygon (`SUPPORTS_POLYGON_AOI` is
+        `False`) still get the mask recorded — a later migration then needs no
+        facade change — but the caller is warned, because such a request
+        silently returns the polygon's bounding box instead.
+
         Args:
             geometry: A WGS84 `GeoDataFrame` polygon mask.
+
+        Warns:
+            PolygonAoiWarning: When the backend does not honour a polygon
+                `aoi=`, so the result is the polygon's bounding box.
         """
         space = getattr(self, "space", None)
-        if isinstance(space, SpatialExtent):
-            self.space = space.model_copy(update={"geometry": geometry})
+        if not isinstance(space, SpatialExtent):
+            return
+        if geometry is not None and not self.SUPPORTS_POLYGON_AOI:
+            warnings.warn(
+                f"the {type(self).__name__} backend clips to a bounding box only, "
+                f"so this polygon aoi= is applied as its bounding box — cells "
+                f"outside the polygon are still included. Post-clip the result "
+                f"with `pyramids.Dataset.crop(mask=...)`, or pass a bbox aoi= to "
+                f"make the request's extent explicit.",
+                PolygonAoiWarning,
+                stacklevel=3,
+            )
+        self.space = space.model_copy(update={"geometry": geometry})
 
     def authenticate(self) -> AbstractDataSource:
         """Eagerly establish the backend's authenticated connection.

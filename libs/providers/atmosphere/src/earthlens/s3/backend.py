@@ -110,6 +110,9 @@ class S3(AbstractDataSource):
 
     OUTPUT_KIND = "mixed"
 
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
     @classmethod
     def datasets(cls) -> list[str]:
         """Return the registered dataset names available to `dataset=`.

@@ -215,6 +215,9 @@ class CHIRPS(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
     api_url: str = "data.chc.ucsb.edu"
 
     @property

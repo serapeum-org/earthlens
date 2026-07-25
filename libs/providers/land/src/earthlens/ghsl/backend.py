@@ -68,6 +68,9 @@ class GHSL(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
+    SUPPORTS_POLYGON_AOI = True
+
     def __init__(
         self,
         start: str,
@@ -407,7 +410,7 @@ class GHSL(AbstractDataSource):
         import numpy as np
         from pyramids.dataset import Dataset
 
-        from earthlens.aggregate import _reduce, _window_groups
+        from earthlens.aggregate import reduce_time_axis, window_groups
 
         op = "mean" if config.op == "auto" else config.op
         out_dir = (
@@ -446,8 +449,8 @@ class GHSL(AbstractDataSource):
             geo = datasets[0].geotransform
             nodata = datasets[0].no_data_value
             fill = nodata[0] if isinstance(nodata, (list, tuple)) else nodata
-            for label, mask in _window_groups(time_axis, config.freq):
-                reduced = _reduce(
+            for label, mask in window_groups(time_axis, config.freq):
+                reduced = reduce_time_axis(
                     stack[mask],
                     op,
                     skipna=config.skipna,
