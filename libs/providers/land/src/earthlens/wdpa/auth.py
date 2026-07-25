@@ -144,7 +144,7 @@ class WdpaAuth(AbstractAuth[WdpaCredentials]):
                 f"{_TOKEN_URL}."
             )
         self._token = token
-        self._configured = True
+        self.mark_configured()
 
     @property
     def token(self) -> str:

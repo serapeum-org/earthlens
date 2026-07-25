@@ -165,6 +165,11 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
             ```
     """
 
+    #: Set to `True` by :meth:`mark_configured`; read by the default
+    #: :meth:`is_authenticated`. Class-level so an instance that never
+    #: configured still answers `False` without an `__init__` of its own.
+    _configured: bool = False
+
     def __init__(self, credentials: CredentialsT) -> None:
         """Store the credentials value object.
 
@@ -191,11 +196,6 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
             AuthenticationError: When the credentials are
                 missing/invalid or the backend rejects them.
         """
-
-    #: Set to `True` by :meth:`mark_configured`; read by the default
-    #: :meth:`is_authenticated`. Class-level so an instance that never
-    #: configured still answers `False` without an `__init__` of its own.
-    _configured: bool = False
 
     def mark_configured(self) -> None:
         """Record that :meth:`configure` completed, for the default predicate.

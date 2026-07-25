@@ -287,7 +287,7 @@ class CmemsAuth(AbstractAuth[CmemsCredentials]):
                 f"malformed; see {_DOCS_URL}."
             )
 
-        self._configured = True
+        self.mark_configured()
 
 
 def _saved_credentials_present() -> bool:

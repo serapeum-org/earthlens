@@ -162,7 +162,7 @@ class UsgsWaterAuth(AbstractAuth[UsgsWaterCredentials]):
         if token:
             os.environ[_TOKEN_ENV_VAR] = token
             self._token = token
-            self._configured = True
+            self.mark_configured()
 
     @property
     def token(self) -> str | None:

@@ -163,7 +163,7 @@ class OpenaqAuth(AbstractAuth[OpenaqCredentials]):
                 f"free key at {_REGISTER_URL}."
             )
         self._key = key
-        self._configured = True
+        self.mark_configured()
 
     @property
     def api_key(self) -> str:

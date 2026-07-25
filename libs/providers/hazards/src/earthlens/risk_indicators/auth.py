@@ -165,7 +165,7 @@ class GfwAuth(AbstractAuth[GfwCredentials]):
                 f"Create a free key with a MyGFW account: {_CREATE_KEY_URL}."
             )
         self._key = key
-        self._configured = True
+        self.mark_configured()
 
     @property
     def api_key(self) -> str:

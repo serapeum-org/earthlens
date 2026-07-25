@@ -290,7 +290,7 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             )
 
         self._auth = auth
-        self._configured = True
+        self.mark_configured()
 
     def s3_credentials(self, provider: str) -> dict[str, str]:
         """Return rotating S3 credentials for one CMR provider.

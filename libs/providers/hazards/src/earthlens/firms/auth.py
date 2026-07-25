@@ -165,7 +165,7 @@ class FirmsAuth(AbstractAuth[FirmsCredentials]):
                 f"environment variable. Request a free key at {_MAP_KEY_URL}."
             )
         self._key = key
-        self._configured = True
+        self.mark_configured()
 
     @property
     def api_key(self) -> str:

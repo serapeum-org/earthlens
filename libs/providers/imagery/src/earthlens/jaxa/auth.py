@@ -320,7 +320,7 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
         if self._configured:
             return
         if self._protocol == "jaxa-earth":
-            self._configured = True
+            self.mark_configured()
             return
         spec = _PROTOCOL_SPECS[self._protocol]
         cred_username = getattr(self._creds, spec.cred_user)
@@ -341,4 +341,4 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
             )
         self._username = username
         self._password = SecretStr(password_raw)
-        self._configured = True
+        self.mark_configured()

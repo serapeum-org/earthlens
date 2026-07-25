@@ -173,7 +173,7 @@ class NrelAuth(AbstractAuth[NrelCredentials]):
             )
         self._key = key
         self._email = email
-        self._configured = True
+        self.mark_configured()
 
     @property
     def api_key(self) -> SecretStr:
