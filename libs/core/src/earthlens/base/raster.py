@@ -62,11 +62,16 @@ def close_quietly(handle: Any) -> None:
 
             ```
     """
-    closer = getattr(handle, "close", None)
-    if not callable(closer):
-        return
+    # The attribute lookup is inside the `try` on purpose: `close` may be a
+    # property or arrive through a `__getattr__` on a lazy proxy, and such a
+    # descriptor can raise something other than AttributeError — which
+    # `getattr(..., None)` would not absorb. Since this runs on a cleanup path
+    # (often inside `finally:`), letting that escape would mask the real
+    # exception, so the whole access is guarded.
     try:
-        closer()
+        closer = getattr(handle, "close", None)
+        if callable(closer):
+            closer()
     except Exception:  # noqa: BLE001 - best-effort release on a cleanup path
         pass
 

@@ -57,6 +57,71 @@ _SOURCES = _provider_sources()
 _IDS = [str(path.relative_to(_ROOT)).replace("\\", "/") for path in _SOURCES]
 
 
+def _unbounded_caches(path: Path) -> list[str]:
+    """Return module-level `_*CACHE*` names still assigned a plain `dict` literal.
+
+    One entry per declaration, so a file that bounds one cache and leaves two
+    beside it is still reported.
+    """
+    found: list[str] = []
+    for node in ast.parse(path.read_text(encoding="utf-8")).body:
+        target = None
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            target = node.target.id
+        elif isinstance(node, ast.Assign) and len(node.targets) == 1:
+            target = getattr(node.targets[0], "id", None)
+        if not target or "CACHE" not in target:
+            continue
+        if isinstance(node.value, ast.Dict) and not node.value.keys:
+            found.append(target)
+    return found
+
+
+def _quiet_close_lookalikes(path: Path) -> list[str]:
+    """Return module-level functions whose body is the quiet-close shape.
+
+    The shape is "look up `close`, call it, swallow whatever it raises" — the
+    duplication `earthlens.base.close_quietly` replaced. Detected from the AST so
+    renaming the helper cannot hide it. A genuinely different teardown (chc's FTP
+    `quit()`-then-`close()` fallback) has more than one call and is not matched.
+    """
+    found: list[str] = []
+    for node in ast.parse(path.read_text(encoding="utf-8")).body:
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        body = [
+            statement
+            for statement in node.body
+            if not (
+                isinstance(statement, ast.Expr)
+                and isinstance(statement.value, ast.Constant)
+            )
+        ]
+        if len(body) != 1 or not isinstance(body[0], ast.Try):
+            # Allow the `closer = getattr(...)` / `if callable(closer)` prelude.
+            if not (
+                len(body) == 2
+                and isinstance(body[0], ast.Assign)
+                and isinstance(body[1], ast.If)
+            ):
+                continue
+        module = ast.Module(body=body, type_ignores=[])
+        source = ast.unparse(module)
+        swallows = "except Exception" in source and "pass" in source
+        # Exactly one try, and `close` is the only method it calls. chc's FTP
+        # teardown has a nested try and calls `quit()` first, so it is a genuinely
+        # different protocol-specific shape and is not matched.
+        tries = sum(isinstance(n, ast.Try) for n in ast.walk(module))
+        methods = {
+            n.func.attr
+            for n in ast.walk(module)
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+        }
+        if swallows and tries == 1 and methods <= {"close"}:
+            found.append(node.name)
+    return found
+
+
 class TestNoPrivateCoreImports:
     """No provider imports a private symbol or module from core."""
 
@@ -138,14 +203,19 @@ class TestSharedHelpersAreNotReimplemented:
         )
 
     def test_no_provider_reimplements_quiet_close(self):
-        """No provider re-declares its own best-effort handle-release helper."""
+        """No provider re-declares the best-effort handle-release shape.
+
+        Matched structurally, on the function's body, rather than by its name: the
+        earlier name-grep version passed while two byte-equivalent copies survived
+        as `_close_dataset`, certifying a property that did not hold.
+        """
         offenders = [
-            str(path.relative_to(_ROOT)).replace("\\", "/")
+            f"{str(path.relative_to(_ROOT)).replace(chr(92), '/')}::{name}"
             for path in _provider_sources()
-            if "def _close_quietly" in path.read_text(encoding="utf-8")
+            for name in _quiet_close_lookalikes(path)
         ]
         assert not offenders, (
-            f"{offenders} declare a local close helper; use "
+            f"{offenders} re-implement the best-effort close shape; use "
             f"`earthlens.base.close_quietly`"
         )
 
@@ -160,16 +230,24 @@ class TestCatalogParseCacheIsBounded:
     """Every backend's parse cache evicts superseded generations."""
 
     def test_all_catalogs_use_the_bounded_cache(self):
-        """No `catalog.py` memoises into a plain unbounded dict."""
+        """Every `(path, mtime)`-keyed parse cache is a bounded one.
+
+        Checks each cache declaration individually, not merely that the file
+        mentions `CatalogParseCache` somewhere: the earlier version passed a file
+        that converted one cache and left two unbounded beside it.
+        """
+        scope = [
+            *_ROOT.glob("libs/providers/*/src/earthlens/*/catalog.py"),
+            _ROOT / "libs/core/src/earthlens/base/providers.py",
+        ]
         offenders = [
-            str(path.relative_to(_ROOT)).replace("\\", "/")
-            for path in _ROOT.glob("libs/providers/*/src/earthlens/*/catalog.py")
-            if "_CATALOG_CACHE" in (text := path.read_text(encoding="utf-8"))
-            and "CatalogParseCache" not in text
+            f"{str(path.relative_to(_ROOT)).replace(chr(92), '/')}::{name}"
+            for path in scope
+            for name in _unbounded_caches(path)
         ]
         assert not offenders, (
-            f"{offenders} cache parses in a plain dict keyed on (path, mtime), "
-            f"which retains every past generation; use "
+            f"{offenders} memoise into a plain dict keyed on (path, mtime), which "
+            f"retains every past generation; use "
             f"`earthlens.base.yaml_loader.CatalogParseCache`"
         )
 

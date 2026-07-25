@@ -34,6 +34,7 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
+    close_quietly,
 )
 from earthlens.base.spatial import mask_to_geometry
 from earthlens.soilgrids._helpers import (
@@ -87,7 +88,8 @@ class SoilGrids(AbstractDataSource):
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
-    #: the soil property grids are time-invariant, so a missing `start` / `end` is legal here.
+    #: The soil property grids are time-invariant, so a missing `start` / `end` is legal
+    #: here.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(
@@ -222,7 +224,7 @@ class SoilGrids(AbstractDataSource):
             TemporalExtent: A frozen model with `None` bounds and an empty date
                 index (a static soil-property map has no time axis).
         """
-        return self._static_extent(resolution=temporal_resolution or 'static')
+        return self._static_extent(resolution=temporal_resolution or "static")
 
     def _api(self) -> list[Path]:
         """Fetch each coverage under a progress bar, isolating per-coverage faults.
@@ -385,13 +387,13 @@ class SoilGrids(AbstractDataSource):
             # keeping `os.replace` in the try means a rename failure is cleaned
             # up rather than orphaning a fully-written temp in the output tree.
             if result is not dataset:
-                _close_dataset(result)
-            _close_dataset(dataset)
+                close_quietly(result)
+            close_quietly(dataset)
             os.replace(tmp_path, out_path)
         except Exception:
             if result is not None and result is not dataset:
-                _close_dataset(result)
-            _close_dataset(dataset)
+                close_quietly(result)
+            close_quietly(dataset)
             try:
                 tmp_path.unlink(missing_ok=True)
             except OSError:
@@ -432,20 +434,3 @@ class SoilGrids(AbstractDataSource):
         paths = self._api()
         logger.info(f"soilgrids attribution: {SOILGRIDS_ATTRIBUTION}")
         return paths
-
-
-def _close_dataset(dataset: object) -> None:
-    """Release a pyramids `Dataset`'s underlying GDAL handle if it exposes one.
-
-    Closing the dataset lets the OS release the file lock (notably on Windows)
-    once the GeoTIFF is written. A no-op when the object has no `close`.
-
-    Args:
-        dataset: A pyramids `Dataset` (or anything with an optional `close`).
-    """
-    closer = getattr(dataset, "close", None)
-    if callable(closer):
-        try:
-            closer()
-        except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
-            pass

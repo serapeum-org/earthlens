@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
     from earthlens.aggregate import AggregationConfig
 
-from earthlens.base import OutputKind, date_windows, to_datetime
+from earthlens.base import OutputKind, close_quietly, date_windows, to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     RemoteProduct,
@@ -450,10 +450,10 @@ class GHSL(AbstractDataSource):
                     f"_epsg{self._output_epsg}.tif"
                 )
                 result.to_file(str(target))
-                _close_dataset(result)
+                close_quietly(result)
                 out.append(target)
             for ds in datasets:
-                _close_dataset(ds)
+                close_quietly(ds)
         return out
 
     @staticmethod
@@ -723,8 +723,8 @@ class GHSL(AbstractDataSource):
         cropped.to_file(str(target))
         if has_legend:
             self._write_legend_sidecar(target, rp.metadata["product"])
-        _close_dataset(dataset)
-        _close_dataset(cropped)
+        close_quietly(dataset)
+        close_quietly(cropped)
         # Best-effort cleanup of the merge intermediate; on Windows the GDAL
         # handle can briefly outlive the Python object, so a locked file is
         # left in the cache rather than raising.
@@ -815,24 +815,6 @@ class GHSL(AbstractDataSource):
         dest: Path = Path(self.path) / code
         download_and_extract(f"{version_url}/{zips[0]}", dest)
         return dest
-
-
-def _close_dataset(dataset: object) -> None:
-    """Release a pyramids `Dataset`'s underlying GDAL handle if it exposes one.
-
-    pyramids `Dataset` objects may hold an open GDAL dataset; closing it lets
-    the OS release the file lock (notably on Windows) before the intermediate
-    is deleted. A no-op when the object has no `close`.
-
-    Args:
-        dataset: A pyramids `Dataset` (or anything with an optional `close`).
-    """
-    closer = getattr(dataset, "close", None)
-    if callable(closer):
-        try:
-            closer()
-        except Exception:  # noqa: BLE001 - best-effort handle release  # nosec B110
-            pass
 
 
 def _epsg_int(crs: str | int) -> int:
