@@ -46,7 +46,6 @@ import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeGuard
 
-import pandas as pd
 from loguru import logger
 from tqdm import tqdm
 
@@ -56,7 +55,6 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
     date_windows,
-    to_datetime,
 )
 from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
 
@@ -334,14 +332,7 @@ class NWM(AbstractDataSource):
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="raw",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='raw')
 
     def _resolve_mode(self) -> str:
         """Resolve operational vs retrospective for this request.

@@ -46,7 +46,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
@@ -268,13 +267,8 @@ class ERDDAP(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution=temporal_resolution,
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
+        return self._whole_window_extent(
+            start, end, fmt, resolution=temporal_resolution
         )
 
     def _search(self) -> list[RemoteProduct]:

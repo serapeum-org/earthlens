@@ -42,7 +42,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.nrel import _helpers
 from earthlens.nrel.auth import NrelAuth, NrelCredentials
@@ -272,14 +271,7 @@ class NREL(AbstractDataSource):
                 not a `ValueError` subclass).
             ValueError: If `start` / `end` do not match `fmt` (from `strptime`).
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="hourly",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='hourly')
 
     def _names(self) -> list[Any]:
         """Enumerate the `names=` values (years, or the literal `tmy`).

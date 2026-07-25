@@ -37,8 +37,6 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
     date_windows,
-    resolve_cadence,
-    to_datetime,
 )
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
 from earthlens.sentinel_hub._helpers import (
@@ -242,16 +240,12 @@ class SentinelHub(AbstractDataSource):
                 `time_interval`, so this backend keeps the inherited
                 `REQUIRES_TIME_WINDOW = True`.
         """
-
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
-        resolution = resolve_cadence(
-            temporal_resolution, freq_map, backend=type(self).__name__
-        )
-        dates = date_windows(start_dt, end_dt, resolution)
-        return TemporalExtent(
-            start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates
+        return self._cadence_extent(
+            start,
+            end,
+            fmt,
+            temporal_resolution,
+            {'daily': 'D', 'monthly': 'MS', 'hourly': 'h', 'yearly': 'YS'},
         )
 
     def _bbox(self) -> Any:

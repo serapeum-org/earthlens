@@ -28,20 +28,17 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.biodiversity import occurrences_to_fc, warn_license, wkt_from_bbox
 from earthlens.gbif.catalog import Catalog
 
 if TYPE_CHECKING:
-    import pandas as pd
     from pyramids.feature.collection import FeatureCollection
 
     from earthlens.aggregate import AggregationConfig
@@ -207,14 +204,7 @@ class GBIF(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='all')
 
     def _plan_search(self) -> dict[str, Any]:
         """Build the `occ.search` keyword arguments for the request.

@@ -48,7 +48,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.firms import events
 from earthlens.firms._helpers import chunk_windows, classify_body, firms_get
@@ -307,14 +306,7 @@ class FIRMS(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='all')
 
     def _search(self) -> list[RemoteProduct]:
         """List one :class:`RemoteProduct` per `(sensor, ≤5-day chunk)`.

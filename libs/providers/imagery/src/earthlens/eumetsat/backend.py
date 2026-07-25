@@ -55,9 +55,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    date_windows,
-    resolve_cadence,
-    to_datetime,
 )
 from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
@@ -291,18 +288,12 @@ class EUMETSAT(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        freq_map = {"daily": "D", "monthly": "MS", "hourly": "h"}
-        resolution = resolve_cadence(
-            temporal_resolution, freq_map, backend=type(self).__name__
-        )
-        dates = date_windows(start_dt, end_dt, resolution)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution=resolution,
-            dates=dates,
+        return self._cadence_extent(
+            start,
+            end,
+            fmt,
+            temporal_resolution,
+            {'daily': 'D', 'monthly': 'MS', 'hourly': 'h'},
         )
 
     def _search(self) -> list[RemoteProduct]:

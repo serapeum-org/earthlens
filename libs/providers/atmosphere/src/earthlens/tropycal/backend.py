@@ -44,7 +44,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.tropycal import events
 from earthlens.tropycal.catalog import Catalog
@@ -300,14 +299,7 @@ class TropicalCyclone(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='all')
 
     def _search(self) -> list[RemoteProduct]:
         """One :class:`RemoteProduct` per requested unit.

@@ -67,12 +67,18 @@ class TestFlexibleDateForms:
 
     @staticmethod
     def _extent(backend, value):
-        """Call the unbound hook, or return None when it needs instance state."""
+        """Parse dates on an uninitialised instance, or None if state is needed.
+
+        `object.__new__` skips `__init__` (no network, no catalog load) while
+        still giving real bound methods, so the hook can reach the inherited
+        `_whole_window_extent` / `_cadence_extent` factories. A backend whose
+        hook also reads constructor-set state (s3 and drought read the resolved
+        dataset row) raises `AttributeError` and is covered by the static guard.
+        """
+        instance = object.__new__(backend)
         try:
-            return backend._check_input_dates(None, value, value, "daily", "%Y-%m-%d")
+            return instance._check_input_dates(value, value, "daily", "%Y-%m-%d")
         except AttributeError:
-            # The hook reads `self` (s3 / drought read the resolved dataset row);
-            # the static guard above covers those.
             return None
 
     @pytest.mark.parametrize("key,backend", _CASES, ids=_IDS)

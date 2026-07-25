@@ -31,7 +31,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.biodiversity import occurrences_to_fc, warn_license, wkt_from_bbox
 from earthlens.obis.catalog import Catalog
@@ -194,14 +193,7 @@ class OBIS(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='all')
 
     def _plan_search(self, name: str | None = None) -> dict[str, Any]:
         """Build the `occurrences.search` keyword arguments for one species.

@@ -41,7 +41,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.pvgis import _helpers
 from earthlens.pvgis.catalog import Catalog, Product
@@ -225,14 +224,7 @@ class PVGIS(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="hourly",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='hourly')
 
     def _resolved_params(self) -> dict[str, Any]:
         """Build the per-request query params (catalog defaults + knobs).

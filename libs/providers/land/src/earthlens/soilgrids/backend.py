@@ -27,7 +27,6 @@ from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
@@ -223,12 +222,7 @@ class SoilGrids(AbstractDataSource):
             TemporalExtent: A frozen model with `None` bounds and an empty date
                 index (a static soil-property map has no time axis).
         """
-        return TemporalExtent(
-            start_date=None,
-            end_date=None,
-            resolution=temporal_resolution or "static",
-            dates=pd.DatetimeIndex([]),
-        )
+        return self._static_extent(resolution=temporal_resolution or 'static')
 
     def _api(self) -> list[Path]:
         """Fetch each coverage under a progress bar, isolating per-coverage faults.

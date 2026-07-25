@@ -6,6 +6,7 @@ import inspect
 import os
 import warnings
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -286,9 +287,18 @@ class SpatialExtent(BaseModel):
                 f"latitude_max ({self.latitude_max})"
             )
         if self.longitude_min > self.longitude_max:
+            # A west > east box is how GeoJSON/STAC spell an antimeridian
+            # crossing, so say so and name the remedy: only the stac backend
+            # splits such a box today (via
+            # `pyramids.feature.bbox.split_antimeridian`), and a bare
+            # "min > max" reads like a typo rather than an unsupported case.
             raise ValueError(
-                f"longitude_min ({self.longitude_min}) > "
-                f"longitude_max ({self.longitude_max})"
+                f"longitude_min ({self.longitude_min}) > longitude_max "
+                f"({self.longitude_max}). A west-of-east box denotes an "
+                f"antimeridian crossing, which this backend does not support; "
+                f"split it at ±180 and issue the two halves as separate "
+                f"requests (e.g. [{self.longitude_min}, 180] and "
+                f"[-180, {self.longitude_max}])."
             )
         return self
 
@@ -798,10 +808,13 @@ class AbstractDataSource(ABC):
         Raises:
             AuthenticationError: If the backend cannot authenticate.
         """
+        # Independent checks, not an if/elif chain: a backend may legitimately
+        # have both a lazily-opened client *and* a credential object, and an
+        # `elif` would silently skip `configure()` for it.
         if isinstance(self, LazyClientMixin):
             # Accessing `client` runs the cached `_open_client` (auth).
             _ = self.client
-        elif (auth := getattr(self, "_auth", None)) is not None:
+        if (auth := getattr(self, "_auth", None)) is not None:
             auth.configure()
         return self
 
@@ -809,8 +822,131 @@ class AbstractDataSource(ABC):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ):
-        """Check validity of input dates. Called by `__init__`."""
+        """Check validity of input dates. Called by `__init__`.
+
+        Still abstract, because the *shape* of a backend's time axis is a real
+        design decision rather than boilerplate. Most implementations are one
+        call to one of the three factories below —
+        :meth:`_whole_window_extent`, :meth:`_cadence_extent`, or
+        :meth:`_static_extent` — which cover the three archetypes the 48
+        backends fall into; only a genuinely bespoke axis (a provider release
+        cadence to snap to, a forecast `(cycle, step)` grid) needs its own body.
+        """
         pass
+
+    # ------------------------------------------------------------------
+    # TemporalExtent factories.
+    #
+    # Every backend's `_check_input_dates` used to re-derive one of three
+    # shapes by hand, which is how the cadence bug (a `.get(..., "D")` that
+    # silently substituted daily) reached seven backends. Building the extent
+    # through these keeps the parsing, the cadence validation, and the
+    # `dates` axis consistent.
+    # ------------------------------------------------------------------
+
+    def _whole_window_extent(
+        self,
+        start: Any,
+        end: Any,
+        fmt: str,
+        resolution: str = "all",
+    ) -> TemporalExtent:
+        """Build the extent for a backend that queries the window in one request.
+
+        The archetype for a provider whose API takes a date *range* rather
+        than one date per file (an event feed, an occurrence search, a station
+        query): there is no per-step download loop, so `dates` carries just the
+        two bounds and `resolution` is a label rather than a pandas frequency.
+
+        Args:
+            start: The requested start bound, in any form
+                :func:`~earthlens.base.to_datetime` accepts.
+            end: The requested end bound.
+            fmt: `strptime` format tried first for a string bound.
+            resolution: The label to record — conventionally `"all"` (one
+                query spans the window), or the backend's own cadence word
+                where that is more informative.
+
+        Returns:
+            TemporalExtent: The window, with `dates` holding `[start, end]`.
+        """
+        import pandas as pd
+
+        from earthlens.base._dates import to_datetime
+
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
+        return TemporalExtent(
+            start_date=start_dt,
+            end_date=end_dt,
+            resolution=resolution,
+            dates=pd.DatetimeIndex([start_dt, end_dt]),
+        )
+
+    def _cadence_extent(
+        self,
+        start: Any,
+        end: Any,
+        fmt: str,
+        cadence: str,
+        accepted: Mapping[str, str],
+    ) -> TemporalExtent:
+        """Build the extent for a backend that loops over one step per cadence.
+
+        The archetype for a provider addressed one file / request per period.
+        The cadence is resolved through
+        :func:`~earthlens.base.resolve_cadence`, so an unsupported or mistyped
+        spelling raises instead of silently substituting a different cadence,
+        and `dates` is the expanded period axis the download loop iterates.
+
+        Args:
+            start: The requested start bound.
+            end: The requested end bound.
+            fmt: `strptime` format tried first for a string bound.
+            cadence: The user-facing cadence (`temporal_resolution`).
+            accepted: This backend's `{cadence: pandas offset alias}` map.
+
+        Returns:
+            TemporalExtent: The window, with `dates` holding one entry per
+                period start.
+
+        Raises:
+            ValueError: If `cadence` is not a key of `accepted`.
+        """
+        from earthlens.base._dates import date_windows, resolve_cadence, to_datetime
+
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
+        resolution = resolve_cadence(cadence, accepted, backend=type(self).__name__)
+        return TemporalExtent(
+            start_date=start_dt,
+            end_date=end_dt,
+            resolution=resolution,
+            dates=date_windows(start_dt, end_dt, resolution),
+        )
+
+    def _static_extent(self, resolution: str = "static") -> TemporalExtent:
+        """Build the extent for a backend whose product has no time axis.
+
+        The archetype for a time-invariant product (elevation, soil
+        properties, a long-term resource climatology): both bounds are `None`
+        and `dates` is empty, so nothing downstream tries to iterate a time
+        axis that does not exist.
+
+        Args:
+            resolution: The label to record. Defaults to `"static"`.
+
+        Returns:
+            TemporalExtent: An empty, boundless extent.
+        """
+        import pandas as pd
+
+        return TemporalExtent(
+            start_date=None,
+            end_date=None,
+            resolution=resolution,
+            dates=pd.DatetimeIndex([]),
+        )
 
     def _initialize(self, *args: Any, **kwargs: Any) -> Any:
         """Prepare the backend before the extents are built; return its client.

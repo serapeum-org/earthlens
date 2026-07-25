@@ -32,7 +32,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
-import pandas as pd
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 from loguru import logger
 
@@ -41,7 +40,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
@@ -208,14 +206,7 @@ class GDACS(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='all')
 
     def _search(self) -> list[RemoteProduct]:
         """One :class:`RemoteProduct` carrying the whole combined query.

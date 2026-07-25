@@ -32,7 +32,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
@@ -40,7 +39,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.fdsn import events
 from earthlens.fdsn.auth import resolve_earthscope_token
@@ -233,14 +231,7 @@ class FDSN(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='all')
 
     def _search(self) -> list[RemoteProduct]:
         """One :class:`RemoteProduct` per requested network.

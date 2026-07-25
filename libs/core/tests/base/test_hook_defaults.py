@@ -177,3 +177,98 @@ class TestApiDefault:
                 return "one-shot"
 
         assert _build(_Bespoke, tmp_path).download() == "one-shot"
+
+
+class TestTemporalExtentFactories:
+    """The three `TemporalExtent` archetypes the backends build through."""
+
+    def test_whole_window_holds_both_bounds(self, tmp_path):
+        """A whole-window extent carries the two bounds as its date axis."""
+        backend = _build(_Minimal, tmp_path)
+        extent = backend._whole_window_extent("2024-01-01", "2024-01-31", "%Y-%m-%d")
+        assert len(extent.dates) == 2
+        assert extent.resolution == "all"
+
+    def test_whole_window_accepts_a_datetime(self, tmp_path):
+        """The factory parses through `to_datetime`, so objects work too."""
+        import datetime as dt
+
+        backend = _build(_Minimal, tmp_path)
+        extent = backend._whole_window_extent(
+            dt.date(2024, 1, 1), dt.date(2024, 1, 2), "%Y-%m-%d"
+        )
+        assert extent.start_date == dt.datetime(2024, 1, 1)
+
+    def test_whole_window_custom_resolution_label(self, tmp_path):
+        """A backend can record its own label instead of `"all"`."""
+        backend = _build(_Minimal, tmp_path)
+        extent = backend._whole_window_extent(
+            "2024-01-01", "2024-01-02", "%Y-%m-%d", resolution="raw"
+        )
+        assert extent.resolution == "raw"
+
+    def test_cadence_expands_the_window(self, tmp_path):
+        """A cadence extent expands to one entry per period start."""
+        backend = _build(_Minimal, tmp_path)
+        extent = backend._cadence_extent(
+            "2024-01-01", "2024-03-01", "%Y-%m-%d", "monthly", {"monthly": "MS"}
+        )
+        assert len(extent.dates) == 3
+        assert extent.resolution == "MS"
+
+    def test_cadence_rejects_an_unknown_spelling(self, tmp_path):
+        """An unsupported cadence raises rather than substituting a default."""
+        backend = _build(_Minimal, tmp_path)
+        with pytest.raises(ValueError, match="is not supported by _Minimal"):
+            backend._cadence_extent(
+                "2024-01-01", "2024-03-01", "%Y-%m-%d", "yearly", {"monthly": "MS"}
+            )
+
+    def test_static_extent_has_no_axis(self, tmp_path):
+        """A static extent carries no bounds and an empty date axis."""
+        extent = _build(_Minimal, tmp_path)._static_extent()
+        assert extent.start_date is None
+        assert len(extent.dates) == 0
+        assert extent.resolution == "static"
+
+
+class TestAuthenticateRunsBothPaths:
+    """`authenticate()` opens a lazy client *and* configures a credential."""
+
+    def test_both_paths_run_for_a_backend_with_both(self, tmp_path):
+        """A backend with a lazy client and an auth object gets both, not one."""
+        from earthlens.base import LazyClientMixin
+
+        class _Auth:
+            configured = False
+
+            def configure(self):
+                self.configured = True
+
+        class _Both(LazyClientMixin, _Minimal):
+            def _initialize(self):
+                self._auth = _Auth()
+                return None
+
+            def _open_client(self):
+                self.opened = True
+                return "connection"
+
+        backend = _build(_Both, tmp_path)
+        backend.authenticate()
+        assert backend.opened is True
+        assert backend._auth.configured is True
+
+
+class TestAntimeridianExtent:
+    """A west-of-east bbox is reported as an antimeridian crossing."""
+
+    def test_spatial_extent_names_the_crossing(self):
+        """The validator explains the case rather than just "min > max"."""
+        with pytest.raises(ValueError, match="antimeridian crossing"):
+            SpatialExtent.from_pairs(lat_lim=[-10.0, 10.0], lon_lim=[170.0, -170.0])
+
+    def test_message_suggests_the_two_halves(self):
+        """The remedy names the split at ±180."""
+        with pytest.raises(ValueError, match=r"\[170.0, 180\]"):
+            SpatialExtent.from_pairs(lat_lim=[-10.0, 10.0], lon_lim=[170.0, -170.0])

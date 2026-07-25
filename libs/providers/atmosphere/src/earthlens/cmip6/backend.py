@@ -30,7 +30,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
 from loguru import logger
 from tqdm import tqdm
 
@@ -39,7 +38,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.cmip6 import accessor
 from earthlens.cmip6.catalog import Catalog
@@ -186,14 +184,7 @@ class CMIP6(AbstractDataSource):
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="raw",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='raw')
 
     def _wants_spatial_subset(self) -> bool:
         """Return whether the request narrows the grid (a bbox crop).

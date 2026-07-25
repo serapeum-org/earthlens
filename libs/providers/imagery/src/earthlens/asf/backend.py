@@ -29,8 +29,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
-import pandas as pd
-
 from earthlens.asf._helpers import apply_baseline_windows, wkt_from_extent
 from earthlens.asf.auth import ASFAuth, ASFCredentials
 from earthlens.asf.catalog import Catalog, Product
@@ -39,7 +37,6 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    to_datetime,
 )
 
 if TYPE_CHECKING:
@@ -280,14 +277,7 @@ class ASF(AbstractDataSource):
             ValueError: If `start` parses to a date later than
                 `end`.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='all')
 
     @property
     def _mode(self) -> str:

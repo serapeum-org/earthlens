@@ -26,7 +26,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
-import pandas as pd
 from loguru import logger
 
 from earthlens.base import (
@@ -175,12 +174,7 @@ class SolarWindAtlas(AbstractDataSource):
             TemporalExtent: A frozen model with `None` bounds and an empty date
                 index (a static climatology layer has no time axis).
         """
-        return TemporalExtent(
-            start_date=None,
-            end_date=None,
-            resolution=temporal_resolution or "static",
-            dates=pd.DatetimeIndex([]),
-        )
+        return self._static_extent(resolution=temporal_resolution or 'static')
 
     @property
     def cache_dir(self) -> Path:

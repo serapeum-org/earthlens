@@ -32,7 +32,6 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.biodiversity import WDPA_LICENSE, warn_license
 from earthlens.wdpa import _rest
@@ -202,14 +201,7 @@ class WDPA(AbstractDataSource):
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        start_dt = to_datetime(start, fmt)
-        end_dt = to_datetime(end, fmt)
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution="all",
-            dates=pd.DatetimeIndex([start_dt, end_dt]),
-        )
+        return self._whole_window_extent(start, end, fmt, resolution='all')
 
     def _fetch(self):  # type: ignore[override]
         """Fetch every selector's protected areas as one GeoDataFrame.
