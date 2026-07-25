@@ -264,9 +264,9 @@ class TestCatalog:
         )
 
     def test_get_catalog_returns_datasets(self, shipped_catalog: Catalog):
-        """`get_catalog` returns the same mapping as `.datasets`."""
+        """`get_catalog` returns `.datasets`; `.catalog` is a read-only view of it."""
         assert shipped_catalog.get_catalog() is shipped_catalog.datasets
-        assert shipped_catalog.catalog is shipped_catalog.datasets
+        assert dict(shipped_catalog.catalog) == dict(shipped_catalog.datasets)
 
     def test_get_dataset_unknown_raises_with_hint(self, shipped_catalog: Catalog):
         """`get_dataset` raises ValueError with a close-match suggestion."""

@@ -17,9 +17,9 @@ class TestModelPostInitSuper:
         """`Catalog()` (no args) sets `self.catalog` to the same dict as `self.datasets`."""
         clear_catalog_cache()
         cat = Catalog()
-        assert cat.catalog is cat.datasets, (
-            "AbstractCatalog.model_post_init must set `self.catalog = self.get_catalog()`, "
-            "and `get_catalog()` returns the same dict object as `self.datasets`."
+        assert dict(cat.catalog) == dict(cat.datasets), (
+            "`AbstractCatalog.catalog` must be a read-only view of "
+            "`get_catalog()`, which returns `self.datasets`."
         )
         assert len(cat.catalog) == len(cat.datasets) > 0
 
@@ -51,14 +51,15 @@ class TestModelPostInitSuper:
         clear_catalog_cache()
         loaded = Catalog.load(catalog_path=catalog_yaml)
         # Constructing a SECOND `Catalog` with `datasets=` from the first should
-        # still get `self.catalog == self.datasets` via the super call (the
-        # `if not self.datasets:` branch is skipped, but super still runs).
+        # still expose those rows through the `catalog` view (the
+        # `if not self.datasets:` branch is skipped, but the property reads
+        # straight off `get_catalog()`).
         passthrough = Catalog(
             datasets=loaded.datasets,
             available_datasets=loaded.available_datasets,
             available_regions=loaded.available_regions,
         )
-        assert passthrough.catalog is passthrough.datasets
+        assert dict(passthrough.catalog) == dict(passthrough.datasets)
         assert "synth" in passthrough.catalog
 
     def test_self_catalog_is_not_an_empty_default_dict(self):

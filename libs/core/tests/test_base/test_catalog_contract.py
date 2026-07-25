@@ -53,10 +53,20 @@ def test_catalog_field_is_populated(module_name: str, class_name: str):
 
 
 @pytest.mark.parametrize("module_name, class_name", CATALOG_BACKENDS)
-def test_catalog_field_mirrors_get_catalog(module_name: str, class_name: str):
-    """`super().model_post_init` set `catalog` to the `get_catalog()` result."""
+def test_catalog_mirrors_get_catalog(module_name: str, class_name: str):
+    """`catalog` reads back exactly what `get_catalog()` returns."""
     cat = _build(module_name, class_name)
-    assert cat.catalog is cat.get_catalog()
+    assert dict(cat.catalog) == dict(cat.get_catalog())
+
+
+@pytest.mark.parametrize("module_name, class_name", CATALOG_BACKENDS)
+def test_catalog_is_a_read_only_view(module_name: str, class_name: str):
+    """Writing through `catalog` fails instead of rewriting `datasets`."""
+    cat = _build(module_name, class_name)
+    key = next(iter(cat.datasets))
+    with pytest.raises(TypeError):
+        cat.catalog[key] = None
+    assert cat.datasets[key] is not None, "datasets must be untouched"
 
 
 @pytest.mark.parametrize("module_name, class_name", CATALOG_BACKENDS)
