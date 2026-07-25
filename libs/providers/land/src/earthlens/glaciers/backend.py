@@ -30,7 +30,6 @@ pure pandas.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
@@ -43,6 +42,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.glaciers import _helpers
 from earthlens.glaciers.catalog import Catalog, Dataset
@@ -84,6 +84,9 @@ class Glaciers(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    #: the outline / fluctuation records span their whole archive, so a missing `start` / `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -237,7 +240,9 @@ class Glaciers(AbstractDataSource):
             start: Inclusive start date string, or `None`.
             end: Inclusive end date string, or `None`.
             temporal_resolution: Recorded as the resolution label.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed (or `None`) endpoints.
@@ -245,8 +250,8 @@ class Glaciers(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt) if start else None
-        end_dt = dt.datetime.strptime(end, fmt) if end else None
+        start_dt = to_datetime(start, fmt) if start else None
+        end_dt = to_datetime(end, fmt) if end else None
         dates = (
             pd.DatetimeIndex([start_dt, end_dt])
             if start_dt is not None and end_dt is not None

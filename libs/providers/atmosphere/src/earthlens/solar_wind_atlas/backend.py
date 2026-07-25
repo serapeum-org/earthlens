@@ -84,6 +84,9 @@ class SolarWindAtlas(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: the resource-atlas layers are long-term climatologies, so a missing `start` / `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
+
     def __init__(
         self,
         start: str = "",

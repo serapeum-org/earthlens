@@ -301,7 +301,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             end: Inclusive end date as a string.
             temporal_resolution: `"daily"` (uses `freq="D"`) or
                 `"monthly"` (uses `freq="MS"`).
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen pydantic model with `start_date`,

@@ -38,7 +38,9 @@ from earthlens.base import (
     TemporalExtent,
     crop_to_aoi,
     date_windows,
+    resolve_cadence,
     safe_filename,
+    to_datetime,
     window_labels,
 )
 
@@ -250,12 +252,13 @@ class STAC(LazyClientMixin, AbstractDataSource):
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
         """Parse the date window into a :class:`TemporalExtent`."""
-        import datetime as dt
 
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
-        resolution = freq_map.get(temporal_resolution, "D")
+        resolution = resolve_cadence(
+            temporal_resolution, freq_map, backend=type(self).__name__
+        )
         dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates

@@ -22,7 +22,6 @@ the `[worldpop]` extra.
 
 from __future__ import annotations
 
-import datetime as dt
 import re
 import time
 from pathlib import Path
@@ -33,7 +32,13 @@ import pandas as pd
 import requests
 from joblib import Parallel, delayed
 
-from earthlens.base import OutputKind, RemoteProduct, date_windows, window_labels
+from earthlens.base import (
+    OutputKind,
+    RemoteProduct,
+    date_windows,
+    to_datetime,
+    window_labels,
+)
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
@@ -354,7 +359,9 @@ class WorldPop(AbstractDataSource):
             start: Inclusive start of the window.
             end: Inclusive end of the window.
             temporal_resolution: Advisory label (ignored).
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
@@ -362,8 +369,8 @@ class WorldPop(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         dates = date_windows(start_dt, end_dt, "YS")
         return TemporalExtent(
             start_date=start_dt,

@@ -42,7 +42,6 @@ imported lazily (Overpass/ohsome inside `_fetch`; pyrosm/pyosmium inside
 
 from __future__ import annotations
 
-import datetime as dt
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
@@ -57,6 +56,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.base.http import DEFAULT_TIMEOUT, HttpClient
 from earthlens.osm._helpers import (
@@ -162,6 +162,9 @@ class OSM(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    #: an Overpass current-state query has no window; ohsome supplies its own, so a missing `start` / `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -335,14 +338,16 @@ class OSM(AbstractDataSource):
             end: Inclusive end date string, or `None`.
             temporal_resolution: Recorded as the resolution label; OSM
                 always queries in one shot.
-            fmt: `strptime` format applied to `start` / `end` when set.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model; `start_date` / `end_date` are
                 `None` when the corresponding argument was `None`.
         """
-        start_dt = dt.datetime.strptime(start, fmt) if start else None
-        end_dt = dt.datetime.strptime(end, fmt) if end else None
+        start_dt = to_datetime(start, fmt) if start else None
+        end_dt = to_datetime(end, fmt) if end else None
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

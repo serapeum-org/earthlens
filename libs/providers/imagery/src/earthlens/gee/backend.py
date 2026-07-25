@@ -557,7 +557,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             temporal_resolution: `"raw"` (one bucket spanning the whole
                 window), `"daily"` (`freq="D"`), `"monthly"` (`"MS"`),
                 or `"yearly"` (`"YS"`).
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: `start_date`, `end_date`, `resolution` (the

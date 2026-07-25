@@ -32,7 +32,6 @@ in `variables` are informational for a whole-granule fetch.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -46,6 +45,8 @@ from earthlens.base import (
     TemporalExtent,
     date_windows,
     region_affinity,
+    resolve_cadence,
+    to_datetime,
 )
 from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
 from earthlens.earthdata.catalog import Catalog, EarthdataDataset
@@ -283,7 +284,9 @@ class Earthdata(AbstractDataSource):
             end: Inclusive end date as a string.
             temporal_resolution: Advisory cadence label; mapped to a
                 pandas frequency for the `dates` index when known.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with parsed bounds.
@@ -291,10 +294,12 @@ class Earthdata(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h"}
-        resolution = freq_map.get(temporal_resolution, "D")
+        resolution = resolve_cadence(
+            temporal_resolution, freq_map, backend=type(self).__name__
+        )
         dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt,

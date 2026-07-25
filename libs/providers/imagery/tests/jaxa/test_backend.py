@@ -148,7 +148,6 @@ def test_authenticate_no_op_for_jaxa_earth(monkeypatch, base_kwargs) -> None:
         ("monthly", "MS"),
         ("yearly", "YS"),
         ("raw", "D"),
-        ("nonsense", "MS"),  # unknown values fall back to month-start
     ],
 )
 def test_temporal_resolution_maps_to_frequency_alias(
@@ -161,3 +160,15 @@ def test_temporal_resolution_maps_to_frequency_alias(
         **{k: v for k, v in base_kwargs.items() if k != "temporal_resolution"},
     )
     assert backend.time.resolution == expected_freq
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_unknown_temporal_resolution_rejected(base_kwargs) -> None:
+    """An unsupported cadence raises instead of silently becoming month-start."""
+    with pytest.raises(ValueError, match="is not supported by JAXA"):
+        JAXA(
+            variables=["elevation"],
+            temporal_resolution="nonsense",
+            **{k: v for k, v in base_kwargs.items() if k != "temporal_resolution"},
+        )

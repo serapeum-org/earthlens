@@ -478,9 +478,20 @@ class AbstractDataSource(ABC):
             `self.OUTPUT_KIND`, and tropycal sets `"tabular"` for its
             `ships` product (else `"vector"`). The facade reads the
             instance attribute, so both forms work.
+        REQUIRES_TIME_WINDOW: Whether this backend needs both `start` and
+            `end`. `True` (the default) makes :meth:`__init__` reject a
+            missing bound up front with an actionable message, instead of
+            letting the `None` reach the subclass's date parsing and surface
+            as a bare `TypeError: strptime() argument 1 must be str, not
+            NoneType`. Snapshot backends with no per-step time axis — admin,
+            osm, overture, glaciers, risk_indicators, bathymetry, dem,
+            soilgrids, solar_wind_atlas — set it to `False` and treat a
+            `None` bound as "the whole record".
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    REQUIRES_TIME_WINDOW: bool = True
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Give every backend the facade's ergonomic constructor sugar.
@@ -610,7 +621,13 @@ class AbstractDataSource(ABC):
                 to `"%Y-%m-%d"`.
             path: Output directory. Created if it does not exist.
                 Defaults to the current working directory.
+
+        Raises:
+            ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
+                `start` or `end` is `None`.
         """
+        self._check_time_window(start, end)
+
         client = self._initialize()
         if client is not None:
             self.client = client
@@ -641,6 +658,38 @@ class AbstractDataSource(ABC):
         self.path = self.root_dir
         if not os.path.exists(self.root_dir):
             os.makedirs(self.root_dir)
+
+    @classmethod
+    def _check_time_window(cls, start: Any, end: Any) -> None:
+        """Reject a missing `start` / `end` when the backend needs both.
+
+        Runs before :meth:`_check_input_dates` so a backend that declares
+        :attr:`REQUIRES_TIME_WINDOW` never has to defend against `None`, and
+        the user gets the name of the missing bound rather than a bare
+        `strptime` `TypeError` from deep inside the subclass.
+
+        Args:
+            start: The requested start bound, possibly `None`.
+            end: The requested end bound, possibly `None`.
+
+        Raises:
+            ValueError: If the backend requires a window and either bound is
+                `None`. The message names which bound(s) are missing.
+        """
+        if not cls.REQUIRES_TIME_WINDOW:
+            return
+        missing = [
+            name for name, value in (("start", start), ("end", end)) if value is None
+        ]
+        if not missing:
+            return
+        raise ValueError(
+            f"the {cls.__name__} backend requires a time window, but "
+            f"{' and '.join(missing)} "
+            f"{'is' if len(missing) == 1 else 'are'} missing. Pass "
+            f"start=/end= (e.g. start='2024-01-01', end='2024-01-31') or the "
+            f"single time='2024-01-01/2024-01-31' range."
+        )
 
     def _attach_clip_geometry(self, geometry: Any) -> None:
         """Record a polygon mask on `self.space` for precise clipping.

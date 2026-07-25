@@ -10,6 +10,8 @@ parameter becomes an optional override rather than a requirement.
 from __future__ import annotations
 
 import datetime as dt
+import difflib
+from collections.abc import Mapping
 from typing import Any
 
 import pandas as pd
@@ -112,6 +114,78 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
     raise TypeError(
         f"start / end must be a datetime, date, or string; got {type(value).__name__}"
     )
+
+
+def resolve_cadence(
+    cadence: str,
+    accepted: Mapping[str, str],
+    *,
+    backend: str = "this backend",
+) -> str:
+    """Map a user-facing cadence onto its pandas offset alias, or raise.
+
+    The single home for the cadence lookup the multi-cadence backends each
+    spelled as `freq_map.get(temporal_resolution, "D")` — a form that silently
+    substitutes a *different* cadence when the caller's spelling is unknown, so
+    a mistyped `cadence="dailyy"` (or a legitimate `"yearly"` missing from a
+    backend's map) quietly downloaded daily steps instead of failing. Raising
+    is the only safe behaviour: the alternative silently changes both the
+    request count and the output shape.
+
+    Args:
+        cadence: The user-facing cadence (`temporal_resolution` / `cadence=`),
+            e.g. `"daily"`.
+        accepted: Mapping of every cadence this backend supports to its pandas
+            offset alias, e.g. `{"daily": "D", "monthly": "MS"}`.
+        backend: Backend name used in the error message. Defaults to a generic
+            phrase; pass `type(self).__name__`.
+
+    Returns:
+        The pandas offset alias for `cadence`.
+
+    Raises:
+        ValueError: If `cadence` is not a key of `accepted`. The message lists
+            the accepted spellings and suggests the closest one.
+
+    Examples:
+        - A supported cadence resolves to its pandas alias:
+            ```python
+            >>> from earthlens.base import resolve_cadence
+            >>> resolve_cadence("monthly", {"daily": "D", "monthly": "MS"})
+            'MS'
+
+            ```
+        - An unsupported cadence raises instead of defaulting:
+            ```python
+            >>> from earthlens.base import resolve_cadence
+            >>> resolve_cadence(  # doctest: +ELLIPSIS
+            ...     "yearly", {"daily": "D", "monthly": "MS"}
+            ... )
+            Traceback (most recent call last):
+                ...
+            ValueError: temporal_resolution='yearly' is not supported by this backend. ...
+
+            ```
+        - A near-miss gets a did-you-mean hint:
+            ```python
+            >>> from earthlens.base import resolve_cadence
+            >>> try:
+            ...     resolve_cadence("dailyy", {"daily": "D"}, backend="CMEMS")
+            ... except ValueError as exc:
+            ...     print("Did you mean 'daily'?" in str(exc))
+            True
+
+            ```
+    """
+    try:
+        return accepted[cadence]
+    except KeyError:
+        close = difflib.get_close_matches(cadence, accepted, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"temporal_resolution={cadence!r} is not supported by {backend}. "
+            f"Accepted: {sorted(accepted)}.{hint}"
+        ) from None
 
 
 def date_windows(

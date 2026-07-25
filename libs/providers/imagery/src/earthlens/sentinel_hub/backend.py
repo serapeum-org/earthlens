@@ -38,6 +38,8 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     date_windows,
+    resolve_cadence,
+    to_datetime,
 )
 from earthlens.sentinel_hub._dispatch import resolve_api, validate_api
 from earthlens.sentinel_hub._helpers import (
@@ -239,25 +241,27 @@ class SentinelHub(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Advisory cadence label (`"daily"`, `"monthly"`,
                 `"hourly"`, `"yearly"`) → the pandas frequency on the extent.
-            fmt: `strptime` format for `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: The parsed window (inclusive `end_date`).
 
         Raises:
-            ValueError: When `start` or `end` is `None`.
+            ValueError: When `temporal_resolution` is not one of the accepted
+                cadences. A missing `start` / `end` is rejected earlier, by
+                `AbstractDataSource._check_time_window` — the render needs a
+                `time_interval`, so this backend keeps the inherited
+                `REQUIRES_TIME_WINDOW = True`.
         """
-        import datetime as dt
 
-        if start is None or end is None:
-            raise ValueError(
-                "Sentinel Hub requires both start and end dates (the render "
-                "needs a time_interval); pass start=… and end=…."
-            )
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h", "yearly": "YS"}
-        resolution = freq_map.get(temporal_resolution, "D")
+        resolution = resolve_cadence(
+            temporal_resolution, freq_map, backend=type(self).__name__
+        )
         dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt, end_date=end_dt, resolution=resolution, dates=dates

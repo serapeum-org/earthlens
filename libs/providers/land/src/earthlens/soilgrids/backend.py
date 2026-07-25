@@ -86,6 +86,9 @@ class SoilGrids(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: the soil property grids are time-invariant, so a missing `start` / `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
+
     def __init__(
         self,
         start: str = "",

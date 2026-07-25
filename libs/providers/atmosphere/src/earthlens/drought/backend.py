@@ -244,7 +244,9 @@ class Drought(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Advisory label (overridden by the
                 resolved cadence).
-            fmt: `strptime` format for both ends.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: The window plus the per-period snapped dates.

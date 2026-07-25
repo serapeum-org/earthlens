@@ -41,7 +41,6 @@ the bundled catalog.
 
 from __future__ import annotations
 
-import datetime as dt
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
@@ -54,6 +53,7 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.eea_aq._helpers import (
     countries_in_bbox,
@@ -201,7 +201,9 @@ class EEA_AQ(AbstractDataSource):
             end: Inclusive end date string.
             temporal_resolution: Provenance label (`"hourly"` or
                 `"daily"`); does not change the request.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints.
@@ -215,8 +217,8 @@ class EEA_AQ(AbstractDataSource):
                 f"temporal_resolution must be one of "
                 f"{sorted(_ACCEPTED_RESOLUTIONS)}, got {temporal_resolution!r}."
             )
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

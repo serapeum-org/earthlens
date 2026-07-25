@@ -18,7 +18,6 @@ is a genuine pyramids-consuming backend.
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -30,7 +29,7 @@ if TYPE_CHECKING:
 
     from earthlens.aggregate import AggregationConfig
 
-from earthlens.base import OutputKind, date_windows
+from earthlens.base import OutputKind, date_windows, to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     RemoteProduct,
@@ -314,7 +313,9 @@ class GHSL(AbstractDataSource):
             start: Inclusive start of the window.
             end: Inclusive end of the window.
             temporal_resolution: Advisory label (ignored).
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
@@ -322,8 +323,8 @@ class GHSL(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         dates = date_windows(start_dt, end_dt, "YS")
         return TemporalExtent(
             start_date=start_dt,

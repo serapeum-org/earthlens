@@ -21,7 +21,6 @@ set, writes it (GeoParquet by default). Like GBIF the facade rejects an
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -33,6 +32,7 @@ from earthlens.base import (
     OutputKind,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.biodiversity import occurrences_to_fc, warn_license, wkt_from_bbox
 from earthlens.obis.catalog import Catalog
@@ -208,13 +208,15 @@ class OBIS(AbstractDataSource):
             start: Inclusive start date string.
             end: Inclusive end date string.
             temporal_resolution: The sentinel `"all"`.
-            fmt: `strptime` format for both ends.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: The validated `[start, end]` window.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

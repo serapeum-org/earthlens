@@ -41,6 +41,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.radar.catalog import Catalog, Station
 
@@ -193,7 +194,9 @@ class Radar(AbstractDataSource):
             start: Inclusive window start.
             end: Inclusive window end.
             temporal_resolution: Advisory cadence label.
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with parsed bounds.
@@ -201,8 +204,8 @@ class Radar(AbstractDataSource):
         Raises:
             ValueError: If `start` parses later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

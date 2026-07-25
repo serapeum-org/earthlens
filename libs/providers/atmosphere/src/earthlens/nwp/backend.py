@@ -39,6 +39,7 @@ from earthlens.base import (
     TemporalExtent,
     crop_to_aoi,
     date_windows,
+    to_datetime,
 )
 from earthlens.nwp._helpers import (
     cog_name,
@@ -295,7 +296,9 @@ class NWP(AbstractDataSource):
             start: Inclusive start of the cycle-date range.
             end: Inclusive end of the cycle-date range.
             temporal_resolution: Advisory cadence label.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with parsed bounds.
@@ -303,8 +306,8 @@ class NWP(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         dates = date_windows(start_dt, end_dt, "D")
         return TemporalExtent(
             start_date=start_dt,

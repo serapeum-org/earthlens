@@ -7,7 +7,13 @@ into the private module layout.
 
 from __future__ import annotations
 
-from earthlens.base._dates import date_windows, split_time, to_datetime, window_labels
+from earthlens.base._dates import (
+    date_windows,
+    resolve_cadence,
+    split_time,
+    to_datetime,
+    window_labels,
+)
 from earthlens.base.abstractdatasource import (
     AbstractCatalog,
     AbstractDataSource,
@@ -63,6 +69,7 @@ __all__ = [
     "normalize_aoi",
     "region_affinity",
     "resolve_aoi",
+    "resolve_cadence",
     "safe_filename",
     "split_time",
     "to_datetime",

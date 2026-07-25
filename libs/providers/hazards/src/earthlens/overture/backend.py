@@ -33,7 +33,6 @@ the backend guards the bbox area for `buildings` / `transportation` /
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
@@ -46,6 +45,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.overture.catalog import Catalog, Theme
 
@@ -105,6 +105,9 @@ class Overture(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    #: each Overture release is a snapshot with no time axis, so a missing `start` / `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -266,14 +269,16 @@ class Overture(AbstractDataSource):
             start: Inclusive start date string, or `None`.
             end: Inclusive end date string, or `None`.
             temporal_resolution: Ignored beyond being recorded.
-            fmt: `strptime` format applied to `start` / `end` when set.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model; `start_date` / `end_date` are
                 `None` when the corresponding argument was `None`.
         """
-        start_dt = dt.datetime.strptime(start, fmt) if start else None
-        end_dt = dt.datetime.strptime(end, fmt) if end else None
+        start_dt = to_datetime(start, fmt) if start else None
+        end_dt = to_datetime(end, fmt) if end else None
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

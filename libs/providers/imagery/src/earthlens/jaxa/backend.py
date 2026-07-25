@@ -32,7 +32,6 @@ shape stabilises across the catalog (see `G6` in the planning doc).
 
 from __future__ import annotations
 
-import datetime as dt
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -41,7 +40,7 @@ from pydantic import SecretStr
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
 
-from earthlens.base import OutputKind, date_windows
+from earthlens.base import OutputKind, date_windows, resolve_cadence, to_datetime
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     SpatialExtent,
@@ -306,7 +305,9 @@ class JAXA(AbstractDataSource):
             start: Inclusive start of the window.
             end: Inclusive end of the window.
             temporal_resolution: Advisory label; defaults to `"daily"`.
-            fmt: `strptime` format applied to `start` / `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed bounds.
@@ -314,9 +315,11 @@ class JAXA(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
-        freq_alias = _FREQ_ALIAS.get(temporal_resolution, "MS")
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
+        freq_alias = resolve_cadence(
+            temporal_resolution, _FREQ_ALIAS, backend=type(self).__name__
+        )
         dates = date_windows(start_dt, end_dt, freq_alias)
         return TemporalExtent(
             start_date=start_dt,

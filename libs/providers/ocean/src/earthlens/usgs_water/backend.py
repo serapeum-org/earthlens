@@ -35,7 +35,6 @@ works at lower rate limits. See :class:`earthlens.usgs_water.auth`.
 
 from __future__ import annotations
 
-import datetime as dt
 import importlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
@@ -50,6 +49,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.usgs_water import _helpers
 from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
@@ -310,7 +310,9 @@ class USGSWater(AbstractDataSource):
             start: Inclusive start date string.
             end: Inclusive end date string.
             temporal_resolution: Recorded as the resolution label.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model with the parsed endpoints.
@@ -318,8 +320,8 @@ class USGSWater(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

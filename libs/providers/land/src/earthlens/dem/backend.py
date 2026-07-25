@@ -36,6 +36,7 @@ from earthlens.base import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    to_datetime,
 )
 from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.dem._helpers import Tile, bbox_to_tiles, tile_key
@@ -81,6 +82,9 @@ class DEM(AbstractDataSource):
     """
 
     OUTPUT_KIND = "raster"
+
+    #: elevation is time-invariant, so a missing `start` / `end` is legal here.
+    REQUIRES_TIME_WINDOW = False
 
     def __init__(
         self,
@@ -149,8 +153,8 @@ class DEM(AbstractDataSource):
         `DatetimeIndex` derived from `start` so the shared
         `TemporalExtent` validator passes.
         """
-        start_date = pd.to_datetime(start, format=fmt)
-        end_date = pd.to_datetime(end, format=fmt)
+        start_date = to_datetime(start, fmt)
+        end_date = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_date,
             end_date=end_date,

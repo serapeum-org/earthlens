@@ -53,7 +53,7 @@ class TestConstruction:
 
     def test_missing_dates_rejected(self, output_dir: Path):
         """A request with no start/end dates is rejected with a clear message."""
-        with pytest.raises(ValueError, match="requires both start and end"):
+        with pytest.raises(ValueError, match="requires a time window"):
             OpenEO(
                 start=None,
                 end=None,

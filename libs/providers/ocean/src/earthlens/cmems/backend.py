@@ -29,7 +29,6 @@ without `NetCDF.reduce` raises a clear `NotImplementedError`.
 
 from __future__ import annotations
 
-import datetime as dt
 from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
@@ -44,7 +43,9 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     date_windows,
+    resolve_cadence,
     safe_filename,
+    to_datetime,
     window_labels,
 )
 from earthlens.cmems.auth import (
@@ -246,7 +247,9 @@ class CMEMS(AbstractDataSource):
                 `"daily"` and `"monthly"` aliases are mapped to a
                 pandas frequency, otherwise `freq=None` is used and
                 `dates` collapses to the two endpoints.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen pydantic model with parsed bounds.
@@ -255,10 +258,12 @@ class CMEMS(AbstractDataSource):
             ValueError: If `start` parses to a date later than
                 `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         freq_map = {"daily": "D", "monthly": "MS", "hourly": "h"}
-        resolution = freq_map.get(temporal_resolution, "D")
+        resolution = resolve_cadence(
+            temporal_resolution, freq_map, backend=type(self).__name__
+        )
         dates = date_windows(start_dt, end_dt, resolution)
         return TemporalExtent(
             start_date=start_dt,

@@ -22,7 +22,6 @@ scalar series use no gridded-array dependency.
 
 from __future__ import annotations
 
-import datetime as dt
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
@@ -38,6 +37,7 @@ from earthlens.base import (
     SpatialExtent,
     TemporalExtent,
     date_windows,
+    to_datetime,
 )
 from earthlens.base.http import HttpClient
 from earthlens.base.http import RequestsGet as _RequestsGet
@@ -205,7 +205,9 @@ class ClimateIndices(AbstractDataSource):
             start: Inclusive start date string.
             end: Inclusive end date string.
             temporal_resolution: Recorded as the resolution label.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen model spanning the window at month-start
@@ -214,8 +216,8 @@ class ClimateIndices(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
-        start_dt = dt.datetime.strptime(start, fmt)
-        end_dt = dt.datetime.strptime(end, fmt)
+        start_dt = to_datetime(start, fmt)
+        end_dt = to_datetime(end, fmt)
         return TemporalExtent(
             start_date=start_dt,
             end_date=end_dt,

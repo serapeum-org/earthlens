@@ -364,7 +364,9 @@ class CHIRPS(AbstractDataSource):
             temporal_resolution: Accepted for API symmetry; ignored
                 here because the real frequency comes from the
                 catalog per dataset.
-            fmt: `strptime` format applied to `start` and `end`.
+            fmt: `strptime` format tried first for a string `start` /
+                `end`; a non-matching string falls back to an ISO-8601
+                parse, and a `datetime` / `date` ignores it.
 
         Returns:
             TemporalExtent: Frozen outer window. Only `start_date` /
