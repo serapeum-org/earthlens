@@ -463,6 +463,10 @@ class FDSN(AbstractDataSource):
                 written.append(self._write(product.id, collection))
 
         combined = events.concat_fcs(collections)
+        # Each network's events are already written and copied into
+        # `combined`; drop the per-network copies rather than carry them
+        # through the summary and the return.
+        collections.clear()
         if written:
             logger.info(
                 f"FDSN download summary: {len(combined)} events across "
