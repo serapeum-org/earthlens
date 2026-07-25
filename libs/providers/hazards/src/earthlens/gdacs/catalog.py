@@ -34,6 +34,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "gdacs_data_catalog.yaml"
@@ -41,7 +42,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "gdacs_data_catalog.yaml"
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
 #: the FDSN / NWP / radar loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, HazardType]] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -76,6 +77,38 @@ class HazardType(BaseModel):
 
     name: str
     description: str = ""
+
+
+def _parse_hazard_types(files: list[Path]) -> dict[str, HazardType]:
+    """Parse the GDACS catalog's `hazard_types:` block into validated rows.
+
+    Args:
+        files: The contributing YAML files (GDACS ships a single file).
+
+    Returns:
+        dict[str, HazardType]: One row per GDACS event-type code.
+
+    Raises:
+        ValueError: If the `hazard_types:` block is missing or empty, or a
+            row fails :class:`HazardType` validation.
+    """
+    catalog_path = files[0]
+    data = load_yaml_strict(catalog_path) or {}
+    hazards_yaml = data.get("hazard_types") or {}
+    if not hazards_yaml:
+        raise ValueError(
+            f"{catalog_path} is missing or has an empty 'hazard_types:' "
+            "block. The GDACS catalog must list at least one hazard type."
+        )
+    hazards: dict[str, HazardType] = {}
+    for code, body in hazards_yaml.items():
+        try:
+            hazards[code] = HazardType(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{catalog_path} hazard type {code!r} failed validation:\n{exc}"
+            ) from exc
+    return hazards
 
 
 class Catalog(AbstractCatalog):
@@ -153,31 +186,9 @@ class Catalog(AbstractCatalog):
                 row fails :class:`HazardType` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        resolved = str(catalog_path.resolve())
-        try:
-            mtime = catalog_path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        key = (resolved, mtime)
-        cached = _CATALOG_CACHE.get(key)
-        if cached is not None:
-            return cls(datasets=dict(cached))
-        data = load_yaml_strict(catalog_path) or {}
-        hazards_yaml = data.get("hazard_types") or {}
-        if not hazards_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'hazard_types:' "
-                "block. The GDACS catalog must list at least one hazard type."
-            )
-        hazards: dict[str, HazardType] = {}
-        for code, body in hazards_yaml.items():
-            try:
-                hazards[code] = HazardType(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} hazard type {code!r} failed validation:\n{exc}"
-                ) from exc
-        _CATALOG_CACHE[key] = hazards
+        hazards = load_catalog(
+            catalog_path, _CATALOG_CACHE, _parse_hazard_types, provider="GDACS"
+        )
         return cls(datasets=dict(hazards))
 
     def get_catalog(self) -> dict[str, HazardType]:

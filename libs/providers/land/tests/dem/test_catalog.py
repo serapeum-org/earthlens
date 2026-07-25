@@ -122,11 +122,11 @@ class TestParseCache:
         second = Catalog.load(path)
         assert first is second
 
-    def test_missing_file_reported_by_pydantic(self, tmp_path: Path):
-        """`load(nonexistent_path)` reports the missing / empty catalog."""
+    def test_missing_file_reported_by_the_shared_loader(self, tmp_path: Path):
+        """`load(nonexistent_path)` names the missing catalog path."""
         clear_catalog_cache()
         ghost = tmp_path / "does-not-exist.yaml"
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(ValueError, match="does not exist"):
             Catalog.load(ghost)
 
     def test_get_catalog_returns_datasets_map(self):

@@ -25,6 +25,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "openaq_data_catalog.yaml"
@@ -32,7 +33,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "openaq_data_catalog.yaml"
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
 #: the FDSN / NWP / radar loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Parameter]] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -91,6 +92,38 @@ class Parameter(BaseModel):
     units: list[str] = Field(default_factory=list)
     display_name: str = ""
     group: ParameterGroup = "other"
+
+
+def _parse_parameters(files: list[Path]) -> dict[str, Parameter]:
+    """Parse the OpenAQ catalog's `parameters:` block into validated rows.
+
+    Args:
+        files: The contributing YAML files (OpenAQ ships a single file).
+
+    Returns:
+        dict[str, Parameter]: One row per measured parameter name.
+
+    Raises:
+        ValueError: If the `parameters:` block is missing or empty, or a row
+            fails :class:`Parameter` validation.
+    """
+    catalog_path = files[0]
+    data = load_yaml_strict(catalog_path) or {}
+    parameters_yaml = data.get("parameters") or {}
+    if not parameters_yaml:
+        raise ValueError(
+            f"{catalog_path} is missing or has an empty 'parameters:' "
+            "block. The OpenAQ catalog must list at least one parameter."
+        )
+    parameters: dict[str, Parameter] = {}
+    for name, body in parameters_yaml.items():
+        try:
+            parameters[name] = Parameter(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{catalog_path} parameter {name!r} failed validation:\n{exc}"
+            ) from exc
+    return parameters
 
 
 class Catalog(AbstractCatalog):
@@ -214,31 +247,9 @@ class Catalog(AbstractCatalog):
                 row fails :class:`Parameter` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        resolved = str(catalog_path.resolve())
-        try:
-            mtime = catalog_path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        key = (resolved, mtime)
-        cached = _CATALOG_CACHE.get(key)
-        if cached is not None:
-            return cls(datasets=dict(cached))
-        data = load_yaml_strict(catalog_path) or {}
-        parameters_yaml = data.get("parameters") or {}
-        if not parameters_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'parameters:' "
-                "block. The OpenAQ catalog must list at least one parameter."
-            )
-        parameters: dict[str, Parameter] = {}
-        for name, body in parameters_yaml.items():
-            try:
-                parameters[name] = Parameter(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} parameter {name!r} failed validation:\n{exc}"
-                ) from exc
-        _CATALOG_CACHE[key] = parameters
+        parameters = load_catalog(
+            catalog_path, _CATALOG_CACHE, _parse_parameters, provider="OpenAQ"
+        )
         return cls(datasets=dict(parameters))
 
     def get_catalog(self) -> dict[str, Parameter]:
