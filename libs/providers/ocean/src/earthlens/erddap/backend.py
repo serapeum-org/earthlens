@@ -353,10 +353,15 @@ class ERDDAP(AbstractDataSource):
             raise
 
     def _fetch_grid(self, row: Dataset, variables: list[str]) -> Path:
-        """Download a griddap subset to a `.nc` file and return its path.
+        """Stream a griddap subset to a `.nc` file and return its path.
 
         Builds the OPeNDAP URL directly (avoiding erddapy's axis-fetch)
-        and GETs it. An out-of-coverage / no-data response surfaces as a
+        and streams the response to disk in blocks — a griddap window can
+        run to gigabytes, so holding the body in memory to then write it
+        would double the peak footprint. The leading bytes are checked
+        against the NetCDF magic before the file is published, so an HTML
+        error page (which ERDDAP sometimes serves with a `200`) never lands
+        as a `.nc`. An out-of-coverage / no-data response surfaces as a
         clear :class:`ValueError` naming the dataset and bbox, not a bare
         HTTP stack trace.
 

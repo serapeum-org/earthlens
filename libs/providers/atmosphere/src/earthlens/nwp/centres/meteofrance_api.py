@@ -91,6 +91,12 @@ class MeteoFranceAPICentre(_NWPCentre):
     ) -> Path:
         """Fetch each variable via WCS GetCoverage into one `.grib2`.
 
+        Each coverage is streamed to disk block by block rather than
+        buffered whole, so a full-globe ARPEGE band does not have to fit in
+        memory alongside the file being written. The per-variable bodies are
+        appended to a single `.part` that is renamed only once every
+        requested band has arrived.
+
         `member` and `whole` are accepted for interface parity but
         ignored (the Météo-France rows here are deterministic;
         PEARP/PEAROME are a follow-on — and each WCS `GetCoverage`

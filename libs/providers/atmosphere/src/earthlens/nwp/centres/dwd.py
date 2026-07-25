@@ -56,6 +56,13 @@ class DWDCentre(_NWPCentre):
     ) -> Path:
         """Download + decompress one `.bz2` per variable into one GRIB2.
 
+        Each variable is streamed and fed through an incremental
+        `bz2.BZ2Decompressor`, so neither the compressed body nor the
+        decompressed result is ever held whole in memory — a global ICON
+        band runs to hundreds of megabytes on each side. The decompressed
+        messages are appended to a single `.part` that is renamed only once
+        every variable has succeeded.
+
         `member` and `whole` are accepted for interface parity but ignored
         — the ICON rows here are deterministic (ICON-EPS is a separate
         model), and DWD already serves one whole `.bz2` per variable, so

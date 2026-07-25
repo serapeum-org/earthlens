@@ -554,11 +554,19 @@ class AbstractDataSource(ABC):
     SUPPORTS_POLYGON_AOI: bool = False
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
-        """Give every backend the facade's ergonomic constructor sugar.
+        """Give every backend its `download` wrapper and constructor sugar.
 
-        Wraps each concrete backend's `__init__` so that — whether reached
-        through the `EarthLens` facade or by constructing the backend
-        class directly — it also accepts:
+        Two independent pieces of wiring run for each concrete backend:
+
+        1. :meth:`_wrap_download` wraps whichever `download` the class
+           defines so :attr:`root_dir` is created when a download starts
+           rather than at construction. This runs for *every* subclass,
+           including one that declares no `__init__` of its own.
+        2. The backend's `__init__` is wrapped so that — whether reached
+           through the `EarthLens` facade or by constructing the backend
+           class directly — it also accepts the ergonomic kwargs below.
+
+        The constructor sugar adds:
 
         * `aoi` (+ `buffer`): any shape :func:`earthlens.base.spatial.normalize_aoi`
           understands, reduced to `lat_lim` / `lon_lim`; a backend that
@@ -643,11 +651,16 @@ class AbstractDataSource(ABC):
         """Make the backend's own `download` create `root_dir` before it runs.
 
         `root_dir` is resolved at construction but deliberately not created
-        there (see :meth:`_ensure_root_dir`). Rather than make all 48 backends
-        remember to call it, the subclass hook wraps whichever `download` the
-        class defines so the directory exists the moment a real download
-        starts. A backend that inherits `download` unchanged is untouched —
-        the wrapper it inherits already does this.
+        there (see :meth:`_ensure_root_dir`). Rather than make every backend
+        remember to call it, :meth:`__init_subclass__` calls this so the
+        directory exists the moment a real download starts.
+
+        The wrap is applied only to a `download` the class defines itself, and
+        only once: a subclass that inherits `download` unchanged already
+        inherits a wrapped one, and re-running this on an
+        already-wrapped method is a no-op. `functools.wraps` keeps the
+        backend's own name, docstring and signature introspectable, so
+        `EarthLens.options_for` and the docs build still see the real method.
         """
         original = cls.__dict__.get("download")
         if original is None or getattr(original, "_ensures_root_dir", False):
@@ -760,8 +773,38 @@ class AbstractDataSource(ABC):
         directory before the request had been validated, so a rejected
         request still made one).
 
+        Creating an existing directory is a no-op, and any missing parent is
+        created too, so a backend pointed at a deep path needs no
+        preparation from the caller.
+
         Returns:
             Path: The (now existing) :attr:`root_dir`.
+
+        Examples:
+            - Constructing a backend resolves the path without touching the
+              filesystem; the first download is what creates it:
+                ```python
+                >>> from pathlib import Path
+                >>> from tempfile import TemporaryDirectory
+                >>> from earthlens.chc import CHIRPS
+                >>> with TemporaryDirectory() as tmp:
+                ...     target = Path(tmp) / "chirps-out"
+                ...     backend = CHIRPS(
+                ...         start="2009-01-01",
+                ...         end="2009-01-02",
+                ...         variables=["precipitation"],
+                ...         lat_lim=[4.0, 5.0],
+                ...         lon_lim=[-75.0, -74.0],
+                ...         path=str(target),
+                ...     )
+                ...     print(target.exists())
+                ...     print(backend._ensure_root_dir() == target.absolute())
+                ...     print(target.is_dir())
+                False
+                True
+                True
+
+                ```
         """
         self.root_dir.mkdir(parents=True, exist_ok=True)
         return self.root_dir

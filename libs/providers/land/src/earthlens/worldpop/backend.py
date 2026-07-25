@@ -494,7 +494,14 @@ class WorldPop(AbstractDataSource):
         return raw
 
     def _http_get(self, url: str, dest: Path) -> Path:
-        """Download `url` to `dest`, skipping when the file already exists.
+        """Stream `url` to `dest`, skipping when the file already exists.
+
+        The body is streamed to disk in blocks rather than buffered in
+        memory: a WorldPop national mosaic is routinely over a gigabyte, so
+        reading it whole before writing it would hold two copies at peak.
+        The write is atomic — the bytes land in a sibling `.part` that is
+        renamed only on success — so an interrupted download never leaves a
+        truncated GeoTIFF for the next run's skip check to accept.
 
         Transient connection / timeout errors are retried up to
         `_MAX_RETRIES` with exponential backoff; an HTTP status error (e.g.
