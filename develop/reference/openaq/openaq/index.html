@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20592,8 +20592,7 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pollutant-parameter catalog for the OpenAQ backend.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Reads the bundled `openaq_data_catalog.yaml` (shipped as package</span>
@@ -20710,71 +20709,70 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                contents fail validation.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            ValueError: If the file has no `parameters:` block, or a</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                row fails :class:`Parameter` validation.</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="n">parameters</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_parameters</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;OpenAQ&quot;</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="p">)</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            dict[str, Parameter]: Same object as :attr:`datasets` /</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                :attr:`parameters`.</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its :class:`Parameter` row.</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            name: A user-facing parameter name (`&quot;pm25&quot;`, `&quot;no2&quot;`).</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            Parameter: The matching dispatch row.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            ValueError: If `name` is not a known parameter; the</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                message names the catalog kind and, when a close match</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                exists, adds a did-you-mean hint.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">ids_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to the union of their OpenAQ ids (all unit variants).</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        Each name contributes every id in its :attr:`Parameter.ids`</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        (one per reporting unit), so a request for `&quot;no2&quot;` yields all of</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        `no2`&#39;s ids regardless of the unit a station reports in. Order</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        follows `names` then each parameter&#39;s own id order; duplicates</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        across names are dropped (first occurrence wins).</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            names: User-facing parameter names to resolve.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            list[int]: The union of OpenAQ `parameters_id`s across</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                `names`, de-duplicated, order-stable.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            ValueError: If any name is unknown (via</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">                :meth:`get_parameter`).</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="n">ids</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                `parameters:` block, or a row fails :class:`Parameter`</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                validation.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="n">parameters</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_parameters</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;OpenAQ&quot;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="p">)</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            dict[str, Parameter]: Same object as :attr:`datasets` /</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                :attr:`parameters`.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            name: A user-facing parameter name (`&quot;pm25&quot;`, `&quot;no2&quot;`).</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            Parameter: The matching dispatch row.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            ValueError: If `name` is not a known parameter; the</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">                message names the catalog kind and, when a close match</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                exists, adds a did-you-mean hint.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">ids_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to the union of their OpenAQ ids (all unit variants).</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Each name contributes every id in its :attr:`Parameter.ids`</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        (one per reporting unit), so a request for `&quot;no2&quot;` yields all of</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        `no2`&#39;s ids regardless of the unit a station reports in. Order</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        follows `names` then each parameter&#39;s own id order; duplicates</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        across names are dropped (first occurrence wins).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            names: User-facing parameter names to resolve.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            list[int]: The union of OpenAQ `parameters_id`s across</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                `names`, de-duplicated, order-stable.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            ValueError: If any name is unknown (via</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">                :meth:`get_parameter`).</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                    <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="k">return</span> <span class="n">ids</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -20890,21 +20888,21 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
 <span class="normal"><a href="#__codelineno-0-260">260</a></span>
 <span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        dict[str, Parameter]: Same object as :attr:`datasets` /</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            :attr:`parameters`.</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        dict[str, Parameter]: Same object as :attr:`datasets` /</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            :attr:`parameters`.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21008,7 +21006,8 @@ exists, adds a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-266">266</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
@@ -21024,25 +21023,24 @@ exists, adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-279">279</a></span>
 <span class="normal"><a href="#__codelineno-0-280">280</a></span>
 <span class="normal"><a href="#__codelineno-0-281">281</a></span>
-<span class="normal"><a href="#__codelineno-0-282">282</a></span>
-<span class="normal"><a href="#__codelineno-0-283">283</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its :class:`Parameter` row.</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        name: A user-facing parameter name (`&quot;pm25&quot;`, `&quot;no2&quot;`).</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        Parameter: The matching dispatch row.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        ValueError: If `name` is not a known parameter; the</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            message names the catalog kind and, when a close match</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            exists, adds a did-you-mean hint.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        name: A user-facing parameter name (`&quot;pm25&quot;`, `&quot;no2&quot;`).</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Parameter: The matching dispatch row.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        ValueError: If `name` is not a known parameter; the</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            message names the catalog kind and, when a close match</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            exists, adds a did-you-mean hint.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21149,7 +21147,8 @@ across names are dropped (first occurrence wins).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-285">285</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
 <span class="normal"><a href="#__codelineno-0-286">286</a></span>
 <span class="normal"><a href="#__codelineno-0-287">287</a></span>
 <span class="normal"><a href="#__codelineno-0-288">288</a></span>
@@ -21173,33 +21172,32 @@ across names are dropped (first occurrence wins).</p>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="k">def</span><span class="w"> </span><span class="nf">ids_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve names to the union of their OpenAQ ids (all unit variants).</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    Each name contributes every id in its :attr:`Parameter.ids`</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    (one per reporting unit), so a request for `&quot;no2&quot;` yields all of</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    `no2`&#39;s ids regardless of the unit a station reports in. Order</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    follows `names` then each parameter&#39;s own id order; duplicates</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    across names are dropped (first occurrence wins).</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        names: User-facing parameter names to resolve.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        list[int]: The union of OpenAQ `parameters_id`s across</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            `names`, de-duplicated, order-stable.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ValueError: If any name is unknown (via</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            :meth:`get_parameter`).</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>            <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">return</span> <span class="n">ids</span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="k">def</span><span class="w"> </span><span class="nf">ids_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve names to the union of their OpenAQ ids (all unit variants).</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Each name contributes every id in its :attr:`Parameter.ids`</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    (one per reporting unit), so a request for `&quot;no2&quot;` yields all of</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    `no2`&#39;s ids regardless of the unit a station reports in. Order</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    follows `names` then each parameter&#39;s own id order; duplicates</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    across names are dropped (first occurrence wins).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        names: User-facing parameter names to resolve.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        list[int]: The union of OpenAQ `parameters_id`s across</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            `names`, de-duplicated, order-stable.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ValueError: If any name is unknown (via</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            :meth:`get_parameter`).</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">return</span> <span class="n">ids</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21294,19 +21292,9 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>catalog_path</code> does not exist, or the file's
-contents fail validation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ValueError">ValueError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the file has no <code>parameters:</code> block, or a
-row fails :class:<code>Parameter</code> validation.</p>
+                <p>If <code>catalog_path</code> does not exist, or if the file has no
+<code>parameters:</code> block, or a row fails :class:<code>Parameter</code>
+validation.</p>
               </div>
             </td>
           </tr>
@@ -21336,8 +21324,7 @@ row fails :class:<code>Parameter</code> validation.</p>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
 <span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
-<span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="nd">@classmethod</span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="nd">@classmethod</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the OpenAQ parameter catalog from disk.</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>
@@ -21349,16 +21336,15 @@ row fails :class:<code>Parameter</code> validation.</p>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            contents fail validation.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        ValueError: If the file has no `parameters:` block, or a</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            row fails :class:`Parameter` validation.</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="n">parameters</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_parameters</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;OpenAQ&quot;</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="p">)</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            `parameters:` block, or a row fails :class:`Parameter`</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            validation.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">parameters</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_parameters</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;OpenAQ&quot;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="p">)</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26119,8 +26105,7 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pollutant-parameter catalog for the OpenAQ backend.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Reads the bundled `openaq_data_catalog.yaml` (shipped as package</span>
@@ -26237,71 +26222,70 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                contents fail validation.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            ValueError: If the file has no `parameters:` block, or a</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                row fails :class:`Parameter` validation.</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="n">parameters</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_parameters</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;OpenAQ&quot;</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="p">)</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            dict[str, Parameter]: Same object as :attr:`datasets` /</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                :attr:`parameters`.</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its :class:`Parameter` row.</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            name: A user-facing parameter name (`&quot;pm25&quot;`, `&quot;no2&quot;`).</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            Parameter: The matching dispatch row.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            ValueError: If `name` is not a known parameter; the</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                message names the catalog kind and, when a close match</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                exists, adds a did-you-mean hint.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">ids_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to the union of their OpenAQ ids (all unit variants).</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        Each name contributes every id in its :attr:`Parameter.ids`</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        (one per reporting unit), so a request for `&quot;no2&quot;` yields all of</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        `no2`&#39;s ids regardless of the unit a station reports in. Order</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        follows `names` then each parameter&#39;s own id order; duplicates</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        across names are dropped (first occurrence wins).</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            names: User-facing parameter names to resolve.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            list[int]: The union of OpenAQ `parameters_id`s across</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                `names`, de-duplicated, order-stable.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            ValueError: If any name is unknown (via</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">                :meth:`get_parameter`).</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="n">ids</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                `parameters:` block, or a row fails :class:`Parameter`</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                validation.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="n">parameters</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_parameters</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;OpenAQ&quot;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="p">)</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            dict[str, Parameter]: Same object as :attr:`datasets` /</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                :attr:`parameters`.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            name: A user-facing parameter name (`&quot;pm25&quot;`, `&quot;no2&quot;`).</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            Parameter: The matching dispatch row.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            ValueError: If `name` is not a known parameter; the</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">                message names the catalog kind and, when a close match</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                exists, adds a did-you-mean hint.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">ids_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to the union of their OpenAQ ids (all unit variants).</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Each name contributes every id in its :attr:`Parameter.ids`</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        (one per reporting unit), so a request for `&quot;no2&quot;` yields all of</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        `no2`&#39;s ids regardless of the unit a station reports in. Order</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        follows `names` then each parameter&#39;s own id order; duplicates</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        across names are dropped (first occurrence wins).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            names: User-facing parameter names to resolve.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            list[int]: The union of OpenAQ `parameters_id`s across</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                `names`, de-duplicated, order-stable.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            ValueError: If any name is unknown (via</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">                :meth:`get_parameter`).</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                    <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="k">return</span> <span class="n">ids</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26417,21 +26401,21 @@ list of names to ids with :meth:<code>ids_for</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
 <span class="normal"><a href="#__codelineno-0-260">260</a></span>
 <span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        dict[str, Parameter]: Same object as :attr:`datasets` /</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            :attr:`parameters`.</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        dict[str, Parameter]: Same object as :attr:`datasets` /</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            :attr:`parameters`.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26535,7 +26519,8 @@ exists, adds a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-266">266</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span>
 <span class="normal"><a href="#__codelineno-0-267">267</a></span>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
@@ -26551,25 +26536,24 @@ exists, adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-279">279</a></span>
 <span class="normal"><a href="#__codelineno-0-280">280</a></span>
 <span class="normal"><a href="#__codelineno-0-281">281</a></span>
-<span class="normal"><a href="#__codelineno-0-282">282</a></span>
-<span class="normal"><a href="#__codelineno-0-283">283</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its :class:`Parameter` row.</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        name: A user-facing parameter name (`&quot;pm25&quot;`, `&quot;no2&quot;`).</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        Parameter: The matching dispatch row.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        ValueError: If `name` is not a known parameter; the</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            message names the catalog kind and, when a close match</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            exists, adds a did-you-mean hint.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        name: A user-facing parameter name (`&quot;pm25&quot;`, `&quot;no2&quot;`).</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Parameter: The matching dispatch row.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        ValueError: If `name` is not a known parameter; the</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            message names the catalog kind and, when a close match</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            exists, adds a did-you-mean hint.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26676,7 +26660,8 @@ across names are dropped (first occurrence wins).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/openaq/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-285">285</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
 <span class="normal"><a href="#__codelineno-0-286">286</a></span>
 <span class="normal"><a href="#__codelineno-0-287">287</a></span>
 <span class="normal"><a href="#__codelineno-0-288">288</a></span>
@@ -26700,33 +26685,32 @@ across names are dropped (first occurrence wins).</p>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="k">def</span><span class="w"> </span><span class="nf">ids_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve names to the union of their OpenAQ ids (all unit variants).</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    Each name contributes every id in its :attr:`Parameter.ids`</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    (one per reporting unit), so a request for `&quot;no2&quot;` yields all of</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    `no2`&#39;s ids regardless of the unit a station reports in. Order</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    follows `names` then each parameter&#39;s own id order; duplicates</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    across names are dropped (first occurrence wins).</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        names: User-facing parameter names to resolve.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        list[int]: The union of OpenAQ `parameters_id`s across</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            `names`, de-duplicated, order-stable.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ValueError: If any name is unknown (via</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            :meth:`get_parameter`).</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>            <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">return</span> <span class="n">ids</span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="k">def</span><span class="w"> </span><span class="nf">ids_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve names to the union of their OpenAQ ids (all unit variants).</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Each name contributes every id in its :attr:`Parameter.ids`</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    (one per reporting unit), so a request for `&quot;no2&quot;` yields all of</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    `no2`&#39;s ids regardless of the unit a station reports in. Order</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    follows `names` then each parameter&#39;s own id order; duplicates</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    across names are dropped (first occurrence wins).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        names: User-facing parameter names to resolve.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        list[int]: The union of OpenAQ `parameters_id`s across</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            `names`, de-duplicated, order-stable.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ValueError: If any name is unknown (via</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            :meth:`get_parameter`).</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ids</span><span class="p">:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">return</span> <span class="n">ids</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26821,19 +26805,9 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>catalog_path</code> does not exist, or the file's
-contents fail validation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ValueError">ValueError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the file has no <code>parameters:</code> block, or a
-row fails :class:<code>Parameter</code> validation.</p>
+                <p>If <code>catalog_path</code> does not exist, or if the file has no
+<code>parameters:</code> block, or a row fails :class:<code>Parameter</code>
+validation.</p>
               </div>
             </td>
           </tr>
@@ -26863,8 +26837,7 @@ row fails :class:<code>Parameter</code> validation.</p>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
 <span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
-<span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="nd">@classmethod</span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="nd">@classmethod</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the OpenAQ parameter catalog from disk.</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>
@@ -26876,16 +26849,15 @@ row fails :class:<code>Parameter</code> validation.</p>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            contents fail validation.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        ValueError: If the file has no `parameters:` block, or a</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            row fails :class:`Parameter` validation.</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="n">parameters</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_parameters</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;OpenAQ&quot;</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="p">)</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            `parameters:` block, or a row fails :class:`Parameter`</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            validation.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">parameters</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_parameters</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;OpenAQ&quot;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="p">)</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

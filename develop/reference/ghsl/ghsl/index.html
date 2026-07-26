@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23368,7 +23368,14 @@ epochs).</p>
 <span class="normal"><a href="#__codelineno-0-831">831</a></span>
 <span class="normal"><a href="#__codelineno-0-832">832</a></span>
 <span class="normal"><a href="#__codelineno-0-833">833</a></span>
-<span class="normal"><a href="#__codelineno-0-834">834</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="k">class</span><span class="w"> </span><span class="nc">GHSL</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-834">834</a></span>
+<span class="normal"><a href="#__codelineno-0-835">835</a></span>
+<span class="normal"><a href="#__codelineno-0-836">836</a></span>
+<span class="normal"><a href="#__codelineno-0-837">837</a></span>
+<span class="normal"><a href="#__codelineno-0-838">838</a></span>
+<span class="normal"><a href="#__codelineno-0-839">839</a></span>
+<span class="normal"><a href="#__codelineno-0-840">840</a></span>
+<span class="normal"><a href="#__codelineno-0-841">841</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="k">class</span><span class="w"> </span><span class="nc">GHSL</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download GHSL products from the JRC over open HTTPS, localised via pyramids.</span>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    Attributes:</span>
@@ -24045,105 +24052,112 @@ epochs).</p>
 <a id="__codelineno-0-733" name="__codelineno-0-733"></a>        <span class="c1"># The real suffix is kept — pyramids picks its driver from the</span>
 <a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="c1"># extension, and a bare `.part` matches none.</span>
 <a id="__codelineno-0-735" name="__codelineno-0-735"></a>        <span class="n">staged</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.part</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>        <span class="n">cropped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="c1"># pyramids keeps the written dataset&#39;s GDAL handle open, which holds a</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>        <span class="c1"># Windows lock and blocks the rename; release it first.</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>        <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a>        <span class="n">staged</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="k">if</span> <span class="n">has_legend</span><span class="p">:</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_write_legend_sidecar</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">])</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>        <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a>        <span class="c1"># Best-effort cleanup of the merge intermediate; on Windows the GDAL</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>        <span class="c1"># handle can briefly outlive the Python object, so a locked file is</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>        <span class="c1"># left in the cache rather than raising.</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a>            <span class="n">merged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a>            <span class="k">pass</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_via_stac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch via the JRC STAC search path — unconfirmed, raises (`C9`/`G1`).</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">        The `H21` spec mentioned &quot;STAC at `data.jrc.ec.europa.eu`&quot;, but the</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">        `A1` verification (2026-05) found JRC exposes only a STAC *browser*, no</span>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">        queryable STAC API (`/stac`, `/collections` all `404`). Until a stable</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">        endpoint is confirmed, `api=&quot;stac&quot;` raises this documented error rather</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">        than guessing a URL; the deterministic `api=&quot;direct&quot;` path is fully</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">        functional and is the default.</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>            <span class="n">cropped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>            <span class="c1"># pyramids keeps the written dataset&#39;s GDAL handle open, which</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="c1"># holds a Windows lock and blocks the rename; release it first.</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>            <span class="c1"># A failed write must not strand the `.part` for the next run to</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="c1"># trip over, and both handles have to go either way.</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>        <span class="k">if</span> <span class="n">has_legend</span><span class="p">:</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_write_legend_sidecar</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a>        <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>        <span class="c1"># Best-effort cleanup of the merge intermediate; on Windows the GDAL</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>        <span class="c1"># handle can briefly outlive the Python object, so a locked file is</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a>        <span class="c1"># left in the cache rather than raising.</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a>            <span class="n">merged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a>        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a>            <span class="k">pass</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_via_stac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch via the JRC STAC search path — unconfirmed, raises (`C9`/`G1`).</span>
 <a id="__codelineno-0-763" name="__codelineno-0-763"></a>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">            products: The plan from `_search` (unused — the path is inactive).</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            ValueError: Always — directing the caller to `api=&quot;direct&quot;`.</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>            <span class="s2">&quot;GHSL api=&#39;stac&#39; is unavailable: no stable, queryable JRC STAC API &quot;</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>            <span class="s2">&quot;endpoint is confirmed (verified 2026-05 — JRC exposes a STAC &quot;</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="s2">&quot;browser only). Use api=&#39;direct&#39; (the default), which serves every &quot;</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>            <span class="s2">&quot;GHSL product over the deterministic HTTPS file tree.&quot;</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>        <span class="p">)</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_legend_sidecar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a `{target}.legend.json` class-code → label sidecar.</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">        Ensures the categorical legend survives regardless of whether the</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        GeoTIFF colour table is preserved by downstream readers.</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">            target: The written categorical GeoTIFF.</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">            code: The product code whose legend to serialise.</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="n">legend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">legend</span> <span class="ow">or</span> <span class="p">{}</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>        <span class="n">sidecar</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.legend.json&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="n">sidecar</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">legend</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="p">)</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">        The `H21` spec mentioned &quot;STAC at `data.jrc.ec.europa.eu`&quot;, but the</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        `A1` verification (2026-05) found JRC exposes only a STAC *browser*, no</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        queryable STAC API (`/stac`, `/collections` all `404`). Until a stable</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        endpoint is confirmed, `api=&quot;stac&quot;` raises this documented error rather</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">        than guessing a URL; the deterministic `api=&quot;direct&quot;` path is fully</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">        functional and is the default.</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">            products: The plan from `_search` (unused — the path is inactive).</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">            ValueError: Always — directing the caller to `api=&quot;direct&quot;`.</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>            <span class="s2">&quot;GHSL api=&#39;stac&#39; is unavailable: no stable, queryable JRC STAC API &quot;</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="s2">&quot;endpoint is confirmed (verified 2026-05 — JRC exposes a STAC &quot;</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>            <span class="s2">&quot;browser only). Use api=&#39;direct&#39; (the default), which serves every &quot;</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="s2">&quot;GHSL product over the deterministic HTTPS file tree.&quot;</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>        <span class="p">)</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_legend_sidecar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a `{target}.legend.json` class-code → label sidecar.</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">        Ensures the categorical legend survives regardless of whether the</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">        GeoTIFF colour table is preserved by downstream readers.</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">            target: The written categorical GeoTIFF.</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">            code: The product code whose legend to serialise.</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <a id="__codelineno-0-795" name="__codelineno-0-795"></a>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_duc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rp</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a tabular DUC / WUP-statistics product as a side table.</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">        Tabular products do not follow the per-epoch raster URL convention:</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">        their payload is a single `.zip` (CSV / GeoPackage / xlsx) under the</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">        latest `V{maj}-{min}` directory of the product family. This</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        auto-discovers that directory + zip, downloads and extracts it under</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">        `self.path/{code}/`, and returns that directory. No mosaic / reproject</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        / crop, and no GADM polygon join (a scope guard).</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="n">legend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">legend</span> <span class="ow">or</span> <span class="p">{}</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>        <span class="n">sidecar</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.legend.json&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>        <span class="n">sidecar</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a>            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">legend</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a>        <span class="p">)</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_duc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rp</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a tabular DUC / WUP-statistics product as a side table.</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">            rp: The tabular `RemoteProduct` (its `metadata[&quot;product&quot;]` names</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">                the catalog code).</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">            pathlib.Path: The directory the table was extracted into.</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        Tabular products do not follow the per-epoch raster URL convention:</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        their payload is a single `.zip` (CSV / GeoPackage / xlsx) under the</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">        latest `V{maj}-{min}` directory of the product family. This</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">        auto-discovers that directory + zip, downloads and extracts it under</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        `self.path/{code}/`, and returns that directory. No mosaic / reproject</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">        / crop, and no GADM polygon join (a scope guard).</span>
 <a id="__codelineno-0-812" name="__codelineno-0-812"></a>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">            ValueError: If no version directory / `.zip` is found upstream.</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>        <span class="n">code</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>        <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>        <span class="n">release</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_release_for</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>        <span class="n">blocks</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">releases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">release</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>        <span class="n">region</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">region</span> <span class="k">if</span> <span class="n">blocks</span> <span class="k">else</span> <span class="s2">&quot;GLOBE&quot;</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>        <span class="n">family_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">family_token</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>        <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version_dir</span><span class="p">(</span><span class="n">family_url</span><span class="p">)</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="n">version_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">family_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>        <span class="n">zips</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">list_remote_dir</span><span class="p">(</span><span class="n">version_url</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">zips</span><span class="p">:</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no .zip table found under </span><span class="si">{</span><span class="n">version_url</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zips</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>                <span class="sa">f</span><span class="s2">&quot;GHSL: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> has multiple table zips </span><span class="si">{</span><span class="n">zips</span><span class="si">}</span><span class="s2">; &quot;</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a>                <span class="sa">f</span><span class="s2">&quot;downloading the first (</span><span class="si">{</span><span class="n">zips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>            <span class="p">)</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a>        <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="n">code</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="n">download_and_extract</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">version_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">zips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="k">return</span> <span class="n">dest</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">            rp: The tabular `RemoteProduct` (its `metadata[&quot;product&quot;]` names</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">                the catalog code).</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">            pathlib.Path: The directory the table was extracted into.</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">            ValueError: If no version directory / `.zip` is found upstream.</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="n">code</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>        <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a>        <span class="n">release</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_release_for</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a>        <span class="n">blocks</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">releases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">release</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a>        <span class="n">region</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">region</span> <span class="k">if</span> <span class="n">blocks</span> <span class="k">else</span> <span class="s2">&quot;GLOBE&quot;</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a>        <span class="n">family_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">family_token</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>        <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version_dir</span><span class="p">(</span><span class="n">family_url</span><span class="p">)</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>        <span class="n">version_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">family_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>        <span class="n">zips</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">list_remote_dir</span><span class="p">(</span><span class="n">version_url</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">zips</span><span class="p">:</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no .zip table found under </span><span class="si">{</span><span class="n">version_url</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zips</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>                <span class="sa">f</span><span class="s2">&quot;GHSL: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> has multiple table zips </span><span class="si">{</span><span class="n">zips</span><span class="si">}</span><span class="s2">; &quot;</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>                <span class="sa">f</span><span class="s2">&quot;downloading the first (</span><span class="si">{</span><span class="n">zips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>            <span class="p">)</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>        <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="n">code</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>        <span class="n">download_and_extract</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">version_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">zips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>        <span class="k">return</span> <span class="n">dest</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27183,7 +27197,14 @@ epochs).</p>
 <span class="normal"><a href="#__codelineno-0-831">831</a></span>
 <span class="normal"><a href="#__codelineno-0-832">832</a></span>
 <span class="normal"><a href="#__codelineno-0-833">833</a></span>
-<span class="normal"><a href="#__codelineno-0-834">834</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="k">class</span><span class="w"> </span><span class="nc">GHSL</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-834">834</a></span>
+<span class="normal"><a href="#__codelineno-0-835">835</a></span>
+<span class="normal"><a href="#__codelineno-0-836">836</a></span>
+<span class="normal"><a href="#__codelineno-0-837">837</a></span>
+<span class="normal"><a href="#__codelineno-0-838">838</a></span>
+<span class="normal"><a href="#__codelineno-0-839">839</a></span>
+<span class="normal"><a href="#__codelineno-0-840">840</a></span>
+<span class="normal"><a href="#__codelineno-0-841">841</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="k">class</span><span class="w"> </span><span class="nc">GHSL</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download GHSL products from the JRC over open HTTPS, localised via pyramids.</span>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    Attributes:</span>
@@ -27860,105 +27881,112 @@ epochs).</p>
 <a id="__codelineno-0-733" name="__codelineno-0-733"></a>        <span class="c1"># The real suffix is kept — pyramids picks its driver from the</span>
 <a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="c1"># extension, and a bare `.part` matches none.</span>
 <a id="__codelineno-0-735" name="__codelineno-0-735"></a>        <span class="n">staged</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.part</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>        <span class="n">cropped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="c1"># pyramids keeps the written dataset&#39;s GDAL handle open, which holds a</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>        <span class="c1"># Windows lock and blocks the rename; release it first.</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>        <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a>        <span class="n">staged</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="k">if</span> <span class="n">has_legend</span><span class="p">:</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_write_legend_sidecar</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">])</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>        <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a>        <span class="c1"># Best-effort cleanup of the merge intermediate; on Windows the GDAL</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>        <span class="c1"># handle can briefly outlive the Python object, so a locked file is</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>        <span class="c1"># left in the cache rather than raising.</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a>            <span class="n">merged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a>            <span class="k">pass</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_via_stac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch via the JRC STAC search path — unconfirmed, raises (`C9`/`G1`).</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">        The `H21` spec mentioned &quot;STAC at `data.jrc.ec.europa.eu`&quot;, but the</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">        `A1` verification (2026-05) found JRC exposes only a STAC *browser*, no</span>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">        queryable STAC API (`/stac`, `/collections` all `404`). Until a stable</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">        endpoint is confirmed, `api=&quot;stac&quot;` raises this documented error rather</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">        than guessing a URL; the deterministic `api=&quot;direct&quot;` path is fully</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">        functional and is the default.</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>            <span class="n">cropped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>            <span class="c1"># pyramids keeps the written dataset&#39;s GDAL handle open, which</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="c1"># holds a Windows lock and blocks the rename; release it first.</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>            <span class="c1"># A failed write must not strand the `.part` for the next run to</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="c1"># trip over, and both handles have to go either way.</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>        <span class="k">if</span> <span class="n">has_legend</span><span class="p">:</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_write_legend_sidecar</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a>        <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>        <span class="c1"># Best-effort cleanup of the merge intermediate; on Windows the GDAL</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>        <span class="c1"># handle can briefly outlive the Python object, so a locked file is</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a>        <span class="c1"># left in the cache rather than raising.</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a>            <span class="n">merged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a>        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a>            <span class="k">pass</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_via_stac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch via the JRC STAC search path — unconfirmed, raises (`C9`/`G1`).</span>
 <a id="__codelineno-0-763" name="__codelineno-0-763"></a>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">            products: The plan from `_search` (unused — the path is inactive).</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            ValueError: Always — directing the caller to `api=&quot;direct&quot;`.</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>            <span class="s2">&quot;GHSL api=&#39;stac&#39; is unavailable: no stable, queryable JRC STAC API &quot;</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>            <span class="s2">&quot;endpoint is confirmed (verified 2026-05 — JRC exposes a STAC &quot;</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="s2">&quot;browser only). Use api=&#39;direct&#39; (the default), which serves every &quot;</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>            <span class="s2">&quot;GHSL product over the deterministic HTTPS file tree.&quot;</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>        <span class="p">)</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_legend_sidecar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a `{target}.legend.json` class-code → label sidecar.</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">        Ensures the categorical legend survives regardless of whether the</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        GeoTIFF colour table is preserved by downstream readers.</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">            target: The written categorical GeoTIFF.</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">            code: The product code whose legend to serialise.</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="n">legend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">legend</span> <span class="ow">or</span> <span class="p">{}</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>        <span class="n">sidecar</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.legend.json&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="n">sidecar</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">legend</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="p">)</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">        The `H21` spec mentioned &quot;STAC at `data.jrc.ec.europa.eu`&quot;, but the</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        `A1` verification (2026-05) found JRC exposes only a STAC *browser*, no</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        queryable STAC API (`/stac`, `/collections` all `404`). Until a stable</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        endpoint is confirmed, `api=&quot;stac&quot;` raises this documented error rather</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">        than guessing a URL; the deterministic `api=&quot;direct&quot;` path is fully</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">        functional and is the default.</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">            products: The plan from `_search` (unused — the path is inactive).</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">            ValueError: Always — directing the caller to `api=&quot;direct&quot;`.</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>            <span class="s2">&quot;GHSL api=&#39;stac&#39; is unavailable: no stable, queryable JRC STAC API &quot;</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="s2">&quot;endpoint is confirmed (verified 2026-05 — JRC exposes a STAC &quot;</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>            <span class="s2">&quot;browser only). Use api=&#39;direct&#39; (the default), which serves every &quot;</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="s2">&quot;GHSL product over the deterministic HTTPS file tree.&quot;</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>        <span class="p">)</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_legend_sidecar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a `{target}.legend.json` class-code → label sidecar.</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">        Ensures the categorical legend survives regardless of whether the</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">        GeoTIFF colour table is preserved by downstream readers.</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">            target: The written categorical GeoTIFF.</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">            code: The product code whose legend to serialise.</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <a id="__codelineno-0-795" name="__codelineno-0-795"></a>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_duc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rp</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a tabular DUC / WUP-statistics product as a side table.</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">        Tabular products do not follow the per-epoch raster URL convention:</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">        their payload is a single `.zip` (CSV / GeoPackage / xlsx) under the</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">        latest `V{maj}-{min}` directory of the product family. This</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        auto-discovers that directory + zip, downloads and extracts it under</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">        `self.path/{code}/`, and returns that directory. No mosaic / reproject</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        / crop, and no GADM polygon join (a scope guard).</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="n">legend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">legend</span> <span class="ow">or</span> <span class="p">{}</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>        <span class="n">sidecar</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.legend.json&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>        <span class="n">sidecar</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a>            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">legend</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>            <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a>        <span class="p">)</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_duc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rp</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a tabular DUC / WUP-statistics product as a side table.</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">            rp: The tabular `RemoteProduct` (its `metadata[&quot;product&quot;]` names</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">                the catalog code).</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">            pathlib.Path: The directory the table was extracted into.</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        Tabular products do not follow the per-epoch raster URL convention:</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        their payload is a single `.zip` (CSV / GeoPackage / xlsx) under the</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">        latest `V{maj}-{min}` directory of the product family. This</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">        auto-discovers that directory + zip, downloads and extracts it under</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        `self.path/{code}/`, and returns that directory. No mosaic / reproject</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">        / crop, and no GADM polygon join (a scope guard).</span>
 <a id="__codelineno-0-812" name="__codelineno-0-812"></a>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">            ValueError: If no version directory / `.zip` is found upstream.</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>        <span class="n">code</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>        <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>        <span class="n">release</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_release_for</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>        <span class="n">blocks</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">releases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">release</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>        <span class="n">region</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">region</span> <span class="k">if</span> <span class="n">blocks</span> <span class="k">else</span> <span class="s2">&quot;GLOBE&quot;</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>        <span class="n">family_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">family_token</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>        <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version_dir</span><span class="p">(</span><span class="n">family_url</span><span class="p">)</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="n">version_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">family_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>        <span class="n">zips</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">list_remote_dir</span><span class="p">(</span><span class="n">version_url</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">zips</span><span class="p">:</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no .zip table found under </span><span class="si">{</span><span class="n">version_url</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zips</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>                <span class="sa">f</span><span class="s2">&quot;GHSL: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> has multiple table zips </span><span class="si">{</span><span class="n">zips</span><span class="si">}</span><span class="s2">; &quot;</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a>                <span class="sa">f</span><span class="s2">&quot;downloading the first (</span><span class="si">{</span><span class="n">zips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>            <span class="p">)</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a>        <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="n">code</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="n">download_and_extract</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">version_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">zips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="k">return</span> <span class="n">dest</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">            rp: The tabular `RemoteProduct` (its `metadata[&quot;product&quot;]` names</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">                the catalog code).</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">            pathlib.Path: The directory the table was extracted into.</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">            ValueError: If no version directory / `.zip` is found upstream.</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="n">code</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;product&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>        <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a>        <span class="n">release</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_release_for</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a>        <span class="n">blocks</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">releases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">release</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a>        <span class="n">region</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">region</span> <span class="k">if</span> <span class="n">blocks</span> <span class="k">else</span> <span class="s2">&quot;GLOBE&quot;</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a>        <span class="n">family_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">family_token</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">release</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>        <span class="n">version</span> <span class="o">=</span> <span class="n">latest_version_dir</span><span class="p">(</span><span class="n">family_url</span><span class="p">)</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>        <span class="n">version_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">family_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>        <span class="n">zips</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">list_remote_dir</span><span class="p">(</span><span class="n">version_url</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">zips</span><span class="p">:</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no .zip table found under </span><span class="si">{</span><span class="n">version_url</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zips</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>                <span class="sa">f</span><span class="s2">&quot;GHSL: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> has multiple table zips </span><span class="si">{</span><span class="n">zips</span><span class="si">}</span><span class="s2">; &quot;</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>                <span class="sa">f</span><span class="s2">&quot;downloading the first (</span><span class="si">{</span><span class="n">zips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>            <span class="p">)</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>        <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="n">code</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>        <span class="n">download_and_extract</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">version_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">zips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>        <span class="k">return</span> <span class="n">dest</span>
 </code></pre></div></td></tr></table></div>
               </details>
 

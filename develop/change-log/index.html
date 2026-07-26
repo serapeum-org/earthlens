@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19892,7 +19892,7 @@
 <h3 id="breaking-change"><a class="toclink" href="#breaking-change">BREAKING CHANGE</a><a class="headerlink" href="#breaking-change" title="Permanent link">#</a></h3>
 <ul>
 <li><code>Catalog.load(&lt;missing path&gt;)</code> now raises <code>ValueError</code> naming the path,
-where 21 of the catalogs previously raised <code>FileNotFoundError</code>. Every
+where the 16 migrated catalogs previously raised <code>FileNotFoundError</code>. Every
 catalog reports a missing file the same way now that they share
 <code>earthlens.base.catalog_source.load_catalog</code>. No shipped caller catches
 <code>FileNotFoundError</code> around a catalog load, but external code that does
@@ -19901,18 +19901,27 @@ should catch <code>ValueError</code> instead.</li>
 <code>"Backend 'gee' catalog is unavailable"</code> to
 <code>"Backend catalog for 'gee' is unavailable"</code>, since the registry and
 catalog paths now share one message builder.</li>
-<li>An <code>ImportError</code> raised <em>inside</em> a backend is no longer rewritten into
+<li>
+<p>An <code>ImportError</code> raised <em>inside</em> a backend is no longer rewritten into
 <code>"its runtime dependency is not installed. Install with pip install
 earthlens[...]"</code>. Only a genuinely absent third-party SDK gets that hint;
 a fault in earthlens' own code propagates unchanged so the real cause is
-visible.</li>
+visible.</p>
+</li>
+<li>
+<p><code>AbstractCatalog.catalog</code> is a read-only property rather than a pydantic
+field, so it no longer appears in <code>model_fields</code> or <code>model_dump()</code>, and
+<code>Catalog(catalog=...)</code> is ignored instead of setting it. Reads
+(<code>cat.catalog["key"]</code>, <code>in</code>, <code>len</code>, iteration) are unchanged; writes now
+raise instead of silently rewriting <code>datasets</code>.</p>
+</li>
 </ul>
 <h3 id="fix"><a class="toclink" href="#fix">Fix</a><a class="headerlink" href="#fix" title="Permanent link">#</a></h3>
 <ul>
-<li><code>AbstractCatalog.catalog</code> is a read-only view rather than a second name
-bound to the same <code>dict</code> as <code>datasets</code>, and <code>Catalog.load()</code> hands out a
-fresh instance per call. Previously one caller mutating <code>.datasets</code> could
-corrupt the catalog for the whole process.</li>
+<li><code>Catalog.load()</code> hands out a fresh instance per call. Previously one
+caller mutating <code>.datasets</code> corrupted the catalog for the whole process,
+including a later <code>Catalog()</code>. The row objects inside are still shared
+frozen models and should be treated as read-only.</li>
 <li>A <code>download()</code> the backend rejects no longer leaves an empty output
 directory behind.</li>
 <li>DWD NWP downloads reject a truncated <code>.bz2</code> body instead of publishing a

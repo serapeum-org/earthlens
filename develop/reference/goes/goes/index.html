@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20238,9 +20238,7 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product / domain / satellite catalog for the GOES ABI backend.</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    Reads the bundled `goes_data_catalog.yaml` (shipped as package data)</span>
@@ -20327,94 +20325,92 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">                contents fail validation.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            ValueError: If the file has no `products:` block, or any</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">                product / domain / satellite / channel row fails</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                validation.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;GOES&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GOESProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            dict[str, GOESProduct]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            GOESProduct: The matching product row.</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ValueError: If `key` is not a registered GOES product.</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            GOESDomain: The matching domain row.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            ValueError: If `key` is not a registered GOES domain.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a GOES domain. &quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                <span class="sa">f</span><span class="s2">&quot;Known domains: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">bucket_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a satellite role / number to its unsigned bucket name.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            satellite: A role (`&quot;east&quot;` / `&quot;west&quot;`) or satellite number</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                (`&quot;16&quot;` / `&quot;18&quot;` / `&quot;19&quot;`). Case-insensitive for roles.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            str: The bucket name (`&quot;noaa-goes19&quot;`).</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            ValueError: If `satellite` maps to no known bucket.</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">satellite</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">satellite</span><span class="si">!r}</span><span class="s2"> is not a known GOES satellite. &quot;</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            list[str]: The product keys.</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">                `products:` block, or any product / domain / satellite /</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">                channel row fails validation.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;GOES&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GOESProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            dict[str, GOESProduct]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Thin alias over</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            GOESProduct: The matching product row.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ValueError: If `key` is not a registered GOES product.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            GOESDomain: The matching domain row.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            ValueError: If `key` is not a registered GOES domain.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a GOES domain. &quot;</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                <span class="sa">f</span><span class="s2">&quot;Known domains: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">bucket_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a satellite role / number to its unsigned bucket name.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            satellite: A role (`&quot;east&quot;` / `&quot;west&quot;`) or satellite number</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">                (`&quot;16&quot;` / `&quot;18&quot;` / `&quot;19&quot;`). Case-insensitive for roles.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            str: The bucket name (`&quot;noaa-goes19&quot;`).</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            ValueError: If `satellite` maps to no known bucket.</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">satellite</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">satellite</span><span class="si">!r}</span><span class="s2"> is not a known GOES satellite. &quot;</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>                <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            list[str]: The product keys.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -20525,7 +20521,9 @@ to its unsigned bucket name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-351">351</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span>
 <span class="normal"><a href="#__codelineno-0-354">354</a></span>
@@ -20545,31 +20543,29 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-368">368</a></span>
 <span class="normal"><a href="#__codelineno-0-369">369</a></span>
 <span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="k">def</span><span class="w"> </span><span class="nf">bucket_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a satellite role / number to its unsigned bucket name.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        satellite: A role (`&quot;east&quot;` / `&quot;west&quot;`) or satellite number</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            (`&quot;16&quot;` / `&quot;18&quot;` / `&quot;19&quot;`). Case-insensitive for roles.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        str: The bucket name (`&quot;noaa-goes19&quot;`).</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        ValueError: If `satellite` maps to no known bucket.</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">satellite</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">satellite</span><span class="si">!r}</span><span class="s2"> is not a known GOES satellite. &quot;</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="k">def</span><span class="w"> </span><span class="nf">bucket_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a satellite role / number to its unsigned bucket name.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        satellite: A role (`&quot;east&quot;` / `&quot;west&quot;`) or satellite number</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            (`&quot;16&quot;` / `&quot;18&quot;` / `&quot;19&quot;`). Case-insensitive for roles.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        str: The bucket name (`&quot;noaa-goes19&quot;`).</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        ValueError: If `satellite` maps to no known bucket.</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">satellite</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">satellite</span><span class="si">!r}</span><span class="s2"> is not a known GOES satellite. &quot;</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20615,19 +20611,19 @@ to its unsigned bucket name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-304">304</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GOESProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        dict[str, GOESProduct]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GOESProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        dict[str, GOESProduct]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20727,7 +20723,9 @@ to its unsigned bucket name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-329">329</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
@@ -20745,29 +20743,27 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        GOESDomain: The matching domain row.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        ValueError: If `key` is not a registered GOES domain.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a GOES domain. &quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>            <span class="sa">f</span><span class="s2">&quot;Known domains: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        GOESDomain: The matching domain row.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        ValueError: If `key` is not a registered GOES domain.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a GOES domain. &quot;</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>            <span class="sa">f</span><span class="s2">&quot;Known domains: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20869,7 +20865,9 @@ to its unsigned bucket name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-312">312</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
 <span class="normal"><a href="#__codelineno-0-315">315</a></span>
@@ -20882,24 +20880,22 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
 <span class="normal"><a href="#__codelineno-0-323">323</a></span>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        GOESProduct: The matching product row.</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        ValueError: If `key` is not a registered GOES product.</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Thin alias over</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        GOESProduct: The matching product row.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        ValueError: If `key` is not a registered GOES product.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20994,20 +20990,9 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>catalog_path</code> does not exist, or the file's
-contents fail validation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ValueError">ValueError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the file has no <code>products:</code> block, or any
-product / domain / satellite / channel row fails
-validation.</p>
+                <p>If <code>catalog_path</code> does not exist, or if the file has no
+<code>products:</code> block, or any product / domain / satellite /
+channel row fails validation.</p>
               </div>
             </td>
           </tr>
@@ -21035,9 +21020,7 @@ validation.</p>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span>
-<span class="normal"><a href="#__codelineno-0-301">301</a></span>
-<span class="normal"><a href="#__codelineno-0-302">302</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="nd">@classmethod</span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="nd">@classmethod</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read and validate the GOES catalog from disk (cached).</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
@@ -21049,15 +21032,13 @@ validation.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            contents fail validation.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ValueError: If the file has no `products:` block, or any</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            product / domain / satellite / channel row fails</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            validation.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;GOES&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            `products:` block, or any product / domain / satellite /</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            channel row fails validation.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;GOES&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21190,19 +21171,19 @@ missing, empty, or has a malformed row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-375">375</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-373">373</a></span>
+<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        list[str]: The product keys.</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        list[str]: The product keys.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25657,9 +25638,7 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product / domain / satellite catalog for the GOES ABI backend.</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    Reads the bundled `goes_data_catalog.yaml` (shipped as package data)</span>
@@ -25746,94 +25725,92 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">                contents fail validation.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            ValueError: If the file has no `products:` block, or any</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">                product / domain / satellite / channel row fails</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                validation.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;GOES&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GOESProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            dict[str, GOESProduct]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            GOESProduct: The matching product row.</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ValueError: If `key` is not a registered GOES product.</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            GOESDomain: The matching domain row.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            ValueError: If `key` is not a registered GOES domain.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a GOES domain. &quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                <span class="sa">f</span><span class="s2">&quot;Known domains: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">bucket_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a satellite role / number to its unsigned bucket name.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            satellite: A role (`&quot;east&quot;` / `&quot;west&quot;`) or satellite number</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                (`&quot;16&quot;` / `&quot;18&quot;` / `&quot;19&quot;`). Case-insensitive for roles.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            str: The bucket name (`&quot;noaa-goes19&quot;`).</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            ValueError: If `satellite` maps to no known bucket.</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">satellite</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">satellite</span><span class="si">!r}</span><span class="s2"> is not a known GOES satellite. &quot;</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            list[str]: The product keys.</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">                `products:` block, or any product / domain / satellite /</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">                channel row fails validation.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;GOES&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GOESProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            dict[str, GOESProduct]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Thin alias over</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            GOESProduct: The matching product row.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ValueError: If `key` is not a registered GOES product.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            GOESDomain: The matching domain row.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            ValueError: If `key` is not a registered GOES domain.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a GOES domain. &quot;</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                <span class="sa">f</span><span class="s2">&quot;Known domains: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">bucket_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a satellite role / number to its unsigned bucket name.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            satellite: A role (`&quot;east&quot;` / `&quot;west&quot;`) or satellite number</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">                (`&quot;16&quot;` / `&quot;18&quot;` / `&quot;19&quot;`). Case-insensitive for roles.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            str: The bucket name (`&quot;noaa-goes19&quot;`).</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            ValueError: If `satellite` maps to no known bucket.</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">satellite</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">satellite</span><span class="si">!r}</span><span class="s2"> is not a known GOES satellite. &quot;</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>                <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            list[str]: The product keys.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25944,7 +25921,9 @@ to its unsigned bucket name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-351">351</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span>
 <span class="normal"><a href="#__codelineno-0-354">354</a></span>
@@ -25964,31 +25943,29 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-368">368</a></span>
 <span class="normal"><a href="#__codelineno-0-369">369</a></span>
 <span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="k">def</span><span class="w"> </span><span class="nf">bucket_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a satellite role / number to its unsigned bucket name.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        satellite: A role (`&quot;east&quot;` / `&quot;west&quot;`) or satellite number</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            (`&quot;16&quot;` / `&quot;18&quot;` / `&quot;19&quot;`). Case-insensitive for roles.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        str: The bucket name (`&quot;noaa-goes19&quot;`).</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        ValueError: If `satellite` maps to no known bucket.</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">satellite</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">satellite</span><span class="si">!r}</span><span class="s2"> is not a known GOES satellite. &quot;</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="k">def</span><span class="w"> </span><span class="nf">bucket_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a satellite role / number to its unsigned bucket name.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        satellite: A role (`&quot;east&quot;` / `&quot;west&quot;`) or satellite number</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            (`&quot;16&quot;` / `&quot;18&quot;` / `&quot;19&quot;`). Case-insensitive for roles.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        str: The bucket name (`&quot;noaa-goes19&quot;`).</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        ValueError: If `satellite` maps to no known bucket.</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">satellite</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">satellite</span><span class="si">!r}</span><span class="s2"> is not a known GOES satellite. &quot;</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satellites</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26034,19 +26011,19 @@ to its unsigned bucket name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-304">304</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GOESProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        dict[str, GOESProduct]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GOESProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        dict[str, GOESProduct]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26146,7 +26123,9 @@ to its unsigned bucket name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-329">329</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
@@ -26164,29 +26143,27 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        GOESDomain: The matching domain row.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        ValueError: If `key` is not a registered GOES domain.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a GOES domain. &quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>            <span class="sa">f</span><span class="s2">&quot;Known domains: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        GOESDomain: The matching domain row.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        ValueError: If `key` is not a registered GOES domain.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a GOES domain. &quot;</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>            <span class="sa">f</span><span class="s2">&quot;Known domains: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26288,7 +26265,9 @@ to its unsigned bucket name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-312">312</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
 <span class="normal"><a href="#__codelineno-0-315">315</a></span>
@@ -26301,24 +26280,22 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
 <span class="normal"><a href="#__codelineno-0-323">323</a></span>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        GOESProduct: The matching product row.</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        ValueError: If `key` is not a registered GOES product.</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Thin alias over</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        GOESProduct: The matching product row.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        ValueError: If `key` is not a registered GOES product.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26413,20 +26390,9 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>catalog_path</code> does not exist, or the file's
-contents fail validation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ValueError">ValueError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the file has no <code>products:</code> block, or any
-product / domain / satellite / channel row fails
-validation.</p>
+                <p>If <code>catalog_path</code> does not exist, or if the file has no
+<code>products:</code> block, or any product / domain / satellite /
+channel row fails validation.</p>
               </div>
             </td>
           </tr>
@@ -26454,9 +26420,7 @@ validation.</p>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span>
-<span class="normal"><a href="#__codelineno-0-301">301</a></span>
-<span class="normal"><a href="#__codelineno-0-302">302</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="nd">@classmethod</span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="nd">@classmethod</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read and validate the GOES catalog from disk (cached).</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
@@ -26468,15 +26432,13 @@ validation.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            contents fail validation.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ValueError: If the file has no `products:` block, or any</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            product / domain / satellite / channel row fails</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            validation.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;GOES&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            `products:` block, or any product / domain / satellite /</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            channel row fails validation.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;GOES&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26609,19 +26571,19 @@ missing, empty, or has a malformed row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/goes/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-375">375</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-373">373</a></span>
+<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        list[str]: The product keys.</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        list[str]: The product keys.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20013,7 +20013,13 @@ subclassing.</p>
 <span class="normal"><a href="#__codelineno-0-852">852</a></span>
 <span class="normal"><a href="#__codelineno-0-853">853</a></span>
 <span class="normal"><a href="#__codelineno-0-854">854</a></span>
-<span class="normal"><a href="#__codelineno-0-855">855</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="k">class</span><span class="w"> </span><span class="nc">HttpClient</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-855">855</a></span>
+<span class="normal"><a href="#__codelineno-0-856">856</a></span>
+<span class="normal"><a href="#__codelineno-0-857">857</a></span>
+<span class="normal"><a href="#__codelineno-0-858">858</a></span>
+<span class="normal"><a href="#__codelineno-0-859">859</a></span>
+<span class="normal"><a href="#__codelineno-0-860">860</a></span>
+<span class="normal"><a href="#__codelineno-0-861">861</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="k">class</span><span class="w"> </span><span class="nc">HttpClient</span><span class="p">:</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reusable HTTP transport: session, headers, timeout, retry, download.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Wraps a :class:`requests.Session`, attaching default headers (a</span>
@@ -20347,234 +20353,240 @@ subclassing.</p>
 <a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-626" name="__codelineno-0-626"></a>        <span class="n">dest</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
 <a id="__codelineno-0-627" name="__codelineno-0-627"></a>        <span class="n">dest</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">dest</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">atomic</span> <span class="k">else</span> <span class="n">dest</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">discard_partial</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="w">            </span><span class="sd">&quot;&quot;&quot;Remove the partial write, but never a caller-owned `dest`.</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">            With `atomic` the partial lives at a private `&lt;dest&gt;.part`, so</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            removing it is always safe. Without it the stream writes straight to</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">            `dest`, which `_stream_to_file` has already truncated by opening it</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            `&quot;wb&quot;` — deleting it as well would only turn a truncated file into a</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">            missing one, and would destroy a file this call never owned.</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">            &quot;&quot;&quot;</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>            <span class="k">if</span> <span class="n">atomic</span><span class="p">:</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>                <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>        <span class="n">effective_timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">timeout</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>        <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_throttle</span><span class="p">()</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>                    <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>                    <span class="n">url</span><span class="p">,</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a>                    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a>                    <span class="n">headers</span><span class="o">=</span><span class="n">merged</span><span class="p">,</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a>                    <span class="n">timeout</span><span class="o">=</span><span class="n">effective_timeout</span><span class="p">,</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a>                <span class="p">)</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>                <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>                    <span class="n">retryable</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_forcelist</span> <span class="ow">or</span> <span class="p">(</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>                    <span class="k">if</span> <span class="n">retryable</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>                        <span class="n">retry_after</span> <span class="o">=</span> <span class="n">_parse_retry_after</span><span class="p">(</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>                            <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>                        <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="n">retry_after</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>                            <span class="sa">f</span><span class="s2">&quot;HTTP </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>                        <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>                        <span class="k">continue</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>                    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_stream_to_file</span><span class="p">(</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>                        <span class="n">response</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a>                    <span class="k">if</span> <span class="n">expect_magic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>                        <span class="n">_check_magic</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">expect_magic</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>                <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>                    <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>            <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_on_exceptions</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>                <span class="n">discard_partial</span><span class="p">()</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>                    <span class="k">raise</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>                <span class="p">)</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>                <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                <span class="n">discard_partial</span><span class="p">()</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                <span class="k">raise</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>            <span class="k">if</span> <span class="n">atomic</span><span class="p">:</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>                <span class="c1"># Guard the rename too, so the &quot;removes the temp on any</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>                <span class="c1"># failure&quot; promise holds if the final replace fails.</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>                <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                    <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>                <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                    <span class="n">discard_partial</span><span class="p">()</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>                    <span class="k">raise</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="k">return</span> <span class="n">dest</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_throttle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sleep so consecutive requests are &gt;= `min_interval` apart.</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a><span class="sd">        A no-op when `min_interval` is `0`. Uses the injected monotonic</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a><span class="sd">        `clock`, records the send time, and sleeps via the injected</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a><span class="sd">        `sleep` so tests drive the rate limit deterministically.</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a><span class="sd">        Held under a lock for the whole read-sleep-write sequence, so</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a><span class="sd">        `min_interval` bounds the *aggregate* request rate rather than the</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a><span class="sd">        rate per thread. Read-then-write without it is a race: every thread</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="sd">        sees the same `_last_request`, each concludes the interval has</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a><span class="sd">        elapsed, and they all fire together — the burst the limit exists to</span>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a><span class="sd">        prevent.</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="sd">        No backend shares one client across threads *today*: the three that</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">        thread (worldpop, ghsl, hdx, all `prefer=&quot;threads&quot;`) build a fresh</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        client inside each worker, and `_run_items` is a sequential loop. The</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">        lock is cheap and makes a shared client safe whenever one appears,</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        rather than leaving a latent race for that change to trip over.</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_interval</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>            <span class="k">return</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_throttle_lock</span><span class="p">:</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>                <span class="n">remaining</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_interval</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_clock</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span><span class="p">)</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>                <span class="k">if</span> <span class="n">remaining</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">remaining</span><span class="p">)</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clock</span><span class="p">()</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_backoff_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">retry_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute one retry wait: `Retry-After` else exponential back-off.</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a><span class="sd">        Applies the `max_backoff` ceiling and a non-negative floor.</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">            retry_after: Parsed `Retry-After` seconds, or `None`.</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">            attempt: The zero-based attempt index.</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>        <span class="c1"># `expect_magic` promises a rejected body is discarded, which is only</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="c1"># possible if `dest` has not been written yet — so a magic check forces</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a>        <span class="c1"># staging even when the caller passed `atomic=False`. Otherwise the</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>        <span class="c1"># validation would run on a file that had already replaced a good one.</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>        <span class="n">staged</span> <span class="o">=</span> <span class="n">atomic</span> <span class="ow">or</span> <span class="n">expect_magic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">dest</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">staged</span> <span class="k">else</span> <span class="n">dest</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">discard_partial</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="w">            </span><span class="sd">&quot;&quot;&quot;Remove the partial write, but never a caller-owned `dest`.</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">            When the write was staged (`atomic`, or a magic check forcing it)</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">            the partial lives at a private `&lt;dest&gt;.part`, so removing it is</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">            always safe. Otherwise the stream wrote straight to `dest`, which</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">            `_stream_to_file` has already truncated by opening it `&quot;wb&quot;` —</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">            deleting it as well would only turn a truncated file into a missing</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">            one, and would destroy a file this call never owned.</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">            &quot;&quot;&quot;</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>            <span class="k">if</span> <span class="n">staged</span><span class="p">:</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>                <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>        <span class="n">effective_timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">timeout</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>        <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_throttle</span><span class="p">()</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a>                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a>                    <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>                    <span class="n">url</span><span class="p">,</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>                    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a>                    <span class="n">headers</span><span class="o">=</span><span class="n">merged</span><span class="p">,</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>                    <span class="n">timeout</span><span class="o">=</span><span class="n">effective_timeout</span><span class="p">,</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>                <span class="p">)</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>                <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>                    <span class="n">retryable</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_forcelist</span> <span class="ow">or</span> <span class="p">(</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>                    <span class="k">if</span> <span class="n">retryable</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>                        <span class="n">retry_after</span> <span class="o">=</span> <span class="n">_parse_retry_after</span><span class="p">(</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>                            <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>                        <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="n">retry_after</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>                            <span class="sa">f</span><span class="s2">&quot;HTTP </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>                        <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a>                        <span class="k">continue</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>                    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_stream_to_file</span><span class="p">(</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>                        <span class="n">response</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>                    <span class="k">if</span> <span class="n">expect_magic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>                        <span class="n">_check_magic</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">expect_magic</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>                <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>                    <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>            <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_on_exceptions</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>                <span class="n">discard_partial</span><span class="p">()</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>                    <span class="k">raise</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                <span class="p">)</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>                <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                <span class="n">discard_partial</span><span class="p">()</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>                <span class="k">raise</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>            <span class="k">if</span> <span class="n">staged</span><span class="p">:</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>                <span class="c1"># Guard the rename too, so the &quot;removes the temp on any</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                <span class="c1"># failure&quot; promise holds if the final replace fails.</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>                <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                    <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>                <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>                    <span class="n">discard_partial</span><span class="p">()</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>                    <span class="k">raise</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="k">return</span> <span class="n">dest</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_throttle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sleep so consecutive requests are &gt;= `min_interval` apart.</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a><span class="sd">        A no-op when `min_interval` is `0`. Uses the injected monotonic</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a><span class="sd">        `clock`, records the send time, and sleeps via the injected</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a><span class="sd">        `sleep` so tests drive the rate limit deterministically.</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">        Held under a lock for the whole read-sleep-write sequence, so</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="sd">        `min_interval` bounds the *aggregate* request rate rather than the</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">        rate per thread. Read-then-write without it is a race: every thread</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        sees the same `_last_request`, each concludes the interval has</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">        elapsed, and they all fire together — the burst the limit exists to</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        prevent.</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">        No backend shares one client across threads *today*: the three that</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        thread (worldpop, ghsl, hdx, all `prefer=&quot;threads&quot;`) build a fresh</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">        client inside each worker, and `_run_items` is a sequential loop. The</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">        lock is cheap and makes a shared client safe whenever one appears,</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">        rather than leaving a latent race for that change to trip over.</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_interval</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>            <span class="k">return</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_throttle_lock</span><span class="p">:</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>                <span class="n">remaining</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_interval</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_clock</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span><span class="p">)</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>                <span class="k">if</span> <span class="n">remaining</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">remaining</span><span class="p">)</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_last_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clock</span><span class="p">()</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_backoff_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">retry_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute one retry wait: `Retry-After` else exponential back-off.</span>
 <a id="__codelineno-0-743" name="__codelineno-0-743"></a>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">            The clamped wait in seconds.</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>        <span class="n">wait</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a>            <span class="n">retry_after</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a>            <span class="k">if</span> <span class="n">retry_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">backoff_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a>        <span class="p">)</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_backoff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a>            <span class="n">wait</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">wait</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_backoff</span><span class="p">)</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a>        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_request_with_retry</span><span class="p">(</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a>        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a>        <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="n">raise_for_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Send one request, retrying statuses/exceptions with back-off.</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        Retries while the attempt budget holds and either the response</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        status is in `status_forcelist`, the `retry_predicate` marks the</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">        response retryable, or the transport raised one of</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">        `retry_on_exceptions`. Waits `Retry-After` seconds when present</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        and numeric, otherwise `backoff_factor * 2**attempt` (capped by</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        `max_backoff`). Honours the `min_interval` throttle before every</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">        send. Once non-retryable or exhausted, the response is</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">        `raise_for_status`-ed unless that is disabled, then returned.</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">            method: HTTP verb.</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">            url: Absolute request URL.</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">            raise_for_status: Per-request override; `None` uses the</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">                client policy.</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">            **kwargs: Keyword arguments forwarded to the session.</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">            requests.Response: The final response.</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">            requests.HTTPError: On a non-retryable error status when</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">                `raise_for_status` is on.</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">            BaseException: The last transport exception, re-raised after</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">                the `retry_on_exceptions` budget is exhausted.</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="n">effective_raise</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">raise_for_status</span> <span class="k">if</span> <span class="n">raise_for_status</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">raise_for_status</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>        <span class="p">)</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_throttle</span><span class="p">()</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a>            <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_on_exceptions</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a>                    <span class="k">raise</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>                <span class="p">)</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a>                <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a>            <span class="n">retryable</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_forcelist</span> <span class="ow">or</span> <span class="p">(</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a>            <span class="p">)</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a>            <span class="k">if</span> <span class="n">retryable</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a>                <span class="n">retry_after</span> <span class="o">=</span> <span class="n">_parse_retry_after</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="n">retry_after</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>                    <span class="sa">f</span><span class="s2">&quot;HTTP </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>                <span class="p">)</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>                <span class="c1"># Release the (possibly streamed) connection before retrying;</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>                <span class="c1"># a stream=True body is otherwise never consumed and its socket</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>                <span class="c1"># leaks out of the pool.</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>                <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>            <span class="k">if</span> <span class="n">effective_raise</span><span class="p">:</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>                <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>                    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a>                <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>                    <span class="c1"># Close the final errored response too — for a streamed</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a>                    <span class="c1"># request the caller never receives it, so nothing else would.</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>                    <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>                    <span class="k">raise</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>            <span class="k">return</span> <span class="n">response</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dispatch to the session&#39;s verb method, falling back to `request`.</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">        Routing `GET` to `session.get` (rather than a generic</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">        `session.request`) keeps drop-in fake transports that implement</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        only `get()` working — the shape the migrated backends&#39; tests use.</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">            method: HTTP verb.</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">            url: Absolute request URL.</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">            **kwargs: Keyword arguments forwarded to the session call.</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">            requests.Response: The raw response (no status check).</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a>        <span class="n">verb</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">,</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a>        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">verb</span><span class="p">):</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;requests.Response&quot;</span><span class="p">,</span> <span class="n">verb</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">        Applies the `max_backoff` ceiling and a non-negative floor.</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">            retry_after: Parsed `Retry-After` seconds, or `None`.</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">            attempt: The zero-based attempt index.</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">            The clamped wait in seconds.</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>        <span class="n">wait</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a>            <span class="n">retry_after</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a>            <span class="k">if</span> <span class="n">retry_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a>            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">backoff_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a>        <span class="p">)</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_backoff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a>            <span class="n">wait</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">wait</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_backoff</span><span class="p">)</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a>        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_request_with_retry</span><span class="p">(</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>        <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">raise_for_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Send one request, retrying statuses/exceptions with back-off.</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">        Retries while the attempt budget holds and either the response</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">        status is in `status_forcelist`, the `retry_predicate` marks the</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">        response retryable, or the transport raised one of</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">        `retry_on_exceptions`. Waits `Retry-After` seconds when present</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        and numeric, otherwise `backoff_factor * 2**attempt` (capped by</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        `max_backoff`). Honours the `min_interval` throttle before every</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">        send. Once non-retryable or exhausted, the response is</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        `raise_for_status`-ed unless that is disabled, then returned.</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">            method: HTTP verb.</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">            url: Absolute request URL.</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">            raise_for_status: Per-request override; `None` uses the</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">                client policy.</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">            **kwargs: Keyword arguments forwarded to the session.</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">            requests.Response: The final response.</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">            requests.HTTPError: On a non-retryable error status when</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">                `raise_for_status` is on.</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">            BaseException: The last transport exception, re-raised after</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">                the `retry_on_exceptions` budget is exhausted.</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>        <span class="n">effective_raise</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">raise_for_status</span> <span class="k">if</span> <span class="n">raise_for_status</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">raise_for_status</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a>        <span class="p">)</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>        <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_throttle</span><span class="p">()</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a>                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a>            <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_on_exceptions</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a>                    <span class="k">raise</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a>                <span class="p">)</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a>                <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a>            <span class="n">retryable</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_forcelist</span> <span class="ow">or</span> <span class="p">(</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a>            <span class="p">)</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a>            <span class="k">if</span> <span class="n">retryable</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a>                <span class="n">retry_after</span> <span class="o">=</span> <span class="n">_parse_retry_after</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="n">retry_after</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a>                    <span class="sa">f</span><span class="s2">&quot;HTTP </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a>                <span class="p">)</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a>                <span class="c1"># Release the (possibly streamed) connection before retrying;</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a>                <span class="c1"># a stream=True body is otherwise never consumed and its socket</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a>                <span class="c1"># leaks out of the pool.</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>                <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>            <span class="k">if</span> <span class="n">effective_raise</span><span class="p">:</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a>                <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>                    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>                <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>                    <span class="c1"># Close the final errored response too — for a streamed</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>                    <span class="c1"># request the caller never receives it, so nothing else would.</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>                    <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>                    <span class="k">raise</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>            <span class="k">return</span> <span class="n">response</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Dispatch to the session&#39;s verb method, falling back to `request`.</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">        Routing `GET` to `session.get` (rather than a generic</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">        `session.request`) keeps drop-in fake transports that implement</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">        only `get()` working — the shape the migrated backends&#39; tests use.</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">            method: HTTP verb.</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">            url: Absolute request URL.</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">            **kwargs: Keyword arguments forwarded to the session call.</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">            requests.Response: The raw response (no status check).</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a>        <span class="n">verb</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="p">,</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a>        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">verb</span><span class="p">):</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;requests.Response&quot;</span><span class="p">,</span> <span class="n">verb</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21498,7 +21510,13 @@ is exhausted.</p>
 <span class="normal"><a href="#__codelineno-0-701">701</a></span>
 <span class="normal"><a href="#__codelineno-0-702">702</a></span>
 <span class="normal"><a href="#__codelineno-0-703">703</a></span>
-<span class="normal"><a href="#__codelineno-0-704">704</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-704">704</a></span>
+<span class="normal"><a href="#__codelineno-0-705">705</a></span>
+<span class="normal"><a href="#__codelineno-0-706">706</a></span>
+<span class="normal"><a href="#__codelineno-0-707">707</a></span>
+<span class="normal"><a href="#__codelineno-0-708">708</a></span>
+<span class="normal"><a href="#__codelineno-0-709">709</a></span>
+<span class="normal"><a href="#__codelineno-0-710">710</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-560" name="__codelineno-0-560"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a>    <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
@@ -21568,83 +21586,89 @@ is exhausted.</p>
 <a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-626" name="__codelineno-0-626"></a>    <span class="n">dest</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
 <a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="n">dest</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a>    <span class="n">tmp</span> <span class="o">=</span> <span class="n">dest</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">atomic</span> <span class="k">else</span> <span class="n">dest</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">discard_partial</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove the partial write, but never a caller-owned `dest`.</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        With `atomic` the partial lives at a private `&lt;dest&gt;.part`, so</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">        removing it is always safe. Without it the stream writes straight to</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        `dest`, which `_stream_to_file` has already truncated by opening it</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">        `&quot;wb&quot;` — deleting it as well would only turn a truncated file into a</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">        missing one, and would destroy a file this call never owned.</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a>        <span class="k">if</span> <span class="n">atomic</span><span class="p">:</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a>    <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a>    <span class="n">effective_timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">timeout</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>    <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a>    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_throttle</span><span class="p">()</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>                <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>                <span class="n">url</span><span class="p">,</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a>                <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a>                <span class="n">headers</span><span class="o">=</span><span class="n">merged</span><span class="p">,</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a>                <span class="n">timeout</span><span class="o">=</span><span class="n">effective_timeout</span><span class="p">,</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a>            <span class="p">)</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>                <span class="n">retryable</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_forcelist</span> <span class="ow">or</span> <span class="p">(</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a>                <span class="p">)</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>                <span class="k">if</span> <span class="n">retryable</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>                    <span class="n">retry_after</span> <span class="o">=</span> <span class="n">_parse_retry_after</span><span class="p">(</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>                        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>                    <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="n">retry_after</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>                        <span class="sa">f</span><span class="s2">&quot;HTTP </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>                    <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>                    <span class="k">continue</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>                <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_stream_to_file</span><span class="p">(</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>                    <span class="n">response</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>                <span class="p">)</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a>                <span class="k">if</span> <span class="n">expect_magic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>                    <span class="n">_check_magic</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">expect_magic</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_on_exceptions</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>            <span class="n">discard_partial</span><span class="p">()</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>            <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>                <span class="k">raise</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>            <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="p">)</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>            <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>            <span class="n">discard_partial</span><span class="p">()</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="k">if</span> <span class="n">atomic</span><span class="p">:</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>            <span class="c1"># Guard the rename too, so the &quot;removes the temp on any</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>            <span class="c1"># failure&quot; promise holds if the final replace fails.</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                <span class="n">discard_partial</span><span class="p">()</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>                <span class="k">raise</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>        <span class="k">return</span> <span class="n">dest</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>    <span class="c1"># `expect_magic` promises a rejected body is discarded, which is only</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>    <span class="c1"># possible if `dest` has not been written yet — so a magic check forces</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a>    <span class="c1"># staging even when the caller passed `atomic=False`. Otherwise the</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a>    <span class="c1"># validation would run on a file that had already replaced a good one.</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>    <span class="n">staged</span> <span class="o">=</span> <span class="n">atomic</span> <span class="ow">or</span> <span class="n">expect_magic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a>    <span class="n">tmp</span> <span class="o">=</span> <span class="n">dest</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">staged</span> <span class="k">else</span> <span class="n">dest</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">discard_partial</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove the partial write, but never a caller-owned `dest`.</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">        When the write was staged (`atomic`, or a magic check forcing it)</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">        the partial lives at a private `&lt;dest&gt;.part`, so removing it is</span>
+<a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">        always safe. Otherwise the stream wrote straight to `dest`, which</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        `_stream_to_file` has already truncated by opening it `&quot;wb&quot;` —</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        deleting it as well would only turn a truncated file into a missing</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">        one, and would destroy a file this call never owned.</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a>        <span class="k">if</span> <span class="n">staged</span><span class="p">:</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>            <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a>    <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a>    <span class="n">effective_timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">timeout</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>    <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a>    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_throttle</span><span class="p">()</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a>            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a>                <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>                <span class="n">url</span><span class="p">,</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>                <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a>                <span class="n">headers</span><span class="o">=</span><span class="n">merged</span><span class="p">,</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>                <span class="n">timeout</span><span class="o">=</span><span class="n">effective_timeout</span><span class="p">,</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>            <span class="p">)</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>                <span class="n">retryable</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_forcelist</span> <span class="ow">or</span> <span class="p">(</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_predicate</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>                <span class="p">)</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>                <span class="k">if</span> <span class="n">retryable</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>                    <span class="n">retry_after</span> <span class="o">=</span> <span class="n">_parse_retry_after</span><span class="p">(</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>                        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>                    <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="n">retry_after</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>                        <span class="sa">f</span><span class="s2">&quot;HTTP </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>                    <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>                <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_stream_to_file</span><span class="p">(</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>                    <span class="n">response</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>                <span class="p">)</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>                <span class="k">if</span> <span class="n">expect_magic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>                    <span class="n">_check_magic</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">expect_magic</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>            <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>                <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_on_exceptions</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>            <span class="n">discard_partial</span><span class="p">()</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="p">:</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>                <span class="k">raise</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>            <span class="n">wait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_wait</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">redact_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">; retry &quot;</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>            <span class="p">)</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>            <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="n">discard_partial</span><span class="p">()</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="k">if</span> <span class="n">staged</span><span class="p">:</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>            <span class="c1"># Guard the rename too, so the &quot;removes the temp on any</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="c1"># failure&quot; promise holds if the final replace fails.</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>                <span class="n">discard_partial</span><span class="p">()</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>                <span class="k">raise</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>        <span class="k">return</span> <span class="n">dest</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
