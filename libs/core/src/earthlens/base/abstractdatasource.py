@@ -672,21 +672,28 @@ class AbstractDataSource(ABC):
 
         @functools.wraps(original)
         def download(self, *args, **kw):
-            existed = self.root_dir.exists()
+            # Record which directories are missing *before* creating them, so
+            # the failure path can unwind exactly what this call added.
+            created = []
+            probe = self.root_dir
+            while not probe.exists() and probe != probe.parent:
+                created.append(probe)
+                probe = probe.parent
             self._ensure_root_dir()
             try:
                 return original(self, *args, **kw)
             except BaseException:
                 # A request the backend rejects (an unsupported `aggregate=`,
                 # a bad dataset key) must not leave an output directory
-                # behind. Only remove one this call created, and only while
-                # it is still empty, so a partially-successful download keeps
-                # whatever it managed to write.
-                if not existed:
+                # behind. Unwind leaf-first, and only the directories this
+                # call created and only while each is still empty — so a
+                # pre-existing tree, and anything a partially-successful
+                # download wrote, are both untouched.
+                for directory in created:
                     try:
-                        self.root_dir.rmdir()
+                        directory.rmdir()
                     except OSError:
-                        pass
+                        break
                 raise
 
         download._ensures_root_dir = True  # type: ignore[attr-defined]
@@ -1535,7 +1542,7 @@ class AbstractCatalog(BaseModel):
     expose individual entries via :meth:`get_variable`. The
     :func:`model_post_init` hook eagerly populates :attr:`catalog`
     after pydantic validation runs, so subclasses can treat the
-    catalog as a dict thereafter without writing their own
+    catalog as a mapping thereafter without writing their own
     `__init__`.
 
     Subclasses pass through pydantic's normal `BaseModel.__init__`

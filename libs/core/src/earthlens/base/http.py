@@ -625,18 +625,24 @@ class HttpClient:
         """
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        tmp = dest.with_name(dest.name + ".part") if atomic else dest
+        # `expect_magic` promises a rejected body is discarded, which is only
+        # possible if `dest` has not been written yet — so a magic check forces
+        # staging even when the caller passed `atomic=False`. Otherwise the
+        # validation would run on a file that had already replaced a good one.
+        staged = atomic or expect_magic is not None
+        tmp = dest.with_name(dest.name + ".part") if staged else dest
 
         def discard_partial() -> None:
             """Remove the partial write, but never a caller-owned `dest`.
 
-            With `atomic` the partial lives at a private `<dest>.part`, so
-            removing it is always safe. Without it the stream writes straight to
-            `dest`, which `_stream_to_file` has already truncated by opening it
-            `"wb"` — deleting it as well would only turn a truncated file into a
-            missing one, and would destroy a file this call never owned.
+            When the write was staged (`atomic`, or a magic check forcing it)
+            the partial lives at a private `<dest>.part`, so removing it is
+            always safe. Otherwise the stream wrote straight to `dest`, which
+            `_stream_to_file` has already truncated by opening it `"wb"` —
+            deleting it as well would only turn a truncated file into a missing
+            one, and would destroy a file this call never owned.
             """
-            if atomic:
+            if staged:
                 tmp.unlink(missing_ok=True)
 
         merged = self._merge_headers(headers)
@@ -693,7 +699,7 @@ class HttpClient:
             except BaseException:
                 discard_partial()
                 raise
-            if atomic:
+            if staged:
                 # Guard the rename too, so the "removes the temp on any
                 # failure" promise holds if the final replace fails.
                 try:
