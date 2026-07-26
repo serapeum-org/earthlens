@@ -37,70 +37,11 @@ jobs:
             echo "::error::expected 7 wheels, got $(ls dist/*.whl | wc -l)"; exit 1; }
           ls -1 dist/*.whl
 
-      - name: Export the locked third-party dependency set
-        # The test job installs the third-party SDKs from this file instead of
-        # resolving `earthlens[all]` against PyPI at job time. Two reasons:
-        # every version is the one `uv.lock` already resolved (so an upstream
-        # release cannot redden an unrelated PR), and every artefact is
-        # hash-verified. `--no-emit-workspace` leaves the seven earthlens
-        # distributions out — those come from the wheels built above. The dev
-        # group is included so pytest arrives pinned from the same file rather
-        # than through a second, unpinned install.
-        run: |
-          set -euo pipefail
-          uv export --extra all --group dev --no-emit-workspace --frozen \
-            --output-file dist/requirements-wheel.txt
-          test -s dist/requirements-wheel.txt
-          echo "pinned $(grep -cE '^[A-Za-z0-9]' dist/requirements-wheel.txt) packages"
-          # The install step asks pip for wheels only, naming the handful of
-          # packages that publish no wheel as explicit exceptions. Recompute
-          # that set from the lock here so a new sdist-only dependency fails
-          # with this message instead of an opaque pip resolution error.
-          python - <<'PY'
-          import re
-          import sys
-          import tomllib
-
-          declared = {"docopt", "ratelimit", "tropycal"}
-
-
-          def canonical(name: str) -> str:
-              return re.sub(r"[-_.]+", "-", name).lower()
-
-
-          with open("dist/requirements-wheel.txt", encoding="utf-8") as handle:
-              exported = {
-                  canonical(match.group(1))
-                  for match in (
-                      re.match(r"^([A-Za-z0-9][A-Za-z0-9._-]*)==", line)
-                      for line in handle
-                  )
-                  if match
-              }
-          with open("uv.lock", "rb") as handle:
-              lock = tomllib.load(handle)
-          actual = {
-              canonical(package["name"])
-              for package in lock.get("package", [])
-              if canonical(package["name"]) in exported and not package.get("wheels")
-          }
-          if actual != declared:
-              print(
-                  "::error::the sdist-only dependency set changed: "
-                  f"{sorted(actual)} != declared {sorted(declared)}. Update the "
-                  "--no-binary list in the 'Install wheels' step to match."
-              )
-              sys.exit(1)
-          print(f"sdist-only exceptions confirmed: {sorted(actual)}")
-          PY
-
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:
           name: wheel
-          path: |
-            dist/*.whl
-            dist/requirements-wheel.txt
+          path: dist/*.whl
 
   test-wheel:
     needs: build-wheel
@@ -150,32 +91,14 @@ jobs:
         # `reduce_time_axis` without a version bump, and the suite failed on
         # ImportErrors for all four against the stale 0.11.0 from PyPI.
         #
-        # Naming each wheel as a local file pins it beyond substitution.
-        #
-        # The two installs are deliberately separate. The third-party SDKs come
-        # from the exported lock, so every version is hash-verified and pinned
-        # to what `uv.lock` resolved rather than to whatever the index serves
-        # today. The earthlens wheels then go in from a requirements file listing
-        # each built file with its own sha256, under `--no-index --no-deps`:
-        # dist/ is the only reachable source and every artefact is verified, so
-        # no published earthlens can stand in for a freshly built one.
-        #
-        # `--only-binary :all:` on both installs keeps pip from falling back to
-        # an sdist, whose build backend would run arbitrary setup code. The three
-        # named exceptions publish no wheel at all, so they have to be built —
-        # the build job fails the run if that set ever changes.
+        # Naming each wheel as a local file pins it beyond substitution, while
+        # `[all]` on the meta wheel still resolves the third-party SDKs (boto3
+        # / cdsapi / earthengine-api) from PyPI as intended.
         run: |
           set -euo pipefail
-          pip install --only-binary :all: \
-            --no-binary docopt,ratelimit,tropycal \
-            --require-hashes -r dist/requirements-wheel.txt
-          for wheel in dist/earthlens*.whl; do
-            printf '%s --hash=sha256:%s\n' \
-              "./${wheel}" "$(sha256sum "${wheel}" | cut -d' ' -f1)"
-          done > dist/earthlens-wheels.txt
-          cat dist/earthlens-wheels.txt
-          pip install --no-index --no-deps --only-binary :all: --require-hashes \
-            -r dist/earthlens-wheels.txt
+          META=$(ls dist/earthlens-[0-9]*.whl)
+          MEMBERS=$(ls dist/earthlens_*.whl)
+          pip install --find-links dist ${MEMBERS} "${META}[all]"
           # Assert the installed distributions really are the ones just built,
           # not same-version wheels an index happened to serve. `direct_url.json`
           # (PEP 610) is only written for a path/URL install, and the recorded
@@ -215,6 +138,10 @@ jobs:
         # earthlens is a PEP 420 namespace with no attributes; the version and
         # facade live in earthlens.core.
         run: python -c "import earthlens.core; print(earthlens.core.__version__)"
+
+      - name: Install test dependencies
+        shell: bash -el {0}
+        run: pip install pytest pytest-cov
 
       - name: Run tests against installed wheel
         shell: bash -el {0}

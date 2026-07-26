@@ -171,6 +171,24 @@ class TestWindow:
         assert (end.hour, end.minute, end.second) == (18, 30, 0)
 
 
+def _boom_on_101(Bucket, Key):  # noqa: N803 - mirrors the boto3 keyword name
+    """Fail the `/101/` chunk, serve one byte for every other key.
+
+    Args:
+        Bucket: The bucket name (ignored).
+        Key: The object key being fetched.
+
+    Returns:
+        dict: A minimal `get_object` response.
+
+    Raises:
+        RuntimeError: For any key under the `101` volume.
+    """
+    if "/101/" in Key:
+        raise RuntimeError("s3 down")
+    return {"Body": type("B", (), {"read": lambda self: b"x"})()}
+
+
 class TestApi:
     """Tests for the `_api` search/fetch composition."""
 
@@ -206,6 +224,18 @@ class TestFetch:
         fake_s3.get_object = boom
         paths = b._fetch(products)
         assert len(paths) == 1  # the 100 volume survives, 101 skipped
+
+    def test_errors_raise_propagates_the_failed_volume(self, tmp_path, fake_s3):
+        """download(errors="raise") surfaces the assembly error instead of skipping."""
+        b = _make(tmp_path)
+        fake_s3.get_object = _boom_on_101
+        with pytest.raises(RuntimeError, match="s3 down"):
+            b.download(errors="raise")
+
+    def test_errors_rejects_an_unknown_policy(self, tmp_path, fake_s3):
+        """An unrecognised errors= value is refused before any request."""
+        with pytest.raises(ValueError, match="errors"):
+            _make(tmp_path).download(errors="explode")
 
 
 class TestDownload:

@@ -16,6 +16,15 @@ def test_chirps_declares_raster_output_kind():
     assert CHIRPS.OUTPUT_KIND == "raster"
 
 
+def _raise_ftp_down(*_args, **_kwargs):
+    """Stand in for `_download_dataset` and always fail.
+
+    Raises:
+        RuntimeError: Always.
+    """
+    raise RuntimeError("ftp down")
+
+
 def test_chirps_download_rejects_aggregate(tmp_path):
     """CHIRPS raises NotImplementedError for aggregate= instead of silently dropping it."""
     chirps = CHIRPS(
@@ -62,6 +71,54 @@ def test_chirps_download_returns_written_paths(tmp_path, monkeypatch):
     result = chirps.download(progress_bar=False)
 
     assert result == fake
+
+
+def test_chirps_download_errors_raise_propagates(tmp_path, monkeypatch):
+    """errors="raise" surfaces the per-variable failure instead of logging it."""
+    chirps = CHIRPS(
+        start="2020-01-01",
+        end="2020-01-02",
+        variables=["precipitation"],
+        temporal_resolution="daily",
+        lat_lim=[4.0, 5.0],
+        lon_lim=[-75.0, -74.0],
+        path=str(tmp_path),
+    )
+    monkeypatch.setattr(chirps, "_download_dataset", _raise_ftp_down)
+
+    with pytest.raises(RuntimeError, match="ftp down"):
+        chirps.download(progress_bar=False, errors="raise")
+
+
+def test_chirps_download_errors_warn_keeps_going(tmp_path, monkeypatch):
+    """The default policy drops the failed variable and returns the rest."""
+    chirps = CHIRPS(
+        start="2020-01-01",
+        end="2020-01-02",
+        variables=["precipitation"],
+        temporal_resolution="daily",
+        lat_lim=[4.0, 5.0],
+        lon_lim=[-75.0, -74.0],
+        path=str(tmp_path),
+    )
+    monkeypatch.setattr(chirps, "_download_dataset", _raise_ftp_down)
+
+    assert chirps.download(progress_bar=False) == []
+
+
+def test_chirps_download_rejects_an_unknown_errors_policy(tmp_path):
+    """An unrecognised errors= value is refused before any request."""
+    chirps = CHIRPS(
+        start="2020-01-01",
+        end="2020-01-02",
+        variables=["precipitation"],
+        temporal_resolution="daily",
+        lat_lim=[4.0, 5.0],
+        lon_lim=[-75.0, -74.0],
+        path=str(tmp_path),
+    )
+    with pytest.raises(ValueError, match="errors"):
+        chirps.download(progress_bar=False, errors="explode")
 
 
 @pytest.fixture(scope="module")

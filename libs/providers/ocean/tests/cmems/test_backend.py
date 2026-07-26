@@ -361,6 +361,19 @@ class TestCMEMSFetch:
             f"partial failure should return only the survivor; got {paths!r}"
         )
 
+    def test_errors_raise_propagates_the_first_failure(
+        self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
+    ):
+        """errors="raise" surfaces the toolbox exception, not the batch summary."""
+        fake_cmems.subset_raises = RuntimeError("server upset")
+        with pytest.raises(RuntimeError, match="server upset"):
+            cmems_instance.download(errors="raise")
+
+    def test_errors_rejects_an_unknown_policy(self, cmems_instance: CMEMS):
+        """An unrecognised errors= value is refused before any request."""
+        with pytest.raises(ValueError, match="errors"):
+            cmems_instance.download(errors="explode")
+
     def test_subset_missing_file_path_raises(
         self, fake_cmems: _FakeCmems, cmems_instance: CMEMS
     ):

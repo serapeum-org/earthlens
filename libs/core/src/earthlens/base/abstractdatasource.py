@@ -497,6 +497,19 @@ class LazyClientMixin:
         self.__dict__["_client_obj"] = value
 
 
+def _describe_remote_product(product: Any) -> str:
+    """Render a product for the :meth:`AbstractDataSource._run_items` log lines.
+
+    Args:
+        product: The product whose fetch failed. Only its `id` is read, so a
+            backend passing anything id-shaped works.
+
+    Returns:
+        str: The product id, quoted.
+    """
+    return repr(getattr(product, "id", product))
+
+
 class AbstractDataSource(ABC):
     """Blueprint for every concrete data-source backend.
 
@@ -1191,22 +1204,22 @@ class AbstractDataSource(ABC):
         backends return their written `list[Path]` and also leave the
         files on disk under `self.root_dir`).
 
-        Partial-failure policy is per backend and currently varies:
-        most multi-item backends are **skip-and-continue** — a single
-        failed `(dataset, variable)` / chunk / sensor is logged and the
-        batch proceeds, with a success/failure summary at the end
-        (CHIRPS, CMEMS, FIRMS, …) — while single-shot backends
-        propagate the error.
+        Partial-failure policy across a multi-item batch defaults to
+        **skip-and-continue** — a failed `(dataset, variable)` / chunk /
+        sensor is logged and the batch proceeds, with a summary at the end
+        — while single-shot backends propagate the error.
 
-        Only three backends (`nwp`, `fdsn`, `soilgrids`) currently make
-        that policy caller-controllable, via an explicit
-        `errors="warn" | "raise" | "ignore"` argument routed through
-        :meth:`check_errors_policy` and :meth:`_run_items`. The rest hard-code
-        skip-and-continue, so **do not assume `errors=` is accepted** — check
-        the backend's own `download` signature. New backends with a per-item
-        loop should follow the convention so it eventually holds everywhere;
-        until then this docstring describes what the backends actually do
-        rather than what they ought to.
+        The backends whose batch is a genuine loop over independent items
+        (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`, `soilgrids`) make
+        that policy caller-controllable with an explicit
+        `errors="warn" | "raise" | "ignore"` argument, routed through
+        :meth:`check_errors_policy` and :meth:`_run_items`. A backend whose
+        `download` does not take `errors=` has nothing to apply it to — it
+        issues one request, or its loop needs per-failure recovery the
+        shared helper cannot express (chc re-opens its FTP session between
+        failed dates). So **check the backend's own `download` signature**
+        rather than assuming; :meth:`_search_fetch_each` also takes
+        `errors=` for backends composed from it.
         """
         # loop over dates if the downloaded rasters/netcdf are for a specific date out of the required
         # list of dates
@@ -1370,6 +1383,12 @@ class AbstractDataSource(ABC):
     #: :meth:`download`.
     ERROR_POLICIES: frozenset[str] = frozenset({"raise", "warn", "ignore", "skip"})
 
+    #: The policy :meth:`_run_items` applies when a backend's own `download`
+    #: was not given one. Declared here rather than per backend so a loop can
+    #: read `self._errors` unconditionally; a `download(errors=...)` overrides
+    #: it by assigning the :meth:`check_errors_policy` result.
+    _errors: str = "warn"
+
     @staticmethod
     def check_errors_policy(errors: str) -> str:
         """Validate an `errors=` argument, normalising the `"skip"` alias.
@@ -1499,6 +1518,8 @@ class AbstractDataSource(ABC):
         progress_bar: bool = False,
         desc: str | None = None,
         unit: str = "item",
+        errors: str | None = None,
+        label: str = "product",
     ) -> list[Any]:
         """C3 composition with an optional per-product `tqdm` progress bar.
 
@@ -1514,11 +1535,22 @@ class AbstractDataSource(ABC):
             progress_bar: Show the per-product `tqdm` bar when `True`.
             desc: `tqdm` description; defaults to the class name.
             unit: `tqdm` unit label.
+            errors: The partial-failure policy to apply across the
+                products, normally `self._errors` from a backend whose
+                `download` accepts `errors=`. `None` — the default —
+                propagates the first failure, which is what a caller that
+                never opted into a policy already expects.
+            label: Noun for the :meth:`_run_items` log lines when a policy
+                is in force.
 
         Returns:
             list[Any]: One :meth:`_fetch_one` result per product
                 (element type tracks :attr:`OUTPUT_KIND`), or `[]` when
-                `_search` matched nothing.
+                `_search` matched nothing. With a policy in force, failed
+                products are absent rather than aborting the batch.
+
+        Raises:
+            ValueError: If `errors` is not a recognised policy.
         """
         products = self._search()
         if not products:
@@ -1531,7 +1563,16 @@ class AbstractDataSource(ABC):
             desc=desc or type(self).__name__,
             unit=unit,
         )
-        return [self._fetch_one(product) for product in iterator]
+        if errors is None:
+            return [self._fetch_one(product) for product in iterator]
+        results, _failures = self._run_items(
+            list(iterator),
+            self._fetch_one,
+            errors=errors,
+            label=label,
+            describe=_describe_remote_product,
+        )
+        return results
 
 
 class AbstractCatalog(BaseModel):

@@ -36,6 +36,7 @@ from __future__ import annotations
 import math
 from contextlib import closing
 from ftplib import FTP  # nosec B402  # noqa: S402
+from functools import partial
 from pathlib import Path
 
 import numpy as np
@@ -197,6 +198,18 @@ def _reject_unsigned_for_nodata_sentinel(dtype: np.dtype) -> None:
             "for unsigned products before extending the catalog with "
             "one."
         )
+
+
+def _describe_pair(pair: tuple[str, str]) -> str:
+    """Render a `(dataset, variable)` pair for the `_run_items` log lines.
+
+    Args:
+        pair: The `(dataset key, variable name)` that failed.
+
+    Returns:
+        str: `"<dataset>/<variable>"`.
+    """
+    return f"{pair[0]}/{pair[1]}"
 
 
 class CHIRPS(AbstractDataSource):
@@ -406,6 +419,7 @@ class CHIRPS(AbstractDataSource):
         progress_bar: bool = True,
         cores: int | None = None,
         aggregate: object | None = None,
+        errors: str = "warn",
         **_kwargs: object,
     ) -> list[Path]:
         """Download every `(dataset, variable)` pair in `self.vars`.
@@ -420,14 +434,22 @@ class CHIRPS(AbstractDataSource):
                 silently ignored. CHIRPS writes per-date GeoTIFFs and
                 has no aggregator wiring (unlike the NetCDF-emitting
                 ECMWF backend).
+            errors: Partial-failure policy across the
+                `(dataset, variable)` pairs — `"warn"` (default) logs each
+                failure and continues, `"raise"` propagates the first one,
+                `"ignore"` continues silently.
             **_kwargs: Reserved for other forwarded keyword arguments.
 
         Returns:
             list[Path]: The written GeoTIFF paths
             (`<self.root_dir>/<ds_key>_<var_name>_<date>.tif`), across
-            every `(dataset, variable)` and date. Per-variable and
-            per-date failures are logged and omitted from the list (they
-            do not abort the rest of the loop).
+            every `(dataset, variable)` and date. Under the default
+            `errors="warn"`, per-variable and per-date failures are logged
+            and omitted from the list rather than aborting the batch.
+
+        Raises:
+            NotImplementedError: If `aggregate` is not `None`.
+            ValueError: If `errors` is not a recognised policy.
 
         Examples:
             - Legacy shape (CHIRPS-2.0 global daily):
@@ -463,54 +485,55 @@ class CHIRPS(AbstractDataSource):
                 "(unlike the NetCDF-emitting ECMWF backend); reduce the "
                 "downloaded rasters yourself."
             )
-        succeeded: list[tuple[str, str]] = []
-        failed: list[tuple[tuple[str, str], BaseException]] = []
-        out_paths: list[Path] = []
-
         assert isinstance(self.vars, dict)  # CHC normalises variables to a mapping
-        for ds_key, var_names in self.vars.items():
-            dataset = self._catalog.datasets[ds_key]
-            for var_name in var_names:
-                var = dataset.variables[var_name]
-                logger.info(
-                    f"Download CHIRPS {ds_key}/{var_name} from "
-                    f"{self.time.start_date.date()} to "
-                    f"{self.time.end_date.date()}"
-                )
-                try:
-                    out_paths.extend(
-                        self._download_dataset(
-                            ds_key,
-                            dataset,
-                            var,
-                            progress_bar=progress_bar,
-                            cores=cores,
-                        )
-                    )
-                except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
-                    logger.error(
-                        f"CHIRPS download for {ds_key}/{var_name} failed: "
-                        f"{type(exc).__name__}: {exc}"
-                    )
-                    failed.append(((ds_key, var_name), exc))
-                    continue
-                succeeded.append((ds_key, var_name))
-
-        if failed:
-            failed_summary = ", ".join(
-                f"{ds}/{v} ({type(exc).__name__})" for (ds, v), exc in failed
-            )
-            logger.warning(
-                f"CHIRPS download summary: {len(succeeded)} succeeded "
-                f"({succeeded}), {len(failed)} failed ({failed_summary})"
-            )
-        else:
+        pairs = [
+            (ds_key, var_name)
+            for ds_key, var_names in self.vars.items()
+            for var_name in var_names
+        ]
+        per_pair_paths, failures = self._run_items(
+            pairs,
+            partial(self._download_pair, progress_bar=progress_bar, cores=cores),
+            errors=errors,
+            label="variable",
+            describe=_describe_pair,
+        )
+        if not failures:
             logger.info(
-                f"CHIRPS download summary: all {len(succeeded)} variables "
-                f"succeeded ({succeeded})"
+                f"CHIRPS download summary: all {len(pairs)} variables succeeded."
             )
+        return [path for paths in per_pair_paths for path in paths]
 
-        return out_paths
+    def _download_pair(
+        self,
+        pair: tuple[str, str],
+        *,
+        progress_bar: bool,
+        cores: int | None,
+    ) -> list[Path]:
+        """Download one `(dataset, variable)` pair across the whole date range.
+
+        Args:
+            pair: The `(dataset key, variable name)` to fetch.
+            progress_bar: Whether to show the per-dataset tqdm bar.
+            cores: joblib worker count for the per-date retrieval.
+
+        Returns:
+            list[Path]: The GeoTIFFs written for that pair.
+        """
+        ds_key, var_name = pair
+        dataset = self._catalog.datasets[ds_key]
+        logger.info(
+            f"Download CHIRPS {ds_key}/{var_name} from "
+            f"{self.time.start_date.date()} to {self.time.end_date.date()}"
+        )
+        return self._download_dataset(
+            ds_key,
+            dataset,
+            dataset.variables[var_name],
+            progress_bar=progress_bar,
+            cores=cores,
+        )
 
     def _download_dataset(
         self,

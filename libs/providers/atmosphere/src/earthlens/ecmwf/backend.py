@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 import zipfile
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -184,6 +185,18 @@ def _unwrap_zipped_netcdf(target: Path) -> None:
         # written temp file is removed so we never leave litter.
         if tmp.exists():
             tmp.unlink(missing_ok=True)
+
+
+def _describe_pair(pair: tuple[str, str]) -> str:
+    """Render a `(dataset, variable)` pair for the `_run_items` log lines.
+
+    Args:
+        pair: The `(dataset name, variable code)` that failed.
+
+    Returns:
+        str: `"<dataset>/<variable>"`.
+    """
+    return f"{pair[0]}/{pair[1]}"
 
 
 class ECMWF(LazyClientMixin, AbstractDataSource):
@@ -561,6 +574,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Download every `(dataset, variable)` pair in `self.vars` from CDS.
 
@@ -627,13 +641,16 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             NetCDF at `<self.root_dir>/<cds_variable>_<cds_dataset>.nc`,
             or, when `aggregate` is set, the per-window GeoTIFFs at
             `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<freq>_<window>.tif`.
-            Variables whose download (or aggregate) failed are logged
-            and omitted from the returned list.
+            Under the default `errors="warn"`, variables whose download
+            (or aggregate) failed are logged and omitted from the returned
+            list rather than aborting the batch.
 
         Raises:
+            ValueError: If `errors` is not a recognised policy.
             KeyError: If any dataset key in `self.vars` is not a
                 curated CDS dataset, or if a listed variable is not
-                declared under that dataset.
+                declared under that dataset — under `errors="warn"` this
+                is logged per pair rather than raised.
             Exception: Any error :meth:`_api` propagates from
                 :meth:`cdsapi.Client.retrieve`.
 
@@ -670,11 +687,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             :class:`Catalog`: Resolves `(dataset, code)` pairs to
                 per-variable metadata.
         """
+        self._errors = self.check_errors_policy(errors)
         catalog = Catalog()
-        succeeded: list[tuple[str, str]] = []
-        failed: list[tuple[tuple[str, str], BaseException]] = []
-        out_paths: list[Path] = []
-
         effective_aggregate: AggregationConfig | None = None
         if aggregate is not None:
             # Only the written paths are kept below, so the reduced arrays are
@@ -687,58 +701,64 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             effective_aggregate = aggregate.model_copy(update=updates)
 
         assert isinstance(self.vars, dict)  # ECMWF requires a {dataset: [vars]} mapping
-        for dataset_name, var_codes in self.vars.items():
-            for var in var_codes:
-                start = self.time.start_date
-                end = self.time.end_date
-                logger.info(
-                    f"Download ECMWF {dataset_name}/{var} data for "
-                    f"period {start} till {end}"
-                )
-                try:
-                    var_info = catalog.get_variable(dataset_name, var)
-                    nc_path = self._download_dataset(
-                        var_info, progress_bar=progress_bar
-                    )
-                except Exception as exc:  # noqa: BLE001 - log + continue so one bad variable doesn't kill the batch
-                    logger.error(
-                        f"ECMWF download for {dataset_name}/{var} failed: "
-                        f"{type(exc).__name__}: {exc}"
-                    )
-                    failed.append(((dataset_name, var), exc))
-                    continue
-
-                if effective_aggregate is not None:
-                    try:
-                        agg = aggregate_netcdf(nc_path, var_info, effective_aggregate)
-                    except Exception as exc:  # noqa: BLE001 - log + continue so one bad aggregate doesn't kill the batch
-                        logger.error(
-                            f"ECMWF aggregate for {dataset_name}/{var} failed: "
-                            f"{type(exc).__name__}: {exc}"
-                        )
-                        failed.append(((dataset_name, var), exc))
-                        continue
-                    out_paths.extend(p for _, _, p in agg if p is not None)
-                else:
-                    out_paths.append(nc_path)
-
-                succeeded.append((dataset_name, var))
-
-        if failed:
-            failed_summary = ", ".join(
-                f"{ds}/{var} ({type(exc).__name__})" for (ds, var), exc in failed
-            )
-            logger.warning(
-                f"ECMWF download summary: {len(succeeded)} succeeded "
-                f"({succeeded}), {len(failed)} failed ({failed_summary})"
-            )
-        else:
+        pairs = [
+            (dataset_name, var)
+            for dataset_name, var_codes in self.vars.items()
+            for var in var_codes
+        ]
+        per_pair_paths, failures = self._run_items(
+            pairs,
+            partial(
+                self._download_pair,
+                catalog=catalog,
+                progress_bar=progress_bar,
+                aggregate=effective_aggregate,
+            ),
+            errors=self._errors,
+            label="variable",
+            describe=_describe_pair,
+        )
+        if not failures:
             logger.info(
-                f"ECMWF download summary: all {len(succeeded)} "
-                f"variables succeeded ({succeeded})"
+                f"ECMWF download summary: all {len(pairs)} variables succeeded."
             )
+        return [path for paths in per_pair_paths for path in paths]
 
-        return out_paths
+    def _download_pair(
+        self,
+        pair: tuple[str, str],
+        *,
+        catalog: Catalog,
+        progress_bar: bool,
+        aggregate: AggregationConfig | None,
+    ) -> list[Path]:
+        """Retrieve one `(dataset, variable)` pair, aggregating if asked.
+
+        A failure anywhere here — resolving the variable, the CDS retrieve, or
+        the reduction — leaves the whole pair failed, which is what the caller's
+        `errors=` policy is applied to.
+
+        Args:
+            pair: The `(dataset name, variable code)` to retrieve.
+            catalog: The CDS catalog, resolving the pair to variable metadata.
+            progress_bar: Forwarded to the per-request download.
+            aggregate: The reduction to apply, or `None` to keep the NetCDF.
+
+        Returns:
+            list[Path]: The NetCDF path, or the per-window GeoTIFFs when
+                aggregating.
+        """
+        dataset_name, var = pair
+        logger.info(
+            f"Download ECMWF {dataset_name}/{var} data for period "
+            f"{self.time.start_date} till {self.time.end_date}"
+        )
+        var_info = catalog.get_variable(dataset_name, var)
+        nc_path = self._download_dataset(var_info, progress_bar=progress_bar)
+        if aggregate is None:
+            return [nc_path]
+        agg = aggregate_netcdf(nc_path, var_info, aggregate)
+        return [path for _, _, path in agg if path is not None]
 
     def _download_dataset(
         self,

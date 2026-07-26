@@ -105,6 +105,33 @@ class TestDownloadIteration:
             "evaporation",
         ]
 
+    def test_download_errors_raise_stops_at_the_first_failure(self, ecmwf_stub):
+        """errors="raise" propagates, so later variables are never attempted."""
+        ecmwf_stub.vars = {
+            "reanalysis-era5-single-levels": [
+                "2m-temperature",
+                "total-precipitation",
+            ],
+        }
+        ecmwf_stub._download_dataset = MagicMock(
+            side_effect=RuntimeError("simulated CDS 503")
+        )
+
+        with pytest.raises(RuntimeError, match="simulated CDS 503"):
+            ecmwf_stub.download(progress_bar=False, errors="raise")
+
+        assert ecmwf_stub._download_dataset.call_count == 1, (
+            "raise must not continue past the first failure; got "
+            f"{ecmwf_stub._download_dataset.call_count} attempts"
+        )
+
+    def test_download_rejects_an_unknown_errors_policy(self, ecmwf_stub):
+        """An unrecognised errors= value is refused before any CDS request."""
+        ecmwf_stub._download_dataset = MagicMock()
+        with pytest.raises(ValueError, match="errors"):
+            ecmwf_stub.download(progress_bar=False, errors="explode")
+        assert ecmwf_stub._download_dataset.call_count == 0
+
     def test_download_does_not_attempt_to_delete_legacy_files(
         self, ecmwf_stub, monkeypatch
     ):
