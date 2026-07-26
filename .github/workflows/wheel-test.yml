@@ -82,23 +82,28 @@ jobs:
 
       - name: Install wheels
         shell: bash -el {0}
-        # Install every earthlens wheel by explicit file path. `--find-links
-        # dist` alone is NOT enough: it adds dist/ as a source but leaves PyPI
-        # enabled, so once a version has been released pip is free to download
-        # that published wheel instead of the one just built — and it does.
-        # This job then silently tested the previous release: main gained
-        # `CADENCE_ALIASES`, `PolygonAoiWarning`, `close_quietly` and
+        # Install every earthlens wheel by explicit file path. A bare
+        # `--find-links dist` is NOT enough: it adds dist/ as a source but
+        # leaves PyPI enabled, so once a version has been released pip is free
+        # to download that published wheel instead of the one just built — and
+        # it did. This job then silently tested the previous release: main
+        # gained `CADENCE_ALIASES`, `PolygonAoiWarning`, `close_quietly` and
         # `reduce_time_axis` without a version bump, and the suite failed on
         # ImportErrors for all four against the stale 0.11.0 from PyPI.
         #
-        # Naming each wheel as a local file pins it beyond substitution, while
+        # Naming each wheel as a local file pins it beyond substitution. The
+        # meta wheel depends on `earthlens-<member> ==0.11.0`, and because all
+        # six members are direct requirements of the same command pip unifies
+        # them onto these files — so `--find-links` is redundant and is not
+        # passed. That matters beyond tidiness: it is an additional, unpinned
+        # package source, which is what SonarCloud's S8544 objects to.
         # `[all]` on the meta wheel still resolves the third-party SDKs (boto3
         # / cdsapi / earthengine-api) from PyPI as intended.
         run: |
           set -euo pipefail
           META=$(ls dist/earthlens-[0-9]*.whl)
           MEMBERS=$(ls dist/earthlens_*.whl)
-          pip install --find-links dist ${MEMBERS} "${META}[all]"
+          pip install ${MEMBERS} "${META}[all]"
           # Assert the installed distributions really are the ones just built,
           # not same-version wheels an index happened to serve. `direct_url.json`
           # (PEP 610) is only written for a path/URL install, and the recorded
