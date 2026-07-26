@@ -15,12 +15,9 @@ from __future__ import annotations
 
 import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from earthlens.base.http import HttpClient
-
-if TYPE_CHECKING:
-    pass
 
 
 def read_cdsapirc() -> dict[str, str]:
