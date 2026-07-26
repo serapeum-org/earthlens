@@ -82,16 +82,34 @@ jobs:
 
       - name: Install wheels
         shell: bash -el {0}
-        # Install the meta-package, which pulls in core and the five provider
-        # distributions. `--find-links dist` resolves those siblings from the
-        # wheels just built rather than from PyPI, where this version does not
-        # exist yet. `[all]` then pulls every backend's optional SDK (boto3 /
-        # cdsapi / earthengine-api) so the suite — which exercises every
-        # backend — can import them.
+        # Install every earthlens wheel by explicit file path. `--find-links
+        # dist` alone is NOT enough: it adds dist/ as a source but leaves PyPI
+        # enabled, so once a version has been released pip is free to download
+        # that published wheel instead of the one just built — and it does.
+        # This job then silently tested the previous release: main gained
+        # `CADENCE_ALIASES`, `PolygonAoiWarning`, `close_quietly` and
+        # `reduce_time_axis` without a version bump, and the suite failed on
+        # ImportErrors for all four against the stale 0.11.0 from PyPI.
+        #
+        # Naming each wheel as a local file pins it beyond substitution, while
+        # `[all]` on the meta wheel still resolves the third-party SDKs (boto3
+        # / cdsapi / earthengine-api) from PyPI as intended.
         run: |
           set -euo pipefail
           META=$(ls dist/earthlens-[0-9]*.whl)
-          pip install --find-links dist "${META}[all]"
+          MEMBERS=$(ls dist/earthlens_*.whl)
+          pip install --find-links dist ${MEMBERS} "${META}[all]"
+          # Fail loudly if a sibling still came from PyPI rather than dist/.
+          python - <<'PY'
+          import earthlens.core, pathlib, sys
+          from importlib.metadata import distribution
+          for name in ("earthlens-core", "earthlens-atmosphere", "earthlens-hazards",
+                       "earthlens-imagery", "earthlens-land", "earthlens-ocean"):
+              direct = distribution(name).read_text("direct_url.json")
+              if not direct:
+                  sys.exit(f"::error::{name} was resolved from an index, not dist/")
+          print("all earthlens distributions installed from dist/")
+          PY
 
       - name: Verify package import
         shell: bash -el {0}
