@@ -18815,6 +18815,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#earthlens.earthlens.EarthLens.iter_download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iter_download
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#earthlens.earthlens.EarthLens.list_datasets" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19218,6 +19229,17 @@
     <span class="md-ellipsis">
       
         guess_dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#earthlens.earthlens.EarthLens.iter_download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iter_download
       
     </span>
   </a>
@@ -20886,7 +20908,57 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <span class="normal"><a href="#__codelineno-0-1721">1721</a></span>
 <span class="normal"><a href="#__codelineno-0-1722">1722</a></span>
 <span class="normal"><a href="#__codelineno-0-1723">1723</a></span>
-<span class="normal"><a href="#__codelineno-0-1724">1724</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="k">class</span><span class="w"> </span><span class="nc">EarthLens</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-1724">1724</a></span>
+<span class="normal"><a href="#__codelineno-0-1725">1725</a></span>
+<span class="normal"><a href="#__codelineno-0-1726">1726</a></span>
+<span class="normal"><a href="#__codelineno-0-1727">1727</a></span>
+<span class="normal"><a href="#__codelineno-0-1728">1728</a></span>
+<span class="normal"><a href="#__codelineno-0-1729">1729</a></span>
+<span class="normal"><a href="#__codelineno-0-1730">1730</a></span>
+<span class="normal"><a href="#__codelineno-0-1731">1731</a></span>
+<span class="normal"><a href="#__codelineno-0-1732">1732</a></span>
+<span class="normal"><a href="#__codelineno-0-1733">1733</a></span>
+<span class="normal"><a href="#__codelineno-0-1734">1734</a></span>
+<span class="normal"><a href="#__codelineno-0-1735">1735</a></span>
+<span class="normal"><a href="#__codelineno-0-1736">1736</a></span>
+<span class="normal"><a href="#__codelineno-0-1737">1737</a></span>
+<span class="normal"><a href="#__codelineno-0-1738">1738</a></span>
+<span class="normal"><a href="#__codelineno-0-1739">1739</a></span>
+<span class="normal"><a href="#__codelineno-0-1740">1740</a></span>
+<span class="normal"><a href="#__codelineno-0-1741">1741</a></span>
+<span class="normal"><a href="#__codelineno-0-1742">1742</a></span>
+<span class="normal"><a href="#__codelineno-0-1743">1743</a></span>
+<span class="normal"><a href="#__codelineno-0-1744">1744</a></span>
+<span class="normal"><a href="#__codelineno-0-1745">1745</a></span>
+<span class="normal"><a href="#__codelineno-0-1746">1746</a></span>
+<span class="normal"><a href="#__codelineno-0-1747">1747</a></span>
+<span class="normal"><a href="#__codelineno-0-1748">1748</a></span>
+<span class="normal"><a href="#__codelineno-0-1749">1749</a></span>
+<span class="normal"><a href="#__codelineno-0-1750">1750</a></span>
+<span class="normal"><a href="#__codelineno-0-1751">1751</a></span>
+<span class="normal"><a href="#__codelineno-0-1752">1752</a></span>
+<span class="normal"><a href="#__codelineno-0-1753">1753</a></span>
+<span class="normal"><a href="#__codelineno-0-1754">1754</a></span>
+<span class="normal"><a href="#__codelineno-0-1755">1755</a></span>
+<span class="normal"><a href="#__codelineno-0-1756">1756</a></span>
+<span class="normal"><a href="#__codelineno-0-1757">1757</a></span>
+<span class="normal"><a href="#__codelineno-0-1758">1758</a></span>
+<span class="normal"><a href="#__codelineno-0-1759">1759</a></span>
+<span class="normal"><a href="#__codelineno-0-1760">1760</a></span>
+<span class="normal"><a href="#__codelineno-0-1761">1761</a></span>
+<span class="normal"><a href="#__codelineno-0-1762">1762</a></span>
+<span class="normal"><a href="#__codelineno-0-1763">1763</a></span>
+<span class="normal"><a href="#__codelineno-0-1764">1764</a></span>
+<span class="normal"><a href="#__codelineno-0-1765">1765</a></span>
+<span class="normal"><a href="#__codelineno-0-1766">1766</a></span>
+<span class="normal"><a href="#__codelineno-0-1767">1767</a></span>
+<span class="normal"><a href="#__codelineno-0-1768">1768</a></span>
+<span class="normal"><a href="#__codelineno-0-1769">1769</a></span>
+<span class="normal"><a href="#__codelineno-0-1770">1770</a></span>
+<span class="normal"><a href="#__codelineno-0-1771">1771</a></span>
+<span class="normal"><a href="#__codelineno-0-1772">1772</a></span>
+<span class="normal"><a href="#__codelineno-0-1773">1773</a></span>
+<span class="normal"><a href="#__codelineno-0-1774">1774</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="k">class</span><span class="w"> </span><span class="nc">EarthLens</span><span class="p">:</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Facade that routes a download to the requested backend.</span>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    The class-level :attr:`DataSources` mapping resolves a string key</span>
@@ -22061,136 +22133,186 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1592" name="__codelineno-0-1592"></a>            <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">aggregate</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
 <a id="__codelineno-0-1593" name="__codelineno-0-1593"></a>        <span class="p">)</span>
 <a id="__codelineno-0-1594" name="__codelineno-0-1594"></a>
-<a id="__codelineno-0-1595" name="__codelineno-0-1595"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_redirect_output_to_tempdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1596" name="__codelineno-0-1596"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Point the backend output at a throwaway temp dir for an in-memory load.</span>
+<a id="__codelineno-0-1595" name="__codelineno-0-1595"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">iter_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-1596" name="__codelineno-0-1596"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream the backend&#39;s artifacts one item at a time.</span>
 <a id="__codelineno-0-1597" name="__codelineno-0-1597"></a>
-<a id="__codelineno-0-1598" name="__codelineno-0-1598"></a><span class="sd">        Called by :meth:`load` when `path` was omitted: `load` only needs the</span>
-<a id="__codelineno-0-1599" name="__codelineno-0-1599"></a><span class="sd">        in-memory object, so the incidental files go to a fresh temp directory</span>
-<a id="__codelineno-0-1600" name="__codelineno-0-1600"></a><span class="sd">        instead of the persistent `./earthlens-data/&lt;source&gt;/` default, and a</span>
-<a id="__codelineno-0-1601" name="__codelineno-0-1601"></a><span class="sd">        load-and-plot run never leaves files in the working tree. Creating the</span>
-<a id="__codelineno-0-1602" name="__codelineno-0-1602"></a><span class="sd">        temp dir here (not at construction) means a construct-only or</span>
-<a id="__codelineno-0-1603" name="__codelineno-0-1603"></a><span class="sd">        download-only run allocates no temp directory.</span>
-<a id="__codelineno-0-1604" name="__codelineno-0-1604"></a>
-<a id="__codelineno-0-1605" name="__codelineno-0-1605"></a><span class="sd">        The `rmdir` below is now belt-and-braces: construction no longer</span>
-<a id="__codelineno-0-1606" name="__codelineno-0-1606"></a><span class="sd">        creates `root_dir` at all, so in a fresh process there is nothing to</span>
-<a id="__codelineno-0-1607" name="__codelineno-0-1607"></a><span class="sd">        remove. It still fires for a directory an earlier run left empty.</span>
-<a id="__codelineno-0-1608" name="__codelineno-0-1608"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1609" name="__codelineno-0-1609"></a>        <span class="n">default_dir</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">,</span> <span class="s2">&quot;root_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-1610" name="__codelineno-0-1610"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;earthlens-load-&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-1611" name="__codelineno-0-1611"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">=</span> <span class="n">tmp</span>
-<a id="__codelineno-0-1612" name="__codelineno-0-1612"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">tmp</span>
-<a id="__codelineno-0-1613" name="__codelineno-0-1613"></a>        <span class="k">if</span> <span class="n">default_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">default_dir</span> <span class="o">!=</span> <span class="n">tmp</span><span class="p">:</span>
-<a id="__codelineno-0-1614" name="__codelineno-0-1614"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-1615" name="__codelineno-0-1615"></a>                <span class="k">if</span> <span class="n">default_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">default_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
-<a id="__codelineno-0-1616" name="__codelineno-0-1616"></a>                    <span class="n">default_dir</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span>
-<a id="__codelineno-0-1617" name="__codelineno-0-1617"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<a id="__codelineno-0-1618" name="__codelineno-0-1618"></a>                <span class="k">pass</span>
-<a id="__codelineno-0-1619" name="__codelineno-0-1619"></a>
-<a id="__codelineno-0-1620" name="__codelineno-0-1620"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_dispatch_download</span><span class="p">(</span>
-<a id="__codelineno-0-1621" name="__codelineno-0-1621"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-1622" name="__codelineno-0-1622"></a>        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
-<a id="__codelineno-0-1623" name="__codelineno-0-1623"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-1624" name="__codelineno-0-1624"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1625" name="__codelineno-0-1625"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
-<a id="__codelineno-0-1626" name="__codelineno-0-1626"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-1627" name="__codelineno-0-1627"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the `aggregate=` guard, then forward to the backend&#39;s `download`.</span>
-<a id="__codelineno-0-1628" name="__codelineno-0-1628"></a>
-<a id="__codelineno-0-1629" name="__codelineno-0-1629"></a><span class="sd">        The shared fetch path behind :meth:`download` (which first redirects an</span>
-<a id="__codelineno-0-1630" name="__codelineno-0-1630"></a><span class="sd">        omitted `path` to the persistent directory) and :meth:`load` (which</span>
-<a id="__codelineno-0-1631" name="__codelineno-0-1631"></a><span class="sd">        keeps the throwaway temp directory). Rejects a non-`None` `aggregate`</span>
-<a id="__codelineno-0-1632" name="__codelineno-0-1632"></a><span class="sd">        for a non-raster backend before the backend is called.</span>
-<a id="__codelineno-0-1633" name="__codelineno-0-1633"></a>
-<a id="__codelineno-0-1634" name="__codelineno-0-1634"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-1635" name="__codelineno-0-1635"></a><span class="sd">            *args: Forwarded positionally to `backend.download`.</span>
-<a id="__codelineno-0-1636" name="__codelineno-0-1636"></a><span class="sd">            progress_bar: Whether the backend prints its progress bar.</span>
-<a id="__codelineno-0-1637" name="__codelineno-0-1637"></a><span class="sd">            aggregate: Optional aggregation config; only valid for `&quot;raster&quot;` /</span>
-<a id="__codelineno-0-1638" name="__codelineno-0-1638"></a><span class="sd">                `&quot;mixed&quot;` backends.</span>
-<a id="__codelineno-0-1639" name="__codelineno-0-1639"></a><span class="sd">            **kwargs: Forwarded as keywords to `backend.download`.</span>
-<a id="__codelineno-0-1640" name="__codelineno-0-1640"></a>
-<a id="__codelineno-0-1641" name="__codelineno-0-1641"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-1642" name="__codelineno-0-1642"></a><span class="sd">            Whatever the bound backend&#39;s `download` returns.</span>
-<a id="__codelineno-0-1643" name="__codelineno-0-1643"></a>
-<a id="__codelineno-0-1644" name="__codelineno-0-1644"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-1645" name="__codelineno-0-1645"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None` and the backend&#39;s</span>
-<a id="__codelineno-0-1646" name="__codelineno-0-1646"></a><span class="sd">                `OUTPUT_KIND` is `&quot;vector&quot;` or `&quot;tabular&quot;`.</span>
-<a id="__codelineno-0-1647" name="__codelineno-0-1647"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1648" name="__codelineno-0-1648"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1649" name="__codelineno-0-1649"></a>            <span class="n">output_kind</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">,</span> <span class="s2">&quot;OUTPUT_KIND&quot;</span><span class="p">,</span> <span class="s2">&quot;raster&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1650" name="__codelineno-0-1650"></a>            <span class="k">if</span> <span class="n">output_kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;mixed&quot;</span><span class="p">}:</span>
-<a id="__codelineno-0-1651" name="__codelineno-0-1651"></a>                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-1652" name="__codelineno-0-1652"></a>                    <span class="sa">f</span><span class="s2">&quot;aggregate= is not supported for &quot;</span>
-<a id="__codelineno-0-1653" name="__codelineno-0-1653"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> backends &quot;</span>
-<a id="__codelineno-0-1654" name="__codelineno-0-1654"></a>                    <span class="sa">f</span><span class="s2">&quot;(OUTPUT_KIND=</span><span class="si">{</span><span class="n">output_kind</span><span class="si">!r}</span><span class="s2">). The aggregator only &quot;</span>
-<a id="__codelineno-0-1655" name="__codelineno-0-1655"></a>                    <span class="sa">f</span><span class="s2">&quot;handles gridded raster outputs; vector / tabular &quot;</span>
-<a id="__codelineno-0-1656" name="__codelineno-0-1656"></a>                    <span class="sa">f</span><span class="s2">&quot;backends emit GeoDataFrames or DataFrames that do &quot;</span>
-<a id="__codelineno-0-1657" name="__codelineno-0-1657"></a>                    <span class="sa">f</span><span class="s2">&quot;not have a meaningful gridded reduction.&quot;</span>
-<a id="__codelineno-0-1658" name="__codelineno-0-1658"></a>                <span class="p">)</span>
-<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a>            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;aggregate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-1660" name="__codelineno-0-1660"></a>
-<a id="__codelineno-0-1661" name="__codelineno-0-1661"></a>        <span class="c1"># The base `download(self)` is a minimal placeholder; every concrete</span>
-<a id="__codelineno-0-1662" name="__codelineno-0-1662"></a>        <span class="c1"># backend override accepts `progress_bar` (and its own extra kwargs).</span>
-<a id="__codelineno-0-1663" name="__codelineno-0-1663"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>  <span class="c1"># type: ignore[call-arg]</span>
-<a id="__codelineno-0-1664" name="__codelineno-0-1664"></a>            <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-<a id="__codelineno-0-1665" name="__codelineno-0-1665"></a>        <span class="p">)</span>
-<a id="__codelineno-0-1666" name="__codelineno-0-1666"></a>
-<a id="__codelineno-0-1667" name="__codelineno-0-1667"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-1668" name="__codelineno-0-1668"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download and return the data in memory instead of only on disk.</span>
+<a id="__codelineno-0-1598" name="__codelineno-0-1598"></a><span class="sd">        The streaming counterpart to :meth:`download`, for a vector / tabular</span>
+<a id="__codelineno-0-1599" name="__codelineno-0-1599"></a><span class="sd">        result too large to want resident all at once: each product&#39;s fragment</span>
+<a id="__codelineno-0-1600" name="__codelineno-0-1600"></a><span class="sd">        is yielded as it arrives, so a caller can write or reduce it and let it</span>
+<a id="__codelineno-0-1601" name="__codelineno-0-1601"></a><span class="sd">        go before the next one is fetched.</span>
+<a id="__codelineno-0-1602" name="__codelineno-0-1602"></a>
+<a id="__codelineno-0-1603" name="__codelineno-0-1603"></a><span class="sd">        Whether a backend can stream depends on it having a per-product fetch</span>
+<a id="__codelineno-0-1604" name="__codelineno-0-1604"></a><span class="sd">        hook — most search/fetch backends do; a backend that answers the whole</span>
+<a id="__codelineno-0-1605" name="__codelineno-0-1605"></a><span class="sd">        request in one server-side call cannot, and says so rather than</span>
+<a id="__codelineno-0-1606" name="__codelineno-0-1606"></a><span class="sd">        pretending. `aggregate=` is not accepted: a reduction needs the whole</span>
+<a id="__codelineno-0-1607" name="__codelineno-0-1607"></a><span class="sd">        cube, so ask for it through :meth:`download`.</span>
+<a id="__codelineno-0-1608" name="__codelineno-0-1608"></a>
+<a id="__codelineno-0-1609" name="__codelineno-0-1609"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-1610" name="__codelineno-0-1610"></a><span class="sd">            limit: Total rows / features to yield across every product, or</span>
+<a id="__codelineno-0-1611" name="__codelineno-0-1611"></a><span class="sd">                `None` for no cap. Products past the cap are never fetched.</span>
+<a id="__codelineno-0-1612" name="__codelineno-0-1612"></a>
+<a id="__codelineno-0-1613" name="__codelineno-0-1613"></a><span class="sd">        Yields:</span>
+<a id="__codelineno-0-1614" name="__codelineno-0-1614"></a><span class="sd">            Any: One fragment per product, of the same type the backend&#39;s</span>
+<a id="__codelineno-0-1615" name="__codelineno-0-1615"></a><span class="sd">                `download` collects (a `FeatureCollection` /</span>
+<a id="__codelineno-0-1616" name="__codelineno-0-1616"></a><span class="sd">                `GeoDataFrame` / `DataFrame` fragment, or written paths).</span>
+<a id="__codelineno-0-1617" name="__codelineno-0-1617"></a>
+<a id="__codelineno-0-1618" name="__codelineno-0-1618"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-1619" name="__codelineno-0-1619"></a><span class="sd">            NotImplementedError: When the bound backend has no per-product</span>
+<a id="__codelineno-0-1620" name="__codelineno-0-1620"></a><span class="sd">                fetch to stream from.</span>
+<a id="__codelineno-0-1621" name="__codelineno-0-1621"></a><span class="sd">            TypeError: If `limit` is neither `None` nor an `int`.</span>
+<a id="__codelineno-0-1622" name="__codelineno-0-1622"></a><span class="sd">            ValueError: If `limit` is less than 1.</span>
+<a id="__codelineno-0-1623" name="__codelineno-0-1623"></a>
+<a id="__codelineno-0-1624" name="__codelineno-0-1624"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-1625" name="__codelineno-0-1625"></a><span class="sd">            - Consume a large query without holding every page. Marked</span>
+<a id="__codelineno-0-1626" name="__codelineno-0-1626"></a><span class="sd">              `# doctest: +SKIP` because it performs a live request:</span>
+<a id="__codelineno-0-1627" name="__codelineno-0-1627"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-1628" name="__codelineno-0-1628"></a><span class="sd">                &gt;&gt;&gt; from earthlens.core import EarthLens</span>
+<a id="__codelineno-0-1629" name="__codelineno-0-1629"></a><span class="sd">                &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-1630" name="__codelineno-0-1630"></a><span class="sd">                ...     data_source=&quot;obis&quot;,</span>
+<a id="__codelineno-0-1631" name="__codelineno-0-1631"></a><span class="sd">                ...     start=&quot;2024-01-01&quot;,</span>
+<a id="__codelineno-0-1632" name="__codelineno-0-1632"></a><span class="sd">                ...     end=&quot;2024-01-31&quot;,</span>
+<a id="__codelineno-0-1633" name="__codelineno-0-1633"></a><span class="sd">                ...     lat_lim=[50.0, 54.0],</span>
+<a id="__codelineno-0-1634" name="__codelineno-0-1634"></a><span class="sd">                ...     lon_lim=[2.0, 7.0],</span>
+<a id="__codelineno-0-1635" name="__codelineno-0-1635"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-1636" name="__codelineno-0-1636"></a><span class="sd">                &gt;&gt;&gt; total = 0  # doctest: +SKIP</span>
+<a id="__codelineno-0-1637" name="__codelineno-0-1637"></a><span class="sd">                &gt;&gt;&gt; for fragment in earthlens.iter_download():  # doctest: +SKIP</span>
+<a id="__codelineno-0-1638" name="__codelineno-0-1638"></a><span class="sd">                ...     total += len(fragment)</span>
+<a id="__codelineno-0-1639" name="__codelineno-0-1639"></a>
+<a id="__codelineno-0-1640" name="__codelineno-0-1640"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-1641" name="__codelineno-0-1641"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1642" name="__codelineno-0-1642"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_ensure_root_dir</span><span class="p">()</span>
+<a id="__codelineno-0-1643" name="__codelineno-0-1643"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-1644" name="__codelineno-0-1644"></a>
+<a id="__codelineno-0-1645" name="__codelineno-0-1645"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_redirect_output_to_tempdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1646" name="__codelineno-0-1646"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Point the backend output at a throwaway temp dir for an in-memory load.</span>
+<a id="__codelineno-0-1647" name="__codelineno-0-1647"></a>
+<a id="__codelineno-0-1648" name="__codelineno-0-1648"></a><span class="sd">        Called by :meth:`load` when `path` was omitted: `load` only needs the</span>
+<a id="__codelineno-0-1649" name="__codelineno-0-1649"></a><span class="sd">        in-memory object, so the incidental files go to a fresh temp directory</span>
+<a id="__codelineno-0-1650" name="__codelineno-0-1650"></a><span class="sd">        instead of the persistent `./earthlens-data/&lt;source&gt;/` default, and a</span>
+<a id="__codelineno-0-1651" name="__codelineno-0-1651"></a><span class="sd">        load-and-plot run never leaves files in the working tree. Creating the</span>
+<a id="__codelineno-0-1652" name="__codelineno-0-1652"></a><span class="sd">        temp dir here (not at construction) means a construct-only or</span>
+<a id="__codelineno-0-1653" name="__codelineno-0-1653"></a><span class="sd">        download-only run allocates no temp directory.</span>
+<a id="__codelineno-0-1654" name="__codelineno-0-1654"></a>
+<a id="__codelineno-0-1655" name="__codelineno-0-1655"></a><span class="sd">        The `rmdir` below is now belt-and-braces: construction no longer</span>
+<a id="__codelineno-0-1656" name="__codelineno-0-1656"></a><span class="sd">        creates `root_dir` at all, so in a fresh process there is nothing to</span>
+<a id="__codelineno-0-1657" name="__codelineno-0-1657"></a><span class="sd">        remove. It still fires for a directory an earlier run left empty.</span>
+<a id="__codelineno-0-1658" name="__codelineno-0-1658"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a>        <span class="n">default_dir</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">,</span> <span class="s2">&quot;root_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-1660" name="__codelineno-0-1660"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;earthlens-load-&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-1661" name="__codelineno-0-1661"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">=</span> <span class="n">tmp</span>
+<a id="__codelineno-0-1662" name="__codelineno-0-1662"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">tmp</span>
+<a id="__codelineno-0-1663" name="__codelineno-0-1663"></a>        <span class="k">if</span> <span class="n">default_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">default_dir</span> <span class="o">!=</span> <span class="n">tmp</span><span class="p">:</span>
+<a id="__codelineno-0-1664" name="__codelineno-0-1664"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-1665" name="__codelineno-0-1665"></a>                <span class="k">if</span> <span class="n">default_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">default_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+<a id="__codelineno-0-1666" name="__codelineno-0-1666"></a>                    <span class="n">default_dir</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span>
+<a id="__codelineno-0-1667" name="__codelineno-0-1667"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+<a id="__codelineno-0-1668" name="__codelineno-0-1668"></a>                <span class="k">pass</span>
 <a id="__codelineno-0-1669" name="__codelineno-0-1669"></a>
-<a id="__codelineno-0-1670" name="__codelineno-0-1670"></a><span class="sd">        The lazy-stack convenience: runs :meth:`download` and hands back the</span>
-<a id="__codelineno-0-1671" name="__codelineno-0-1671"></a><span class="sd">        fetched data as the project&#39;s **native pyramids objects** rather than</span>
-<a id="__codelineno-0-1672" name="__codelineno-0-1672"></a><span class="sd">        leaving the caller to re-open files. Raster outputs are read into a</span>
-<a id="__codelineno-0-1673" name="__codelineno-0-1673"></a><span class="sd">        `pyramids.Dataset` / `NetCDF` (a `.nc` path becomes a `NetCDF`, every</span>
-<a id="__codelineno-0-1674" name="__codelineno-0-1674"></a><span class="sd">        other raster a `Dataset`); a non-raster output a backend already</span>
-<a id="__codelineno-0-1675" name="__codelineno-0-1675"></a><span class="sd">        returns in memory (a `FeatureCollection` / `GeoDataFrame` /</span>
-<a id="__codelineno-0-1676" name="__codelineno-0-1676"></a><span class="sd">        `DataFrame`) is passed through unchanged, as are non-raster file paths</span>
-<a id="__codelineno-0-1677" name="__codelineno-0-1677"></a><span class="sd">        (e.g. a `.csv` table from a mixed backend). The files are still written</span>
-<a id="__codelineno-0-1678" name="__codelineno-0-1678"></a><span class="sd">        to `path` — `load` adds the in-memory handle on top.</span>
-<a id="__codelineno-0-1679" name="__codelineno-0-1679"></a>
-<a id="__codelineno-0-1680" name="__codelineno-0-1680"></a><span class="sd">        When `path` was omitted, `load` writes to a throwaway temp directory</span>
-<a id="__codelineno-0-1681" name="__codelineno-0-1681"></a><span class="sd">        (not the persistent `./earthlens-data/&lt;source&gt;/` that `download` uses),</span>
-<a id="__codelineno-0-1682" name="__codelineno-0-1682"></a><span class="sd">        so a load-and-plot run never leaves files in the working tree — there is</span>
-<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">        no need to pass `path=tempfile.mkdtemp()` yourself. Each returned raster</span>
-<a id="__codelineno-0-1684" name="__codelineno-0-1684"></a><span class="sd">        is detached into an in-memory copy and the temp directory is removed</span>
-<a id="__codelineno-0-1685" name="__codelineno-0-1685"></a><span class="sd">        immediately, so repeated `load()` calls — e.g. a per-year loop — do not</span>
-<a id="__codelineno-0-1686" name="__codelineno-0-1686"></a><span class="sd">        accumulate gigabytes under the system temp dir. (Because the data is</span>
-<a id="__codelineno-0-1687" name="__codelineno-0-1687"></a><span class="sd">        copied into memory, a `path=`-less `load` of a very large raster reads it</span>
-<a id="__codelineno-0-1688" name="__codelineno-0-1688"></a><span class="sd">        fully into RAM; pass `path=` to keep the lazy, file-backed objects.)</span>
-<a id="__codelineno-0-1689" name="__codelineno-0-1689"></a>
-<a id="__codelineno-0-1690" name="__codelineno-0-1690"></a><span class="sd">        `xarray` is intentionally not the return type: a returned</span>
-<a id="__codelineno-0-1691" name="__codelineno-0-1691"></a><span class="sd">        `pyramids.Dataset` / `NetCDF` already exposes `.to_xarray()` for callers</span>
-<a id="__codelineno-0-1692" name="__codelineno-0-1692"></a><span class="sd">        who want the climate-stack interop, so EarthLens stays free of an</span>
-<a id="__codelineno-0-1693" name="__codelineno-0-1693"></a><span class="sd">        xarray dependency.</span>
-<a id="__codelineno-0-1694" name="__codelineno-0-1694"></a>
-<a id="__codelineno-0-1695" name="__codelineno-0-1695"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-1696" name="__codelineno-0-1696"></a><span class="sd">            *args: Forwarded positionally to :meth:`download`.</span>
-<a id="__codelineno-0-1697" name="__codelineno-0-1697"></a><span class="sd">            **kwargs: Forwarded as keywords to :meth:`download`.</span>
-<a id="__codelineno-0-1698" name="__codelineno-0-1698"></a>
-<a id="__codelineno-0-1699" name="__codelineno-0-1699"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-1700" name="__codelineno-0-1700"></a><span class="sd">            For a raster / mixed backend, a list with each written raster read</span>
-<a id="__codelineno-0-1701" name="__codelineno-0-1701"></a><span class="sd">            into a `pyramids.Dataset` / `NetCDF` (non-raster entries left as</span>
-<a id="__codelineno-0-1702" name="__codelineno-0-1702"></a><span class="sd">            their `Path`); for a vector / tabular backend, the in-memory</span>
-<a id="__codelineno-0-1703" name="__codelineno-0-1703"></a><span class="sd">            `FeatureCollection` / `GeoDataFrame` / `DataFrame` `download`</span>
-<a id="__codelineno-0-1704" name="__codelineno-0-1704"></a><span class="sd">            returned.</span>
-<a id="__codelineno-0-1705" name="__codelineno-0-1705"></a>
-<a id="__codelineno-0-1706" name="__codelineno-0-1706"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-1707" name="__codelineno-0-1707"></a><span class="sd">            - Load CHIRPS precipitation into pyramids `Dataset` objects</span>
-<a id="__codelineno-0-1708" name="__codelineno-0-1708"></a><span class="sd">              (live; skipped here):</span>
-<a id="__codelineno-0-1709" name="__codelineno-0-1709"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-1710" name="__codelineno-0-1710"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
-<a id="__codelineno-0-1711" name="__codelineno-0-1711"></a><span class="sd">                &gt;&gt;&gt; rasters = EarthLens(  # doctest: +SKIP</span>
-<a id="__codelineno-0-1712" name="__codelineno-0-1712"></a><span class="sd">                ...     &quot;chc&quot;, variables=[&quot;precipitation&quot;],</span>
-<a id="__codelineno-0-1713" name="__codelineno-0-1713"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-01-02&quot;, aoi=[-75, 4, -74, 5],</span>
-<a id="__codelineno-0-1714" name="__codelineno-0-1714"></a><span class="sd">                ... ).load()</span>
-<a id="__codelineno-0-1715" name="__codelineno-0-1715"></a><span class="sd">                &gt;&gt;&gt; rasters[0].read_array()  # doctest: +SKIP</span>
+<a id="__codelineno-0-1670" name="__codelineno-0-1670"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_dispatch_download</span><span class="p">(</span>
+<a id="__codelineno-0-1671" name="__codelineno-0-1671"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-1672" name="__codelineno-0-1672"></a>        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+<a id="__codelineno-0-1673" name="__codelineno-0-1673"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-1674" name="__codelineno-0-1674"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1675" name="__codelineno-0-1675"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+<a id="__codelineno-0-1676" name="__codelineno-0-1676"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-1677" name="__codelineno-0-1677"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the `aggregate=` guard, then forward to the backend&#39;s `download`.</span>
+<a id="__codelineno-0-1678" name="__codelineno-0-1678"></a>
+<a id="__codelineno-0-1679" name="__codelineno-0-1679"></a><span class="sd">        The shared fetch path behind :meth:`download` (which first redirects an</span>
+<a id="__codelineno-0-1680" name="__codelineno-0-1680"></a><span class="sd">        omitted `path` to the persistent directory) and :meth:`load` (which</span>
+<a id="__codelineno-0-1681" name="__codelineno-0-1681"></a><span class="sd">        keeps the throwaway temp directory). Rejects a non-`None` `aggregate`</span>
+<a id="__codelineno-0-1682" name="__codelineno-0-1682"></a><span class="sd">        for a non-raster backend before the backend is called.</span>
+<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a>
+<a id="__codelineno-0-1684" name="__codelineno-0-1684"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-1685" name="__codelineno-0-1685"></a><span class="sd">            *args: Forwarded positionally to `backend.download`.</span>
+<a id="__codelineno-0-1686" name="__codelineno-0-1686"></a><span class="sd">            progress_bar: Whether the backend prints its progress bar.</span>
+<a id="__codelineno-0-1687" name="__codelineno-0-1687"></a><span class="sd">            aggregate: Optional aggregation config; only valid for `&quot;raster&quot;` /</span>
+<a id="__codelineno-0-1688" name="__codelineno-0-1688"></a><span class="sd">                `&quot;mixed&quot;` backends.</span>
+<a id="__codelineno-0-1689" name="__codelineno-0-1689"></a><span class="sd">            **kwargs: Forwarded as keywords to `backend.download`.</span>
+<a id="__codelineno-0-1690" name="__codelineno-0-1690"></a>
+<a id="__codelineno-0-1691" name="__codelineno-0-1691"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-1692" name="__codelineno-0-1692"></a><span class="sd">            Whatever the bound backend&#39;s `download` returns.</span>
+<a id="__codelineno-0-1693" name="__codelineno-0-1693"></a>
+<a id="__codelineno-0-1694" name="__codelineno-0-1694"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-1695" name="__codelineno-0-1695"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None` and the backend&#39;s</span>
+<a id="__codelineno-0-1696" name="__codelineno-0-1696"></a><span class="sd">                `OUTPUT_KIND` is `&quot;vector&quot;` or `&quot;tabular&quot;`.</span>
+<a id="__codelineno-0-1697" name="__codelineno-0-1697"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1698" name="__codelineno-0-1698"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1699" name="__codelineno-0-1699"></a>            <span class="n">output_kind</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">,</span> <span class="s2">&quot;OUTPUT_KIND&quot;</span><span class="p">,</span> <span class="s2">&quot;raster&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1700" name="__codelineno-0-1700"></a>            <span class="k">if</span> <span class="n">output_kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;mixed&quot;</span><span class="p">}:</span>
+<a id="__codelineno-0-1701" name="__codelineno-0-1701"></a>                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-1702" name="__codelineno-0-1702"></a>                    <span class="sa">f</span><span class="s2">&quot;aggregate= is not supported for &quot;</span>
+<a id="__codelineno-0-1703" name="__codelineno-0-1703"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> backends &quot;</span>
+<a id="__codelineno-0-1704" name="__codelineno-0-1704"></a>                    <span class="sa">f</span><span class="s2">&quot;(OUTPUT_KIND=</span><span class="si">{</span><span class="n">output_kind</span><span class="si">!r}</span><span class="s2">). The aggregator only &quot;</span>
+<a id="__codelineno-0-1705" name="__codelineno-0-1705"></a>                    <span class="sa">f</span><span class="s2">&quot;handles gridded raster outputs; vector / tabular &quot;</span>
+<a id="__codelineno-0-1706" name="__codelineno-0-1706"></a>                    <span class="sa">f</span><span class="s2">&quot;backends emit GeoDataFrames or DataFrames that do &quot;</span>
+<a id="__codelineno-0-1707" name="__codelineno-0-1707"></a>                    <span class="sa">f</span><span class="s2">&quot;not have a meaningful gridded reduction.&quot;</span>
+<a id="__codelineno-0-1708" name="__codelineno-0-1708"></a>                <span class="p">)</span>
+<a id="__codelineno-0-1709" name="__codelineno-0-1709"></a>            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;aggregate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aggregate</span>
+<a id="__codelineno-0-1710" name="__codelineno-0-1710"></a>
+<a id="__codelineno-0-1711" name="__codelineno-0-1711"></a>        <span class="c1"># The base `download(self)` is a minimal placeholder; every concrete</span>
+<a id="__codelineno-0-1712" name="__codelineno-0-1712"></a>        <span class="c1"># backend override accepts `progress_bar` (and its own extra kwargs).</span>
+<a id="__codelineno-0-1713" name="__codelineno-0-1713"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>  <span class="c1"># type: ignore[call-arg]</span>
+<a id="__codelineno-0-1714" name="__codelineno-0-1714"></a>            <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<a id="__codelineno-0-1715" name="__codelineno-0-1715"></a>        <span class="p">)</span>
 <a id="__codelineno-0-1716" name="__codelineno-0-1716"></a>
-<a id="__codelineno-0-1717" name="__codelineno-0-1717"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-1718" name="__codelineno-0-1718"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1719" name="__codelineno-0-1719"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_path</span><span class="p">:</span>
-<a id="__codelineno-0-1720" name="__codelineno-0-1720"></a>            <span class="k">return</span> <span class="n">_load_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-<a id="__codelineno-0-1721" name="__codelineno-0-1721"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_redirect_output_to_tempdir</span><span class="p">()</span>
-<a id="__codelineno-0-1722" name="__codelineno-0-1722"></a>        <span class="n">temp_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">path</span>
-<a id="__codelineno-0-1723" name="__codelineno-0-1723"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">_load_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-<a id="__codelineno-0-1724" name="__codelineno-0-1724"></a>        <span class="k">return</span> <span class="n">_detach_and_cleanup</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-1717" name="__codelineno-0-1717"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-1718" name="__codelineno-0-1718"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download and return the data in memory instead of only on disk.</span>
+<a id="__codelineno-0-1719" name="__codelineno-0-1719"></a>
+<a id="__codelineno-0-1720" name="__codelineno-0-1720"></a><span class="sd">        The lazy-stack convenience: runs :meth:`download` and hands back the</span>
+<a id="__codelineno-0-1721" name="__codelineno-0-1721"></a><span class="sd">        fetched data as the project&#39;s **native pyramids objects** rather than</span>
+<a id="__codelineno-0-1722" name="__codelineno-0-1722"></a><span class="sd">        leaving the caller to re-open files. Raster outputs are read into a</span>
+<a id="__codelineno-0-1723" name="__codelineno-0-1723"></a><span class="sd">        `pyramids.Dataset` / `NetCDF` (a `.nc` path becomes a `NetCDF`, every</span>
+<a id="__codelineno-0-1724" name="__codelineno-0-1724"></a><span class="sd">        other raster a `Dataset`); a non-raster output a backend already</span>
+<a id="__codelineno-0-1725" name="__codelineno-0-1725"></a><span class="sd">        returns in memory (a `FeatureCollection` / `GeoDataFrame` /</span>
+<a id="__codelineno-0-1726" name="__codelineno-0-1726"></a><span class="sd">        `DataFrame`) is passed through unchanged, as are non-raster file paths</span>
+<a id="__codelineno-0-1727" name="__codelineno-0-1727"></a><span class="sd">        (e.g. a `.csv` table from a mixed backend). The files are still written</span>
+<a id="__codelineno-0-1728" name="__codelineno-0-1728"></a><span class="sd">        to `path` — `load` adds the in-memory handle on top.</span>
+<a id="__codelineno-0-1729" name="__codelineno-0-1729"></a>
+<a id="__codelineno-0-1730" name="__codelineno-0-1730"></a><span class="sd">        When `path` was omitted, `load` writes to a throwaway temp directory</span>
+<a id="__codelineno-0-1731" name="__codelineno-0-1731"></a><span class="sd">        (not the persistent `./earthlens-data/&lt;source&gt;/` that `download` uses),</span>
+<a id="__codelineno-0-1732" name="__codelineno-0-1732"></a><span class="sd">        so a load-and-plot run never leaves files in the working tree — there is</span>
+<a id="__codelineno-0-1733" name="__codelineno-0-1733"></a><span class="sd">        no need to pass `path=tempfile.mkdtemp()` yourself. Each returned raster</span>
+<a id="__codelineno-0-1734" name="__codelineno-0-1734"></a><span class="sd">        is detached into an in-memory copy and the temp directory is removed</span>
+<a id="__codelineno-0-1735" name="__codelineno-0-1735"></a><span class="sd">        immediately, so repeated `load()` calls — e.g. a per-year loop — do not</span>
+<a id="__codelineno-0-1736" name="__codelineno-0-1736"></a><span class="sd">        accumulate gigabytes under the system temp dir. (Because the data is</span>
+<a id="__codelineno-0-1737" name="__codelineno-0-1737"></a><span class="sd">        copied into memory, a `path=`-less `load` of a very large raster reads it</span>
+<a id="__codelineno-0-1738" name="__codelineno-0-1738"></a><span class="sd">        fully into RAM; pass `path=` to keep the lazy, file-backed objects.)</span>
+<a id="__codelineno-0-1739" name="__codelineno-0-1739"></a>
+<a id="__codelineno-0-1740" name="__codelineno-0-1740"></a><span class="sd">        `xarray` is intentionally not the return type: a returned</span>
+<a id="__codelineno-0-1741" name="__codelineno-0-1741"></a><span class="sd">        `pyramids.Dataset` / `NetCDF` already exposes `.to_xarray()` for callers</span>
+<a id="__codelineno-0-1742" name="__codelineno-0-1742"></a><span class="sd">        who want the climate-stack interop, so EarthLens stays free of an</span>
+<a id="__codelineno-0-1743" name="__codelineno-0-1743"></a><span class="sd">        xarray dependency.</span>
+<a id="__codelineno-0-1744" name="__codelineno-0-1744"></a>
+<a id="__codelineno-0-1745" name="__codelineno-0-1745"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-1746" name="__codelineno-0-1746"></a><span class="sd">            *args: Forwarded positionally to :meth:`download`.</span>
+<a id="__codelineno-0-1747" name="__codelineno-0-1747"></a><span class="sd">            **kwargs: Forwarded as keywords to :meth:`download`.</span>
+<a id="__codelineno-0-1748" name="__codelineno-0-1748"></a>
+<a id="__codelineno-0-1749" name="__codelineno-0-1749"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-1750" name="__codelineno-0-1750"></a><span class="sd">            For a raster / mixed backend, a list with each written raster read</span>
+<a id="__codelineno-0-1751" name="__codelineno-0-1751"></a><span class="sd">            into a `pyramids.Dataset` / `NetCDF` (non-raster entries left as</span>
+<a id="__codelineno-0-1752" name="__codelineno-0-1752"></a><span class="sd">            their `Path`); for a vector / tabular backend, the in-memory</span>
+<a id="__codelineno-0-1753" name="__codelineno-0-1753"></a><span class="sd">            `FeatureCollection` / `GeoDataFrame` / `DataFrame` `download`</span>
+<a id="__codelineno-0-1754" name="__codelineno-0-1754"></a><span class="sd">            returned.</span>
+<a id="__codelineno-0-1755" name="__codelineno-0-1755"></a>
+<a id="__codelineno-0-1756" name="__codelineno-0-1756"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-1757" name="__codelineno-0-1757"></a><span class="sd">            - Load CHIRPS precipitation into pyramids `Dataset` objects</span>
+<a id="__codelineno-0-1758" name="__codelineno-0-1758"></a><span class="sd">              (live; skipped here):</span>
+<a id="__codelineno-0-1759" name="__codelineno-0-1759"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-1760" name="__codelineno-0-1760"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
+<a id="__codelineno-0-1761" name="__codelineno-0-1761"></a><span class="sd">                &gt;&gt;&gt; rasters = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-1762" name="__codelineno-0-1762"></a><span class="sd">                ...     &quot;chc&quot;, variables=[&quot;precipitation&quot;],</span>
+<a id="__codelineno-0-1763" name="__codelineno-0-1763"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-01-02&quot;, aoi=[-75, 4, -74, 5],</span>
+<a id="__codelineno-0-1764" name="__codelineno-0-1764"></a><span class="sd">                ... ).load()</span>
+<a id="__codelineno-0-1765" name="__codelineno-0-1765"></a><span class="sd">                &gt;&gt;&gt; rasters[0].read_array()  # doctest: +SKIP</span>
+<a id="__codelineno-0-1766" name="__codelineno-0-1766"></a>
+<a id="__codelineno-0-1767" name="__codelineno-0-1767"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-1768" name="__codelineno-0-1768"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1769" name="__codelineno-0-1769"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_path</span><span class="p">:</span>
+<a id="__codelineno-0-1770" name="__codelineno-0-1770"></a>            <span class="k">return</span> <span class="n">_load_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<a id="__codelineno-0-1771" name="__codelineno-0-1771"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_redirect_output_to_tempdir</span><span class="p">()</span>
+<a id="__codelineno-0-1772" name="__codelineno-0-1772"></a>        <span class="n">temp_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">path</span>
+<a id="__codelineno-0-1773" name="__codelineno-0-1773"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">_load_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<a id="__codelineno-0-1774" name="__codelineno-0-1774"></a>        <span class="k">return</span> <span class="n">_detach_and_cleanup</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25348,6 +25470,254 @@ the full <code>available_datasets</code> universe plus the curated keys.</p>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="earthlens.earthlens.EarthLens.iter_download" class="doc doc-heading"><a href="#earthlens.earthlens.EarthLens.iter_download" class="toclink">
+            <code class="highlight language-python"><span class="n">iter_download</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</a><a href="#earthlens.earthlens.EarthLens.iter_download" class="headerlink" title="Permanent link">#</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Stream the backend's artifacts one item at a time.</p>
+<p>The streaming counterpart to :meth:<code>download</code>, for a vector / tabular
+result too large to want resident all at once: each product's fragment
+is yielded as it arrives, so a caller can write or reduce it and let it
+go before the next one is fetched.</p>
+<p>Whether a backend can stream depends on it having a per-product fetch
+hook — most search/fetch backends do; a backend that answers the whole
+request in one server-side call cannot, and says so rather than
+pretending. <code>aggregate=</code> is not accepted: a reduction needs the whole
+cube, so ask for it through :meth:<code>download</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>limit</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Total rows / features to yield across every product, or
+<code>None</code> for no cap. Products past the cap are never fetched.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Yields:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Any</code></td>            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>One fragment per product, of the same type the backend's
+<code>download</code> collects (a <code>FeatureCollection</code> /
+<code>GeoDataFrame</code> / <code>DataFrame</code> fragment, or written paths).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="NotImplementedError">NotImplementedError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>When the bound backend has no per-product
+fetch to stream from.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>limit</code> is neither <code>None</code> nor an <code>int</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>limit</code> is less than 1.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <ul>
+<li>Consume a large query without holding every page. Marked
+  <code># doctest: +SKIP</code> because it performs a live request:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>  <span class="c1"># doctest: +SKIP</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">...</span>     <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;obis&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">...</span>     <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">...</span>     <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-01-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="o">...</span>     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">],</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="o">...</span>     <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">],</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="o">...</span> <span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># doctest: +SKIP</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">earthlens</span><span class="o">.</span><span class="n">iter_download</span><span class="p">():</span>  <span class="c1"># doctest: +SKIP</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="o">...</span>     <span class="n">total</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fragment</span><span class="p">)</span>
+</code></pre></div></li>
+</ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>libs/core/src/earthlens/earthlens.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1595">1595</a></span>
+<span class="normal"><a href="#__codelineno-0-1596">1596</a></span>
+<span class="normal"><a href="#__codelineno-0-1597">1597</a></span>
+<span class="normal"><a href="#__codelineno-0-1598">1598</a></span>
+<span class="normal"><a href="#__codelineno-0-1599">1599</a></span>
+<span class="normal"><a href="#__codelineno-0-1600">1600</a></span>
+<span class="normal"><a href="#__codelineno-0-1601">1601</a></span>
+<span class="normal"><a href="#__codelineno-0-1602">1602</a></span>
+<span class="normal"><a href="#__codelineno-0-1603">1603</a></span>
+<span class="normal"><a href="#__codelineno-0-1604">1604</a></span>
+<span class="normal"><a href="#__codelineno-0-1605">1605</a></span>
+<span class="normal"><a href="#__codelineno-0-1606">1606</a></span>
+<span class="normal"><a href="#__codelineno-0-1607">1607</a></span>
+<span class="normal"><a href="#__codelineno-0-1608">1608</a></span>
+<span class="normal"><a href="#__codelineno-0-1609">1609</a></span>
+<span class="normal"><a href="#__codelineno-0-1610">1610</a></span>
+<span class="normal"><a href="#__codelineno-0-1611">1611</a></span>
+<span class="normal"><a href="#__codelineno-0-1612">1612</a></span>
+<span class="normal"><a href="#__codelineno-0-1613">1613</a></span>
+<span class="normal"><a href="#__codelineno-0-1614">1614</a></span>
+<span class="normal"><a href="#__codelineno-0-1615">1615</a></span>
+<span class="normal"><a href="#__codelineno-0-1616">1616</a></span>
+<span class="normal"><a href="#__codelineno-0-1617">1617</a></span>
+<span class="normal"><a href="#__codelineno-0-1618">1618</a></span>
+<span class="normal"><a href="#__codelineno-0-1619">1619</a></span>
+<span class="normal"><a href="#__codelineno-0-1620">1620</a></span>
+<span class="normal"><a href="#__codelineno-0-1621">1621</a></span>
+<span class="normal"><a href="#__codelineno-0-1622">1622</a></span>
+<span class="normal"><a href="#__codelineno-0-1623">1623</a></span>
+<span class="normal"><a href="#__codelineno-0-1624">1624</a></span>
+<span class="normal"><a href="#__codelineno-0-1625">1625</a></span>
+<span class="normal"><a href="#__codelineno-0-1626">1626</a></span>
+<span class="normal"><a href="#__codelineno-0-1627">1627</a></span>
+<span class="normal"><a href="#__codelineno-0-1628">1628</a></span>
+<span class="normal"><a href="#__codelineno-0-1629">1629</a></span>
+<span class="normal"><a href="#__codelineno-0-1630">1630</a></span>
+<span class="normal"><a href="#__codelineno-0-1631">1631</a></span>
+<span class="normal"><a href="#__codelineno-0-1632">1632</a></span>
+<span class="normal"><a href="#__codelineno-0-1633">1633</a></span>
+<span class="normal"><a href="#__codelineno-0-1634">1634</a></span>
+<span class="normal"><a href="#__codelineno-0-1635">1635</a></span>
+<span class="normal"><a href="#__codelineno-0-1636">1636</a></span>
+<span class="normal"><a href="#__codelineno-0-1637">1637</a></span>
+<span class="normal"><a href="#__codelineno-0-1638">1638</a></span>
+<span class="normal"><a href="#__codelineno-0-1639">1639</a></span>
+<span class="normal"><a href="#__codelineno-0-1640">1640</a></span>
+<span class="normal"><a href="#__codelineno-0-1641">1641</a></span>
+<span class="normal"><a href="#__codelineno-0-1642">1642</a></span>
+<span class="normal"><a href="#__codelineno-0-1643">1643</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1595" name="__codelineno-0-1595"></a><span class="k">def</span><span class="w"> </span><span class="nf">iter_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-1596" name="__codelineno-0-1596"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream the backend&#39;s artifacts one item at a time.</span>
+<a id="__codelineno-0-1597" name="__codelineno-0-1597"></a>
+<a id="__codelineno-0-1598" name="__codelineno-0-1598"></a><span class="sd">    The streaming counterpart to :meth:`download`, for a vector / tabular</span>
+<a id="__codelineno-0-1599" name="__codelineno-0-1599"></a><span class="sd">    result too large to want resident all at once: each product&#39;s fragment</span>
+<a id="__codelineno-0-1600" name="__codelineno-0-1600"></a><span class="sd">    is yielded as it arrives, so a caller can write or reduce it and let it</span>
+<a id="__codelineno-0-1601" name="__codelineno-0-1601"></a><span class="sd">    go before the next one is fetched.</span>
+<a id="__codelineno-0-1602" name="__codelineno-0-1602"></a>
+<a id="__codelineno-0-1603" name="__codelineno-0-1603"></a><span class="sd">    Whether a backend can stream depends on it having a per-product fetch</span>
+<a id="__codelineno-0-1604" name="__codelineno-0-1604"></a><span class="sd">    hook — most search/fetch backends do; a backend that answers the whole</span>
+<a id="__codelineno-0-1605" name="__codelineno-0-1605"></a><span class="sd">    request in one server-side call cannot, and says so rather than</span>
+<a id="__codelineno-0-1606" name="__codelineno-0-1606"></a><span class="sd">    pretending. `aggregate=` is not accepted: a reduction needs the whole</span>
+<a id="__codelineno-0-1607" name="__codelineno-0-1607"></a><span class="sd">    cube, so ask for it through :meth:`download`.</span>
+<a id="__codelineno-0-1608" name="__codelineno-0-1608"></a>
+<a id="__codelineno-0-1609" name="__codelineno-0-1609"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1610" name="__codelineno-0-1610"></a><span class="sd">        limit: Total rows / features to yield across every product, or</span>
+<a id="__codelineno-0-1611" name="__codelineno-0-1611"></a><span class="sd">            `None` for no cap. Products past the cap are never fetched.</span>
+<a id="__codelineno-0-1612" name="__codelineno-0-1612"></a>
+<a id="__codelineno-0-1613" name="__codelineno-0-1613"></a><span class="sd">    Yields:</span>
+<a id="__codelineno-0-1614" name="__codelineno-0-1614"></a><span class="sd">        Any: One fragment per product, of the same type the backend&#39;s</span>
+<a id="__codelineno-0-1615" name="__codelineno-0-1615"></a><span class="sd">            `download` collects (a `FeatureCollection` /</span>
+<a id="__codelineno-0-1616" name="__codelineno-0-1616"></a><span class="sd">            `GeoDataFrame` / `DataFrame` fragment, or written paths).</span>
+<a id="__codelineno-0-1617" name="__codelineno-0-1617"></a>
+<a id="__codelineno-0-1618" name="__codelineno-0-1618"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-1619" name="__codelineno-0-1619"></a><span class="sd">        NotImplementedError: When the bound backend has no per-product</span>
+<a id="__codelineno-0-1620" name="__codelineno-0-1620"></a><span class="sd">            fetch to stream from.</span>
+<a id="__codelineno-0-1621" name="__codelineno-0-1621"></a><span class="sd">        TypeError: If `limit` is neither `None` nor an `int`.</span>
+<a id="__codelineno-0-1622" name="__codelineno-0-1622"></a><span class="sd">        ValueError: If `limit` is less than 1.</span>
+<a id="__codelineno-0-1623" name="__codelineno-0-1623"></a>
+<a id="__codelineno-0-1624" name="__codelineno-0-1624"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1625" name="__codelineno-0-1625"></a><span class="sd">        - Consume a large query without holding every page. Marked</span>
+<a id="__codelineno-0-1626" name="__codelineno-0-1626"></a><span class="sd">          `# doctest: +SKIP` because it performs a live request:</span>
+<a id="__codelineno-0-1627" name="__codelineno-0-1627"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1628" name="__codelineno-0-1628"></a><span class="sd">            &gt;&gt;&gt; from earthlens.core import EarthLens</span>
+<a id="__codelineno-0-1629" name="__codelineno-0-1629"></a><span class="sd">            &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-1630" name="__codelineno-0-1630"></a><span class="sd">            ...     data_source=&quot;obis&quot;,</span>
+<a id="__codelineno-0-1631" name="__codelineno-0-1631"></a><span class="sd">            ...     start=&quot;2024-01-01&quot;,</span>
+<a id="__codelineno-0-1632" name="__codelineno-0-1632"></a><span class="sd">            ...     end=&quot;2024-01-31&quot;,</span>
+<a id="__codelineno-0-1633" name="__codelineno-0-1633"></a><span class="sd">            ...     lat_lim=[50.0, 54.0],</span>
+<a id="__codelineno-0-1634" name="__codelineno-0-1634"></a><span class="sd">            ...     lon_lim=[2.0, 7.0],</span>
+<a id="__codelineno-0-1635" name="__codelineno-0-1635"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-1636" name="__codelineno-0-1636"></a><span class="sd">            &gt;&gt;&gt; total = 0  # doctest: +SKIP</span>
+<a id="__codelineno-0-1637" name="__codelineno-0-1637"></a><span class="sd">            &gt;&gt;&gt; for fragment in earthlens.iter_download():  # doctest: +SKIP</span>
+<a id="__codelineno-0-1638" name="__codelineno-0-1638"></a><span class="sd">            ...     total += len(fragment)</span>
+<a id="__codelineno-0-1639" name="__codelineno-0-1639"></a>
+<a id="__codelineno-0-1640" name="__codelineno-0-1640"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1641" name="__codelineno-0-1641"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1642" name="__codelineno-0-1642"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_ensure_root_dir</span><span class="p">()</span>
+<a id="__codelineno-0-1643" name="__codelineno-0-1643"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="earthlens.earthlens.EarthLens.list_datasets" class="doc doc-heading"><a href="#earthlens.earthlens.EarthLens.list_datasets" class="toclink">
             <code class="highlight language-python"><span class="n">list_datasets</span><span class="p">(</span><span class="n">data_source</span><span class="p">)</span></code>
 
@@ -25677,121 +26047,121 @@ xarray dependency.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/earthlens.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1667">1667</a></span>
-<span class="normal"><a href="#__codelineno-0-1668">1668</a></span>
-<span class="normal"><a href="#__codelineno-0-1669">1669</a></span>
-<span class="normal"><a href="#__codelineno-0-1670">1670</a></span>
-<span class="normal"><a href="#__codelineno-0-1671">1671</a></span>
-<span class="normal"><a href="#__codelineno-0-1672">1672</a></span>
-<span class="normal"><a href="#__codelineno-0-1673">1673</a></span>
-<span class="normal"><a href="#__codelineno-0-1674">1674</a></span>
-<span class="normal"><a href="#__codelineno-0-1675">1675</a></span>
-<span class="normal"><a href="#__codelineno-0-1676">1676</a></span>
-<span class="normal"><a href="#__codelineno-0-1677">1677</a></span>
-<span class="normal"><a href="#__codelineno-0-1678">1678</a></span>
-<span class="normal"><a href="#__codelineno-0-1679">1679</a></span>
-<span class="normal"><a href="#__codelineno-0-1680">1680</a></span>
-<span class="normal"><a href="#__codelineno-0-1681">1681</a></span>
-<span class="normal"><a href="#__codelineno-0-1682">1682</a></span>
-<span class="normal"><a href="#__codelineno-0-1683">1683</a></span>
-<span class="normal"><a href="#__codelineno-0-1684">1684</a></span>
-<span class="normal"><a href="#__codelineno-0-1685">1685</a></span>
-<span class="normal"><a href="#__codelineno-0-1686">1686</a></span>
-<span class="normal"><a href="#__codelineno-0-1687">1687</a></span>
-<span class="normal"><a href="#__codelineno-0-1688">1688</a></span>
-<span class="normal"><a href="#__codelineno-0-1689">1689</a></span>
-<span class="normal"><a href="#__codelineno-0-1690">1690</a></span>
-<span class="normal"><a href="#__codelineno-0-1691">1691</a></span>
-<span class="normal"><a href="#__codelineno-0-1692">1692</a></span>
-<span class="normal"><a href="#__codelineno-0-1693">1693</a></span>
-<span class="normal"><a href="#__codelineno-0-1694">1694</a></span>
-<span class="normal"><a href="#__codelineno-0-1695">1695</a></span>
-<span class="normal"><a href="#__codelineno-0-1696">1696</a></span>
-<span class="normal"><a href="#__codelineno-0-1697">1697</a></span>
-<span class="normal"><a href="#__codelineno-0-1698">1698</a></span>
-<span class="normal"><a href="#__codelineno-0-1699">1699</a></span>
-<span class="normal"><a href="#__codelineno-0-1700">1700</a></span>
-<span class="normal"><a href="#__codelineno-0-1701">1701</a></span>
-<span class="normal"><a href="#__codelineno-0-1702">1702</a></span>
-<span class="normal"><a href="#__codelineno-0-1703">1703</a></span>
-<span class="normal"><a href="#__codelineno-0-1704">1704</a></span>
-<span class="normal"><a href="#__codelineno-0-1705">1705</a></span>
-<span class="normal"><a href="#__codelineno-0-1706">1706</a></span>
-<span class="normal"><a href="#__codelineno-0-1707">1707</a></span>
-<span class="normal"><a href="#__codelineno-0-1708">1708</a></span>
-<span class="normal"><a href="#__codelineno-0-1709">1709</a></span>
-<span class="normal"><a href="#__codelineno-0-1710">1710</a></span>
-<span class="normal"><a href="#__codelineno-0-1711">1711</a></span>
-<span class="normal"><a href="#__codelineno-0-1712">1712</a></span>
-<span class="normal"><a href="#__codelineno-0-1713">1713</a></span>
-<span class="normal"><a href="#__codelineno-0-1714">1714</a></span>
-<span class="normal"><a href="#__codelineno-0-1715">1715</a></span>
-<span class="normal"><a href="#__codelineno-0-1716">1716</a></span>
-<span class="normal"><a href="#__codelineno-0-1717">1717</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1717">1717</a></span>
 <span class="normal"><a href="#__codelineno-0-1718">1718</a></span>
 <span class="normal"><a href="#__codelineno-0-1719">1719</a></span>
 <span class="normal"><a href="#__codelineno-0-1720">1720</a></span>
 <span class="normal"><a href="#__codelineno-0-1721">1721</a></span>
 <span class="normal"><a href="#__codelineno-0-1722">1722</a></span>
 <span class="normal"><a href="#__codelineno-0-1723">1723</a></span>
-<span class="normal"><a href="#__codelineno-0-1724">1724</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1667" name="__codelineno-0-1667"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-1668" name="__codelineno-0-1668"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and return the data in memory instead of only on disk.</span>
-<a id="__codelineno-0-1669" name="__codelineno-0-1669"></a>
-<a id="__codelineno-0-1670" name="__codelineno-0-1670"></a><span class="sd">    The lazy-stack convenience: runs :meth:`download` and hands back the</span>
-<a id="__codelineno-0-1671" name="__codelineno-0-1671"></a><span class="sd">    fetched data as the project&#39;s **native pyramids objects** rather than</span>
-<a id="__codelineno-0-1672" name="__codelineno-0-1672"></a><span class="sd">    leaving the caller to re-open files. Raster outputs are read into a</span>
-<a id="__codelineno-0-1673" name="__codelineno-0-1673"></a><span class="sd">    `pyramids.Dataset` / `NetCDF` (a `.nc` path becomes a `NetCDF`, every</span>
-<a id="__codelineno-0-1674" name="__codelineno-0-1674"></a><span class="sd">    other raster a `Dataset`); a non-raster output a backend already</span>
-<a id="__codelineno-0-1675" name="__codelineno-0-1675"></a><span class="sd">    returns in memory (a `FeatureCollection` / `GeoDataFrame` /</span>
-<a id="__codelineno-0-1676" name="__codelineno-0-1676"></a><span class="sd">    `DataFrame`) is passed through unchanged, as are non-raster file paths</span>
-<a id="__codelineno-0-1677" name="__codelineno-0-1677"></a><span class="sd">    (e.g. a `.csv` table from a mixed backend). The files are still written</span>
-<a id="__codelineno-0-1678" name="__codelineno-0-1678"></a><span class="sd">    to `path` — `load` adds the in-memory handle on top.</span>
-<a id="__codelineno-0-1679" name="__codelineno-0-1679"></a>
-<a id="__codelineno-0-1680" name="__codelineno-0-1680"></a><span class="sd">    When `path` was omitted, `load` writes to a throwaway temp directory</span>
-<a id="__codelineno-0-1681" name="__codelineno-0-1681"></a><span class="sd">    (not the persistent `./earthlens-data/&lt;source&gt;/` that `download` uses),</span>
-<a id="__codelineno-0-1682" name="__codelineno-0-1682"></a><span class="sd">    so a load-and-plot run never leaves files in the working tree — there is</span>
-<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">    no need to pass `path=tempfile.mkdtemp()` yourself. Each returned raster</span>
-<a id="__codelineno-0-1684" name="__codelineno-0-1684"></a><span class="sd">    is detached into an in-memory copy and the temp directory is removed</span>
-<a id="__codelineno-0-1685" name="__codelineno-0-1685"></a><span class="sd">    immediately, so repeated `load()` calls — e.g. a per-year loop — do not</span>
-<a id="__codelineno-0-1686" name="__codelineno-0-1686"></a><span class="sd">    accumulate gigabytes under the system temp dir. (Because the data is</span>
-<a id="__codelineno-0-1687" name="__codelineno-0-1687"></a><span class="sd">    copied into memory, a `path=`-less `load` of a very large raster reads it</span>
-<a id="__codelineno-0-1688" name="__codelineno-0-1688"></a><span class="sd">    fully into RAM; pass `path=` to keep the lazy, file-backed objects.)</span>
-<a id="__codelineno-0-1689" name="__codelineno-0-1689"></a>
-<a id="__codelineno-0-1690" name="__codelineno-0-1690"></a><span class="sd">    `xarray` is intentionally not the return type: a returned</span>
-<a id="__codelineno-0-1691" name="__codelineno-0-1691"></a><span class="sd">    `pyramids.Dataset` / `NetCDF` already exposes `.to_xarray()` for callers</span>
-<a id="__codelineno-0-1692" name="__codelineno-0-1692"></a><span class="sd">    who want the climate-stack interop, so EarthLens stays free of an</span>
-<a id="__codelineno-0-1693" name="__codelineno-0-1693"></a><span class="sd">    xarray dependency.</span>
-<a id="__codelineno-0-1694" name="__codelineno-0-1694"></a>
-<a id="__codelineno-0-1695" name="__codelineno-0-1695"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1696" name="__codelineno-0-1696"></a><span class="sd">        *args: Forwarded positionally to :meth:`download`.</span>
-<a id="__codelineno-0-1697" name="__codelineno-0-1697"></a><span class="sd">        **kwargs: Forwarded as keywords to :meth:`download`.</span>
-<a id="__codelineno-0-1698" name="__codelineno-0-1698"></a>
-<a id="__codelineno-0-1699" name="__codelineno-0-1699"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1700" name="__codelineno-0-1700"></a><span class="sd">        For a raster / mixed backend, a list with each written raster read</span>
-<a id="__codelineno-0-1701" name="__codelineno-0-1701"></a><span class="sd">        into a `pyramids.Dataset` / `NetCDF` (non-raster entries left as</span>
-<a id="__codelineno-0-1702" name="__codelineno-0-1702"></a><span class="sd">        their `Path`); for a vector / tabular backend, the in-memory</span>
-<a id="__codelineno-0-1703" name="__codelineno-0-1703"></a><span class="sd">        `FeatureCollection` / `GeoDataFrame` / `DataFrame` `download`</span>
-<a id="__codelineno-0-1704" name="__codelineno-0-1704"></a><span class="sd">        returned.</span>
-<a id="__codelineno-0-1705" name="__codelineno-0-1705"></a>
-<a id="__codelineno-0-1706" name="__codelineno-0-1706"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-1707" name="__codelineno-0-1707"></a><span class="sd">        - Load CHIRPS precipitation into pyramids `Dataset` objects</span>
-<a id="__codelineno-0-1708" name="__codelineno-0-1708"></a><span class="sd">          (live; skipped here):</span>
-<a id="__codelineno-0-1709" name="__codelineno-0-1709"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1710" name="__codelineno-0-1710"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
-<a id="__codelineno-0-1711" name="__codelineno-0-1711"></a><span class="sd">            &gt;&gt;&gt; rasters = EarthLens(  # doctest: +SKIP</span>
-<a id="__codelineno-0-1712" name="__codelineno-0-1712"></a><span class="sd">            ...     &quot;chc&quot;, variables=[&quot;precipitation&quot;],</span>
-<a id="__codelineno-0-1713" name="__codelineno-0-1713"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-01-02&quot;, aoi=[-75, 4, -74, 5],</span>
-<a id="__codelineno-0-1714" name="__codelineno-0-1714"></a><span class="sd">            ... ).load()</span>
-<a id="__codelineno-0-1715" name="__codelineno-0-1715"></a><span class="sd">            &gt;&gt;&gt; rasters[0].read_array()  # doctest: +SKIP</span>
-<a id="__codelineno-0-1716" name="__codelineno-0-1716"></a>
-<a id="__codelineno-0-1717" name="__codelineno-0-1717"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1718" name="__codelineno-0-1718"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1719" name="__codelineno-0-1719"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_path</span><span class="p">:</span>
-<a id="__codelineno-0-1720" name="__codelineno-0-1720"></a>        <span class="k">return</span> <span class="n">_load_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-<a id="__codelineno-0-1721" name="__codelineno-0-1721"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_redirect_output_to_tempdir</span><span class="p">()</span>
-<a id="__codelineno-0-1722" name="__codelineno-0-1722"></a>    <span class="n">temp_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">path</span>
-<a id="__codelineno-0-1723" name="__codelineno-0-1723"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">_load_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-<a id="__codelineno-0-1724" name="__codelineno-0-1724"></a>    <span class="k">return</span> <span class="n">_detach_and_cleanup</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-1724">1724</a></span>
+<span class="normal"><a href="#__codelineno-0-1725">1725</a></span>
+<span class="normal"><a href="#__codelineno-0-1726">1726</a></span>
+<span class="normal"><a href="#__codelineno-0-1727">1727</a></span>
+<span class="normal"><a href="#__codelineno-0-1728">1728</a></span>
+<span class="normal"><a href="#__codelineno-0-1729">1729</a></span>
+<span class="normal"><a href="#__codelineno-0-1730">1730</a></span>
+<span class="normal"><a href="#__codelineno-0-1731">1731</a></span>
+<span class="normal"><a href="#__codelineno-0-1732">1732</a></span>
+<span class="normal"><a href="#__codelineno-0-1733">1733</a></span>
+<span class="normal"><a href="#__codelineno-0-1734">1734</a></span>
+<span class="normal"><a href="#__codelineno-0-1735">1735</a></span>
+<span class="normal"><a href="#__codelineno-0-1736">1736</a></span>
+<span class="normal"><a href="#__codelineno-0-1737">1737</a></span>
+<span class="normal"><a href="#__codelineno-0-1738">1738</a></span>
+<span class="normal"><a href="#__codelineno-0-1739">1739</a></span>
+<span class="normal"><a href="#__codelineno-0-1740">1740</a></span>
+<span class="normal"><a href="#__codelineno-0-1741">1741</a></span>
+<span class="normal"><a href="#__codelineno-0-1742">1742</a></span>
+<span class="normal"><a href="#__codelineno-0-1743">1743</a></span>
+<span class="normal"><a href="#__codelineno-0-1744">1744</a></span>
+<span class="normal"><a href="#__codelineno-0-1745">1745</a></span>
+<span class="normal"><a href="#__codelineno-0-1746">1746</a></span>
+<span class="normal"><a href="#__codelineno-0-1747">1747</a></span>
+<span class="normal"><a href="#__codelineno-0-1748">1748</a></span>
+<span class="normal"><a href="#__codelineno-0-1749">1749</a></span>
+<span class="normal"><a href="#__codelineno-0-1750">1750</a></span>
+<span class="normal"><a href="#__codelineno-0-1751">1751</a></span>
+<span class="normal"><a href="#__codelineno-0-1752">1752</a></span>
+<span class="normal"><a href="#__codelineno-0-1753">1753</a></span>
+<span class="normal"><a href="#__codelineno-0-1754">1754</a></span>
+<span class="normal"><a href="#__codelineno-0-1755">1755</a></span>
+<span class="normal"><a href="#__codelineno-0-1756">1756</a></span>
+<span class="normal"><a href="#__codelineno-0-1757">1757</a></span>
+<span class="normal"><a href="#__codelineno-0-1758">1758</a></span>
+<span class="normal"><a href="#__codelineno-0-1759">1759</a></span>
+<span class="normal"><a href="#__codelineno-0-1760">1760</a></span>
+<span class="normal"><a href="#__codelineno-0-1761">1761</a></span>
+<span class="normal"><a href="#__codelineno-0-1762">1762</a></span>
+<span class="normal"><a href="#__codelineno-0-1763">1763</a></span>
+<span class="normal"><a href="#__codelineno-0-1764">1764</a></span>
+<span class="normal"><a href="#__codelineno-0-1765">1765</a></span>
+<span class="normal"><a href="#__codelineno-0-1766">1766</a></span>
+<span class="normal"><a href="#__codelineno-0-1767">1767</a></span>
+<span class="normal"><a href="#__codelineno-0-1768">1768</a></span>
+<span class="normal"><a href="#__codelineno-0-1769">1769</a></span>
+<span class="normal"><a href="#__codelineno-0-1770">1770</a></span>
+<span class="normal"><a href="#__codelineno-0-1771">1771</a></span>
+<span class="normal"><a href="#__codelineno-0-1772">1772</a></span>
+<span class="normal"><a href="#__codelineno-0-1773">1773</a></span>
+<span class="normal"><a href="#__codelineno-0-1774">1774</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1717" name="__codelineno-0-1717"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-1718" name="__codelineno-0-1718"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and return the data in memory instead of only on disk.</span>
+<a id="__codelineno-0-1719" name="__codelineno-0-1719"></a>
+<a id="__codelineno-0-1720" name="__codelineno-0-1720"></a><span class="sd">    The lazy-stack convenience: runs :meth:`download` and hands back the</span>
+<a id="__codelineno-0-1721" name="__codelineno-0-1721"></a><span class="sd">    fetched data as the project&#39;s **native pyramids objects** rather than</span>
+<a id="__codelineno-0-1722" name="__codelineno-0-1722"></a><span class="sd">    leaving the caller to re-open files. Raster outputs are read into a</span>
+<a id="__codelineno-0-1723" name="__codelineno-0-1723"></a><span class="sd">    `pyramids.Dataset` / `NetCDF` (a `.nc` path becomes a `NetCDF`, every</span>
+<a id="__codelineno-0-1724" name="__codelineno-0-1724"></a><span class="sd">    other raster a `Dataset`); a non-raster output a backend already</span>
+<a id="__codelineno-0-1725" name="__codelineno-0-1725"></a><span class="sd">    returns in memory (a `FeatureCollection` / `GeoDataFrame` /</span>
+<a id="__codelineno-0-1726" name="__codelineno-0-1726"></a><span class="sd">    `DataFrame`) is passed through unchanged, as are non-raster file paths</span>
+<a id="__codelineno-0-1727" name="__codelineno-0-1727"></a><span class="sd">    (e.g. a `.csv` table from a mixed backend). The files are still written</span>
+<a id="__codelineno-0-1728" name="__codelineno-0-1728"></a><span class="sd">    to `path` — `load` adds the in-memory handle on top.</span>
+<a id="__codelineno-0-1729" name="__codelineno-0-1729"></a>
+<a id="__codelineno-0-1730" name="__codelineno-0-1730"></a><span class="sd">    When `path` was omitted, `load` writes to a throwaway temp directory</span>
+<a id="__codelineno-0-1731" name="__codelineno-0-1731"></a><span class="sd">    (not the persistent `./earthlens-data/&lt;source&gt;/` that `download` uses),</span>
+<a id="__codelineno-0-1732" name="__codelineno-0-1732"></a><span class="sd">    so a load-and-plot run never leaves files in the working tree — there is</span>
+<a id="__codelineno-0-1733" name="__codelineno-0-1733"></a><span class="sd">    no need to pass `path=tempfile.mkdtemp()` yourself. Each returned raster</span>
+<a id="__codelineno-0-1734" name="__codelineno-0-1734"></a><span class="sd">    is detached into an in-memory copy and the temp directory is removed</span>
+<a id="__codelineno-0-1735" name="__codelineno-0-1735"></a><span class="sd">    immediately, so repeated `load()` calls — e.g. a per-year loop — do not</span>
+<a id="__codelineno-0-1736" name="__codelineno-0-1736"></a><span class="sd">    accumulate gigabytes under the system temp dir. (Because the data is</span>
+<a id="__codelineno-0-1737" name="__codelineno-0-1737"></a><span class="sd">    copied into memory, a `path=`-less `load` of a very large raster reads it</span>
+<a id="__codelineno-0-1738" name="__codelineno-0-1738"></a><span class="sd">    fully into RAM; pass `path=` to keep the lazy, file-backed objects.)</span>
+<a id="__codelineno-0-1739" name="__codelineno-0-1739"></a>
+<a id="__codelineno-0-1740" name="__codelineno-0-1740"></a><span class="sd">    `xarray` is intentionally not the return type: a returned</span>
+<a id="__codelineno-0-1741" name="__codelineno-0-1741"></a><span class="sd">    `pyramids.Dataset` / `NetCDF` already exposes `.to_xarray()` for callers</span>
+<a id="__codelineno-0-1742" name="__codelineno-0-1742"></a><span class="sd">    who want the climate-stack interop, so EarthLens stays free of an</span>
+<a id="__codelineno-0-1743" name="__codelineno-0-1743"></a><span class="sd">    xarray dependency.</span>
+<a id="__codelineno-0-1744" name="__codelineno-0-1744"></a>
+<a id="__codelineno-0-1745" name="__codelineno-0-1745"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1746" name="__codelineno-0-1746"></a><span class="sd">        *args: Forwarded positionally to :meth:`download`.</span>
+<a id="__codelineno-0-1747" name="__codelineno-0-1747"></a><span class="sd">        **kwargs: Forwarded as keywords to :meth:`download`.</span>
+<a id="__codelineno-0-1748" name="__codelineno-0-1748"></a>
+<a id="__codelineno-0-1749" name="__codelineno-0-1749"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1750" name="__codelineno-0-1750"></a><span class="sd">        For a raster / mixed backend, a list with each written raster read</span>
+<a id="__codelineno-0-1751" name="__codelineno-0-1751"></a><span class="sd">        into a `pyramids.Dataset` / `NetCDF` (non-raster entries left as</span>
+<a id="__codelineno-0-1752" name="__codelineno-0-1752"></a><span class="sd">        their `Path`); for a vector / tabular backend, the in-memory</span>
+<a id="__codelineno-0-1753" name="__codelineno-0-1753"></a><span class="sd">        `FeatureCollection` / `GeoDataFrame` / `DataFrame` `download`</span>
+<a id="__codelineno-0-1754" name="__codelineno-0-1754"></a><span class="sd">        returned.</span>
+<a id="__codelineno-0-1755" name="__codelineno-0-1755"></a>
+<a id="__codelineno-0-1756" name="__codelineno-0-1756"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1757" name="__codelineno-0-1757"></a><span class="sd">        - Load CHIRPS precipitation into pyramids `Dataset` objects</span>
+<a id="__codelineno-0-1758" name="__codelineno-0-1758"></a><span class="sd">          (live; skipped here):</span>
+<a id="__codelineno-0-1759" name="__codelineno-0-1759"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1760" name="__codelineno-0-1760"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthlens import EarthLens</span>
+<a id="__codelineno-0-1761" name="__codelineno-0-1761"></a><span class="sd">            &gt;&gt;&gt; rasters = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-1762" name="__codelineno-0-1762"></a><span class="sd">            ...     &quot;chc&quot;, variables=[&quot;precipitation&quot;],</span>
+<a id="__codelineno-0-1763" name="__codelineno-0-1763"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-01-02&quot;, aoi=[-75, 4, -74, 5],</span>
+<a id="__codelineno-0-1764" name="__codelineno-0-1764"></a><span class="sd">            ... ).load()</span>
+<a id="__codelineno-0-1765" name="__codelineno-0-1765"></a><span class="sd">            &gt;&gt;&gt; rasters[0].read_array()  # doctest: +SKIP</span>
+<a id="__codelineno-0-1766" name="__codelineno-0-1766"></a>
+<a id="__codelineno-0-1767" name="__codelineno-0-1767"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1768" name="__codelineno-0-1768"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1769" name="__codelineno-0-1769"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit_path</span><span class="p">:</span>
+<a id="__codelineno-0-1770" name="__codelineno-0-1770"></a>        <span class="k">return</span> <span class="n">_load_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<a id="__codelineno-0-1771" name="__codelineno-0-1771"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_redirect_output_to_tempdir</span><span class="p">()</span>
+<a id="__codelineno-0-1772" name="__codelineno-0-1772"></a>    <span class="n">temp_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">path</span>
+<a id="__codelineno-0-1773" name="__codelineno-0-1773"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">_load_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_download</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<a id="__codelineno-0-1774" name="__codelineno-0-1774"></a>    <span class="k">return</span> <span class="n">_detach_and_cleanup</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
