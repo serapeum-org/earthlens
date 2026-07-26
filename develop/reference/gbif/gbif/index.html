@@ -20981,7 +20981,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="p">)</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="k">return</span> <span class="n">rows</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_records</span><span class="p">]</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>  <span class="c1"># type: ignore[override]</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the search and map the rows to a FeatureCollection.</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        Imports `pygbif` lazily (so the package imports without the</span>
@@ -21009,7 +21009,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the occurrence search (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="bp">self</span><span class="p">,</span>
@@ -21040,7 +21040,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="s2">&quot;download() without aggregate= and post-process the returned &quot;</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="p">)</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -21651,7 +21651,7 @@ file under <code>path</code> when <code>path</code> is set.</p>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="s2">&quot;download() without aggregate= and post-process the returned &quot;</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="p">)</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -22463,7 +22463,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="p">)</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="k">return</span> <span class="n">rows</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_records</span><span class="p">]</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>  <span class="c1"># type: ignore[override]</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the search and map the rows to a FeatureCollection.</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        Imports `pygbif` lazily (so the package imports without the</span>
@@ -22491,7 +22491,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the occurrence search (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="bp">self</span><span class="p">,</span>
@@ -22522,7 +22522,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="s2">&quot;download() without aggregate= and post-process the returned &quot;</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="p">)</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -23133,7 +23133,7 @@ file under <code>path</code> when <code>path</code> is set.</p>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="s2">&quot;download() without aggregate= and post-process the returned &quot;</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="p">)</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
