@@ -312,6 +312,8 @@ class Catalog(AbstractCatalog):
             A fully-populated :class:`Catalog`.
 
         Raises:
+            ValueError: If `catalog_path` does not exist, or the file's
+                contents fail validation.
             ValueError: If the file has no `products:` block, or any
                 product / configuration row fails validation.
         """

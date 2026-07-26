@@ -1,5 +1,37 @@
 # Change Log
 
+## Unreleased
+
+### BREAKING CHANGE
+
+- `Catalog.load(<missing path>)` now raises `ValueError` naming the path,
+where 21 of the catalogs previously raised `FileNotFoundError`. Every
+catalog reports a missing file the same way now that they share
+`earthlens.base.catalog_source.load_catalog`. No shipped caller catches
+`FileNotFoundError` around a catalog load, but external code that does
+should catch `ValueError` instead.
+- The catalog-import error text changed from
+`"Backend 'gee' catalog is unavailable"` to
+`"Backend catalog for 'gee' is unavailable"`, since the registry and
+catalog paths now share one message builder.
+- An `ImportError` raised *inside* a backend is no longer rewritten into
+`"its runtime dependency is not installed. Install with pip install
+earthlens[...]"`. Only a genuinely absent third-party SDK gets that hint;
+a fault in earthlens' own code propagates unchanged so the real cause is
+visible.
+
+### Fix
+
+- `AbstractCatalog.catalog` is a read-only view rather than a second name
+bound to the same `dict` as `datasets`, and `Catalog.load()` hands out a
+fresh instance per call. Previously one caller mutating `.datasets` could
+corrupt the catalog for the whole process.
+- A `download()` the backend rejects no longer leaves an empty output
+directory behind.
+- DWD NWP downloads reject a truncated `.bz2` body instead of publishing a
+short `.grib2`, and decode multi-stream `.bz2` fully.
+
+
 ## 0.11.0 (2026-07-20)
 
 ### BREAKING CHANGE

@@ -219,6 +219,8 @@ class Catalog(AbstractCatalog):
             A fully-populated `Catalog`.
 
         Raises:
+            ValueError: If `catalog_path` does not exist, or the file's
+                contents fail validation.
             ValueError: If the file has no `pollutants:` block, or a row
                 fails `Pollutant` validation.
         """

@@ -35,10 +35,20 @@ class TestStrictSafeLoader:
         assert issubclass(_StrictSafeLoader, safe_bases)
         assert not issubclass(_StrictSafeLoader, yaml.UnsafeLoader)
 
-    def test_prefers_the_libyaml_backed_loader(self):
-        """When libyaml is available the strict loader is built on it."""
-        expected = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
-        assert issubclass(_StrictSafeLoader, expected)
+    def test_uses_libyaml_when_the_wheel_ships_it(self):
+        """The installed PyYAML has libyaml, and the loader is built on it.
+
+        Asserting `issubclass(_StrictSafeLoader, getattr(yaml, "CSafeLoader",
+        SafeLoader))` would restate the implementation and pass either way.
+        This states the expectation instead: our pinned PyYAML *does* ship the
+        C extension, so a silent fall back to the ~3x slower Python parser is
+        a regression worth failing on.
+        """
+        assert hasattr(yaml, "CSafeLoader"), (
+            "the pinned PyYAML should ship libyaml; without it every catalog "
+            "parse falls back to the pure-Python loader"
+        )
+        assert issubclass(_StrictSafeLoader, yaml.CSafeLoader)
 
 
 class TestLoadYamlStrict:

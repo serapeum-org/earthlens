@@ -416,12 +416,14 @@ class TestTopLevelReExports:
         import earthlens.core
 
         assert sorted(earthlens.core.__all__) == [
+            "AggregatedWindow",
             "AggregationConfig",
             "EarthLens",
             "PolygonAoiWarning",
             "aggregate_netcdf",
             "download",
             "find",
+            "iter_aggregate_netcdf",
             "search",
             "sources",
         ], f"Unexpected top-level __all__: {earthlens.core.__all__!r}"
