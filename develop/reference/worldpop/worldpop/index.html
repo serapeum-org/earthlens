@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25725,7 +25725,7 @@ tidy age/sex table, so the facade forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            requests.ConnectionError | requests.Timeout: If every retry of a</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">                transient network error is exhausted.</span>
 <a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="k">if</span> <span class="n">dest</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_complete</span><span class="p">(</span><span class="n">dest</span><span class="p">):</span>
 <a id="__codelineno-0-523" name="__codelineno-0-523"></a>            <span class="k">return</span> <span class="n">dest</span>
 <a id="__codelineno-0-524" name="__codelineno-0-524"></a>        <span class="n">http</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span>
 <a id="__codelineno-0-525" name="__codelineno-0-525"></a>            <span class="n">session</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;requests.Session | None&quot;</span><span class="p">,</span> <span class="n">_RequestsGet</span><span class="p">()),</span>
@@ -28988,7 +28988,7 @@ tidy age/sex table, so the facade forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            requests.ConnectionError | requests.Timeout: If every retry of a</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">                transient network error is exhausted.</span>
 <a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="k">if</span> <span class="n">dest</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_complete</span><span class="p">(</span><span class="n">dest</span><span class="p">):</span>
 <a id="__codelineno-0-523" name="__codelineno-0-523"></a>            <span class="k">return</span> <span class="n">dest</span>
 <a id="__codelineno-0-524" name="__codelineno-0-524"></a>        <span class="n">http</span> <span class="o">=</span> <span class="n">HttpClient</span><span class="p">(</span>
 <a id="__codelineno-0-525" name="__codelineno-0-525"></a>            <span class="n">session</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;requests.Session | None&quot;</span><span class="p">,</span> <span class="n">_RequestsGet</span><span class="p">()),</span>
