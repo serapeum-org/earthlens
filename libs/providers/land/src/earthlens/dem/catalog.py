@@ -86,15 +86,16 @@ class DEMDataset(BaseModel):
     description: str = ""
 
 
-def _parse_datasets(files: list[Path]) -> Catalog:
+def _parse_datasets(files: list[Path]) -> dict[str, DEMDataset]:
     """Parse the DEM catalog's `datasets:` block into validated rows.
 
     Args:
         files: The contributing YAML files (DEM ships a single file).
 
     Returns:
-        Catalog: The built catalog. The instance itself is what gets cached,
-            so repeated `Catalog.load(path)` calls return the same object.
+        dict[str, DEMDataset]: One row per DEM dataset key. The rows are
+            cached, not a built Catalog — `load()` makes a fresh instance per
+            call so one caller mutating `.datasets` cannot reach another's.
 
     Raises:
         ValueError: If the `datasets:` block is missing or empty, or a row
@@ -116,7 +117,7 @@ def _parse_datasets(files: list[Path]) -> Catalog:
             raise ValueError(
                 f"{path} dataset {key!r} failed validation:\n{exc}"
             ) from exc
-    return Catalog(datasets=datasets)
+    return datasets
 
 
 class Catalog(AbstractCatalog):
@@ -195,7 +196,8 @@ class Catalog(AbstractCatalog):
                 row fails validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        return load_catalog(path, _CATALOG_CACHE, _parse_datasets, provider="DEM")
+        rows = load_catalog(path, _CATALOG_CACHE, _parse_datasets, provider="DEM")
+        return cls(datasets=dict(rows))
 
     def get_catalog(self) -> dict[str, DEMDataset]:
         """Return the dataset map (satisfies the abstract contract).

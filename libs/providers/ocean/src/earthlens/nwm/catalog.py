@@ -184,15 +184,17 @@ class NWMConfig(BaseModel):
     products: list[str] = Field(default_factory=list)
 
 
-def _parse_catalog(files: list[Path]) -> Catalog:
+def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     """Parse the NWM catalog YAML into a populated :class:`Catalog`.
 
     Args:
         files: The contributing YAML files (NWM ships a single file).
 
     Returns:
-        Catalog: The built catalog. The instance itself is cached, so
-            repeated loads of an unchanged file return the same object.
+        dict[str, Any]: The validated construction kwargs. The payload is
+            cached, not a built Catalog — `load()` makes a fresh instance
+            per call so one caller mutating `.datasets` cannot reach
+            another's, nor the cache itself.
 
     Raises:
         ValueError: If a required block is missing or a row fails
@@ -222,8 +224,7 @@ def _parse_catalog(files: list[Path]) -> Catalog:
             raise ValueError(
                 f"{path} configuration {key!r} failed validation:\n{exc}"
             ) from exc
-    catalog = Catalog(datasets=products, configurations=configurations)
-    return catalog
+    return dict(datasets=products, configurations=configurations)
 
 
 class Catalog(AbstractCatalog):
@@ -315,7 +316,8 @@ class Catalog(AbstractCatalog):
                 product / configuration row fails validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        return load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="NWM")
+        payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="NWM")
+        return cls(**payload)
 
     def get_catalog(self) -> dict[str, NWMProduct]:
         """Return the product map (satisfies the abstract contract).

@@ -148,16 +148,16 @@ class GOESProduct(BaseModel):
     bands: list[str] = Field(default_factory=list)
 
 
-def _parse_catalog(files: list[Path]) -> Catalog:
+def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     """Parse the GOES catalog YAML into a fully-populated :class:`Catalog`.
 
     Args:
         files: The contributing YAML files (GOES ships a single file).
 
     Returns:
-        Catalog: Products, domains, satellites and channels in one object.
-            The instance itself is cached, so repeated loads of an unchanged
-            file return the same object.
+        dict[str, Any]: The validated construction kwargs (products,
+            domains, satellites, channels). The payload is cached, not a
+            built Catalog — `load()` makes a fresh instance per call.
 
     Raises:
         ValueError: If the `products:` block is missing or empty, or any
@@ -196,13 +196,12 @@ def _parse_catalog(files: list[Path]) -> Catalog:
                 f"{path} channel {key!r} failed validation:\n{exc}"
             ) from exc
     satellites = {str(k): str(v) for k, v in (data.get("satellites") or {}).items()}
-    catalog = Catalog(
+    return dict(
         datasets=products,
         domains=domains,
         satellites=satellites,
         channels=channels,
     )
-    return catalog
 
 
 class Catalog(AbstractCatalog):
@@ -297,7 +296,8 @@ class Catalog(AbstractCatalog):
                 validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        return load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="GOES")
+        payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="GOES")
+        return cls(**payload)
 
     def get_catalog(self) -> dict[str, GOESProduct]:
         """Return the product map (satisfies the abstract contract).

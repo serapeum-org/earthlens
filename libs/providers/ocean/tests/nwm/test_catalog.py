@@ -164,7 +164,12 @@ def test_parse_cache_returns_same_object(tmp_path):
     clear_catalog_cache()
     first = Catalog.load(path)
     second = Catalog.load(path)
-    assert first is second
+    assert first is not second, "callers must not share one Catalog"
+    assert first.datasets == second.datasets, "the parse should be reused"
+    first.datasets.pop("chrtout")
+    assert "chrtout" in Catalog.load(path).datasets, (
+        "one caller's mutation leaked into the shared parse cache"
+    )
 
 
 def test_injected_catalog_skips_disk(tmp_path):

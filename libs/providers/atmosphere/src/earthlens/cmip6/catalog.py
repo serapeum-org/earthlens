@@ -152,15 +152,17 @@ class Source(BaseModel):
     description: str = ""
 
 
-def _parse_catalog(files: list[Path]) -> Catalog:
+def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     """Parse the CMIP6 catalog YAML into a populated :class:`Catalog`.
 
     Args:
         files: The contributing YAML files (CMIP6 ships a single file).
 
     Returns:
-        Catalog: The built catalog. The instance itself is cached, so
-            repeated loads of an unchanged file return the same object.
+        dict[str, Any]: The validated construction kwargs. The payload is
+            cached, not a built Catalog — `load()` makes a fresh instance
+            per call so one caller mutating `.datasets` cannot reach
+            another's, nor the cache itself.
 
     Raises:
         ValueError: If a required block is missing or a row fails
@@ -179,7 +181,7 @@ def _parse_catalog(files: list[Path]) -> Catalog:
     tables = Catalog._parse_block(path, data.get("tables"), Table)
     sources = Catalog._parse_block(path, data.get("sources"), Source)
     defaults = data.get("defaults") or {}
-    catalog = Catalog(
+    return dict(
         csv_url=csv_url,
         bucket=data.get("bucket", "cmip6"),
         facet_columns=list(data.get("facet_columns") or []),
@@ -191,7 +193,6 @@ def _parse_catalog(files: list[Path]) -> Catalog:
         tables=tables,
         sources=sources,
     )
-    return catalog
 
 
 class Catalog(AbstractCatalog):
@@ -299,7 +300,8 @@ class Catalog(AbstractCatalog):
                 fails validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        return load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="CMIP6")
+        payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="CMIP6")
+        return cls(**payload)
 
     @staticmethod
     def _parse_block(path: Path, block: Any, model: type[BaseModel]) -> dict[str, Any]:

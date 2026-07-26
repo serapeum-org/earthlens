@@ -102,13 +102,15 @@ def test_get_catalog_returns_variable_map(catalog):
 
 
 def test_load_is_cached():
-    """Loading the same catalog path twice returns the cached instance."""
+    """Loading twice reuses the parse but builds a separate Catalog each time."""
     clear_catalog_cache()
     first = Catalog.load()
     second = Catalog.load()
-    assert first is second
-    clear_catalog_cache()
-    assert Catalog.load() is not first
+    assert first is not second, "callers must not share one Catalog"
+    assert first.datasets == second.datasets, "the parse should be reused"
+    key = next(iter(first.datasets))
+    first.datasets.pop(key)
+    assert key in Catalog.load().datasets, "a mutation leaked into the cache"
 
 
 def test_load_missing_csv_url_raises(tmp_path):
