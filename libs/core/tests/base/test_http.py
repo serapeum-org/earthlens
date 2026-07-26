@@ -236,6 +236,43 @@ class TestDefaults:
         session = _RecordingSession([])
         assert HttpClient(session=session).session is session
 
+    def test_default_transport_is_a_pooled_session(self, real_pooled_session):
+        """With no session injected, the client pools (ARC-4a).
+
+        The suite's autouse seam swaps the default for the `requests`-module
+        adapter so module-level fakes keep working, which would otherwise leave
+        the shipped default untested. `real_pooled_session` puts it back.
+        """
+        import requests
+
+        assert isinstance(HttpClient().session, requests.Session)
+
+    def test_each_client_gets_its_own_pooled_session(self, real_pooled_session):
+        """Two clients do not share one session, so their headers cannot collide."""
+        first, second = HttpClient(), HttpClient()
+        assert first.session is not second.session
+
+    def test_repeated_requests_reuse_one_session(self, real_pooled_session):
+        """Pooling is the point: every call goes through the same session object."""
+        client = HttpClient(max_retries=0, raise_for_status=False)
+        pooled = client.session
+        seen: list[str] = []
+
+        def record(url, **_kwargs):
+            seen.append(url)
+            return _Resp(status=200)
+
+        pooled.get = record
+
+        client.get("https://example.invalid/a")
+        client.get("https://example.invalid/b")
+
+        assert client.session is pooled, "the client must not rebuild its session"
+        assert seen == [
+            "https://example.invalid/a",
+            "https://example.invalid/b",
+        ], f"both calls should reach the one pooled session; got {seen}"
+
 
 @pytest.mark.unit
 class TestRequest:

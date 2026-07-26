@@ -258,6 +258,23 @@ def _default_user_agent() -> str:
     return f"earthlens/{__version__}"
 
 
+def new_session() -> requests.Session:
+    """Return the pooled transport :class:`HttpClient` uses by default.
+
+    A single indirection so the default transport is decided in one place
+    rather than at 21 construction sites. A `requests.Session` keeps the
+    TCP+TLS connection open across calls, which is the difference between one
+    handshake per batch and one per request — and every backend that fetches
+    many small files from one host pays that difference.
+
+    Returns:
+        requests.Session: A fresh pooled session.
+    """
+    import requests
+
+    return requests.Session()
+
+
 class RequestsGet:
     """Session-like adapter routing every call through the `requests` module.
 
@@ -391,7 +408,7 @@ class HttpClient:
                 throttle. Defaults to :func:`time.sleep`; injectable so
                 tests run without real delays.
         """
-        self._session = session if session is not None else requests.Session()
+        self._session = session if session is not None else new_session()
         self._user_agent = user_agent or _default_user_agent()
         self.timeout = timeout
         self.max_retries = max_retries

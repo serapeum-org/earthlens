@@ -19,13 +19,12 @@ import math
 import os
 import zipfile
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
 
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
@@ -237,7 +236,6 @@ def download_zip(url: str, cache_dir: Path, *, timeout: float = 600.0) -> Path:
     if target.exists() and target.stat().st_size > 0:
         return target
     client = HttpClient(
-        session=cast("requests.Session | None", _RequestsGet()),
         status_forcelist=(),
         max_backoff=None,
     )

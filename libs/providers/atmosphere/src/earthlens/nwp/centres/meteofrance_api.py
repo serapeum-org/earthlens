@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from earthlens.base import AuthenticationError, redact_url
 from earthlens.nwp._helpers import grib_name, valid_time
@@ -39,8 +39,6 @@ from earthlens.nwp.centres.base import _NWPCentre
 
 if TYPE_CHECKING:
     import datetime as dt
-
-    import requests
 
     from earthlens.nwp.catalog import NWPModel
 
@@ -136,9 +134,9 @@ class MeteoFranceAPICentre(_NWPCentre):
                 f"model with backend {model.backend!r} needs request_options "
                 "with 'api_base' and 'coverage_service' for the WCS API centre."
             )
-        from earthlens.base.http import HttpClient, RequestsGet
+        from earthlens.base.http import HttpClient
 
-        client = HttpClient(session=cast("requests.Session | None", RequestsGet()))
+        client = HttpClient()
         headers = {"apikey": resolve_api_key()}
         url = f"{api_base}/wcs/{coverage_service}/GetCoverage"
         valid = valid_time(cycle, step)

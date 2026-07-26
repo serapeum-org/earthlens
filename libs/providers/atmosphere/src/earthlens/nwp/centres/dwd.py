@@ -31,8 +31,6 @@ from earthlens.nwp.centres.base import _NWPCentre
 if TYPE_CHECKING:
     import datetime as dt
 
-    import requests
-
     from earthlens.nwp.catalog import NWPModel
 
 #: HTTP timeout (seconds) for one per-variable `.bz2` download.
@@ -250,9 +248,9 @@ class DWDCentre(_NWPCentre):
                 partial file is removed first, so no truncated `.grib2`
                 is left for a later `open_grib` to misread.
         """
-        from earthlens.base.http import HttpClient, RequestsGet
+        from earthlens.base.http import HttpClient
 
-        client = HttpClient(session=cast("requests.Session | None", RequestsGet()))
+        client = HttpClient()
         out = self.save_dir / grib_name(model.model_family, cycle, step)
         # Stream into a sibling .part and atomically rename on full success, so
         # a failure partway through (variable 2 of N) never leaves a truncated

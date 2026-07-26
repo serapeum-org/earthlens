@@ -44,7 +44,6 @@ from earthlens.base.abstractdatasource import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.base.spatial import crop_to_aoi, resolve_aoi
 from earthlens.worldpop._helpers import (
     cohort_of,
@@ -525,7 +524,6 @@ class WorldPop(AbstractDataSource):
         if self._is_complete(dest, force=self._force):
             return dest
         http = HttpClient(
-            session=cast("requests.Session | None", _RequestsGet()),
             retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
             status_forcelist=(),
             max_retries=_MAX_RETRIES - 1,

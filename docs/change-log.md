@@ -40,6 +40,14 @@ raise instead of silently rewriting `datasets`.
 
 ### Feat
 
+- HTTP requests are pooled by default. `HttpClient()` already built a
+`requests.Session`, but 22 call sites across 17 modules opted out by injecting
+the per-call `RequestsGet` adapter, so every request paid a fresh TCP+TLS
+handshake. They now take the pooled default, and the three backends that built
+a client per item (erddap per dataset row, bathymetry per file, gee per
+exported tile) hold one on the instance so the connection is actually reused.
+`RequestsGet` remains available for a caller that wants no pooling.
+
 - A bounded-result contract on `AbstractDataSource`, so a large vector or
 tabular request no longer has to be held whole in memory:
   - `EarthLens.iter_download(limit=...)` (and

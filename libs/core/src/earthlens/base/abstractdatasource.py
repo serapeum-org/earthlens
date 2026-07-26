@@ -10,10 +10,13 @@ from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+if TYPE_CHECKING:
+    from earthlens.base.http import HttpClient
 
 OutputKind = Literal["raster", "vector", "tabular", "mixed"]
 """The four output shapes an `AbstractDataSource` subclass can emit.
@@ -1410,6 +1413,12 @@ class AbstractDataSource(ABC):
     #: read `self._errors` unconditionally; a `download(errors=...)` overrides
     #: it by assigning the :meth:`check_errors_policy` result.
     _errors: str = "warn"
+
+    #: Slot for a backend's lazily-built `HttpClient`. Declared here so the
+    #: backends that hold one (rather than rebuilding it per item, which would
+    #: discard the pooled connection) can check `if self._http is None` without
+    #: each re-declaring the attribute. `None` until first use.
+    _http: HttpClient | None = None
 
     @staticmethod
     def check_limit(limit: int | None) -> int | None:

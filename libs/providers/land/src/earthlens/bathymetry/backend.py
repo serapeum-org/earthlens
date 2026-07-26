@@ -35,7 +35,6 @@ from earthlens.base import (
     mask_to_geometry,
 )
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.bathymetry._helpers import (
     bbox_from_extent,
     estimate_grid_pixels,
@@ -271,6 +270,24 @@ class Bathymetry(AbstractDataSource):
         self._to_geotiff(nc_path, row.variable, tif_path)
         return tif_path
 
+    def _client(self) -> HttpClient:
+        """Return this instance's HTTP client, built once.
+
+        Held on the instance so a request spanning several tiles reuses one
+        pooled connection instead of re-handshaking per file.
+
+        Returns:
+            HttpClient: The shared client.
+        """
+        if self._http is None:
+            self._http = HttpClient(
+                timeout=self._timeout,
+                max_retries=0,
+                status_forcelist=(),
+                raise_for_status=True,
+            )
+        return self._http
+
     def _download(self, url: str, row: Dataset, dest: Path) -> Path:
         """Stream the griddap `.nc` body to `dest`, validating it is real NetCDF.
 
@@ -292,13 +309,7 @@ class Bathymetry(AbstractDataSource):
                 error page, sometimes served with a 200) — typically an
                 out-of-coverage or oversize bbox.
         """
-        http = HttpClient(
-            session=cast("requests.Session | None", _RequestsGet()),
-            timeout=self._timeout,
-            max_retries=0,
-            status_forcelist=(),
-            raise_for_status=True,
-        )
+        http = self._client()
         try:
             http.download(url, dest, progress=False, expect_magic=_NETCDF_MAGIC)
         except requests.exceptions.RequestException as exc:

@@ -48,7 +48,6 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.erddap._helpers import (
     build_constraints,
     build_griddap_url,
@@ -352,6 +351,24 @@ class ERDDAP(AbstractDataSource):
                 return empty_canonical(variables)
             raise
 
+    def _client(self) -> HttpClient:
+        """Return this instance's HTTP client, built once.
+
+        Held on the instance so a multi-dataset request reuses one pooled
+        connection to the ERDDAP host rather than re-handshaking per row.
+
+        Returns:
+            HttpClient: The shared client.
+        """
+        if self._http is None:
+            self._http = HttpClient(
+                timeout=self._timeout,
+                max_retries=0,
+                status_forcelist=(),
+                raise_for_status=True,
+            )
+        return self._http
+
     def _fetch_grid(self, row: Dataset, variables: list[str]) -> Path:
         """Stream a griddap subset to a `.nc` file and return its path.
 
@@ -384,13 +401,7 @@ class ERDDAP(AbstractDataSource):
         )
         dest = self.root_dir / f"{row.dataset_id}.nc"
         logger.info(f"ERDDAP griddap {row.dataset_id}: GET {url}")
-        http = HttpClient(
-            session=cast("requests.Session | None", _RequestsGet()),
-            timeout=self._timeout,
-            max_retries=0,
-            status_forcelist=(),
-            raise_for_status=True,
-        )
+        http = self._client()
         # Stream to disk rather than materialising `response.content`: a
         # griddap window can run to gigabytes, and holding the whole body in
         # memory to then write it doubles the peak footprint for no gain.
