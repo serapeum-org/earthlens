@@ -37,11 +37,58 @@ jobs:
             echo "::error::expected 7 wheels, got $(ls dist/*.whl | wc -l)"; exit 1; }
           ls -1 dist/*.whl
 
+      - name: Pin the third-party dependency set
+        # The test job installs the SDKs from this file rather than resolving
+        # them at job time, so every version is hash-verified (S8544) and an
+        # upstream release cannot redden an unrelated PR.
+        #
+        # `uv pip compile`, not `uv export`: the workspace lock is deliberately
+        # forked (argopy needs xarray>=2025.7, openeo needs <2025.1.2, declared
+        # in `[tool.uv] conflicts`) and `export` emits the union of both forks
+        # unmarked, which pip rejects as self-contradictory. `compile` performs
+        # one ordinary resolution, so there is exactly one version per package.
+        # The guard below fails the build if that ever stops being true.
+        #
+        # The seven earthlens distributions are excluded — they are installed
+        # from the wheels built above, by path.
+        run: |
+          set -euo pipefail
+          version=$(ls dist/earthlens-[0-9]*.whl | sed -E 's|.*/earthlens-([^-]+)-py3.*|\1|')
+          printf 'earthlens[all]==%s\npytest\npytest-cov\n' "${version}" \
+            > dist/requirements.in
+          uv pip compile --generate-hashes --universal --python-version 3.11 \
+            --find-links dist \
+            --no-emit-package earthlens \
+            --no-emit-package earthlens-core \
+            --no-emit-package earthlens-atmosphere \
+            --no-emit-package earthlens-hazards \
+            --no-emit-package earthlens-imagery \
+            --no-emit-package earthlens-land \
+            --no-emit-package earthlens-ocean \
+            dist/requirements.in -o dist/requirements-wheel.txt
+          test "$(grep -c '^earthlens' dist/requirements-wheel.txt)" -eq 0 || {
+            echo "::error::an earthlens distribution leaked into the pins"; exit 1; }
+          # A universal resolution legitimately pins one package twice when the
+          # versions are split by a marker (`numpy==2.4.6 ; python < '3.12'`).
+          # A fork shows up as two pins with *no* marker, which contradict each
+          # other — that is what pip rejected when this was tried with
+          # `uv export`, so it is what the guard looks for.
+          duplicates=$(grep -E '^[A-Za-z0-9][A-Za-z0-9._-]*==' \
+            dist/requirements-wheel.txt | grep -v ';' | sed -E 's/==.*//' \
+            | sort | uniq -d)
+          if [ -n "${duplicates}" ]; then
+            echo "::error::the resolution forked — contradictory pins for: ${duplicates}"
+            exit 1
+          fi
+          echo "pinned $(grep -cE '^[A-Za-z0-9]' dist/requirements-wheel.txt) packages"
+
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:
           name: wheel
-          path: dist/*.whl
+          path: |
+            dist/*.whl
+            dist/requirements-wheel.txt
 
   test-wheel:
     needs: build-wheel
@@ -91,19 +138,30 @@ jobs:
         # `reduce_time_axis` without a version bump, and the suite failed on
         # ImportErrors for all four against the stale 0.11.0 from PyPI.
         #
-        # Naming each wheel as a local file pins it beyond substitution. The
-        # meta wheel depends on `earthlens-<member> ==0.11.0`, and because all
-        # six members are direct requirements of the same command pip unifies
-        # them onto these files — so `--find-links` is redundant and is not
-        # passed. That matters beyond tidiness: it is an additional, unpinned
-        # package source, which is what SonarCloud's S8544 objects to.
-        # `[all]` on the meta wheel still resolves the third-party SDKs (boto3
-        # / cdsapi / earthengine-api) from PyPI as intended.
+        # Naming each wheel as a local file pins it beyond substitution.
+        #
+        # Two installs. The SDKs come from the compiled pin file, so every
+        # version is hash-verified. The earthlens wheels then go in from a
+        # requirements file carrying each built file's own sha256, under
+        # `--no-index`: dist/ is the only reachable source and every artefact
+        # is verified, so pip refuses a substitution rather than the job
+        # merely detecting one afterwards.
+        #
+        # `--only-binary :all:` keeps pip from falling back to an sdist, whose
+        # build backend would run arbitrary setup code. The two exceptions
+        # publish no wheel at all and must be built; a third package joining
+        # them fails this step with pip naming it.
         run: |
           set -euo pipefail
-          META=$(ls dist/earthlens-[0-9]*.whl)
-          MEMBERS=$(ls dist/earthlens_*.whl)
-          pip install ${MEMBERS} "${META}[all]"
+          pip install --only-binary :all: --no-binary docopt,ratelimit \
+            --require-hashes -r dist/requirements-wheel.txt
+          for wheel in dist/earthlens*.whl; do
+            printf '%s --hash=sha256:%s\n' \
+              "./${wheel}" "$(sha256sum "${wheel}" | cut -d' ' -f1)"
+          done > dist/earthlens-wheels.txt
+          cat dist/earthlens-wheels.txt
+          pip install --no-index --no-deps --only-binary :all: --require-hashes \
+            -r dist/earthlens-wheels.txt
           # Assert the installed distributions really are the ones just built,
           # not same-version wheels an index happened to serve. `direct_url.json`
           # (PEP 610) is only written for a path/URL install, and the recorded
@@ -143,10 +201,6 @@ jobs:
         # earthlens is a PEP 420 namespace with no attributes; the version and
         # facade live in earthlens.core.
         run: python -c "import earthlens.core; print(earthlens.core.__version__)"
-
-      - name: Install test dependencies
-        shell: bash -el {0}
-        run: pip install pytest pytest-cov
 
       - name: Run tests against installed wheel
         shell: bash -el {0}
