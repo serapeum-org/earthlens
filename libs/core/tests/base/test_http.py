@@ -17,7 +17,7 @@ from earthlens.base.http import (
     _default_user_agent,
     _parse_retry_after,
     _progress_total,
-    _redact_url,
+    redact_url,
 )
 
 
@@ -172,7 +172,7 @@ class TestRedactUrl:
     )
     def test_redact(self, url: str, expected: str):
         """Path, query, and userinfo are stripped to scheme://host."""
-        assert _redact_url(url) == expected
+        assert redact_url(url) == expected
 
     def test_retry_log_omits_url_path_and_query(self):
         """A retry warning logs only the host — never a path/query secret."""

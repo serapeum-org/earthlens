@@ -115,7 +115,7 @@ def _parse_retry_after(value: str | None) -> float | None:
     return max(0.0, (target - now).total_seconds())
 
 
-def _redact_url(url: str) -> str:
+def redact_url(url: str) -> str:
     """Return `scheme://host` for logging, hiding any secret in the URL.
 
     Retry warnings must never echo the full request URL: some backends
@@ -134,10 +134,10 @@ def _redact_url(url: str) -> str:
         - The path, query, and userinfo — where secrets ride — are
           stripped:
             ```python
-            >>> from earthlens.base.http import _redact_url
-            >>> _redact_url("https://firms.example/api/SECRETKEY/area?x=1")
+            >>> from earthlens.base.http import redact_url
+            >>> redact_url("https://firms.example/api/SECRETKEY/area?x=1")
             'https://firms.example'
-            >>> _redact_url("https://user:pass@host/p")
+            >>> redact_url("https://user:pass@host/p")
             'https://host'
 
             ```
@@ -163,8 +163,9 @@ def _check_magic(path: Path, magic: bytes | tuple[bytes, ...], url: str) -> None
         url: The source URL, redacted before it reaches the message.
 
     Raises:
-        ValueError: When the file starts with none of the prefixes. The
-            message carries the size and the first bytes actually seen.
+        ValueError: When the file starts with none of the prefixes — the
+            message carries the size and the first bytes actually seen — or
+            when `magic` is an empty sequence, which is a caller error.
 
     Examples:
         - A NetCDF-3 body passes the classic `CDF` check:
@@ -195,13 +196,20 @@ def _check_magic(path: Path, magic: bytes | tuple[bytes, ...], url: str) -> None
             ```
     """
     options = (magic,) if isinstance(magic, bytes) else tuple(magic)
+    if not options:
+        # No prefixes to check against is a caller bug, not a bad download —
+        # say which rather than dying inside `max()` on an empty sequence.
+        raise ValueError(
+            "expect_magic was an empty sequence; pass at least one byte "
+            "prefix, or None to skip the check entirely."
+        )
     with open(path, "rb") as handle:
         head = handle.read(max(max(len(m) for m in options), 24))
     if any(head.startswith(m) for m in options):
         return
     size = path.stat().st_size
     raise ValueError(
-        f"{_redact_url(url)} returned a body that does not start with "
+        f"{redact_url(url)} returned a body that does not start with "
         f"{magic!r} ({size} bytes, starts {head[:24]!r}). The server likely "
         f"returned an error page or a redirect instead of the file."
     )
@@ -656,7 +664,7 @@ class HttpClient:
                         )
                         wait = self._backoff_wait(retry_after, attempt)
                         logger.warning(
-                            f"HTTP {response.status_code} on {_redact_url(url)}; retry "
+                            f"HTTP {response.status_code} on {redact_url(url)}; retry "
                             f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                         )
                         self._sleep(wait)
@@ -676,7 +684,7 @@ class HttpClient:
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
-                    f"{type(exc).__name__} on {_redact_url(url)}; retry "
+                    f"{type(exc).__name__} on {redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 self._sleep(wait)
@@ -789,7 +797,7 @@ class HttpClient:
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
-                    f"{type(exc).__name__} on {_redact_url(url)}; retry "
+                    f"{type(exc).__name__} on {redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 self._sleep(wait)
@@ -802,7 +810,7 @@ class HttpClient:
                 retry_after = _parse_retry_after(response.headers.get("Retry-After"))
                 wait = self._backoff_wait(retry_after, attempt)
                 logger.warning(
-                    f"HTTP {response.status_code} on {_redact_url(url)}; retry "
+                    f"HTTP {response.status_code} on {redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 # Release the (possibly streamed) connection before retrying;

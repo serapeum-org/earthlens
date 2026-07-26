@@ -24,7 +24,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, cast
 
-from earthlens.base.http import _redact_url
+from earthlens.base import redact_url
 from earthlens.nwp._helpers import grib_name
 from earthlens.nwp.centres.base import _NWPCentre
 
@@ -79,7 +79,7 @@ def _decompress_stream(blocks: Iterable[bytes], handle: IO[bytes], url: str) -> 
             handle.write(decompressor.decompress(leftover))
     if saw_data and not decompressor.eof:
         raise ValueError(
-            f"{_redact_url(url)} returned a truncated bz2 body: the stream "
+            f"{redact_url(url)} returned a truncated bz2 body: the stream "
             "ended before its end-of-stream marker, so the decompressed GRIB2 "
             "would be short. Retry the download."
         )

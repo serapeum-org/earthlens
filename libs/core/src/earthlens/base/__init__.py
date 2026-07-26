@@ -33,7 +33,7 @@ from earthlens.base.catalog_source import (
     load_catalog,
     yaml_files_for,
 )
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, redact_url
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.naming import safe_filename
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
@@ -77,6 +77,7 @@ __all__ = [
     "clear_providers_cache",
     "clear_region_cache",
     "close_quietly",
+    "redact_url",
     "crop_to_aoi",
     "date_windows",
     "estimate_pixel_dims",
