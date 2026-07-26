@@ -33,6 +33,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "tropycal_data_catalog.yaml"
@@ -45,7 +46,7 @@ _KNOWN_SOURCES: frozenset[str] = frozenset({"ibtracs", "hurdat"})
 # mtime_ns)` so any real file mutation invalidates the entry naturally.
 # Mirrors the ECMWF / GEE catalog cache so repeated `Catalog()`
 # construction skips the YAML parse + pydantic validation.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Basin]] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -59,26 +60,20 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_basins(path: Path) -> dict[str, Basin]:
-    """Parse, validate, and cache the basin map at `path`.
+def _parse_basins(files: list[Path]) -> dict[str, Basin]:
+    """Parse and validate the Tropycal catalog rows.
 
-    Cached on `(resolved-path, mtime_ns)` so a second `Catalog()` on an
-    unchanged file skips both YAML parsing and pydantic validation.
+    Args:
+        files: The contributing YAML files (Tropycal ships a single file).
+
+    Returns:
+        dict[str, Basin]: The validated rows.
 
     Raises:
-        ValueError: If the YAML has no `basins:` block or a row fails
-            :class:`Basin` validation.
+        ValueError: If a required block is missing or a row fails
+            validation.
     """
-    resolved = str(path.resolve())
-    try:
-        mtime_ns = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime_ns = 0
-    key = (resolved, mtime_ns)
-    cached = _CATALOG_CACHE.get(key)
-    if cached is not None:
-        return cached
-
+    path = files[0]
     data = load_yaml_strict(path) or {}
     basins_yaml = data.get("basins") or {}
     if not basins_yaml:
@@ -94,8 +89,22 @@ def _load_basins(path: Path) -> dict[str, Basin]:
             raise ValueError(
                 f"{path} basin {code!r} failed validation:\n{exc}"
             ) from exc
-    _CATALOG_CACHE[key] = basins
     return basins
+
+
+def _load_basins(path: Path) -> dict[str, Basin]:
+    """Return the parsed Tropycal catalog at `path`, memoised on its mtime.
+
+    Args:
+        path: The catalog file.
+
+    Returns:
+        dict[str, Basin]: From the cache when the file is unchanged.
+
+    Raises:
+        ValueError: If the path does not exist, or parsing fails.
+    """
+    return load_catalog(path, _CATALOG_CACHE, _parse_basins, provider="Tropycal")
 
 
 class TrackField(BaseModel):

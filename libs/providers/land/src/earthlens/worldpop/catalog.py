@@ -29,6 +29,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "worldpop_data_catalog.yaml"
@@ -185,7 +186,7 @@ class Product(BaseModel):
 # mtime_ns)` so any real file mutation invalidates the entry naturally.
 # Mirrors the ECMWF / GEE / tropycal catalog caches so repeated `Catalog()`
 # construction skips the YAML parse + pydantic validation.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Product]] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -199,32 +200,20 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_products(path: Path) -> dict[str, Product]:
-    """Parse, validate, and cache the product map at `path`.
-
-    Cached on `(resolved-path, mtime_ns)` so a second `Catalog()` on an
-    unchanged file skips both YAML parsing and pydantic validation.
+def _parse_products(files: list[Path]) -> dict[str, Product]:
+    """Parse and validate the WorldPop catalog rows.
 
     Args:
-        path: Path to a `worldpop_data_catalog.yaml`-shaped file.
+        files: The contributing YAML files (WorldPop ships a single file).
 
     Returns:
-        dict[str, Product]: `alias -> Product` for every curated row.
+        dict[str, Product]: The validated rows.
 
     Raises:
-        ValueError: If the YAML has no `products:` block or a row fails
-            `Product` validation.
+        ValueError: If a required block is missing or a row fails
+            validation.
     """
-    resolved = str(path.resolve())
-    try:
-        mtime_ns = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime_ns = 0
-    key = (resolved, mtime_ns)
-    cached = _CATALOG_CACHE.get(key)
-    if cached is not None:
-        return cached
-
+    path = files[0]
     data = load_yaml_strict(path) or {}
     products_yaml = data.get("products") or {}
     if not products_yaml:
@@ -240,8 +229,22 @@ def _load_products(path: Path) -> dict[str, Product]:
             raise ValueError(
                 f"{path} product {alias!r} failed validation:\n{exc}"
             ) from exc
-    _CATALOG_CACHE[key] = products
     return products
+
+
+def _load_products(path: Path) -> dict[str, Product]:
+    """Return the parsed WorldPop catalog at `path`, memoised on its mtime.
+
+    Args:
+        path: The catalog file.
+
+    Returns:
+        dict[str, Product]: From the cache when the file is unchanged.
+
+    Raises:
+        ValueError: If the path does not exist, or parsing fails.
+    """
+    return load_catalog(path, _CATALOG_CACHE, _parse_products, provider="WorldPop")
 
 
 class Catalog(AbstractCatalog):
