@@ -1338,10 +1338,11 @@ class TestDecompressStream:
 
         centre = DWDCentre(tmp_path)
         model = TestDWDCentre._icon(TestDWDCentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
         with pytest.raises(ValueError, match="empty body for band"):
             centre.fetch_one(
                 model,
-                dt.datetime(2024, 6, 1, 0),
+                cycle,
                 0,
                 ["temperature_2m"],
                 "auto",
@@ -1364,10 +1365,11 @@ class TestDecompressStream:
 
         centre = DWDCentre(tmp_path)
         model = TestDWDCentre._icon(TestDWDCentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
         with pytest.raises(ValueError, match="truncated bz2 body"):
             centre.fetch_one(
                 model,
-                dt.datetime(2024, 6, 1, 0),
+                cycle,
                 0,
                 ["temperature_2m"],
                 "auto",
@@ -1394,10 +1396,11 @@ class TestGribMagicValidation:
 
         centre = DWDCentre(tmp_path)
         model = TestDWDCentre._icon(TestDWDCentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
         with pytest.raises(ValueError, match="did not return GRIB2"):
             centre.fetch_one(
                 model,
-                dt.datetime(2024, 6, 1, 0),
+                cycle,
                 0,
                 ["temperature_2m"],
                 "auto",
@@ -1425,10 +1428,11 @@ class TestGribMagicValidation:
 
         centre = DWDCentre(tmp_path)
         model = TestDWDCentre._icon(TestDWDCentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
         with pytest.raises(ValueError, match="did not return GRIB2"):
             centre.fetch_one(
                 model,
-                dt.datetime(2024, 6, 1, 0),
+                cycle,
                 0,
                 ["temperature_2m", "precipitation_acc"],
                 "auto",
@@ -1448,10 +1452,11 @@ class TestGribMagicValidation:
 
         centre = MeteoFranceAPICentre(tmp_path)
         model = TestMeteoFranceAPICentre._arpege(TestMeteoFranceAPICentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
         with pytest.raises(ValueError, match="did not return GRIB2"):
             centre.fetch_one(
                 model,
-                dt.datetime(2024, 6, 1, 0),
+                cycle,
                 24,
                 ["temperature_2m"],
                 "auto",
@@ -1472,8 +1477,7 @@ class TestGribMagicValidation:
         model = TestDWDCentre._icon(
             TestDWDCentre(), url_template="https://x/{var_lc}/f.grib2.bz2?key=SECRET"
         )
+        cycle = dt.datetime(2024, 6, 1, 0)
         with pytest.raises(ValueError) as exc:
-            DWDCentre(tmp_path).fetch_one(
-                model, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
-            )
+            DWDCentre(tmp_path).fetch_one(model, cycle, 0, ["temperature_2m"], "auto")
         assert "SECRET" not in str(exc.value), f"secret leaked: {exc.value}"

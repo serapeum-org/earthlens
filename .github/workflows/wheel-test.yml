@@ -37,11 +37,29 @@ jobs:
             echo "::error::expected 7 wheels, got $(ls dist/*.whl | wc -l)"; exit 1; }
           ls -1 dist/*.whl
 
+      - name: Export the locked third-party dependency set
+        # The test job installs the third-party SDKs from this file instead of
+        # resolving `earthlens[all]` against PyPI at job time. Two reasons:
+        # every version is the one `uv.lock` already resolved (so an upstream
+        # release cannot redden an unrelated PR), and every artefact is
+        # hash-verified. `--no-emit-workspace` leaves the seven earthlens
+        # distributions out — those come from the wheels built above. The dev
+        # group is included so pytest arrives pinned from the same file rather
+        # than through a second, unpinned install.
+        run: |
+          set -euo pipefail
+          uv export --extra all --group dev --no-emit-workspace --frozen \
+            --output-file dist/requirements-wheel.txt
+          test -s dist/requirements-wheel.txt
+          echo "pinned $(grep -cE '^[A-Za-z0-9]' dist/requirements-wheel.txt) packages"
+
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:
           name: wheel
-          path: dist/*.whl
+          path: |
+            dist/*.whl
+            dist/requirements-wheel.txt
 
   test-wheel:
     needs: build-wheel
@@ -91,14 +109,21 @@ jobs:
         # `reduce_time_axis` without a version bump, and the suite failed on
         # ImportErrors for all four against the stale 0.11.0 from PyPI.
         #
-        # Naming each wheel as a local file pins it beyond substitution, while
-        # `[all]` on the meta wheel still resolves the third-party SDKs (boto3
-        # / cdsapi / earthengine-api) from PyPI as intended.
+        # Naming each wheel as a local file pins it beyond substitution.
+        #
+        # The two installs are deliberately separate. The third-party SDKs come
+        # from the exported lock, so every version is hash-verified and pinned
+        # to what `uv.lock` resolved rather than to whatever the index serves
+        # today. The earthlens wheels then go in with `--no-index --no-deps`:
+        # nothing but dist/ is reachable, so no published earthlens can be
+        # substituted for a freshly built one, and their requirements are
+        # already satisfied by the first install.
         run: |
           set -euo pipefail
           META=$(ls dist/earthlens-[0-9]*.whl)
           MEMBERS=$(ls dist/earthlens_*.whl)
-          pip install --find-links dist ${MEMBERS} "${META}[all]"
+          pip install --require-hashes -r dist/requirements-wheel.txt
+          pip install --no-index --no-deps --find-links dist ${MEMBERS} "${META}"
           # Assert the installed distributions really are the ones just built,
           # not same-version wheels an index happened to serve. `direct_url.json`
           # (PEP 610) is only written for a path/URL install, and the recorded
@@ -138,10 +163,6 @@ jobs:
         # earthlens is a PEP 420 namespace with no attributes; the version and
         # facade live in earthlens.core.
         run: python -c "import earthlens.core; print(earthlens.core.__version__)"
-
-      - name: Install test dependencies
-        shell: bash -el {0}
-        run: pip install pytest pytest-cov
 
       - name: Run tests against installed wheel
         shell: bash -el {0}
