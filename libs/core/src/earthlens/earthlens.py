@@ -202,24 +202,95 @@ def _import_backend_module(
             'earthlens.chc'
 
             ```
-        - A missing one names the extra to install:
+        - A failure *inside* earthlens is re-raised untouched, so a bug in our
+          own code is never reported as somebody's missing dependency:
             ```python
             >>> from earthlens.earthlens import _import_backend_module
-            >>> _import_backend_module("earthlens.nope", "nope", "nope")
+            >>> _import_backend_module("earthlens.no_such_backend", "gee", "gee")
             Traceback (most recent call last):
                 ...
-            ImportError: Backend 'nope' is unavailable — its runtime dependency is not installed. Install with `pip install earthlens[nope]`.
+            ModuleNotFoundError: No module named 'earthlens.no_such_backend'
 
             ```
+
+        When the missing module is a third-party SDK instead — `ee` for gee,
+        `cdsapi` for ecmwf — the raised `ImportError` reads
+        `Backend 'gee' is unavailable — its runtime dependency is not
+        installed. Install with `pip install earthlens[gee]`.` That path needs
+        the SDK to be genuinely absent, so it is covered by the unit tests
+        rather than a doctest.
     """
     try:
         return importlib.import_module(module_name)
     except ImportError as exc:
+        if not _is_missing_dependency(exc, module_name):
+            # A bug inside the backend's own code — a typo'd relative import,
+            # a broken sibling module. Telling the user to install an extra
+            # they already have sends them after the wrong thing entirely, so
+            # the real error is re-raised untouched.
+            raise
         hint = f" Install with `pip install earthlens[{extras}]`." if extras else ""
         raise ImportError(
             f"{subject} {label!r} is unavailable — its runtime "
             f"dependency is not installed.{hint}"
         ) from exc
+
+
+def _is_missing_dependency(exc: ImportError, module_name: str) -> bool:
+    """Report whether `exc` is a genuinely absent third-party dependency.
+
+    Distinguishes the two very different failures that both surface as
+    `ImportError` when a backend module is imported:
+
+    * the optional SDK is not installed — the user needs the pip extra;
+    * something inside the backend package is broken — the user needs a bug
+      report, and an "install the extra" message actively misleads.
+
+    The discriminator is `ImportError.name`: the interpreter sets it to the
+    module that could not be found. `module_name` is always a backend inside
+    our own namespace (`earthlens.gee`, `earthlens.ecmwf`, …), so a missing
+    module sharing that root is our code and anything else is a third-party
+    import. A `None` name means the exception was raised by hand rather than
+    by the import system, so it is treated as internal — the conservative
+    choice, since it surfaces the original message rather than replacing it.
+
+    Args:
+        exc: The `ImportError` raised while importing the backend.
+        module_name: The backend module that was being imported.
+
+    Returns:
+        bool: `True` when the failure is a missing external dependency.
+
+    Examples:
+        - A missing SDK is a dependency problem:
+            ```python
+            >>> from earthlens.earthlens import _is_missing_dependency
+            >>> exc = ImportError("No module named 'ee'", name="ee")
+            >>> _is_missing_dependency(exc, "earthlens.gee")
+            True
+
+            ```
+        - A broken import inside the backend is not, so the real error shows:
+            ```python
+            >>> from earthlens.earthlens import _is_missing_dependency
+            >>> exc = ImportError("cannot import name 'x'", name="earthlens.gee._helpers")
+            >>> _is_missing_dependency(exc, "earthlens.gee")
+            False
+
+            ```
+        - So is an ImportError raised by hand, with no module name at all:
+            ```python
+            >>> from earthlens.earthlens import _is_missing_dependency
+            >>> _is_missing_dependency(ImportError("hand-rolled"), "earthlens.gee")
+            False
+
+            ```
+    """
+    missing = getattr(exc, "name", None)
+    if not missing:
+        return False
+    root = module_name.split(".")[0]
+    return not (missing == root or missing.startswith(f"{root}."))
 
 
 class _LazyRegistry(Mapping):

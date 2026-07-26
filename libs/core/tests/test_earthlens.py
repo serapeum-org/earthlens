@@ -650,7 +650,7 @@ class TestTopLevelDiscovery:
 
         def _fake_guess(cls, source, text):
             if source == "broken":
-                raise ImportError("no SDK")
+                raise ImportError("No module named 'ee'", name="ee")
             return [f"{source}-ds"] if source == "chc" else []
 
         monkeypatch.setattr(
@@ -1150,7 +1150,7 @@ class TestFacadeDiscovery:
         from earthlens import earthlens as facade_module
 
         def _boom(name):
-            raise ImportError("no SDK")
+            raise ImportError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError, match="Backend catalog for"):
@@ -1173,7 +1173,7 @@ class TestImportBackendModule:
         from earthlens.earthlens import _import_backend_module
 
         def _boom(name):
-            raise ImportError("no module named 'ee'")
+            raise ImportError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError) as exc:
@@ -1188,7 +1188,7 @@ class TestImportBackendModule:
         from earthlens.earthlens import _import_backend_module
 
         def _boom(name):
-            raise ImportError("broken module")
+            raise ImportError("No module named 'ftplib_x'", name="ftplib_x")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError) as exc:
@@ -1201,7 +1201,7 @@ class TestImportBackendModule:
         from earthlens.earthlens import _import_backend_module
 
         def _boom(name):
-            raise ImportError("no SDK")
+            raise ImportError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError, match="Backend catalog for 'gee'"):
@@ -1214,7 +1214,7 @@ class TestImportBackendModule:
         from earthlens import earthlens as facade_module
         from earthlens.earthlens import _import_backend_module
 
-        original = ImportError("no module named 'ee'")
+        original = ImportError("No module named 'ee'", name="ee")
 
         def _boom(name):
             raise original
@@ -1224,12 +1224,54 @@ class TestImportBackendModule:
             _import_backend_module("earthlens.gee", "gee", "gee")
         assert exc.value.__cause__ is original, "the SDK error must stay reachable"
 
+    def test_internal_import_error_is_passed_through(self, monkeypatch):
+        """A bug inside the backend must not be reported as a missing extra."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ImportError(
+                "cannot import name 'helper' from 'earthlens.gee._helpers'",
+                name="earthlens.gee._helpers",
+            )
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as exc:
+            _import_backend_module("earthlens.gee", "gee", "gee")
+        message = str(exc.value)
+        assert "pip install" not in message, f"misleading install hint: {message}"
+        assert "earthlens.gee._helpers" in message, f"real cause lost: {message}"
+
+    def test_hand_rolled_import_error_is_passed_through(self, monkeypatch):
+        """An ImportError with no module name keeps its own message."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ImportError("the backend rejected this configuration")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError, match="rejected this configuration"):
+            _import_backend_module("earthlens.gee", "gee", "gee")
+
+    def test_missing_sdk_still_gets_the_hint(self, monkeypatch):
+        """A genuinely absent third-party SDK keeps the extras hint."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ImportError("No module named 'ee'", name="ee")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError, match=r"pip install earthlens\[gee\]"):
+            _import_backend_module("earthlens.gee", "gee", "gee")
+
     def test_registry_and_catalog_share_the_wording(self, monkeypatch):
         """Both entry points produce the same body, differing only in subject."""
         from earthlens import earthlens as facade_module
 
         def _boom(name):
-            raise ImportError("no SDK")
+            raise ImportError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError) as registry_exc:
