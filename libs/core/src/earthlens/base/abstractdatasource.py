@@ -670,8 +670,22 @@ class AbstractDataSource(ABC):
 
         @functools.wraps(original)
         def download(self, *args, **kw):
+            existed = self.root_dir.exists()
             self._ensure_root_dir()
-            return original(self, *args, **kw)
+            try:
+                return original(self, *args, **kw)
+            except BaseException:
+                # A request the backend rejects (an unsupported `aggregate=`,
+                # a bad dataset key) must not leave an output directory
+                # behind. Only remove one this call created, and only while
+                # it is still empty, so a partially-successful download keeps
+                # whatever it managed to write.
+                if not existed:
+                    try:
+                        self.root_dir.rmdir()
+                    except OSError:
+                        pass
+                raise
 
         download._ensures_root_dir = True  # type: ignore[attr-defined]
         cls.download = download  # type: ignore[method-assign]
