@@ -1592,6 +1592,56 @@ class EarthLens:
             *args, progress_bar=progress_bar, aggregate=aggregate, **kwargs
         )
 
+    def iter_download(self, *, limit: int | None = None) -> Iterator[Any]:
+        """Stream the backend's artifacts one item at a time.
+
+        The streaming counterpart to :meth:`download`, for a vector / tabular
+        result too large to want resident all at once: each product's fragment
+        is yielded as it arrives, so a caller can write or reduce it and let it
+        go before the next one is fetched.
+
+        Whether a backend can stream depends on it having a per-product fetch
+        hook — most search/fetch backends do; a backend that answers the whole
+        request in one server-side call cannot, and says so rather than
+        pretending. `aggregate=` is not accepted: a reduction needs the whole
+        cube, so ask for it through :meth:`download`.
+
+        Args:
+            limit: Total rows / features to yield across every product, or
+                `None` for no cap. Products past the cap are never fetched.
+
+        Yields:
+            Any: One fragment per product, of the same type the backend's
+                `download` collects (a `FeatureCollection` /
+                `GeoDataFrame` / `DataFrame` fragment, or written paths).
+
+        Raises:
+            NotImplementedError: When the bound backend has no per-product
+                fetch to stream from.
+            TypeError: If `limit` is neither `None` nor an `int`.
+            ValueError: If `limit` is less than 1.
+
+        Examples:
+            - Consume a large query without holding every page. Marked
+              `# doctest: +SKIP` because it performs a live request:
+                ```python
+                >>> from earthlens.core import EarthLens
+                >>> earthlens = EarthLens(  # doctest: +SKIP
+                ...     data_source="obis",
+                ...     start="2024-01-01",
+                ...     end="2024-01-31",
+                ...     lat_lim=[50.0, 54.0],
+                ...     lon_lim=[2.0, 7.0],
+                ... )
+                >>> total = 0  # doctest: +SKIP
+                >>> for fragment in earthlens.iter_download():  # doctest: +SKIP
+                ...     total += len(fragment)
+
+                ```
+        """
+        self.datasource._ensure_root_dir()
+        return self.datasource.iter_download(limit=limit)
+
     def _redirect_output_to_tempdir(self) -> None:
         """Point the backend output at a throwaway temp dir for an in-memory load.
 

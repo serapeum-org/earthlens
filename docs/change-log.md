@@ -12,6 +12,12 @@ earthdata, gee, hdx, jaxa) and radar were migrated too, so no loader
 computes its own `st_mtime_ns` cache key any more. No shipped caller catches
 `FileNotFoundError` around a catalog load, but external code that does
 should catch `ValueError` instead.
+- `OpenAQ(limit=...)` was a *page size*, not a total. The page size is now
+`page_size=` and `limit=` is what it read like: a cap on the measurement rows
+`download()` returns and writes, across every sensor, enforced as the
+per-sensor frames arrive so sensors past the cap are never fetched. Code
+passing `limit=1000` for paging should pass `page_size=1000`.
+
 - `earthlens.jaxa.catalog.Catalog.load()` returns a fresh instance per call
 rather than a shared cached one (the parse payload is what is memoised), so
 mutating the result no longer corrupts later loads. `_yaml_files_for` is gone
@@ -31,6 +37,26 @@ field, so it no longer appears in `model_fields` or `model_dump()`, and
 `Catalog(catalog=...)` is ignored instead of setting it. Reads
 (`cat.catalog["key"]`, `in`, `len`, iteration) are unchanged; writes now
 raise instead of silently rewriting `datasets`.
+
+### Feat
+
+- A bounded-result contract on `AbstractDataSource`, so a large vector or
+tabular request no longer has to be held whole in memory:
+  - `EarthLens.iter_download(limit=...)` (and
+    `AbstractDataSource.iter_download`) streams one fragment per product, so a
+    caller can write or reduce each one and let it go. Backends with the
+    `_search` / `_fetch_one` split get it for free; a backend that answers the
+    whole request in one call raises `NotImplementedError` rather than
+    pretending to stream.
+  - `limit=` is a cap on **total** rows / features, not a page size. It is
+    exact when it lands mid-fragment, and it stops the work: products past the
+    cap are never fetched. `check_limit` rejects `0`, negatives and non-ints
+    instead of quietly returning nothing.
+  - `_take_limited` is the shared helper backends use to apply that cap while
+    their per-item fragments arrive.
+- Every backend whose batch is a loop over independent items now accepts
+`errors="warn" | "raise" | "ignore"`: `chc`, `cmems`, `ecmwf` and `radar` join
+`fdsn`, `nwp` and `soilgrids`. `_search_fetch_each` also takes `errors=`.
 
 ### Fix
 

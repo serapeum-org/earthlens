@@ -1,0 +1,261 @@
+"""The bounded-result contract: `check_limit`, `_take_limited`, `iter_download`.
+
+Before this, 19 backends appended every per-item fragment and concatenated at
+the end, and the three arguments that looked like caps (`openaq`'s `limit`,
+`nrel`'s `max_requests`, `pvgis`'s `max_points`) bounded a page or a request
+count, not the rows. These tests pin what the shared primitives promise: the
+cap is a total, it is exact even when it lands mid-fragment, and reaching it
+stops the work rather than truncating afterwards.
+"""
+
+from __future__ import annotations
+
+import pandas as pd
+import pytest
+
+from earthlens.base import AbstractDataSource, RemoteProduct, TemporalExtent
+
+pytestmark = [pytest.mark.unit]
+
+
+class _Backend(AbstractDataSource):
+    """A search/fetch backend whose per-product fetch is recorded."""
+
+    REQUIRES_TIME_WINDOW = False
+    OUTPUT_KIND = "tabular"
+
+    #: Rows each product contributes, in `_search` order.
+    sizes: tuple[int, ...] = (3, 3, 3)
+
+    def _check_input_dates(self, start, end, temporal_resolution, fmt):
+        return TemporalExtent(
+            start_date=None,
+            end_date=None,
+            resolution="all",
+            dates=pd.DatetimeIndex([]),
+        )
+
+    def _search(self):
+        self.searched = True
+        return [RemoteProduct(id=f"p{index}") for index in range(len(self.sizes))]
+
+    def _fetch_one(self, product):
+        self.fetched.append(product.id)
+        index = int(product.id[1:])
+        start = sum(self.sizes[:index])
+        return pd.DataFrame({"n": range(start, start + self.sizes[index])})
+
+    def download(self, progress_bar: bool = True, **kwargs):
+        return self._api()
+
+
+class _NoPerProductFetch(AbstractDataSource):
+    """A backend that answers the whole request at once, so cannot stream.
+
+    Deriving straight from the ABC (rather than from `_Backend`) is the point:
+    it genuinely inherits the base `_fetch_one`, which is what `iter_download`
+    tests for.
+    """
+
+    REQUIRES_TIME_WINDOW = False
+    OUTPUT_KIND = "tabular"
+
+    def _check_input_dates(self, start, end, temporal_resolution, fmt):
+        return TemporalExtent(
+            start_date=None,
+            end_date=None,
+            resolution="all",
+            dates=pd.DatetimeIndex([]),
+        )
+
+    def _search(self):
+        return [RemoteProduct(id="p0")]
+
+    def download(self, progress_bar: bool = True, **kwargs):
+        return self._api()
+
+
+def _build(cls, tmp_path, **kwargs):
+    """Construct a test backend with the boilerplate request arguments."""
+    kwargs.setdefault("variables", ["x"])
+    kwargs.setdefault("lat_lim", [4.0, 5.0])
+    kwargs.setdefault("lon_lim", [-75.0, -74.0])
+    kwargs.setdefault("start", None)
+    kwargs.setdefault("end", None)
+    backend = cls(path=str(tmp_path), **kwargs)
+    backend.fetched = []
+    return backend
+
+
+class TestCheckLimit:
+    """`check_limit` refuses the values that would silently return nothing."""
+
+    def test_positive_and_none_pass_through(self):
+        """A usable cap is returned unchanged."""
+        assert AbstractDataSource.check_limit(7) == 7
+        assert AbstractDataSource.check_limit(None) is None
+
+    @pytest.mark.parametrize("bad", [0, -1, -1000])
+    def test_non_positive_is_rejected(self, bad):
+        """Zero or negative is a caller bug, not a cheap empty result."""
+        with pytest.raises(ValueError, match="at least 1"):
+            AbstractDataSource.check_limit(bad)
+
+    @pytest.mark.parametrize("bad", ["10", 1.5, True, [10]])
+    def test_non_int_is_rejected(self, bad):
+        """A string, float or bool cap is a mistake — `True` is not a cap of 1."""
+        with pytest.raises(TypeError, match="must be an int or None"):
+            AbstractDataSource.check_limit(bad)
+
+
+class TestTakeLimited:
+    """`_take_limited` caps the total and stops consuming."""
+
+    def test_no_limit_collects_everything(self, tmp_path):
+        """`limit=None` is the unbounded behaviour it replaced."""
+        backend = _build(_Backend, tmp_path)
+        assert backend._take_limited([[1, 2], [3]], limit=None) == [[1, 2], [3]]
+
+    def test_cap_landing_mid_fragment_is_exact(self, tmp_path):
+        """The straddling fragment is trimmed, so the total is not a multiple."""
+        backend = _build(_Backend, tmp_path)
+        kept = backend._take_limited([[1, 2, 3], [4, 5, 6]], limit=4)
+        assert kept == [[1, 2, 3], [4]], (
+            f"expected an exact cap of 4 rows, got {kept!r}"
+        )
+
+    def test_fragments_past_the_cap_are_not_consumed(self, tmp_path):
+        """Reaching the cap stops the generator — the point of the primitive."""
+        backend = _build(_Backend, tmp_path)
+        pulled = []
+
+        kept = backend._take_limited(_counting_pages(pulled), limit=3)
+
+        assert kept == [[0, 1, 2]]
+        assert pulled == [0], (
+            f"only the first page should have been produced; got {pulled}"
+        )
+
+    def test_cap_equal_to_the_total_keeps_every_fragment_whole(self, tmp_path):
+        """An exact-fit cap must not trim or drop the last fragment."""
+        backend = _build(_Backend, tmp_path)
+        assert backend._take_limited([[1, 2], [3, 4]], limit=4) == [[1, 2], [3, 4]]
+
+    def test_dataframe_fragments_are_trimmed_positionally(self, tmp_path):
+        """A pandas fragment trims through `iloc`, not label-based slicing."""
+        backend = _build(_Backend, tmp_path)
+        frame = pd.DataFrame({"n": [10, 11, 12]}, index=[5, 6, 7])
+
+        kept = backend._take_limited([frame], limit=2)
+
+        assert list(kept[0]["n"]) == [10, 11], (
+            f"expected the first two rows by position, got {kept[0].to_dict()}"
+        )
+
+
+class TestIterDownload:
+    """`iter_download` streams per product and honours the cap."""
+
+    def test_yields_one_fragment_per_product(self, tmp_path):
+        """Every product's fragment arrives, in search order."""
+        backend = _build(_Backend, tmp_path)
+        fragments = list(backend.iter_download())
+        assert [len(fragment) for fragment in fragments] == [3, 3, 3]
+        assert backend.fetched == ["p0", "p1", "p2"]
+
+    def test_is_lazy_before_the_first_fragment_is_requested(self, tmp_path):
+        """Calling it fetches nothing until the caller iterates."""
+        backend = _build(_Backend, tmp_path)
+        stream = backend.iter_download()
+        assert backend.fetched == [], "constructing the generator must not fetch"
+        next(stream)
+        assert backend.fetched == ["p0"]
+
+    def test_limit_stops_fetching_the_later_products(self, tmp_path):
+        """The cap bounds the work, not just the result."""
+        backend = _build(_Backend, tmp_path)
+
+        fragments = list(backend.iter_download(limit=4))
+
+        assert [len(fragment) for fragment in fragments] == [3, 1]
+        assert backend.fetched == ["p0", "p1"], (
+            f"p2 must never be fetched under limit=4; got {backend.fetched}"
+        )
+
+    def test_limit_of_one_fetches_a_single_product(self, tmp_path):
+        """The smallest cap still returns a real row."""
+        backend = _build(_Backend, tmp_path)
+        fragments = list(backend.iter_download(limit=1))
+        assert [len(fragment) for fragment in fragments] == [1]
+        assert backend.fetched == ["p0"]
+
+    def test_limit_beyond_the_total_yields_everything(self, tmp_path):
+        """A cap larger than the result set is not an error."""
+        backend = _build(_Backend, tmp_path)
+        assert sum(len(f) for f in backend.iter_download(limit=100)) == 9
+
+    def test_invalid_limit_is_rejected_before_the_first_fetch(self, tmp_path):
+        """A bad cap fails on first iteration, having fetched nothing."""
+        backend = _build(_Backend, tmp_path)
+        with pytest.raises(ValueError, match="at least 1"):
+            next(backend.iter_download(limit=0))
+        assert backend.fetched == []
+
+    def test_a_whole_batch_backend_says_it_cannot_stream(self, tmp_path):
+        """A backend with no per-product hook refuses rather than pretending."""
+        backend = _build(_NoPerProductFetch, tmp_path)
+        with pytest.raises(NotImplementedError, match="cannot stream"):
+            next(backend.iter_download())
+
+
+def _counting_pages(pulled):
+    """Yield three pages, recording each one's first value as it is produced.
+
+    Args:
+        pulled: List the generator appends to, so a test can see how far it ran.
+
+    Yields:
+        list[int]: One page of three rows.
+    """
+    for page in ([0, 1, 2], [3, 4, 5], [6, 7, 8]):
+        pulled.append(page[0])
+        yield page
+
+
+class TestFacadeIterDownload:
+    """`EarthLens.iter_download` delegates to the bound backend."""
+
+    def test_streams_through_the_facade_with_a_cap(self, tmp_path, monkeypatch):
+        """The facade yields the backend's fragments and forwards the cap."""
+        from earthlens.earthlens import EarthLens
+
+        backend = _build(_Backend, tmp_path)
+        facade = EarthLens.__new__(EarthLens)
+        monkeypatch.setattr(
+            type(facade), "datasource", property(lambda _self: backend), raising=False
+        )
+
+        fragments = list(facade.iter_download(limit=4))
+
+        assert [len(fragment) for fragment in fragments] == [3, 1]
+        assert backend.fetched == ["p0", "p1"]
+
+    def test_facade_creates_the_output_directory_before_streaming(
+        self, tmp_path, monkeypatch
+    ):
+        """`iter_download` gets the same root_dir guarantee as `download`."""
+        from earthlens.earthlens import EarthLens
+
+        target = tmp_path / "not-yet"
+        backend = _build(_Backend, target)
+        assert not target.exists(), "the fixture must start with no output dir"
+        facade = EarthLens.__new__(EarthLens)
+        monkeypatch.setattr(
+            type(facade), "datasource", property(lambda _self: backend), raising=False
+        )
+
+        next(facade.iter_download())
+
+        assert backend.root_dir.is_dir(), (
+            f"{backend.root_dir} should have been created before the first fetch"
+        )

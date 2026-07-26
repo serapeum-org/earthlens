@@ -6,7 +6,7 @@ import inspect
 import stat
 import warnings
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
@@ -495,6 +495,28 @@ class LazyClientMixin:
             value: The client object to use.
         """
         self.__dict__["_client_obj"] = value
+
+
+def _head_rows(chunk: Any, count: int) -> Any:
+    """Return the first `count` rows of a fragment.
+
+    The default trimmer for :meth:`AbstractDataSource._take_limited` and
+    :meth:`AbstractDataSource.iter_download`. Prefers `.iloc` when the fragment
+    has it, because slicing a pandas object is label-based for some index types
+    and would not reliably keep the first n rows; falls back to `[:n]`, which
+    covers lists and `FeatureCollection`-style sequences.
+
+    Args:
+        chunk: The fragment to trim.
+        count: How many leading rows to keep.
+
+    Returns:
+        Any: The trimmed fragment, of the same type.
+    """
+    positional = getattr(chunk, "iloc", None)
+    if positional is not None:
+        return positional[:count]
+    return chunk[:count]
 
 
 def _describe_remote_product(product: Any) -> str:
@@ -1388,6 +1410,182 @@ class AbstractDataSource(ABC):
     #: read `self._errors` unconditionally; a `download(errors=...)` overrides
     #: it by assigning the :meth:`check_errors_policy` result.
     _errors: str = "warn"
+
+    @staticmethod
+    def check_limit(limit: int | None) -> int | None:
+        """Validate a total-row cap.
+
+        Args:
+            limit: The maximum number of rows / features the caller wants in
+                total, or `None` for no cap.
+
+        Returns:
+            int | None: `limit` unchanged, once known to be usable.
+
+        Raises:
+            TypeError: If `limit` is neither `None` nor an `int` (a `bool` is
+                rejected too — `limit=True` is a mistake, not a cap of 1).
+            ValueError: If `limit` is zero or negative. A request for no rows
+                is a caller bug, not a cheap no-op to serve.
+
+        Examples:
+            - A positive cap and `None` both pass through:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> AbstractDataSource.check_limit(500)
+                500
+                >>> AbstractDataSource.check_limit(None) is None
+                True
+
+                ```
+            - Zero is refused rather than silently returning nothing:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> try:
+                ...     AbstractDataSource.check_limit(0)
+                ... except ValueError as exc:
+                ...     print("rejected")
+                rejected
+
+                ```
+        """
+        if limit is None:
+            return None
+        if isinstance(limit, bool) or not isinstance(limit, int):
+            raise TypeError(
+                f"limit must be an int or None, got {type(limit).__name__}: {limit!r}."
+            )
+        if limit < 1:
+            raise ValueError(
+                f"limit must be at least 1, got {limit}. Pass None for no cap."
+            )
+        return limit
+
+    def _take_limited(
+        self,
+        chunks: Iterable[Any],
+        *,
+        limit: int | None,
+        size: Callable[[Any], int] | None = None,
+        head: Callable[[Any, int], Any] | None = None,
+    ) -> list[Any]:
+        """Consume `chunks` until `limit` rows have been collected.
+
+        The bounded counterpart to "append every fragment, concatenate at the
+        end". `chunks` is consumed lazily, so a backend whose per-item fetch is
+        a generator stops issuing requests once the cap is met instead of
+        pulling the whole result set and truncating afterwards — which is what
+        makes this a cap on *memory*, not just on the returned value.
+
+        The last fragment is trimmed so the total is exactly `limit`, which is
+        why a page-size argument is not a substitute: pages land in
+        page-size multiples, this does not.
+
+        Args:
+            chunks: The per-item fragments — `DataFrame`s,
+                `FeatureCollection`s, lists of paths. Consumed lazily.
+            limit: Total rows to keep, or `None` to collect everything.
+            size: Row count of one fragment. Defaults to `len`.
+            head: `(fragment, n) -> fragment` keeping the first `n` rows.
+                Defaults to slicing (`fragment[:n]`), which covers lists and
+                anything else sliceable; pass one for a type that is not.
+
+        Returns:
+            list[Any]: The collected fragments, the last one trimmed when it
+                straddled the cap.
+
+        Examples:
+            - The cap is exact even when it falls inside a fragment, and the
+              fragments past it are never consumed:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> pulled = []
+                >>> def pages():
+                ...     for page in ([1, 2, 3], [4, 5, 6], [7, 8, 9]):
+                ...         pulled.append(page[0])
+                ...         yield page
+                >>> class Demo(AbstractDataSource):
+                ...     def _initialize(self): pass
+                ...     def _create_grid(self): pass
+                ...     def _check_input_dates(self): pass
+                ...     def download(self): pass
+                >>> Demo._take_limited(Demo, pages(), limit=4)
+                [[1, 2, 3], [4]]
+                >>> pulled
+                [1, 4]
+
+                ```
+        """
+        if limit is None:
+            return list(chunks)
+        measure = size or len
+        take = head or _head_rows
+        collected: list[Any] = []
+        remaining = limit
+        for chunk in chunks:
+            length = measure(chunk)
+            # `>=`, not `>`: a chunk that exactly fills the cap must also end the
+            # loop here. Deciding on the *next* iteration would pull one more
+            # fragment first — the very work the cap exists to avoid.
+            if length >= remaining:
+                collected.append(
+                    take(chunk, remaining) if length > remaining else chunk
+                )
+                return collected
+            collected.append(chunk)
+            remaining -= length
+        return collected
+
+    def iter_download(self, *, limit: int | None = None) -> Iterator[Any]:
+        """Yield the download's artifacts one item at a time.
+
+        The streaming counterpart to :meth:`download`, for callers who want to
+        consume a large vector / tabular result without the whole thing being
+        resident: each `_search` product's fragment is yielded as it arrives
+        and can be dropped before the next is fetched. `download()` remains the
+        batch form and is unaffected.
+
+        The default implementation composes the `_search` / :meth:`_fetch_one`
+        split, so any backend with that split gets it for free. A backend whose
+        fetch is inherently whole-batch (one server-side request for
+        everything) does not override this and raises below, rather than
+        pretending to stream.
+
+        Args:
+            limit: Total rows / features to yield across every product, or
+                `None` for no cap. The fragment that straddles the cap is
+                trimmed so the total is exact, and the products past it are
+                never fetched.
+
+        Yields:
+            Any: One fragment per product — the same element type
+                :meth:`_fetch` returns for this backend's
+                :attr:`OUTPUT_KIND`.
+
+        Raises:
+            NotImplementedError: When the backend implements neither the
+                `_search` / `_fetch_one` split nor its own `iter_download`.
+            TypeError: If `limit` is neither `None` nor an `int`.
+            ValueError: If `limit` is less than 1.
+        """
+        if type(self)._fetch_one is AbstractDataSource._fetch_one:
+            raise NotImplementedError(
+                f"{type(self).__name__} cannot stream: it has no per-product "
+                "_fetch_one, so there is nothing to yield incrementally. Use "
+                "download() instead."
+            )
+        remaining = self.check_limit(limit)
+        for product in self._search():
+            fragment = self._fetch_one(product)
+            if remaining is None:
+                yield fragment
+                continue
+            length = len(fragment)
+            if length >= remaining:
+                yield _head_rows(fragment, remaining)
+                return
+            yield fragment
+            remaining -= length
 
     @staticmethod
     def check_errors_policy(errors: str) -> str:
